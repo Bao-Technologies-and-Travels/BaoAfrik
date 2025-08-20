@@ -34,11 +34,17 @@ BaoAfrik is a mobile-first peer-to-peer (P2P) marketplace designed to connect th
 - **PWA** capabilities
 - **Custom color palette** with African-inspired themes
 - **Inter & Poppins** fonts for modern typography
+- **Authentic BaoAfrik branding** with custom logo integration
 
 ## Project Structure
 
 ```
 src/
+├── assets/
+│   └── images/
+│       └── logos/
+│           ├── ba-brand-icon-colored.png
+│           └── Frame 656.png
 ├── components/
 │   ├── layout/
 │   │   ├── Header.tsx
@@ -49,7 +55,8 @@ src/
 ├── pages/
 │   ├── auth/
 │   │   ├── Login.tsx
-│   │   └── Register.tsx
+│   │   ├── Register.tsx
+│   │   └── EmailVerification.tsx
 │   ├── Home.tsx
 │   ├── Profile.tsx
 │   ├── Listings.tsx
@@ -59,6 +66,7 @@ src/
 ├── services/
 ├── utils/
 ├── types/
+│   └── images.d.ts
 └── contexts/
 ```
 
@@ -101,6 +109,45 @@ The application will open at `http://localhost:3000`
 - `npm run build` - Builds the app for production
 - `npm run eject` - Ejects from Create React App (one-way operation)
 
+## Authentication System
+
+### 🔐 Complete User Authentication Flow
+The BaoAfrik authentication system provides a seamless, secure user experience with modern UI/UX patterns:
+
+#### **Sign Up Process**
+- **Comprehensive form** with all required fields:
+  - Full Name
+  - Email Address
+  - Phone Number
+  - Password & Confirmation
+- **Real-time validation** and error handling
+- **Loading states** with professional animations
+- **Social login options** (Google, Facebook, GitHub)
+- **Automatic email verification** trigger
+
+#### **Email Verification System**
+- **6-digit verification code** sent via email
+- **Interactive code input** with auto-focus progression
+- **Paste support** for easy code entry
+- **Resend functionality** with 60-second countdown
+- **Error handling** and user feedback
+- **Seamless flow** back to sign-in after verification
+
+#### **Sign In Experience**
+- **Clean, minimal form** (email + password)
+- **Remember me** functionality
+- **Forgot password** link (UI ready)
+- **Social login integration**
+- **Success message display** from email verification
+
+#### **Design Features**
+- **Split-screen layout** with branding illustration
+- **Authentic BaoAfrik logos** (small and large variants)
+- **Warm gradient backgrounds** (orange to yellow tones)
+- **Enhanced social buttons** (larger, better animations)
+- **Consistent typography** using Poppins and Inter fonts
+- **Mobile-first responsive design**
+
 ## Design Guidelines
 
 ### Color Palette
@@ -118,7 +165,12 @@ The application will open at `http://localhost:3000`
 
 ### Phase 1 (MVP)
 - [x] Project setup with React + Tailwind
-- [ ] User authentication system
+- [x] User authentication system
+  - [x] Sign up page with all required fields (name, email, phone, password)
+  - [x] Sign in page with social login options
+  - [x] Email verification with 6-digit code system
+  - [x] Password reset functionality (UI ready)
+  - [x] Responsive design with BaoAfrik branding
 - [ ] Product listing management
 - [ ] Search and discovery features
 - [ ] In-app messaging
