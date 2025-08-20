@@ -7,10 +7,10 @@ const Home: React.FC = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="font-display font-bold text-4xl md:text-6xl mb-6">
+          <h1 className="text-display text-4xl md:text-6xl mb-6">
             Authentic African Products
           </h1>
-          <p className="text-xl md:text-2xl mb-8 text-primary-100">
+          <p className="text-body text-xl md:text-2xl mb-8 text-primary-100">
             Connect with the African diaspora. Discover authentic goods from across Africa.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
