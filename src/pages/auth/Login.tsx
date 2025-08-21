@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { signIn, signInWithProvider } from '../../services/auth';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 
@@ -12,6 +13,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   
   // Get success message from email verification
   const successMessage = location.state?.message;
@@ -20,31 +22,32 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
     try {
-      // TODO: Implement actual login API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Login attempt:', { email, password });
+      const { user } = await signIn({ email, password });
       
-      // On success, set user data and redirect to home
-      const userData = {
-        id: '1',
-        name: 'User Name', // This would come from API response
-        email: email
-      };
-      
-      login(userData);
-      navigate('/');
-    } catch (error) {
+      if (user) {
+        // User will be automatically set via AuthContext's auth state listener
+        navigate('/');
+      }
+    } catch (error: any) {
       console.error('Login failed:', error);
+      setError(error.message || 'Failed to sign in. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    // TODO: Implement social login
-    console.log(`${provider} login clicked`);
+  const handleSocialLogin = async (provider: 'google' | 'facebook' | 'github') => {
+    try {
+      setError('');
+      await signInWithProvider(provider);
+      // Redirect will be handled by the provider
+    } catch (error: any) {
+      console.error(`${provider} login failed:`, error);
+      setError(`Failed to sign in with ${provider}. Please try again.`);
+    }
   };
   
   const handleVisitorAccess = () => {
@@ -80,6 +83,18 @@ const Login: React.FC = () => {
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <p className="text-sm text-green-800">{successMessage}</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <p className="text-sm text-red-800">{error}</p>
               </div>
             </div>
           )}

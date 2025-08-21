@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { signUp, signInWithProvider } from '../../services/auth';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 
@@ -16,24 +17,27 @@ const Register: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
     setIsLoading(true);
+    setError('');
 
     try {
-      // TODO: Implement registration API call
-      console.log('Registration attempt:', formData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await signUp({
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.name,
+        phoneNumber: formData.phoneNumber
+      });
       
       // On successful registration, redirect to email verification
       navigate('/verify-email', { 
@@ -43,9 +47,9 @@ const Register: React.FC = () => {
         } 
       });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration failed:', error);
-      alert('Registration failed. Please try again.');
+      setError(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -59,9 +63,15 @@ const Register: React.FC = () => {
     }));
   };
 
-  const handleSocialLogin = (provider: string) => {
-    // TODO: Implement social login
-    console.log(`${provider} login clicked`);
+  const handleSocialLogin = async (provider: 'google' | 'facebook' | 'github') => {
+    try {
+      setError('');
+      await signInWithProvider(provider);
+      // Redirect will be handled by the provider
+    } catch (error: any) {
+      console.error(`${provider} registration failed:`, error);
+      setError(`Failed to sign up with ${provider}. Please try again.`);
+    }
   };
 
   return (
@@ -69,6 +79,18 @@ const Register: React.FC = () => {
       {/* Left side - Form */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            </div>
+          )}
+          
           {/* Logo */}
           <div className="text-center">
             <div className="mx-auto w-20 h-20 mb-6">
