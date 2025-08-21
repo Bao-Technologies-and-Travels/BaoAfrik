@@ -14,6 +14,9 @@ import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditio
 import cameroonianDecor from '../assets/images/logos/decor.png'; // Wooden combs
 import cameroonianCulture from '../assets/images/logos/culture.png'; // Traditional woven bag
 
+// Import scan icon
+import scanIcon from '../assets/images/logos/scanner (1).png';
+
 // Fashion & Textiles images
 import fashion1 from '../assets/images/logos/Frame 29 (6).png';
 import fashion2 from '../assets/images/logos/Frame 29 (7).png';
@@ -37,6 +40,8 @@ const Home: React.FC = () => {
   const [originLocation, setOriginLocation] = useState('');
   const [location, setLocation] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [likedProducts, setLikedProducts] = useState<Set<number>>(new Set());
+  const [savedProducts, setSavedProducts] = useState<Set<number>>(new Set());
 
   // Banner slides data
   const bannerSlides = [
@@ -127,7 +132,7 @@ const Home: React.FC = () => {
     'Fashion & Textiles': [
       {
         id: 7,
-        name: "Poivre blanc",
+        name: "Kente Fabric Roll",
         price: "232",
         image: fashion1,
         location: "London | United Kingdom",
@@ -135,7 +140,7 @@ const Home: React.FC = () => {
       },
       {
         id: 8,
-        name: "Poivre blanc",
+        name: "Traditional Ankara",
         price: "34.7",
         image: fashion2,
         location: "London | United Kingdom", 
@@ -143,7 +148,7 @@ const Home: React.FC = () => {
       },
       {
         id: 9,
-        name: "Poivre blanc",
+        name: "Wax Print Fabric",
         price: "90.1",
         image: fashion3,
         location: "London | United Kingdom",
@@ -151,7 +156,7 @@ const Home: React.FC = () => {
       },
       {
         id: 10,
-        name: "Poivre blanc",
+        name: "Bogolan Mud Cloth",
         price: "245",
         image: fashion4,
         location: "London | United Kingdom",
@@ -159,7 +164,7 @@ const Home: React.FC = () => {
       },
       {
         id: 11,
-        name: "Poivre blanc",
+        name: "Dashiki Shirt",
         price: "110.9",
         image: fashion5,
         location: "London | United Kingdom",
@@ -167,7 +172,7 @@ const Home: React.FC = () => {
       },
       {
         id: 12,
-        name: "Poivre blanc",
+        name: "African Print Dress",
         price: "68.7",
         image: fashion6,
         location: "London | United Kingdom",
@@ -177,7 +182,7 @@ const Home: React.FC = () => {
     'Beauty & Wellness': [
       {
         id: 13,
-        name: "Poivre blanc",
+        name: "Shea Butter Cream",
         price: "31.7",
         image: beauty1,
         location: "London | United Kingdom",
@@ -185,7 +190,7 @@ const Home: React.FC = () => {
       },
       {
         id: 14,
-        name: "Poivre blanc",
+        name: "African Black Soap",
         price: "31.7",
         image: beauty2,
         location: "London | United Kingdom", 
@@ -193,7 +198,7 @@ const Home: React.FC = () => {
       },
       {
         id: 15,
-        name: "Poivre blanc",
+        name: "Baobab Oil Serum",
         price: "31.7",
         image: beauty3,
         location: "London | United Kingdom",
@@ -201,7 +206,7 @@ const Home: React.FC = () => {
       },
       {
         id: 16,
-        name: "Poivre blanc",
+        name: "Moringa Face Mask",
         price: "31.7",
         image: beauty4,
         location: "London | United Kingdom",
@@ -209,7 +214,7 @@ const Home: React.FC = () => {
       },
       {
         id: 17,
-        name: "Poivre blanc",
+        name: "Argan Hair Oil",
         price: "31.7",
         image: beauty5,
         location: "London | United Kingdom",
@@ -263,6 +268,36 @@ const Home: React.FC = () => {
     console.log('Scan functionality triggered');
     // Here you would typically open camera or barcode scanner
     alert('Scan functionality would open camera/barcode scanner');
+  };
+
+  // Handle like functionality
+  const handleLike = (productId: number) => {
+    setLikedProducts(prev => {
+      const newLiked = new Set(prev);
+      if (newLiked.has(productId)) {
+        newLiked.delete(productId);
+        console.log(`Unliked product ${productId}`);
+      } else {
+        newLiked.add(productId);
+        console.log(`Liked product ${productId}`);
+      }
+      return newLiked;
+    });
+  };
+
+  // Handle save functionality
+  const handleSave = (productId: number) => {
+    setSavedProducts(prev => {
+      const newSaved = new Set(prev);
+      if (newSaved.has(productId)) {
+        newSaved.delete(productId);
+        console.log(`Unsaved product ${productId}`);
+      } else {
+        newSaved.add(productId);
+        console.log(`Saved product ${productId}`);
+      }
+      return newSaved;
+    });
   };
 
   return (
@@ -327,7 +362,10 @@ const Home: React.FC = () => {
               {/* Search Button */}
               <button 
                 onClick={handleSearch}
-                className="bg-orange-500 text-white px-4 sm:px-6 py-3 rounded-full hover:bg-orange-600 transition-colors font-medium text-sm sm:text-base whitespace-nowrap"
+                className="text-white px-4 sm:px-6 py-3 rounded-full transition-colors font-medium text-sm sm:text-base whitespace-nowrap"
+                style={{backgroundColor: '#F9A825'}}
+                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
               >
                 Search
               </button>
@@ -335,12 +373,14 @@ const Home: React.FC = () => {
               {/* Scan Button */}
               <button 
                 onClick={handleScan}
-                className="p-3 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full transition-colors flex-shrink-0"
+                className="p-3 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full transition-colors flex-shrink-0 hover:border-orange-500 hover:text-orange-500"
                 title="Scan QR code"
               >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zM3 15h6v6H3v-6zm2 2v2h2v-2H5zM15 3h6v6h-6V3zm2 2v2h2V5h-2zM3 11h2v2H3v-2zM7 11h2v2H7v-2zM11 3h2v6h-2V3zM11 11h2v2h-2v-2zM15 11h6v2h-6v-2zM11 15h2v2h-2v-2zM13 17h2v2h-2v-2zM15 15h2v6h-2v-6zM19 15h2v2h-2v-2zM19 19h2v2h-2v-2z"/>
-                </svg>
+                <img 
+                  src={scanIcon} 
+                  alt="Scan QR code" 
+                  className="w-4 h-4 sm:w-5 sm:h-5 opacity-60 hover:opacity-100 transition-opacity"
+                />
               </button>
             </div>
           </div>
@@ -348,7 +388,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Hero Banner - Auto Sliding */}
-      <section className="bg-gradient-to-r from-orange-400 to-orange-600 text-white relative overflow-hidden mt-4 sm:mt-6">
+      <section className="text-white relative overflow-hidden mt-4 sm:mt-6" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
             <div className="flex-1 text-center md:text-left px-2 md:pl-2">
@@ -468,7 +508,7 @@ const Home: React.FC = () => {
           {/* Products Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+              <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow block">
                 <div className="aspect-square relative">
                   <img 
                     src={product.image} 
@@ -494,15 +534,49 @@ const Home: React.FC = () => {
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
                         Verified seller
                       </div>
-                      <button className="p-1 text-gray-400 hover:text-gray-600">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        {/* Save Button */}
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSave(product.id);
+                          }}
+                          className={`p-1 transition-colors ${
+                            savedProducts.has(product.id) 
+                              ? 'text-orange-500 hover:text-orange-600' 
+                              : 'text-gray-400 hover:text-gray-600'
+                          }`}
+                          title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                        >
+                          <svg className="w-4 h-4" fill={savedProducts.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                          </svg>
+                        </button>
+                        
+                        {/* Like Button */}
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleLike(product.id);
+                          }}
+                          className={`p-1 transition-colors ${
+                            likedProducts.has(product.id) 
+                              ? 'text-red-500 hover:text-red-600' 
+                              : 'text-gray-400 hover:text-gray-600'
+                          }`}
+                          title={likedProducts.has(product.id) ? 'Unlike product' : 'Like product'}
+                        >
+                          <svg className="w-4 h-4" fill={likedProducts.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
