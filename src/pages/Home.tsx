@@ -297,7 +297,29 @@ const Home: React.FC = () => {
 
   // Get products to display
   const getProductsToDisplay = () => {
-    return filteredProducts();
+    if (isSearchActive) {
+      return searchResults;
+    }
+    
+    // Use activeCategory for filtering
+    let products = [];
+    if (activeCategory === 'All') {
+      products = Object.values(allProducts).flat();
+    } else {
+      products = allProducts[activeCategory as keyof typeof allProducts] || [];
+    }
+    
+    // Apply country filter if selected
+    if (selectedCountry) {
+      const countryName = africanCountries.find(country => country.code === selectedCountry)?.name;
+      if (countryName) {
+        products = products.filter(product => 
+          product.location.toLowerCase().includes(countryName.toLowerCase())
+        );
+      }
+    }
+    
+    return products;
   };
 
   // Clear search and return to category view
@@ -510,45 +532,6 @@ const Home: React.FC = () => {
               </button>
             </div>
             
-            {/* Mobile Country Filter Buttons */}
-            <div className="mt-3 overflow-x-auto">
-              <div className="flex gap-2 pb-2">
-                {/* All Africa Button */}
-                <button
-                  onClick={() => setSelectedCountry('')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors ${
-                    selectedCountry === '' 
-                      ? 'bg-blue-100 text-blue-700 border border-blue-200' 
-                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Afrique
-                </button>
-                
-                {/* Country Buttons */}
-                {africanCountries.map((country) => (
-                  <button
-                    key={country.code}
-                    onClick={() => setSelectedCountry(country.code)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors ${
-                      selectedCountry === country.code 
-                        ? 'bg-orange-100 text-orange-700 border border-orange-200' 
-                        : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    <img 
-                      src={country.flag} 
-                      alt={`${country.name} flag`} 
-                      className="w-4 h-3 object-cover rounded-sm"
-                    />
-                    {country.name}
-                  </button>
-                ))}
-              </div>
-            </div>
             
             {/* Mobile Filter Dropdown */}
             {isMobileFilterOpen && (
@@ -630,52 +613,58 @@ const Home: React.FC = () => {
 
       {/* Hero Banner - Auto Sliding */}
       <section className="text-white relative overflow-hidden mt-4 sm:mt-6" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
-            <div className="flex-1 text-center md:text-left px-2 md:pl-2">
-              <div className="bg-white bg-opacity-20 rounded-lg px-3 py-1 inline-block mb-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 md:gap-0">
+            <div className="flex-1 text-center md:text-left px-2 md:pl-2 w-full md:w-auto">
+              <div className="bg-white bg-opacity-20 rounded-lg px-2 sm:px-3 py-1 inline-block mb-2 sm:mb-3">
                 <span className="text-xs font-medium">Featured</span>
               </div>
-              <div className="relative overflow-hidden">
+              <div className="relative overflow-hidden min-h-[2rem] sm:min-h-[2.5rem] md:min-h-[3rem]">
                 <h1 
                   key={`title-${currentSlide}`}
-                  className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 animate-fade-in-up"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 animate-fade-in-up leading-tight"
                 >
                   {bannerSlides[currentSlide].title}
                 </h1>
               </div>
-              <div className="relative overflow-hidden">
+              <div className="relative overflow-hidden min-h-[1.5rem] sm:min-h-[2rem]">
                 <p 
                   key={`desc-${currentSlide}`}
-                  className="text-orange-100 text-sm sm:text-base mb-4 animate-fade-in-up animation-delay-100"
+                  className="text-orange-100 text-xs sm:text-sm md:text-base mb-3 sm:mb-4 animate-fade-in-up animation-delay-100 leading-relaxed"
                 >
                   {bannerSlides[currentSlide].description}
                 </p>
               </div>
               <button 
                 onClick={() => setActiveCategory(bannerSlides[currentSlide].category)}
-                className="bg-white text-orange-600 px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium hover:bg-orange-50 transition-all duration-300 transform hover:scale-105"
+                className="bg-white text-orange-600 px-3 sm:px-4 md:px-5 py-2 rounded-full text-xs sm:text-sm font-medium hover:bg-orange-50 transition-all duration-300 transform hover:scale-105 touch-manipulation"
               >
                 Explore {bannerSlides[currentSlide].category}
               </button>
             </div>
-            <div className="block md:hidden w-full px-4">
-              <div className="relative overflow-hidden rounded-lg">
+            <div className="block md:hidden w-full px-2 sm:px-4">
+              <div className="relative overflow-hidden rounded-lg aspect-[16/9] sm:aspect-[2/1]">
                 <img 
                   key={`img-mobile-${currentSlide}`}
                   src={bannerSlides[currentSlide].image}
                   alt={bannerSlides[currentSlide].title}
-                  className="w-full h-40 sm:h-48 object-cover shadow-lg animate-slide-in-right"
+                  className="w-full h-full object-cover shadow-lg animate-slide-in-right"
+                  loading="eager"
+                  width="400"
+                  height="200"
                 />
               </div>
             </div>
-            <div className="hidden md:block pr-2 relative">
+            <div className="hidden md:block pr-2 relative flex-shrink-0">
               <div className="relative overflow-hidden rounded-lg">
                 <img 
                   key={`img-${currentSlide}`}
                   src={bannerSlides[currentSlide].image}
                   alt={bannerSlides[currentSlide].title}
                   className="w-64 lg:w-80 h-40 lg:h-48 object-cover shadow-lg animate-slide-in-right"
+                  loading="eager"
+                  width="320"
+                  height="192"
                 />
               </div>
             </div>
@@ -705,7 +694,11 @@ const Home: React.FC = () => {
             {categories.map((category) => (
               <button
                 key={category}
-                onClick={() => setActiveCategory(category)}
+                onClick={() => {
+                  setActiveCategory(category);
+                  setIsSearchActive(false);
+                  setSearchQuery('');
+                }}
                 className={`whitespace-nowrap pb-3 sm:pb-4 px-1 border-b-2 font-medium text-sm sm:text-lg transition-colors flex-shrink-0 ${
                   activeCategory === category
                     ? 'border-orange-500 text-orange-600'
@@ -717,8 +710,8 @@ const Home: React.FC = () => {
             ))}
           </div>
           
-          {/* Filter Button */}
-          <div className="mt-4 relative filter-dropdown">
+          {/* Filter Button - Desktop Only */}
+          <div className="mt-4 relative filter-dropdown hidden md:block">
             <button
               onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
               className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
@@ -778,12 +771,57 @@ const Home: React.FC = () => {
       {/* Filtered Products Section */}
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Mobile Country Filter Buttons - Above Products */}
+          <div className="md:hidden mb-4 sm:mb-6">
+            <div className="overflow-x-auto">
+              <div className="flex gap-2 pb-2 min-w-max px-1">
+                {/* All Africa Button */}
+                <button
+                  onClick={() => setSelectedCountry('')}
+                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-full whitespace-nowrap text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
+                    selectedCountry === '' 
+                      ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Afrique</span>
+                </button>
+                
+                {/* Country Buttons */}
+                {africanCountries.map((country) => (
+                  <button
+                    key={country.code}
+                    onClick={() => setSelectedCountry(country.code)}
+                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-full whitespace-nowrap text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
+                      selectedCountry === country.code 
+                        ? 'bg-orange-100 text-orange-700 border border-orange-200' 
+                        : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <img 
+                      src={country.flag} 
+                      alt={`${country.name} flag`} 
+                      className="w-3 h-2 sm:w-4 sm:h-3 object-cover rounded-sm flex-shrink-0"
+                      loading="lazy"
+                      width="16"
+                      height="12"
+                    />
+                    <span>{country.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* Section Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <h2 className="text-xl font-semibold text-gray-900">
                 {isSearchActive 
-                  ? `Search Results (${filteredProducts.length} found)` 
+                  ? `Search Results (${filteredProducts().length} found)` 
                   : activeCategory === 'All' ? 'All Products' : activeCategory
                 }
               </h2>
@@ -814,7 +852,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Products Grid */}
-          {filteredProducts.length === 0 && isSearchActive ? (
+          {filteredProducts().length === 0 && isSearchActive ? (
             <div className="text-center py-12">
               <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -831,35 +869,39 @@ const Home: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
               {getProductsToDisplay().map((product) => (
-              <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow block">
-                <div className="aspect-square relative">
+              <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200 block group">
+                <div className="aspect-square relative overflow-hidden">
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    loading="lazy"
+                    width="200"
+                    height="200"
                   />
                 </div>
-                <div className="p-3">
-                  <div className="text-lg font-bold text-gray-900 mb-1">
+                <div className="p-2 sm:p-3">
+                  <div className="text-sm sm:text-lg font-bold text-gray-900 mb-1">
                     ${product.price}
                   </div>
-                  <h3 className="text-sm text-gray-600 mb-2">{product.name}</h3>
+                  <h3 className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">{product.name}</h3>
                   <div className="flex items-center text-xs text-gray-500 mb-2">
-                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span>{product.location}</span>
+                    <span className="truncate">{product.location}</span>
                   </div>
                   {product.verified && (
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                      <div className="flex items-center text-xs text-green-600 bg-green-50 px-1 sm:px-2 py-1 rounded">
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                        Verified seller
+                        <span className="hidden sm:inline">Verified seller</span>
+                        <span className="sm:hidden">Verified</span>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2">
                         {/* Save Button */}
                         <button 
                           onClick={(e) => {
@@ -867,7 +909,7 @@ const Home: React.FC = () => {
                             e.stopPropagation();
                             handleSave(product.id);
                           }}
-                          className={`p-1 transition-colors ${
+                          className={`p-1 transition-colors touch-manipulation ${
                             savedProducts.has(product.id) 
                               ? 'text-orange-500 hover:text-orange-600' 
                               : 'text-gray-400 hover:text-gray-600'
@@ -886,7 +928,7 @@ const Home: React.FC = () => {
                             e.stopPropagation();
                             handleLike(product.id);
                           }}
-                          className={`p-1 transition-colors ${
+                          className={`p-1 transition-colors touch-manipulation ${
                             likedProducts.has(product.id) 
                               ? 'text-red-500 hover:text-red-600' 
                               : 'text-gray-400 hover:text-gray-600'
@@ -908,19 +950,55 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Pagination */}
-      <section className="py-12 bg-white">
+      {/* Pagination - Mobile Responsive */}
+      <section className="py-8 sm:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center">
+          {/* Mobile Pagination */}
+          <div className="md:hidden">
+            <div className="flex items-center justify-between mb-4">
+              <button className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Previous
+              </button>
+              <span className="text-sm text-gray-600 font-medium">Page 1 of 48</span>
+              <button className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                Next
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex justify-center">
+              <div className="flex space-x-1 overflow-x-auto pb-2">
+                {[1, 2, 3, '...', 48].map((page, index) => (
+                  <button
+                    key={index}
+                    className={`flex-shrink-0 px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
+                      page === 1
+                        ? 'bg-orange-500 text-white'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-gray-200'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          {/* Desktop Pagination */}
+          <div className="hidden md:flex items-center justify-center">
             <div className="flex items-center space-x-4">
-              <button className="px-4 py-2 text-base text-black hover:text-gray-700 font-medium">
+              <button className="px-4 py-2 text-base text-black hover:text-gray-700 font-medium transition-colors">
                 Previous
               </button>
               <div className="flex space-x-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8, '...', 48].map((page, index) => (
                   <button
                     key={index}
-                    className={`px-4 py-2 text-base rounded-lg font-medium ${
+                    className={`px-4 py-2 text-base rounded-lg font-medium transition-colors ${
                       page === 1
                         ? 'bg-orange-500 text-white'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -930,7 +1008,7 @@ const Home: React.FC = () => {
                   </button>
                 ))}
               </div>
-              <button className="px-4 py-2 text-base text-black hover:text-gray-700 font-medium">
+              <button className="px-4 py-2 text-base text-black hover:text-gray-700 font-medium transition-colors">
                 Next
               </button>
             </div>

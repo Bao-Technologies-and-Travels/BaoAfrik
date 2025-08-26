@@ -110,6 +110,22 @@ const UserPreferences: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-6 sm:space-y-8">
+        {/* Back Arrow */}
+        <div className="flex justify-start mb-4">
+          <button
+            onClick={() => navigate('/profile-setup')}
+            className="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors"
+            style={{backgroundColor: '#F9A825'}}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+            aria-label="Go back to profile setup"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
           <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-6 sm:mb-8">

@@ -46,7 +46,7 @@ function AppContent() {
   // For all other pages, render with header/footer
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header showSearchBar={isProductDetailPage} />
+      <Header showSearchBar={isProductDetailPage} isProductDetailPage={isProductDetailPage} />
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
