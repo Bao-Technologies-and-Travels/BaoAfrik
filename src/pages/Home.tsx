@@ -42,6 +42,11 @@ const Home: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [likedProducts, setLikedProducts] = useState<Set<number>>(new Set());
   const [savedProducts, setSavedProducts] = useState<Set<number>>(new Set());
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState('');
 
   // Banner slides data
   const bannerSlides = [
@@ -76,6 +81,16 @@ const Home: React.FC = () => {
   ];
 
   const categories = ['All', 'Food & Spices', 'Fashion & Textiles', 'Beauty & Wellness', 'Home & Decor', 'Books & Media'];
+
+  const africanCountries = [
+    { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png' },
+    { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png' }, 
+    { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png' },
+    { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png' },
+    { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png' },
+    { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png' },
+    { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png' }
+  ];
 
   // All products data organized by category
   const allProducts = {
@@ -231,15 +246,69 @@ const Home: React.FC = () => {
     ]
   };
 
-  // Get filtered products based on active category
+  // Get all products as flat array for searching
+  const getAllProducts = () => {
+    return Object.values(allProducts).flat();
+  };
+
+  // Search functionality
+  const filteredProducts = () => {
+    let products = [];
+    
+    if (selectedCategory && allProducts[selectedCategory as keyof typeof allProducts]) {
+      products = allProducts[selectedCategory as keyof typeof allProducts];
+    } else {
+      // Get all products from all categories
+      products = Object.values(allProducts).flat();
+    }
+
+    // Apply search filter if there's a search query
+    if (searchQuery.trim()) {
+      products = products.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Apply country filter if a specific country is selected
+    if (selectedCountry) {
+      const countryName = africanCountries.find(country => country.code === selectedCountry)?.name;
+      if (countryName) {
+        products = products.filter(product => 
+          product.location.toLowerCase().includes(countryName.toLowerCase())
+        );
+      }
+    }
+
+    return products;
+  };
+
+  // Get filtered products based on active category or search results
   const getFilteredProducts = () => {
+    if (isSearchActive) {
+      return searchResults;
+    }
+    
     if (activeCategory === 'All') {
       return Object.values(allProducts).flat();
     }
     return allProducts[activeCategory as keyof typeof allProducts] || [];
   };
 
-  const filteredProducts = getFilteredProducts();
+  // Get products to display
+  const getProductsToDisplay = () => {
+    return filteredProducts();
+  };
+
+  // Clear search and return to category view
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSelectedCategory('');
+    setOriginLocation('');
+    setLocation('');
+    setSearchResults([]);
+    setIsSearchActive(false);
+  };
 
   // Auto-slide functionality
   useEffect(() => {
@@ -254,13 +323,14 @@ const Home: React.FC = () => {
 
   // Handle search functionality
   const handleSearch = () => {
-    console.log('Search triggered with:', {
-      searchQuery,
-      selectedCategory,
-      originLocation,
-      location
-    });
-    // Here you would typically make an API call or filter products
+    console.log('Search triggered');
+  };
+
+  // Handle Enter key press in search input
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   // Handle scan functionality
@@ -300,12 +370,28 @@ const Home: React.FC = () => {
     });
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isFilterDropdownOpen) {
+        const target = event.target as Element;
+        if (!target.closest('.filter-dropdown')) {
+          setIsFilterDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isFilterDropdownOpen]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Search Section */}
       <section className="bg-white shadow-sm border-b border-gray-200 mt-4 sm:mt-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-4">
+          {/* Desktop Search */}
+          <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-4">
             {/* Search Input */}
             <div className="flex-1 relative">
               <input
@@ -313,6 +399,7 @@ const Home: React.FC = () => {
                 placeholder="Search for products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
                 className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -383,6 +470,160 @@ const Home: React.FC = () => {
                 />
               </button>
             </div>
+          </div>
+
+          {/* Mobile Search */}
+          <div className="md:hidden">
+            <div className="flex items-center gap-3">
+              {/* Search Input */}
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Search for products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                />
+                <button 
+                  onClick={handleScan}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 hover:opacity-70 transition-opacity"
+                  title="Scan image to search"
+                >
+                  <img 
+                    src={scanIcon} 
+                    alt="Scan" 
+                    className="w-4 h-4 opacity-60 hover:opacity-100 transition-opacity"
+                  />
+                </button>
+              </div>
+              
+              {/* Filter Button */}
+              <button 
+                onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+                className="p-3 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full transition-colors flex-shrink-0 hover:border-orange-500 hover:text-orange-500 relative"
+                title="Filter options"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Mobile Country Filter Buttons */}
+            <div className="mt-3 overflow-x-auto">
+              <div className="flex gap-2 pb-2">
+                {/* All Africa Button */}
+                <button
+                  onClick={() => setSelectedCountry('')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors ${
+                    selectedCountry === '' 
+                      ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Afrique
+                </button>
+                
+                {/* Country Buttons */}
+                {africanCountries.map((country) => (
+                  <button
+                    key={country.code}
+                    onClick={() => setSelectedCountry(country.code)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors ${
+                      selectedCountry === country.code 
+                        ? 'bg-orange-100 text-orange-700 border border-orange-200' 
+                        : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <img 
+                      src={country.flag} 
+                      alt={`${country.name} flag`} 
+                      className="w-4 h-3 object-cover rounded-sm"
+                    />
+                    {country.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Mobile Filter Dropdown */}
+            {isMobileFilterOpen && (
+              <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="space-y-3">
+                  {/* Category Dropdown */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm"
+                    >
+                      <option value="">All Categories</option>
+                      <option value="Food & Spices">Food & Spices</option>
+                      <option value="Fashion & Textiles">Fashion & Textiles</option>
+                      <option value="Beauty & Wellness">Beauty & Wellness</option>
+                      <option value="Home & Decor">Home & Decor</option>
+                      <option value="Books & Media">Books & Media</option>
+                    </select>
+                  </div>
+                  
+                  {/* Place of Origin */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Place of Origin</label>
+                    <input
+                      type="text"
+                      placeholder="Place of origin"
+                      value={originLocation}
+                      onChange={(e) => setOriginLocation(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+                  
+                  {/* Location */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input
+                      type="text"
+                      placeholder="Location"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 pt-2">
+                    <button 
+                      onClick={() => {
+                        handleSearch();
+                        setIsMobileFilterOpen(false);
+                      }}
+                      className="flex-1 text-white py-2 px-4 rounded-lg font-medium text-sm transition-colors"
+                      style={{backgroundColor: '#F9A825'}}
+                      onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+                      onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+                    >
+                      Search
+                    </button>
+                    <button 
+                      onClick={handleScan}
+                      className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg transition-colors hover:border-orange-500 hover:text-orange-500"
+                      title="Scan QR code"
+                    >
+                      <img 
+                        src={scanIcon} 
+                        alt="Scan QR code" 
+                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -475,6 +716,62 @@ const Home: React.FC = () => {
               </button>
             ))}
           </div>
+          
+          {/* Filter Button */}
+          <div className="mt-4 relative filter-dropdown">
+            <button
+              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              <span className="text-sm font-medium">Filter : {selectedCountry || 'Africa'}</span>
+              <svg className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {/* Dropdown Menu */}
+            {isFilterDropdownOpen && (
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                <div className="py-2">
+                  <button
+                    onClick={() => {
+                      setSelectedCountry('');
+                      setIsFilterDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                      !selectedCountry ? 'text-orange-600 bg-orange-50' : 'text-gray-700'
+                    }`}
+                  >
+                    <span>All Africa</span>
+                  </button>
+                  {africanCountries.map((country) => (
+                    <button
+                      key={country.name}
+                      onClick={() => {
+                        setSelectedCountry(country.name);
+                        setIsFilterDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                        selectedCountry === country.name ? 'text-orange-600 bg-orange-50' : 'text-gray-700'
+                      }`}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <img 
+                          src={country.flag} 
+                          alt={`${country.name} flag`}
+                          className="w-5 h-4 object-cover rounded-sm"
+                        />
+                        <span>{country.name}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -485,8 +782,19 @@ const Home: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <h2 className="text-xl font-semibold text-gray-900">
-                {activeCategory === 'All' ? 'All Products' : activeCategory}
+                {isSearchActive 
+                  ? `Search Results (${filteredProducts.length} found)` 
+                  : activeCategory === 'All' ? 'All Products' : activeCategory
+                }
               </h2>
+              {isSearchActive && (
+                <button
+                  onClick={clearSearch}
+                  className="ml-3 text-sm text-orange-600 hover:text-orange-700 font-medium"
+                >
+                  Clear Search
+                </button>
+              )}
               <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -506,8 +814,25 @@ const Home: React.FC = () => {
           </div>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {filteredProducts.map((product) => (
+          {filteredProducts.length === 0 && isSearchActive ? (
+            <div className="text-center py-12">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No products found</h3>
+              <p className="mt-1 text-sm text-gray-500">Try adjusting your search criteria or browse our categories.</p>
+              <div className="mt-6">
+                <button
+                  onClick={clearSearch}
+                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700"
+                >
+                  Browse All Products
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {getProductsToDisplay().map((product) => (
               <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow block">
                 <div className="aspect-square relative">
                   <img 
@@ -577,8 +902,9 @@ const Home: React.FC = () => {
                   )}
                 </div>
               </Link>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

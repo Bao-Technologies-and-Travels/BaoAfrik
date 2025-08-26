@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 // Import product images
@@ -20,12 +20,16 @@ import sellerAvatar from '../assets/images/logos/avatar.png';
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
   const [likedProducts, setLikedProducts] = useState<Set<string>>(new Set());
   const [wishlistProducts, setWishlistProducts] = useState<Set<string>>(new Set());
   const [currentOtherProductsIndex, setCurrentOtherProductsIndex] = useState(0);
   const [currentRecommendedIndex, setCurrentRecommendedIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [location, setLocation] = useState('');
 
   // Product images array - main image first, then thumbnail images
   const images = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
@@ -53,8 +57,8 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleContactSeller = () => {
-    // TODO: Implement contact seller functionality
     console.log('Contact seller clicked');
+    // TODO: Implement messaging functionality
   };
 
   const handleLike = (productId: string) => {
@@ -97,8 +101,81 @@ const ProductDetail: React.FC = () => {
     setCurrentRecommendedIndex(prev => (prev - 1 + 4) % 4);
   };
 
+  const handleSearch = () => {
+    const searchParams = new URLSearchParams();
+    if (searchQuery) searchParams.set('q', searchQuery);
+    if (selectedCategory) searchParams.set('category', selectedCategory);
+    if (location) searchParams.set('location', location);
+    
+    navigate(`/?${searchParams.toString()}`);
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Search Section */}
+      <section className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-4">
+            {/* Search Input */}
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search for products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+            
+            {/* Category Dropdown */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 sm:px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base"
+            >
+              <option value="">All Categories</option>
+              <option value="Food & Spices">Food & Spices</option>
+              <option value="Fashion & Textiles">Fashion & Textiles</option>
+              <option value="Beauty & Wellness">Beauty & Wellness</option>
+              <option value="Home & Decor">Home & Decor</option>
+              <option value="Books & Media">Books & Media</option>
+            </select>
+            
+            {/* Location Input */}
+            <input
+              type="text"
+              placeholder="Location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="px-3 sm:px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
+            />
+            
+            {/* Search Button */}
+            <button 
+              onClick={handleSearch}
+              className="text-white px-4 sm:px-6 py-3 rounded-full transition-colors font-medium text-sm sm:text-base whitespace-nowrap"
+              style={{backgroundColor: '#F9A825'}}
+              onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+              onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+            >
+              Search
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* Breadcrumb */}
       <div className="bg-white py-8 mt-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

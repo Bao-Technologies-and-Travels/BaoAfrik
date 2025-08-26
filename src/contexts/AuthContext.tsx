@@ -4,6 +4,8 @@ interface User {
   id: string;
   name: string;
   email: string;
+  profileImage?: string;
+  provider?: string;
 }
 
 interface AuthContextType {
@@ -12,6 +14,7 @@ interface AuthContextType {
   login: (user: User) => void;
   logout: () => void;
   setVisitorMode: (isVisitor: boolean) => void;
+  updateUserProfile: (profileData: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,7 +42,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    setIsVisitor(false);
+    localStorage.removeItem('user');
+    // Clear remembered email on explicit logout
+    localStorage.removeItem('rememberedEmail');
   };
 
   const setVisitorMode = (visitor: boolean) => {
@@ -49,12 +54,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updateUserProfile = (profileData: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...profileData });
+    }
+  };
+
   const value = {
     user,
     isVisitor,
     login,
     logout,
     setVisitorMode,
+    updateUserProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
