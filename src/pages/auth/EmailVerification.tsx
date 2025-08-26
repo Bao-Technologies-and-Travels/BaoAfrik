@@ -85,13 +85,8 @@ const EmailVerification: React.FC = () => {
       console.log('Email verified successfully!');
       
       if (fromRegistration) {
-        // If coming from registration, redirect to login with success message
-        navigate('/login', { 
-          state: { 
-            message: 'Email verified successfully! Please sign in to continue.',
-            type: 'success'
-          } 
-        });
+        // If coming from registration, redirect to verification success page
+        navigate('/email-verification-success');
       } else {
         // If verifying existing account, redirect to dashboard/profile
         navigate('/profile');
@@ -126,119 +121,103 @@ const EmailVerification: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex">
-      {/* Left side - Form */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          {/* Logo */}
-          <div className="text-center">
-            <div className="mx-auto w-20 h-20 mb-6">
-              <img 
-                src={logoSmall} 
-                alt="BaoAfrik Logo" 
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <h2 className="text-display text-2xl text-gray-900 mb-2">
-              Verify Your Email
-            </h2>
-            <p className="text-body text-gray-500 text-sm mb-2">
-              We've sent a 6-digit verification code to:
-            </p>
-            <p className="text-body text-gray-900 text-sm font-semibold mb-4">
-              {email}
-            </p>
-            <p className="text-body text-gray-600 text-sm">
-              Please enter the code below to complete your {fromRegistration ? 'registration' : 'verification'}.
-            </p>
-          </div>
-          
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {/* 6-Digit Code Input */}
-            <div className="space-y-4">
-              <div className="flex justify-center space-x-3">
-                {verificationCode.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={(el) => (inputRefs.current[index] = el)}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(index, e)}
-                    onPaste={handlePaste}
-                    className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900"
-                  />
-                ))}
-              </div>
-              
-              {error && (
-                <div className="text-center">
-                  <p className="text-red-500 text-sm">{error}</p>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading || verificationCode.join('').length !== 6}
-                className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100"
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Verifying...
-                  </div>
-                ) : (
-                  'Verify Email'
-                )}
-              </button>
-            </div>
-
-            {/* Resend Code */}
-            <div className="text-center space-y-2">
-              <p className="text-gray-500 text-sm">Didn't receive the code?</p>
-              <button
-                type="button"
-                onClick={handleResendCode}
-                disabled={!canResend}
-                className="font-medium text-orange-600 hover:text-orange-500 disabled:text-gray-400 disabled:cursor-not-allowed text-sm"
-              >
-                {canResend ? 'Resend Code' : `Resend in ${countdown}s`}
-              </button>
-            </div>
-
-            <div className="text-center">
-              <Link to="/register" className="font-medium text-gray-500 hover:text-gray-700 text-sm">
-                ← Back to Sign Up
-              </Link>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      {/* Right side - Illustration */}
-      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-orange-100 to-yellow-100">
-        <div className="max-w-md text-center">
-          {/* Large Logo Illustration */}
-          <div className="mx-auto w-80 h-80 mb-8 flex items-center justify-center">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center">
+          <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-4 sm:mb-6">
             <img 
-              src={logoLarge} 
-              alt="BaoAfrik Large Logo" 
+              src={logoSmall} 
+              alt="BaoAfrik Logo" 
               className="w-full h-full object-contain"
             />
           </div>
-          <div className="text-center">
-            <h3 className="text-display text-xl text-gray-700 mb-2">
-              Almost There!
-            </h3>
-            <p className="text-body text-gray-600 text-sm">
-              Just one more step to join the BaoAfrik community and start discovering authentic African products.
-            </p>
+          <h2 className="text-display text-xl sm:text-2xl text-gray-900 mb-2">
+            Verify Your Email
+          </h2>
+          <p className="text-body text-gray-500 text-sm mb-6 sm:mb-8 px-2">
+            We've sent a 6-digit verification code to <span className="font-medium text-gray-700">{email}</span>
+          </p>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="flex items-center">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <p className="text-xs sm:text-sm text-red-800">{error}</p>
+            </div>
           </div>
+        )}
+
+        {/* Verification Code Input */}
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+              Enter verification code
+            </label>
+            <div className="flex justify-between space-x-1 sm:space-x-2">
+              {verificationCode.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => inputRefs.current[index] = el}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleInputChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={index === 0 ? handlePaste : undefined}
+                  className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+                  disabled={isLoading}
+                />
+              ))}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading || verificationCode.some(digit => !digit)}
+            className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2.5 sm:py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100 text-sm sm:text-base"
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+                <span className="text-sm sm:text-base">Verifying...</span>
+              </div>
+            ) : (
+              'Verify Email'
+            )}
+          </button>
+        </form>
+
+        {/* Resend Code */}
+        <div className="text-center mt-4 sm:mt-6">
+          <p className="text-xs sm:text-sm text-gray-500 mb-2">
+            Didn't receive the code?
+          </p>
+          {canResend ? (
+            <button
+              onClick={handleResendCode}
+              className="text-orange-600 hover:text-orange-500 font-medium text-xs sm:text-sm"
+            >
+              Resend Code
+            </button>
+          ) : (
+            <p className="text-gray-400 text-xs sm:text-sm">
+              Resend code in {countdown}s
+            </p>
+          )}
+        </div>
+
+        {/* Back to Login */}
+        <div className="text-center mt-6 sm:mt-8">
+          <Link to="/login" className="text-gray-500 hover:text-gray-700 text-xs sm:text-sm">
+            ← Back to Sign In
+          </Link>
         </div>
       </div>
     </div>

@@ -17,12 +17,55 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    // Required field validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Full name is required';
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    }
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = 'Phone number is required';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    }
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    }
+
+    // Password validation
+    if (formData.password) {
+      if (formData.password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters long';
+      } else if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
+        newErrors.password = 'Password must contain both letters and numbers';
+      }
+    }
+
+    // Show password requirements if password field is focused but criteria not met
+    if (formData.password && formData.password.length > 0 && formData.password.length < 8) {
+      newErrors.passwordHint = 'Password must be at least 8 characters with letters and numbers';
+    } else if (formData.password && formData.password.length >= 8 && !/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.passwordHint = 'Password must contain both letters and numbers';
+    }
+
+    // Confirm password validation
+    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+    if (!validateForm()) {
       return;
     }
 
@@ -31,6 +74,35 @@ const Register: React.FC = () => {
     try {
       // TODO: Implement registration API call
       console.log('Registration attempt:', formData);
+      
+      // Store user credentials in localStorage for frontend-only demo
+      const userCredentials = {
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        phoneNumber: formData.phoneNumber,
+        profileImage: undefined, // Will be set during profile setup
+        registeredAt: new Date().toISOString()
+      };
+      
+      // Get existing users or create empty array
+      const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      
+      // Check if user already exists
+      const userExists = existingUsers.some((user: any) => user.email === formData.email);
+      
+      if (userExists) {
+        setErrors({ email: 'An account with this email already exists' });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Add new user to the list
+      existingUsers.push(userCredentials);
+      localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+      
+      // Store current user email for profile setup
+      localStorage.setItem('currentUserEmail', formData.email);
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -45,7 +117,20 @@ const Register: React.FC = () => {
       
     } catch (error) {
       console.error('Registration failed:', error);
-      alert('Registration failed. Please try again.');
+      
+      // Simulate different types of server errors for demo
+      const errorType = Math.random();
+      
+      if (errorType < 0.3) {
+        // Simulate server error
+        setErrors({ general: 'Server error occurred. Please try again later.' });
+      } else if (errorType < 0.6) {
+        // Simulate network error
+        setErrors({ general: 'Network error. Please check your connection and try again.' });
+      } else {
+        // Generic error
+        setErrors({ general: 'Registration failed. Please try again.' });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -59,35 +144,80 @@ const Register: React.FC = () => {
     }));
   };
 
-  const handleSocialLogin = (provider: string) => {
-    // TODO: Implement social login
-    console.log(`${provider} login clicked`);
+  const handleSocialLogin = async (provider: string) => {
+    try {
+      setIsLoading(true);
+      console.log(`${provider} login clicked`);
+      
+      // Simulate brief authentication delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Simulate getting user data from social provider
+      const mockSocialData = {
+        google: {
+          name: 'John Doe',
+          email: 'john.doe@gmail.com',
+          picture: 'https://via.placeholder.com/150',
+          provider: 'google'
+        },
+        facebook: {
+          name: 'Jane Smith',
+          email: 'jane.smith@facebook.com',
+          picture: 'https://via.placeholder.com/150',
+          provider: 'facebook'
+        },
+        github: {
+          name: 'Dev User',
+          email: 'dev.user@github.com',
+          picture: 'https://via.placeholder.com/150',
+          provider: 'github'
+        }
+      };
+      
+      const socialUserData = mockSocialData[provider as keyof typeof mockSocialData];
+      
+      // Store social login data temporarily
+      localStorage.setItem('tempSocialUser', JSON.stringify(socialUserData));
+      
+      // Redirect to validation success screen
+      navigate('/social-login-validation', {
+        state: {
+          provider: provider
+        }
+      });
+      
+    } catch (error) {
+      console.error(`${provider} login failed:`, error);
+      alert(`Failed to login with ${provider}. Please try again.`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex">
-      {/* Left side - Form */}
+      {/* Mobile-first single column layout */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+        <div className="max-w-md w-full space-y-6 lg:space-y-8">
           {/* Logo */}
           <div className="text-center">
-            <div className="mx-auto w-20 h-20 mb-6">
+            <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 mb-4 sm:mb-6">
               <img 
                 src={logoSmall} 
                 alt="BaoAfrik Logo" 
                 className="w-full h-full object-contain"
               />
             </div>
-            <h2 className="text-display text-2xl text-gray-900 mb-2">
+            <h2 className="text-display text-xl sm:text-2xl text-gray-900 mb-2">
               Sign Up
             </h2>
-            <p className="text-body text-gray-500 text-sm">
+            <p className="text-body text-gray-500 text-sm px-2">
               Please fill in your information to connect to BaoAfrik
             </p>
           </div>
           
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
+          <form className="mt-6 sm:mt-8 space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4 sm:space-y-5">
               <div>
                 <input
                   id="name"
@@ -95,11 +225,17 @@ const Register: React.FC = () => {
                   type="text"
                   autoComplete="name"
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
-                  placeholder="Full Name"
+                  disabled={isLoading}
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
+                    errors.name ? 'border-red-500' : 'border-gray-200'
+                  }`}
+                  placeholder="Full name"
                   value={formData.name}
-                  onChange={handleChange}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                )}
               </div>
 
               <div>
@@ -109,11 +245,17 @@ const Register: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
+                  disabled={isLoading}
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
+                    errors.email ? 'border-red-500' : 'border-gray-200'
+                  }`}
                   placeholder="Email address"
                   value={formData.email}
-                  onChange={handleChange}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                )}
               </div>
 
               <div>
@@ -123,11 +265,17 @@ const Register: React.FC = () => {
                   type="tel"
                   autoComplete="tel"
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
-                  placeholder="Phone Number"
+                  disabled={isLoading}
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
+                    errors.phoneNumber ? 'border-red-500' : 'border-gray-200'
+                  }`}
+                  placeholder="Phone number"
                   value={formData.phoneNumber}
-                  onChange={handleChange}
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                 />
+                {errors.phoneNumber && (
+                  <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
+                )}
               </div>
               
               <div className="relative">
@@ -137,10 +285,15 @@ const Register: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   required
-                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
+                  minLength={8}
+                  pattern="^(?=.*[a-zA-Z])(?=.*\d).{8,}$"
+                  disabled={isLoading}
+                  className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
+                    errors.password ? 'border-red-500' : 'border-gray-200'
+                  }`}
                   placeholder="Password"
                   value={formData.password}
-                  onChange={handleChange}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
                 <button
                   type="button"
@@ -170,10 +323,13 @@ const Register: React.FC = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     autoComplete="new-password"
                     required
-                    className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
-                    placeholder="Confirm your password"
+                    disabled={isLoading}
+                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
+                      errors.confirmPassword ? 'border-red-500' : 'border-gray-200'
+                    }`}
+                    placeholder="Confirm password"
                     value={formData.confirmPassword}
-                    onChange={handleChange}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   />
                   <button
                     type="button"
@@ -202,7 +358,7 @@ const Register: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100"
+                className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100 text-base"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
@@ -220,13 +376,14 @@ const Register: React.FC = () => {
             </div>
 
             {/* Social Login Buttons */}
-            <div className="flex justify-center space-x-6">
+            <div className="flex justify-center space-x-4 sm:space-x-6">
               <button
                 type="button"
                 onClick={() => handleSocialLogin('google')}
-                className="w-16 h-16 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:shadow-lg transition-all duration-200 hover:scale-105"
+                disabled={isLoading}
+                className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <svg className="w-7 h-7" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -237,9 +394,10 @@ const Register: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleSocialLogin('facebook')}
-                className="w-16 h-16 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:shadow-lg transition-all duration-200 hover:scale-105"
+                disabled={isLoading}
+                className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <svg className="w-7 h-7 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
               </button>
@@ -247,9 +405,10 @@ const Register: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleSocialLogin('github')}
-                className="w-16 h-16 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:shadow-lg transition-all duration-200 hover:scale-105"
+                disabled={isLoading}
+                className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <svg className="w-7 h-7 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                 </svg>
               </button>
@@ -265,7 +424,7 @@ const Register: React.FC = () => {
         </div>
       </div>
 
-      {/* Right side - Illustration */}
+      {/* Right side - Illustration - Hidden on mobile */}
       <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-orange-100 to-yellow-100">
         <div className="max-w-md text-center">
           {/* Large Logo Illustration */}

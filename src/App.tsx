@@ -7,6 +7,11 @@ import Home from './pages/Home';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import EmailVerification from './pages/auth/EmailVerification';
+import EmailVerificationSuccess from './pages/auth/EmailVerificationSuccess';
+import SocialLoginValidation from './pages/auth/SocialLoginValidation';
+import SocialLoginError from './pages/auth/SocialLoginError';
+import ProfileSetup from './pages/auth/ProfileSetup';
+import UserPreferences from './pages/auth/UserPreferences';
 import Profile from './pages/Profile';
 import Listings from './pages/Listings';
 import CreateListing from './pages/CreateListing';
@@ -17,16 +22,34 @@ import './App.css';
 function AppContent() {
   const location = useLocation();
   const isProductDetailPage = location.pathname.startsWith('/product/');
+  const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences'];
+  const isAuthPage = authPages.includes(location.pathname);
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header showSearchBar={isProductDetailPage} />
-      <main className="flex-1">
+  // For auth pages, render without header/footer
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen">
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<EmailVerification />} />
+          <Route path="/email-verification-success" element={<EmailVerificationSuccess />} />
+          <Route path="/social-login-validation" element={<SocialLoginValidation />} />
+          <Route path="/social-login-error" element={<SocialLoginError />} />
+          <Route path="/profile-setup" element={<ProfileSetup />} />
+          <Route path="/user-preferences" element={<UserPreferences />} />
+        </Routes>
+      </div>
+    );
+  }
+
+  // For all other pages, render with header/footer
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header showSearchBar={isProductDetailPage} isProductDetailPage={isProductDetailPage} />
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/create-listing" element={<CreateListing />} />
