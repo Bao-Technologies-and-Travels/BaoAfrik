@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logo from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
+import logoIcon from '../../assets/images/logos/ba-brand-icon-colored.png';
 import avatar from '../../assets/images/logos/avatar.png';
 
 interface HeaderProps {
@@ -33,12 +34,20 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
               className="flex items-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded transition-all duration-200"
               aria-label="BaoAfrik Home"
             >
+              {/* Desktop: Full logo, Mobile: Icon only */}
               <img 
                 src={logo} 
                 alt="BaoAfrik - African Marketplace Logo" 
-                className="h-8 w-auto object-contain"
+                className="hidden sm:block h-8 w-auto object-contain"
                 width="120"
                 height="32"
+              />
+              <img 
+                src={logoIcon} 
+                alt="BaoAfrik Logo" 
+                className="sm:hidden h-10 w-10 object-contain"
+                width="40"
+                height="40"
               />
             </Link>
           </div>
