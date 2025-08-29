@@ -1,35 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
+import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 
 const EmailVerificationSuccess: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Auto-redirect to profile information page after 3 seconds
-    const timer = setTimeout(() => {
-      navigate('/profile-setup');
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [navigate]);
+  // Removed auto-redirect - let user choose to proceed or skip
 
   const handleContinue = () => {
     navigate('/profile-setup');
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md text-center">
-        {/* Logo */}
-        <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-6 sm:mb-8">
-          <img 
-            src={logoSmall} 
-            alt="BaoAfrik Logo" 
-            className="w-full h-full object-contain"
-          />
-        </div>
+    <div className="min-h-screen bg-white flex flex-col px-4 sm:px-6 lg:px-8">
+      {/* Desktop Logo - Top Left with Background */}
+      <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8">
+        <img 
+          src={logoFull} 
+          alt="BaoAfrik Logo" 
+          className="h-8 object-contain"
+        />
+      </div>
+      
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-md text-center">
+          {/* Mobile Logo - Centered with Background */}
+          <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-6 sm:mb-8">
+            <div className="text-center">
+              <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-6 sm:mb-8">
+                <img 
+                  src={logoSmall} 
+                  alt="BaoAfrik Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+          </div>
 
         {/* Success Icon */}
         <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center mb-4 sm:mb-6">
@@ -62,10 +70,11 @@ const EmailVerificationSuccess: React.FC = () => {
           )}
         </button>
 
-        {/* Skip Link */}
-        <Link to="/login" className="text-gray-500 hover:text-gray-700 text-xs sm:text-sm">
-          Skip for now and sign in
-        </Link>
+          {/* Skip Link */}
+          <Link to="/login" className="text-gray-500 hover:text-gray-700 text-xs sm:text-sm">
+            Skip for now and sign in
+          </Link>
+        </div>
       </div>
     </div>
   );

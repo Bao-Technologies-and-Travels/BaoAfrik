@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
+import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 
 const EmailVerification: React.FC = () => {
@@ -122,24 +123,34 @@ const EmailVerification: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center">
-          <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-4 sm:mb-6">
-            <img 
-              src={logoSmall} 
-              alt="BaoAfrik Logo" 
-              className="w-full h-full object-contain"
-            />
+      {/* Desktop Logo - Top Left with Background */}
+      <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8">
+        <img 
+          src={logoFull} 
+          alt="BaoAfrik Logo" 
+          className="h-8 object-contain"
+        />
+      </div>
+      
+      <div className="w-full max-w-md text-center">
+        {/* Mobile Logo - Centered with Background */}
+        <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-4 sm:mb-6">
+          <div className="text-center">
+            <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-4 sm:mb-6">
+              <img 
+                src={logoSmall} 
+                alt="BaoAfrik Logo" 
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
+        </div>
           <h2 className="text-display text-xl sm:text-2xl text-gray-900 mb-2">
             Verify Your Email
           </h2>
           <p className="text-body text-gray-500 text-sm mb-6 sm:mb-8 px-2">
             We've sent a 6-digit verification code to <span className="font-medium text-gray-700">{email}</span>
           </p>
-        </div>
-
         {/* Error Message */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">

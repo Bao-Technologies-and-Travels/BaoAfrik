@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logo from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import logoIcon from '../../assets/images/logos/ba-brand-icon-colored.png';
@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailPage = false }) => {
-  const { user, isVisitor, logout } = useAuth();
+  const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -256,7 +256,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     <div className="flex items-center space-x-3">
                       <img 
                         src={user.profileImage || avatar} 
-                        alt="User profile picture" 
+                        alt="User avatar" 
                         className="w-12 h-12 rounded-full object-cover"
                         width="48"
                         height="48"

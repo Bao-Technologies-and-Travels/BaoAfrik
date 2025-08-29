@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
+import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -39,6 +40,12 @@ const ProfileSetup: React.FC = () => {
   }, [fromSocialLogin]);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // Form validation state
+  const isFormValid = formData.firstName.trim() && 
+                     formData.lastName.trim() && 
+                     formData.gender && 
+                     formData.birthDate;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -185,26 +192,33 @@ const ProfileSetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="max-w-4xl w-full">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 mb-6">
-            <img 
-              src={logoSmall} 
-              alt="BaoAfrik Logo" 
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <h1 className="text-2xl font-medium text-gray-900 mb-6">
-            Profile Information
-          </h1>
-          <div className="flex items-center justify-end mb-8">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-              1
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+      {/* Desktop Logo - Top Left with Background */}
+      <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8">
+        <img 
+          src={logoFull} 
+          alt="BaoAfrik Logo" 
+          className="h-8 object-contain"
+        />
+      </div>
+      
+      <div className="w-full max-w-2xl">
+        {/* Mobile Logo - Centered with Background */}
+        <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-8">
+          <div className="text-center">
+            <div className="mx-auto w-16 h-16 mb-6">
+              <img 
+                src={logoSmall} 
+                alt="BaoAfrik Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
           </div>
         </div>
+        
+        <h1 className="text-2xl font-medium text-gray-900 mb-12 mt-16 text-center">
+          Profile Information
+        </h1>
 
         {/* Display general error if any */}
         {errors.general && (
@@ -213,38 +227,49 @@ const ProfileSetup: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-            {/* Left side - Profile Photo */}
-            <div className="w-full lg:w-1/2">
-              <div className="bg-sky-100 rounded-2xl p-4 sm:p-6 lg:p-8 h-full flex flex-col items-center justify-center min-h-[300px] sm:min-h-[350px] lg:min-h-[400px]">
-                <div className="relative">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex flex-col lg:flex-row gap-16">
+            {/* Left side - Profile Image */}
+            <div className="w-full lg:w-2/5 flex items-center justify-center">
+              <div className="bg-blue-50 rounded-2xl p-16 flex flex-col items-center justify-center w-80 h-80">
+                <div className="w-40 h-40 bg-blue-100 rounded-2xl flex items-center justify-center mb-8 cursor-pointer hover:bg-blue-200 transition-colors relative overflow-hidden" onClick={handleImageClick}>
                   {profileImage ? (
-                    <div className="relative">
-                      <img
-                        src={profileImage}
-                        alt="Profile preview"
-                        className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 rounded-full object-cover border-4 border-white shadow-lg"
+                    <>
+                      <img 
+                        src={profileImage} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover rounded-2xl"
                       />
-                      <button
-                        type="button"
-                        onClick={handleRemoveImage}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-white opacity-0 hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                      </button>
-                    </div>
+                      </div>
+                    </>
                   ) : (
-                    <div className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 rounded-full bg-gray-200 border-4 border-white shadow-lg flex items-center justify-center">
-                      <svg className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
+                    <svg className="w-20 h-20 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   )}
                 </div>
-                
+                <div className="flex items-center gap-2">
+                  <p className="text-base text-gray-500 text-center whitespace-nowrap">
+                    {profileImage ? 'Change profile photo' : 'Add a profile photo'}
+                  </p>
+                  {profileImage && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveImage();
+                      }}
+                      className="ml-2 text-red-500 hover:text-red-700 text-sm underline"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -252,19 +277,11 @@ const ProfileSetup: React.FC = () => {
                   onChange={handleImageUpload}
                   className="hidden"
                 />
-                
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="mt-4 sm:mt-6 bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base"
-                >
-                  {profileImage ? 'Change Photo' : 'Upload Photo'}
-                </button>
               </div>
             </div>
 
             {/* Right side - Form Fields */}
-            <div className="w-full lg:w-1/2 space-y-4 sm:space-y-6">
+            <div className="w-full space-y-6">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
                   First Name
@@ -274,7 +291,7 @@ const ProfileSetup: React.FC = () => {
                   id="firstName"
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                  className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50"
                   placeholder="Enter your first name"
                   required
                 />
@@ -292,7 +309,7 @@ const ProfileSetup: React.FC = () => {
                   id="lastName"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                  className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50"
                   placeholder="Enter your last name"
                   required
                 />
@@ -305,20 +322,27 @@ const ProfileSetup: React.FC = () => {
                 <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
                   Gender
                 </label>
-                <select
-                  id="gender"
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base bg-white"
-                  required
-                >
-                  <option value="">Select your gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                  <option value="prefer-not-to-say">Prefer not to say</option>
-                </select>
+                <div className="relative">
+                  <select
+                    id="gender"
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 appearance-none cursor-pointer"
+                    required
+                  >
+                    <option value="">Select your gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    <option value="prefer-not-to-say">Prefer not to say</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
                 {errors.gender && (
                   <p className="mt-1 text-sm text-red-600">{errors.gender}</p>
                 )}
@@ -334,7 +358,7 @@ const ProfileSetup: React.FC = () => {
                   name="birthDate"
                   value={formData.birthDate}
                   onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                  className="w-full px-6 py-5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base bg-gray-50 cursor-pointer min-h-[60px]"
                   required
                 />
                 {errors.birthDate && (
@@ -344,27 +368,23 @@ const ProfileSetup: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-between pt-4 sm:pt-6 gap-3 sm:gap-0">
-            <button
-              type="button"
-              onClick={() => navigate('/user-preferences')}
-              className="px-4 sm:px-6 py-2 text-gray-600 hover:text-gray-800 font-medium text-sm sm:text-base order-2 sm:order-1"
-            >
-              Skip for now
-            </button>
-            
+          <div className="pt-8">
             <button
               type="submit"
-              disabled={isLoading}
-              className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-medium transition-colors disabled:cursor-not-allowed text-sm sm:text-base order-1 sm:order-2"
+              disabled={isLoading || !isFormValid}
+              className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer ${
+                isFormValid && !isLoading
+                  ? 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  <span className="text-sm sm:text-base">Saving...</span>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700 mr-2"></div>
+                  <span>Saving information...</span>
                 </div>
               ) : (
-                'Continue'
+                'Save Information'
               )}
             </button>
           </div>
