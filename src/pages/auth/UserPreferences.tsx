@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
+import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 
 const UserPreferences: React.FC = () => {
   const navigate = useNavigate();
@@ -108,42 +109,50 @@ const UserPreferences: React.FC = () => {
   const isFormValid = selectedReasons.length > 0;
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 sm:space-y-8">
-        {/* Back Arrow */}
-        <div className="flex justify-start mb-4">
-          <button
-            onClick={() => navigate('/profile-setup')}
-            className="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors"
-            style={{backgroundColor: '#F9A825'}}
-            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-            aria-label="Go back to profile setup"
-          >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-6 sm:mb-8">
-            <img 
-              src={logoSmall} 
-              alt="BaoAfrik Logo" 
-              className="w-full h-full object-contain"
-            />
+    <div className="min-h-screen bg-white flex flex-col px-4 sm:px-6 lg:px-8">
+      {/* Desktop Logo - Top Left */}
+      <div className="hidden lg:block absolute top-6 left-8">
+        <img 
+          src={logoFull} 
+          alt="BaoAfrik Logo" 
+          className="h-8 object-contain"
+        />
+      </div>
+      
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-2xl">
+          {/* Mobile Logo - Centered */}
+          <div className="lg:hidden text-center mb-8 sm:mb-12">
+            <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-6 sm:mb-8">
+              <img 
+                src={logoSmall} 
+                alt="BaoAfrik Logo" 
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
+          
+          {/* Back Arrow */}
+          <div className="flex justify-start mb-4">
+            <button
+              onClick={() => navigate('/profile-setup')}
+              className="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          </div>
+          
           <h1 className="text-xl sm:text-2xl font-medium text-gray-900 mb-6 sm:mb-8 px-2">
             Why do you want to join BaoAfrik?
           </h1>
+          
           <div className="flex items-center justify-end mb-6 sm:mb-8">
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-              ?
+              2
             </div>
           </div>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Reason Options */}
@@ -267,6 +276,7 @@ const UserPreferences: React.FC = () => {
             )}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );

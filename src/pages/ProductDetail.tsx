@@ -23,8 +23,9 @@ const ProductDetail: React.FC = () => {
   const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isShared, setIsShared] = useState(false);
   const [likedProducts, setLikedProducts] = useState<Set<string>>(new Set());
+  const [sharedProducts, setSharedProducts] = useState<Set<string>>(new Set());
   const [wishlistProducts, setWishlistProducts] = useState<Set<string>>(new Set());
   const [currentOtherProductsIndex, setCurrentOtherProductsIndex] = useState(0);
   const [currentRecommendedIndex, setCurrentRecommendedIndex] = useState(0);
@@ -35,6 +36,37 @@ const ProductDetail: React.FC = () => {
 
   // Product images array - main image first, then thumbnail images
   const images = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
+
+  // Share product handler
+  const handleShareProduct = async (productId: string) => {
+    const newSet = new Set(sharedProducts);
+    if (newSet.has(productId)) {
+      newSet.delete(productId);
+    } else {
+      newSet.add(productId);
+      
+      // Share functionality
+      const shareData = {
+        title: 'Check out this product on BaoAfrik',
+        text: 'I found this amazing product on BaoAfrik marketplace',
+        url: window.location.href
+      };
+      
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          // Fallback: copy to clipboard
+          await navigator.clipboard.writeText(window.location.href);
+          // You could show a toast notification here
+          console.log('Product link copied to clipboard!');
+        }
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    }
+    setSharedProducts(newSet);
+  };
 
   // Mock product data (in real app, this would come from API based on id)
   const product = {
@@ -60,10 +92,29 @@ const ProductDetail: React.FC = () => {
     console.log(isSaved ? 'Product removed from saved items' : 'Product saved to saved items');
   };
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    // In a real app, this would update the user's liked items
-    console.log(isLiked ? 'Product unliked' : 'Product liked');
+  const handleShare = async () => {
+    setIsShared(!isShared);
+    
+    if (!isShared) {
+      // Share functionality
+      const shareData = {
+        title: 'Check out this product on BaoAfrik',
+        text: 'I found this amazing product on BaoAfrik marketplace',
+        url: window.location.href
+      };
+      
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          // Fallback: copy to clipboard
+          await navigator.clipboard.writeText(window.location.href);
+          console.log('Product link copied to clipboard!');
+        }
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    }
   };
 
   const toggleAdditionalInfo = () => {
@@ -75,17 +126,6 @@ const ProductDetail: React.FC = () => {
     // TODO: Implement messaging functionality
   };
 
-  const handleLikeProduct = (productId: string) => {
-    setLikedProducts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(productId)) {
-        newSet.delete(productId);
-      } else {
-        newSet.add(productId);
-      }
-      return newSet;
-    });
-  };
 
   const handleWishlist = (productId: string) => {
     setWishlistProducts(prev => {
@@ -132,49 +172,6 @@ const ProductDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Desktop Search Section - Hidden on Mobile */}
-      <section className="hidden lg:block bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={handleSearchKeyPress}
-              className="flex-1 pl-4 pr-10 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
-            >
-              <option value="">All Categories</option>
-              <option value="Food & Spices">Food & Spices</option>
-              <option value="Fashion & Textiles">Fashion & Textiles</option>
-              <option value="Beauty & Wellness">Beauty & Wellness</option>
-              <option value="Home & Decor">Home & Decor</option>
-              <option value="Books & Media">Books & Media</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            />
-            <button 
-              onClick={handleSearch}
-              className="text-white px-6 py-3 rounded-full transition-colors font-medium whitespace-nowrap"
-              style={{backgroundColor: '#F9A825'}}
-              onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-              onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-            >
-              Search
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Desktop Breadcrumb - Hidden on Mobile */}
       <div className="hidden lg:block bg-white py-8">
@@ -331,31 +328,31 @@ const ProductDetail: React.FC = () => {
                   </svg>
                   <span className="text-gray-600">{product.location}</span>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 lg:space-x-4">
                   <button 
                     onClick={handleSave}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 lg:p-3 rounded-full transition-colors ${
                       isSaved 
                         ? 'text-orange-500 bg-orange-50' 
                         : 'text-gray-400 hover:text-orange-500'
                     }`}
                     title={isSaved ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-5 h-5" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 lg:w-6 lg:h-6" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>
                   <button 
-                    onClick={handleLike}
-                    className={`p-2 rounded-full transition-colors ${
-                      isLiked 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                    onClick={handleShare}
+                    className={`p-2 lg:p-3 rounded-full transition-colors ${
+                      isShared 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={isLiked ? 'Unlike product' : 'Like product'}
+                    title={isShared ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                 </div>
@@ -588,14 +585,14 @@ const ProductDetail: React.FC = () => {
         <div className="mb-8">
           {/* Tab Navigation */}
           <div className="flex justify-center border-b border-gray-200 relative">
-            <button className="px-6 py-3 text-gray-900 font-medium border-b-2 border-gray-900">
+            <button className="px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base text-gray-900 font-medium border-b-2 border-gray-900">
               Other seller products
             </button>
-            <button className="px-6 py-3 text-gray-500 font-medium hover:text-gray-700">
+            <button className="px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base text-gray-500 font-medium hover:text-gray-700">
               Reviews and ratings
             </button>
             {/* Carousel Navigation */}
-            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+            <div className="hidden lg:flex absolute right-0 top-1/2 transform -translate-y-1/2 items-center space-x-2">
               <button 
                 onClick={handleOtherProductsPrev}
                 className="p-2 rounded-full border border-gray-300 text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors"
@@ -643,16 +640,16 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
                   <button 
-                    onClick={() => handleLikeProduct('textiles-1')}
+                    onClick={() => handleShareProduct('textiles-1')}
                     className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('textiles-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                      sharedProducts.has('textiles-1') 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={likedProducts.has('textiles-1') ? 'Unlike product' : 'Like product'}
+                    title={sharedProducts.has('textiles-1') ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-4 h-4" fill={likedProducts.has('textiles-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                   <button 
@@ -706,16 +703,16 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
                   <button 
-                    onClick={() => handleLikeProduct('tomatoes-1')}
+                    onClick={() => handleShareProduct('tomatoes-1')}
                     className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('tomatoes-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                      sharedProducts.has('tomatoes-1') 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={likedProducts.has('tomatoes-1') ? 'Unlike product' : 'Like product'}
+                    title={sharedProducts.has('tomatoes-1') ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-3 h-3" fill={likedProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                   <button 
@@ -735,7 +732,7 @@ const ProductDetail: React.FC = () => {
                     }`}
                     title={wishlistProducts.has('tomatoes-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill={wishlistProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>
@@ -769,16 +766,16 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
                   <button 
-                    onClick={() => handleLikeProduct('shrimp-1')}
+                    onClick={() => handleShareProduct('shrimp-1')}
                     className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('shrimp-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                      sharedProducts.has('shrimp-1') 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={likedProducts.has('shrimp-1') ? 'Unlike product' : 'Like product'}
+                    title={sharedProducts.has('shrimp-1') ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-3 h-3" fill={likedProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                   <button 
@@ -798,7 +795,7 @@ const ProductDetail: React.FC = () => {
                     }`}
                     title={wishlistProducts.has('shrimp-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill={wishlistProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>
@@ -832,16 +829,16 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
                   <button 
-                    onClick={() => handleLikeProduct('ndole-1')}
+                    onClick={() => handleShareProduct('ndole-1')}
                     className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('ndole-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                      sharedProducts.has('ndole-1') 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={likedProducts.has('ndole-1') ? 'Unlike product' : 'Like product'}
+                    title={sharedProducts.has('ndole-1') ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-3 h-3" fill={likedProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                   <button 
@@ -861,7 +858,7 @@ const ProductDetail: React.FC = () => {
                     }`}
                     title={wishlistProducts.has('ndole-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill={wishlistProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>
@@ -875,7 +872,7 @@ const ProductDetail: React.FC = () => {
       {/* Recommended Articles Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-base lg:text-xl font-semibold text-gray-900">Articles that might interest you</h2>
+          <h2 className="text-sm lg:text-xl font-semibold text-gray-900">Articles that might interest you</h2>
           <div className="flex items-center space-x-1 lg:space-x-2">
             <button 
               onClick={handleRecommendedPrev}
@@ -923,16 +920,16 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
                   <button 
-                    onClick={() => handleLikeProduct('basket-1')}
+                    onClick={() => handleShareProduct('basket-1')}
                     className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('basket-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                      sharedProducts.has('basket-1') 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={likedProducts.has('basket-1') ? 'Unlike product' : 'Like product'}
+                    title={sharedProducts.has('basket-1') ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-3 h-3" fill={likedProducts.has('basket-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                   <button 
@@ -952,7 +949,7 @@ const ProductDetail: React.FC = () => {
                     }`}
                     title={wishlistProducts.has('basket-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('basket-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill={wishlistProducts.has('basket-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>
@@ -986,16 +983,16 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
                   <button 
-                    onClick={() => handleLikeProduct('combs-1')}
+                    onClick={() => handleShareProduct('combs-1')}
                     className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('combs-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                      sharedProducts.has('combs-1') 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={likedProducts.has('combs-1') ? 'Unlike product' : 'Like product'}
+                    title={sharedProducts.has('combs-1') ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-3 h-3" fill={likedProducts.has('combs-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                   <button 
@@ -1015,7 +1012,7 @@ const ProductDetail: React.FC = () => {
                     }`}
                     title={wishlistProducts.has('combs-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('combs-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill={wishlistProducts.has('combs-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>
@@ -1049,16 +1046,16 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
                   <button 
-                    onClick={() => handleLikeProduct('beans-1')}
+                    onClick={() => handleShareProduct('beans-1')}
                     className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('beans-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                      sharedProducts.has('beans-1') 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={likedProducts.has('beans-1') ? 'Unlike product' : 'Like product'}
+                    title={sharedProducts.has('beans-1') ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-3 h-3" fill={likedProducts.has('beans-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                   <button 
@@ -1078,7 +1075,7 @@ const ProductDetail: React.FC = () => {
                     }`}
                     title={wishlistProducts.has('beans-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('beans-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill={wishlistProducts.has('beans-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>
@@ -1112,16 +1109,16 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
                   <button 
-                    onClick={() => handleLikeProduct('cassava-1')}
+                    onClick={() => handleShareProduct('cassava-1')}
                     className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('cassava-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                      sharedProducts.has('cassava-1') 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={likedProducts.has('cassava-1') ? 'Unlike product' : 'Like product'}
+                    title={sharedProducts.has('cassava-1') ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-3 h-3" fill={likedProducts.has('cassava-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                   <button 
@@ -1141,7 +1138,7 @@ const ProductDetail: React.FC = () => {
                     }`}
                     title={wishlistProducts.has('cassava-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('cassava-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill={wishlistProducts.has('cassava-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>

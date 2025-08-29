@@ -6,9 +6,7 @@ import logoLarge from '../../assets/images/logos/Frame 656.png';
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
-    phoneNumber: '',
     password: '',
     confirmPassword: ''
   });
@@ -21,14 +19,8 @@ const Register: React.FC = () => {
     const newErrors: {[key: string]: string} = {};
 
     // Required field validation
-    if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required';
-    }
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
-    }
-    if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
     }
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -79,8 +71,6 @@ const Register: React.FC = () => {
       const userCredentials = {
         email: formData.email,
         password: formData.password,
-        name: formData.name,
-        phoneNumber: formData.phoneNumber,
         profileImage: undefined, // Will be set during profile setup
         registeredAt: new Date().toISOString()
       };
@@ -220,26 +210,6 @@ const Register: React.FC = () => {
             <div className="space-y-4 sm:space-y-5">
               <div>
                 <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  required
-                  disabled={isLoading}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                    errors.name ? 'border-red-500' : 'border-gray-200'
-                  }`}
-                  placeholder="Full name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                )}
-              </div>
-
-              <div>
-                <input
                   id="email"
                   name="email"
                   type="email"
@@ -255,26 +225,6 @@ const Register: React.FC = () => {
                 />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
-              </div>
-
-              <div>
-                <input
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  type="tel"
-                  autoComplete="tel"
-                  required
-                  disabled={isLoading}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                    errors.phoneNumber ? 'border-red-500' : 'border-gray-200'
-                  }`}
-                  placeholder="Phone number"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                />
-                {errors.phoneNumber && (
-                  <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
                 )}
               </div>
               

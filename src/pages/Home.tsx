@@ -40,7 +40,7 @@ const Home: React.FC = () => {
   const [originLocation, setOriginLocation] = useState('');
   const [location, setLocation] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [likedProducts, setLikedProducts] = useState<Set<number>>(new Set());
+  const [sharedProducts, setSharedProducts] = useState<Set<number>>(new Set());
   const [savedProducts, setSavedProducts] = useState<Set<number>>(new Set());
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -362,18 +362,39 @@ const Home: React.FC = () => {
     alert('Scan functionality would open camera/barcode scanner');
   };
 
-  // Handle like functionality
-  const handleLike = (productId: number) => {
-    setLikedProducts(prev => {
-      const newLiked = new Set(prev);
-      if (newLiked.has(productId)) {
-        newLiked.delete(productId);
-        console.log(`Unliked product ${productId}`);
+  // Handle share functionality
+  const handleShare = async (productId: number) => {
+    setSharedProducts(prev => {
+      const newShared = new Set(prev);
+      if (newShared.has(productId)) {
+        newShared.delete(productId);
+        return newShared;
       } else {
-        newLiked.add(productId);
-        console.log(`Liked product ${productId}`);
+        newShared.add(productId);
+        
+        // Share functionality - moved outside setState to prevent multiple calls
+        setTimeout(async () => {
+          const shareData = {
+            title: 'Check out this product on BaoAfrik',
+            text: 'I found this amazing product on BaoAfrik marketplace',
+            url: window.location.href
+          };
+          
+          try {
+            if (navigator.share) {
+              await navigator.share(shareData);
+            } else {
+              // Fallback: copy to clipboard
+              await navigator.clipboard.writeText(window.location.href);
+              console.log('Product link copied to clipboard!');
+            }
+          } catch (error) {
+            console.log('Error sharing:', error);
+          }
+        }, 100);
+        
+        return newShared;
       }
-      return newLiked;
     });
   };
 
@@ -923,21 +944,21 @@ const Home: React.FC = () => {
                         </button>
                         
                         {/* Like Button */}
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            handleLike(product.id);
+                            handleShare(product.id);
                           }}
                           className={`p-1 transition-colors touch-manipulation ${
-                            likedProducts.has(product.id) 
-                              ? 'text-red-500 hover:text-red-600' 
+                            sharedProducts.has(product.id) 
+                              ? 'text-blue-500 hover:text-blue-600' 
                               : 'text-gray-400 hover:text-gray-600'
                           }`}
-                          title={likedProducts.has(product.id) ? 'Unlike product' : 'Like product'}
+                          title={sharedProducts.has(product.id) ? 'Shared' : 'Share product'}
                         >
-                          <svg className="w-4 h-4" fill={likedProducts.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                           </svg>
                         </button>
                       </div>
