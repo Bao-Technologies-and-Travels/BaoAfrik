@@ -5,3 +5,42 @@
 {"level":"error","message":"Missing required environment variable: SITE_URL","timestamp":"2025-08-29 13:51:57"}
 {"level":"error","message":"Missing required environment variable: SITE_URL","timestamp":"2025-08-29 13:52:34"}
 {"level":"error","message":"Missing required environment variable: SITE_URL","timestamp":"2025-08-29 13:53:43"}
+{"level":"error","message":"Missing required environment variable: SITE_URL","timestamp":"2025-08-29 14:11:34"}
+{"level":"error","message":"Missing required environment variable: SUPABASE_URL","timestamp":"2025-08-29 14:29:57"}
+{"level":"error","message":"Missing required environment variable: SUPABASE_URL","timestamp":"2025-08-29 14:30:10"}
+{"level":"error","message":"Missing required environment variable: SUPABASE_URL","timestamp":"2025-08-29 14:50:01"}
+{"level":"error","message":"Missing required environment variable: SUPABASE_URL","timestamp":"2025-08-29 14:52:35"}
+{"level":"error","message":"Missing required environment variable: SUPABASE_URL","timestamp":"2025-08-29 14:53:47"}
+{"level":"error","message":"Missing required environment variable: SUPABASE_URL","timestamp":"2025-08-29 14:54:14"}
+{"level":"info","message":"🚀 Server is running on port 3000","timestamp":"2025-08-29 15:01:22"}
+{"level":"info","message":"📝 Environment: development","timestamp":"2025-08-29 15:01:22"}
+{"code":"PGRST202","details":"Searched for the function public.test_connection without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"level":"error","message":"Could not find the function public.test_connection without parameters in the schema cache","timestamp":"2025-08-29 15:01:24"}
+{"level":"info","message":"✅ Successfully connected to Supabase","timestamp":"2025-08-29 15:01:24"}
+{"level":"info","message":"✅ BaoAfrik Backend API is ready!","timestamp":"2025-08-29 15:01:24"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","timestamp":"2025-08-29 15:01:26"}
+{"level":"info","message":"🚀 Server is running on port 3000","timestamp":"2025-08-29 15:01:33"}
+{"level":"info","message":"📝 Environment: development","timestamp":"2025-08-29 15:01:33"}
+{"level":"info","message":"✅ Successfully connected to Supabase","timestamp":"2025-08-29 15:01:34"}
+{"level":"info","message":"✅ BaoAfrik Backend API is ready!","timestamp":"2025-08-29 15:01:34"}
+{"code":"PGRST202","details":"Searched for the function public.test_connection without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"level":"error","message":"Could not find the function public.test_connection without parameters in the schema cache","timestamp":"2025-08-29 15:01:34"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","timestamp":"2025-08-29 15:02:07"}
+{"level":"info","message":"🚀 Server is running on port 3000","timestamp":"2025-08-29 15:02:15"}
+{"level":"info","message":"📝 Environment: development","timestamp":"2025-08-29 15:02:15"}
+{"code":"PGRST202","details":"Searched for the function public.test_connection without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"level":"error","message":"Could not find the function public.test_connection without parameters in the schema cache","timestamp":"2025-08-29 15:02:17"}
+{"level":"info","message":"✅ Successfully connected to Supabase","timestamp":"2025-08-29 15:02:17"}
+{"level":"info","message":"✅ BaoAfrik Backend API is ready!","timestamp":"2025-08-29 15:02:17"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","timestamp":"2025-08-29 15:08:39"}
+{"level":"info","message":"🚀 Server is running on port 3000","timestamp":"2025-08-29 15:08:42"}
+{"level":"info","message":"📝 Environment: development","timestamp":"2025-08-29 15:08:42"}
+{"code":"PGRST202","details":"Searched for the function public.test_connection without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"level":"error","message":"Could not find the function public.test_connection without parameters in the schema cache","timestamp":"2025-08-29 15:08:46"}
+{"level":"info","message":"✅ Successfully connected to Supabase","timestamp":"2025-08-29 15:08:47"}
+{"level":"info","message":"✅ BaoAfrik Backend API is ready!","timestamp":"2025-08-29 15:08:47"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","timestamp":"2025-08-29 15:09:16"}
+{"level":"info","message":"🚀 Server is running on port 3000","timestamp":"2025-08-29 15:10:40"}
+{"level":"info","message":"📝 Environment: development","timestamp":"2025-08-29 15:10:40"}
+{"level":"info","message":"✅ Successfully connected to Supabase","timestamp":"2025-08-29 15:10:40"}
+{"level":"info","message":"✅ BaoAfrik Backend API is ready!","timestamp":"2025-08-29 15:10:40"}
+{"code":"PGRST202","details":"Searched for the function public.test_connection without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"level":"error","message":"Could not find the function public.test_connection without parameters in the schema cache","timestamp":"2025-08-29 15:10:41"}
+{"__isAuthError":true,"code":"unexpected_failure","level":"error","message":"Sign up error: Database error saving new user","name":"AuthApiError","stack":"AuthApiError: Database error saving new user\n    at handleError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\@supabase\\auth-js\\dist\\main\\lib\\fetch.js:69:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async _handleRequest (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\@supabase\\auth-js\\dist\\main\\lib\\fetch.js:114:9)\n    at async _request (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\@supabase\\auth-js\\dist\\main\\lib\\fetch.js:95:18)\n    at async SupabaseAuthClient.signUp (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\@supabase\\auth-js\\dist\\main\\GoTrueClient.js:321:23)\n    at async Object.signUp (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\dist\\services\\auth.js:11:60)\n    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\dist\\routes\\auth.js:18:24","status":500,"timestamp":"2025-08-29 15:13:42"}
+{"__isAuthError":true,"code":"email_address_invalid","level":"error","message":"Sign up error: Email address \"test@example.com\" is invalid","name":"AuthApiError","stack":"AuthApiError: Email address \"test@example.com\" is invalid\n    at handleError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\@supabase\\auth-js\\dist\\main\\lib\\fetch.js:69:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async _handleRequest (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\@supabase\\auth-js\\dist\\main\\lib\\fetch.js:114:9)\n    at async _request (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\@supabase\\auth-js\\dist\\main\\lib\\fetch.js:95:18)\n    at async SupabaseAuthClient.signUp (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\@supabase\\auth-js\\dist\\main\\GoTrueClient.js:321:23)\n    at async Object.signUp (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\dist\\services\\auth.js:11:60)\n    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\dist\\routes\\auth.js:18:24","status":400,"timestamp":"2025-08-29 16:01:08"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","timestamp":"2025-08-29 16:02:14"}

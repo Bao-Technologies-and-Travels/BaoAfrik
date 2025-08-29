@@ -94,8 +94,8 @@ process.on('SIGINT', () => {
 // Test Supabase connection function
 const testSupabaseConnection = async () => {
   try {
-    const { data, error } = await supabase.from('profiles').select('count').limit(1);
-    if (error) throw error;
+    const { data, error } = await supabase.from('profiles').select('id').limit(1);
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "table not found" which is expected if schema isn't set up yet
     logger.info('✅ Successfully connected to Supabase');
   } catch (error) {
     logger.error('❌ Failed to connect to Supabase:', error);

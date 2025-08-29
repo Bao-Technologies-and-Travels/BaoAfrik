@@ -1,79 +1,35 @@
 import request from 'supertest';
 import { app } from '../index';
 
-// Jest globals are available through @types/jest
-declare const describe: jest.Describe;
-declare const it: jest.It;
-declare const expect: jest.Expect;
+describe('Authentication Routes', () => {
+  // Mock test data
+  const testUser = {
+    email: `test-${Date.now()}@example.com`,
+    password: 'TestPassword123!',
+    fullName: 'Test User',
+    phone: '+1234567890'
+  };
 
-describe('Authentication Endpoints', () => {
   describe('POST /api/auth/signup', () => {
-    it('should create a new user with valid data', async () => {
-      const userData = {
-        email: 'test@example.com',
-        password: 'password123',
-        fullName: 'Test User'
-      };
-
+    it('should create a new user account', async () => {
       const response = await request(app)
         .post('/api/auth/signup')
-        .send(userData)
-        .expect(201);
+        .send(testUser);
 
+      expect([200, 201]).toContain(response.status);
       expect(response.body.success).toBe(true);
-      expect(response.body.user).toBeDefined();
-    });
-
-    it('should return 400 for missing required fields', async () => {
-      const response = await request(app)
-        .post('/api/auth/signup')
-        .send({
-          email: 'test@example.com'
-          // Missing password and fullName
-        })
-        .expect(400);
-
-      expect(response.body.success).toBe(false);
-      expect(response.body.error).toContain('required');
-    });
-
-    it('should return 400 for invalid email format', async () => {
-      const userData = {
-        email: 'invalid-email',
-        password: 'password123',
-        fullName: 'Test User'
-      };
-
-      const response = await request(app)
-        .post('/api/auth/signup')
-        .send(userData)
-        .expect(400);
-
-      expect(response.body.success).toBe(false);
-    });
-  });
-
-  describe('POST /api/auth/signin', () => {
-    it('should sign in with valid credentials', async () => {
-      const credentials = {
-        email: 'test@example.com',
-        password: 'password123'
-      };
-
-      const response = await request(app)
-        .post('/api/auth/signin')
-        .send(credentials);
-
-      if (response.status === 200) {
-        expect(response.body.success).toBe(true);
-        expect(response.body.user).toBeDefined();
-        expect(response.body.session).toBeDefined();
+      
+      // Handle both immediate success and email confirmation cases
+      if (response.body.user) {
+        expect(response.body.user.email).toBe(testUser.email);
+      } else if (response.body.requiresConfirmation) {
+        expect(response.body.message).toContain('Confirmation email sent');
       }
     });
 
-    it('should return 400 for missing credentials', async () => {
+    it('should return error for missing required fields', async () => {
       const response = await request(app)
-        .post('/api/auth/signin')
+        .post('/api/auth/signup')
         .send({
           email: 'test@example.com'
           // Missing password

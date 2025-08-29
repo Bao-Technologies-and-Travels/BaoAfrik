@@ -1,5 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '../utils/logger';
+import dotenv from 'dotenv';
+
+// Load environment variables first
+dotenv.config();
 
 // Validate environment variables
 const requiredEnvVars = [
