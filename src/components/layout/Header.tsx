@@ -13,6 +13,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailPage = false }) => {
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -21,6 +22,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const toggleDesktopMenu = () => {
+    setIsDesktopMenuOpen(!isDesktopMenuOpen);
   };
 
   return (
@@ -146,6 +151,127 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 >
                   Logout
                 </button>
+                
+                {/* Desktop Burger Menu */}
+                <div className="relative">
+                  <button
+                    onClick={toggleDesktopMenu}
+                    className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors duration-200"
+                    aria-label="Open user menu"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
+                  
+                  {/* Desktop Dropdown Menu */}
+                  {isDesktopMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                      {/* User Profile */}
+                      <Link 
+                        to="/profile" 
+                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-orange-50 transition-colors"
+                        onClick={() => setIsDesktopMenuOpen(false)}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                            <img 
+                              src={user?.profileImage || avatar} 
+                              alt="Profile" 
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">User Profile</div>
+                            <div className="text-sm text-gray-500">View and edit your profile</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* Notifications */}
+                      <Link 
+                        to="/notifications" 
+                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-orange-50 transition-colors"
+                        onClick={() => setIsDesktopMenuOpen(false)}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM11 19H6a2 2 0 01-2-2V7a2 2 0 012-2h5m5 0v5" />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">Notifications</div>
+                            <div className="text-sm text-gray-500">View your notifications</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                        </div>
+                      </Link>
+
+                      {/* Messages */}
+                      <Link 
+                        to="/messages" 
+                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-orange-50 transition-colors"
+                        onClick={() => setIsDesktopMenuOpen(false)}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">Messages</div>
+                            <div className="text-sm text-gray-500">Check your messages</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">1</span>
+                        </div>
+                      </Link>
+
+                      {/* Request & Bring */}
+                      <Link 
+                        to="/requests" 
+                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-orange-50 transition-colors"
+                        onClick={() => setIsDesktopMenuOpen(false)}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">Request & Bring</div>
+                            <div className="text-sm text-gray-500">Request products from sellers</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* Bookmarks */}
+                      <Link 
+                        to="/bookmarks" 
+                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-orange-50 transition-colors"
+                        onClick={() => setIsDesktopMenuOpen(false)}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">Bookmarks</div>
+                            <div className="text-sm text-gray-500">View your saved items</div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               // Not logged in buttons (includes visitor mode)
