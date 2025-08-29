@@ -15,8 +15,8 @@ const EmailVerificationSuccess: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col px-4 sm:px-6 lg:px-8">
-      {/* Desktop Logo - Top Left */}
-      <div className="hidden lg:block absolute top-6 left-8">
+      {/* Desktop Logo - Top Left with Background */}
+      <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8">
         <img 
           src={logoFull} 
           alt="BaoAfrik Logo" 
@@ -26,13 +26,17 @@ const EmailVerificationSuccess: React.FC = () => {
       
       <div className="flex-1 flex items-center justify-center">
         <div className="w-full max-w-md text-center">
-          {/* Mobile Logo - Centered */}
-          <div className="lg:hidden mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-6 sm:mb-8">
-            <img 
-              src={logoSmall} 
-              alt="BaoAfrik Logo" 
-              className="w-full h-full object-contain"
-            />
+          {/* Mobile Logo - Centered with Background */}
+          <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-6 sm:mb-8">
+            <div className="text-center">
+              <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-6 sm:mb-8">
+                <img 
+                  src={logoSmall} 
+                  alt="BaoAfrik Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
           </div>
 
         {/* Success Icon */}
