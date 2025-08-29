@@ -1,0 +1,7 @@
+{"level":"error","message":"Missing required environment variable: SUPABASE_URL","timestamp":"2025-08-29 12:52:59"}
+{"level":"error","message":"Missing required environment variable: SUPABASE_URL","timestamp":"2025-08-29 13:50:26"}
+{"level":"error","message":"Missing required environment variable: SUPABASE_URL","timestamp":"2025-08-29 13:50:26"}
+{"level":"error","message":"Missing required environment variable: SITE_URL","timestamp":"2025-08-29 13:51:56"}
+{"level":"error","message":"Missing required environment variable: SITE_URL","timestamp":"2025-08-29 13:51:57"}
+{"level":"error","message":"Missing required environment variable: SITE_URL","timestamp":"2025-08-29 13:52:34"}
+{"level":"error","message":"Missing required environment variable: SITE_URL","timestamp":"2025-08-29 13:53:43"}
