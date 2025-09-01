@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 
 const EmailVerification: React.FC = () => {
@@ -196,11 +197,11 @@ const EmailVerification: React.FC = () => {
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+                <LoadingSpinner size="md" color="white" className="mr-2" />
                 <span className="text-sm sm:text-base">Verifying...</span>
               </div>
             ) : (
-              'Verify Email'
+              <span className="text-sm sm:text-base">Confirm email address</span>
             )}
           </button>
         </form>

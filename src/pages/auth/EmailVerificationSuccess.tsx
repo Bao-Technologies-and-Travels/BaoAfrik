@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 const EmailVerificationSuccess: React.FC = () => {
   const navigate = useNavigate();
@@ -62,11 +63,11 @@ const EmailVerificationSuccess: React.FC = () => {
         >
           {isLoading ? (
             <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+              <LoadingSpinner size="md" color="white" className="mr-2" />
               <span className="text-sm sm:text-base">Loading...</span>
             </div>
           ) : (
-            'Continue to Profile Setup'
+            <span className="text-sm sm:text-base">Continue to Profile Setup</span>
           )}
         </button>
 

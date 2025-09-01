@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -384,7 +385,7 @@ const Login: React.FC = () => {
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  <LoadingSpinner size="md" color="white" className="mr-2" />
                   Signing In...
                 </div>
               ) : (

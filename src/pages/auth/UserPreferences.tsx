@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 const UserPreferences: React.FC = () => {
   const navigate = useNavigate();
@@ -270,11 +271,11 @@ const UserPreferences: React.FC = () => {
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-gray-700 mr-2"></div>
+                <LoadingSpinner size="md" color="gray" className="mr-2" />
                 <span className="text-sm sm:text-base">Finishing...</span>
               </div>
             ) : (
-              'Finish'
+              <span className="text-sm sm:text-base">Finish Setup</span>
             )}
           </button>
         </form>

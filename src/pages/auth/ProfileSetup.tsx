@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -22,22 +23,6 @@ const ProfileSetup: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   
   // Load social login data if available
-  useEffect(() => {
-    if (fromSocialLogin) {
-      const socialUserData = JSON.parse(localStorage.getItem('tempSocialUser') || '{}');
-      if (socialUserData.name) {
-        const nameParts = socialUserData.name.split(' ');
-        setFormData(prev => ({
-          ...prev,
-          firstName: nameParts[0] || '',
-          lastName: nameParts.slice(1).join(' ') || ''
-        }));
-      }
-      if (socialUserData.profileImage) {
-        setProfileImage(socialUserData.profileImage);
-      }
-    }
-  }, [fromSocialLogin]);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -380,11 +365,11 @@ const ProfileSetup: React.FC = () => {
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700 mr-2"></div>
+                  <LoadingSpinner size="sm" color="gray" className="mr-2" />
                   <span>Saving information...</span>
                 </div>
               ) : (
-                'Save Information'
+                'Save information'
               )}
             </button>
           </div>
