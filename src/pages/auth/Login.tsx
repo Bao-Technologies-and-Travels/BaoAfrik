@@ -448,7 +448,7 @@ const Login: React.FC = () => {
       </div>
 
       {/* Right side - Logo Illustration */}
-      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-orange-100 to-yellow-100">
+      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-orange-50 via-orange-100 to-white">
         <div className="max-w-md text-center">
           {/* Large BaoAfrik Logo */}
           <div className="mx-auto w-80 h-80 mb-8 flex items-center justify-center">
