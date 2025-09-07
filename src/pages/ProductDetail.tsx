@@ -407,7 +407,10 @@ const ProductDetail: React.FC = () => {
               </div>
 
               {/* Seller Info */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+              <div 
+                className="bg-white rounded-lg border border-gray-200 p-4 mb-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={() => navigate(`/seller/${product.seller.name.toLowerCase().replace(/\s+/g, '-')}`)}
+              >
                 <div className="text-sm font-medium text-gray-500 mb-3">Seller profile</div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -421,9 +424,9 @@ const ProductDetail: React.FC = () => {
                     </div>
                   </div>
                   {product.seller.verified && (
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-2 py-1 rounded-md">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                      <span className="text-xs font-medium">Verified Seller</span>
                     </div>
                   )}
                 </div>
@@ -540,25 +543,25 @@ const ProductDetail: React.FC = () => {
         </div>
         
         {/* Seller Profile */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-3">
-          <div className="text-sm font-medium text-gray-500 mb-3">Seller profile</div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <img
-                src={product.seller.avatar}
-                alt={product.seller.name}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <div>
-                <div className="font-medium text-gray-900">{product.seller.name}</div>
-              </div>
+        <div 
+          className="mb-4 cursor-pointer hover:bg-gray-50 transition-colors rounded-lg p-3 -mx-3"
+          onClick={() => navigate(`/seller/${product.seller.name.toLowerCase().replace(/\s+/g, '-')}`)}
+        >
+          <div className="flex items-center space-x-3 mb-2">
+            <img
+              src={product.seller.avatar}
+              alt={product.seller.name}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div>
+              <div className="font-medium text-gray-900">{product.seller.name}</div>
+              {product.seller.verified && (
+                <div className="flex items-center text-xs text-green-600 mt-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                  Verified Seller
+                </div>
+              )}
             </div>
-            {product.seller.verified && (
-              <div className="flex items-center text-xs text-green-600">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                Verified Seller
-              </div>
-            )}
           </div>
         </div>
         
@@ -588,7 +591,10 @@ const ProductDetail: React.FC = () => {
             <button className="px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base text-gray-900 font-medium border-b-2 border-gray-900">
               Other seller products
             </button>
-            <button className="px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base text-gray-500 font-medium hover:text-gray-700">
+            <button 
+              onClick={() => navigate(`/seller/${product.seller.name.toLowerCase().replace(/\s+/g, '-')}?tab=reviews`)}
+              className="px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base text-gray-500 font-medium hover:text-gray-700 transition-colors"
+            >
               Reviews and ratings
             </button>
             {/* Carousel Navigation */}
