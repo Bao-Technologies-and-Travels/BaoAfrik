@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -28,6 +28,20 @@ const SellerProfile: React.FC = () => {
     }
   }, [tabFromUrl]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setFilterDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleShareProduct = (productId: string) => {
     const newSet = new Set(sharedProducts);
     if (newSet.has(productId)) {
@@ -56,7 +70,25 @@ const SellerProfile: React.FC = () => {
   const [likes, setLikes] = useState({ review1: 5, review2: 5, review3: 5 });
   const [likedReviews, setLikedReviews] = useState<string[]>([]);
   const [expandedDiscussions, setExpandedDiscussions] = useState<string[]>([]);
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState('Most Relevant');
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
   const { sellerId } = useParams<{ sellerId: string }>();
+
+  // Filter options
+  const filterOptions = [
+    'Most Relevant',
+    'Newest First',
+    'Oldest First',
+    'Highest Rating',
+    'Lowest Rating'
+  ];
+
+  // Function to handle filter selection
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
+    setFilterDropdownOpen(false);
+  };
 
   // Mock seller data - in real app this would come from API
   const seller = {
@@ -137,93 +169,105 @@ const SellerProfile: React.FC = () => {
 
 
       {/* Cover Page Section - Desktop */}
-      <div className="hidden lg:block px-6 py-4 relative">
-        <div className="bg-orange-100 h-64 rounded-2xl relative overflow-hidden">
-          {/* Cover Image */}
-          <img
-            src={seller.coverPhoto || defaultCoverImage}
-            alt="Cover Photo"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        {/* Profile Avatar - Half in cover, positioned for left alignment */}
-        <div className="absolute left-12 bottom-[-80px]">
-          <div className="w-40 h-40 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+      <div className="hidden lg:block px-2 py-4 relative">
+        <div className="w-full">
+          <div className="bg-orange-100 h-64 rounded-2xl relative overflow-hidden w-full">
+            {/* Cover Image */}
             <img
-              src={seller.avatar}
-              alt={seller.name}
-              className="w-36 h-36 rounded-xl object-cover"
+              src={seller.coverPhoto || defaultCoverImage}
+              alt="Cover Photo"
+              className="w-full h-full object-cover"
             />
           </div>
-        </div>
-        
-        {/* Chat Button - Positioned at right side of cover */}
-        <div className="absolute right-12 bottom-[-60px]">
-          <div className="flex items-center space-x-3">
-            <button className="bg-orange-400 text-white px-12 py-3 rounded-lg hover:bg-orange-500 transition-colors font-medium flex items-center space-x-2">
-              <span>Chat with seller</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </button>
-            <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        
-        {/* Name and Status - Positioned next to avatar */}
-        <div className="absolute left-56 bottom-[-70px]">
-          <h1 className="text-xl text-gray-900 mb-2">{seller.name}</h1>
-          {seller.isVerified && (
-            <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-2 py-1 rounded-md">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-              <span className="text-xs font-medium">Verified Seller</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile Profile Section - Desktop-like Layout */}
-      <div className="lg:hidden relative">
-        {/* Cover Photo Background */}
-        <div className="bg-orange-100 h-32 relative overflow-hidden">
-          <img
-            src={seller.coverPhoto || defaultCoverImage}
-            alt="Cover Photo"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        {/* Profile Content Overlay */}
-        <div className="px-4 pb-6 relative">
-          {/* Profile Avatar - Positioned like desktop */}
-          <div className="absolute left-4 -top-10">
-            <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+          
+          {/* Profile Avatar - Half in cover, positioned for left alignment */}
+          <div className="absolute left-8 bottom-[-80px]">
+            <div className="w-40 h-40 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
               <img
                 src={seller.avatar}
                 alt={seller.name}
-                className="w-16 h-16 rounded-xl object-cover"
+                className="w-36 h-36 rounded-xl object-cover"
+              />
+            </div>
+          </div>
+          
+          {/* Chat Button - Positioned at right side of cover */}
+          <div className="absolute right-8 bottom-[-60px]">
+            <div className="flex items-center space-x-3">
+              <button className="bg-orange-400 text-white px-8 xl:px-12 py-3 rounded-lg hover:bg-orange-500 transition-colors font-medium flex items-center space-x-2">
+                <span>Chat with seller</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </button>
+              <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white">
+                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 010 2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          {/* Name and Status - Positioned next to avatar */}
+          <div className="absolute left-52 bottom-[-70px]">
+            <h1 className="text-xl text-gray-900 mb-2">{seller.name}</h1>
+            {seller.isVerified && (
+              <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-2 py-1 rounded-md">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                <span className="text-xs font-medium">Verified Seller</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile and Tablet Profile Section */}
+      <div className="lg:hidden relative">
+        {/* Cover Photo Background */}
+        <div className="bg-orange-100 h-32 md:h-40 relative overflow-hidden">
+          <img
+            src={seller.coverPhoto || defaultCoverImage}
+            alt="Cover Photo"
+            className="w-full h-full object-cover"
+          />
+          
+          {/* Back Button - Top Left */}
+          <button 
+            onClick={() => navigate(-1)}
+            className="absolute top-4 left-4 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full border border-gray-300 flex items-center justify-center shadow-sm hover:bg-gray-50 transition-colors"
+          >
+            <svg className="w-5 h-5 md:w-6 md:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
+        
+        {/* Profile Content Overlay */}
+        <div className="px-4 md:px-6 pb-6 relative">
+          {/* Profile Avatar - Positioned like desktop */}
+          <div className="absolute left-4 md:left-6 -top-10">
+            <div className="w-20 h-20 md:w-24 md:h-24 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+              <img
+                src={seller.avatar}
+                alt={seller.name}
+                className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover"
               />
             </div>
           </div>
           
           {/* Verified Badge - Moved Down */}
-          <div className="absolute right-4 top-2">
+          <div className="absolute right-4 md:right-6 top-2">
             {seller.isVerified && (
-              <div className="inline-flex items-center space-x-1 bg-green-100 text-green-700 px-2 py-1 rounded">
-                <div className="w-1 h-1 bg-green-500 rounded-full"></div>
-                <span className="text-xs font-medium">Verified Seller</span>
+              <div className="inline-flex items-center space-x-1 bg-green-100 text-green-700 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg text-xs md:text-sm whitespace-nowrap">
+                <div className="w-1 h-1 md:w-1.5 md:h-1.5 bg-green-500 rounded-full"></div>
+                <span className="font-medium">Verified Seller</span>
               </div>
             )}
           </div>
           
           {/* Name and Info - Below Avatar */}
-          <div className="pt-12">
-            <h1 className="text-lg font-semibold text-gray-900 mb-2">{seller.name}</h1>
+          <div className="pt-12 md:pt-14">
+            <h1 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">{seller.name}</h1>
             
             {/* Location, Member Info, and Rating */}
             <div className="flex items-start justify-between mb-3">
@@ -263,15 +307,15 @@ const SellerProfile: React.FC = () => {
 
       {/* Profile Section - Desktop Only */}
       <div className="hidden lg:block bg-white pt-24">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           {/* Profile Header */}
           <div className="mb-0">
           </div>
 
-          {/* Bio and Info Sections - Side by side layout */}
-          <div className="mb-4 flex gap-16">
+          {/* Bio and Info Sections - Responsive grid layout */}
+          <div className="mb-4 grid grid-cols-1 xl:grid-cols-3 gap-8 xl:gap-16">
             {/* Bio Section */}
-            <div className="ml-[-280px] max-w-2xl">
+            <div className="xl:col-span-2">
               <h3 className="text-xl font-semibold text-gray-900 mb-6">Bio</h3>
               <p className="text-gray-600 leading-relaxed text-base">
                 {seller.bio}
@@ -279,9 +323,9 @@ const SellerProfile: React.FC = () => {
             </div>
 
             {/* Info Section - Location and Membership */}
-            <div className="space-y-8 ml-auto mr-[-200px]">
+            <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">Reviews & Ratings</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Reviews & Ratings</h2>
                 <div className="flex items-center space-x-2 text-gray-600">
                   <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -292,7 +336,7 @@ const SellerProfile: React.FC = () => {
               </div>
 
               <div>
-                <h4 className="text-xl font-semibold text-gray-900 mb-4">Member</h4>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Member</h4>
                 <div className="flex items-center space-x-2 text-gray-600">
                   <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -305,39 +349,41 @@ const SellerProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Bio Section - Moved to Top */}
-      <div className="lg:hidden bg-white px-4 py-3">
-        <h3 className="text-base font-semibold text-gray-900 mb-3">Bio</h3>
-        <p className="text-gray-600 leading-relaxed text-sm">
+      {/* Mobile and Tablet Bio Section */}
+      <div className="lg:hidden bg-white px-4 md:px-6 py-3 md:py-4">
+        <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Bio</h3>
+        <p className="text-gray-600 leading-relaxed text-sm md:text-base">
           {seller.bio}
         </p>
       </div>
 
       {/* Reviews and Ratings Section */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           {/* Tab Navigation */}
-          <div className="flex border-b border-gray-200 mb-8">
-            <button 
-              onClick={() => setActiveTab('reviews')}
-              className={`px-4 py-2 text-sm lg:text-base font-medium border-b-2 ${
-                activeTab === 'reviews' 
-                  ? 'text-gray-900 border-gray-900' 
-                  : 'text-gray-500 border-transparent hover:text-gray-700'
-              }`}
-            >
-              Reviews and Ratings
-            </button>
-            <button 
-              onClick={() => setActiveTab('items')}
-              className={`px-4 py-2 text-sm lg:text-base font-medium ml-8 border-b-2 ${
-                activeTab === 'items' 
-                  ? 'text-gray-900 border-gray-900' 
-                  : 'text-gray-500 border-transparent hover:text-gray-700'
-              }`}
-            >
-              Seller Items
-            </button>
+          <div className="border-b border-gray-200 mb-8">
+            <div className="flex">
+              <button 
+                onClick={() => setActiveTab('reviews')}
+                className={`px-4 py-2 text-sm lg:text-base font-medium border-b-2 ${
+                  activeTab === 'reviews' 
+                    ? 'text-gray-900 border-gray-900' 
+                    : 'text-gray-500 border-transparent hover:text-gray-700'
+                }`}
+              >
+                Reviews and Ratings
+              </button>
+              <button 
+                onClick={() => setActiveTab('items')}
+                className={`px-4 py-2 text-sm lg:text-base font-medium ml-8 border-b-2 ${
+                  activeTab === 'items' 
+                    ? 'text-gray-900 border-gray-900' 
+                    : 'text-gray-500 border-transparent hover:text-gray-700'
+                }`}
+              >
+                Seller Items
+              </button>
+            </div>
           </div>
 
           {/* Reviews Content */}
@@ -388,15 +434,42 @@ const SellerProfile: React.FC = () => {
             <div className="-mt-4 text-sm text-gray-600">Reviews (456)</div>
           </div>
 
-          {/* Most Relevant Filter */}
-          <div className="flex items-center mb-6">
-            <svg className="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-              <circle cx="8" cy="6" r="2" fill="currentColor" />
-              <circle cx="16" cy="10" r="2" fill="currentColor" />
-              <circle cx="12" cy="14" r="2" fill="currentColor" />
-            </svg>
-            <span className="text-gray-600 text-sm">Most Relevant</span>
+          {/* Filter Dropdown */}
+          <div className="relative mb-6" ref={filterDropdownRef}>
+            <button 
+              onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+              className="flex items-center text-gray-600 text-sm hover:text-gray-800 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                <circle cx="8" cy="6" r="2" fill="currentColor" />
+                <circle cx="16" cy="10" r="2" fill="currentColor" />
+                <circle cx="12" cy="14" r="2" fill="currentColor" />
+              </svg>
+              <span>{selectedFilter}</span>
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {/* Dropdown Menu */}
+            {filterDropdownOpen && (
+              <div className="absolute top-8 left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-48">
+                {filterOptions.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => handleFilterSelect(option)}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                      selectedFilter === option ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+                    } ${option === filterOptions[0] ? 'rounded-t-lg' : ''} ${
+                      option === filterOptions[filterOptions.length - 1] ? 'rounded-b-lg' : ''
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Review Cards */}
@@ -411,27 +484,27 @@ const SellerProfile: React.FC = () => {
                 />
                 <div className="flex-1">
                   <div className="mb-2">
-                    <div className="flex items-center justify-between lg:justify-start lg:flex-col lg:items-start">
-                      <h4 className="font-medium text-gray-900">Miles Kennedy</h4>
-                      <div className="flex items-center justify-between lg:justify-start lg:space-x-2 lg:mt-1">
-                        <div className="flex items-center">
-                          {[1,2,3,4].map((star) => (
-                            <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                          ))}
-                        </div>
-                        <span className="text-xs text-gray-500 lg:text-sm">
-                          <span className="lg:hidden">15/07/2025</span>
-                          <span className="hidden lg:inline">Published on 15, Jul 2025</span>
-                        </span>
+                    <h4 className="font-medium text-gray-900 mb-1">Miles Kennedy</h4>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        {[1,2,3,4].map((star) => (
+                          <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
                       </div>
+                      <span className="text-xs text-gray-500 lg:text-sm">
+                        <span className="lg:hidden">15/07/2025</span>
+                        <span className="hidden lg:inline">Published on 15, Jul 2025</span>
+                      </span>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                    Amazing seller! The product quality exceeded my expectations. Fast shipping and excellent communication throughout the process. The item was exactly as described and arrived in perfect condition. Highly recommend this seller to anyone looking for quality products and reliable service.
-                  </p>
-                  <div className="flex items-center justify-between">
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm leading-relaxed mb-3 mt-2">
+                Amazing seller! The product quality exceeded my expectations. Fast shipping and excellent communication throughout the process. The item was exactly as described and arrived in perfect condition. Highly recommend this seller to anyone looking for quality products and reliable service.
+              </p>
+              <div className="flex items-center justify-between">
                     <button 
                       onClick={() => {
                         const isLiked = likedReviews.includes('review1');
@@ -443,8 +516,8 @@ const SellerProfile: React.FC = () => {
                           setLikedReviews(prev => [...prev, 'review1']);
                         }
                       }}
-                      className={`flex items-center space-x-2 transition-colors ${
-                        likedReviews.includes('review1') ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+                      className={`flex items-center space-x-2 transition-colors px-3 py-1 rounded-lg ${
+                        likedReviews.includes('review1') ? 'text-red-500 bg-red-50' : 'text-gray-500 hover:text-red-500 bg-blue-50 hover:bg-blue-100'
                       }`}
                     >
                       <svg className="w-4 h-4" fill={likedReviews.includes('review1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -498,8 +571,6 @@ const SellerProfile: React.FC = () => {
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
             </div>
 
             {/* Review 2 */}
@@ -512,27 +583,27 @@ const SellerProfile: React.FC = () => {
                 />
                 <div className="flex-1">
                   <div className="mb-2">
-                    <div className="flex items-center justify-between lg:justify-start lg:flex-col lg:items-start">
-                      <h4 className="font-medium text-gray-900">Samine Herald</h4>
-                      <div className="flex items-center justify-between lg:justify-start lg:space-x-2 lg:mt-1">
-                        <div className="flex items-center">
-                          {[1,2,3,4].map((star) => (
-                            <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                          ))}
-                        </div>
-                        <span className="text-xs text-gray-500 lg:text-sm">
-                          <span className="lg:hidden">22/06/2025</span>
-                          <span className="hidden lg:inline">Published on 22, Jun 2025</span>
-                        </span>
+                    <h4 className="font-medium text-gray-900 mb-1">Samine Herald</h4>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        {[1,2,3,4].map((star) => (
+                          <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
                       </div>
+                      <span className="text-xs text-gray-500 lg:text-sm">
+                        <span className="lg:hidden">22/06/2025</span>
+                        <span className="hidden lg:inline">Published on 22, Jun 2025</span>
+                      </span>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                    Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages. Will definitely purchase from this seller again!
-                  </p>
-                  <div className="flex items-center justify-between">
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm leading-relaxed mb-3 mt-2">
+                Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages. Will definitely purchase from this seller again!
+              </p>
+              <div className="flex items-center justify-between">
                     <button 
                       onClick={() => {
                         const isLiked = likedReviews.includes('review2');
@@ -544,8 +615,8 @@ const SellerProfile: React.FC = () => {
                           setLikedReviews(prev => [...prev, 'review2']);
                         }
                       }}
-                      className={`flex items-center space-x-2 transition-colors ${
-                        likedReviews.includes('review2') ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+                      className={`flex items-center space-x-2 transition-colors px-3 py-1 rounded-lg ${
+                        likedReviews.includes('review2') ? 'text-red-500 bg-red-50' : 'text-gray-500 hover:text-red-500 bg-blue-50 hover:bg-blue-100'
                       }`}
                     >
                       <svg className="w-4 h-4" fill={likedReviews.includes('review2') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -599,8 +670,6 @@ const SellerProfile: React.FC = () => {
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
             </div>
 
             {/* Review 3 */}
@@ -613,27 +682,27 @@ const SellerProfile: React.FC = () => {
                 />
                 <div className="flex-1">
                   <div className="mb-2">
-                    <div className="flex items-center justify-between lg:justify-start lg:flex-col lg:items-start">
-                      <h4 className="font-medium text-gray-900">David Johnson</h4>
-                      <div className="flex items-center justify-between lg:justify-start lg:space-x-2 lg:mt-1">
-                        <div className="flex items-center">
-                          {[1,2,3,4].map((star) => (
-                            <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                          ))}
-                        </div>
-                        <span className="text-xs text-gray-500 lg:text-sm">
-                          <span className="lg:hidden">10/05/2025</span>
-                          <span className="hidden lg:inline">Published on 10, May 2025</span>
-                        </span>
+                    <h4 className="font-medium text-gray-900 mb-1">David Johnson</h4>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        {[1,2,3,4].map((star) => (
+                          <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
                       </div>
+                      <span className="text-xs text-gray-500 lg:text-sm">
+                        <span className="lg:hidden">10/05/2025</span>
+                        <span className="hidden lg:inline">Published on 10, May 2025</span>
+                      </span>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                    Fantastic seller with top-notch products! The quality is exceptional and the price was very reasonable. Quick delivery and the item was exactly what I was looking for. Professional packaging and great customer service. This seller truly cares about their customers' experience.
-                  </p>
-                  <div className="flex items-center justify-between">
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm leading-relaxed mb-3 mt-2">
+                Fantastic seller with top-notch products! The quality is exceptional and the price was very reasonable. Quick delivery and the item was exactly what I was looking for. Professional packaging and great customer service. This seller truly cares about their customers' experience.
+              </p>
+              <div className="flex items-center justify-between">
                     <button 
                       onClick={() => {
                         const isLiked = likedReviews.includes('review3');
@@ -645,8 +714,8 @@ const SellerProfile: React.FC = () => {
                           setLikedReviews(prev => [...prev, 'review3']);
                         }
                       }}
-                      className={`flex items-center space-x-2 transition-colors ${
-                        likedReviews.includes('review3') ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+                      className={`flex items-center space-x-2 transition-colors px-3 py-1 rounded-lg ${
+                        likedReviews.includes('review3') ? 'text-red-500 bg-red-50' : 'text-gray-500 hover:text-red-500 bg-blue-50 hover:bg-blue-100'
                       }`}
                     >
                       <svg className="w-4 h-4" fill={likedReviews.includes('review3') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -700,8 +769,6 @@ const SellerProfile: React.FC = () => {
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
             </div>
           </div>
 
@@ -709,7 +776,7 @@ const SellerProfile: React.FC = () => {
           <div className="text-center mt-8">
             <button 
               onClick={() => navigate('/reviews')}
-              className="text-blue-500 hover:underline transition-colors"
+              className="text-blue-500 hover:underline transition-colors bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100"
             >
               View more reviews (453)
             </button>
@@ -719,7 +786,7 @@ const SellerProfile: React.FC = () => {
 
           {/* Seller Items Content */}
           {activeTab === 'items' && (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
               {/* Product 1 - African Textiles */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="aspect-square bg-gray-100">
@@ -728,9 +795,12 @@ const SellerProfile: React.FC = () => {
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-base font-semibold text-gray-900">$13.9</span>
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="flex items-center text-xs lg:text-sm text-green-600 whitespace-nowrap bg-green-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-lg">
+                      <div className="w-1 h-1 lg:w-2 lg:h-2 bg-green-500 rounded-full mr-1"></div>
+                      <span className="text-xs lg:text-sm">
+                        <span className="lg:hidden">Verified</span>
+                        <span className="hidden lg:inline">Verified Seller</span>
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">
@@ -791,9 +861,12 @@ const SellerProfile: React.FC = () => {
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-base font-semibold text-gray-900">$45</span>
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="flex items-center text-xs lg:text-sm text-green-600 whitespace-nowrap bg-green-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-lg">
+                      <div className="w-1 h-1 lg:w-2 lg:h-2 bg-green-500 rounded-full mr-1"></div>
+                      <span className="text-xs lg:text-sm">
+                        <span className="lg:hidden">Verified</span>
+                        <span className="hidden lg:inline">Verified Seller</span>
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">
@@ -854,9 +927,12 @@ const SellerProfile: React.FC = () => {
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-base font-semibold text-gray-900">$8.09</span>
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="flex items-center text-xs lg:text-sm text-green-600 whitespace-nowrap bg-green-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-lg">
+                      <div className="w-1 h-1 lg:w-2 lg:h-2 bg-green-500 rounded-full mr-1"></div>
+                      <span className="text-xs lg:text-sm">
+                        <span className="lg:hidden">Verified</span>
+                        <span className="hidden lg:inline">Verified Seller</span>
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">
@@ -917,9 +993,12 @@ const SellerProfile: React.FC = () => {
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-base font-semibold text-gray-900">$11.5</span>
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="flex items-center text-xs lg:text-sm text-green-600 whitespace-nowrap bg-green-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-lg">
+                      <div className="w-1 h-1 lg:w-2 lg:h-2 bg-green-500 rounded-full mr-1"></div>
+                      <span className="text-xs lg:text-sm">
+                        <span className="lg:hidden">Verified</span>
+                        <span className="hidden lg:inline">Verified Seller</span>
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">
@@ -980,9 +1059,12 @@ const SellerProfile: React.FC = () => {
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-base font-semibold text-gray-900">$6.50</span>
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="flex items-center text-xs lg:text-sm text-green-600 whitespace-nowrap bg-green-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-lg">
+                      <div className="w-1 h-1 lg:w-2 lg:h-2 bg-green-500 rounded-full mr-1"></div>
+                      <span className="text-xs lg:text-sm">
+                        <span className="lg:hidden">Verified</span>
+                        <span className="hidden lg:inline">Verified Seller</span>
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">
@@ -1043,9 +1125,12 @@ const SellerProfile: React.FC = () => {
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-base font-semibold text-gray-900">$9.75</span>
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="flex items-center text-xs lg:text-sm text-green-600 whitespace-nowrap bg-green-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-lg">
+                      <div className="w-1 h-1 lg:w-2 lg:h-2 bg-green-500 rounded-full mr-1"></div>
+                      <span className="text-xs lg:text-sm">
+                        <span className="lg:hidden">Verified</span>
+                        <span className="hidden lg:inline">Verified Seller</span>
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">
@@ -1106,9 +1191,12 @@ const SellerProfile: React.FC = () => {
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-base font-semibold text-gray-900">$15.20</span>
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="flex items-center text-xs lg:text-sm text-green-600 whitespace-nowrap bg-green-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-lg">
+                      <div className="w-1 h-1 lg:w-2 lg:h-2 bg-green-500 rounded-full mr-1"></div>
+                      <span className="text-xs lg:text-sm">
+                        <span className="lg:hidden">Verified</span>
+                        <span className="hidden lg:inline">Verified Seller</span>
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">
@@ -1169,9 +1257,12 @@ const SellerProfile: React.FC = () => {
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-base font-semibold text-gray-900">$22.00</span>
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="flex items-center text-xs lg:text-sm text-green-600 whitespace-nowrap bg-green-100 px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-lg">
+                      <div className="w-1 h-1 lg:w-2 lg:h-2 bg-green-500 rounded-full mr-1"></div>
+                      <span className="text-xs lg:text-sm">
+                        <span className="lg:hidden">Verified</span>
+                        <span className="hidden lg:inline">Verified Seller</span>
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">

@@ -431,7 +431,7 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Search Section */}
-      <section className="bg-white shadow-sm border-b border-gray-200 mt-4 sm:mt-6">
+      <section className="bg-white shadow-sm border border-gray-200 rounded-full mt-4 sm:mt-6 mx-4 sm:mx-6 lg:mx-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           {/* Desktop Search */}
           <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-4">
@@ -458,7 +458,7 @@ const Home: React.FC = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 sm:px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base"
+                className="px-3 sm:px-4 pr-8 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base"
               >
                 <option value="">All Categories</option>
                 <option value="Food & Spices">Food & Spices</option>
@@ -492,12 +492,14 @@ const Home: React.FC = () => {
               {/* Search Button */}
               <button 
                 onClick={handleSearch}
-                className="text-white px-4 sm:px-6 py-3 rounded-full transition-colors font-medium text-sm sm:text-base whitespace-nowrap"
+                className="text-white px-4 sm:px-6 py-3 rounded-full transition-colors font-medium text-sm sm:text-base whitespace-nowrap flex items-center justify-center"
                 style={{backgroundColor: '#F9A825'}}
                 onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
               >
-                Search
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
               </button>
               
               {/* Scan Button */}
@@ -596,12 +598,14 @@ const Home: React.FC = () => {
                         handleSearch();
                         setIsMobileFilterOpen(false);
                       }}
-                      className="flex-1 text-white py-2 px-4 rounded-lg font-medium text-sm transition-colors"
+                      className="flex-1 text-white py-2 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center"
                       style={{backgroundColor: '#F9A825'}}
                       onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
                       onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
                     >
-                      Search
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
                     </button>
                     <button 
                       onClick={handleScan}

@@ -168,7 +168,7 @@ const Login: React.FC = () => {
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           {/* Visitor Access Button */}
-          <div className="text-center">
+          <div className="text-center pt-8 md:pt-0">
             <button
               onClick={handleVisitorAccess}
               className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-full hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"

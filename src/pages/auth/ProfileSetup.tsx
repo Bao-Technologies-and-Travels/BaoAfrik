@@ -353,7 +353,7 @@ const ProfileSetup: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-8">
+          <div className="pt-8 pb-8 md:pb-0">
             <button
               type="submit"
               disabled={isLoading || !isFormValid}
