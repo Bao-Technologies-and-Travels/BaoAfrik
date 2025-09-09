@@ -128,7 +128,7 @@ const ResetPasswordSent: React.FC = () => {
         />
       </div>
       
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-8 lg:pt-16">
         <div className="w-full max-w-md">
           {/* Mobile Logo - Centered with Background */}
           <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-8">
@@ -143,99 +143,94 @@ const ResetPasswordSent: React.FC = () => {
             </div>
           </div>
 
-          <div className="text-center mb-8 mt-16 lg:mt-0">
-            {/* Mail Verification Icon */}
-            <div className="mx-auto w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mb-6">
-              <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            
-            <h1 className="text-2xl font-medium text-gray-900 mb-3">
-              Mail verification
-            </h1>
-            <p className="text-gray-500 text-sm px-4 mb-2">
-              Please enter the 6-digit code sent to the email address <span className="font-medium text-gray-700">{maskEmail(email)}</span>
-            </p>
-            <p className="text-red-500 text-xs">
-              Request another code 0:{countdown.toString().padStart(2, '0')}
-            </p>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm text-center">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* 6-Digit Code Input */}
-            <div className="flex justify-center space-x-3">
-              {verificationCode.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => (inputRefs.current[index] = el)}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleInputChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-12 h-12 text-center text-lg font-medium border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
-                  disabled={isLoading}
-                />
-              ))}
-            </div>
-
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isLoading || verificationCode.join('').length !== 6}
-                className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${
-                  verificationCode.join('').length === 6 && !isLoading
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                    : 'bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-700'
-                }`}
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <LoadingSpinner size="md" color={verificationCode.join('').length === 6 ? 'white' : 'gray'} className="mr-2" />
-                    Verifying...
-                  </div>
-                ) : (
-                  'Confirm email address'
-                )}
-              </button>
-            </div>
-          </form>
-
-          {/* Resend Code */}
-          <div className="mt-6 text-center">
-            {canResend ? (
-              <button
-                onClick={handleResendCode}
-                disabled={isLoading}
-                className="text-sm text-orange-600 hover:text-orange-500 focus:outline-none focus:underline disabled:opacity-50"
-              >
-                Resend verification code
-              </button>
-            ) : (
-              <p className="text-sm text-gray-500">
-                Resend code in {countdown} seconds
+          {/* Main content with border and shadow */}
+          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-8 mt-16 lg:mt-0">
+            <div className="text-center mb-8">
+              {/* Mail Verification Icon */}
+              <div className="mx-auto w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              
+              <h1 className="text-2xl font-medium text-gray-900 mb-3">
+                Mail verification
+              </h1>
+              <p className="text-gray-500 text-sm px-4 mb-2">
+                Please enter the 6-digit code sent to the email address <span className="font-medium text-gray-700">{maskEmail(email)}</span>
               </p>
+              <p className="text-red-500 text-xs">
+                Request another code 0:{countdown.toString().padStart(2, '0')}
+              </p>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600 text-sm text-center">{error}</p>
+              </div>
             )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* 6-Digit Code Input */}
+              <div className="flex justify-center space-x-3">
+                {verificationCode.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => (inputRefs.current[index] = el)}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleInputChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className="w-12 h-12 text-center text-lg font-medium border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+                    disabled={isLoading}
+                  />
+                ))}
+              </div>
+
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={isLoading || verificationCode.join('').length !== 6}
+                  className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${
+                    verificationCode.join('').length === 6 && !isLoading
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                      : 'bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-700'
+                  }`}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <LoadingSpinner size="md" color={verificationCode.join('').length === 6 ? 'white' : 'gray'} className="mr-2" />
+                      Verifying...
+                    </div>
+                  ) : (
+                    'Confirm email address'
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* Resend Code */}
+            <div className="mt-6 text-center">
+              {canResend ? (
+                <button
+                  onClick={handleResendCode}
+                  disabled={isLoading}
+                  className="text-sm text-orange-600 hover:text-orange-500 focus:outline-none focus:underline disabled:opacity-50"
+                >
+                  Resend verification code
+                </button>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  Resend code in {countdown} seconds
+                </p>
+              )}
+            </div>
           </div>
 
-          <div className="mt-8 text-center">
-            <Link 
-              to="/forgot-password" 
-              className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus:underline"
-            >
-              Back to Email Entry
-            </Link>
-          </div>
         </div>
       </div>
 

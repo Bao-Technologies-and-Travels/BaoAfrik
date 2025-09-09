@@ -15,7 +15,7 @@ const PasswordResetSuccess: React.FC = () => {
         />
       </div>
       
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-8 lg:pt-16">
         <div className="w-full max-w-md">
           {/* Mobile Logo - Centered with Background */}
           <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-8">
@@ -30,28 +30,31 @@ const PasswordResetSuccess: React.FC = () => {
             </div>
           </div>
 
-          <div className="text-center mb-8 mt-16 lg:mt-0">
-            {/* Success Checkmark Icon */}
-            <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            
-            <h1 className="text-2xl font-medium text-gray-900 mb-3">
-              Password reset successfully
-            </h1>
-            <p className="text-gray-500 text-sm px-4 mb-8">
-              Your password has been reset, you can now log in with the new password.
-            </p>
+          {/* Main content with border and shadow */}
+          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-8 mt-16 lg:mt-0">
+            <div className="text-center mb-8">
+              {/* Success Checkmark Icon */}
+              <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              
+              <h1 className="text-2xl font-medium text-gray-900 mb-3">
+                Password reset successfully
+              </h1>
+              <p className="text-gray-500 text-sm px-4 mb-8">
+                Your password has been reset, you can now log in with the new password.
+              </p>
 
-            {/* Back to Sign In Page Button */}
-            <Link 
-              to="/login" 
-              className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors duration-200"
-            >
-              Back to sign in page
-            </Link>
+              {/* Back to Sign In Page Button */}
+              <Link 
+                to="/login" 
+                className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors duration-200"
+              >
+                Back to sign in page
+              </Link>
+            </div>
           </div>
         </div>
       </div>
