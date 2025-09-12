@@ -78,11 +78,13 @@ const ForgotPassword: React.FC = () => {
     <div className="min-h-screen bg-white flex flex-col">
       {/* Desktop Logo - Top Left with Background */}
       <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8">
-        <img 
-          src={logoFull} 
-          alt="BaoAfrik Logo" 
-          className="h-8 object-contain"
-        />
+        <Link to="/">
+          <img 
+            src={logoFull} 
+            alt="BaoAfrik Logo" 
+            className="h-8 object-contain cursor-pointer"
+          />
+        </Link>
       </div>
       
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-8 lg:pt-16">
@@ -90,13 +92,15 @@ const ForgotPassword: React.FC = () => {
           {/* Mobile Logo - Centered with Background */}
           <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-8">
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 mb-6">
-                <img 
-                  src={logoSmall} 
-                  alt="BaoAfrik Logo" 
-                  className="w-full h-full object-contain"
-                />
-              </div>
+              <Link to="/">
+                <div className="mx-auto w-16 h-16 mb-6 cursor-pointer">
+                  <img 
+                    src={logoSmall} 
+                    alt="BaoAfrik Logo" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </Link>
             </div>
           </div>
 
@@ -130,18 +134,20 @@ const ForgotPassword: React.FC = () => {
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email address
                 </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter your email address"
-                  required
-                  disabled={isLoading}
-                />
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onMouseEnter={(e) => (e.target as HTMLInputElement).focus()}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white ${
+                  errors.email ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter your email address"
+                required
+                disabled={isLoading}
+                autoFocus
+              />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email}</p>
                 )}

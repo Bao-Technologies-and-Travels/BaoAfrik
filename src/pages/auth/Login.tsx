@@ -225,6 +225,9 @@ const Login: React.FC = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email address
+                </label>
                 <input
                   id="email"
                   name="email"
@@ -235,7 +238,7 @@ const Login: React.FC = () => {
                   className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
                     errors.email ? 'border-red-500' : 'border-gray-200'
                   }`}
-                  placeholder="Email address"
+                  placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -245,6 +248,9 @@ const Login: React.FC = () => {
             </div>
             
             <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
               <div className="relative">
                 <input
                   id="password"
@@ -258,7 +264,7 @@ const Login: React.FC = () => {
                   className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
                     errors.password ? 'border-red-500' : 'border-gray-200'
                   }`}
-                  placeholder="Password"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />

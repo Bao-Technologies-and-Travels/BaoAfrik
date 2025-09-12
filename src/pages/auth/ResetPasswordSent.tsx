@@ -121,11 +121,13 @@ const ResetPasswordSent: React.FC = () => {
     <div className="min-h-screen bg-white flex flex-col">
       {/* Desktop Logo - Top Left with Background */}
       <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8">
-        <img 
-          src={logoFull} 
-          alt="BaoAfrik Logo" 
-          className="h-8 object-contain"
-        />
+        <Link to="/">
+          <img 
+            src={logoFull} 
+            alt="BaoAfrik Logo" 
+            className="h-8 object-contain cursor-pointer"
+          />
+        </Link>
       </div>
       
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-8 lg:pt-16">
@@ -133,13 +135,15 @@ const ResetPasswordSent: React.FC = () => {
           {/* Mobile Logo - Centered with Background */}
           <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-8">
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 mb-6">
-                <img 
-                  src={logoSmall} 
-                  alt="BaoAfrik Logo" 
-                  className="w-full h-full object-contain"
-                />
-              </div>
+              <Link to="/">
+                <div className="mx-auto w-16 h-16 mb-6 cursor-pointer">
+                  <img 
+                    src={logoSmall} 
+                    alt="BaoAfrik Logo" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </Link>
             </div>
           </div>
 

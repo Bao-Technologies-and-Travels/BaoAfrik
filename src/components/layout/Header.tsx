@@ -166,11 +166,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-4 z-50 max-h-[80vh] overflow-y-auto">
                       {/* Become a seller button */}
                       <div className="px-4 pb-4">
-                       <Link 
+                      <Link 
                            to="/register" 
                            className="inline-flex items-center px-4 py-2 bg-orange-100 text-orange-600 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2" 
-                         onClick={() => setIsDesktopMenuOpen(false)}
-                       >
+                        onClick={() => setIsDesktopMenuOpen(false)}
+                      >
                           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
                           </svg>
@@ -413,10 +413,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
             ) : (
               // Not logged in buttons (includes visitor mode)
               <>
-                 <Link 
-                   to="/register" 
+                <Link 
+                  to="/register" 
                    className="inline-flex items-center px-4 py-2 bg-orange-100 text-orange-600 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2" 
-                 >
+                >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
                   </svg>
@@ -428,10 +428,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 >
                   Login
                 </Link>
-                 <Link 
-                   to="/register" 
+                <Link 
+                  to="/register" 
                    className="inline-flex items-center px-4 py-2 bg-orange-100 text-orange-600 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2"
-                 >
+                >
                   Sign Up
                 </Link>
               </>
@@ -441,10 +441,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
           {/* Mobile Navigation */}
           <div className="md:hidden flex items-center space-x-4">
             {/* Become a seller button - always visible on mobile */}
-             <Link 
-               to="/register" 
+            <Link 
+              to="/register" 
                className="inline-flex items-center px-3 py-2 bg-orange-100 text-orange-600 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2" 
-             >
+            >
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
               </svg>
@@ -582,7 +582,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
+                        </svg>
                     </div>
                   </Link>
 
@@ -736,11 +736,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                   >
                     Login
                   </Link>
-                   <Link 
-                     to="/register" 
+                  <Link 
+                    to="/register" 
                      className="block w-full text-center px-6 py-4 rounded-lg bg-orange-100 text-orange-600 font-medium text-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2"
-                     onClick={() => setIsMobileMenuOpen(false)}
-                   >
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                     Sign Up
                   </Link>
                 </div>
