@@ -201,9 +201,15 @@ const ProfileSetup: React.FC = () => {
           </div>
         </div>
         
-        <h1 className="text-2xl font-medium text-gray-900 mb-12 mt-16 text-center">
+        <h1 className="text-2xl font-medium text-gray-900 mb-6 mt-16 text-center">
           Profile Information
         </h1>
+        
+        <div className="hidden sm:flex items-center justify-end mb-6">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+            1
+          </div>
+        </div>
 
         {/* Display general error if any */}
         {errors.general && (
@@ -359,13 +365,13 @@ const ProfileSetup: React.FC = () => {
               disabled={isLoading || !isFormValid}
               className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer ${
                 isFormValid && !isLoading
-                  ? 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                  ? 'bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
-                  <LoadingSpinner size="sm" color="gray" className="mr-2" />
+                  <LoadingSpinner size="sm" color="white" className="mr-2" />
                   <span>Saving information...</span>
                 </div>
               ) : (

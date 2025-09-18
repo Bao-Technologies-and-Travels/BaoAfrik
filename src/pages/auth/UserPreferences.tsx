@@ -107,7 +107,8 @@ const UserPreferences: React.FC = () => {
     }
   };
 
-  const isFormValid = selectedReasons.length > 0;
+  const isFormValid = selectedReasons.length > 0 && 
+    (!selectedReasons.includes('other') || (selectedReasons.includes('other') && otherDescription.trim().length >= 10));
 
   return (
     <div className="min-h-screen bg-white flex flex-col px-4 sm:px-6 lg:px-8">
@@ -151,7 +152,7 @@ const UserPreferences: React.FC = () => {
             Why do you want to join BaoAfrik?
           </h1>
           
-          <div className="flex items-center justify-end mb-6 sm:mb-8">
+          <div className="hidden sm:flex items-center justify-end mb-6 sm:mb-8">
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
               2
             </div>
@@ -260,24 +261,26 @@ const UserPreferences: React.FC = () => {
           )}
 
           {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading || !isFormValid}
-            className={`w-full font-medium py-3 sm:py-4 px-6 rounded-xl transition-colors duration-200 text-sm sm:text-base ${
-              isFormValid && !isLoading
-                ? 'bg-gray-300 hover:bg-gray-400 text-gray-700'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-            }`}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <LoadingSpinner size="md" color="gray" className="mr-2" />
-                <span className="text-sm sm:text-base">Finishing...</span>
-              </div>
-            ) : (
-              <span className="text-sm sm:text-base">Finish Setup</span>
-            )}
-          </button>
+          <div className="pb-8 sm:pb-0">
+            <button
+              type="submit"
+              disabled={isLoading || !isFormValid}
+              className={`w-full font-medium py-3 sm:py-4 px-6 rounded-xl transition-colors duration-200 text-sm sm:text-base ${
+                isFormValid && !isLoading
+                  ? 'bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <LoadingSpinner size="md" color="white" className="mr-2" />
+                  <span className="text-sm sm:text-base">Finishing...</span>
+                </div>
+              ) : (
+                <span className="text-sm sm:text-base">Finish Setup</span>
+              )}
+            </button>
+          </div>
         </form>
         </div>
       </div>

@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-// Import product images
-import whiteBeans from '../assets/images/logos/Frame 29.png';
-import gingembre from '../assets/images/logos/Frame 29 (1).png';
-import tomates from '../assets/images/logos/Frame 29 (2).png';
-import spaghetti from '../assets/images/logos/Frame 29 (3).png';
-import ndole from '../assets/images/logos/Frame 29 (4).png';
-import poivreBlanc from '../assets/images/logos/Frame 29 (5).png';
+// Import product images from pre folder
+import pre1 from '../assets/images/pre/1.png';
+import pre2 from '../assets/images/pre/2.png';
+import pre3 from '../assets/images/pre/3.png';
+import pre4 from '../assets/images/pre/4.png';
+import pre5 from '../assets/images/pre/5.png';
+import pre6 from '../assets/images/pre/6.png';
+import pre7 from '../assets/images/pre/7.png';
+import pre8 from '../assets/images/pre/8.png';
+import pre9 from '../assets/images/pre/9.png';
+import pre10 from '../assets/images/pre/10.png';
+import pre11 from '../assets/images/pre/11.png';
+import pre12 from '../assets/images/pre/12.png';
+import pre13 from '../assets/images/pre/13.png';
+import pre14 from '../assets/images/pre/14.png';
+import pre15 from '../assets/images/pre/15.png';
+import pre16 from '../assets/images/pre/16.png';
+import pre17 from '../assets/images/pre/17.png';
+import pre18 from '../assets/images/pre/18.png';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -17,27 +29,11 @@ import cameroonianCulture from '../assets/images/logos/culture.png'; // Traditio
 // Import scan icon
 import scanIcon from '../assets/images/logos/scanner (1).png';
 
-// Fashion & Textiles images
-import fashion1 from '../assets/images/logos/Frame 29 (6).png';
-import fashion2 from '../assets/images/logos/Frame 29 (7).png';
-import fashion3 from '../assets/images/logos/Frame 29 (8).png';
-import fashion4 from '../assets/images/logos/Frame 29 (9).png';
-import fashion5 from '../assets/images/logos/Frame 29 (10).png';
-import fashion6 from '../assets/images/logos/Frame 29 (11).png';
-
-// Beauty & Wellness images
-import beauty1 from '../assets/images/logos/Frame 29 (12).png';
-import beauty2 from '../assets/images/logos/Frame 29 (13).png';
-import beauty3 from '../assets/images/logos/Frame 29 (14).png';
-import beauty4 from '../assets/images/logos/Frame 29 (15).png';
-import beauty5 from '../assets/images/logos/Frame 29 (16).png';
-import beauty6 from '../assets/images/logos/Frame 29 (1).png';
 
 const Home: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [originLocation, setOriginLocation] = useState('');
   const [location, setLocation] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sharedProducts, setSharedProducts] = useState<Set<number>>(new Set());
@@ -47,6 +43,17 @@ const Home: React.FC = () => {
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('');
+  const [notifications, setNotifications] = useState<Array<{
+    id: string;
+    product: {
+      id: number;
+      name: string;
+      price: number;
+      image: string;
+    };
+    timestamp: number;
+    type: 'success' | 'error';
+  }>>([]);
 
   // Banner slides data
   const bannerSlides = [
@@ -99,7 +106,7 @@ const Home: React.FC = () => {
         id: 1,
         name: "Poivre blanc",
         price: "31.7",
-        image: whiteBeans,
+        image: pre1,
         location: "London | United Kingdom",
         verified: true
       },
@@ -107,23 +114,23 @@ const Home: React.FC = () => {
         id: 2,
         name: "Gingembre",
         price: "13.9",
-        image: gingembre,
+        image: pre2,
         location: "London | United Kingdom", 
-        verified: true
+        verified: false
       },
       {
         id: 3,
         name: "Tomates",
         price: "45",
-        image: tomates,
+        image: pre3,
         location: "London | United Kingdom",
-        verified: true
+        verified: false
       },
       {
         id: 4,
         name: "Crevettes",
         price: "8.09",
-        image: spaghetti,
+        image: pre4,
         location: "London | United Kingdom",
         verified: true
       },
@@ -131,15 +138,15 @@ const Home: React.FC = () => {
         id: 5,
         name: "Ndole",
         price: "11.5",
-        image: ndole,
+        image: pre5,
         location: "London | United Kingdom",
-        verified: true
+        verified: false
       },
       {
         id: 6,
         name: "Poivre blanc",
         price: "15.3",
-        image: poivreBlanc,
+        image: pre6,
         location: "London | United Kingdom",
         verified: true
       }
@@ -149,7 +156,7 @@ const Home: React.FC = () => {
         id: 7,
         name: "Kente Fabric Roll",
         price: "232",
-        image: fashion1,
+        image: pre7,
         location: "London | United Kingdom",
         verified: true
       },
@@ -157,7 +164,7 @@ const Home: React.FC = () => {
         id: 8,
         name: "Traditional Ankara",
         price: "34.7",
-        image: fashion2,
+        image: pre8,
         location: "London | United Kingdom", 
         verified: true
       },
@@ -165,7 +172,7 @@ const Home: React.FC = () => {
         id: 9,
         name: "Wax Print Fabric",
         price: "90.1",
-        image: fashion3,
+        image: pre9,
         location: "London | United Kingdom",
         verified: true
       },
@@ -173,7 +180,7 @@ const Home: React.FC = () => {
         id: 10,
         name: "Bogolan Mud Cloth",
         price: "245",
-        image: fashion4,
+        image: pre10,
         location: "London | United Kingdom",
         verified: true
       },
@@ -181,7 +188,7 @@ const Home: React.FC = () => {
         id: 11,
         name: "Dashiki Shirt",
         price: "110.9",
-        image: fashion5,
+        image: pre11,
         location: "London | United Kingdom",
         verified: true
       },
@@ -189,7 +196,7 @@ const Home: React.FC = () => {
         id: 12,
         name: "African Print Dress",
         price: "68.7",
-        image: fashion6,
+        image: pre12,
         location: "London | United Kingdom",
         verified: true
       }
@@ -199,7 +206,7 @@ const Home: React.FC = () => {
         id: 13,
         name: "Shea Butter Cream",
         price: "31.7",
-        image: beauty1,
+        image: pre13,
         location: "London | United Kingdom",
         verified: true
       },
@@ -207,7 +214,7 @@ const Home: React.FC = () => {
         id: 14,
         name: "African Black Soap",
         price: "31.7",
-        image: beauty2,
+        image: pre14,
         location: "London | United Kingdom", 
         verified: true
       },
@@ -215,7 +222,7 @@ const Home: React.FC = () => {
         id: 15,
         name: "Baobab Oil Serum",
         price: "31.7",
-        image: beauty3,
+        image: pre15,
         location: "London | United Kingdom",
         verified: true
       },
@@ -223,7 +230,7 @@ const Home: React.FC = () => {
         id: 16,
         name: "Moringa Face Mask",
         price: "31.7",
-        image: beauty4,
+        image: pre16,
         location: "London | United Kingdom",
         verified: true
       },
@@ -231,7 +238,7 @@ const Home: React.FC = () => {
         id: 17,
         name: "Argan Hair Oil",
         price: "31.7",
-        image: beauty5,
+        image: pre17,
         location: "London | United Kingdom",
         verified: true
       },
@@ -239,7 +246,7 @@ const Home: React.FC = () => {
         id: 18,
         name: "Poivre blanc",
         price: "31.7",
-        image: beauty6,
+        image: pre18,
         location: "London | United Kingdom",
         verified: true
       }
@@ -326,7 +333,6 @@ const Home: React.FC = () => {
   const clearSearch = () => {
     setSearchQuery('');
     setSelectedCategory('');
-    setOriginLocation('');
     setLocation('');
     setSearchResults([]);
     setIsSearchActive(false);
@@ -404,13 +410,82 @@ const Home: React.FC = () => {
       const newSaved = new Set(prev);
       if (newSaved.has(productId)) {
         newSaved.delete(productId);
+        // Remove notification if product is unbookmarked
+        setNotifications(prev => prev.filter(notif => notif.product.id !== productId));
         console.log(`Unsaved product ${productId}`);
       } else {
-        newSaved.add(productId);
-        console.log(`Saved product ${productId}`);
+        // Simulate bookmarking attempt with potential failure
+        const product = getProductsToDisplay().find(p => p.id === productId);
+        if (product) {
+          // Simulate random failure (20% chance of failure for demo purposes)
+          const shouldFail = Math.random() < 0.2;
+          
+          if (shouldFail) {
+            // Show error notification
+            setNotifications(prev => {
+              const existingNotification = prev.find(notif => notif.product.id === productId);
+              if (existingNotification) {
+                return prev;
+              }
+              
+              const notificationId = `${productId}-error-${Date.now()}`;
+              const errorNotification = {
+                id: notificationId,
+                product: {
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image
+                },
+                timestamp: Date.now(),
+                type: 'error' as const
+              };
+              
+              setTimeout(() => {
+                setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
+              }, 5000);
+              
+              return [...prev, errorNotification];
+            });
+            console.log(`Failed to save product ${productId}`);
+          } else {
+            // Success - add to bookmarks
+            newSaved.add(productId);
+            setNotifications(prev => {
+              const existingNotification = prev.find(notif => notif.product.id === productId);
+              if (existingNotification) {
+                return prev;
+              }
+              
+              const notificationId = `${productId}-${Date.now()}`;
+              const newNotification = {
+                id: notificationId,
+                product: {
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image
+                },
+                timestamp: Date.now(),
+                type: 'success' as const
+              };
+              
+              setTimeout(() => {
+                setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
+              }, 5000);
+              
+              return [...prev, newNotification];
+            });
+            console.log(`Saved product ${productId}`);
+          }
+        }
       }
       return newSaved;
     });
+  };
+
+  const removeNotification = (notificationId: string) => {
+    setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
   };
 
   // Close dropdown when clicking outside
@@ -431,10 +506,11 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Search Section */}
-      <section className="bg-white shadow-sm border border-gray-200 rounded-full mt-4 sm:mt-6 mx-4 sm:mx-6 lg:mx-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+       <div className="mt-4 sm:mt-6 mx-4 sm:mx-6" style={{maxWidth: '900px', margin: '0 auto', marginTop: '20px'}}>
+        <section className="bg-transparent sm:bg-white sm:shadow-sm sm:border sm:border-gray-200 rounded-full">
+          <div className="px-4 sm:px-6 lg:px-8 py-3">
           {/* Desktop Search */}
-          <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-4">
+          <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-3">
             {/* Search Input */}
             <div className="flex-1 relative">
               <input
@@ -443,7 +519,7 @@ const Home: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleSearchKeyPress}
-                className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
+                className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -458,7 +534,7 @@ const Home: React.FC = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 sm:px-4 pr-8 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base"
+                className="px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base"
               >
                 <option value="">All Categories</option>
                 <option value="Food & Spices">Food & Spices</option>
@@ -471,41 +547,19 @@ const Home: React.FC = () => {
               {/* Location Input */}
               <input
                 type="text"
-                placeholder="Place of origin"
-                value={originLocation}
-                onChange={(e) => setOriginLocation(e.target.value)}
-                className="px-3 sm:px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
-              />
-            </div>
-            
-            {/* Mobile: Second row for location and buttons */}
-            <div className="flex gap-3 lg:contents">
-              {/* Location Input */}
-              <input
-                type="text"
                 placeholder="Location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="flex-1 lg:flex-none px-3 sm:px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
+                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
               />
-              
-              {/* Search Button */}
-              <button 
-                onClick={handleSearch}
-                className="text-white px-4 sm:px-6 py-3 rounded-full transition-colors font-medium text-sm sm:text-base whitespace-nowrap flex items-center justify-center"
-                style={{backgroundColor: '#F9A825'}}
-                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-              
+            </div>
+            
+            {/* Mobile: Second row for buttons */}
+            <div className="flex gap-3 lg:contents">
               {/* Scan Button */}
               <button 
                 onClick={handleScan}
-                className="p-3 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full transition-colors flex-shrink-0 hover:border-orange-500 hover:text-orange-500"
+                className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full transition-colors flex-shrink-0 hover:border-orange-500 hover:text-orange-500"
                 title="Scan QR code"
               >
                 <img 
@@ -514,12 +568,25 @@ const Home: React.FC = () => {
                   className="w-4 h-4 sm:w-5 sm:h-5 opacity-60 hover:opacity-100 transition-opacity"
                 />
               </button>
+              
+              {/* Search Button */}
+              <button 
+                onClick={handleSearch}
+                className="text-white px-4 sm:px-6 py-2 rounded-full transition-colors font-medium text-sm sm:text-base whitespace-nowrap flex items-center justify-center"
+                style={{backgroundColor: '#F9A825'}}
+                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
             </div>
           </div>
 
           {/* Mobile Search */}
           <div className="md:hidden">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {/* Search Input */}
               <div className="flex-1 relative">
                 <input
@@ -528,7 +595,7 @@ const Home: React.FC = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
-                  className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                  className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
                 />
                 <button 
                   onClick={handleScan}
@@ -567,17 +634,6 @@ const Home: React.FC = () => {
                     </select>
                   </div>
                   
-                  {/* Place of Origin */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Place of Origin</label>
-                    <input
-                      type="text"
-                      placeholder="Place of origin"
-                      value={originLocation}
-                      onChange={(e) => setOriginLocation(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
-                    />
-                  </div>
                   
                   {/* Location */}
                   <div>
@@ -594,6 +650,17 @@ const Home: React.FC = () => {
                   {/* Action Buttons */}
                   <div className="flex gap-2 pt-2">
                     <button 
+                      onClick={handleScan}
+                      className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg transition-colors hover:border-orange-500 hover:text-orange-500"
+                      title="Scan QR code"
+                    >
+                      <img 
+                        src={scanIcon} 
+                        alt="Scan QR code" 
+                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
+                      />
+                    </button>
+                    <button 
                       onClick={() => {
                         handleSearch();
                         setIsMobileFilterOpen(false);
@@ -607,24 +674,14 @@ const Home: React.FC = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                     </button>
-                    <button 
-                      onClick={handleScan}
-                      className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg transition-colors hover:border-orange-500 hover:text-orange-500"
-                      title="Scan QR code"
-                    >
-                      <img 
-                        src={scanIcon} 
-                        alt="Scan QR code" 
-                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
-                      />
-                    </button>
                   </div>
                 </div>
               </div>
             )}
           </div>
         </div>
-      </section>
+        </section>
+      </div>
 
       {/* Hero Banner - Auto Sliding */}
       <section className="text-white relative overflow-hidden mt-4 sm:mt-6" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
@@ -703,9 +760,12 @@ const Home: React.FC = () => {
       </section>
 
       {/* Category Navigation */}
-      <section className="bg-white border-b border-gray-200 py-4 sm:py-6">
+      <section className="bg-white py-4 sm:py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide">
+            <div className="flex justify-center space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide relative">
+            {/* Gray line background - extends beyond container */}
+            <div className="absolute bottom-0 left-[-1rem] right-[-1rem] h-0.5 bg-gray-200"></div>
+            
             {categories.map((category) => (
               <button
                 key={category}
@@ -714,34 +774,41 @@ const Home: React.FC = () => {
                   setIsSearchActive(false);
                   setSearchQuery('');
                 }}
-                className={`whitespace-nowrap pb-3 sm:pb-4 px-1 border-b-2 font-medium text-sm sm:text-lg transition-colors flex-shrink-0 ${
+                className={`whitespace-nowrap pb-3 sm:pb-4 px-1 font-medium text-sm sm:text-lg transition-colors flex-shrink-0 relative ${
                   activeCategory === category
-                    ? 'border-orange-500 text-orange-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'text-orange-600'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 {category}
+                {/* Orange line for active category */}
+                {activeCategory === category && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500"></div>
+                )}
               </button>
             ))}
           </div>
-          
-          {/* Filter Button - Desktop Only */}
-          <div className="mt-4 relative filter-dropdown hidden md:block">
-            <button
-              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                <circle cx="8" cy="6" r="2" fill="currentColor" />
-                <circle cx="16" cy="10" r="2" fill="currentColor" />
-                <circle cx="12" cy="14" r="2" fill="currentColor" />
-              </svg>
-              <span className="text-sm font-medium">Filter : {selectedCountry || 'Africa'}</span>
-              <svg className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+        </div>
+      </section>
+
+      {/* Filter Button - Desktop Only */}
+      <section className="bg-white py-2 sm:py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <div className="relative filter-dropdown hidden md:block">
+              <button
+                onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                <span className="text-sm font-medium text-gray-400">Filter :</span>
+                <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-medium text-blue-500">{selectedCountry || 'Africa'}</span>
+                <svg className={`w-3 h-3 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
             
             {/* Dropdown Menu */}
             {isFilterDropdownOpen && (
@@ -753,10 +820,15 @@ const Home: React.FC = () => {
                       setIsFilterDropdownOpen(false);
                     }}
                     className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                      !selectedCountry ? 'text-orange-600 bg-orange-50' : 'text-gray-700'
+                      !selectedCountry ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
                     }`}
                   >
-                    <span>All Africa</span>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Africa</span>
+                    </div>
                   </button>
                   {africanCountries.map((country) => (
                     <button
@@ -782,6 +854,73 @@ const Home: React.FC = () => {
                 </div>
               </div>
             )}
+            </div>
+            
+            {/* Notifications - Centered */}
+            <div className="flex-1 flex justify-center relative">
+              {notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                     className={`absolute top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 shadow-sm animate-in slide-in-from-right duration-300 w-80 sm:w-96 ${
+                      notification.type === 'success' 
+                        ? 'bg-blue-50 border border-blue-200' 
+                        : 'bg-orange-50 border border-orange-200'
+                    }`}
+                  >
+                    {/* Product Image */}
+                    <div className="relative mr-3">
+                      <img
+                        src={notification.product.image}
+                        alt={notification.product.name}
+                         className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg"
+                      />
+                      {/* Bookmark Icon Overlay */}
+                      <div className={`absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex items-center justify-center ${
+                        notification.type === 'success' 
+                          ? 'bg-blue-500' 
+                          : 'bg-white border border-orange-300'
+                      }`}>
+                        {notification.type === 'success' ? (
+                           <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5l14 14M5 19L19 5" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Notification Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-gray-800">
+                        {notification.type === 'success' ? (
+                          <>Added to <Link to="/bookmarks" className="text-blue-600 hover:text-blue-700 underline">Bookmarks</Link></>
+                        ) : (
+                          <>Failed to add to <span className="text-orange-600">Bookmarks</span></>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-600 truncate">
+                        {notification.product.name} - ${notification.product.price}
+                      </div>
+                    </div>
+                    
+                    {/* Close Button */}
+                    <button
+                      onClick={() => removeNotification(notification.id)}
+                      className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+              ))}
+            </div>
+            
+            {/* Empty div to balance the layout */}
+            <div className="w-0"></div>
           </div>
         </div>
       </section>
@@ -793,10 +932,19 @@ const Home: React.FC = () => {
           <div className="md:hidden mb-4 sm:mb-6">
             <div className="overflow-x-auto">
               <div className="flex gap-2 pb-2 min-w-max px-1">
+                {/* Three-dot Menu Button - Mobile Only */}
+                <button className="md:hidden flex items-center justify-center w-8 h-8 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-colors touch-manipulation">
+                  <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="6" cy="12" r="2"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <circle cx="18" cy="12" r="2"/>
+                  </svg>
+                </button>
+                
                 {/* All Africa Button */}
                 <button
                   onClick={() => setSelectedCountry('')}
-                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-full whitespace-nowrap text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
+                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md sm:rounded-full whitespace-nowrap text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                     selectedCountry === '' 
                       ? 'bg-blue-100 text-blue-700 border border-blue-200' 
                       : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
@@ -814,10 +962,10 @@ const Home: React.FC = () => {
                   <button
                     key={country.code}
                     onClick={() => setSelectedCountry(country.code)}
-                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-full whitespace-nowrap text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
+                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md sm:rounded-full whitespace-nowrap text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                       selectedCountry === country.code 
                         ? 'bg-orange-100 text-orange-700 border border-orange-200' 
-                        : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                        : 'bg-gray-100 sm:bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                     }`}
                   >
                     <img 
@@ -888,9 +1036,10 @@ const Home: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
               {getProductsToDisplay().map((product) => (
               <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200 block group">
+                {/* Product Image - Top */}
                 <div className="aspect-square relative overflow-hidden">
                   <img 
                     src={product.image} 
@@ -901,66 +1050,79 @@ const Home: React.FC = () => {
                     height="200"
                   />
                 </div>
-                <div className="p-2 sm:p-3">
-                  <div className="text-sm sm:text-lg font-bold text-gray-900 mb-1">
-                    ${product.price}
-                  </div>
-                  <h3 className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">{product.name}</h3>
-                  <div className="flex items-center text-xs text-gray-500 mb-2">
-                    <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span className="truncate">{product.location}</span>
-                  </div>
-                  {product.verified && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center text-xs text-green-600 bg-green-50 px-1 sm:px-2 py-1 rounded">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                        <span className="hidden sm:inline">Verified seller</span>
-                        <span className="sm:hidden">Verified</span>
-                      </div>
-                      <div className="flex items-center space-x-1 sm:space-x-2">
-                        {/* Save Button */}
-                        <button 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleSave(product.id);
-                          }}
-                          className={`p-1 transition-colors touch-manipulation ${
-                            savedProducts.has(product.id) 
-                              ? 'text-orange-500 hover:text-orange-600' 
-                              : 'text-gray-400 hover:text-gray-600'
-                          }`}
-                          title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
-                        >
-                          <svg className="w-4 h-4" fill={savedProducts.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                        </button>
-                        
-                        {/* Like Button */}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleShare(product.id);
-                          }}
-                          className={`p-1 transition-colors touch-manipulation ${
-                            sharedProducts.has(product.id) 
-                              ? 'text-blue-500 hover:text-blue-600' 
-                              : 'text-gray-400 hover:text-gray-600'
-                          }`}
-                          title={sharedProducts.has(product.id) ? 'Shared' : 'Share product'}
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                          </svg>
-                        </button>
-                      </div>
+                
+                {/* Product Content */}
+                <div className="p-2 sm:p-3 flex flex-col">
+                  {/* Price and Verified Badge Row */}
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="text-sm sm:text-lg font-bold text-gray-900">
+                      ${product.price}
                     </div>
-                  )}
+                    {product.verified ? (
+                      <div className="flex items-center text-xs text-green-600 bg-green-50 px-1 py-0.5 rounded text-xs">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
+                        <span className="text-xs">Verified seller</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center text-xs sm:text-xs text-gray-600 bg-gray-100 px-0.5 sm:px-1 py-0.5 rounded text-xs">
+                        <svg className="w-1.5 h-1.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2l2.5 5.5L20 8l-4.5 4.5L17 18l-5-2.5L7 18l1.5-5.5L4 8l5.5-.5L12 2z" stroke="currentColor" strokeWidth="1" fill="none"/>
+                          <text x="12" y="16" textAnchor="middle" fontSize="4" fill="currentColor" fontWeight="bold">!</text>
+                        </svg>
+                        <span className="text-xs sm:text-xs">Unverified Seller</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Product Name */}
+                  <h3 className="text-xs sm:text-sm text-gray-600 mb-1 line-clamp-2 font-medium">{product.name}</h3>
+                  
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <svg className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 mr-0.5 sm:mr-1 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="truncate text-xs sm:text-xs font-normal max-w-[60px] sm:max-w-none">{product.location}</span>
+                    </div>
+                    
+                    {/* Bookmark Button */}
+                    <div className="ml-2 sm:ml-4">
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSave(product.id);
+                      }}
+                       className={`p-2 sm:p-2 transition-colors touch-manipulation ${
+                        savedProducts.has(product.id) 
+                          ? 'text-blue-500 hover:text-blue-600' 
+                          : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                      title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                    >
+                      <div className="relative">
+                         <svg className="w-5 h-5 sm:w-6 sm:h-6" fill={savedProducts.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
+                        {savedProducts.has(product.id) && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                        {!savedProducts.has(product.id) && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xs font-bold">+</span>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                    </div>
+                  </div>
                 </div>
               </Link>
               ))}
