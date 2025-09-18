@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import lilLogo from '../../assets/images/pre/lil.png';
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -177,29 +178,39 @@ const ProfileSetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
-      {/* Desktop Logo - Top Left with Background */}
-      <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8">
-        <img 
-          src={logoFull} 
-          alt="BaoAfrik Logo" 
-          className="h-8 object-contain"
-        />
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Desktop Header - Top Left with Background */}
+      <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8 border-b-2 border-orange-200">
+        <div className="flex items-center justify-between">
+          <Link to="/">
+            <img 
+              src={logoFull} 
+              alt="BaoAfrik Logo" 
+              className="h-8 object-contain"
+            />
+          </Link>
+          <button className="p-2 rounded-lg hover:bg-orange-100 transition-colors">
+            <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
       </div>
       
-      <div className="w-full max-w-2xl">
-        {/* Mobile Logo - Centered with Background */}
-        <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-8">
-          <div className="text-center">
-            <div className="mx-auto w-16 h-16 mb-6">
-              <img 
-                src={logoSmall} 
-                alt="BaoAfrik Logo" 
-                className="w-full h-full object-contain"
-              />
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-8 lg:pt-16">
+        <div className="w-full max-w-2xl">
+          {/* Mobile Logo - Centered with Background */}
+          <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-8">
+            <div className="text-center">
+              <div className="mx-auto w-16 h-16 mb-6">
+                <img 
+                  src={logoSmall} 
+                  alt="BaoAfrik Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
             </div>
           </div>
-        </div>
         
         <h1 className="text-2xl font-medium text-gray-900 mb-6 mt-16 text-center">
           Profile Information
@@ -360,15 +371,16 @@ const ProfileSetup: React.FC = () => {
           </div>
 
           <div className="pt-8 pb-8 md:pb-0">
-            <button
-              type="submit"
-              disabled={isLoading || !isFormValid}
-              className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer ${
-                isFormValid && !isLoading
-                  ? 'bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
-            >
+             <button
+               type="submit"
+               disabled={isLoading || !isFormValid}
+               className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer ${
+                 isFormValid && !isLoading
+                   ? 'text-white'
+                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+               }`}
+               style={isFormValid && !isLoading ? { backgroundColor: '#F9A825' } : {}}
+             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <LoadingSpinner size="sm" color="white" className="mr-2" />
@@ -380,6 +392,28 @@ const ProfileSetup: React.FC = () => {
             </button>
           </div>
         </form>
+        </div>
+      </div>
+
+      {/* Footer - Hidden on mobile */}
+      <div className="hidden lg:block py-6 px-4">
+        <div className="border-t border-gray-200 pt-4">
+          <div className="flex items-center justify-between text-xs text-gray-400">
+            <div className="flex items-center space-x-1">
+              <img src={lilLogo} alt="BaoAfrik" className="w-4 h-4" />
+              <span>© All rights reserved</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link to="/contact" className="hover:text-gray-600">Contact Us</Link>
+              <span>|</span>
+              <Link to="/terms" className="hover:text-gray-600">Terms and conditions of use</Link>
+              <span>|</span>
+              <Link to="/privacy" className="hover:text-gray-600">Privacy policies</Link>
+              <span>|</span>
+              <Link to="/cookies" className="hover:text-gray-600">Cookies</Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

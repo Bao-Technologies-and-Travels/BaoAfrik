@@ -275,7 +275,8 @@ const Register: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100 text-base"
+                className="w-full disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100 text-base"
+                style={{ backgroundColor: isLoading ? '#9CA3AF' : '#F9A825' }}
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
@@ -288,8 +289,13 @@ const Register: React.FC = () => {
               </button>
             </div>
 
-            <div className="text-center">
-              <span className="text-gray-400 text-sm">Or sign up with</span>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+              </div>
             </div>
 
             {/* Social Login Buttons */}
@@ -333,7 +339,7 @@ const Register: React.FC = () => {
 
             <div className="text-center">
               <span className="text-gray-500 text-sm">Already have an account? </span>
-              <Link to="/login" className="font-medium text-orange-600 hover:text-orange-500">
+              <Link to="/login" className="font-medium text-black hover:text-gray-700 underline">
                 Sign In
               </Link>
             </div>
