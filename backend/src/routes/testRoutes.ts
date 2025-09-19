@@ -110,4 +110,83 @@ router.post('/send-email', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/test/get-verification-code:
+ *   post:
+ *     summary: Get verification code for testing (Development only)
+ *     tags: [Test]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Verification code retrieved
+ *       404:
+ *         description: User not found
+ */
+router.post('/get-verification-code', async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
+    // Import prisma here to avoid circular dependencies
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+    
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+      select: {
+        id: true,
+        email: true,
+        emailVerificationCode: true,
+        emailVerificationExpires: true,
+        emailVerified: true
+      }
+    });
+
+    await prisma.$disconnect();
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    return res.json({
+      success: true,
+      message: 'Verification code retrieved (Development only)',
+      data: {
+        email: user.email,
+        verificationCode: user.emailVerificationCode,
+        expiresAt: user.emailVerificationExpires,
+        isVerified: user.emailVerified
+      }
+    });
+  } catch (error) {
+    logger.error('Get verification code error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get verification code',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 export default router;

@@ -2757,3 +2757,892 @@
     '    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)',
   timestamp: '2025-09-19 09:53:50'
 }
+{
+  requestId: '0e03c764-25c9-4453-bedd-a35835cac6b2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/health',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:43:14'
+}
+{
+  requestId: '0e03c764-25c9-4453-bedd-a35835cac6b2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '6ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:43:14'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:43:14 +0000] "GET /health HTTP/1.1" 200 109 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:43:14'
+}
+{
+  requestId: 'fc3c487e-bad5-40a9-beb1-ee12dcf6ada5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: {
+    name: 'Test User',
+    email: 'test@example.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:43:53'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  error: 'Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-462c17c9347sm60688655e9.0 - gsmtp',
+  to: 'test@example.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'error',
+  message: 'Failed to send email',
+  timestamp: '2025-09-19 21:43:55'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '6459f733-59bf-4bb8-9131-4ae85c2d6071',
+  email: 'test@example.com',
+  level: 'info',
+  message: 'User registered successfully',
+  timestamp: '2025-09-19 21:43:55'
+}
+{
+  requestId: 'fc3c487e-bad5-40a9-beb1-ee12dcf6ada5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 201,
+  duration: '1918ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:43:55'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:43:55 +0000] "POST /api/auth/register HTTP/1.1" 201 241 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:43:55'
+}
+{
+  requestId: '67a2e619-3104-4f90-a15a-56a942b31e60',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { email: 'test@example.com', verificationCode: '123456' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:44:35'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.46.1',
+  level: 'error',
+  timestamp: '2025-09-19 21:44:35'
+}
+{
+  requestId: '67a2e619-3104-4f90-a15a-56a942b31e60',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '14ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:44:35'
+}
+{
+  requestId: '67a2e619-3104-4f90-a15a-56a942b31e60',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 21:44:35'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:44:35 +0000] "POST /api/auth/verify-email HTTP/1.1" 500 367 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:44:35'
+}
+{
+  requestId: '0f2a4a48-cef9-4707-98e6-9d1051910c45',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { email: 'test@example.com', password: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:44:49'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.46.1',
+  level: 'error',
+  timestamp: '2025-09-19 21:44:49'
+}
+{
+  requestId: '0f2a4a48-cef9-4707-98e6-9d1051910c45',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '306ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:44:49'
+}
+{
+  requestId: '0f2a4a48-cef9-4707-98e6-9d1051910c45',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 21:44:49'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:44:49 +0000] "POST /api/auth/login HTTP/1.1" 500 379 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:44:49'
+}
+{
+  requestId: '795affff-7a15-46ea-b453-f2a0c5f41995',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:44:59'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.46.1',
+  level: 'error',
+  timestamp: '2025-09-19 21:44:59'
+}
+{
+  requestId: '795affff-7a15-46ea-b453-f2a0c5f41995',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '14ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:44:59'
+}
+{
+  requestId: '795affff-7a15-46ea-b453-f2a0c5f41995',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 21:44:59'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:44:59 +0000] "GET /api/auth/me HTTP/1.1" 500 970 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:44:59'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:49:29'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:49:29'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:49:29'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:49:29'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:49:29'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:49:29'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:49:29'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  response: '535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3ee0fbc7478sm9168574f8f.38 - gsmtp',
+  responseCode: 535,
+  command: 'AUTH PLAIN',
+  level: 'error',
+  message: 'SMTP connection verification failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3ee0fbc7478sm9168574f8f.38 - gsmtp',
+  stack: 'Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3ee0fbc7478sm9168574f8f.38 - gsmtp\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection._actionAUTHComplete (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1588:34)\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:556:26)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)\n' +
+    '    at TLSSocket.SMTPConnection._onSocketData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:195:44)\n' +
+    '    at TLSSocket.emit (node:events:518:28)\n' +
+    '    at TLSSocket.emit (node:domain:489:12)\n' +
+    '    at addChunk (node:internal/streams/readable:561:12)\n' +
+    '    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)',
+  timestamp: '2025-09-19 21:49:31'
+}
+{
+  requestId: '9914f18d-f6eb-4c39-ae99-4d9fb840f256',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: {
+    name: 'Test User',
+    email: 'test@example.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:51:02'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: User with this email already exists',
+  stack: 'Error: User with this email already exists\n' +
+    '    at createConflictError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:43:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:53:30',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.46.1',
+  level: 'error',
+  timestamp: '2025-09-19 21:51:02'
+}
+{
+  requestId: '9914f18d-f6eb-4c39-ae99-4d9fb840f256',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '66ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:51:02'
+}
+{
+  requestId: '9914f18d-f6eb-4c39-ae99-4d9fb840f256',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: User with this email already exists\n' +
+      '    at createConflictError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:43:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:53:30',
+    originalError: 'User with this email already exists'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 21:51:02'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:51:02 +0000] "POST /api/auth/register HTTP/1.1" 500 360 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:51:02'
+}
+{
+  requestId: 'ea94f8e1-c109-468e-8f02-20affbf32d42',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { email: 'test@example.com', verificationCode: '123456' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:51:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.46.1',
+  level: 'error',
+  timestamp: '2025-09-19 21:51:57'
+}
+{
+  requestId: 'ea94f8e1-c109-468e-8f02-20affbf32d42',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '6ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:51:57'
+}
+{
+  requestId: 'ea94f8e1-c109-468e-8f02-20affbf32d42',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 21:51:57'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:51:57 +0000] "POST /api/auth/verify-email HTTP/1.1" 500 367 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:51:57'
+}
+{
+  requestId: '7fe390ee-47b3-4b7c-ab35-0255bd6a0b13',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/resend-verification',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { email: 'test@example.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:52:05'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  error: 'Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-4613d14d2b0sm143153105e9.13 - gsmtp',
+  to: 'test@example.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'error',
+  message: 'Failed to send email',
+  timestamp: '2025-09-19 21:52:07'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '6459f733-59bf-4bb8-9131-4ae85c2d6071',
+  email: 'test@example.com',
+  level: 'info',
+  message: 'Verification code resent',
+  timestamp: '2025-09-19 21:52:07'
+}
+{
+  requestId: '7fe390ee-47b3-4b7c-ab35-0255bd6a0b13',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1354ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:52:07'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:52:07 +0000] "POST /api/auth/resend-verification HTTP/1.1" 200 64 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:52:07'
+}
+{
+  requestId: '03471588-87f6-4904-9871-38b028fe9125',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { email: 'test@example.com', verificationCode: '123456' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:52:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.46.1',
+  level: 'error',
+  timestamp: '2025-09-19 21:52:18'
+}
+{
+  requestId: '03471588-87f6-4904-9871-38b028fe9125',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '5ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:52:18'
+}
+{
+  requestId: '03471588-87f6-4904-9871-38b028fe9125',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 21:52:18'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:52:18 +0000] "POST /api/auth/verify-email HTTP/1.1" 500 367 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:52:18'
+}
+{
+  requestId: 'f8136f30-14dc-433e-8e06-cc25b5a769d3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/refresh',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { refreshToken: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:52:26'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid refresh token',
+  stack: 'Error: Invalid refresh token\n' +
+    '    at createError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:20:10)\n' +
+    '    at verifyRefreshToken (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\jwtUtils.ts:83:24)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:245:37\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/refresh',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.46.1',
+  level: 'error',
+  timestamp: '2025-09-19 21:52:26'
+}
+{
+  requestId: 'f8136f30-14dc-433e-8e06-cc25b5a769d3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '4ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:52:26'
+}
+{
+  requestId: 'f8136f30-14dc-433e-8e06-cc25b5a769d3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid refresh token\n' +
+      '    at createError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:20:10)\n' +
+      '    at verifyRefreshToken (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\jwtUtils.ts:83:24)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:245:37\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid refresh token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 21:52:26'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:52:26 +0000] "POST /api/auth/refresh HTTP/1.1" 500 - "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:52:26'
+}
+{
+  requestId: 'e0b87bcb-f3de-459c-887d-6513c00c3c34',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/test/email-connection',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:52:37'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  response: '535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3ee0fbc7188sm9613085f8f.37 - gsmtp',
+  responseCode: 535,
+  command: 'AUTH PLAIN',
+  level: 'error',
+  message: 'Email service connection test failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3ee0fbc7188sm9613085f8f.37 - gsmtp',
+  stack: 'Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3ee0fbc7188sm9613085f8f.37 - gsmtp\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection._actionAUTHComplete (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1588:34)\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:556:26)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)\n' +
+    '    at TLSSocket.SMTPConnection._onSocketData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:195:44)\n' +
+    '    at TLSSocket.emit (node:events:518:28)\n' +
+    '    at TLSSocket.emit (node:domain:489:12)\n' +
+    '    at addChunk (node:internal/streams/readable:561:12)\n' +
+    '    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)',
+  timestamp: '2025-09-19 21:52:39'
+}
+{
+  requestId: 'e0b87bcb-f3de-459c-887d-6513c00c3c34',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1200ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:52:39'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:52:39 +0000] "GET /api/test/email-connection HTTP/1.1" 200 61 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:52:39'
+}
+{
+  requestId: '4980c444-d600-4ad1-8cbd-cf58923834e3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/test/send-email',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { email: 'your-test-email@example.com', name: 'Test User' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:52:56'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  error: 'Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-4613d33633bsm141832715e9.11 - gsmtp',
+  to: 'your-test-email@example.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'error',
+  message: 'Failed to send email',
+  timestamp: '2025-09-19 21:52:58'
+}
+{
+  requestId: '4980c444-d600-4ad1-8cbd-cf58923834e3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '2501ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:52:58'
+}
+{
+  requestId: '4980c444-d600-4ad1-8cbd-cf58923834e3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: { success: false, message: 'Failed to send test email' },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 21:52:58'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:52:58 +0000] "POST /api/test/send-email HTTP/1.1" 500 55 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:52:58'
+}
+{
+  requestId: '8beaa2ac-9f69-4b99-aa1d-44a79d604b72',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/test/get-verification-code',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { email: 'test@example.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:53:07'
+}
+{
+  requestId: '8beaa2ac-9f69-4b99-aa1d-44a79d604b72',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '56ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:53:07'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:53:07 +0000] "POST /api/test/get-verification-code HTTP/1.1" 200 197 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:53:07'
+}
+{
+  requestId: '51776129-2819-4ff6-80ea-5a08646ad968',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { email: 'test@example.com', verificationCode: '123456' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 21:53:38'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.46.1',
+  level: 'error',
+  timestamp: '2025-09-19 21:53:38'
+}
+{
+  requestId: '51776129-2819-4ff6-80ea-5a08646ad968',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '4ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 21:53:38'
+}
+{
+  requestId: '51776129-2819-4ff6-80ea-5a08646ad968',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 21:53:38'
+}
+{
+  message: '::1 - - [19/Sep/2025:20:53:38 +0000] "POST /api/auth/verify-email HTTP/1.1" 500 367 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 21:53:38'
+}
