@@ -1,0 +1,1068 @@
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 01:21:59'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 01:22:10'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 01:22:20'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 01:25:43'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 08:50:32'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 08:59:50'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:12:30'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:15:41'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:19:17'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:19:17'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:19:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:19:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:19:50'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:19:50'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:19:50'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:19:51'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:20:49'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:20:49'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:20:49'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:20:49'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:30:46'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:30:46'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:30:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:30:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /favicon.ico',
+  stack: 'Error: Not Found - /favicon.ico\n' +
+    '    at notFound (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at requestLogger (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\loggingMiddleware.ts:58:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9',
+  url: '/favicon.ico',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-19 09:32:05'
+}
+{
+  requestId: 'b5d2e8b0-cebe-452c-86d7-79374c01fc97',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /favicon.ico',
+    stack: 'Error: Not Found - /favicon.ico\n' +
+      '    at notFound (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at requestLogger (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\loggingMiddleware.ts:58:3)\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9',
+    originalError: 'Not Found - /favicon.ico'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 09:32:05'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api',
+  stack: 'Error: Not Found - /api\n' +
+    '    at notFound (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at requestLogger (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\loggingMiddleware.ts:58:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9',
+  url: '/api',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-19 09:33:05'
+}
+{
+  requestId: '38009f4b-63d5-4d2f-8866-d31e6e342b16',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api',
+    stack: 'Error: Not Found - /api\n' +
+      '    at notFound (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at requestLogger (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\loggingMiddleware.ts:58:3)\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9',
+    originalError: 'Not Found - /api'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 09:33:05'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:36:28'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:36:28'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:36:29'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:36:29'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  command: 'API',
+  level: 'error',
+  message: 'SMTP connection verification failed: Missing credentials for "PLAIN"',
+  stack: 'Error: Missing credentials for "PLAIN"\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection.login (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:454:38)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-transport\\index.js:375:32\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:215:17)\n' +
+    '    at Object.onceWrapper (node:events:632:28)\n' +
+    '    at SMTPConnection.emit (node:events:518:28)\n' +
+    '    at SMTPConnection.emit (node:domain:489:12)\n' +
+    '    at SMTPConnection._actionEHLO (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1371:14)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)',
+  timestamp: '2025-09-19 09:36:30'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:07'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:07'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:07'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:08'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  command: 'API',
+  level: 'error',
+  message: 'SMTP connection verification failed: Missing credentials for "PLAIN"',
+  stack: 'Error: Missing credentials for "PLAIN"\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection.login (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:454:38)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-transport\\index.js:375:32\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:215:17)\n' +
+    '    at Object.onceWrapper (node:events:632:28)\n' +
+    '    at SMTPConnection.emit (node:events:518:28)\n' +
+    '    at SMTPConnection.emit (node:domain:489:12)\n' +
+    '    at SMTPConnection._actionEHLO (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1371:14)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)',
+  timestamp: '2025-09-19 09:37:08'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:19'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:19'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  command: 'API',
+  level: 'error',
+  message: 'SMTP connection verification failed: Missing credentials for "PLAIN"',
+  stack: 'Error: Missing credentials for "PLAIN"\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection.login (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:454:38)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-transport\\index.js:375:32\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:215:17)\n' +
+    '    at Object.onceWrapper (node:events:632:28)\n' +
+    '    at SMTPConnection.emit (node:events:518:28)\n' +
+    '    at SMTPConnection.emit (node:domain:489:12)\n' +
+    '    at SMTPConnection._actionEHLO (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1371:14)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)',
+  timestamp: '2025-09-19 09:37:19'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:34'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:34'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:34'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:35'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  command: 'API',
+  level: 'error',
+  message: 'SMTP connection verification failed: Missing credentials for "PLAIN"',
+  stack: 'Error: Missing credentials for "PLAIN"\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection.login (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:454:38)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-transport\\index.js:375:32\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:215:17)\n' +
+    '    at Object.onceWrapper (node:events:632:28)\n' +
+    '    at SMTPConnection.emit (node:events:518:28)\n' +
+    '    at SMTPConnection.emit (node:domain:489:12)\n' +
+    '    at SMTPConnection._actionEHLO (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1371:14)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)',
+  timestamp: '2025-09-19 09:37:35'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:37:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:38:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:38:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:38:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:38:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  command: 'API',
+  level: 'error',
+  message: 'SMTP connection verification failed: Missing credentials for "PLAIN"',
+  stack: 'Error: Missing credentials for "PLAIN"\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection.login (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:454:38)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-transport\\index.js:375:32\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:215:17)\n' +
+    '    at Object.onceWrapper (node:events:632:28)\n' +
+    '    at SMTPConnection.emit (node:events:518:28)\n' +
+    '    at SMTPConnection.emit (node:domain:489:12)\n' +
+    '    at SMTPConnection._actionEHLO (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1371:14)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)',
+  timestamp: '2025-09-19 09:38:02'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:38:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:38:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:38:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:38:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  command: 'API',
+  level: 'error',
+  message: 'SMTP connection verification failed: Missing credentials for "PLAIN"',
+  stack: 'Error: Missing credentials for "PLAIN"\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection.login (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:454:38)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-transport\\index.js:375:32\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:215:17)\n' +
+    '    at Object.onceWrapper (node:events:632:28)\n' +
+    '    at SMTPConnection.emit (node:events:518:28)\n' +
+    '    at SMTPConnection.emit (node:domain:489:12)\n' +
+    '    at SMTPConnection._actionEHLO (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1371:14)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)',
+  timestamp: '2025-09-19 09:38:15'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:40:46'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:40:46'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:40:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 6379,
+  level: 'error',
+  message: 'Redis connection error: connect ECONNREFUSED 127.0.0.1:6379',
+  stack: 'Error: connect ECONNREFUSED 127.0.0.1:6379\n' +
+    '    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)',
+  timestamp: '2025-09-19 09:40:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  command: 'API',
+  level: 'error',
+  message: 'SMTP connection verification failed: Missing credentials for "PLAIN"',
+  stack: 'Error: Missing credentials for "PLAIN"\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection.login (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:454:38)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-transport\\index.js:375:32\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:215:17)\n' +
+    '    at Object.onceWrapper (node:events:632:28)\n' +
+    '    at SMTPConnection.emit (node:events:518:28)\n' +
+    '    at SMTPConnection.emit (node:domain:489:12)\n' +
+    '    at SMTPConnection._actionEHLO (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1371:14)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)',
+  timestamp: '2025-09-19 09:40:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  response: '535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-46139ba88d0sm115160525e9.10 - gsmtp',
+  responseCode: 535,
+  command: 'AUTH PLAIN',
+  level: 'error',
+  message: 'SMTP connection verification failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-46139ba88d0sm115160525e9.10 - gsmtp',
+  stack: 'Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-46139ba88d0sm115160525e9.10 - gsmtp\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection._actionAUTHComplete (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1588:34)\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:556:26)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)\n' +
+    '    at TLSSocket.SMTPConnection._onSocketData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:195:44)\n' +
+    '    at TLSSocket.emit (node:events:518:28)\n' +
+    '    at TLSSocket.emit (node:domain:489:12)\n' +
+    '    at addChunk (node:internal/streams/readable:561:12)\n' +
+    '    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)',
+  timestamp: '2025-09-19 09:49:58'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  response: '535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-464f4f9f4e4sm87209695e9.13 - gsmtp',
+  responseCode: 535,
+  command: 'AUTH PLAIN',
+  level: 'error',
+  message: 'SMTP connection verification failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-464f4f9f4e4sm87209695e9.13 - gsmtp',
+  stack: 'Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-464f4f9f4e4sm87209695e9.13 - gsmtp\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection._actionAUTHComplete (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1588:34)\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:556:26)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)\n' +
+    '    at TLSSocket.SMTPConnection._onSocketData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:195:44)\n' +
+    '    at TLSSocket.emit (node:events:518:28)\n' +
+    '    at TLSSocket.emit (node:domain:489:12)\n' +
+    '    at addChunk (node:internal/streams/readable:561:12)\n' +
+    '    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)',
+  timestamp: '2025-09-19 09:53:50'
+}
