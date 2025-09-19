@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { authService } from '../../services/authService';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -103,27 +104,19 @@ const Login: React.FC = () => {
     }
     
     setIsLoading(true);
+    setErrors({});
     
     try {
-      // Simulate API call to validate credentials
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Login attempt:', { email, password });
+      const response = await authService.login({
+        email,
+        password,
+        rememberMe
+      });
       
-      // Check credentials against registered users in localStorage
-      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-      const user = registeredUsers.find((u: any) => 
-        u.email === email && u.password === password
-      );
-      
-      if (user) {
-        // Valid credentials - login successful
-        const userData = {
-          id: user.email, // Use email as ID for demo
-          name: user.name,
-          email: user.email,
-          phoneNumber: user.phoneNumber,
-          profileImage: user.profileImage || undefined
-        };
+      if (response.success && response.data) {
+        // Store tokens
+        localStorage.setItem('accessToken', response.data.tokens.accessToken);
+        localStorage.setItem('refreshToken', response.data.tokens.refreshToken);
         
         // Handle remember me functionality
         if (rememberMe) {
@@ -132,19 +125,30 @@ const Login: React.FC = () => {
           rememberMeService.clearRememberedEmail();
         }
         
-        login(userData);
+        // Login user
+        login(response.data.user);
         navigate('/');
       } else {
-        // Invalid credentials or user doesn't exist
-        setErrors({ 
-          general: 'Invalid email or password. Please check your credentials and try again.' 
-        });
+        // Handle specific error messages from backend
+        if (response.message?.includes('verify your email')) {
+          setErrors({ 
+            general: 'Please verify your email before logging in. Check your inbox for the verification code.' 
+          });
+        } else if (response.message?.includes('Invalid email or password')) {
+          setErrors({ 
+            general: 'Invalid email or password. Please check your credentials and try again.' 
+          });
+        } else {
+          setErrors({ 
+            general: response.message || 'Login failed. Please try again.' 
+          });
+        }
       }
       
     } catch (error) {
       console.error('Login failed:', error);
       setErrors({ 
-        general: 'Login failed. Please try again.' 
+        general: 'Network error. Please check your connection and try again.' 
       });
     } finally {
       setIsLoading(false);

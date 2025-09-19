@@ -4,9 +4,11 @@ import { apiClient, ApiResponse, User, LoginResponse } from './api';
 export class AuthService {
   // Register new user
   async register(userData: {
+    name: string;
     email: string;
     password: string;
     confirmPassword: string;
+    phoneNumber?: string;
   }): Promise<ApiResponse<{ message: string; userId: string }>> {
     return apiClient.post('/auth/register', userData);
   }
@@ -63,13 +65,25 @@ export class AuthService {
 
   // Update user profile
   async updateProfile(profileData: {
-    firstName?: string;
-    lastName?: string;
-    gender?: string;
-    birthDate?: string;
+    name?: string;
+    phoneNumber?: string;
     profileImage?: string;
   }): Promise<ApiResponse<User>> {
     return apiClient.put('/auth/profile', profileData);
+  }
+
+  // Forgot password
+  async forgotPassword(email: string): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.post('/auth/forgot-password', { email });
+  }
+
+  // Reset password
+  async resetPassword(data: {
+    token: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.post('/auth/reset-password', data);
   }
 
   // Upload profile image

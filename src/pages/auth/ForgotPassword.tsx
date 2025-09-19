@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../../services/authService';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
@@ -15,12 +16,6 @@ const ForgotPassword: React.FC = () => {
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-  };
-
-  const checkEmailExists = (email: string): boolean => {
-    // Check if email exists in registered users (localStorage mock)
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    return registeredUsers.some((user: any) => user.email.toLowerCase() === email.toLowerCase());
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,31 +40,26 @@ const ForgotPassword: React.FC = () => {
     setEmailNotFound(false);
 
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await authService.forgotPassword(email);
       
-      // Check if email exists in our mock database
-      const emailExists = checkEmailExists(email);
-      
-      if (!emailExists) {
-        // Email not found in system
-        setEmailNotFound(true);
-        setErrors({ email: 'No account found with this email address' });
-        return;
+      if (response.success) {
+        // Navigate to password reset verification page
+        navigate('/reset-password-sent', { 
+          state: { 
+            email: email 
+          } 
+        });
+      } else {
+        if (response.message?.includes('not found') || response.message?.includes('No account')) {
+          setEmailNotFound(true);
+          setErrors({ email: 'No account found with this email address' });
+        } else {
+          setErrors({ general: response.message || 'Failed to send reset email. Please try again.' });
+        }
       }
-      
-      // Email exists, proceed to reset verification
-      console.log('Forgot password request for:', email);
-      
-      // Navigate to password reset verification page
-      navigate('/reset-password-sent', { 
-        state: { 
-          email: email 
-        } 
-      });
     } catch (error) {
       console.error('Forgot password failed:', error);
-      setErrors({ general: 'Failed to send reset email. Please try again.' });
+      setErrors({ general: 'Network error. Please check your connection and try again.' });
     } finally {
       setIsLoading(false);
     }

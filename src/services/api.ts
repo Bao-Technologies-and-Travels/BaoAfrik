@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 // API Response Types
 export interface ApiResponse<T = any> {
@@ -11,15 +11,14 @@ export interface ApiResponse<T = any> {
 
 export interface User {
   id: string;
+  name: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  phoneNumber?: string;
   profileImage?: string;
-  gender?: string;
-  birthDate?: string;
-  preferences?: string[];
-  createdAt: string;
-  updatedAt: string;
+  provider?: string;
+  emailVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthTokens {
@@ -83,7 +82,8 @@ class ApiClient {
 
       return {
         success: true,
-        data,
+        data: data.data || data,
+        message: data.message,
       };
     } catch (error) {
       console.error('API Request Error:', error);

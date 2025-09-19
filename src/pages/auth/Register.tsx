@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../../services/authService';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -65,63 +66,44 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Implement registration API call
-      console.log('Registration attempt:', formData);
-      
-      // Store user credentials in localStorage for frontend-only demo
-      const userCredentials = {
+      const response = await authService.register({
+        name: formData.email.split('@')[0], // Use email prefix as name for now
         email: formData.email,
         password: formData.password,
-        profileImage: undefined, // Will be set during profile setup
-        registeredAt: new Date().toISOString()
-      };
-      
-      // Get existing users or create empty array
-      const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-      
-      // Check if user already exists
-      const userExists = existingUsers.some((user: any) => user.email === formData.email);
-      
-      if (userExists) {
-        setErrors({ email: 'An account with this email already exists' });
-        setIsLoading(false);
-        return;
-      }
-      
-      // Add new user to the list
-      existingUsers.push(userCredentials);
-      localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
-      
-      // Store current user email for profile setup
-      localStorage.setItem('currentUserEmail', formData.email);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // On successful registration, redirect to email verification
-      navigate('/verify-email', { 
-        state: { 
-          email: formData.email,
-          fromRegistration: true 
-        } 
+        confirmPassword: formData.confirmPassword
       });
+      
+      if (response.success) {
+        // On successful registration, redirect to email verification
+        navigate('/verify-email', { 
+          state: { 
+            email: formData.email,
+            fromRegistration: true 
+          } 
+        });
+      } else {
+        // Handle specific error messages from backend
+        if (response.message?.includes('already exists')) {
+          setErrors({ email: 'An account with this email already exists' });
+        } else if (response.errors) {
+          // Handle validation errors
+          const newErrors: {[key: string]: string} = {};
+          Object.keys(response.errors).forEach(field => {
+            if (response.errors![field] && response.errors![field].length > 0) {
+              newErrors[field] = response.errors![field][0];
+            }
+          });
+          setErrors(newErrors);
+        } else {
+          setErrors({ general: response.message || 'Registration failed. Please try again.' });
+        }
+      }
       
     } catch (error) {
       console.error('Registration failed:', error);
-      
-      // Simulate different types of server errors for demo
-      const errorType = Math.random();
-      
-      if (errorType < 0.3) {
-        // Simulate server error
-        setErrors({ general: 'Server error occurred. Please try again later.' });
-      } else if (errorType < 0.6) {
-        // Simulate network error
-        setErrors({ general: 'Network error. Please check your connection and try again.' });
-      } else {
-        // Generic error
-        setErrors({ general: 'Registration failed. Please try again.' });
-      }
+      setErrors({ 
+        general: 'Network error. Please check your connection and try again.' 
+      });
     } finally {
       setIsLoading(false);
     }
