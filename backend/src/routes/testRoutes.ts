@@ -189,4 +189,62 @@ router.post('/get-verification-code', async (req: Request, res: Response) => {
   }
 });
 
+// Test email sending
+router.post('/send-test-email', async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
+    // Import email service
+    const emailService = await import('../utils/emailService');
+    
+    // Send test email using the sendEmail method
+    await emailService.default.sendEmail({
+      to: email,
+      subject: 'BaoAfrik Email Service Test',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #F9A825;">🎉 Email Service Test Successful!</h2>
+          <p>Hello from BaoAfrik!</p>
+          <p>This is a test email to confirm that your email service is working correctly.</p>
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">✅ Email Configuration Status:</h3>
+            <ul style="color: #666;">
+              <li>SMTP Connection: Active</li>
+              <li>Gmail App Password: Working</li>
+              <li>Email Delivery: Successful</li>
+            </ul>
+          </div>
+          <p style="color: #666;">
+            Sent at: ${new Date().toLocaleString()}<br>
+            From: BaoAfrik Team
+          </p>
+        </div>
+      `
+    });
+
+    logger.info(`Test email sent successfully to ${email}`);
+    
+    return res.json({
+      success: true,
+      message: `Test email sent successfully to ${email}`,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    logger.error('Send test email error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to send test email',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 export default router;

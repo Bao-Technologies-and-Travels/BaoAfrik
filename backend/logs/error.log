@@ -1433,3 +1433,64 @@
   message: 'Error response',
   timestamp: '2025-09-19 21:53:38'
 }
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  response: '535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-45f32640f49sm83039625e9.9 - gsmtp',
+  responseCode: 535,
+  command: 'AUTH PLAIN',
+  level: 'error',
+  message: 'SMTP connection verification failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-45f32640f49sm83039625e9.9 - gsmtp',
+  stack: 'Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-45f32640f49sm83039625e9.9 - gsmtp\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection._actionAUTHComplete (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1588:34)\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:556:26)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)\n' +
+    '    at TLSSocket.SMTPConnection._onSocketData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:195:44)\n' +
+    '    at TLSSocket.emit (node:events:518:28)\n' +
+    '    at TLSSocket.emit (node:domain:489:12)\n' +
+    '    at addChunk (node:internal/streams/readable:561:12)\n' +
+    '    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)',
+  timestamp: '2025-09-19 22:13:08'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  error: 'Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-464f4f9f41csm111342375e9.15 - gsmtp',
+  to: 'arreyjohnson518@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'error',
+  message: 'Failed to send email',
+  timestamp: '2025-09-19 22:15:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  response: '535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-464f0aac271sm97782265e9.3 - gsmtp',
+  responseCode: 535,
+  command: 'AUTH PLAIN',
+  level: 'error',
+  message: 'SMTP connection verification failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-464f0aac271sm97782265e9.3 - gsmtp',
+  stack: 'Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-464f0aac271sm97782265e9.3 - gsmtp\n' +
+    '    at SMTPConnection._formatError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection._actionAUTHComplete (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1588:34)\n' +
+    '    at SMTPConnection.<anonymous> (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:556:26)\n' +
+    '    at SMTPConnection._processResponse (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)\n' +
+    '    at TLSSocket.SMTPConnection._onSocketData (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:195:44)\n' +
+    '    at TLSSocket.emit (node:events:518:28)\n' +
+    '    at TLSSocket.emit (node:domain:489:12)\n' +
+    '    at addChunk (node:internal/streams/readable:561:12)\n' +
+    '    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)',
+  timestamp: '2025-09-19 22:21:16'
+}

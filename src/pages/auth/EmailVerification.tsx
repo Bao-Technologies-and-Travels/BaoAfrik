@@ -5,6 +5,7 @@ import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.pn
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 import lilLogo from '../../assets/images/pre/lil.png';
+import { authService } from '../../services/authService';
 
 const EmailVerification: React.FC = () => {
   const location = useLocation();
@@ -78,25 +79,32 @@ const EmailVerification: React.FC = () => {
     setError('');
 
     try {
-      // TODO: Implement email verification API call
-      console.log('Verifying code:', code);
+      console.log('Verifying email with code:', code, 'for email:', email);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await authService.verifyEmail({
+        email: email,
+        verificationCode: code
+      });
       
-      // On success, redirect to login or dashboard
-      console.log('Email verified successfully!');
+      console.log('Email verification response:', response);
       
-      if (fromRegistration) {
-        // If coming from registration, redirect to verification success page
-        navigate('/email-verification-success');
+      if (response.success) {
+        console.log('Email verified successfully!');
+        
+        if (fromRegistration) {
+          // If coming from registration, redirect to verification success page
+          navigate('/email-verification-success');
+        } else {
+          // If verifying existing account, redirect to dashboard/profile
+          navigate('/profile');
+        }
       } else {
-        // If verifying existing account, redirect to dashboard/profile
-        navigate('/profile');
+        setError(response.message || 'Invalid verification code. Please try again.');
       }
       
     } catch (error) {
-      setError('Invalid verification code. Please try again.');
+      console.error('Email verification error:', error);
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -110,14 +118,21 @@ const EmailVerification: React.FC = () => {
     setError('');
     
     try {
-      // TODO: Implement resend verification code API call
-      console.log('Resending verification code...');
+      console.log('Resending verification code to:', email);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await authService.resendVerificationCode(email);
+      
+      console.log('Resend verification response:', response);
+      
+      if (!response.success) {
+        setError(response.message || 'Failed to resend code. Please try again.');
+        setCanResend(true);
+        setCountdown(0);
+      }
       
     } catch (error) {
-      setError('Failed to resend code. Please try again.');
+      console.error('Resend verification error:', error);
+      setError('Network error. Failed to resend code. Please try again.');
       setCanResend(true);
       setCountdown(0);
     }

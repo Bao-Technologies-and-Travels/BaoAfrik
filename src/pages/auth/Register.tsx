@@ -66,6 +66,13 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
+      console.log('Attempting registration with:', {
+        name: formData.email.split('@')[0],
+        email: formData.email,
+        password: '***',
+        confirmPassword: '***'
+      });
+
       const response = await authService.register({
         name: formData.email.split('@')[0], // Use email prefix as name for now
         email: formData.email,
@@ -73,7 +80,10 @@ const Register: React.FC = () => {
         confirmPassword: formData.confirmPassword
       });
       
+      console.log('Registration response:', response);
+      
       if (response.success) {
+        console.log('Registration successful, navigating to email verification');
         // On successful registration, redirect to email verification
         navigate('/verify-email', { 
           state: { 
@@ -82,6 +92,7 @@ const Register: React.FC = () => {
           } 
         });
       } else {
+        console.log('Registration failed with response:', response);
         // Handle specific error messages from backend
         if (response.message?.includes('already exists')) {
           setErrors({ email: 'An account with this email already exists' });
@@ -100,9 +111,9 @@ const Register: React.FC = () => {
       }
       
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error('Registration network error:', error);
       setErrors({ 
-        general: 'Network error. Please check your connection and try again.' 
+        general: 'Network error. Please check your connection and try again. Check console for details.' 
       });
     } finally {
       setIsLoading(false);
