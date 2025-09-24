@@ -35,12 +35,12 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [location, setLocation] = useState('');
+  const [placeOfOrigin, setPlaceOfOrigin] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sharedProducts, setSharedProducts] = useState<Set<number>>(new Set());
   const [savedProducts, setSavedProducts] = useState<Set<number>>(new Set());
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [notifications, setNotifications] = useState<Array<{
@@ -277,6 +277,13 @@ const Home: React.FC = () => {
       );
     }
 
+    // Apply place of origin filter
+    if (placeOfOrigin) {
+      products = products.filter(product => 
+        product.location.toLowerCase().includes(placeOfOrigin.toLowerCase())
+      );
+    }
+
     // Apply country filter if a specific country is selected
     if (selectedCountry) {
       const countryName = africanCountries.find(country => country.code === selectedCountry)?.name;
@@ -351,7 +358,45 @@ const Home: React.FC = () => {
 
   // Handle search functionality
   const handleSearch = () => {
-    console.log('Search triggered');
+    console.log('Search triggered with:', { searchQuery, selectedCategory, placeOfOrigin, location });
+    
+    // Get all products
+    let products = Object.values(allProducts).flat();
+    
+    // Apply search query filter
+    if (searchQuery.trim()) {
+      products = products.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply category filter
+    if (selectedCategory) {
+      // Filter by category by checking which category array the product belongs to
+      products = products.filter(product => {
+        return Object.entries(allProducts).some(([category, categoryProducts]) => 
+          category === selectedCategory && categoryProducts.some(p => p.id === product.id)
+        );
+      });
+    }
+    
+    // Apply place of origin filter
+    if (placeOfOrigin) {
+      products = products.filter(product => 
+        product.location.toLowerCase().includes(placeOfOrigin.toLowerCase())
+      );
+    }
+    
+    // Apply location filter
+    if (location.trim()) {
+      products = products.filter(product => 
+        product.location.toLowerCase().includes(location.toLowerCase())
+      );
+    }
+    
+    setSearchResults(products);
+    setIsSearchActive(true);
   };
 
   // Handle Enter key press in search input
@@ -450,7 +495,7 @@ const Home: React.FC = () => {
             console.log(`Failed to save product ${productId}`);
           } else {
             // Success - add to bookmarks
-            newSaved.add(productId);
+        newSaved.add(productId);
             setNotifications(prev => {
               const existingNotification = prev.find(notif => notif.product.id === productId);
               if (existingNotification) {
@@ -476,7 +521,7 @@ const Home: React.FC = () => {
               
               return [...prev, newNotification];
             });
-            console.log(`Saved product ${productId}`);
+        console.log(`Saved product ${productId}`);
           }
         }
       }
@@ -488,31 +533,17 @@ const Home: React.FC = () => {
     setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (isFilterDropdownOpen) {
-        const target = event.target as Element;
-        if (!target.closest('.filter-dropdown')) {
-          setIsFilterDropdownOpen(false);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isFilterDropdownOpen]);
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Search Section */}
-       <div className="mt-4 sm:mt-6 mx-4 sm:mx-6" style={{maxWidth: '900px', margin: '0 auto', marginTop: '20px'}}>
+       <div className="mt-4 sm:mt-6 mx-4 sm:mx-6" style={{maxWidth: '1200px', margin: '0 auto', marginTop: '20px'}}>
         <section className="bg-transparent sm:bg-white sm:shadow-sm sm:border sm:border-gray-200 rounded-full">
           <div className="px-4 sm:px-6 lg:px-8 py-3">
           {/* Desktop Search */}
-          <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-3">
+          <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-4">
             {/* Search Input */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative min-w-0">
               <input
                 type="text"
                 placeholder="Search for products..."
@@ -528,13 +559,13 @@ const Home: React.FC = () => {
               </div>
             </div>
             
-            {/* Mobile: Two columns for dropdowns and inputs */}
-            <div className="grid grid-cols-2 gap-3 lg:contents">
+            {/* Desktop: Grid for dropdowns and inputs */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:contents">
               {/* Category Dropdown */}
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base"
+                className="px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base min-w-[140px]"
               >
                 <option value="">All Categories</option>
                 <option value="Food & Spices">Food & Spices</option>
@@ -544,13 +575,52 @@ const Home: React.FC = () => {
                 <option value="Books & Media">Books & Media</option>
               </select>
               
+              {/* Place of Origin Dropdown - Web Only */}
+              <div className="hidden lg:block relative min-w-[160px]">
+                <select
+                  value={placeOfOrigin}
+                  onChange={(e) => setPlaceOfOrigin(e.target.value)}
+                  className="w-full px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base appearance-none"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                    backgroundPosition: 'right 0.5rem center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '1.5em 1.5em',
+                    paddingRight: '2.5rem'
+                  }}
+                >
+                  <option value="">Place of Origin</option>
+                  <option value="Nigeria" style={{backgroundImage: 'url("https://flagcdn.com/w20/ng.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Nigeria</option>
+                  <option value="Ghana" style={{backgroundImage: 'url("https://flagcdn.com/w20/gh.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ghana</option>
+                  <option value="Kenya" style={{backgroundImage: 'url("https://flagcdn.com/w20/ke.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Kenya</option>
+                  <option value="South Africa" style={{backgroundImage: 'url("https://flagcdn.com/w20/za.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>South Africa</option>
+                  <option value="Egypt" style={{backgroundImage: 'url("https://flagcdn.com/w20/eg.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Egypt</option>
+                  <option value="Morocco" style={{backgroundImage: 'url("https://flagcdn.com/w20/ma.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Morocco</option>
+                  <option value="Ethiopia" style={{backgroundImage: 'url("https://flagcdn.com/w20/et.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ethiopia</option>
+                  <option value="Tanzania" style={{backgroundImage: 'url("https://flagcdn.com/w20/tz.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Tanzania</option>
+                  <option value="Uganda" style={{backgroundImage: 'url("https://flagcdn.com/w20/ug.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Uganda</option>
+                  <option value="Cameroon" style={{backgroundImage: 'url("https://flagcdn.com/w20/cm.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Cameroon</option>
+                  <option value="Senegal" style={{backgroundImage: 'url("https://flagcdn.com/w20/sn.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Senegal</option>
+                  <option value="Ivory Coast" style={{backgroundImage: 'url("https://flagcdn.com/w20/ci.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ivory Coast</option>
+                  <option value="Mali" style={{backgroundImage: 'url("https://flagcdn.com/w20/ml.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Mali</option>
+                  <option value="Burkina Faso" style={{backgroundImage: 'url("https://flagcdn.com/w20/bf.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Burkina Faso</option>
+                  <option value="Niger" style={{backgroundImage: 'url("https://flagcdn.com/w20/ne.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Niger</option>
+                  <option value="Chad" style={{backgroundImage: 'url("https://flagcdn.com/w20/td.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Chad</option>
+                  <option value="Sudan" style={{backgroundImage: 'url("https://flagcdn.com/w20/sd.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Sudan</option>
+                  <option value="Algeria" style={{backgroundImage: 'url("https://flagcdn.com/w20/dz.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Algeria</option>
+                  <option value="Tunisia" style={{backgroundImage: 'url("https://flagcdn.com/w20/tn.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Tunisia</option>
+                  <option value="Libya" style={{backgroundImage: 'url("https://flagcdn.com/w20/ly.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Libya</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            
               {/* Location Input */}
               <input
                 type="text"
                 placeholder="Location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
+                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base min-w-[120px]"
               />
             </div>
             
@@ -680,7 +750,7 @@ const Home: React.FC = () => {
             )}
           </div>
         </div>
-        </section>
+      </section>
       </div>
 
       {/* Hero Banner - Auto Sliding */}
@@ -790,71 +860,11 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Filter Button - Desktop Only */}
+          
+          {/* Filter Button - Desktop Only */}
       <section className="bg-white py-2 sm:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <div className="relative filter-dropdown hidden md:block">
-              <button
-                onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                <span className="text-sm font-medium text-gray-400">Filter :</span>
-                <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-sm font-medium text-blue-500">{selectedCountry || 'Africa'}</span>
-                <svg className={`w-3 h-3 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            
-            {/* Dropdown Menu */}
-            {isFilterDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                <div className="py-2">
-                  <button
-                    onClick={() => {
-                      setSelectedCountry('');
-                      setIsFilterDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                      !selectedCountry ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>Africa</span>
-                    </div>
-                  </button>
-                  {africanCountries.map((country) => (
-                    <button
-                      key={country.name}
-                      onClick={() => {
-                        setSelectedCountry(country.name);
-                        setIsFilterDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                        selectedCountry === country.name ? 'text-orange-600 bg-orange-50' : 'text-gray-700'
-                      }`}
-                    >
-                      <span className="flex items-center space-x-2">
-                        <img 
-                          src={country.flag} 
-                          alt={`${country.name} flag`}
-                          className="w-5 h-4 object-cover rounded-sm"
-                        />
-                        <span>{country.name}</span>
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            </div>
             
             {/* Notifications - Centered */}
             <div className="flex-1 flex justify-center relative">
@@ -1056,8 +1066,8 @@ const Home: React.FC = () => {
                   {/* Price and Verified Badge Row */}
                   <div className="flex items-center justify-between mb-1">
                     <div className="text-sm sm:text-lg font-bold text-gray-900">
-                      ${product.price}
-                    </div>
+                    ${product.price}
+                  </div>
                     {product.verified ? (
                       <div className="flex items-center text-xs text-green-600 bg-green-50 px-1 py-0.5 rounded text-xs">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
@@ -1082,43 +1092,43 @@ const Home: React.FC = () => {
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
                       <svg className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 mr-0.5 sm:mr-1 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
                       <span className="truncate text-xs sm:text-xs font-normal max-w-[60px] sm:max-w-none">{product.location}</span>
-                    </div>
+                  </div>
                     
                     {/* Bookmark Button */}
                     <div className="ml-2 sm:ml-4">
-                    <button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleSave(product.id);
-                      }}
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSave(product.id);
+                          }}
                        className={`p-2 sm:p-2 transition-colors touch-manipulation ${
-                        savedProducts.has(product.id) 
+                            savedProducts.has(product.id) 
                           ? 'text-blue-500 hover:text-blue-600' 
-                          : 'text-gray-400 hover:text-gray-600'
-                      }`}
-                      title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
-                    >
+                              : 'text-gray-400 hover:text-gray-600'
+                          }`}
+                          title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                        >
                       <div className="relative">
                          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill={savedProducts.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                          </svg>
                         {savedProducts.has(product.id) && (
                           <div className="absolute inset-0 flex items-center justify-center">
                             <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
+                          </svg>
+                      </div>
                         )}
                         {!savedProducts.has(product.id) && (
                           <div className="absolute inset-0 flex items-center justify-center">
                             <span className="text-xs font-bold">+</span>
-                          </div>
-                        )}
+                    </div>
+                  )}
                       </div>
                     </button>
                     </div>
