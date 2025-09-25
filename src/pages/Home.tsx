@@ -41,6 +41,7 @@ const Home: React.FC = () => {
   const [savedProducts, setSavedProducts] = useState<Set<number>>(new Set());
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [notifications, setNotifications] = useState<Array<{
@@ -98,6 +99,33 @@ const Home: React.FC = () => {
     { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png' },
     { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png' }
   ];
+
+  // Country mapping for products
+  const getProductCountry = (productId: number) => {
+    const countryMap: { [key: number]: { name: string; code: string; flag: string; abbreviation: string } } = {
+      1: { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
+      2: { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
+      3: { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
+      4: { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' },
+      5: { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
+      6: { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
+      7: { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
+      8: { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
+      9: { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
+      10: { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
+      11: { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
+      12: { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
+      13: { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
+      14: { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
+      15: { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
+      16: { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
+      17: { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
+      18: { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
+      19: { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
+      20: { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' }
+    };
+    return countryMap[productId] || { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' };
+  };
 
   // All products data organized by category
   const allProducts = {
@@ -533,6 +561,20 @@ const Home: React.FC = () => {
     setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isFilterDropdownOpen) {
+        const target = event.target as Element;
+        if (!target.closest('.filter-dropdown')) {
+          setIsFilterDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isFilterDropdownOpen]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -589,7 +631,7 @@ const Home: React.FC = () => {
                     paddingRight: '2.5rem'
                   }}
                 >
-                  <option value="">Place of Origin</option>
+                  <option value="">Product Origin</option>
                   <option value="Nigeria" style={{backgroundImage: 'url("https://flagcdn.com/w20/ng.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Nigeria</option>
                   <option value="Ghana" style={{backgroundImage: 'url("https://flagcdn.com/w20/gh.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ghana</option>
                   <option value="Kenya" style={{backgroundImage: 'url("https://flagcdn.com/w20/ke.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Kenya</option>
@@ -612,12 +654,12 @@ const Home: React.FC = () => {
                   <option value="Libya" style={{backgroundImage: 'url("https://flagcdn.com/w20/ly.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Libya</option>
                   <option value="Other">Other</option>
                 </select>
-              </div>
+            </div>
             
               {/* Location Input */}
               <input
                 type="text"
-                placeholder="Location"
+                placeholder="Seller Location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="px-3 sm:px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base min-w-[120px]"
@@ -865,6 +907,66 @@ const Home: React.FC = () => {
       <section className="bg-white py-2 sm:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
+            <div className="relative filter-dropdown hidden md:block">
+            <button
+              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+              className="flex items-center space-x-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg text-gray-600 hover:text-gray-800 hover:bg-blue-100 transition-colors"
+            >
+                <span className="text-base font-medium text-gray-500">Filter :</span>
+                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+                <span className="text-base font-medium text-blue-600">{selectedCountry || 'Africa'}</span>
+                <svg className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {/* Dropdown Menu */}
+            {isFilterDropdownOpen && (
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                <div className="py-2">
+                  <button
+                    onClick={() => {
+                      setSelectedCountry('');
+                      setIsFilterDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                      !selectedCountry ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Africa</span>
+                    </div>
+                  </button>
+                  {africanCountries.map((country) => (
+                    <button
+                      key={country.name}
+                      onClick={() => {
+                        setSelectedCountry(country.name);
+                        setIsFilterDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                        selectedCountry === country.name ? 'text-orange-600 bg-orange-50' : 'text-gray-700'
+                      }`}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <img 
+                          src={country.flag} 
+                          alt={`${country.name} flag`}
+                          className="w-5 h-4 object-cover rounded-sm"
+                        />
+                        <span>{country.name}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            </div>
             
             {/* Notifications - Centered */}
             <div className="flex-1 flex justify-center relative">
@@ -1059,6 +1161,18 @@ const Home: React.FC = () => {
                     width="200"
                     height="200"
                   />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(product.id).flag} 
+                      alt={getProductCountry(product.id).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(product.id).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 
                 {/* Product Content */}
