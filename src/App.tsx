@@ -12,17 +12,23 @@ import SocialLoginValidation from './pages/auth/SocialLoginValidation';
 import SocialLoginError from './pages/auth/SocialLoginError';
 import ProfileSetup from './pages/auth/ProfileSetup';
 import UserPreferences from './pages/auth/UserPreferences';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPasswordSent from './pages/auth/ResetPasswordSent';
+import ResetPassword from './pages/auth/ResetPassword';
+import PasswordResetSuccess from './pages/auth/PasswordResetSuccess';
 import Profile from './pages/Profile';
+import ProductDetail from './pages/ProductDetail';
+import SellerProfile from './pages/SellerProfile';
+import Messages from './pages/Messages';
 import Listings from './pages/Listings';
 import CreateListing from './pages/CreateListing';
-import Messages from './pages/Messages';
-import ProductDetail from './pages/ProductDetail';
 import './App.css';
 
 function AppContent() {
   const location = useLocation();
   const isProductDetailPage = location.pathname.startsWith('/product/');
-  const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences'];
+  const isSellerProfilePage = location.pathname.startsWith('/seller/');
+  const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success'];
   const isAuthPage = authPages.includes(location.pathname);
 
   // For auth pages, render without header/footer
@@ -38,7 +44,28 @@ function AppContent() {
           <Route path="/social-login-error" element={<SocialLoginError />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/user-preferences" element={<UserPreferences />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password-sent" element={<ResetPasswordSent />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/password-reset-success" element={<PasswordResetSuccess />} />
         </Routes>
+      </div>
+    );
+  }
+
+  // For seller profile pages on mobile, render without header
+  if (isSellerProfilePage) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <div className="hidden lg:block">
+          <Header showSearchBar={false} isProductDetailPage={false} />
+        </div>
+        <main className="flex-1">
+          <Routes>
+            <Route path="/seller/:sellerId" element={<SellerProfile />} />
+          </Routes>
+        </main>
+        <Footer />
       </div>
     );
   }

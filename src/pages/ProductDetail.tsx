@@ -5,17 +5,47 @@ import { useAuth } from '../contexts/AuthContext';
 // Import product images
 import mainImage from '../assets/images/logos/0.png'; // New main white pepper image
 import africanTextileImage from '../assets/images/logos/Fashion.png';
-import tomatoImage from '../assets/images/logos/Frame 29 (2).png';
-import driedShrimpImage from '../assets/images/logos/Frame 29 (3).png';
-import ndoleImage from '../assets/images/logos/Frame 29 (4).png';
 import basketImage from '../assets/images/logos/culture.png';
 import woodenCombImage from '../assets/images/logos/decor.png';
-import whiteBeansImage from '../assets/images/logos/Frame 29 (1).png';
-import cassavaFlourImage from '../assets/images/logos/Frame 29 (5).png';
 import thumbnailImage1 from '../assets/images/logos/1.png';
 import thumbnailImage2 from '../assets/images/logos/2.png';
 import thumbnailImage3 from '../assets/images/logos/3.png';
 import sellerAvatar from '../assets/images/logos/avatar.png';
+
+// Import new product images from pre folder
+import pre1 from '../assets/images/pre/1.png';
+import pre2 from '../assets/images/pre/2.png';
+import pre3 from '../assets/images/pre/3.png';
+import pre4 from '../assets/images/pre/4.png';
+import pre5 from '../assets/images/pre/5.png';
+import pre6 from '../assets/images/pre/6.png';
+
+// Country mapping for products
+const getProductCountry = (productId: number) => {
+  const countryMap: { [key: number]: { name: string; code: string; flag: string; abbreviation: string } } = {
+    1: { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
+    2: { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
+    3: { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
+    4: { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' },
+    5: { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
+    6: { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
+    7: { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
+    8: { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
+    9: { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
+    10: { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
+    11: { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
+    12: { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
+    13: { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
+    14: { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
+    15: { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
+    16: { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
+    17: { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
+    18: { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
+    19: { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
+    20: { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' }
+  };
+  return countryMap[productId] || { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' };
+};
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,8 +53,9 @@ const ProductDetail: React.FC = () => {
   const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isShared, setIsShared] = useState(false);
   const [likedProducts, setLikedProducts] = useState<Set<string>>(new Set());
+  const [sharedProducts, setSharedProducts] = useState<Set<string>>(new Set());
   const [wishlistProducts, setWishlistProducts] = useState<Set<string>>(new Set());
   const [currentOtherProductsIndex, setCurrentOtherProductsIndex] = useState(0);
   const [currentRecommendedIndex, setCurrentRecommendedIndex] = useState(0);
@@ -35,6 +66,37 @@ const ProductDetail: React.FC = () => {
 
   // Product images array - main image first, then thumbnail images
   const images = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
+
+  // Share product handler
+  const handleShareProduct = async (productId: string) => {
+    const newSet = new Set(sharedProducts);
+    if (newSet.has(productId)) {
+      newSet.delete(productId);
+    } else {
+      newSet.add(productId);
+      
+      // Share functionality
+      const shareData = {
+        title: 'Check out this product on BaoAfrik',
+        text: 'I found this amazing product on BaoAfrik marketplace',
+        url: window.location.href
+      };
+      
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          // Fallback: copy to clipboard
+          await navigator.clipboard.writeText(window.location.href);
+          // You could show a toast notification here
+          console.log('Product link copied to clipboard!');
+        }
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    }
+    setSharedProducts(newSet);
+  };
 
   // Mock product data (in real app, this would come from API based on id)
   const product = {
@@ -60,10 +122,29 @@ const ProductDetail: React.FC = () => {
     console.log(isSaved ? 'Product removed from saved items' : 'Product saved to saved items');
   };
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    // In a real app, this would update the user's liked items
-    console.log(isLiked ? 'Product unliked' : 'Product liked');
+  const handleShare = async () => {
+    setIsShared(!isShared);
+    
+    if (!isShared) {
+      // Share functionality
+      const shareData = {
+        title: 'Check out this product on BaoAfrik',
+        text: 'I found this amazing product on BaoAfrik marketplace',
+        url: window.location.href
+      };
+      
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          // Fallback: copy to clipboard
+          await navigator.clipboard.writeText(window.location.href);
+          console.log('Product link copied to clipboard!');
+        }
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    }
   };
 
   const toggleAdditionalInfo = () => {
@@ -75,17 +156,6 @@ const ProductDetail: React.FC = () => {
     // TODO: Implement messaging functionality
   };
 
-  const handleLikeProduct = (productId: string) => {
-    setLikedProducts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(productId)) {
-        newSet.delete(productId);
-      } else {
-        newSet.add(productId);
-      }
-      return newSet;
-    });
-  };
 
   const handleWishlist = (productId: string) => {
     setWishlistProducts(prev => {
@@ -132,49 +202,6 @@ const ProductDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Desktop Search Section - Hidden on Mobile */}
-      <section className="hidden lg:block bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={handleSearchKeyPress}
-              className="flex-1 pl-4 pr-10 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
-            >
-              <option value="">All Categories</option>
-              <option value="Food & Spices">Food & Spices</option>
-              <option value="Fashion & Textiles">Fashion & Textiles</option>
-              <option value="Beauty & Wellness">Beauty & Wellness</option>
-              <option value="Home & Decor">Home & Decor</option>
-              <option value="Books & Media">Books & Media</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            />
-            <button 
-              onClick={handleSearch}
-              className="text-white px-6 py-3 rounded-full transition-colors font-medium whitespace-nowrap"
-              style={{backgroundColor: '#F9A825'}}
-              onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-              onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-            >
-              Search
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Desktop Breadcrumb - Hidden on Mobile */}
       <div className="hidden lg:block bg-white py-8">
@@ -331,31 +358,31 @@ const ProductDetail: React.FC = () => {
                   </svg>
                   <span className="text-gray-600">{product.location}</span>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 lg:space-x-4">
                   <button 
                     onClick={handleSave}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 lg:p-3 rounded-full transition-colors ${
                       isSaved 
                         ? 'text-orange-500 bg-orange-50' 
                         : 'text-gray-400 hover:text-orange-500'
                     }`}
                     title={isSaved ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-5 h-5" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 lg:w-6 lg:h-6" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>
                   <button 
-                    onClick={handleLike}
-                    className={`p-2 rounded-full transition-colors ${
-                      isLiked 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
+                    onClick={handleShare}
+                    className={`p-2 lg:p-3 rounded-full transition-colors ${
+                      isShared 
+                        ? 'text-blue-500 bg-blue-50' 
+                        : 'text-gray-400 hover:text-blue-500'
                     }`}
-                    title={isLiked ? 'Unlike product' : 'Like product'}
+                    title={isShared ? 'Shared' : 'Share product'}
                   >
-                    <svg className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                   </button>
                 </div>
@@ -410,7 +437,10 @@ const ProductDetail: React.FC = () => {
               </div>
 
               {/* Seller Info */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+              <div 
+                className="bg-white rounded-lg border border-gray-200 p-4 mb-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={() => navigate(`/seller/${product.seller.name.toLowerCase().replace(/\s+/g, '-')}`)}
+              >
                 <div className="text-sm font-medium text-gray-500 mb-3">Seller profile</div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -424,9 +454,9 @@ const ProductDetail: React.FC = () => {
                     </div>
                   </div>
                   {product.seller.verified && (
-                    <div className="flex items-center text-xs text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      Verified Seller
+                    <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-2 py-1 rounded-md">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                      <span className="text-xs font-medium">Verified Seller</span>
                     </div>
                   )}
                 </div>
@@ -543,25 +573,25 @@ const ProductDetail: React.FC = () => {
         </div>
         
         {/* Seller Profile */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-3">
-          <div className="text-sm font-medium text-gray-500 mb-3">Seller profile</div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <img
-                src={product.seller.avatar}
-                alt={product.seller.name}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <div>
-                <div className="font-medium text-gray-900">{product.seller.name}</div>
-              </div>
+        <div 
+          className="mb-4 cursor-pointer hover:bg-gray-50 transition-colors rounded-lg p-3 -mx-3"
+          onClick={() => navigate(`/seller/${product.seller.name.toLowerCase().replace(/\s+/g, '-')}`)}
+        >
+          <div className="flex items-center space-x-3 mb-2">
+            <img
+              src={product.seller.avatar}
+              alt={product.seller.name}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <div>
+              <div className="font-medium text-gray-900">{product.seller.name}</div>
+              {product.seller.verified && (
+                <div className="flex items-center text-xs text-green-600 mt-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                  Verified Seller
+                </div>
+              )}
             </div>
-            {product.seller.verified && (
-              <div className="flex items-center text-xs text-green-600">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                Verified Seller
-              </div>
-            )}
           </div>
         </div>
         
@@ -588,14 +618,17 @@ const ProductDetail: React.FC = () => {
         <div className="mb-8">
           {/* Tab Navigation */}
           <div className="flex justify-center border-b border-gray-200 relative">
-            <button className="px-6 py-3 text-gray-900 font-medium border-b-2 border-gray-900">
+            <button className="px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base text-gray-900 font-medium border-b-2 border-gray-900">
               Other seller products
             </button>
-            <button className="px-6 py-3 text-gray-500 font-medium hover:text-gray-700">
+            <button 
+              onClick={() => navigate(`/seller/${product.seller.name.toLowerCase().replace(/\s+/g, '-')}?tab=reviews`)}
+              className="px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base text-gray-500 font-medium hover:text-gray-700 transition-colors"
+            >
               Reviews and ratings
             </button>
             {/* Carousel Navigation */}
-            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+            <div className="hidden lg:flex absolute right-0 top-1/2 transform -translate-y-1/2 items-center space-x-2">
               <button 
                 onClick={handleOtherProductsPrev}
                 className="p-2 rounded-full border border-gray-300 text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors"
@@ -620,41 +653,45 @@ const ProductDetail: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6">
           {/* Product 1 - African Textiles */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gray-100">
+            <div className="aspect-square bg-gray-100 relative">
               <img src={africanTextileImage} alt="African Textiles" className="w-full h-full object-cover" />
+              
+              {/* Country Badge */}
+              <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                <img 
+                  src={getProductCountry(1).flag} 
+                  alt={getProductCountry(1).name}
+                  className="w-3 h-2 object-cover rounded-sm"
+                />
+                <span className="text-xs font-medium text-gray-800">
+                  {getProductCountry(1).abbreviation}
+                </span>
+              </div>
             </div>
-            <div className="p-3">
+            <div className="p-3 pb-2">
+              {/* Price and Verified Badge Row */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-semibold text-gray-900">$13.9</span>
-                <div className="flex items-center text-xs text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  Verified Seller
+                <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1"></div>
+                  <span className="text-xs sm:text-xs">Verified Seller</span>
                 </div>
               </div>
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Textiles</h3>
-                  <p className="text-xs text-gray-500 flex items-center truncate">
-                    <svg className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="truncate">London | United Kingdom</span>
-                  </p>
+              
+              {/* Product Name */}
+              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Textiles</h3>
+              
+              {/* Location and Bookmark Row */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1 flex items-center text-xs text-gray-500">
+                  <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
-                <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
-                  <button 
-                    onClick={() => handleLikeProduct('textiles-1')}
-                    className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('textiles-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
-                    }`}
-                    title={likedProducts.has('textiles-1') ? 'Unlike product' : 'Like product'}
-                  >
-                    <svg className="w-4 h-4" fill={likedProducts.has('textiles-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
+                
+                {/* Bookmark Button */}
+                <div className="ml-4">
                   <button 
                     onClick={() => {
                       const newSet = new Set(wishlistProducts);
@@ -665,16 +702,23 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 transition-colors touch-manipulation ${
                       wishlistProducts.has('textiles-1') 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-400 hover:text-orange-500'
+                        ? 'text-orange-500 hover:text-orange-600' 
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={wishlistProducts.has('textiles-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-4 h-4" fill={wishlistProducts.has('textiles-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
+                    <div className="relative">
+                      <svg className="w-6 h-6" fill={wishlistProducts.has('textiles-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      {!wishlistProducts.has('textiles-1') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold">+</span>
+                        </div>
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>
@@ -683,41 +727,45 @@ const ProductDetail: React.FC = () => {
 
           {/* Product 2 - Fresh Tomatoes */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gray-100">
-              <img src={tomatoImage} alt="Fresh Tomatoes" className="w-full h-full object-cover" />
+            <div className="aspect-square bg-gray-100 relative">
+              <img src={pre3} alt="Fresh Tomatoes" className="w-full h-full object-cover" />
+              
+              {/* Country Badge */}
+              <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                <img 
+                  src={getProductCountry(3).flag} 
+                  alt={getProductCountry(3).name}
+                  className="w-3 h-2 object-cover rounded-sm"
+                />
+                <span className="text-xs font-medium text-gray-800">
+                  {getProductCountry(3).abbreviation}
+                </span>
+              </div>
             </div>
-            <div className="p-3">
+            <div className="p-3 pb-2">
+              {/* Price and Verified Badge Row */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-semibold text-gray-900">$45</span>
-                <div className="flex items-center text-xs text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  Verified Seller
+                <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1"></div>
+                  <span className="text-xs sm:text-xs">Verified Seller</span>
                 </div>
               </div>
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Fresh Tomatoes</h3>
-                  <p className="text-xs text-gray-500 flex items-center truncate">
-                    <svg className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="truncate">London | United Kingdom</span>
-                  </p>
+              
+              {/* Product Name */}
+              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Fresh Tomatoes</h3>
+              
+              {/* Location and Bookmark Row */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1 flex items-center text-xs text-gray-500">
+                  <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
-                <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
-                  <button 
-                    onClick={() => handleLikeProduct('tomatoes-1')}
-                    className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('tomatoes-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
-                    }`}
-                    title={likedProducts.has('tomatoes-1') ? 'Unlike product' : 'Like product'}
-                  >
-                    <svg className="w-3 h-3" fill={likedProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
+                
+                {/* Bookmark Button */}
+                <div className="ml-4">
                   <button 
                     onClick={() => {
                       const newSet = new Set(wishlistProducts);
@@ -728,16 +776,23 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 transition-colors touch-manipulation ${
                       wishlistProducts.has('tomatoes-1') 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-400 hover:text-orange-500'
+                        ? 'text-orange-500 hover:text-orange-600' 
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={wishlistProducts.has('tomatoes-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
+                    <div className="relative">
+                      <svg className="w-6 h-6" fill={wishlistProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      {!wishlistProducts.has('tomatoes-1') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold">+</span>
+                        </div>
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>
@@ -746,41 +801,45 @@ const ProductDetail: React.FC = () => {
 
           {/* Product 3 - Dried Shrimp */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gray-100">
-              <img src={driedShrimpImage} alt="Dried Shrimp" className="w-full h-full object-cover" />
+            <div className="aspect-square bg-gray-100 relative">
+              <img src={pre4} alt="Dried Shrimp" className="w-full h-full object-cover" />
+              
+              {/* Country Badge */}
+              <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                <img 
+                  src={getProductCountry(4).flag} 
+                  alt={getProductCountry(4).name}
+                  className="w-3 h-2 object-cover rounded-sm"
+                />
+                <span className="text-xs font-medium text-gray-800">
+                  {getProductCountry(4).abbreviation}
+                </span>
+              </div>
             </div>
-            <div className="p-3">
+            <div className="p-3 pb-2">
+              {/* Price and Verified Badge Row */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-semibold text-gray-900">$8.09</span>
-                <div className="flex items-center text-xs text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  Verified Seller
+                <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1"></div>
+                  <span className="text-xs sm:text-xs">Verified Seller</span>
                 </div>
               </div>
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Dried Shrimp</h3>
-                  <p className="text-xs text-gray-500 flex items-center truncate">
-                    <svg className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="truncate">London | United Kingdom</span>
-                  </p>
+              
+              {/* Product Name */}
+              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Dried Shrimp</h3>
+              
+              {/* Location and Bookmark Row */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1 flex items-center text-xs text-gray-500">
+                  <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
-                <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
-                  <button 
-                    onClick={() => handleLikeProduct('shrimp-1')}
-                    className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('shrimp-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
-                    }`}
-                    title={likedProducts.has('shrimp-1') ? 'Unlike product' : 'Like product'}
-                  >
-                    <svg className="w-3 h-3" fill={likedProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
+                
+                {/* Bookmark Button */}
+                <div className="ml-4">
                   <button 
                     onClick={() => {
                       const newSet = new Set(wishlistProducts);
@@ -791,16 +850,23 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 transition-colors touch-manipulation ${
                       wishlistProducts.has('shrimp-1') 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-400 hover:text-orange-500'
+                        ? 'text-orange-500 hover:text-orange-600' 
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={wishlistProducts.has('shrimp-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
+                    <div className="relative">
+                      <svg className="w-6 h-6" fill={wishlistProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      {!wishlistProducts.has('shrimp-1') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold">+</span>
+                        </div>
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>
@@ -809,41 +875,45 @@ const ProductDetail: React.FC = () => {
 
           {/* Product 4 - Ndolè Leaves */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gray-100">
-              <img src={ndoleImage} alt="Ndolè Leaves" className="w-full h-full object-cover" />
+            <div className="aspect-square bg-gray-100 relative">
+              <img src={pre5} alt="Ndolè Leaves" className="w-full h-full object-cover" />
+              
+              {/* Country Badge */}
+              <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                <img 
+                  src={getProductCountry(5).flag} 
+                  alt={getProductCountry(5).name}
+                  className="w-3 h-2 object-cover rounded-sm"
+                />
+                <span className="text-xs font-medium text-gray-800">
+                  {getProductCountry(5).abbreviation}
+                </span>
+              </div>
             </div>
-            <div className="p-3">
+            <div className="p-3 pb-2">
+              {/* Price and Verified Badge Row */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-semibold text-gray-900">$11.5</span>
-                <div className="flex items-center text-xs text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  Verified Seller
+                <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1"></div>
+                  <span className="text-xs sm:text-xs">Verified Seller</span>
                 </div>
               </div>
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Ndolè Leaves</h3>
-                  <p className="text-xs text-gray-500 flex items-center truncate">
-                    <svg className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="truncate">London | United Kingdom</span>
-                  </p>
+              
+              {/* Product Name */}
+              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Ndolè Leaves</h3>
+              
+              {/* Location and Bookmark Row */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1 flex items-center text-xs text-gray-500">
+                  <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
-                <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
-                  <button 
-                    onClick={() => handleLikeProduct('ndole-1')}
-                    className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('ndole-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
-                    }`}
-                    title={likedProducts.has('ndole-1') ? 'Unlike product' : 'Like product'}
-                  >
-                    <svg className="w-3 h-3" fill={likedProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
+                
+                {/* Bookmark Button */}
+                <div className="ml-4">
                   <button 
                     onClick={() => {
                       const newSet = new Set(wishlistProducts);
@@ -854,16 +924,23 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 transition-colors touch-manipulation ${
                       wishlistProducts.has('ndole-1') 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-400 hover:text-orange-500'
+                        ? 'text-orange-500 hover:text-orange-600' 
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={wishlistProducts.has('ndole-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
+                    <div className="relative">
+                      <svg className="w-6 h-6" fill={wishlistProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      {!wishlistProducts.has('ndole-1') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold">+</span>
+                        </div>
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>
@@ -875,7 +952,7 @@ const ProductDetail: React.FC = () => {
       {/* Recommended Articles Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-base lg:text-xl font-semibold text-gray-900">Articles that might interest you</h2>
+          <h2 className="text-sm lg:text-xl font-semibold text-gray-900">Articles that might interest you</h2>
           <div className="flex items-center space-x-1 lg:space-x-2">
             <button 
               onClick={handleRecommendedPrev}
@@ -900,41 +977,45 @@ const ProductDetail: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {/* Product 1 - Handwoven Basket */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gray-100">
+            <div className="aspect-square bg-gray-100 relative">
               <img src={basketImage} alt="Handwoven Basket" className="w-full h-full object-cover" />
+              
+              {/* Country Badge */}
+              <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                <img 
+                  src={getProductCountry(6).flag} 
+                  alt={getProductCountry(6).name}
+                  className="w-3 h-2 object-cover rounded-sm"
+                />
+                <span className="text-xs font-medium text-gray-800">
+                  {getProductCountry(6).abbreviation}
+                </span>
+              </div>
             </div>
-            <div className="p-3">
+            <div className="p-3 pb-2">
+              {/* Price and Verified Badge Row */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-semibold text-gray-900">$13.9</span>
-                <div className="flex items-center text-xs text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  Verified Seller
+                <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1"></div>
+                  <span className="text-xs sm:text-xs">Verified Seller</span>
                 </div>
               </div>
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Handwoven Basket</h3>
-                  <p className="text-xs text-gray-500 flex items-center truncate">
-                    <svg className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="truncate">London | United Kingdom</span>
-                  </p>
+              
+              {/* Product Name */}
+              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Handwoven Basket</h3>
+              
+              {/* Location and Bookmark Row */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1 flex items-center text-xs text-gray-500">
+                  <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
-                <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
-                  <button 
-                    onClick={() => handleLikeProduct('basket-1')}
-                    className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('basket-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
-                    }`}
-                    title={likedProducts.has('basket-1') ? 'Unlike product' : 'Like product'}
-                  >
-                    <svg className="w-3 h-3" fill={likedProducts.has('basket-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
+                
+                {/* Bookmark Button */}
+                <div className="ml-4">
                   <button 
                     onClick={() => {
                       const newSet = new Set(wishlistProducts);
@@ -945,16 +1026,23 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 transition-colors touch-manipulation ${
                       wishlistProducts.has('basket-1') 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-400 hover:text-orange-500'
+                        ? 'text-orange-500 hover:text-orange-600' 
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={wishlistProducts.has('basket-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('basket-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
+                    <div className="relative">
+                      <svg className="w-6 h-6" fill={wishlistProducts.has('basket-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      {!wishlistProducts.has('basket-1') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold">+</span>
+                        </div>
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>
@@ -963,41 +1051,45 @@ const ProductDetail: React.FC = () => {
 
           {/* Product 2 - Wooden Combs */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gray-100">
+            <div className="aspect-square bg-gray-100 relative">
               <img src={woodenCombImage} alt="Wooden Combs" className="w-full h-full object-cover" />
+              
+              {/* Country Badge */}
+              <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                <img 
+                  src={getProductCountry(7).flag} 
+                  alt={getProductCountry(7).name}
+                  className="w-3 h-2 object-cover rounded-sm"
+                />
+                <span className="text-xs font-medium text-gray-800">
+                  {getProductCountry(7).abbreviation}
+                </span>
+              </div>
             </div>
-            <div className="p-3">
+            <div className="p-3 pb-2">
+              {/* Price and Verified Badge Row */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-semibold text-gray-900">$45</span>
-                <div className="flex items-center text-xs text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  Verified Seller
+                <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1"></div>
+                  <span className="text-xs sm:text-xs">Verified Seller</span>
                 </div>
               </div>
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Wooden Combs</h3>
-                  <p className="text-xs text-gray-500 flex items-center truncate">
-                    <svg className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="truncate">London | United Kingdom</span>
-                  </p>
+              
+              {/* Product Name */}
+              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Wooden Combs</h3>
+              
+              {/* Location and Bookmark Row */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1 flex items-center text-xs text-gray-500">
+                  <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
-                <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
-                  <button 
-                    onClick={() => handleLikeProduct('combs-1')}
-                    className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('combs-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
-                    }`}
-                    title={likedProducts.has('combs-1') ? 'Unlike product' : 'Like product'}
-                  >
-                    <svg className="w-3 h-3" fill={likedProducts.has('combs-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
+                
+                {/* Bookmark Button */}
+                <div className="ml-4">
                   <button 
                     onClick={() => {
                       const newSet = new Set(wishlistProducts);
@@ -1008,16 +1100,23 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 transition-colors touch-manipulation ${
                       wishlistProducts.has('combs-1') 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-400 hover:text-orange-500'
+                        ? 'text-orange-500 hover:text-orange-600' 
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={wishlistProducts.has('combs-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('combs-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
+                    <div className="relative">
+                      <svg className="w-6 h-6" fill={wishlistProducts.has('combs-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      {!wishlistProducts.has('combs-1') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold">+</span>
+                        </div>
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>
@@ -1026,41 +1125,45 @@ const ProductDetail: React.FC = () => {
 
           {/* Product 3 - White Beans */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gray-100">
-              <img src={whiteBeansImage} alt="White Beans" className="w-full h-full object-cover" />
+            <div className="aspect-square bg-gray-100 relative">
+              <img src={pre1} alt="White Beans" className="w-full h-full object-cover" />
+              
+              {/* Country Badge */}
+              <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                <img 
+                  src={getProductCountry(1).flag} 
+                  alt={getProductCountry(1).name}
+                  className="w-3 h-2 object-cover rounded-sm"
+                />
+                <span className="text-xs font-medium text-gray-800">
+                  {getProductCountry(1).abbreviation}
+                </span>
+              </div>
             </div>
-            <div className="p-3">
+            <div className="p-3 pb-2">
+              {/* Price and Verified Badge Row */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-semibold text-gray-900">$8.09</span>
-                <div className="flex items-center text-xs text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  Verified Seller
+                <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1"></div>
+                  <span className="text-xs sm:text-xs">Verified Seller</span>
                 </div>
               </div>
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">White Beans</h3>
-                  <p className="text-xs text-gray-500 flex items-center truncate">
-                    <svg className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="truncate">London | United Kingdom</span>
-                  </p>
+              
+              {/* Product Name */}
+              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">White Beans</h3>
+              
+              {/* Location and Bookmark Row */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1 flex items-center text-xs text-gray-500">
+                  <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
-                <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
-                  <button 
-                    onClick={() => handleLikeProduct('beans-1')}
-                    className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('beans-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
-                    }`}
-                    title={likedProducts.has('beans-1') ? 'Unlike product' : 'Like product'}
-                  >
-                    <svg className="w-3 h-3" fill={likedProducts.has('beans-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
+                
+                {/* Bookmark Button */}
+                <div className="ml-4">
                   <button 
                     onClick={() => {
                       const newSet = new Set(wishlistProducts);
@@ -1071,16 +1174,23 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 transition-colors touch-manipulation ${
                       wishlistProducts.has('beans-1') 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-400 hover:text-orange-500'
+                        ? 'text-orange-500 hover:text-orange-600' 
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={wishlistProducts.has('beans-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('beans-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
+                    <div className="relative">
+                      <svg className="w-6 h-6" fill={wishlistProducts.has('beans-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      {!wishlistProducts.has('beans-1') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold">+</span>
+                        </div>
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>
@@ -1089,41 +1199,45 @@ const ProductDetail: React.FC = () => {
 
           {/* Product 4 - Cassava Flour */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gray-100">
-              <img src={cassavaFlourImage} alt="Cassava Flour" className="w-full h-full object-cover" />
+            <div className="aspect-square bg-gray-100 relative">
+              <img src={pre6} alt="Cassava Flour" className="w-full h-full object-cover" />
+              
+              {/* Country Badge */}
+              <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                <img 
+                  src={getProductCountry(6).flag} 
+                  alt={getProductCountry(6).name}
+                  className="w-3 h-2 object-cover rounded-sm"
+                />
+                <span className="text-xs font-medium text-gray-800">
+                  {getProductCountry(6).abbreviation}
+                </span>
+              </div>
             </div>
-            <div className="p-3">
+            <div className="p-3 pb-2">
+              {/* Price and Verified Badge Row */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-base font-semibold text-gray-900">$11.5</span>
-                <div className="flex items-center text-xs text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  Verified Seller
+                <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1"></div>
+                  <span className="text-xs sm:text-xs">Verified Seller</span>
                 </div>
               </div>
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Cassava Flour</h3>
-                  <p className="text-xs text-gray-500 flex items-center truncate">
-                    <svg className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="truncate">London | United Kingdom</span>
-                  </p>
+              
+              {/* Product Name */}
+              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Cassava Flour</h3>
+              
+              {/* Location and Bookmark Row */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1 flex items-center text-xs text-gray-500">
+                  <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
-                <div className="hidden lg:flex items-center space-x-2 ml-2 flex-shrink-0">
-                  <button 
-                    onClick={() => handleLikeProduct('cassava-1')}
-                    className={`p-2 rounded-full transition-colors ${
-                      likedProducts.has('cassava-1') 
-                        ? 'text-red-500 bg-red-50' 
-                        : 'text-gray-400 hover:text-red-500'
-                    }`}
-                    title={likedProducts.has('cassava-1') ? 'Unlike product' : 'Like product'}
-                  >
-                    <svg className="w-3 h-3" fill={likedProducts.has('cassava-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
+                
+                {/* Bookmark Button */}
+                <div className="ml-4">
                   <button 
                     onClick={() => {
                       const newSet = new Set(wishlistProducts);
@@ -1134,16 +1248,23 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 rounded-full transition-colors ${
+                    className={`p-2 transition-colors touch-manipulation ${
                       wishlistProducts.has('cassava-1') 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-400 hover:text-orange-500'
+                        ? 'text-orange-500 hover:text-orange-600' 
+                        : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={wishlistProducts.has('cassava-1') ? 'Remove from saved' : 'Save product'}
                   >
-                    <svg className="w-3 h-3" fill={wishlistProducts.has('cassava-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
+                    <div className="relative">
+                      <svg className="w-6 h-6" fill={wishlistProducts.has('cassava-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      {!wishlistProducts.has('cassava-1') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold">+</span>
+                        </div>
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>

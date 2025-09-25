@@ -124,4 +124,24 @@
   .african-accent {
     @apply text-primary-600 font-display font-semibold;
   }
+  
+  /* Custom scrollbar for dropdown menus */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: white;
+    border-radius: 3px;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #f9fafb;
+  }
 }

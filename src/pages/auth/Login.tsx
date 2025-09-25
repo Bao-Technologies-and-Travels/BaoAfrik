@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -150,70 +151,9 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleSocialLogin = async (provider: string) => {
-    try {
-      setIsLoading(true);
-      console.log(`${provider} login clicked`);
-      
-      // Simulate brief authentication delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Simulate checking if account exists in BaoAfrik database
-      // 60% chance account exists for demo purposes
-      const accountExists = Math.random() > 0.4;
-      
-      if (accountExists) {
-        // Account found - simulate getting user data
-        const mockUserData = {
-          google: {
-            id: '1',
-            name: 'John Doe',
-            email: 'john.doe@gmail.com',
-            profileImage: 'https://via.placeholder.com/150',
-            provider: 'google'
-          },
-          facebook: {
-            id: '2',
-            name: 'Jane Smith',
-            email: 'jane.smith@facebook.com',
-            profileImage: 'https://via.placeholder.com/150',
-            provider: 'facebook'
-          },
-          github: {
-            id: '3',
-            name: 'Dev User',
-            email: 'dev.user@github.com',
-            profileImage: 'https://via.placeholder.com/150',
-            provider: 'github'
-          }
-        };
-        
-        const userData = mockUserData[provider as keyof typeof mockUserData];
-        
-        // Store user data and redirect to validation success
-        localStorage.setItem('tempSocialUser', JSON.stringify(userData));
-        
-        navigate('/social-login-validation', {
-          state: {
-            provider: provider,
-            isLogin: true
-          }
-        });
-      } else {
-        // No account found - redirect to error page
-        navigate('/social-login-error', {
-          state: {
-            provider: provider
-          }
-        });
-      }
-      
-    } catch (error) {
-      console.error(`${provider} login failed:`, error);
-      setErrors({ general: `Failed to login with ${provider}. Please try again.` });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSocialLogin = (provider: string) => {
+    // Show alert that social login is not available yet
+    alert('Social login not available yet. Backend coming soon.');
   };
   
   const handleVisitorAccess = () => {
@@ -223,12 +163,12 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex">
+    <div className="min-h-screen bg-white flex">
       {/* Left side - Form */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           {/* Visitor Access Button */}
-          <div className="text-center">
+          <div className="text-center pt-8 md:pt-0">
             <button
               onClick={handleVisitorAccess}
               className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-full hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
@@ -285,6 +225,9 @@ const Login: React.FC = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email address
+                </label>
                 <input
                   id="email"
                   name="email"
@@ -295,7 +238,7 @@ const Login: React.FC = () => {
                   className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
                     errors.email ? 'border-red-500' : 'border-gray-200'
                   }`}
-                  placeholder="Email address"
+                  placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -305,6 +248,9 @@ const Login: React.FC = () => {
             </div>
             
             <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
               <div className="relative">
                 <input
                   id="password"
@@ -318,7 +264,7 @@ const Login: React.FC = () => {
                   className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
                     errors.password ? 'border-red-500' : 'border-gray-200'
                   }`}
-                  placeholder="Password"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -370,7 +316,7 @@ const Login: React.FC = () => {
             </div>
 
             <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-orange-600 hover:text-orange-500">
+              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 underline">
                 Forgot password?
               </Link>
             </div>
@@ -380,11 +326,12 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100"
+              className="w-full disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100"
+              style={{ backgroundColor: isLoading ? '#9CA3AF' : '#F9A825' }}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  <LoadingSpinner size="md" color="white" className="mr-2" />
                   Signing In...
                 </div>
               ) : (
@@ -393,8 +340,13 @@ const Login: React.FC = () => {
             </button>
           </div>
 
-          <div className="text-center">
-            <span className="text-gray-400 text-sm">Or sign in with</span>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or sign in with</span>
+            </div>
           </div>
 
           {/* Social Login Buttons */}
@@ -426,19 +378,19 @@ const Login: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => handleSocialLogin('github')}
+              onClick={() => handleSocialLogin('apple')}
               disabled={isLoading}
               className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               <svg className="w-6 h-6 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
               </svg>
             </button>
           </div>
 
           <div className="text-center">
             <span className="text-gray-500 text-sm">Don't have an account? </span>
-            <Link to="/register" className="font-medium text-orange-600 hover:text-orange-500">
+            <Link to="/register" className="font-medium text-black hover:text-gray-700 underline">
               Sign Up
             </Link>
           </div>
@@ -447,7 +399,7 @@ const Login: React.FC = () => {
       </div>
 
       {/* Right side - Logo Illustration */}
-      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-orange-100 to-yellow-100">
+      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-orange-50 via-orange-100 to-white">
         <div className="max-w-md text-center">
           {/* Large BaoAfrik Logo */}
           <div className="mx-auto w-80 h-80 mb-8 flex items-center justify-center">
