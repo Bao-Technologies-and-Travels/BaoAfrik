@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -26,10 +26,20 @@ import './App.css';
 
 function AppContent() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const isProductDetailPage = location.pathname.startsWith('/product/');
   const isSellerProfilePage = location.pathname.startsWith('/seller/');
   const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success'];
   const isAuthPage = authPages.includes(location.pathname);
+  const onboardingPages = ['/profile-setup', '/user-preferences'];
+
+  // Redirect authenticated users away from auth pages
+  React.useEffect(() => {
+    if (isAuthPage && isAuthenticated && !onboardingPages.includes(location.pathname)) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthPage, isAuthenticated, navigate, location.pathname]);
 
   // For auth pages, render without header/footer
   if (isAuthPage) {

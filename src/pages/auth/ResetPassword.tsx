@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { authService } from '../../services/authService';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
@@ -8,7 +9,8 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email || '';
+  // Parse token from query string (reset-password?token=...)
+  const token = useMemo(() => new URLSearchParams(location.search).get('token') || '', [location.search]);
   
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -54,23 +56,18 @@ const ResetPassword: React.FC = () => {
     setErrors({});
 
     try {
-      // Simulate API call to reset password
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Update password in localStorage for demo
-      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-      const userIndex = registeredUsers.findIndex((user: any) => user.email.toLowerCase() === email.toLowerCase());
-      
-      if (userIndex !== -1) {
-        registeredUsers[userIndex].password = password;
-        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+      if (!token) {
+        setErrors({ general: 'Invalid or missing reset link. Please request a new password reset.' });
+        return;
       }
-      
-      console.log('Password reset successful for:', email);
-      
-      // Navigate to password reset success page
-      navigate('/password-reset-success');
-      
+
+      const resp = await authService.resetPassword({ token, newPassword: password, confirmPassword });
+
+      if (resp.success) {
+        navigate('/password-reset-success', { replace: true });
+      } else {
+        setErrors({ general: resp.message || 'Failed to reset password. Please try again.' });
+      }
     } catch (error) {
       console.error('Password reset failed:', error);
       setErrors({ general: 'Failed to reset password. Please try again.' });

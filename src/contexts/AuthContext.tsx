@@ -47,7 +47,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const initializeAuth = async () => {
       const token = localStorage.getItem('accessToken');
       const storedUser = localStorage.getItem('user');
-      
+
+      // Seed from localStorage quickly to avoid UI flicker
       if (token && storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
@@ -59,7 +60,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           localStorage.removeItem('refreshToken');
         }
       }
-      
+
+      // Always try to refresh from server if we have a token
+      if (token) {
+        try {
+          const resp = await authService.getCurrentUser();
+          if (resp.success && resp.data) {
+            setUser(resp.data);
+            localStorage.setItem('user', JSON.stringify(resp.data));
+          }
+        } catch (e) {
+          console.warn('Initial auth refresh failed (non-blocking):', e);
+        }
+      }
+
       setIsLoading(false);
     };
 

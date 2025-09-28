@@ -8,7 +8,9 @@ import {
   validateEmailVerification,
   validateResendVerification,
   validateUpdateProfile,
-  validateChangePassword 
+  validateChangePassword,
+  validateForgotPassword,
+  validateResetPassword,
 } from '@/middleware/validationMiddleware';
 
 const router = Router();
@@ -43,6 +45,8 @@ router.post('/register', authLimiter, validateRegister, authController.register)
 router.post('/login', authLimiter, validateLogin, authController.login);
 router.post('/verify-email', generalLimiter, validateEmailVerification, authController.verifyEmail);
 router.post('/resend-verification', generalLimiter, validateResendVerification, authController.resendVerificationCode);
+router.post('/forgot-password', generalLimiter, validateForgotPassword, authController.forgotPassword);
+router.post('/reset-password', generalLimiter, validateResetPassword, authController.resetPassword);
 
 // Token refresh
 router.post('/refresh', generalLimiter, authController.refreshToken);

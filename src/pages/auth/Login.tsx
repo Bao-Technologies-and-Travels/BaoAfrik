@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
 
-  const { login, setVisitorMode } = useAuth();
+  const { login, setVisitorMode, refreshAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -105,6 +105,7 @@ const Login: React.FC = () => {
     
     setIsLoading(true);
     setErrors({});
+    setSuccessMessage(''); // Clear any previous success messages
     
     try {
       const response = await authService.login({
@@ -114,42 +115,118 @@ const Login: React.FC = () => {
       });
       
       if (response.success && response.data) {
-        // Store tokens
-        localStorage.setItem('accessToken', response.data.tokens.accessToken);
-        localStorage.setItem('refreshToken', response.data.tokens.refreshToken);
-        
-        // Handle remember me functionality
-        if (rememberMe) {
-          rememberMeService.saveRememberedEmail(email);
+        // Accept both shapes:
+        // A) { data: { accessToken, refreshToken, user } }
+        // B) { data: { tokens: { accessToken, refreshToken }, user } }
+        const d: any = response.data as any;
+        const accessToken = d?.tokens?.accessToken ?? d?.accessToken;
+        const refreshToken = d?.tokens?.refreshToken ?? d?.refreshToken;
+        const user = d?.user;
+
+        if (accessToken && refreshToken && user) {
+          // Store tokens
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+
+          // Handle remember me functionality
+          if (rememberMe) {
+            rememberMeService.saveRememberedEmail(email);
+          } else {
+            rememberMeService.clearRememberedEmail();
+          }
+
+          // Login user first
+          login(user);
+          // Immediately refresh from server to ensure latest profile info
+          try {
+            await refreshAuth();
+          } catch (e) {
+            console.warn('refreshAuth failed (non-blocking):', e);
+          }
+
+          // Show success message
+          setSuccessMessage('Login successful! Redirecting...');
+          setMessageType('success');
+          setErrors({});
+
+          // Add debug logging
+          console.log('Login successful, preparing redirect...', user);
+          console.log('Current location:', window.location.pathname);
+
+          // Determine redirect target (prefer previous page if provided)
+          const redirectTo = (location.state as any)?.from || '/';
+          console.log('Redirect target:', redirectTo);
+
+          // Try client-side navigation first; fallback to hard redirect
+          try {
+            navigate(redirectTo, { replace: true });
+          } catch (e) {
+            console.warn('navigate() failed, falling back to window.location.assign', e);
+            window.location.assign(redirectTo);
+          }
         } else {
-          rememberMeService.clearRememberedEmail();
+          // If success is true but tokens are missing, treat as an unexpected response shape
+          console.warn('Login response missing tokens or user:', response);
+          setErrors({
+            general: 'Unexpected response from server. Please try again.'
+          });
         }
-        
-        // Login user
-        login(response.data.user);
-        navigate('/');
       } else {
         // Handle specific error messages from backend
-        if (response.message?.includes('verify your email')) {
+        if (response.message?.includes('verify your email') || response.message?.includes('Please verify')) {
           setErrors({ 
-            general: 'Please verify your email before logging in. Check your inbox for the verification code.' 
+            general: '📧 Email verification required. Please check your inbox and verify your email address before logging in.' 
           });
-        } else if (response.message?.includes('Invalid email or password')) {
+          // Redirect to email verification page
+          navigate('/verify-email', { 
+            state: { 
+              email: email,
+              fromLogin: true 
+            } 
+          });
+        } else if (response.message?.includes('Invalid') || response.message?.includes('password') || response.message?.includes('credentials')) {
           setErrors({ 
-            general: 'Invalid email or password. Please check your credentials and try again.' 
+            general: '🔐 Invalid email or password. Please double-check your credentials and try again.' 
+          });
+        } else if (response.message?.includes('not found') || response.message?.includes('does not exist')) {
+          setErrors({ 
+            general: '👤 No account found with this email address. Please check your email or create a new account.' 
+          });
+        } else if (response.message?.includes('blocked') || response.message?.includes('suspended')) {
+          setErrors({ 
+            general: '🚫 Your account has been temporarily blocked. Please contact support for assistance.' 
+          });
+        } else if (response.message?.includes('too many') || response.message?.includes('rate limit')) {
+          setErrors({ 
+            general: '⏰ Too many login attempts. Please wait a few minutes before trying again.' 
           });
         } else {
           setErrors({ 
-            general: response.message || 'Login failed. Please try again.' 
+            general: response.message || '❌ Login failed. Please try again or contact support if the problem persists.' 
           });
         }
       }
       
     } catch (error) {
       console.error('Login failed:', error);
-      setErrors({ 
-        general: 'Network error. Please check your connection and try again.' 
-      });
+      
+      // Clear any success messages when there's an error
+      setSuccessMessage('');
+      
+      // More specific network error handling
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        setErrors({ 
+          general: '🌐 Unable to connect to server. Please make sure the backend is running on port 3001 and try again.' 
+        });
+      } else if (error instanceof Error && error.message.includes('timeout')) {
+        setErrors({ 
+          general: '⏱️ Request timed out. Please check your connection and try again.' 
+        });
+      } else {
+        setErrors({ 
+          general: '🔧 Network error occurred. Please check your connection or try again later.' 
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -200,11 +277,13 @@ const Login: React.FC = () => {
           {/* General Error Message */}
           {errors.general && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <div className="flex items-start">
+                <svg className="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
-                <p className="text-sm text-red-800">{errors.general}</p>
+                <div className="flex-1">
+                  <p className="text-sm text-red-800 leading-relaxed">{errors.general}</p>
+                </div>
               </div>
             </div>
           )}

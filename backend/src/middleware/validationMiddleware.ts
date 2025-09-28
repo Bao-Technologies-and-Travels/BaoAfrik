@@ -121,15 +121,15 @@ export const validateResetPassword = [
     .notEmpty()
     .withMessage('Reset token is required'),
   
-  body('password')
+  body('newPassword')
     .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long')
+    .withMessage('New password must be at least 8 characters long')
     .matches(/^(?=.*[a-zA-Z])(?=.*\d)/)
-    .withMessage('Password must contain both letters and numbers'),
+    .withMessage('New password must contain both letters and numbers'),
   
   body('confirmPassword')
     .custom((value, { req }) => {
-      if (value !== req.body.password) {
+      if (value !== req.body.newPassword) {
         throw new Error('Passwords do not match');
       }
       return true;
@@ -339,9 +339,13 @@ export const validateUpdateProfile = [
   
   body('profileImage')
     .optional()
-    .trim()
-    .isURL()
-    .withMessage('Profile image must be a valid URL'),
+    .custom((value) => {
+      if (typeof value !== 'string') return false;
+      const isDataUrl = value.startsWith('data:image/');
+      const isHttpUrl = /^https?:\/\//i.test(value);
+      return isDataUrl || isHttpUrl;
+    })
+    .withMessage('Profile image must be an http(s) URL or a data URL'),
   
   handleValidationErrors,
 ];

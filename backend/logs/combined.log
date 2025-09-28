@@ -4121,3 +4121,4571 @@
   environment: 'development',
   timestamp: '2025-09-19 23:13:31'
 }
+{
+  requestId: 'b16d3976-5525-4cad-840d-724e69a8f6c7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:48:42'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:143:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-19 23:48:43'
+}
+{
+  requestId: 'b16d3976-5525-4cad-840d-724e69a8f6c7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '502ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:48:43'
+}
+{
+  requestId: 'b16d3976-5525-4cad-840d-724e69a8f6c7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:143:34',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:48:43'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:48:43 +0000] "POST /api/auth/login HTTP/1.1" 500 345 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:48:43'
+}
+{
+  requestId: 'dc654190-2f83-48ff-9e9d-6c2cf212cfb1',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:49:24'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-19 23:49:24'
+}
+{
+  requestId: 'dc654190-2f83-48ff-9e9d-6c2cf212cfb1',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '307ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:49:24'
+}
+{
+  requestId: 'dc654190-2f83-48ff-9e9d-6c2cf212cfb1',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:49:24'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:49:24 +0000] "POST /api/auth/login HTTP/1.1" 500 379 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:49:24'
+}
+{
+  requestId: '24743f4c-e2ad-4651-9c8d-1af183e75736',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    name: 'dalitine9',
+    email: 'dalitine9@gmail.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:51:10'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  messageId: '<55d0724f-c1f3-0cfc-6a46-2fe25b1a97e4@gmail.com>',
+  to: 'dalitine9@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'info',
+  message: 'Email sent successfully',
+  timestamp: '2025-09-19 23:51:13'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'f9560005-39ac-4744-b2dd-3081174e6385',
+  email: 'dalitine9@gmail.com',
+  level: 'info',
+  message: 'User registered successfully',
+  timestamp: '2025-09-19 23:51:13'
+}
+{
+  requestId: '24743f4c-e2ad-4651-9c8d-1af183e75736',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 201,
+  duration: '2876ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:51:13'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:51:13 +0000] "POST /api/auth/register HTTP/1.1" 201 241 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:51:13'
+}
+{
+  requestId: '5c2205fd-5f90-45db-960a-773aa4c3988d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'dalitine9@gmail.com', verificationCode: '417098' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:52:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-19 23:52:14'
+}
+{
+  requestId: '5c2205fd-5f90-45db-960a-773aa4c3988d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '11ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:52:14'
+}
+{
+  requestId: '5c2205fd-5f90-45db-960a-773aa4c3988d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:52:14'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:52:14 +0000] "POST /api/auth/verify-email HTTP/1.1" 500 367 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:52:14'
+}
+{
+  requestId: 'ed2517d4-9c5b-48c8-ab90-1b720f6026ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'dalitine9@gmail.com', verificationCode: '417095' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:52:19'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'f9560005-39ac-4744-b2dd-3081174e6385',
+  email: 'dalitine9@gmail.com',
+  level: 'info',
+  message: 'Email verified successfully',
+  timestamp: '2025-09-19 23:52:19'
+}
+{
+  requestId: 'ed2517d4-9c5b-48c8-ab90-1b720f6026ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '7ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:52:19'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:52:19 +0000] "POST /api/auth/verify-email HTTP/1.1" 200 56 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:52:19'
+}
+{
+  requestId: 'ce56709b-c3a6-436d-9c08-39c8be1c06d9',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'dalitine9@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:53:21'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'f9560005-39ac-4744-b2dd-3081174e6385',
+  email: 'dalitine9@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-19 23:53:22'
+}
+{
+  requestId: 'ce56709b-c3a6-436d-9c08-39c8be1c06d9',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '306ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:53:22'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:53:22 +0000] "POST /api/auth/login HTTP/1.1" 200 720 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:53:22'
+}
+{
+  requestId: '34099979-a541-46d2-8493-9b43a2ee727f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'dalitine9@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:53:28'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'f9560005-39ac-4744-b2dd-3081174e6385',
+  email: 'dalitine9@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-19 23:53:29'
+}
+{
+  requestId: '34099979-a541-46d2-8493-9b43a2ee727f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '325ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:53:29'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:53:29 +0000] "POST /api/auth/login HTTP/1.1" 200 761 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:53:29'
+}
+{
+  requestId: 'f440b524-e1b4-4cdf-8f99-d22b26825ba4',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'dalitine9@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:54:43'
+}
+{
+  requestId: 'f440b524-e1b4-4cdf-8f99-d22b26825ba4',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 429,
+  duration: '1ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:54:43'
+}
+{
+  requestId: 'f440b524-e1b4-4cdf-8f99-d22b26825ba4',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 429,
+  response: {
+    success: false,
+    message: 'Too many authentication attempts, please try again later.',
+    errors: { general: 'Rate limit exceeded' }
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:54:43'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:54:43 +0000] "POST /api/auth/login HTTP/1.1" 429 130 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:54:43'
+}
+{
+  requestId: 'f0ed84a4-3909-4174-86b3-bfdc57eec4c7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'dalitine9@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:55:04'
+}
+{
+  requestId: 'f0ed84a4-3909-4174-86b3-bfdc57eec4c7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 429,
+  duration: '2ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:55:04'
+}
+{
+  requestId: 'f0ed84a4-3909-4174-86b3-bfdc57eec4c7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 429,
+  response: {
+    success: false,
+    message: 'Too many authentication attempts, please try again later.',
+    errors: { general: 'Rate limit exceeded' }
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:55:04'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:55:04 +0000] "POST /api/auth/login HTTP/1.1" 429 130 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:55:04'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:02'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:10'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:10'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:10'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:10'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:10'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:10'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:10'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:11'
+}
+{
+  requestId: 'a269e028-3191-44a1-aaf5-8af1f72ee09f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'dalitine9@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:56:27'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'f9560005-39ac-4744-b2dd-3081174e6385',
+  email: 'dalitine9@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-19 23:56:27'
+}
+{
+  requestId: 'a269e028-3191-44a1-aaf5-8af1f72ee09f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '369ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:56:27'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:56:27 +0000] "POST /api/auth/login HTTP/1.1" 200 761 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:56:27'
+}
+{
+  requestId: 'a30ae039-1746-453a-9d53-5ccf3f91c031',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'dalitine9@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-19 23:59:35'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'f9560005-39ac-4744-b2dd-3081174e6385',
+  email: 'dalitine9@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-19 23:59:35'
+}
+{
+  requestId: 'a30ae039-1746-453a-9d53-5ccf3f91c031',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '302ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-19 23:59:35'
+}
+{
+  message: '::1 - - [19/Sep/2025:22:59:35 +0000] "POST /api/auth/login HTTP/1.1" 200 761 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-19 23:59:35'
+}
+{
+  requestId: '3043f55a-e5fa-4274-8439-38d4ab46e6c2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 00:01:31'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 00:01:31'
+}
+{
+  requestId: '3043f55a-e5fa-4274-8439-38d4ab46e6c2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '349ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 00:01:31'
+}
+{
+  requestId: '3043f55a-e5fa-4274-8439-38d4ab46e6c2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 00:01:31'
+}
+{
+  message: '::1 - - [19/Sep/2025:23:01:31 +0000] "POST /api/auth/login HTTP/1.1" 500 379 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:01:31'
+}
+{
+  requestId: '1fbb5bc3-9ccb-4b8b-88cb-51e533caf108',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 00:04:03'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 00:04:04'
+}
+{
+  requestId: '1fbb5bc3-9ccb-4b8b-88cb-51e533caf108',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '307ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 00:04:04'
+}
+{
+  requestId: '1fbb5bc3-9ccb-4b8b-88cb-51e533caf108',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 00:04:04'
+}
+{
+  message: '::1 - - [19/Sep/2025:23:04:04 +0000] "POST /api/auth/login HTTP/1.1" 500 379 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:04:04'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:04:56'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:05:54'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:05:54'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:05:54'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:05:54'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:05:54'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:05:54'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:05:54'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:05:56'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:06:53'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:14:53'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:14:53'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:14:53'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:14:53'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:14:53'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:14:53'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:14:53'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:14:54'
+}
+{
+  requestId: 'e7c10afc-16cc-4e2b-aaac-220f2c7d9f34',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 00:14:56'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 00:14:57'
+}
+{
+  requestId: 'e7c10afc-16cc-4e2b-aaac-220f2c7d9f34',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '363ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 00:14:57'
+}
+{
+  requestId: 'e7c10afc-16cc-4e2b-aaac-220f2c7d9f34',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 00:14:57'
+}
+{
+  message: '::1 - - [19/Sep/2025:23:14:57 +0000] "POST /api/auth/login HTTP/1.1" 500 379 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 00:14:57'
+}
+{
+  requestId: '5244f549-5d8f-4731-bf96-b4cb23a3f073',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 17:49:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 17:49:47'
+}
+{
+  requestId: '5244f549-5d8f-4731-bf96-b4cb23a3f073',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '477ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 17:49:47'
+}
+{
+  requestId: '5244f549-5d8f-4731-bf96-b4cb23a3f073',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 17:49:47'
+}
+{
+  message: '::1 - - [20/Sep/2025:16:49:47 +0000] "POST /api/auth/login HTTP/1.1" 500 379 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:49:47'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:04'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:04'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:04'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:04'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:04'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:04'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:04'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:06'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:08'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:14'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:14'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:14'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:14'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:14'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:14'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:14'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:16'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:19'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:25'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:25'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:25'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:25'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:25'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:25'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:25'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:53:26'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:54:37'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:54:37'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:54:37'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:54:37'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:54:37'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:54:37'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:54:37'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:54:38'
+}
+{
+  requestId: 'f321efb6-e920-421c-8d5a-d88e3896fafd',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 17:54:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:147:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 17:54:57'
+}
+{
+  requestId: 'f321efb6-e920-421c-8d5a-d88e3896fafd',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  duration: '528ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 17:54:57'
+}
+{
+  requestId: 'f321efb6-e920-421c-8d5a-d88e3896fafd',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Please verify your email before logging in',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:147:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 17:54:57'
+}
+{
+  message: '::1 - - [20/Sep/2025:16:54:57 +0000] "POST /api/auth/login HTTP/1.1" 401 411 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:54:57'
+}
+{
+  requestId: '0f8fe42d-f814-4776-a908-7a70d3a36624',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/resend-verification',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'arreyjohnson518@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 17:56:29'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  messageId: '<5bc1702c-d8fe-0a52-76b0-f4914594179b@gmail.com>',
+  to: 'arreyjohnson518@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'info',
+  message: 'Email sent successfully',
+  timestamp: '2025-09-20 17:56:32'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  level: 'info',
+  message: 'Verification code resent',
+  timestamp: '2025-09-20 17:56:32'
+}
+{
+  requestId: '0f8fe42d-f814-4776-a908-7a70d3a36624',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '3101ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 17:56:32'
+}
+{
+  message: '::1 - - [20/Sep/2025:16:56:32 +0000] "POST /api/auth/resend-verification HTTP/1.1" 200 64 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:56:32'
+}
+{
+  requestId: 'e6645bcb-8963-4e3e-83c0-c710046851b6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'arreyjohnson518@gmail.com', verificationCode: '887351' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 17:56:54'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  level: 'info',
+  message: 'Email verified successfully',
+  timestamp: '2025-09-20 17:56:54'
+}
+{
+  requestId: 'e6645bcb-8963-4e3e-83c0-c710046851b6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '7ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 17:56:54'
+}
+{
+  message: '::1 - - [20/Sep/2025:16:56:54 +0000] "POST /api/auth/verify-email HTTP/1.1" 200 56 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:56:54'
+}
+{
+  requestId: '0b64035d-ff7e-4d9b-a8df-166264f0d24d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 17:57:21'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-20 17:57:21'
+}
+{
+  requestId: '0b64035d-ff7e-4d9b-a8df-166264f0d24d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '298ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 17:57:21'
+}
+{
+  message: '::1 - - [20/Sep/2025:16:57:21 +0000] "POST /api/auth/login HTTP/1.1" 200 748 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 17:57:21'
+}
+{
+  requestId: 'c9a7163e-5efa-4f90-8add-d934f5cf4bb6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 18:00:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-20 18:00:47'
+}
+{
+  requestId: 'c9a7163e-5efa-4f90-8add-d934f5cf4bb6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '338ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 18:00:47'
+}
+{
+  message: '::1 - - [20/Sep/2025:17:00:47 +0000] "POST /api/auth/login HTTP/1.1" 200 789 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 18:00:47'
+}
+{
+  requestId: '753db71c-4b2e-4a46-aa56-f2373326ae3b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 18:01:19'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-20 18:01:19'
+}
+{
+  requestId: '753db71c-4b2e-4a46-aa56-f2373326ae3b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '306ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 18:01:19'
+}
+{
+  message: '::1 - - [20/Sep/2025:17:01:19 +0000] "POST /api/auth/login HTTP/1.1" 200 789 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 18:01:19'
+}
+{
+  requestId: 'ced29dec-a9ed-47f4-ad7a-6e2a6ed2c5c8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-20 18:02:52'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-20 18:02:53'
+}
+{
+  requestId: 'ced29dec-a9ed-47f4-ad7a-6e2a6ed2c5c8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '316ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-20 18:02:53'
+}
+{
+  message: '::1 - - [20/Sep/2025:17:02:53 +0000] "POST /api/auth/login HTTP/1.1" 200 789 "http://localhost:3000/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-20 18:02:53'
+}
+{
+  requestId: 'fcffb8fd-bc5e-4937-825a-526a3536809c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-22 10:14:39'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-22 10:14:40'
+}
+{
+  requestId: 'fcffb8fd-bc5e-4937-825a-526a3536809c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '960ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-22 10:14:40'
+}
+{
+  message: '::1 - - [22/Sep/2025:09:14:40 +0000] "POST /api/auth/login HTTP/1.1" 200 789 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:14:40'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:15:40'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:15:40'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:15:40'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:15:40'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:15:40'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:15:40'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:15:40'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:15:42'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:22:19'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:23:22'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:29:57'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:33:42'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:54:11'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:54:11'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:54:11'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:54:11'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:54:11'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:54:11'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:54:11'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:54:12'
+}
+{
+  requestId: 'af8ee423-5c10-4069-9bb9-a489eadc6042',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    name: 'bisongeyere69',
+    email: 'bisongeyere69@gmail.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-22 11:58:43'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  messageId: '<203a22f9-6ccf-e709-54df-44ec60947c65@gmail.com>',
+  to: 'bisongeyere69@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'info',
+  message: 'Email sent successfully',
+  timestamp: '2025-09-22 11:58:46'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '17db990b-4db5-4efb-a5e9-fdf3ddd0d9f3',
+  email: 'bisongeyere69@gmail.com',
+  level: 'info',
+  message: 'User registered successfully',
+  timestamp: '2025-09-22 11:58:46'
+}
+{
+  requestId: 'af8ee423-5c10-4069-9bb9-a489eadc6042',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 201,
+  duration: '3033ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-22 11:58:46'
+}
+{
+  message: '::1 - - [22/Sep/2025:10:58:46 +0000] "POST /api/auth/register HTTP/1.1" 201 241 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:58:46'
+}
+{
+  requestId: '3f13f1a3-ea81-44bd-b14c-e4702171e9b2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'bisongeyere69@gmail.com', verificationCode: '755112' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-22 11:59:10'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '17db990b-4db5-4efb-a5e9-fdf3ddd0d9f3',
+  email: 'bisongeyere69@gmail.com',
+  level: 'info',
+  message: 'Email verified successfully',
+  timestamp: '2025-09-22 11:59:10'
+}
+{
+  requestId: '3f13f1a3-ea81-44bd-b14c-e4702171e9b2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '19ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-22 11:59:10'
+}
+{
+  message: '::1 - - [22/Sep/2025:10:59:10 +0000] "POST /api/auth/verify-email HTTP/1.1" 200 56 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 11:59:10'
+}
+{
+  requestId: 'a42c8e2b-6edb-487f-9b37-b32c62ed626e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/logout',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-22 12:00:24'
+}
+{
+  requestId: 'a42c8e2b-6edb-487f-9b37-b32c62ed626e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '2ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-22 12:00:24'
+}
+{
+  message: '::1 - - [22/Sep/2025:11:00:24 +0000] "POST /api/auth/logout HTTP/1.1" 200 52 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 12:00:24'
+}
+{
+  requestId: 'a00945c1-e136-43f4-8d94-5e37ccfa3a94',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'bisongeyere69@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-22 12:00:50'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:142:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-22 12:00:50'
+}
+{
+  requestId: 'a00945c1-e136-43f4-8d94-5e37ccfa3a94',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  duration: '282ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-22 12:00:50'
+}
+{
+  requestId: 'a00945c1-e136-43f4-8d94-5e37ccfa3a94',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid email or password',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:142:34',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-22 12:00:50'
+}
+{
+  message: '::1 - - [22/Sep/2025:11:00:50 +0000] "POST /api/auth/login HTTP/1.1" 401 360 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 12:00:50'
+}
+{
+  requestId: 'a846542c-7156-4a2e-a81b-acf574e4a187',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'bisongeyere69@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-22 12:01:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '17db990b-4db5-4efb-a5e9-fdf3ddd0d9f3',
+  email: 'bisongeyere69@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-22 12:01:01'
+}
+{
+  requestId: 'a846542c-7156-4a2e-a81b-acf574e4a187',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '280ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-22 12:01:01'
+}
+{
+  message: '::1 - - [22/Sep/2025:11:01:01 +0000] "POST /api/auth/login HTTP/1.1" 200 738 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 12:01:01'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 12:02:08'
+}
+{
+  requestId: '054ecf61-8944-4986-b31f-6a7efe352842',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    name: 'tamaglory2001',
+    email: 'tamaglory2001@gmail.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-23 11:38:36'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  messageId: '<cba5e5e6-380f-aaa7-c427-6ea242cd08b3@gmail.com>',
+  to: 'tamaglory2001@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'info',
+  message: 'Email sent successfully',
+  timestamp: '2025-09-23 11:38:50'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '636c2386-f184-4965-8491-72b30e025fe9',
+  email: 'tamaglory2001@gmail.com',
+  level: 'info',
+  message: 'User registered successfully',
+  timestamp: '2025-09-23 11:38:50'
+}
+{
+  requestId: '054ecf61-8944-4986-b31f-6a7efe352842',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 201,
+  duration: '13941ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-23 11:38:50'
+}
+{
+  message: '::1 - - [23/Sep/2025:10:38:50 +0000] "POST /api/auth/register HTTP/1.1" 201 241 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-23 11:38:50'
+}
+{
+  requestId: '7a222448-2e40-4d45-8a33-4582e85057f4',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'tamaglory2001@gmail.com', verificationCode: '568232' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-23 11:39:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '636c2386-f184-4965-8491-72b30e025fe9',
+  email: 'tamaglory2001@gmail.com',
+  level: 'info',
+  message: 'Email verified successfully',
+  timestamp: '2025-09-23 11:39:18'
+}
+{
+  requestId: '7a222448-2e40-4d45-8a33-4582e85057f4',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '6ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-23 11:39:18'
+}
+{
+  message: '::1 - - [23/Sep/2025:10:39:18 +0000] "POST /api/auth/verify-email HTTP/1.1" 200 56 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-23 11:39:18'
+}
+{
+  requestId: '94d18f83-8385-4fce-a52f-c738e8969e68',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/logout',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-23 11:48:08'
+}
+{
+  requestId: '94d18f83-8385-4fce-a52f-c738e8969e68',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-23 11:48:08'
+}
+{
+  message: '::1 - - [23/Sep/2025:10:48:08 +0000] "POST /api/auth/logout HTTP/1.1" 200 52 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-23 11:48:08'
+}
+{
+  requestId: '699cb496-a1fc-48ba-9a1a-d6eaa64b0afc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'tamaglory2001@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-23 11:48:16'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '636c2386-f184-4965-8491-72b30e025fe9',
+  email: 'tamaglory2001@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-23 11:48:16'
+}
+{
+  requestId: '699cb496-a1fc-48ba-9a1a-d6eaa64b0afc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '349ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-23 11:48:16'
+}
+{
+  message: '::1 - - [23/Sep/2025:10:48:16 +0000] "POST /api/auth/login HTTP/1.1" 200 738 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-23 11:48:16'
+}
+{
+  requestId: '046975cf-bc42-4ca8-a60e-1ae239c2a9d8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'tamaglory2001@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-23 11:48:55'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '636c2386-f184-4965-8491-72b30e025fe9',
+  email: 'tamaglory2001@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-23 11:48:56'
+}
+{
+  requestId: '046975cf-bc42-4ca8-a60e-1ae239c2a9d8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '315ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-23 11:48:56'
+}
+{
+  message: '::1 - - [23/Sep/2025:10:48:56 +0000] "POST /api/auth/login HTTP/1.1" 200 779 "http://localhost:3000/" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-23 11:48:56'
+}
+{
+  requestId: '8e490113-5f64-40bb-af3e-595ffe7b9adc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'tamaglory2001@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-23 11:49:43'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '636c2386-f184-4965-8491-72b30e025fe9',
+  email: 'tamaglory2001@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-23 11:49:44'
+}
+{
+  requestId: '8e490113-5f64-40bb-af3e-595ffe7b9adc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '343ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-23 11:49:44'
+}
+{
+  message: '::1 - - [23/Sep/2025:10:49:44 +0000] "POST /api/auth/login HTTP/1.1" 200 779 "http://localhost:3000/" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-23 11:49:44'
+}
+{
+  requestId: 'aa3c7c27-04e8-420b-affc-effe6fdb5921',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/test/get-verification-code',
+  userAgent: 'PostmanRuntime/7.46.1',
+  ip: '::1',
+  query: {},
+  body: { email: 'arreyjohnson518@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-23 11:50:12'
+}
+{
+  requestId: 'aa3c7c27-04e8-420b-affc-effe6fdb5921',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '59ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-23 11:50:12'
+}
+{
+  message: '::1 - - [23/Sep/2025:10:50:12 +0000] "POST /api/test/get-verification-code HTTP/1.1" 200 179 "-" "PostmanRuntime/7.46.1"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-23 11:50:12'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-23 13:06:12'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:42:59'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:42:59'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:42:59'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:42:59'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:42:59'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:42:59'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:42:59'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:43:00'
+}
+{
+  requestId: 'd0e810b0-381f-4055-9fe8-89c21730b009',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:43:52'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-25 09:43:53'
+}
+{
+  requestId: 'd0e810b0-381f-4055-9fe8-89c21730b009',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '471ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:43:53'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:43:53 +0000] "POST /api/auth/login HTTP/1.1" 200 789 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:43:53'
+}
+{
+  requestId: '46daa739-80bb-453a-b496-047c415d05e6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/logout',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:44:21'
+}
+{
+  requestId: '46daa739-80bb-453a-b496-047c415d05e6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '2ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:44:21'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:44:21 +0000] "POST /api/auth/logout HTTP/1.1" 200 52 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:44:21'
+}
+{
+  requestId: '5d7dcff7-747c-463c-b18e-430256ff5857',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'tamaglory2001@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:44:34'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '636c2386-f184-4965-8491-72b30e025fe9',
+  email: 'tamaglory2001@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-25 09:44:35'
+}
+{
+  requestId: '5d7dcff7-747c-463c-b18e-430256ff5857',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '347ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:44:35'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:44:35 +0000] "POST /api/auth/login HTTP/1.1" 200 779 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:44:35'
+}
+{
+  requestId: '05249f62-bca5-4d59-89e1-db0484cbb013',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/logout',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:51:25'
+}
+{
+  requestId: '05249f62-bca5-4d59-89e1-db0484cbb013',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '2ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:51:25'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:51:25 +0000] "POST /api/auth/logout HTTP/1.1" 200 52 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:51:25'
+}
+{
+  requestId: '9827dd87-49f9-4ef5-b411-f9142eb5be48',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:51:34'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-25 09:51:35'
+}
+{
+  requestId: '9827dd87-49f9-4ef5-b411-f9142eb5be48',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '364ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:51:35'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:51:35 +0000] "POST /api/auth/login HTTP/1.1" 200 789 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:51:35'
+}
+{
+  requestId: 'c8c9c0f3-de68-4c32-b26b-2342f9c3e5d9',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/logout',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:52:07'
+}
+{
+  requestId: 'c8c9c0f3-de68-4c32-b26b-2342f9c3e5d9',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:52:07'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:52:07 +0000] "POST /api/auth/logout HTTP/1.1" 200 52 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:52:07'
+}
+{
+  requestId: 'd9d6672b-263f-4983-9ab4-7183ff5c9af0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    name: 'baotechnologiesandtravels',
+    email: 'baotechnologiesandtravels@gmail.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:52:43'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  messageId: '<b5959a2d-cd09-4d07-0dec-c4b0e1e693f7@gmail.com>',
+  to: 'baotechnologiesandtravels@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'info',
+  message: 'Email sent successfully',
+  timestamp: '2025-09-25 09:52:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '0e984e82-a6e0-4555-b08a-6f7cae6785b4',
+  email: 'baotechnologiesandtravels@gmail.com',
+  level: 'info',
+  message: 'User registered successfully',
+  timestamp: '2025-09-25 09:52:47'
+}
+{
+  requestId: 'd9d6672b-263f-4983-9ab4-7183ff5c9af0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 201,
+  duration: '3553ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:52:47'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:52:47 +0000] "POST /api/auth/register HTTP/1.1" 201 241 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:52:47'
+}
+{
+  requestId: '3eefc0f6-f794-4413-92d0-e0e08ef0edac',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'baotechnologiesandtravels@gmail.com',
+    verificationCode: '402981'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:53:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '0e984e82-a6e0-4555-b08a-6f7cae6785b4',
+  email: 'baotechnologiesandtravels@gmail.com',
+  level: 'info',
+  message: 'Email verified successfully',
+  timestamp: '2025-09-25 09:53:18'
+}
+{
+  requestId: '3eefc0f6-f794-4413-92d0-e0e08ef0edac',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '6ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:53:18'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:53:18 +0000] "POST /api/auth/verify-email HTTP/1.1" 200 56 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:53:18'
+}
+{
+  requestId: 'ad17aa5f-12d5-4c15-a4cb-4109fa03798e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/logout',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:54:30'
+}
+{
+  requestId: 'ad17aa5f-12d5-4c15-a4cb-4109fa03798e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:54:30'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:54:30 +0000] "POST /api/auth/logout HTTP/1.1" 200 52 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:54:30'
+}
+{
+  requestId: '19740814-cf81-434a-ad18-b0c8bdd842fc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'baotechnologiesandtravels@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 09:54:44'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '0e984e82-a6e0-4555-b08a-6f7cae6785b4',
+  email: 'baotechnologiesandtravels@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-25 09:54:44'
+}
+{
+  requestId: '19740814-cf81-434a-ad18-b0c8bdd842fc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '308ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 09:54:44'
+}
+{
+  message: '::1 - - [25/Sep/2025:08:54:44 +0000] "POST /api/auth/login HTTP/1.1" 200 794 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 09:54:44'
+}
+{
+  requestId: 'fae2cdbd-e41e-40a1-9e97-d522bb152e77',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { firstName: 'Emperor', lastName: 'Johnson' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:11:28'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '0e984e82-a6e0-4555-b08a-6f7cae6785b4',
+  email: 'baotechnologiesandtravels@gmail.com',
+  requestId: 'fae2cdbd-e41e-40a1-9e97-d522bb152e77',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-09-25 10:11:28'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '0e984e82-a6e0-4555-b08a-6f7cae6785b4',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-09-25 10:11:28'
+}
+{
+  requestId: 'fae2cdbd-e41e-40a1-9e97-d522bb152e77',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '122ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 10:11:28'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:11:28 +0000] "PUT /api/auth/profile HTTP/1.1" 200 404 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:11:28'
+}
+{
+  requestId: '25b47aec-3a8b-442b-9f9f-e5fe7d2d8903',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:14:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '0e984e82-a6e0-4555-b08a-6f7cae6785b4',
+  email: 'baotechnologiesandtravels@gmail.com',
+  requestId: '25b47aec-3a8b-442b-9f9f-e5fe7d2d8903',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-09-25 10:14:01'
+}
+{
+  requestId: '25b47aec-3a8b-442b-9f9f-e5fe7d2d8903',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '9ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 10:14:01'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:14:01 +0000] "GET /api/auth/me HTTP/1.1" 200 363 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:14:01'
+}
+{
+  requestId: 'f4ac92c6-9a31-444d-8301-432afa3a53f4',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:14:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '0e984e82-a6e0-4555-b08a-6f7cae6785b4',
+  email: 'baotechnologiesandtravels@gmail.com',
+  requestId: 'f4ac92c6-9a31-444d-8301-432afa3a53f4',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-09-25 10:14:01'
+}
+{
+  requestId: 'f4ac92c6-9a31-444d-8301-432afa3a53f4',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '7ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 10:14:01'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:14:01 +0000] "GET /api/auth/me HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:14:01'
+}
+{
+  requestId: '48bdea83-81a6-40b5-9de9-b310a819044e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/logout',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:18:36'
+}
+{
+  requestId: '48bdea83-81a6-40b5-9de9-b310a819044e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 10:18:36'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:18:36 +0000] "POST /api/auth/logout HTTP/1.1" 200 52 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:18:36'
+}
+{
+  requestId: '2f001984-0c29-4149-a179-5f9517c90b24',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'baotechnologiesandtravels@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:18:40'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '0e984e82-a6e0-4555-b08a-6f7cae6785b4',
+  email: 'baotechnologiesandtravels@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-25 10:18:40'
+}
+{
+  requestId: '2f001984-0c29-4149-a179-5f9517c90b24',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '381ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 10:18:40'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:18:40 +0000] "POST /api/auth/login HTTP/1.1" 200 825 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:18:40'
+}
+{
+  requestId: 'aadf3b97-9f1e-4e27-9046-83acae51893c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:18:40'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '0e984e82-a6e0-4555-b08a-6f7cae6785b4',
+  email: 'baotechnologiesandtravels@gmail.com',
+  requestId: 'aadf3b97-9f1e-4e27-9046-83acae51893c',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-09-25 10:18:40'
+}
+{
+  requestId: 'aadf3b97-9f1e-4e27-9046-83acae51893c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '74ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 10:18:40'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:18:40 +0000] "GET /api/auth/me HTTP/1.1" 200 363 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:18:40'
+}
+{
+  requestId: 'bef216f4-d106-45a8-9c36-3cc1ea7b52ce',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/logout',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:21:11'
+}
+{
+  requestId: 'bef216f4-d106-45a8-9c36-3cc1ea7b52ce',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 10:21:11'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:21:11 +0000] "POST /api/auth/logout HTTP/1.1" 200 52 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:21:11'
+}
+{
+  requestId: 'f51e2d25-13e8-4e59-9d2d-9cadcf6369e0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'arreyjohnson518@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:21:24'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api/auth/forgot-password',
+  stack: 'Error: Not Found - /api/auth/forgot-password\n' +
+    '    at notFound (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+    '    at Function.handle (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+    '    at router (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-25 10:21:24'
+}
+{
+  requestId: 'f51e2d25-13e8-4e59-9d2d-9cadcf6369e0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  duration: '8ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 10:21:24'
+}
+{
+  requestId: 'f51e2d25-13e8-4e59-9d2d-9cadcf6369e0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api/auth/forgot-password',
+    stack: 'Error: Not Found - /api/auth/forgot-password\n' +
+      '    at notFound (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+      '    at Function.handle (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+      '    at router (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+    originalError: 'Not Found - /api/auth/forgot-password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-25 10:21:24'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:21:24 +0000] "POST /api/auth/forgot-password HTTP/1.1" 404 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:21:24'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:15'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:15'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:15'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:15'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:15'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:15'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:15'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:15'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:16'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:46'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:46'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:46'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:46'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:46'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:46'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:46'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:46'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:47'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:34'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:34'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:34'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:34'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:34'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:34'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:34'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:34'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:35'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:58'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:58'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:58'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:58'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:58'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:58'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:58'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:59'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:33:00'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:40:49'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:40:57'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:40:57'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:40:57'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:40:57'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:40:57'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:40:57'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:40:57'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:40:58'
+}
+{
+  requestId: 'd22f2aed-90d3-40a5-a3b8-bb907a96b68d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api-docs',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:41:04 +0000] "GET /api-docs HTTP/1.1" 301 158 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  requestId: 'b1534f84-6b09-43d8-bc4b-f3de8c786d80',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api-docs/',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:41:04 +0000] "GET /api-docs/ HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  requestId: '55e2c02a-958a-4345-9cee-33ca0cc46a84',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api-docs/swagger-ui.css',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  requestId: '2132f81e-0563-4941-b9db-3d340766f405',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api-docs/swagger-ui-init.js',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  requestId: 'e330b1c6-c5a5-455d-8928-80e32261b3e1',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api-docs/swagger-ui-bundle.js',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  requestId: 'db5c4ff4-b617-4943-a4d8-d0084075ce7d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api-docs/swagger-ui-standalone-preset.js',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:41:04 +0000] "GET /api-docs/swagger-ui-init.js HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:41:04 +0000] "GET /api-docs/swagger-ui.css HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:41:04 +0000] "GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:41:04 +0000] "GET /api-docs/swagger-ui-bundle.js HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:41:04'
+}
+{
+  requestId: '041b7067-542e-4652-b66f-49241653aab9',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api-docs/favicon-32x32.png',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:41:05'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:41:05 +0000] "GET /api-docs/favicon-32x32.png HTTP/1.1" 200 628 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:41:05'
+}
+{
+  requestId: '5f868b7e-8f6a-434e-a121-efea42d42c65',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'arreyjohnson518@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-25 10:41:40'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  error: 'connect ETIMEDOUT 142.251.31.108:587',
+  to: 'arreyjohnson518@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'error',
+  message: 'Failed to send email',
+  timestamp: '2025-09-25 10:42:02'
+}
+{
+  requestId: '5f868b7e-8f6a-434e-a121-efea42d42c65',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '21104ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-25 10:42:02'
+}
+{
+  message: '::1 - - [25/Sep/2025:09:42:02 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 102 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:42:02'
+}
+{
+  requestId: '4cff6185-f06f-40db-ad81-db46f0ccc299',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'arreyjohnson518@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 09:28:22'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  messageId: '<13330928-b1df-0290-2768-7315b1b69324@gmail.com>',
+  to: 'arreyjohnson518@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully',
+  timestamp: '2025-09-26 09:28:25'
+}
+{
+  requestId: '4cff6185-f06f-40db-ad81-db46f0ccc299',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '2800ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 09:28:25'
+}
+{
+  message: '::1 - - [26/Sep/2025:08:28:25 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 102 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:28:25'
+}
+{
+  requestId: '43e35f47-0d9a-4757-9d4f-d2e70891ced3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    token: '[REDACTED]',
+    newPassword: '@Billions237',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 09:28:52'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  level: 'info',
+  message: 'Password reset successfully',
+  timestamp: '2025-09-26 09:28:53'
+}
+{
+  requestId: '43e35f47-0d9a-4757-9d4f-d2e70891ced3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '369ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 09:28:53'
+}
+{
+  message: '::1 - - [26/Sep/2025:08:28:53 +0000] "POST /api/auth/reset-password HTTP/1.1" 200 86 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:28:53'
+}
+{
+  requestId: 'fa8434f7-e50a-45bd-ab41-a8c3e7b5010d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'arreyjohnson518@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 09:29:03'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-09-26 09:29:04'
+}
+{
+  requestId: 'fa8434f7-e50a-45bd-ab41-a8c3e7b5010d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '345ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 09:29:04'
+}
+{
+  message: '::1 - - [26/Sep/2025:08:29:04 +0000] "POST /api/auth/login HTTP/1.1" 200 789 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:29:04'
+}
+{
+  requestId: '9e4a5d04-c42c-4d79-881f-316e1b27c2a3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 09:29:04'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  requestId: '9e4a5d04-c42c-4d79-881f-316e1b27c2a3',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-09-26 09:29:04'
+}
+{
+  requestId: '9e4a5d04-c42c-4d79-881f-316e1b27c2a3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '76ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 09:29:04'
+}
+{
+  message: '::1 - - [26/Sep/2025:08:29:04 +0000] "GET /api/auth/me HTTP/1.1" 200 353 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:29:04'
+}
+{
+  requestId: '7ca7df23-c2ab-4eee-8f11-5ad0005a27d3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 09:29:15'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  requestId: '7ca7df23-c2ab-4eee-8f11-5ad0005a27d3',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-09-26 09:29:15'
+}
+{
+  requestId: '7ca7df23-c2ab-4eee-8f11-5ad0005a27d3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '8ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 09:29:15'
+}
+{
+  message: '::1 - - [26/Sep/2025:08:29:15 +0000] "GET /api/auth/me HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:29:15'
+}
+{
+  requestId: '302ee196-edae-4c3c-a37d-0ced4b01682a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 09:29:15'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  requestId: '302ee196-edae-4c3c-a37d-0ced4b01682a',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-09-26 09:29:15'
+}
+{
+  requestId: '302ee196-edae-4c3c-a37d-0ced4b01682a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '7ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 09:29:15'
+}
+{
+  message: '::1 - - [26/Sep/2025:08:29:15 +0000] "GET /api/auth/me HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:29:15'
+}
+{
+  requestId: 'e48e97c5-3905-452d-b0d6-b463992c2753',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { firstName: 'Arrey', lastName: 'Johnson' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 09:29:30'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  email: 'arreyjohnson518@gmail.com',
+  requestId: 'e48e97c5-3905-452d-b0d6-b463992c2753',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-09-26 09:29:30'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'b37ba0c6-8d79-450f-8779-112b52f89787',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-09-26 09:29:30'
+}
+{
+  requestId: 'e48e97c5-3905-452d-b0d6-b463992c2753',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '8ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 09:29:30'
+}
+{
+  message: '::1 - - [26/Sep/2025:08:29:30 +0000] "PUT /api/auth/profile HTTP/1.1" 200 392 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:29:30'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:54'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:54'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:54'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:54'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:54'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:54'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:54'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:54'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:55'
+}
+{
+  requestId: '9742872c-0da3-4527-86d8-6d66ab590259',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  requestId: '9742872c-0da3-4527-86d8-6d66ab590259',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '17ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  requestId: '9742872c-0da3-4527-86d8-6d66ab590259',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  message: '::1 - - [26/Sep/2025:09:05:22 +0000] "GET /api/auth/me HTTP/1.1" 500 970 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  requestId: '6916fb2f-c0cb-4dfc-b22a-fab4247b04d8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  requestId: '6916fb2f-c0cb-4dfc-b22a-fab4247b04d8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '6ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  requestId: '6916fb2f-c0cb-4dfc-b22a-fab4247b04d8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  message: '::1 - - [26/Sep/2025:09:05:22 +0000] "GET /api/auth/me HTTP/1.1" 500 970 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  requestId: '616cad94-f7e6-4394-9aef-d0f550237159',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  requestId: '616cad94-f7e6-4394-9aef-d0f550237159',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '4ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  requestId: '616cad94-f7e6-4394-9aef-d0f550237159',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  message: '::1 - - [26/Sep/2025:09:05:57 +0000] "GET /api/auth/me HTTP/1.1" 500 970 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  requestId: 'a1e3058d-a132-4cea-ab3c-8de588121174',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  requestId: 'a1e3058d-a132-4cea-ab3c-8de588121174',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '6ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  requestId: 'a1e3058d-a132-4cea-ab3c-8de588121174',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  message: '::1 - - [26/Sep/2025:09:05:57 +0000] "GET /api/auth/me HTTP/1.1" 500 970 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  requestId: 'f0a19320-9559-4dba-8bab-b231d81a89af',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { firstName: 'Arrey', lastName: 'Johnson' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 10:06:33'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:06:33'
+}
+{
+  requestId: 'f0a19320-9559-4dba-8bab-b231d81a89af',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '5ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 10:06:33'
+}
+{
+  requestId: 'f0a19320-9559-4dba-8bab-b231d81a89af',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:06:33'
+}
+{
+  message: '::1 - - [26/Sep/2025:09:06:33 +0000] "PUT /api/auth/profile HTTP/1.1" 500 970 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:06:33'
+}
+{
+  requestId: 'c4864803-e5b0-4f82-97fc-12146f5391ce',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { firstName: 'Arrey', lastName: 'Johnson' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-09-26 10:06:39'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:06:39'
+}
+{
+  requestId: 'c4864803-e5b0-4f82-97fc-12146f5391ce',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '4ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-09-26 10:06:39'
+}
+{
+  requestId: 'c4864803-e5b0-4f82-97fc-12146f5391ce',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:06:39'
+}
+{
+  message: '::1 - - [26/Sep/2025:09:06:39 +0000] "PUT /api/auth/profile HTTP/1.1" 500 970 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:06:39'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:07:12'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:07:19'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:07:19'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:07:19'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:07:19'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:07:19'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:07:19'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:07:19'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 10:07:21'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 17:07:33'
+}

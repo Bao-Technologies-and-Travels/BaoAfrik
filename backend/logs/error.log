@@ -1494,3 +1494,695 @@
     '    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)',
   timestamp: '2025-09-19 22:21:16'
 }
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:143:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-19 23:48:43'
+}
+{
+  requestId: 'b16d3976-5525-4cad-840d-724e69a8f6c7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:143:34',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:48:43'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-19 23:49:24'
+}
+{
+  requestId: 'dc654190-2f83-48ff-9e9d-6c2cf212cfb1',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:49:24'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-19 23:52:14'
+}
+{
+  requestId: '5c2205fd-5f90-45db-960a-773aa4c3988d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:305:34',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:52:14'
+}
+{
+  requestId: 'f440b524-e1b4-4cdf-8f99-d22b26825ba4',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 429,
+  response: {
+    success: false,
+    message: 'Too many authentication attempts, please try again later.',
+    errors: { general: 'Rate limit exceeded' }
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:54:43'
+}
+{
+  requestId: 'f0ed84a4-3909-4174-86b3-bfdc57eec4c7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 429,
+  response: {
+    success: false,
+    message: 'Too many authentication attempts, please try again later.',
+    errors: { general: 'Rate limit exceeded' }
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-19 23:55:04'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 00:01:31'
+}
+{
+  requestId: '3043f55a-e5fa-4274-8439-38d4ab46e6c2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 00:01:31'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 00:04:04'
+}
+{
+  requestId: '1fbb5bc3-9ccb-4b8b-88cb-51e533caf108',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 00:04:04'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 00:14:57'
+}
+{
+  requestId: 'e7c10afc-16cc-4e2b-aaac-220f2c7d9f34',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 00:14:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 17:49:47'
+}
+{
+  requestId: '5244f549-5d8f-4731-bf96-b4cb23a3f073',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:148:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 17:49:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:147:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-20 17:54:57'
+}
+{
+  requestId: 'f321efb6-e920-421c-8d5a-d88e3896fafd',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Please verify your email before logging in',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:147:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-20 17:54:57'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:22:19'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:23:22'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:29:57'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 10:33:42'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:142:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-22 12:00:50'
+}
+{
+  requestId: 'a00945c1-e136-43f4-8d94-5e37ccfa3a94',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid email or password',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\controllers\\authController.ts:142:34',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-22 12:00:50'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-22 12:02:08'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api/auth/forgot-password',
+  stack: 'Error: Not Found - /api/auth/forgot-password\n' +
+    '    at notFound (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+    '    at Function.handle (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+    '    at router (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-25 10:21:24'
+}
+{
+  requestId: 'f51e2d25-13e8-4e59-9d2d-9cadcf6369e0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api/auth/forgot-password',
+    stack: 'Error: Not Found - /api/auth/forgot-password\n' +
+      '    at notFound (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+      '    at Function.handle (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+      '    at router (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+    originalError: 'Not Found - /api/auth/forgot-password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-25 10:21:24'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:29:15'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:30:46'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:34'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-25 10:32:59'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  error: 'connect ETIMEDOUT 142.251.31.108:587',
+  to: 'arreyjohnson518@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'error',
+  message: 'Failed to send email',
+  timestamp: '2025-09-25 10:42:02'
+}
+{
+  message: 'Port 3001 is already in use',
+  level: 'error',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-09-26 09:36:54'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  requestId: '9742872c-0da3-4527-86d8-6d66ab590259',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  requestId: '6916fb2f-c0cb-4dfc-b22a-fab4247b04d8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:05:22'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  requestId: '616cad94-f7e6-4394-9aef-d0f550237159',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  requestId: 'a1e3058d-a132-4cea-ab3c-8de588121174',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:05:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:06:33'
+}
+{
+  requestId: 'f0a19320-9559-4dba-8bab-b231d81a89af',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:06:33'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-09-26 10:06:39'
+}
+{
+  requestId: 'c4864803-e5b0-4f82-97fc-12146f5391ce',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:86:36\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async C:\\Users\\User\\Desktop\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-26 10:06:39'
+}

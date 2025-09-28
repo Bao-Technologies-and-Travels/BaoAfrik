@@ -65,7 +65,8 @@ export class AuthService {
 
   // Update user profile
   async updateProfile(profileData: {
-    name?: string;
+    firstName?: string;
+    lastName?: string;
     phoneNumber?: string;
     profileImage?: string;
   }): Promise<ApiResponse<User>> {

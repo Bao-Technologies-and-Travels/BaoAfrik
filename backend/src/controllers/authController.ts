@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
-import { asyncHandler } from '@/utils/asyncHandler';
+import { asyncHandler } from '@/middleware/errorMiddleware';
 import { 
-  createError, 
   createValidationError, 
   createUnauthorizedError,
   createConflictError 
-} from '@/utils/errorUtils';
+} from '@/middleware/errorMiddleware';
 import { 
   generateTokenPair, 
   verifyRefreshToken,
@@ -342,7 +341,7 @@ export const resendVerificationCode = asyncHandler(async (req: Request<{}, {}, R
   });
 
   if (!user) {
-    throw createError('User not found or already verified', 400, 'USER_NOT_FOUND');
+    throw createValidationError('User not found or already verified');
   }
 
   // Generate new verification code
@@ -363,7 +362,7 @@ export const resendVerificationCode = asyncHandler(async (req: Request<{}, {}, R
     await sendVerificationEmail(user.email, user.name, verificationCode);
   } catch (error) {
     logger.error('Failed to resend verification email:', error);
-    throw createError('Failed to send verification email', 500, 'EMAIL_SEND_FAILED');
+    throw new Error('Failed to send verification email');
   }
 
   logger.info('Verification code resent', { 
@@ -405,7 +404,7 @@ export const getCurrentUser = asyncHandler(async (req: Request, res: Response) =
   });
 
   if (!user) {
-    throw createError('User not found', 404, 'USER_NOT_FOUND');
+    throw createValidationError('User not found');
   }
 
   const response: ApiResponse = {
@@ -465,6 +464,96 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
 });
 
 /**
+ * Forgot password
+ */
+export const forgotPassword = asyncHandler(async (req: Request<{}, {}, ForgotPasswordRequest>, res: Response) => {
+  const { email } = req.body;
+
+  // Always return a success message to avoid account enumeration
+  const user = await prisma.user.findUnique({
+    where: { email: email.toLowerCase() }
+  });
+
+  if (user) {
+    const resetToken = generateSecureToken();
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken: resetToken,
+        passwordResetExpires: expiresAt,
+      }
+    });
+
+    try {
+      await sendPasswordResetEmail(user.email, user.name, resetToken);
+    } catch (error) {
+      logger.error('Failed to send password reset email:', error);
+      // Do not leak errors to client to prevent token enumeration
+    }
+  }
+
+  const response: ApiResponse = {
+    success: true,
+    message: 'If an account exists for that email, a password reset link has been sent.'
+  };
+
+  res.json(response);
+});
+
+/**
+ * Reset password
+ */
+export const resetPassword = asyncHandler(async (req: Request<{}, {}, ResetPasswordRequest>, res: Response) => {
+  const { token, newPassword, confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    throw createValidationError('New passwords do not match');
+  }
+
+  // Find user with valid reset token
+  const user = await prisma.user.findFirst({
+    where: {
+      passwordResetToken: token,
+      passwordResetExpires: { gt: new Date() },
+      isActive: true,
+    },
+    select: { id: true }
+  });
+
+  if (!user) {
+    throw createUnauthorizedError('Invalid or expired password reset token');
+  }
+
+  // Hash new password
+  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
+  const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
+
+  // Update user password and clear reset token
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      passwordHash: newPasswordHash,
+      passwordResetToken: null,
+      passwordResetExpires: null,
+    }
+  });
+
+  // Invalidate all refresh tokens for security
+  await prisma.refreshToken.deleteMany({ where: { userId: user.id } });
+
+  logger.info('Password reset successfully', { userId: user.id });
+
+  const response: ApiResponse = {
+    success: true,
+    message: 'Password has been reset successfully. You can now log in.'
+  };
+
+  res.json(response);
+});
+
+/**
  * Change user password
  */
 export const changePassword = asyncHandler(async (req: Request<{}, {}, ChangePasswordRequest>, res: Response) => {
@@ -485,7 +574,7 @@ export const changePassword = asyncHandler(async (req: Request<{}, {}, ChangePas
   });
 
   if (!user || !user.passwordHash) {
-    throw createError('User not found', 404, 'USER_NOT_FOUND');
+    throw createValidationError('User not found');
   }
 
   // Verify current password
@@ -530,5 +619,7 @@ export default {
   resendVerificationCode,
   getCurrentUser,
   updateProfile,
+  forgotPassword,
+  resetPassword,
   changePassword,
 };

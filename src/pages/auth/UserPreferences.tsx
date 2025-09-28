@@ -8,7 +8,7 @@ import lilLogo from '../../assets/images/pre/lil.png';
 
 const UserPreferences: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { refreshAuth } = useAuth();
   const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [otherDescription, setOtherDescription] = useState('');
@@ -85,20 +85,15 @@ const UserPreferences: React.FC = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Complete user registration by logging them in with stored profile data
-      const storedUser = JSON.parse(localStorage.getItem('tempUserProfile') || '{}');
-      login({
-        id: '1',
-        name: storedUser.name || 'User',
-        email: storedUser.email || 'user@example.com',
-        profileImage: storedUser.profileImage
-      });
-      
-      // Clear temporary storage
-      localStorage.removeItem('tempUserProfile');
-      
+      // Refresh from server to ensure we have the latest profile (name/photo)
+      try {
+        await refreshAuth();
+      } catch (e) {
+        console.warn('refreshAuth failed (non-blocking):', e);
+      }
+
       // On success, redirect to home page
-      navigate('/');
+      navigate('/', { replace: true });
       
     } catch (error) {
       console.error('Failed to save preferences:', error);
