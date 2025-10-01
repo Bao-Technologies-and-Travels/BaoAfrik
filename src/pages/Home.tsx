@@ -54,6 +54,8 @@ const Home: React.FC = () => {
     timestamp: number;
     type: 'success' | 'error';
   }>>([]);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imageFormData, setImageFormData] = useState<FormData | null>(null);
 
   // Banner slides data
   const bannerSlides = [
@@ -406,11 +408,48 @@ const Home: React.FC = () => {
     }
   };
 
-  // Handle scan functionality
+  // Handle scan functionality - trigger file input
   const handleScan = () => {
-    console.log('Scan functionality triggered');
-    // Here you would typically open camera or barcode scanner
-    alert('Scan functionality would open camera/barcode scanner');
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  // Handle image file selection
+  const handleImageSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        alert('Image size must be less than 10MB');
+        return;
+      }
+
+      // Set selected image
+      setSelectedImage(file);
+
+      // Create FormData for future API call
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('timestamp', new Date().toISOString());
+      
+      setImageFormData(formData);
+      
+      console.log('Image selected:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        formDataReady: true
+      });
+    }
   };
 
   // Handle share functionality
@@ -536,6 +575,16 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Hidden file input for image selection */}
+      <input
+        id="image-upload"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleImageSelection}
+        style={{ display: 'none' }}
+      />
+      
       {/* Search Section */}
        <div className="mt-4 sm:mt-6 mx-4 sm:mx-6" style={{maxWidth: '1200px', margin: '0 auto', marginTop: '20px'}}>
         <section className="bg-transparent sm:bg-white sm:shadow-sm sm:border sm:border-gray-200 rounded-full">
@@ -612,7 +661,7 @@ const Home: React.FC = () => {
                   <option value="Libya" style={{backgroundImage: 'url("https://flagcdn.com/w20/ly.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Libya</option>
                   <option value="Other">Other</option>
                 </select>
-              </div>
+            </div>
             
               {/* Location Input */}
               <input
@@ -893,11 +942,11 @@ const Home: React.FC = () => {
                         {notification.type === 'success' ? (
                            <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+              </svg>
                         ) : (
                           <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5l14 14M5 19L19 5" />
-                          </svg>
+              </svg>
                         )}
                       </div>
                     </div>
@@ -917,17 +966,17 @@ const Home: React.FC = () => {
                     </div>
                     
                     {/* Close Button */}
-                    <button
+                  <button
                       onClick={() => removeNotification(notification.id)}
                       className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
-                    </button>
+                  </button>
                   </div>
-              ))}
-            </div>
+                  ))}
+                </div>
             
             {/* Empty div to balance the layout */}
             <div className="w-0"></div>

@@ -240,7 +240,7 @@ const Login: React.FC = () => {
                   }`}
                   placeholder="Enter your email address"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
