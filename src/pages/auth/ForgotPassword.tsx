@@ -148,7 +148,7 @@ const ForgotPassword: React.FC = () => {
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 onMouseEnter={(e) => (e.target as HTMLInputElement).focus()}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
