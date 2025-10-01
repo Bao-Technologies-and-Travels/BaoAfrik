@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { asyncHandler } from '@/utils/asyncHandler';
 import { createUnauthorizedError, createForbiddenError } from '@/utils/errorUtils';
 import logger from '@/config/logger';
+import * as Sentry from '@sentry/node';
 
 const prisma = new PrismaClient();
 
@@ -73,6 +74,8 @@ export const authenticateToken = asyncHandler(async (req: Request, res: Response
 
     // Add user to request object
     req.user = user;
+    // Set Sentry user context
+    try { Sentry.setUser({ id: user.id, email: user.email }); } catch {}
     
     logger.info('User authenticated successfully', { 
       userId: user.id, 
@@ -130,6 +133,9 @@ export const optionalAuth = asyncHandler(async (req: Request, res: Response, nex
         userId: user.id,
         requestId: req.requestId,
       });
+      try { Sentry.setUser({ id: user.id, email: user.email }); } catch {}
+    } else {
+      try { Sentry.setUser(null); } catch {}
     }
   } catch (error) {
     // Silently ignore auth errors for optional auth

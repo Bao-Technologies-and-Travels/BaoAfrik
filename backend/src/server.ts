@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import 'dotenv/config';
+import * as Sentry from '@sentry/node';
 
 import { errorHandler, notFound } from '@/middleware/errorMiddleware';
 import { requestLogger } from '@/middleware/loggingMiddleware';
@@ -21,6 +22,14 @@ import testRoutes from '@/routes/testRoutes';
 // Environment variables already loaded via import 'dotenv/config'
 
 const app = express();
+// Initialize Sentry (backend)
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV,
+  enabled: !!process.env.SENTRY_DSN,
+  tracesSampleRate: 0.2,
+  release: process.env.SENTRY_RELEASE,
+});
 const PORT = process.env.PORT || 3001;
 
 // Swagger configuration
@@ -58,6 +67,9 @@ const swaggerOptions = {
 };
 
 const specs = swaggerJsdoc(swaggerOptions);
+
+// Sentry request handler must be the first middleware
+app.use(Sentry.Handlers.requestHandler());
 
 // Security middleware
 app.use(helmet({
@@ -111,6 +123,26 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(requestLogger);
 }
 
+// Attach Sentry user & request context if available
+app.use((req, _res, next) => {
+  try {
+    if (req.user) {
+      Sentry.setUser({ id: req.user.id, email: req.user.email });
+    } else {
+      Sentry.setUser(null);
+    }
+    Sentry.setContext('request', {
+      url: req.url,
+      method: req.method,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+    });
+  } catch {
+    // no-op
+  }
+  next();
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -134,6 +166,9 @@ app.use('/api/test', testRoutes);
 
 // 404 handler
 app.use(notFound);
+
+// Sentry error handler should come before our error handler
+app.use(Sentry.Handlers.errorHandler());
 
 // Error handling middleware
 app.use(errorHandler);

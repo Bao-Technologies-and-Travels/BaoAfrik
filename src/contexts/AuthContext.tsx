@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService } from '../services/authService';
+import * as Sentry from '@sentry/react';
 
 interface User {
   id: string;
@@ -53,6 +54,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
+          // Set Sentry user context from stored user
+          Sentry.setUser({ id: parsedUser.id, email: parsedUser.email, username: parsedUser.name });
         } catch (error) {
           console.error('Error parsing stored user:', error);
           localStorage.removeItem('user');
@@ -68,6 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (resp.success && resp.data) {
             setUser(resp.data);
             localStorage.setItem('user', JSON.stringify(resp.data));
+            Sentry.setUser({ id: resp.data.id, email: resp.data.email, username: resp.data.name });
           }
         } catch (e) {
           console.warn('Initial auth refresh failed (non-blocking):', e);
@@ -84,6 +88,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(userData);
     setIsVisitor(false);
     localStorage.setItem('user', JSON.stringify(userData));
+    // Set Sentry user context on login
+    Sentry.setUser({ id: userData.id, email: userData.email, username: userData.name });
   };
 
   const logout = async () => {
@@ -98,6 +104,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('rememberedEmail');
+      // Clear Sentry user context on logout
+      Sentry.setUser(null);
     }
   };
 
@@ -122,6 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.success && response.data) {
         setUser(response.data);
         localStorage.setItem('user', JSON.stringify(response.data));
+        Sentry.setUser({ id: response.data.id, email: response.data.email, username: response.data.name });
       }
     } catch (error) {
       console.error('Auth refresh error:', error);

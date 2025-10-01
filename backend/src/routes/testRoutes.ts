@@ -247,4 +247,19 @@ router.post('/send-test-email', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/test/throw-error:
+ *   get:
+ *     summary: Throw an intentional error (Monitoring test)
+ *     tags: [Test]
+ *     responses:
+ *       500:
+ *         description: Intentional error thrown
+ */
+router.get('/throw-error', (_req: Request, _res: Response) => {
+  // Intentionally throw to verify Sentry/monitoring alerting
+  throw new Error('BaoAfrik test error: /api/test/throw-error');
+});
+
 export default router;
