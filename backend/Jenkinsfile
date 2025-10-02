@@ -1,4 +1,4 @@
-pipeline {
+pipeline{
     agent any
 
     environment {
@@ -46,18 +46,19 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deploying as Ubuntu user'
-                sh '''
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY_ID $SSH_HOST '
-                        cd $APP_DIR &&
-                        git pull origin fonsah-staging &&
-                        npm install &&
-                        npm run build &&
-                        pm2 restart $APP_NAME || pm2 start dist/server.js --name $APP_NAME &&
-                        pm2 save
-                        exit
-                    '
-                '''
+                echo 'Deploying as Ubuntu user via SSH'
+                sshagent(credentials: [env.SSH_KEY_ID]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY_ID} ${SSH_HOST} '
+                            cd ${env.APP_DIR} &&
+                            git pull origin fonsah-staging &&
+                            npm install &&
+                            npm run build &&
+                            pm2 restart ${env.APP_NAME} || pm2 start dist/server.js --name ${env.APP_NAME} &&
+                            pm2 save
+                        '
+                    """
+                }
             }
         }
 
