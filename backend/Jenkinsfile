@@ -1,66 +1,49 @@
-pipeline{
+pipeline {
     agent any
 
     environment {
         NODE_ENV = 'staging'
         SSH_HOST = 'ubuntu@98.89.132.2'
-        SSH_KEY_ID = 'baoafrik-key'
-        APP_DIR = 'backend'
+        // SSH_KEY_ID = 'baoafrik-key'
+        APP_DIR = '/home/ubuntu/BaoAfrik/backend'
         APP_NAME = 'baoafrik'
+        REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
+        BRANCH = 'fonsah-staging'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Deploy to Server') {
             steps {
-                git branch: 'fonsah-staging',
-                    url: 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                dir("${env.APP_DIR}") {
-                    sh 'mv .env.example .env'
-                    sh 'npm install'
-                }
-            }
-        }
-
-        // stage('Test') {
-        //     steps {
-        //         dir("${env.APP_DIR}") {
-        //             echo 'Running tests...'
-        //             sh 'npm test  --passWithNoTests'
-        //         }
-        //     }
-        // }
-
-        stage('Build') {
-            steps {
-                dir("${env.APP_DIR}") {
-                    echo 'Building the API...'
-                    sh 'npm run build'
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying backend to server...'
+                echo "Deploying backend on server ${SSH_HOST}..."
 
                 sshagent(['baoafrik-key']) {
-                    sh 'ssh ubuntu@98.89.132.2 "mkdir -p /home/ubuntu/BaoAfrik/backend"'
-
                     sh """
-                        scp -o StrictHostKeyChecking=no -r ${APP_DIR}/dist ubuntu@98.89.132.2:/home/ubuntu/BaoAfrik/backend/
-                    """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        # Create app directory if it doesn't exist
+                        mkdir -p ${APP_DIR} &&
+                        cd ${APP_DIR} &&
 
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@98.89.132.2 '
-                            cd /home/ubuntu/BaoAfrik/backend &&
-                            pm2 restart ${APP_NAME} || pm2 start dist/server.js --name ${APP_NAME} &&
-                            pm2 save
-                        '
+                        # Clone repo if not already cloned, otherwise pull latest
+                        if [ -d ".git" ]; then
+                            git fetch origin ${BRANCH} &&
+                            git reset --hard origin/${BRANCH}
+                        else
+                            git clone -b ${BRANCH} ${REPO_URL} .
+                        fi &&
+
+                        # Install dependencies
+                        npm ci &&
+
+                        # Build the project
+                        npm run build &&
+
+                        # Ensure PM2 is installed
+                        npm install -g pm2 &&
+
+                        # Restart or start the app
+                        pm2 restart ${APP_NAME} || pm2 start dist/server.js --name ${APP_NAME} &&
+                        pm2 save
+                    '
                     """
                 }
             }
