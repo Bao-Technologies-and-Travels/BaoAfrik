@@ -17,9 +17,10 @@ pipeline {
             }
         }
 
-        stage('Install & Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 dir('backend') {
+                    sh 'mv .env.example .env'
                     sh 'npm ci'
                 }
             }

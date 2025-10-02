@@ -1,5 +1,6 @@
 # Dependencies
 /node_modules
+**/node_modules/
 /.pnp
 .pnp.js
 
@@ -27,3 +28,7 @@ yarn-error.log*
 
 # Environment variables
 .env
+
+# Lock files
+package-lock.json
+**/package-lock.json
