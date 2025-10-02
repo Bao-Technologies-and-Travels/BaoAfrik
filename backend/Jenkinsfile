@@ -44,6 +44,7 @@ pipeline {
             emailext(
                 subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - ${currentBuild.currentResult}!",
                 from: 'ashprincepageo@gmail.com',
+                to: 'pageo.fonsah@baotechnologiesandtravels.com',
                 mimeType: 'text/html',
                 body: """
                     <html>
