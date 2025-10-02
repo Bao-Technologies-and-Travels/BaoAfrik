@@ -50,7 +50,10 @@ pipeline{
                 sshagent(credentials: [env.SSH_KEY_ID]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                            git pull origin fonsah-staging &&
+                            cd ~/BaoAfrik &&
+                            git fetch origin fonsah-staging &&
+                            git checkout fonsah-staging &&
+                            git pull fonsah-staging &&
                             cd ${env.APP_DIR} &&
                             npm install &&
                             npm run build &&
