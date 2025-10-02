@@ -5,7 +5,7 @@ pipeline {
         NODE_ENV = 'staging'
         SSH_HOST = 'ubuntu@98.89.132.2'
         // SSH_KEY_ID = 'baoafrik-key'
-        APP_DIR = '/home/ubuntu/BaoAfrik/backend'
+        APP_DIR = '/BaoAfrik/backend'
         APP_NAME = 'baoafrik'
         REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
         BRANCH = 'fonsah-staging'
