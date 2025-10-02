@@ -48,7 +48,7 @@ pipeline {
             steps {
                 dir("${env.APP_DIR}") {
                     echo 'Restarting the API via PM2...'
-                    sh 'pm2 restart ${APP_NAME} || pm2 start ${APP_NAME}'
+                    sh 'pm2 restart ${APP_NAME} || pm2 start dist/server.js --name ${APP_NAME}'
                 }
             }
         }
