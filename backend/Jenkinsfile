@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        NODE_ENV = "staging"
-        SSH_HOST = "ubuntu@ 98.89.132.2"
-        SSH_KEY_ID = "baoafrik-key"
-        APP_DIR = "/home/ubuntu/BaoAfrik/backend"
-        APP_NAME = "baoafrik"
+        NODE_ENV = 'staging'
+        SSH_HOST = 'ubuntu@ 98.89.132.2'
+        SSH_KEY_ID = 'baoafrik-key'
+        APP_DIR = 'backend'
+        APP_NAME = 'baoafrik'
     }
 
     stages {
@@ -19,7 +19,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir('backend') {
+                dir("${env.APP_DIR}") {
                     sh 'mv .env.example .env'
                     sh 'npm ci'
                 }
@@ -28,7 +28,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir('backend') {
+                dir("${env.APP_DIR}") {
                     echo 'Running tests...'
                     sh 'npm test'
                 }
@@ -37,7 +37,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir('backend') {
+                dir("${env.APP_DIR}") {
                     echo 'Building the API...'
                     sh 'npm start'
                 }
@@ -46,17 +46,23 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                dir('backend') {
-                    sh '''
-                    pm2 stop baoafrik || true
-                    pm2 start baoafrik
-                    '''
+                sshagent([env.SSH_KEY_ID]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${env.SSH_HOST} '
+                        cd ~/backend &&
+                        git pull origin fonsah-staging &&
+                        npm ci --production &&
+                        npm run build &&
+                        pm2 stop ${env.APP_NAME} || true &&
+                        pm2 start dist/server.js --name ${env.APP_NAME}
+                    '
+                    """
                 }
             }
         }
 
-        stage("Email Notification"){
-            mail (
+        stage('Email Notification') {
+            mail(
                 bcc: '',
                 body: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - ${currentBuild.currentResult}: Check console output at ${env.BUILD_URL} to view the results. This is an auto-generated email. Do not reply.",
                 cc: '',
