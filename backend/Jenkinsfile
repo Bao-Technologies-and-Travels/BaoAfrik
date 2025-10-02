@@ -25,6 +25,8 @@ pipeline {
                         git fetch origin ${BRANCH}
                         git reset --hard origin/${BRANCH}
 
+                        mv .env.example .env
+
                         npm install
                         npm run build
 
