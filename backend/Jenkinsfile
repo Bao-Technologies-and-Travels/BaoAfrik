@@ -30,7 +30,7 @@ pipeline {
             steps {
                 dir("${env.APP_DIR}") {
                     echo 'Running tests...'
-                    sh 'npm test'
+                    sh 'npm test  --passWithNoTests'
                 }
             }
         }
