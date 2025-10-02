@@ -46,18 +46,19 @@ pipeline{
 
         stage('Deploy') {
             steps {
-                echo 'Deploying as Ubuntu user via SSH'
-                sshagent(credentials: [env.SSH_KEY_ID]) {
+                echo 'Deploying backend to server...'
+
+                sshagent(['baoafrik-key']) {
+                    sh 'ssh ubuntu@98.89.132.2 "echo Hello from server"'
+                    
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                            cd ~/BaoAfrik &&
-                            git fetch origin fonsah-staging &&
-                            git checkout fonsah-staging &&
-                            git pull fonsah-staging &&
-                            cd ${env.APP_DIR} &&
-                            npm install &&
-                            npm run build &&
-                            pm2 restart ${env.APP_NAME} || pm2 start dist/server.js --name ${env.APP_NAME} &&
+                        scp -o StrictHostKeyChecking=no -r ${APP_DIR}/dist ubuntu@98.89.132.2:/home/ubuntu/BaoAfrik/backend/
+                    """
+
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@98.89.132.2 '
+                            cd /home/ubuntu/BaoAfrik/backend &&
+                            pm2 restart ${APP_NAME} || pm2 start dist/server.js --name ${APP_NAME} &&
                             pm2 save
                         '
                     """
