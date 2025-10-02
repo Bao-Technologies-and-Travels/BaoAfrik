@@ -35,6 +35,8 @@ router.post('/register', authLimiter, validationMiddleware_1.validateRegister, a
 router.post('/login', authLimiter, validationMiddleware_1.validateLogin, authController_1.default.login);
 router.post('/verify-email', generalLimiter, validationMiddleware_1.validateEmailVerification, authController_1.default.verifyEmail);
 router.post('/resend-verification', generalLimiter, validationMiddleware_1.validateResendVerification, authController_1.default.resendVerificationCode);
+router.post('/forgot-password', generalLimiter, validationMiddleware_1.validateForgotPassword, authController_1.default.forgotPassword);
+router.post('/reset-password', generalLimiter, validationMiddleware_1.validateResetPassword, authController_1.default.resetPassword);
 router.post('/refresh', generalLimiter, authController_1.default.refreshToken);
 router.post('/logout', generalLimiter, authController_1.default.logout);
 router.get('/me', generalLimiter, authMiddleware_1.authenticateToken, authController_1.default.getCurrentUser);

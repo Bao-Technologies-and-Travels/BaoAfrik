@@ -1,0 +1,70 @@
+pipeline {
+    agent any
+
+    environment {
+        NODE_ENV = "staging"
+        SSH_HOST = "ubuntu@ 98.89.132.2"
+        SSH_KEY_ID = "baoafrik-key"
+        APP_DIR = "/home/ubuntu/BaoAfrik/backend"
+        APP_NAME = "baoafrik"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'fonsah-staging',
+                    url: 'git@github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
+            }
+        }
+
+        stage('Install & Dependencies') {
+            steps {
+                dir('backend') {
+                    sh 'npm ci'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                dir('backend') {
+                    echo 'Running tests...'
+                    sh 'npm test'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('backend') {
+                    echo 'Building the API...'
+                    sh 'npm start'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                dir('backend') {
+                    sh '''
+                    pm2 stop baoafrik || true
+                    pm2 start baoafrik
+                    '''
+                }
+            }
+        }
+    }
+
+    stage("Email Notification")
+    {
+      mail (
+        bcc: '',
+        body: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - ${currentBuild.currentResult}: Check console output at ${env.BUILD_URL} to view the results. This is an auto-generated email. Do not reply.",
+        cc: '',
+        from: '',
+        replyTo: '',
+        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - ${currentBuild.currentResult}!",
+        to: 'ashprincepageo@gmail.com'
+      )
+    }
+}

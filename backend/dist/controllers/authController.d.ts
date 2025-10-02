@@ -7,6 +7,8 @@ export declare const verifyEmail: (req: Request, res: Response, next: import("ex
 export declare const resendVerificationCode: (req: Request, res: Response, next: import("express").NextFunction) => void;
 export declare const getCurrentUser: (req: Request, res: Response, next: import("express").NextFunction) => void;
 export declare const updateProfile: (req: Request, res: Response, next: import("express").NextFunction) => void;
+export declare const forgotPassword: (req: Request, res: Response, next: import("express").NextFunction) => void;
+export declare const resetPassword: (req: Request, res: Response, next: import("express").NextFunction) => void;
 export declare const changePassword: (req: Request, res: Response, next: import("express").NextFunction) => void;
 declare const _default: {
     register: (req: Request, res: Response, next: import("express").NextFunction) => void;
@@ -17,6 +19,8 @@ declare const _default: {
     resendVerificationCode: (req: Request, res: Response, next: import("express").NextFunction) => void;
     getCurrentUser: (req: Request, res: Response, next: import("express").NextFunction) => void;
     updateProfile: (req: Request, res: Response, next: import("express").NextFunction) => void;
+    forgotPassword: (req: Request, res: Response, next: import("express").NextFunction) => void;
+    resetPassword: (req: Request, res: Response, next: import("express").NextFunction) => void;
     changePassword: (req: Request, res: Response, next: import("express").NextFunction) => void;
 };
 export default _default;

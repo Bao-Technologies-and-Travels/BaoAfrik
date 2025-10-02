@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePassword = exports.updateProfile = exports.getCurrentUser = exports.resendVerificationCode = exports.verifyEmail = exports.refreshToken = exports.logout = exports.login = exports.register = void 0;
+exports.changePassword = exports.resetPassword = exports.forgotPassword = exports.updateProfile = exports.getCurrentUser = exports.resendVerificationCode = exports.verifyEmail = exports.refreshToken = exports.logout = exports.login = exports.register = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const client_1 = require("@prisma/client");
 const errorMiddleware_1 = require("@/middleware/errorMiddleware");
@@ -326,6 +326,68 @@ exports.updateProfile = (0, errorMiddleware_1.asyncHandler)(async (req, res) => 
     };
     res.json(response);
 });
+exports.forgotPassword = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({
+        where: { email: email.toLowerCase() }
+    });
+    if (user) {
+        const resetToken = (0, jwtUtils_1.generateSecureToken)();
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                passwordResetToken: resetToken,
+                passwordResetExpires: expiresAt,
+            }
+        });
+        try {
+            await (0, emailService_1.sendPasswordResetEmail)(user.email, user.name, resetToken);
+        }
+        catch (error) {
+            logger_1.default.error('Failed to send password reset email:', error);
+        }
+    }
+    const response = {
+        success: true,
+        message: 'If an account exists for that email, a password reset link has been sent.'
+    };
+    res.json(response);
+});
+exports.resetPassword = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
+    const { token, newPassword, confirmPassword } = req.body;
+    if (newPassword !== confirmPassword) {
+        throw (0, errorMiddleware_2.createValidationError)('New passwords do not match');
+    }
+    const user = await prisma.user.findFirst({
+        where: {
+            passwordResetToken: token,
+            passwordResetExpires: { gt: new Date() },
+            isActive: true,
+        },
+        select: { id: true }
+    });
+    if (!user) {
+        throw (0, errorMiddleware_2.createUnauthorizedError)('Invalid or expired password reset token');
+    }
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
+    const newPasswordHash = await bcryptjs_1.default.hash(newPassword, saltRounds);
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            passwordHash: newPasswordHash,
+            passwordResetToken: null,
+            passwordResetExpires: null,
+        }
+    });
+    await prisma.refreshToken.deleteMany({ where: { userId: user.id } });
+    logger_1.default.info('Password reset successfully', { userId: user.id });
+    const response = {
+        success: true,
+        message: 'Password has been reset successfully. You can now log in.'
+    };
+    res.json(response);
+});
 exports.changePassword = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
     if (!req.user) {
         throw (0, errorMiddleware_2.createUnauthorizedError)('User not authenticated');
@@ -372,6 +434,8 @@ exports.default = {
     resendVerificationCode: exports.resendVerificationCode,
     getCurrentUser: exports.getCurrentUser,
     updateProfile: exports.updateProfile,
+    forgotPassword: exports.forgotPassword,
+    resetPassword: exports.resetPassword,
     changePassword: exports.changePassword,
 };
 //# sourceMappingURL=authController.js.map

@@ -2186,3 +2186,889 @@
   message: 'Error response',
   timestamp: '2025-09-26 10:06:39'
 }
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  code: 'EAUTH',
+  response: '535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-46e2ab62233sm230973685e9.21 - gsmtp',
+  responseCode: 535,
+  command: 'AUTH PLAIN',
+  level: 'error',
+  message: 'SMTP connection verification failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-46e2ab62233sm230973685e9.21 - gsmtp',
+  stack: 'Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-46e2ab62233sm230973685e9.21 - gsmtp\n' +
+    '    at SMTPConnection._formatError (D:\\backend\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:809:19)\n' +
+    '    at SMTPConnection._actionAUTHComplete (D:\\backend\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:1588:34)\n' +
+    '    at SMTPConnection.<anonymous> (D:\\backend\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:556:26)\n' +
+    '    at SMTPConnection._processResponse (D:\\backend\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:993:20)\n' +
+    '    at SMTPConnection._onData (D:\\backend\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:774:14)\n' +
+    '    at TLSSocket.SMTPConnection._onSocketData (D:\\backend\\BaoAfrik\\backend\\node_modules\\nodemailer\\lib\\smtp-connection\\index.js:195:44)\n' +
+    '    at TLSSocket.emit (node:events:519:28)\n' +
+    '    at TLSSocket.emit (node:domain:489:12)\n' +
+    '    at addChunk (node:internal/streams/readable:561:12)\n' +
+    '    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)',
+  timestamp: '2025-09-29 15:30:20'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 15:35:45'
+}
+{
+  requestId: '96d6f1df-9a0b-4db2-89b1-45c00782f0d4',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 15:35:45'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 15:37:16'
+}
+{
+  requestId: 'c8d52021-63d8-4df6-b096-e33f4b50b719',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 15:37:16'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 15:38:04'
+}
+{
+  requestId: 'b93e9eaa-fed1-4a43-aa78-27ce7ff6fa55',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 15:38:04'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 15:40:36'
+}
+{
+  requestId: '623762de-01c6-4ccc-8f7c-f760b8e0fbd2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 15:40:36'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 15:44:56'
+}
+{
+  requestId: 'f6a87661-c5d6-43b6-ac85-217c61ad2cac',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 15:44:56'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 15:46:13'
+}
+{
+  requestId: 'be379c51-78b0-43e9-9f4a-8768d34024e0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 15:46:13'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  clientVersion: '6.16.2',
+  errorCode: 'P1003',
+  retryable: undefined,
+  name: 'PrismaClientInitializationError',
+  level: 'error',
+  message: 'Failed to connect to database: Database `baotest` does not exist',
+  stack: 'PrismaClientInitializationError: Database `baotest` does not exist\n' +
+    '    at r (D:\\backend\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\src\\runtime\\core\\engines\\library\\LibraryEngine.ts:440:17)\n' +
+    '    at async connectDatabase (D:\\backend\\BaoAfrik\\backend\\src\\config\\database.ts:19:5)\n' +
+    '    at async startServer (D:\\backend\\BaoAfrik\\backend\\src\\server.ts:155:5)',
+  timestamp: '2025-09-29 15:50:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 15:52:23'
+}
+{
+  requestId: 'a3612b89-6740-41c8-bcc4-e988ac221a8d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 15:52:23'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /register',
+  stack: 'Error: Not Found - /register\n' +
+    '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at requestLogger (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\loggingMiddleware.ts:58:3)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9',
+  url: '/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:17:22'
+}
+{
+  requestId: '022195aa-8ca5-4e85-98ce-5d8fa8a86efd',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /register',
+    stack: 'Error: Not Found - /register\n' +
+      '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at requestLogger (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\loggingMiddleware.ts:58:3)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9',
+    originalError: 'Not Found - /register'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:17:22'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:20:00'
+}
+{
+  requestId: 'a157ae73-7387-4325-bac2-a7ddd67f5a89',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:20:00'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Expected double-quoted property name in JSON at position 79 (line 4 column 1)',
+  stack: 'SyntaxError: Expected double-quoted property name in JSON at position 79 (line 4 column 1)\n' +
+    '    at JSON.parse (<anonymous>)\n' +
+    '    at parse (D:\\backend\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\types\\json.js:92:19)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\read.js:128:18\n' +
+    '    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n' +
+    '    at invokeCallback (D:\\backend\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:238:16)\n' +
+    '    at done (D:\\backend\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:227:7)\n' +
+    '    at IncomingMessage.onEnd (D:\\backend\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:287:7)\n' +
+    '    at IncomingMessage.emit (node:events:519:28)\n' +
+    '    at IncomingMessage.emit (node:domain:489:12)\n' +
+    '    at endReadableNT (node:internal/streams/readable:1698:12)',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:24:13'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Please verify your email before logging in',
+  stack: 'Error: Please verify your email before logging in\n' +
+    '    at createUnauthorizedError (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\src\\controllers\\authController.ts:147:34',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:24:17'
+}
+{
+  requestId: '3ced796d-de38-47d2-a066-cf44939a9deb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Please verify your email before logging in',
+    stack: 'Error: Please verify your email before logging in\n' +
+      '    at createUnauthorizedError (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:164:10)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\src\\controllers\\authController.ts:147:34',
+    originalError: 'Please verify your email before logging in'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:24:17'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:26:01'
+}
+{
+  requestId: '2a32276c-fe1f-4cbc-98c8-197e44889335',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:26:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api/auth/me',
+  stack: 'Error: Not Found - /api/auth/me\n' +
+    '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+    '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+    '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+  url: '/api/auth/me',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:27:38'
+}
+{
+  requestId: '3cd11bf6-9532-4f4e-8b9e-bfb7ba840966',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api/auth/me',
+    stack: 'Error: Not Found - /api/auth/me\n' +
+      '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+      '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+      '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+    originalError: 'Not Found - /api/auth/me'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:27:38'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api/auth/me',
+  stack: 'Error: Not Found - /api/auth/me\n' +
+    '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+    '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+    '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+  url: '/api/auth/me',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:28:01'
+}
+{
+  requestId: '364fa5d0-5a20-492e-8be4-d093f7c5b66f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api/auth/me',
+    stack: 'Error: Not Found - /api/auth/me\n' +
+      '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+      '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+      '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+    originalError: 'Not Found - /api/auth/me'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:28:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Access token is required',
+  stack: 'Error: Access token is required\n' +
+    '    at createUnauthorizedError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:39:34\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async D:\\backend\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/me',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:28:17'
+}
+{
+  requestId: '476576f5-426c-4cf8-8a27-a23e64d10b50',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Access token is required\n' +
+      '    at createUnauthorizedError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:31:10)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\src\\middleware\\authMiddleware.ts:39:34\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\src\\utils\\asyncHandler.ts:10:21\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async D:\\backend\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Access token is required'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:28:17'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api/auth/login',
+  stack: 'Error: Not Found - /api/auth/login\n' +
+    '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+    '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+    '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+  url: '/api/auth/login',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:36:43'
+}
+{
+  requestId: '7d89848b-574c-452c-b37f-7caa5d1414c3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api/auth/login',
+    stack: 'Error: Not Found - /api/auth/login\n' +
+      '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+      '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+      '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+    originalError: 'Not Found - /api/auth/login'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:36:43'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:37:18'
+}
+{
+  requestId: '3ea6317f-0a35-422b-89ba-764f40ba8e8d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:37:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:37:23'
+}
+{
+  requestId: '0d40a94e-a2c8-40a4-a383-94d1b1197712',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:37:23'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api/auth/me',
+  stack: 'Error: Not Found - /api/auth/me\n' +
+    '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+    '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+    '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+  url: '/api/auth/me',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:38:06'
+}
+{
+  requestId: 'ea4b9719-6732-4286-8cca-75b64dfd2dcc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api/auth/me',
+    stack: 'Error: Not Found - /api/auth/me\n' +
+      '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+      '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+      '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+    originalError: 'Not Found - /api/auth/me'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:38:06'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api/auth/login',
+  stack: 'Error: Not Found - /api/auth/login\n' +
+    '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+    '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+    '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+  url: '/api/auth/login',
+  method: 'GET',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:47:32'
+}
+{
+  requestId: '14ee3131-d615-4c94-a6e3-30f4e65f37a2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api/auth/login',
+    stack: 'Error: Not Found - /api/auth/login\n' +
+      '    at notFound (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\errorMiddleware.ts:25:17)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+      '    at Function.handle (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+      '    at router (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+    originalError: 'Not Found - /api/auth/login'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:47:32'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed',
+  stack: 'Error: Validation failed\n' +
+    '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+    '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+    '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'PostmanRuntime/7.47.1',
+  level: 'error',
+  timestamp: '2025-09-29 16:47:49'
+}
+{
+  requestId: '0f9e9c95-ac34-4756-a46c-0d2cf5bb540f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Validation failed\n' +
+      '    at createValidationError (D:\\backend\\BaoAfrik\\backend\\src\\utils\\errorUtils.ts:27:10)\n' +
+      '    at handleValidationErrors (D:\\backend\\BaoAfrik\\backend\\src\\middleware\\validationMiddleware.ts:18:50)\n' +
+      '    at Layer.handle [as handle_request] (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\backend\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\backend\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-09-29 16:47:49'
+}

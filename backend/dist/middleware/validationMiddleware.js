@@ -98,14 +98,14 @@ exports.validateResetPassword = [
     (0, express_validator_1.body)('token')
         .notEmpty()
         .withMessage('Reset token is required'),
-    (0, express_validator_1.body)('password')
+    (0, express_validator_1.body)('newPassword')
         .isLength({ min: 8 })
-        .withMessage('Password must be at least 8 characters long')
+        .withMessage('New password must be at least 8 characters long')
         .matches(/^(?=.*[a-zA-Z])(?=.*\d)/)
-        .withMessage('Password must contain both letters and numbers'),
+        .withMessage('New password must contain both letters and numbers'),
     (0, express_validator_1.body)('confirmPassword')
         .custom((value, { req }) => {
-        if (value !== req.body.password) {
+        if (value !== req.body.newPassword) {
             throw new Error('Passwords do not match');
         }
         return true;
@@ -274,9 +274,14 @@ exports.validateUpdateProfile = [
         .withMessage('Please provide a valid phone number'),
     (0, express_validator_1.body)('profileImage')
         .optional()
-        .trim()
-        .isURL()
-        .withMessage('Profile image must be a valid URL'),
+        .custom((value) => {
+        if (typeof value !== 'string')
+            return false;
+        const isDataUrl = value.startsWith('data:image/');
+        const isHttpUrl = /^https?:\/\//i.test(value);
+        return isDataUrl || isHttpUrl;
+    })
+        .withMessage('Profile image must be an http(s) URL or a data URL'),
     exports.handleValidationErrors,
 ];
 exports.validateChangePassword = [
