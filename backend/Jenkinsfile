@@ -49,8 +49,8 @@ pipeline{
                 echo 'Deploying backend to server...'
 
                 sshagent(['baoafrik-key']) {
-                    sh 'ssh ubuntu@98.89.132.2 "echo Hello from server"'
-                    
+                    sh 'ssh ubuntu@98.89.132.2 "mkdir -p /home/ubuntu/BaoAfrik/backend"'
+
                     sh """
                         scp -o StrictHostKeyChecking=no -r ${APP_DIR}/dist ubuntu@98.89.132.2:/home/ubuntu/BaoAfrik/backend/
                     """
