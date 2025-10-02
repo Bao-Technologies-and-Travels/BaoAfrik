@@ -4,8 +4,7 @@ pipeline {
     environment {
         NODE_ENV = 'staging'
         SSH_HOST = 'ubuntu@98.89.132.2'
-        // SSH_KEY_ID = 'baoafrik-key'
-        APP_DIR = '/BaoAfrik/backend'
+        APP_DIR = '~/BaoAfrik/backend'
         APP_NAME = 'baoafrik'
         REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
         BRANCH = 'fonsah-staging'
@@ -19,29 +18,17 @@ pipeline {
                 sshagent(['baoafrik-key']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                        # Create app directory if it doesn't exist
-                        mkdir -p ${APP_DIR} &&
-                        cd ${APP_DIR} &&
+                        if [ ! -d ~/BaoAfrik ]; then
+                            git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
+                        fi
+                        cd ${APP_DIR}
+                        git fetch origin ${BRANCH}
+                        git reset --hard origin/${BRANCH}
 
-                        # Clone repo if not already cloned, otherwise pull latest
-                        if [ -d ".git" ]; then
-                            git fetch origin ${BRANCH} &&
-                            git reset --hard origin/${BRANCH}
-                        else
-                            git clone -b ${BRANCH} ${REPO_URL} .
-                        fi &&
+                        npm install
+                        npm run build
 
-                        # Install dependencies
-                        npm ci &&
-
-                        # Build the project
-                        npm run build &&
-
-                        # Ensure PM2 is installed
-                        npm install -g pm2 &&
-
-                        # Restart or start the app
-                        pm2 restart ${APP_NAME} || pm2 start dist/server.js --name ${APP_NAME} &&
+                        pm2 restart ${APP_NAME} || pm2 start dist/server.js --name ${APP_NAME}
                         pm2 save
                     '
                     """
