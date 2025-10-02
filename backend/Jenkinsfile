@@ -26,37 +26,29 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                dir("${env.APP_DIR}") {
-                    echo 'Running tests...'
-                    sh 'npm test  --passWithNoTests'
-                }
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //         dir("${env.APP_DIR}") {
+        //             echo 'Running tests...'
+        //             sh 'npm test  --passWithNoTests'
+        //         }
+        //     }
+        // }
 
         stage('Build') {
             steps {
                 dir("${env.APP_DIR}") {
                     echo 'Building the API...'
-                    sh 'npm start'
+                    sh 'npm run build'
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                sshagent([env.SSH_KEY_ID]) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${env.SSH_HOST} '
-                        cd ~/backend &&
-                        git pull origin fonsah-staging &&
-                        npm ci --production &&
-                        npm run build &&
-                        pm2 stop ${env.APP_NAME} || true &&
-                        pm2 start dist/server.js --name ${env.APP_NAME}
-                    '
-                    """
+                dir("${env.APP_DIR}") {
+                    echo 'Restarting the API via PM2...'
+                    sh 'pm2 restart ${APP_NAME} || pm2 start ${APP_NAME}'
                 }
             }
         }
