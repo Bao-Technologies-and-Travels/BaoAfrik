@@ -21,7 +21,7 @@ pipeline {
             steps {
                 dir("${env.APP_DIR}") {
                     sh 'mv .env.example .env'
-                    sh 'npm ci'
+                    sh 'npm install'
                 }
             }
         }
