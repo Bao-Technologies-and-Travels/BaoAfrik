@@ -49,7 +49,7 @@ pipeline{
                 echo 'Deploying as Ubuntu user via SSH'
                 sshagent(credentials: [env.SSH_KEY_ID]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY_ID} ${SSH_HOST} '
+                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                             git pull origin fonsah-staging &&
                             cd ${env.APP_DIR} &&
                             npm install &&
