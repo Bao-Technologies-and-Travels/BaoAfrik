@@ -13,7 +13,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'fonsah-staging',
-                    url: 'git@github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
+                    url: 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
             }
         }
 
