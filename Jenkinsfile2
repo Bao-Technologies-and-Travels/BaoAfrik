@@ -115,76 +115,76 @@ pipeline {
             }
         }
 
-        stage('Configure Nginx and SSL'){
-            steps{
-                echo 'Configuring Nginx and SSL...'
+        // stage('Configure Nginx and SSL'){
+        //     steps{
+        //         echo 'Configuring Nginx and SSL...'
 
-                sshagent([env.SSH_KEY_ID]){
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                        set -e  # Exit on error
+        //         sshagent([env.SSH_KEY_ID]){
+        //             sh """
+        //             ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+        //                 set -e  # Exit on error
                         
-                        # Create nginx configuration
-                        sudo bash -c "cat > /etc/nginx/sites-available/${DOMAIN}" << EOL
-                        server {
-                            listen 80;
-                            server_name staging.baoafrik.com;
+        //                 # Create nginx configuration
+        //                 sudo bash -c "cat > /etc/nginx/sites-available/${DOMAIN}" << EOL
+        //                 server {
+        //                     listen 80;
+        //                     server_name staging.baoafrik.com;
                             
-                            location / {
-                                proxy_pass http://localhost:3000;
-                                proxy_set_header Host \\$host;
-                                proxy_set_header X-Real-IP \\$remote_addr;
-                                proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
-                                proxy_set_header X-Forwarded-Proto \\$scheme;
-                            }
+        //                     location / {
+        //                         proxy_pass http://localhost:3000;
+        //                         proxy_set_header Host \\$host;
+        //                         proxy_set_header X-Real-IP \\$remote_addr;
+        //                         proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
+        //                         proxy_set_header X-Forwarded-Proto \\$scheme;
+        //                     }
                             
-                            location /api/ {
-                                proxy_pass http://localhost:3001;
-                                proxy_set_header Host \\$host;
-                                proxy_set_header X-Real-IP \\$remote_addr;
-                                proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
-                                proxy_set_header X-Forwarded-Proto \\$scheme;
-                            }
-                        }
-                        EOF
+        //                     location /api/ {
+        //                         proxy_pass http://localhost:3001;
+        //                         proxy_set_header Host \\$host;
+        //                         proxy_set_header X-Real-IP \\$remote_addr;
+        //                         proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
+        //                         proxy_set_header X-Forwarded-Proto \\$scheme;
+        //                     }
+        //                 }
+        //                 EOF
 
-                        # Enable site
-                        sudo ln -sf /etc/nginx/sites-available/${DOMAIN} /etc/nginx/sites-enabled/
-                        sudo rm -f /etc/nginx/sites-enabled/default
+        //                 # Enable site
+        //                 sudo ln -sf /etc/nginx/sites-available/${DOMAIN} /etc/nginx/sites-enabled/
+        //                 sudo rm -f /etc/nginx/sites-enabled/default
 
-                        # Test nginx configuration
-                        sudo nginx -t
+        //                 # Test nginx configuration
+        //                 sudo nginx -t
 
-                        # Restart nginx
-                        sudo systemctl restart nginx
+        //                 # Restart nginx
+        //                 sudo systemctl restart nginx
 
-                        echo "Nginx configuration completed."
-                    '
-                    """
-                }
-            }
-        }
+        //                 echo "Nginx configuration completed."
+        //             '
+        //             """
+        //         }
+        //     }
+        // }
 
-        stage('Setup SSL Certificate') {
-            steps {
-                echo 'Setting up SSL certificate...'
+        // stage('Setup SSL Certificate') {
+        //     steps {
+        //         echo 'Setting up SSL certificate...'
 
-                sshagent([env.SSH_KEY_ID]) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                        set -e
+        //         sshagent([env.SSH_KEY_ID]) {
+        //             sh """
+        //             ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+        //                 set -e
 
-                        sudo certbot --nginx -d ${DOMAIN} --non-interactive --agree-tos --email ${EMAIL} --redirect
+        //                 sudo certbot --nginx -d ${DOMAIN} --non-interactive --agree-tos --email ${EMAIL} --redirect
 
-                        # Test certificate renewal
-                        sudo certbot renew --dry-run
+        //                 # Test certificate renewal
+        //                 sudo certbot renew --dry-run
 
-                        echo "SSL certificate setup completed."
-                    '
-                    """
-                }
-            }
-        }
+        //                 echo "SSL certificate setup completed."
+        //             '
+        //             """
+        //         }
+        //     }
+        // }
 
         stage('Verify Deployment') {
             steps {
