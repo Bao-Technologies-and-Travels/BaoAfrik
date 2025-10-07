@@ -3623,3 +3623,65 @@
   message: 'Error response',
   timestamp: '2025-10-07 02:35:53'
 }
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:134:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:90:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-07 06:17:18'
+}
+{
+  requestId: 'f1c06dd6-7789-4537-8375-a683408d908c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid email or password',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:134:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:90:61',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-07 06:17:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:134:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:90:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-07 06:17:30'
+}
+{
+  requestId: 'f2a6f8b1-eb03-49ae-8137-0c3abaf0f30b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid email or password',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:134:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:90:61',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-07 06:17:30'
+}

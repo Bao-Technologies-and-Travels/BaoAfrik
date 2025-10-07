@@ -12412,3 +12412,324 @@
   environment: 'development',
   timestamp: '2025-10-07 02:36:14'
 }
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:16:42'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:16:42'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:16:42'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:16:42'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:16:42'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:16:42'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:16:42'
+}
+{
+  message: 'SMTP connection verified successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:16:43'
+}
+{
+  requestId: 'f1c06dd6-7789-4537-8375-a683408d908c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', password: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-07 06:17:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:134:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:90:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-07 06:17:18'
+}
+{
+  requestId: 'f1c06dd6-7789-4537-8375-a683408d908c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  duration: '243ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-07 06:17:18'
+}
+{
+  requestId: 'f1c06dd6-7789-4537-8375-a683408d908c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid email or password',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:134:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:90:61',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-07 06:17:18'
+}
+{
+  message: '::1 - - [07/Oct/2025:05:17:18 +0000] "POST /api/auth/login HTTP/1.1" 401 331 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:17:18'
+}
+{
+  requestId: 'f2a6f8b1-eb03-49ae-8137-0c3abaf0f30b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', password: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-07 06:17:30'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:134:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:90:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-07 06:17:30'
+}
+{
+  requestId: 'f2a6f8b1-eb03-49ae-8137-0c3abaf0f30b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  duration: '13ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-07 06:17:30'
+}
+{
+  requestId: 'f2a6f8b1-eb03-49ae-8137-0c3abaf0f30b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid email or password',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:134:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:90:61',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-07 06:17:30'
+}
+{
+  message: '::1 - - [07/Oct/2025:05:17:30 +0000] "POST /api/auth/login HTTP/1.1" 401 331 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:17:30'
+}
+{
+  requestId: '29fba73b-1822-4a40-8d9b-ca6cf8aa9709',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    name: 'Fonsah Pageo Ashu',
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-07 06:17:59'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  messageId: '<e9de1ba0-5378-7996-3dc6-bbd01e9b8c33@gmail.com>',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'info',
+  message: 'Email sent successfully',
+  timestamp: '2025-10-07 06:18:03'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '08873921-07da-42d4-a503-f6be7a81d7e6',
+  email: 'ashprincepageo@gmail.com',
+  level: 'info',
+  message: 'User registered successfully',
+  timestamp: '2025-10-07 06:18:03'
+}
+{
+  requestId: '29fba73b-1822-4a40-8d9b-ca6cf8aa9709',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 201,
+  duration: '3751ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-07 06:18:03'
+}
+{
+  message: '::1 - - [07/Oct/2025:05:18:03 +0000] "POST /api/auth/register HTTP/1.1" 201 241 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:18:03'
+}
+{
+  requestId: '1821db45-51dd-40f7-9894-74a86df44e9e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', verificationCode: '604879' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-07 06:18:38'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '08873921-07da-42d4-a503-f6be7a81d7e6',
+  email: 'ashprincepageo@gmail.com',
+  level: 'info',
+  message: 'Email verified successfully',
+  timestamp: '2025-10-07 06:18:38'
+}
+{
+  requestId: '1821db45-51dd-40f7-9894-74a86df44e9e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '24ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-07 06:18:38'
+}
+{
+  message: '::1 - - [07/Oct/2025:05:18:38 +0000] "POST /api/auth/verify-email HTTP/1.1" 200 56 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:18:38'
+}
+{
+  requestId: '3824bb54-13e4-4912-b58d-87c40f3dba38',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', password: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-07 06:18:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '08873921-07da-42d4-a503-f6be7a81d7e6',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-07 06:18:48'
+}
+{
+  requestId: '3824bb54-13e4-4912-b58d-87c40f3dba38',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '546ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-07 06:18:48'
+}
+{
+  message: '::1 - - [07/Oct/2025:05:18:48 +0000] "POST /api/auth/login HTTP/1.1" 200 747 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 06:18:48'
+}
