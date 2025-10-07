@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         NODE_ENV = 'staging'
-        SSH_HOST = 'ubuntu@3.90.146.4'
+        SSH_HOST = 'ubuntu@98.84.31.86'
         APP_DIR = '~/BaoAfrik'
         BACKEND_DIR = '~/BaoAfrik/backend'
         APP_NAME_FRONTEND = 'baoafrik-frontend'
@@ -23,23 +23,36 @@ pipeline {
                         if [ ! -d ~/BaoAfrik ]; then
                             git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
                         fi
+
                         cd ${APP_DIR}
                         git fetch origin ${BRANCH}
                         git reset --hard origin/${BRANCH}
+
+                        echo "starting backend deployment..."
+
+                        cd ${BACKEND_DIR}
+                        mv .env.example .env
+                        rm -rf node_modules package-lock.json
+
+                        npm install
+                        npm run build
+
+                        pm2 delete ${APP_NAME_BACKEND} || true
+                        pm2 start dist/server.js --name ${APP_NAME_BACKEND}
+                        pm2 save
+
+                        echo "backend deployed successfully."
+                        echo "starting frontend deployment..."
+
+                        cd ${APP_DIR}
+                        rm -rf node_modules package-lock.json build
 
                         npm install
                         npm run db:generate
                         npm run db:migrate
                         npm start
 
-                        cd ${BACKEND_DIR}
-                        mv .env.example .env
-
-                        npm install
-                        npm run build
-
-                        pm2 restart ${APP_NAME_BACKEND} || pm2 start dist/server.js --name ${APP_NAME_BACKEND}
-                        pm2 save
+                        echo "Frontend deployment completed successfully."
                     '
                     """
                 }
