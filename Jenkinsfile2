@@ -83,6 +83,8 @@ pipeline {
 
                         npm install
                         npm run build
+                        npm run db:generate
+                        npm run db:migrate
 
                         pm2 delete ${APP_NAME_BACKEND} || true
                         pm2 restart ${APP_NAME_BACKEND} || pm2 start dist/server.js --name ${APP_NAME_BACKEND} -- --port 3001
