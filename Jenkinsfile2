@@ -128,7 +128,7 @@ pipeline {
                         sudo bash -c "cat > /etc/nginx/sites-available/${DOMAIN}" << EOL
                         server {
                             listen 80;
-                            server_name ${DOMAIN};
+                            server_name staging.baoafrik.com;
                             
                             location / {
                                 proxy_pass http://localhost:3000;
