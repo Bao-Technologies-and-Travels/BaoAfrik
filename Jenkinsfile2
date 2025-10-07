@@ -4,7 +4,7 @@ pipeline {
     environment {
         NODE_ENV = 'staging'
         SSH_KEY_ID = 'baoafrik-key'
-        SSH_HOST = 'ubuntu@98.84.31.86'
+        SSH_HOST = 'ubuntu@54.162.69.251'
         APP_DIR = '~/BaoAfrik'
         BACKEND_DIR = '~/BaoAfrik/backend'
         APP_NAME_FRONTEND = 'baoafrik-frontend'
