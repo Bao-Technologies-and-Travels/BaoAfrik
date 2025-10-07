@@ -7,8 +7,6 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-console.log("API URL:", process.env.REACT_APP_API_URL);
-
 root.render(
   <React.StrictMode>
     <App />
