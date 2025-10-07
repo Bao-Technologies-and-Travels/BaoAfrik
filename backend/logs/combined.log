@@ -12733,3 +12733,10 @@
   environment: 'development',
   timestamp: '2025-10-07 06:18:48'
 }
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-07 10:04:15'
+}

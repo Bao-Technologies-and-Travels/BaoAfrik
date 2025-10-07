@@ -20,6 +20,12 @@ pipeline {
                 sshagent(['baoafrik-key']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+                        sudo apt-get install -y nodejs
+
+                        node --version
+                        npm --version
+
                         if [ ! -d ~/BaoAfrik ]; then
                             git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
                         fi
@@ -37,8 +43,7 @@ pipeline {
                         npm install
                         npm run build
 
-                        pm2 delete ${APP_NAME_BACKEND} || true
-                        pm2 start dist/server.js --name ${APP_NAME_BACKEND}
+                        pm2 restart ${APP_NAME_BACKEND} || pm2 start dist/server.js --name ${APP_NAME_BACKEND}
                         pm2 save
 
                         echo "backend deployed successfully."
@@ -48,9 +53,18 @@ pipeline {
                         rm -rf node_modules package-lock.json build
 
                         npm install
-                        npm run db:generate
-                        npm run db:migrate
-                        npm start
+
+                        if ! npm list react-scripts | grep react-scripts > /dev/null 2>&1; then
+                            echo "Installing react-scripts..."
+                            npm install --save-dev react-scripts
+                        fi
+
+                        npm run build
+
+                        pm2 restart ${APP_NAME_FRONTEND} || pm2 serve build 3000 --name ${APP_NAME_FRONTEND} --spa
+
+                        pm2 save
+                        pm2 list
 
                         echo "Frontend deployment completed successfully."
                     '
