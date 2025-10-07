@@ -125,7 +125,7 @@ pipeline {
                         set -e  # Exit on error
                         
                         # Create nginx configuration
-                        sudo tee /etc/nginx/sites-available/${DOMAIN} > /dev/null <<'EOF'
+                        sudo bash -c "cat > /etc/nginx/sites-available/${DOMAIN}" << EOL
                         server {
                             listen 80;
                             server_name ${DOMAIN};
