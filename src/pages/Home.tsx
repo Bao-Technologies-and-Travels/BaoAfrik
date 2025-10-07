@@ -35,6 +35,7 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [location, setLocation] = useState('');
+  const [placeOfOrigin, setPlaceOfOrigin] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sharedProducts, setSharedProducts] = useState<Set<number>>(new Set());
   const [savedProducts, setSavedProducts] = useState<Set<number>>(new Set());
@@ -54,6 +55,8 @@ const Home: React.FC = () => {
     timestamp: number;
     type: 'success' | 'error';
   }>>([]);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imageFormData, setImageFormData] = useState<FormData | null>(null);
 
   // Banner slides data
   const bannerSlides = [
@@ -98,6 +101,33 @@ const Home: React.FC = () => {
     { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png' },
     { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png' }
   ];
+
+  // Country mapping for products
+  const getProductCountry = (productId: number) => {
+    const countryMap: { [key: number]: { name: string; code: string; flag: string; abbreviation: string } } = {
+      1: { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
+      2: { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
+      3: { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
+      4: { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' },
+      5: { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
+      6: { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
+      7: { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
+      8: { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
+      9: { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
+      10: { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
+      11: { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
+      12: { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
+      13: { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
+      14: { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
+      15: { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
+      16: { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
+      17: { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
+      18: { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
+      19: { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
+      20: { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' }
+    };
+    return countryMap[productId] || { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' };
+  };
 
   // All products data organized by category
   const allProducts = {
@@ -277,6 +307,13 @@ const Home: React.FC = () => {
       );
     }
 
+    // Apply place of origin filter
+    if (placeOfOrigin) {
+      products = products.filter(product => 
+        product.location.toLowerCase().includes(placeOfOrigin.toLowerCase())
+      );
+    }
+
     // Apply country filter if a specific country is selected
     if (selectedCountry) {
       const countryName = africanCountries.find(country => country.code === selectedCountry)?.name;
@@ -351,7 +388,45 @@ const Home: React.FC = () => {
 
   // Handle search functionality
   const handleSearch = () => {
-    console.log('Search triggered');
+    console.log('Search triggered with:', { searchQuery, selectedCategory, placeOfOrigin, location });
+    
+    // Get all products
+    let products = Object.values(allProducts).flat();
+    
+    // Apply search query filter
+    if (searchQuery.trim()) {
+      products = products.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply category filter
+    if (selectedCategory) {
+      // Filter by category by checking which category array the product belongs to
+      products = products.filter(product => {
+        return Object.entries(allProducts).some(([category, categoryProducts]) => 
+          category === selectedCategory && categoryProducts.some(p => p.id === product.id)
+        );
+      });
+    }
+    
+    // Apply place of origin filter
+    if (placeOfOrigin) {
+      products = products.filter(product => 
+        product.location.toLowerCase().includes(placeOfOrigin.toLowerCase())
+      );
+    }
+    
+    // Apply location filter
+    if (location.trim()) {
+      products = products.filter(product => 
+        product.location.toLowerCase().includes(location.toLowerCase())
+      );
+    }
+    
+    setSearchResults(products);
+    setIsSearchActive(true);
   };
 
   // Handle Enter key press in search input
@@ -361,11 +436,48 @@ const Home: React.FC = () => {
     }
   };
 
-  // Handle scan functionality
+  // Handle scan functionality - trigger file input
   const handleScan = () => {
-    console.log('Scan functionality triggered');
-    // Here you would typically open camera or barcode scanner
-    alert('Scan functionality would open camera/barcode scanner');
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  // Handle image file selection
+  const handleImageSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        alert('Image size must be less than 10MB');
+        return;
+      }
+
+      // Set selected image
+      setSelectedImage(file);
+
+      // Create FormData for future API call
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('timestamp', new Date().toISOString());
+      
+      setImageFormData(formData);
+      
+      console.log('Image selected:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        formDataReady: true
+      });
+    }
   };
 
   // Handle share functionality
@@ -450,7 +562,7 @@ const Home: React.FC = () => {
             console.log(`Failed to save product ${productId}`);
           } else {
             // Success - add to bookmarks
-            newSaved.add(productId);
+        newSaved.add(productId);
             setNotifications(prev => {
               const existingNotification = prev.find(notif => notif.product.id === productId);
               if (existingNotification) {
@@ -476,7 +588,7 @@ const Home: React.FC = () => {
               
               return [...prev, newNotification];
             });
-            console.log(`Saved product ${productId}`);
+        console.log(`Saved product ${productId}`);
           }
         }
       }
@@ -505,14 +617,24 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Hidden file input for image selection */}
+      <input
+        id="image-upload"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleImageSelection}
+        style={{ display: 'none' }}
+      />
+      
       {/* Search Section */}
-       <div className="mt-4 sm:mt-6 mx-4 sm:mx-6" style={{maxWidth: '900px', margin: '0 auto', marginTop: '20px'}}>
+       <div className="mt-4 sm:mt-6 mx-4 sm:mx-6" style={{maxWidth: '1200px', margin: '0 auto', marginTop: '20px'}}>
         <section className="bg-transparent sm:bg-white sm:shadow-sm sm:border sm:border-gray-200 rounded-full">
           <div className="px-4 sm:px-6 lg:px-8 py-3">
           {/* Desktop Search */}
-          <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-3">
+          <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-4">
             {/* Search Input */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative min-w-0">
               <input
                 type="text"
                 placeholder="Search for products..."
@@ -528,13 +650,13 @@ const Home: React.FC = () => {
               </div>
             </div>
             
-            {/* Mobile: Two columns for dropdowns and inputs */}
-            <div className="grid grid-cols-2 gap-3 lg:contents">
+            {/* Desktop: Grid for dropdowns and inputs */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:contents">
               {/* Category Dropdown */}
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base"
+                className="px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base min-w-[140px]"
               >
                 <option value="">All Categories</option>
                 <option value="Food & Spices">Food & Spices</option>
@@ -544,13 +666,52 @@ const Home: React.FC = () => {
                 <option value="Books & Media">Books & Media</option>
               </select>
               
+              {/* Place of Origin Dropdown - Web Only */}
+              <div className="hidden lg:block relative min-w-[160px]">
+                <select
+                  value={placeOfOrigin}
+                  onChange={(e) => setPlaceOfOrigin(e.target.value)}
+                  className="w-full px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base appearance-none"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                    backgroundPosition: 'right 0.5rem center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '1.5em 1.5em',
+                    paddingRight: '2.5rem'
+                  }}
+                >
+                  <option value="">Product Origin</option>
+                  <option value="Nigeria" style={{backgroundImage: 'url("https://flagcdn.com/w20/ng.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Nigeria</option>
+                  <option value="Ghana" style={{backgroundImage: 'url("https://flagcdn.com/w20/gh.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ghana</option>
+                  <option value="Kenya" style={{backgroundImage: 'url("https://flagcdn.com/w20/ke.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Kenya</option>
+                  <option value="South Africa" style={{backgroundImage: 'url("https://flagcdn.com/w20/za.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>South Africa</option>
+                  <option value="Egypt" style={{backgroundImage: 'url("https://flagcdn.com/w20/eg.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Egypt</option>
+                  <option value="Morocco" style={{backgroundImage: 'url("https://flagcdn.com/w20/ma.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Morocco</option>
+                  <option value="Ethiopia" style={{backgroundImage: 'url("https://flagcdn.com/w20/et.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ethiopia</option>
+                  <option value="Tanzania" style={{backgroundImage: 'url("https://flagcdn.com/w20/tz.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Tanzania</option>
+                  <option value="Uganda" style={{backgroundImage: 'url("https://flagcdn.com/w20/ug.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Uganda</option>
+                  <option value="Cameroon" style={{backgroundImage: 'url("https://flagcdn.com/w20/cm.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Cameroon</option>
+                  <option value="Senegal" style={{backgroundImage: 'url("https://flagcdn.com/w20/sn.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Senegal</option>
+                  <option value="Ivory Coast" style={{backgroundImage: 'url("https://flagcdn.com/w20/ci.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ivory Coast</option>
+                  <option value="Mali" style={{backgroundImage: 'url("https://flagcdn.com/w20/ml.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Mali</option>
+                  <option value="Burkina Faso" style={{backgroundImage: 'url("https://flagcdn.com/w20/bf.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Burkina Faso</option>
+                  <option value="Niger" style={{backgroundImage: 'url("https://flagcdn.com/w20/ne.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Niger</option>
+                  <option value="Chad" style={{backgroundImage: 'url("https://flagcdn.com/w20/td.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Chad</option>
+                  <option value="Sudan" style={{backgroundImage: 'url("https://flagcdn.com/w20/sd.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Sudan</option>
+                  <option value="Algeria" style={{backgroundImage: 'url("https://flagcdn.com/w20/dz.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Algeria</option>
+                  <option value="Tunisia" style={{backgroundImage: 'url("https://flagcdn.com/w20/tn.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Tunisia</option>
+                  <option value="Libya" style={{backgroundImage: 'url("https://flagcdn.com/w20/ly.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Libya</option>
+                  <option value="Other">Other</option>
+                </select>
+            </div>
+            
               {/* Location Input */}
               <input
                 type="text"
-                placeholder="Location"
+                placeholder="Seller Location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
+                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base min-w-[120px]"
               />
             </div>
             
@@ -680,7 +841,7 @@ const Home: React.FC = () => {
             )}
           </div>
         </div>
-        </section>
+      </section>
       </div>
 
       {/* Hero Banner - Auto Sliding */}
@@ -790,25 +951,25 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Filter Button - Desktop Only */}
+          
+          {/* Filter Button - Desktop Only */}
       <section className="bg-white py-2 sm:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="relative filter-dropdown hidden md:block">
-              <button
-                onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                <span className="text-sm font-medium text-gray-400">Filter :</span>
-                <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button
+              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+              className="flex items-center space-x-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg text-gray-600 hover:text-gray-800 hover:bg-blue-100 transition-colors"
+            >
+                <span className="text-base font-medium text-gray-500">Filter :</span>
+                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-sm font-medium text-blue-500">{selectedCountry || 'Africa'}</span>
-                <svg className={`w-3 h-3 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+              </svg>
+                <span className="text-base font-medium text-blue-600">{selectedCountry || 'Africa'}</span>
+                <svg className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
             
             {/* Dropdown Menu */}
             {isFilterDropdownOpen && (
@@ -883,11 +1044,11 @@ const Home: React.FC = () => {
                         {notification.type === 'success' ? (
                            <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+              </svg>
                         ) : (
                           <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5l14 14M5 19L19 5" />
-                          </svg>
+              </svg>
                         )}
                       </div>
                     </div>
@@ -907,17 +1068,17 @@ const Home: React.FC = () => {
                     </div>
                     
                     {/* Close Button */}
-                    <button
+                  <button
                       onClick={() => removeNotification(notification.id)}
                       className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
-                    </button>
+                  </button>
                   </div>
-              ))}
-            </div>
+                  ))}
+                </div>
             
             {/* Empty div to balance the layout */}
             <div className="w-0"></div>
@@ -1049,6 +1210,18 @@ const Home: React.FC = () => {
                     width="200"
                     height="200"
                   />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(product.id).flag} 
+                      alt={getProductCountry(product.id).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(product.id).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 
                 {/* Product Content */}
@@ -1056,8 +1229,8 @@ const Home: React.FC = () => {
                   {/* Price and Verified Badge Row */}
                   <div className="flex items-center justify-between mb-1">
                     <div className="text-sm sm:text-lg font-bold text-gray-900">
-                      ${product.price}
-                    </div>
+                    ${product.price}
+                  </div>
                     {product.verified ? (
                       <div className="flex items-center text-xs text-green-600 bg-green-50 px-1 py-0.5 rounded text-xs">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
@@ -1082,43 +1255,43 @@ const Home: React.FC = () => {
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
                       <svg className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 mr-0.5 sm:mr-1 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
                       <span className="truncate text-xs sm:text-xs font-normal max-w-[60px] sm:max-w-none">{product.location}</span>
-                    </div>
+                  </div>
                     
                     {/* Bookmark Button */}
                     <div className="ml-2 sm:ml-4">
-                    <button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleSave(product.id);
-                      }}
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSave(product.id);
+                          }}
                        className={`p-2 sm:p-2 transition-colors touch-manipulation ${
-                        savedProducts.has(product.id) 
+                            savedProducts.has(product.id) 
                           ? 'text-blue-500 hover:text-blue-600' 
-                          : 'text-gray-400 hover:text-gray-600'
-                      }`}
-                      title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
-                    >
+                              : 'text-gray-400 hover:text-gray-600'
+                          }`}
+                          title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                        >
                       <div className="relative">
                          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill={savedProducts.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                          </svg>
                         {savedProducts.has(product.id) && (
                           <div className="absolute inset-0 flex items-center justify-center">
                             <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
+                          </svg>
+                      </div>
                         )}
                         {!savedProducts.has(product.id) && (
                           <div className="absolute inset-0 flex items-center justify-center">
                             <span className="text-xs font-bold">+</span>
-                          </div>
-                        )}
+                    </div>
+                  )}
                       </div>
                     </button>
                     </div>

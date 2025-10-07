@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.testEmailConnection = exports.sendWelcomeEmail = exports.sendPasswordResetEmail = exports.sendVerificationEmail = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
-const logger_1 = __importDefault(require("@/config/logger"));
+const logger_1 = __importDefault(require("../config/logger"));
 class EmailService {
     constructor() {
         this.transporter = nodemailer_1.default.createTransport({

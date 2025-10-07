@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateUUIDParam = exports.validateChangePassword = exports.validateUpdateProfile = exports.validateProductQuery = exports.validateUpdateProduct = exports.validateCreateProduct = exports.validateRefreshToken = exports.validateResetPassword = exports.validateForgotPassword = exports.validateResendVerification = exports.validateEmailVerification = exports.validateLogin = exports.validateRegister = exports.handleValidationErrors = void 0;
 const express_validator_1 = require("express-validator");
-const errorUtils_1 = require("@/utils/errorUtils");
+const errorUtils_1 = require("../utils/errorUtils");
 const handleValidationErrors = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {

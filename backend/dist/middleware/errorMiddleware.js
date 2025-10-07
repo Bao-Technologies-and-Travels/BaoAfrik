@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createConflictError = exports.createForbiddenError = exports.createUnauthorizedError = exports.createNotFoundError = exports.createValidationError = exports.asyncHandler = exports.errorHandler = exports.notFound = exports.CustomError = void 0;
 const client_1 = require("@prisma/client");
-const logger_1 = __importDefault(require("@/config/logger"));
+const logger_1 = __importDefault(require("../config/logger"));
 class CustomError extends Error {
     constructor(message, statusCode = 500, isOperational = true) {
         super(message);

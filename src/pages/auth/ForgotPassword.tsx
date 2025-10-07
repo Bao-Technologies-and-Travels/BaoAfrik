@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authService } from '../../services/authService';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
@@ -16,6 +15,12 @@ const ForgotPassword: React.FC = () => {
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  };
+
+  const checkEmailExists = (email: string): boolean => {
+    // Check if email exists in registered users (localStorage mock)
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    return registeredUsers.some((user: any) => user.email.toLowerCase() === email.toLowerCase());
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,26 +45,31 @@ const ForgotPassword: React.FC = () => {
     setEmailNotFound(false);
 
     try {
-      const response = await authService.forgotPassword(email);
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      if (response.success) {
-        // Navigate to password reset verification page
-        navigate('/reset-password-sent', { 
-          state: { 
-            email: email 
-          } 
-        });
-      } else {
-        if (response.message?.includes('not found') || response.message?.includes('No account')) {
-          setEmailNotFound(true);
-          setErrors({ email: 'No account found with this email address' });
-        } else {
-          setErrors({ general: response.message || 'Failed to send reset email. Please try again.' });
-        }
+      // Check if email exists in our mock database
+      const emailExists = checkEmailExists(email);
+      
+      if (!emailExists) {
+        // Email not found in system
+        setEmailNotFound(true);
+        setErrors({ email: 'No account found with this email address' });
+        return;
       }
+      
+      // Email exists, proceed to reset verification
+      console.log('Forgot password request for:', email);
+      
+      // Navigate to password reset verification page
+      navigate('/reset-password-sent', { 
+        state: { 
+          email: email 
+        } 
+      });
     } catch (error) {
       console.error('Forgot password failed:', error);
-      setErrors({ general: 'Network error. Please check your connection and try again.' });
+      setErrors({ general: 'Failed to send reset email. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +148,7 @@ const ForgotPassword: React.FC = () => {
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 onMouseEnter={(e) => (e.target as HTMLInputElement).focus()}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white ${
                   errors.email ? 'border-red-500' : 'border-gray-300'

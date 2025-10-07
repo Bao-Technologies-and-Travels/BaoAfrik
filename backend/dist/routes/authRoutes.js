@@ -5,9 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
-const authController_1 = __importDefault(require("@/controllers/authController"));
-const authMiddleware_1 = require("@/middleware/authMiddleware");
-const validationMiddleware_1 = require("@/middleware/validationMiddleware");
+const authController_1 = __importDefault(require("../controllers/authController"));
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const validationMiddleware_1 = require("../middleware/validationMiddleware");
 const router = (0, express_1.Router)();
 const authLimiter = (0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000,

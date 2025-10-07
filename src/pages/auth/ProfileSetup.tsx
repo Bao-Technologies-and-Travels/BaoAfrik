@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { authService } from '../../services/authService';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -127,31 +126,49 @@ const ProfileSetup: React.FC = () => {
     setIsLoading(true);
 
     try {
-      console.log('Saving profile to server...', formData);
-
-      // Persist to backend
-      const payload = {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        profileImage: profileImage || undefined,
-      };
-
-      const resp = await authService.updateProfile(payload);
-
-      if (resp.success && resp.data) {
-        // Update local auth context with server-confirmed data
-        updateUserProfile({
-          name: resp.data.name,
-          profileImage: resp.data.profileImage,
-          // phoneNumber may come back; merge it if present
-          ...(resp.data as any).phoneNumber ? { phoneNumber: (resp.data as any).phoneNumber } : {}
-        });
-
-        // Redirect to preferences
-        navigate('/user-preferences', { replace: true });
+      // TODO: Implement profile setup API call
+      console.log('Setting up profile:', formData);
+      
+      // Store profile data temporarily for use after preferences
+      let profileData;
+      if (fromSocialLogin) {
+        const socialUserData = JSON.parse(localStorage.getItem('tempSocialUser') || '{}');
+        profileData = {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: socialUserData.email || 'user@example.com',
+          profileImage: profileImage || undefined,
+          provider: provider
+        };
       } else {
-        throw new Error(resp.message || 'Failed to update profile');
+        // For regular registration, get user data from localStorage
+        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        const currentUserEmail = localStorage.getItem('currentUserEmail'); // We'll set this during registration
+        const currentUser = registeredUsers.find((u: any) => u.email === currentUserEmail);
+        
+        profileData = {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: currentUser?.email || 'user@example.com',
+          profileImage: profileImage || undefined
+        };
+        
+        // Update the user's profile image in the registered users list
+        if (currentUser) {
+          currentUser.profileImage = profileImage;
+          currentUser.name = `${formData.firstName} ${formData.lastName}`;
+          localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+        }
       }
+      localStorage.setItem('tempUserProfile', JSON.stringify(profileData));
+      
+      // Update user profile with image
+      updateUserProfile(profileData);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // On success, redirect to questions page
+      navigate('/user-preferences');
+      
     } catch (error) {
       console.error('Profile setup failed:', error);
       setErrors({ general: 'Failed to save profile information. Please try again.' });

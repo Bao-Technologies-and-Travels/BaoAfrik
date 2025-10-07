@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+
+    environment {
+        NODE_ENV = 'staging'
+        SSH_HOST = 'ubuntu@34.238.160.159'
+        APP_DIR = '~/BaoAfrik'
+        BACKEND_DIR = '~/BaoAfrik/backend'
+        APP_NAME_FRONTEND = 'baoafrik-frontend'
+        APP_NAME_BACKEND = 'baoafrik-backend'
+        REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
+        BRANCH = 'fonsah-staging'
+    }
+
+    stages {
+        stage('Deploy to Server') {
+            steps {
+                echo "Deploying frontend and backend on server ${SSH_HOST}..."
+
+                sshagent(['baoafrik-key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        if [ ! -d ~/BaoAfrik ]; then
+                            git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
+                        fi
+                        cd ${APP_DIR}
+                        git fetch origin ${BRANCH}
+                        git reset --hard origin/${BRANCH}
+
+                        npm install
+                        npm run db:generate
+                        npm run db:migrate
+                        npm start
+
+                        cd ${BACKEND_DIR}
+                        mv .env.example .env
+
+                        npm install
+                        npm run build
+
+                        pm2 restart ${APP_NAME_BACKEND} || pm2 start dist/server.js --name ${APP_NAME_BACKEND}
+                        pm2 save
+                    '
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            emailext(
+                subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - ${currentBuild.currentResult}!",
+                from: 'ashprincepageo@gmail.com',
+                to: 'pageo.fonsah@baotechnologiesandtravels.com',
+                mimeType: 'text/html',
+                body: """
+                    <html>
+                        <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+                            <h2 style="color: #2E86C1;">Jenkins Build Notification</h2>
+                            <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+                            <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
+                            <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
+                            <p>Check the <a href="${env.BUILD_URL}">console output</a> for details.</p>
+                            <hr>
+                            <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
+                        </body>
+                    </html>
+                """
+            )
+        }
+    }
+}

@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requestLogger = void 0;
 const uuid_1 = require("uuid");
-const logger_1 = __importDefault(require("@/config/logger"));
+const logger_1 = __importDefault(require("../config/logger"));
 const requestLogger = (req, res, next) => {
     req.requestId = (0, uuid_1.v4)();
     req.startTime = Date.now();

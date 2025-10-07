@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { authService } from '../../services/authService';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import { authService } from '../../services/authService';
+import { log } from 'console';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ const Login: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
 
-  const { login, setVisitorMode, refreshAuth } = useAuth();
+  const { login, setVisitorMode } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -30,28 +31,28 @@ const Login: React.FC = () => {
       };
       localStorage.setItem('rememberedEmail', JSON.stringify(rememberData));
     },
-    
+
     getRememberedEmail: () => {
       const stored = localStorage.getItem('rememberedEmail');
       if (!stored) return null;
-      
+
       try {
         const data = JSON.parse(stored);
         const now = new Date().getTime();
-        
+
         // Check if expired (30 days)
         if (now - data.timestamp > data.expiresIn) {
           localStorage.removeItem('rememberedEmail');
           return null;
         }
-        
+
         return data.email;
       } catch {
         localStorage.removeItem('rememberedEmail');
         return null;
       }
     },
-    
+
     clearRememberedEmail: () => {
       localStorage.removeItem('rememberedEmail');
     }
@@ -98,135 +99,48 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
+
+    if (!validateForm()) return;
+
     setIsLoading(true);
     setErrors({});
-    setSuccessMessage(''); // Clear any previous success messages
-    
+    setSuccessMessage('');
+
     try {
-      const response = await authService.login({
-        email,
-        password,
-        rememberMe
+      const response = await authService.login({ email, password });
+      console.log('Login response:', response);
+
+      if (!response.success || !response.data) {
+        throw new Error(response.message || 'Invalid backend response');
+      }
+
+      const { user, accessToken, refreshToken } = response.data; 
+
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      if (rememberMe) {
+        rememberMeService.saveRememberedEmail(email);
+      } else {
+        rememberMeService.clearRememberedEmail();
+      }
+
+      login({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage,
       });
-      
-      if (response.success && response.data) {
-        // Accept both shapes:
-        // A) { data: { accessToken, refreshToken, user } }
-        // B) { data: { tokens: { accessToken, refreshToken }, user } }
-        const d: any = response.data as any;
-        const accessToken = d?.tokens?.accessToken ?? d?.accessToken;
-        const refreshToken = d?.tokens?.refreshToken ?? d?.refreshToken;
-        const user = d?.user;
 
-        if (accessToken && refreshToken && user) {
-          // Store tokens
-          localStorage.setItem('accessToken', accessToken);
-          localStorage.setItem('refreshToken', refreshToken);
-
-          // Handle remember me functionality
-          if (rememberMe) {
-            rememberMeService.saveRememberedEmail(email);
-          } else {
-            rememberMeService.clearRememberedEmail();
-          }
-
-          // Login user first
-          login(user);
-          // Immediately refresh from server to ensure latest profile info
-          try {
-            await refreshAuth();
-          } catch (e) {
-            console.warn('refreshAuth failed (non-blocking):', e);
-          }
-
-          // Show success message
-          setSuccessMessage('Login successful! Redirecting...');
-          setMessageType('success');
-          setErrors({});
-
-          // Add debug logging
-          console.log('Login successful, preparing redirect...', user);
-          console.log('Current location:', window.location.pathname);
-
-          // Determine redirect target (prefer previous page if provided)
-          const redirectTo = (location.state as any)?.from || '/';
-          console.log('Redirect target:', redirectTo);
-
-          // Try client-side navigation first; fallback to hard redirect
-          try {
-            navigate(redirectTo, { replace: true });
-          } catch (e) {
-            console.warn('navigate() failed, falling back to window.location.assign', e);
-            window.location.assign(redirectTo);
-          }
-        } else {
-          // If success is true but tokens are missing, treat as an unexpected response shape
-          console.warn('Login response missing tokens or user:', response);
-          setErrors({
-            general: 'Unexpected response from server. Please try again.'
-          });
-        }
-      } else {
-        // Handle specific error messages from backend
-        if (response.message?.includes('verify your email') || response.message?.includes('Please verify')) {
-          setErrors({ 
-            general: '📧 Email verification required. Please check your inbox and verify your email address before logging in.' 
-          });
-          // Redirect to email verification page
-          navigate('/verify-email', { 
-            state: { 
-              email: email,
-              fromLogin: true 
-            } 
-          });
-        } else if (response.message?.includes('Invalid') || response.message?.includes('password') || response.message?.includes('credentials')) {
-          setErrors({ 
-            general: '🔐 Invalid email or password. Please double-check your credentials and try again.' 
-          });
-        } else if (response.message?.includes('not found') || response.message?.includes('does not exist')) {
-          setErrors({ 
-            general: '👤 No account found with this email address. Please check your email or create a new account.' 
-          });
-        } else if (response.message?.includes('blocked') || response.message?.includes('suspended')) {
-          setErrors({ 
-            general: '🚫 Your account has been temporarily blocked. Please contact support for assistance.' 
-          });
-        } else if (response.message?.includes('too many') || response.message?.includes('rate limit')) {
-          setErrors({ 
-            general: '⏰ Too many login attempts. Please wait a few minutes before trying again.' 
-          });
-        } else {
-          setErrors({ 
-            general: response.message || '❌ Login failed. Please try again or contact support if the problem persists.' 
-          });
-        }
-      }
-      
-    } catch (error) {
+      navigate('/');
+    } catch (error: any) {
       console.error('Login failed:', error);
-      
-      // Clear any success messages when there's an error
-      setSuccessMessage('');
-      
-      // More specific network error handling
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        setErrors({ 
-          general: '🌐 Unable to connect to server. Please make sure the backend is running on port 3001 and try again.' 
-        });
-      } else if (error instanceof Error && error.message.includes('timeout')) {
-        setErrors({ 
-          general: '⏱️ Request timed out. Please check your connection and try again.' 
-        });
-      } else {
-        setErrors({ 
-          general: '🔧 Network error occurred. Please check your connection or try again later.' 
-        });
-      }
+      const message =
+        error.message ||
+        error.response?.data?.message ||
+        'Login failed. Please check your credentials and try again.';
+      setErrors({ general: message });
     } finally {
       setIsLoading(false);
     }
@@ -236,7 +150,7 @@ const Login: React.FC = () => {
     // Show alert that social login is not available yet
     alert('Social login not available yet. Backend coming soon.');
   };
-  
+
   const handleVisitorAccess = () => {
     // Set visitor mode and navigate to home page
     setVisitorMode(true);
@@ -261,7 +175,7 @@ const Login: React.FC = () => {
               Access as visitor
             </button>
           </div>
-          
+
           {/* Success Message */}
           {successMessage && messageType === 'success' && (
             <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
@@ -273,27 +187,25 @@ const Login: React.FC = () => {
               </div>
             </div>
           )}
-          
+
           {/* General Error Message */}
           {errors.general && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-              <div className="flex items-start">
-                <svg className="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
-                <div className="flex-1">
-                  <p className="text-sm text-red-800 leading-relaxed">{errors.general}</p>
-                </div>
+                <p className="text-sm text-red-800">{errors.general}</p>
               </div>
             </div>
           )}
-          
+
           {/* Logo */}
           <div className="text-center">
             <div className="mx-auto w-16 h-16 mb-6">
-              <img 
-                src={logoSmall} 
-                alt="BaoAfrik Logo" 
+              <img
+                src={logoSmall}
+                alt="BaoAfrik Logo"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -304,10 +216,10 @@ const Login: React.FC = () => {
               Welcome back! Please sign in to your BaoAfrik account
             </p>
           </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
+
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email address
                 </label>
@@ -318,72 +230,70 @@ const Login: React.FC = () => {
                   autoComplete="email"
                   required
                   disabled={isLoading}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                    errors.email ? 'border-red-500' : 'border-gray-200'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.email ? 'border-red-500' : 'border-gray-200'
+                    }`}
                   placeholder="Enter your email address"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-              )}
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  required
-                  minLength={8}
-                  pattern="^(?=.*[a-zA-Z])(?=.*\d).{8,}$"
-                  disabled={isLoading}
-                  className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                    errors.password ? 'border-red-500' : 'border-gray-200'
-                  }`}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                )}
               </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-              )}
-              {errors.passwordHint && !errors.password && (
-                <div className="mt-1 flex items-center text-sm text-orange-600">
-                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {errors.passwordHint}
-                </div>
-              )}
-            </div>
-          </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    minLength={8}
+                    pattern="^(?=.*[a-zA-Z])(?=.*\d).{8,}$"
+                    disabled={isLoading}
+                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.password ? 'border-red-500' : 'border-gray-200'
+                      }`}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      </svg>
+                    ) : (
+                      <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                )}
+                {errors.passwordHint && !errors.password && (
+                  <div className="mt-1 flex items-center text-sm text-orange-600">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.passwordHint}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
                 <input
                   id="remember-me"
                   name="remember-me"
@@ -393,91 +303,91 @@ const Login: React.FC = () => {
                   disabled={isLoading}
                   className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded disabled:cursor-not-allowed"
                 />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-600">
-                Remember me
-              </label>
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-600">
+                  Remember me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 underline">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
-            <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 underline">
-                Forgot password?
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100"
+                style={{ backgroundColor: isLoading ? '#9CA3AF' : '#F9A825' }}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <LoadingSpinner size="md" color="white" className="mr-2" />
+                    Signing In...
+                  </div>
+                ) : (
+                  'Sign In'
+                )}
+              </button>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or sign in with</span>
+              </div>
+            </div>
+
+            {/* Social Login Buttons */}
+            <div className="flex justify-center space-x-4">
+              <button
+                type="button"
+                onClick={() => handleSocialLogin('google')}
+                disabled={isLoading}
+                className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                <svg className="w-6 h-6" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSocialLogin('facebook')}
+                disabled={isLoading}
+                className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSocialLogin('apple')}
+                disabled={isLoading}
+                className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                <svg className="w-6 h-6 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="text-center">
+              <span className="text-gray-500 text-sm">Don't have an account? </span>
+              <Link to="/register" className="font-medium text-black hover:text-gray-700 underline">
+                Sign Up
               </Link>
             </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100"
-              style={{ backgroundColor: isLoading ? '#9CA3AF' : '#F9A825' }}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <LoadingSpinner size="md" color="white" className="mr-2" />
-                  Signing In...
-                </div>
-              ) : (
-                'Sign In'
-              )}
-            </button>
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or sign in with</span>
-            </div>
-          </div>
-
-          {/* Social Login Buttons */}
-          <div className="flex justify-center space-x-4">
-            <button
-              type="button"
-              onClick={() => handleSocialLogin('google')}
-              disabled={isLoading}
-              className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              <svg className="w-6 h-6" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleSocialLogin('facebook')}
-              disabled={isLoading}
-              className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleSocialLogin('apple')}
-              disabled={isLoading}
-              className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              <svg className="w-6 h-6 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
-              </svg>
-            </button>
-          </div>
-
-          <div className="text-center">
-            <span className="text-gray-500 text-sm">Don't have an account? </span>
-            <Link to="/register" className="font-medium text-black hover:text-gray-700 underline">
-              Sign Up
-            </Link>
-          </div>
-        </form>
+          </form>
         </div>
       </div>
 
@@ -486,9 +396,9 @@ const Login: React.FC = () => {
         <div className="max-w-md text-center">
           {/* Large BaoAfrik Logo */}
           <div className="mx-auto w-80 h-80 mb-8 flex items-center justify-center">
-            <img 
-              src={logoLarge} 
-              alt="BaoAfrik - Authentic African Marketplace" 
+            <img
+              src={logoLarge}
+              alt="BaoAfrik - Authentic African Marketplace"
               className="max-w-full max-h-full object-contain drop-shadow-lg"
             />
           </div>

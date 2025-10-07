@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.changePassword = exports.resetPassword = exports.forgotPassword = exports.updateProfile = exports.getCurrentUser = exports.resendVerificationCode = exports.verifyEmail = exports.refreshToken = exports.logout = exports.login = exports.register = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const client_1 = require("@prisma/client");
-const errorMiddleware_1 = require("@/middleware/errorMiddleware");
-const errorMiddleware_2 = require("@/middleware/errorMiddleware");
-const jwtUtils_1 = require("@/utils/jwtUtils");
-const emailService_1 = require("@/utils/emailService");
-const logger_1 = __importDefault(require("@/config/logger"));
+const errorMiddleware_1 = require("../middleware/errorMiddleware");
+const errorMiddleware_2 = require("../middleware/errorMiddleware");
+const jwtUtils_1 = require("../utils/jwtUtils");
+const emailService_1 = require("../utils/emailService");
+const logger_1 = __importDefault(require("../config/logger"));
 const prisma = new client_1.PrismaClient();
 exports.register = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
     const { name, email, password, confirmPassword, phoneNumber } = req.body;

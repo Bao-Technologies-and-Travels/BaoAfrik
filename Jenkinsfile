@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         NODE_ENV = 'staging'
-        SSH_HOST = 'ubuntu@98.89.132.2'
-        APP_DIR = '~/BaoAfrik/backend'
+        SSH_HOST = 'ubuntu@34.238.160.159'
+        APP_DIR = '~/BaoAfrik'
         APP_NAME = 'baoafrik'
         REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
         BRANCH = 'fonsah-staging'

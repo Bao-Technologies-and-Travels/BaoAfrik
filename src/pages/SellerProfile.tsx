@@ -14,6 +14,33 @@ import pre6 from '../assets/images/pre/6.png';
 import pre7 from '../assets/images/pre/7.png';
 import pre8 from '../assets/images/pre/8.png';
 
+// Country mapping for products
+const getProductCountry = (productId: number) => {
+  const countryMap: { [key: number]: { name: string; code: string; flag: string; abbreviation: string } } = {
+    1: { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
+    2: { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
+    3: { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
+    4: { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' },
+    5: { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
+    6: { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
+    7: { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
+    8: { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
+    9: { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
+    10: { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
+    11: { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
+    12: { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
+    13: { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
+    14: { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
+    15: { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
+    16: { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
+    17: { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
+    18: { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
+    19: { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
+    20: { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' }
+  };
+  return countryMap[productId] || { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' };
+};
+
 const SellerProfile: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -790,8 +817,20 @@ const SellerProfile: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
               {/* Product 1 - African Textiles */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 relative">
                   <img src={pre1} alt="African Textiles" className="w-full h-full object-cover" />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(1).flag} 
+                      alt={getProductCountry(1).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(1).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -852,8 +891,20 @@ const SellerProfile: React.FC = () => {
 
               {/* Product 2 - Fresh Tomatoes */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 relative">
                   <img src={pre2} alt="Fresh Tomatoes" className="w-full h-full object-cover" />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(2).flag} 
+                      alt={getProductCountry(2).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(2).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -914,8 +965,20 @@ const SellerProfile: React.FC = () => {
 
               {/* Product 3 - Dried Shrimp */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 relative">
                   <img src={pre3} alt="Dried Shrimp" className="w-full h-full object-cover" />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(3).flag} 
+                      alt={getProductCountry(3).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(3).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -976,8 +1039,20 @@ const SellerProfile: React.FC = () => {
 
               {/* Product 4 - Ndolé Leaves */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 relative">
                   <img src={pre4} alt="Ndolé Leaves" className="w-full h-full object-cover" />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(4).flag} 
+                      alt={getProductCountry(4).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(4).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -1038,8 +1113,20 @@ const SellerProfile: React.FC = () => {
 
               {/* Product 5 - Plantain Chips */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 relative">
                   <img src={pre5} alt="Plantain Chips" className="w-full h-full object-cover" />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(5).flag} 
+                      alt={getProductCountry(5).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(5).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -1100,8 +1187,20 @@ const SellerProfile: React.FC = () => {
 
               {/* Product 6 - Yam Flour */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 relative">
                   <img src={pre6} alt="Yam Flour" className="w-full h-full object-cover" />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(6).flag} 
+                      alt={getProductCountry(6).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(6).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -1162,8 +1261,20 @@ const SellerProfile: React.FC = () => {
 
               {/* Product 7 - Palm Oil */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 relative">
                   <img src={pre7} alt="Palm Oil" className="w-full h-full object-cover" />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(7).flag} 
+                      alt={getProductCountry(7).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(7).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -1224,8 +1335,20 @@ const SellerProfile: React.FC = () => {
 
               {/* Product 8 - African Spices */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 relative">
                   <img src={pre8} alt="African Spices" className="w-full h-full object-cover" />
+                  
+                  {/* Country Badge */}
+                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                    <img 
+                      src={getProductCountry(8).flag} 
+                      alt={getProductCountry(8).name}
+                      className="w-3 h-2 object-cover rounded-sm"
+                    />
+                    <span className="text-xs font-medium text-gray-800">
+                      {getProductCountry(8).abbreviation}
+                    </span>
+                  </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}

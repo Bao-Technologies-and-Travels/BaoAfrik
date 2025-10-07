@@ -1,8 +1,8 @@
 // API Configuration and Environment Variables
 export const API_CONFIG = {
   // Base URLs
-  BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:3001/api',
-  WS_URL: process.env.REACT_APP_WS_URL || 'ws://localhost:3001/ws',
+  BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
+  WS_URL: process.env.REACT_APP_WS_URL || 'ws://localhost:8000/ws',
   
   // Authentication
   TOKEN_STORAGE_KEY: 'accessToken',

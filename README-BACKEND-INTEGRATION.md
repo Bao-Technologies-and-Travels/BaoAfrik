@@ -1,162 +1,165 @@
 # BaoAfrik Backend Integration Guide
 
 ## 📋 Overview
-This document describes the current status of the BaoAfrik Backend API, how to run it locally, required environment variables, implemented endpoints, and testing/troubleshooting notes. Authentication and password reset flows are implemented and wired to the frontend. Email delivery uses SMTP (Gmail) through Nodemailer. Swagger docs and a Postman collection are provided.
+This document outlines the backend integration requirements for the BaoAfrik marketplace frontend. All necessary API services, types, and utilities have been prepared for seamless backend integration.
 
-## 🚦 Status Snapshot
-- **API server**: `backend/src/server.ts` on port `3001` (configurable via `PORT`).
-- **Docs**: Swagger UI at `http://localhost:3001/api-docs`. Health at `http://localhost:3001/health`.
-- **DB**: PostgreSQL via Prisma. Configure `DATABASE_URL`.
-- **Auth**: JWT access/refresh, email verification, profile update, change password.
-- **Password reset**: Request + Reset flows live. Email uses SMTP (Gmail).
-- **Email test routes**: Available under `/api/test`.
+## 🏗️ Backend-Ready Architecture
 
-## 🔌 Implemented API Endpoints
+### API Services Layer
+- **`/src/services/api.ts`** - Core HTTP client with authentication
+- **`/src/services/authService.ts`** - Authentication endpoints
+- **`/src/services/passwordResetService.ts`** - Password reset flow
+- **`/src/services/marketplaceService.ts`** - Marketplace features
+- **`/src/services/index.ts`** - Service exports
+
+### Utilities & Configuration
+- **`/src/utils/apiConfig.ts`** - API configuration and endpoints
+- **`/src/utils/errorHandler.ts`** - Error handling utilities
+- **`/src/utils/tokenManager.ts`** - JWT token management
+- **`/src/hooks/useApi.ts`** - React hooks for API calls
+
+## 🔌 Required Backend Endpoints
 
 ### Authentication Endpoints
 ```
-POST /api/auth/register           # registration with email verification code generated
-POST /api/auth/login              # returns accessToken, refreshToken, user
-POST /api/auth/logout             # clears provided refresh token
-POST /api/auth/refresh            # issue new access token from refresh token
-GET  /api/auth/me                 # requires Bearer access token
-PUT  /api/auth/profile            # body: { firstName?, lastName?, phoneNumber?, profileImage? }
-PUT  /api/auth/change-password    # requires Bearer; body: { currentPassword, newPassword, confirmPassword }
-POST /api/auth/verify-email       # body: { email, verificationCode }
-POST /api/auth/resend-verification# body: { email }
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/logout
+POST /api/auth/refresh
+GET  /api/auth/me
+PUT  /api/auth/profile
+POST /api/auth/profile/image
+PUT  /api/auth/preferences
+PUT  /api/auth/change-password
+POST /api/auth/verify-email
+POST /api/auth/resend-verification
+POST /api/auth/social-login
 ```
 
 ### Password Reset Endpoints
 ```
-POST /api/auth/forgot-password    # body: { email } (always 200 to avoid enumeration)
-POST /api/auth/reset-password     # body: { token, newPassword, confirmPassword }
+POST /api/auth/forgot-password
+POST /api/auth/verify-reset-code
+POST /api/auth/reset-password
+POST /api/auth/resend-reset-code
 ```
 
-### Test & Diagnostics Endpoints
+### Marketplace Endpoints
 ```
-GET  /api/test/email-connection   # verify SMTP connectivity
-POST /api/test/send-email         # send verification-style test email
-POST /api/test/get-verification-code  # dev-only helper: returns current code for an email
-POST /api/test/send-test-email    # generic HTML test email
+GET  /api/products
+POST /api/products
+GET  /api/products/:id
+PUT  /api/products/:id
+DELETE /api/products/:id
+POST /api/products/search
+GET  /api/products/my-products
+GET  /api/products/user/:userId
+
+GET  /api/categories
+GET  /api/locations
+
+GET  /api/messages/conversations
+GET  /api/messages/conversations/:id
+POST /api/messages/send
+PUT  /api/messages/:id/read
+PUT  /api/messages/conversations/:id/read
+
+GET  /api/bookmarks
+POST /api/bookmarks
+DELETE /api/bookmarks/:productId
+
+POST /api/requests
+GET  /api/requests
+GET  /api/requests/:id
+PUT  /api/requests/:id
+DELETE /api/requests/:id
+
+GET  /api/notifications
+PUT  /api/notifications/:id/read
+PUT  /api/notifications/read-all
 ```
 
-### Health & Docs
-```
-GET  /health
-GET  /api-docs
-```
+## 🔧 Environment Variables Required
 
-<!-- Note: Marketplace endpoints are planned; not implemented in this build. See Roadmap below. -->
-
-## 🔧 Environment Variables (Backend)
-
-Copy `backend/.env.example` to `backend/.env` and set these:
+Create a `.env` file with:
 ```env
-# Server
-NODE_ENV=development
-PORT=3001
-
-# Database (PostgreSQL)
-DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/postgres?schema=public"
-
-# JWT
-JWT_SECRET="your-super-secret-jwt-key"
-JWT_REFRESH_SECRET="your-super-secret-refresh-key"
-JWT_EXPIRE_TIME="30m"
-JWT_REFRESH_EXPIRE_TIME="7d"
-
-# Bcrypt
-# The code reads BCRYPT_SALT_ROUNDS (default: 12)
-BCRYPT_SALT_ROUNDS=12
-
-# Email (SMTP via Gmail App Password)
-EMAIL_SERVICE="smtp"
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT="587"
-SMTP_SECURE="false"
-EMAIL_FROM_ADDRESS="your_gmail_or_workspace_address"
-EMAIL_PASSWORD="your_gmail_app_password"
-EMAIL_FROM_NAME="BaoAfrik Team"
-
-# Frontend URL used inside email templates
-FRONTEND_URL="http://localhost:3000"
-
-# CORS
-CORS_ORIGINS="http://localhost:3000,https://baoafrik.com"
-
-# Logging
-LOG_LEVEL="info"
-LOG_FILE_PATH="logs/app.log"
+REACT_APP_API_URL=http://localhost:8000/api
+REACT_APP_WS_URL=ws://localhost:8000/ws
 ```
 
-## ▶️ Quick Start (Backend)
-- **Install**: `cd backend && npm install`
-- **Prisma**: `npm run db:generate` then `npm run db:migrate`
-- **Run (dev)**: `npm run dev`
-- **Verify**:
-  - Health: `GET http://localhost:3001/health`
-  - Docs: `http://localhost:3001/api-docs`
-  - Auth routes base: `http://localhost:3001/api/auth`
+## 📱 Pages Ready for Backend Integration
 
-## 🧪 Postman Collection & Environment
-- Import collection: `backend/BaoAfrik-API.postman_collection.json`
-- Import environment: `backend/BaoAfrik-Environment.postman_environment.json`
-- Ensure `baseUrl` is `http://localhost:3001`.
-- Login request stores `accessToken` and `refreshToken` into the environment for subsequent calls.
+### Authentication Flow
+- **Login** (`/src/pages/auth/Login.tsx`)
+- **Register** (`/src/pages/auth/Register.tsx`)
+- **EmailVerification** (`/src/pages/auth/EmailVerification.tsx`)
+- **ProfileSetup** (`/src/pages/auth/ProfileSetup.tsx`)
+- **UserPreferences** (`/src/pages/auth/UserPreferences.tsx`)
 
-## ✉️ Email Configuration
-- Use a Gmail account with 2FA enabled and generate a Gmail App Password.
-- Set `EMAIL_FROM_ADDRESS` to the exact account that owns the app password (or a permitted alias).
-- Use `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_SECURE=false`.
-- Set `FRONTEND_URL` (used in email templates for links).
-- Test with:
-  - `GET  /api/test/email-connection`
-  - `POST /api/test/send-email`  body: `{ "email": "you@example.com", "name": "You" }`
-  - `POST /api/test/send-test-email` body: `{ "email": "you@example.com" }`
+### Password Reset Flow
+- **ForgotPassword** (`/src/pages/auth/ForgotPassword.tsx`)
+- **ResetPasswordSent** (`/src/pages/auth/ResetPasswordSent.tsx`)
+- **ResetPassword** (`/src/pages/auth/ResetPassword.tsx`)
+- **PasswordResetSuccess** (`/src/pages/auth/PasswordResetSuccess.tsx`)
 
-## ⚠️ Troubleshooting
-- **Email fails (login or password reset)**
-  - Check server logs for `SMTP connection verification failed` on startup.
-  - Confirm `EMAIL_FROM_ADDRESS` matches the Gmail account for the App Password.
-  - Ensure `FRONTEND_URL` is set so reset links are valid.
-- **Bcrypt rounds env mismatch**
-  - Code reads `BCRYPT_SALT_ROUNDS`. If `.env.example` shows `BCRYPT_ROUNDS`, prefer setting `BCRYPT_SALT_ROUNDS`.
-- **429 Too many requests**
-  - Rate limits: Auth limiter (5/15min), General limiter (100/15min). See `backend/src/routes/authRoutes.ts`.
-- **CORS issues**
-  - Update `CORS_ORIGINS` to include your frontend origin.
+### Marketplace Pages
+- **Home** (`/src/pages/Home.tsx`)
+- **Listings** (`/src/pages/Listings.tsx`)
+- **CreateListing** (`/src/pages/CreateListing.tsx`)
+- **ProductDetail** (`/src/pages/ProductDetail.tsx`)
+- **Profile** (`/src/pages/Profile.tsx`)
+- **Messages** (`/src/pages/Messages.tsx`)
 
-## 📈 Rate Limiting & CORS
-- Global `/api/*` limiter configured in `backend/src/server.ts`.
-- Per-route limiters in `backend/src/routes/authRoutes.ts`.
-- CORS origins read from `CORS_ORIGINS`.
+## 🔄 Integration Steps
 
-## 🗺️ Roadmap / Not Yet Implemented
-- Social login endpoints.
-- Profile image upload endpoint.
-- Preferences endpoint.
-- Marketplace domain (planned endpoints):
-  - Products: list/create/read/update/delete, search, my-products, by-user
-  - Categories, Locations
-  - Messages: conversations, send, mark read
-  - Bookmarks: list/add/remove
-  - Requests: CRUD
-  - Notifications: list, read, read-all
+### 1. Update Environment Variables
+```bash
+# Add to .env file
+REACT_APP_API_URL=https://your-backend-url.com/api
+```
 
-## 📝 Changelog (2025-09-29)
-- Added forgot/reset password endpoints and wired to frontend.
-- Implemented email service with SMTP (Nodemailer) and test routes.
-- `PUT /api/auth/profile` now accepts `firstName` + `lastName` and supports `profileImage` as HTTP URL or data URL.
-- Postman collection updated for auth and reset flows; environment stores tokens.
+### 2. Replace Mock Data Calls
+All pages currently use localStorage for demo purposes. Replace with API calls:
 
-## 📂 Key Backend Files
-- **Server**: `backend/src/server.ts`
-- **Auth routes**: `backend/src/routes/authRoutes.ts`
-- **Test routes**: `backend/src/routes/testRoutes.ts`
-- **Email service**: `backend/src/utils/emailService.ts`
-- **Controllers**: `backend/src/controllers/authController.ts`
-- **Env template**: `backend/.env.example`
-- **Postman**: `backend/BaoAfrik-API.postman_collection.json`, `backend/BaoAfrik-Environment.postman_environment.json`
+```typescript
+// Before (mock)
+const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+
+// After (API)
+import { authService } from '../services';
+const response = await authService.login({ email, password });
+```
+
+### 3. Update AuthContext
+The AuthContext (`/src/contexts/AuthContext.tsx`) needs to be updated to use real API calls instead of localStorage.
+
+### 4. Error Handling
+All error handling is already implemented using the ErrorHandler utility. Backend errors will be automatically formatted for user display.
+
+### 5. File Uploads
+File upload functionality is ready for profile images and product images using FormData.
+
+## 🚀 Features Ready for Backend
+
+### ✅ Completed & Backend-Ready
+- User registration and login
+- Email verification flow
+- Password reset flow (4 pages)
+- Profile setup and management
+- Custom loading spinners across all forms
+- Mobile-responsive design
+- Error handling and validation
+- File upload preparation
+- JWT token management
+- API service layer
+
+### 🔄 Requires Backend Implementation
+- Real-time messaging
+- Product search and filtering
+- Image upload and storage
+- Email sending service
+- Push notifications
+- Payment processing (future)
 
 ## 📋 Backend Requirements Summary
 

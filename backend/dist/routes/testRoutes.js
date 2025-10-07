@@ -37,8 +37,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const emailService_1 = require("@/utils/emailService");
-const logger_1 = __importDefault(require("@/config/logger"));
+const emailService_1 = require("../utils/emailService");
+const logger_1 = __importDefault(require("../config/logger"));
 const router = (0, express_1.Router)();
 router.get('/email-connection', async (req, res) => {
     try {

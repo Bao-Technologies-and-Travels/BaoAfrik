@@ -11,7 +11,7 @@ exports.verifyRefreshToken = verifyRefreshToken;
 exports.parseDurationToSeconds = parseDurationToSeconds;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const crypto_1 = __importDefault(require("crypto"));
-const errorUtils_1 = require("@/utils/errorUtils");
+const errorUtils_1 = require("./errorUtils");
 function requiredEnv(name, fallback) {
     const v = process.env[name] ?? fallback;
     if (!v)

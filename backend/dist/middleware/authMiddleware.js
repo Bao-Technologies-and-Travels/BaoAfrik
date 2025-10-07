@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.requireResourceOwnership = exports.requireVerifiedSeller = exports.optionalAuth = exports.authenticateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client_1 = require("@prisma/client");
-const asyncHandler_1 = require("@/utils/asyncHandler");
-const errorUtils_1 = require("@/utils/errorUtils");
-const logger_1 = __importDefault(require("@/config/logger"));
+const asyncHandler_1 = require("..//utils/asyncHandler");
+const errorUtils_1 = require("..//utils/errorUtils");
+const logger_1 = __importDefault(require("../config/logger"));
 const prisma = new client_1.PrismaClient();
 exports.authenticateToken = (0, asyncHandler_1.asyncHandler)(async (req, res, next) => {
     const authHeader = req.headers.authorization;

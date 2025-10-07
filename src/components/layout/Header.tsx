@@ -169,13 +169,6 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                               : 'text-gray-700 hover:bg-gray-50'
                           }`}
                         >
-                          <img 
-                            src="https://flagcdn.com/w20/gb.png" 
-                            alt="UK flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
                           English
                         </button>
                         <button
@@ -186,48 +179,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                               : 'text-gray-700 hover:bg-gray-50'
                           }`}
                         >
-                          <img 
-                            src="https://flagcdn.com/w20/fr.png" 
-                            alt="France flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          France
-                        </button>
-                        <button
-                          onClick={() => handleLanguageChange('DE')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'DE' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          <img 
-                            src="https://flagcdn.com/w20/de.png" 
-                            alt="Germany flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          Germany
-                        </button>
-                        <button
-                          onClick={() => handleLanguageChange('ES')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'ES' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          <img 
-                            src="https://flagcdn.com/w20/es.png" 
-                            alt="Spain flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          Spanish
+                          French
                         </button>
                       </div>
                     </div>
@@ -576,13 +528,6 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                               : 'text-gray-700 hover:bg-gray-50'
                           }`}
                         >
-                          <img 
-                            src="https://flagcdn.com/w20/gb.png" 
-                            alt="UK flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
                           English
                         </button>
                         <button
@@ -593,48 +538,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                               : 'text-gray-700 hover:bg-gray-50'
                           }`}
                         >
-                          <img 
-                            src="https://flagcdn.com/w20/fr.png" 
-                            alt="France flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          France
-                        </button>
-                        <button
-                          onClick={() => handleLanguageChange('DE')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'DE' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          <img 
-                            src="https://flagcdn.com/w20/de.png" 
-                            alt="Germany flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          Germany
-                        </button>
-                        <button
-                          onClick={() => handleLanguageChange('ES')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'ES' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          <img 
-                            src="https://flagcdn.com/w20/es.png" 
-                            alt="Spain flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          Spanish
+                          French
                         </button>
                       </div>
                     </div>
@@ -901,13 +805,6 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                               : 'text-gray-700 hover:bg-gray-50'
                           }`}
                         >
-                          <img 
-                            src="https://flagcdn.com/w20/gb.png" 
-                            alt="UK flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
                           English
                         </button>
                         <button
@@ -918,48 +815,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                               : 'text-gray-700 hover:bg-gray-50'
                           }`}
                         >
-                          <img 
-                            src="https://flagcdn.com/w20/fr.png" 
-                            alt="France flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          France
-                        </button>
-                        <button
-                          onClick={() => handleLanguageChange('DE')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'DE' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          <img 
-                            src="https://flagcdn.com/w20/de.png" 
-                            alt="Germany flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          Germany
-                        </button>
-                        <button
-                          onClick={() => handleLanguageChange('ES')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'ES' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          <img 
-                            src="https://flagcdn.com/w20/es.png" 
-                            alt="Spain flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          Spanish
+                          French
                         </button>
                       </div>
                     </div>
@@ -1058,14 +914,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                                : 'text-gray-700 hover:bg-gray-50'
                            }`}
                          >
-                          <img 
-                            src="https://flagcdn.com/w20/fr.png" 
-                            alt="France flag" 
-                            className="w-5 h-4 mr-3 object-cover rounded-sm"
-                            width="20"
-                            height="16"
-                          />
-                          France
+                          French
                          </button>
                          <button
                            onClick={() => handleLanguageChange('DE')}

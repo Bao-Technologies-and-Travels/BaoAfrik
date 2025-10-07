@@ -16,7 +16,7 @@ const EmailVerification: React.FC = () => {
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  
+
   // Get email from navigation state
   const email = location.state?.email || 'your email';
   const fromRegistration = location.state?.fromRegistration || false;
@@ -33,7 +33,7 @@ const EmailVerification: React.FC = () => {
 
   const handleInputChange = (index: number, value: string) => {
     if (value.length > 1) return; // Only allow single digit
-    
+
     const newCode = [...verificationCode];
     newCode[index] = value;
     setVerificationCode(newCode);
@@ -55,13 +55,13 @@ const EmailVerification: React.FC = () => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').slice(0, 6);
     const newCode = [...verificationCode];
-    
+
     for (let i = 0; i < pastedData.length && i < 6; i++) {
       if (/^\d$/.test(pastedData[i])) {
         newCode[i] = pastedData[i];
       }
     }
-    
+
     setVerificationCode(newCode);
     setError('');
   };
@@ -69,7 +69,7 @@ const EmailVerification: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = verificationCode.join('');
-    
+
     if (code.length !== 6) {
       setError('Please enter all 6 digits');
       return;
@@ -78,61 +78,69 @@ const EmailVerification: React.FC = () => {
     setIsLoading(true);
     setError('');
 
+    // try {
+    //   // TODO: Implement email verification API call
+    //   console.log('Verifying code:', code);
+
+    //   // Simulate API call
+    //   await new Promise(resolve => setTimeout(resolve, 2000));
+
+    //   // On success, redirect to login or dashboard
+    //   console.log('Email verified successfully!');
+
+    //   if (fromRegistration) {
+    //     // If coming from registration, redirect to verification success page
+    //     navigate('/email-verification-success');
+    //   } else {
+    //     // If verifying existing account, redirect to dashboard/profile
+    //     navigate('/profile');
+    //   }
+
+    // } catch (error) {
+    //   setError('Invalid verification code. Please try again.');
+    // } finally {
+    //   setIsLoading(false);
+    // }
+
     try {
-      console.log('Verifying email with code:', code, 'for email:', email);
-      
       const response = await authService.verifyEmail({
-        email: email,
-        verificationCode: code
+        email,
+        verificationCode: code,
       });
-      
-      console.log('Email verification response:', response);
-      
+
       if (response.success) {
         console.log('Email verified successfully!');
-        
         if (fromRegistration) {
-          // If coming from registration, redirect to verification success page
           navigate('/email-verification-success');
         } else {
-          // If verifying existing account, redirect to dashboard/profile
           navigate('/profile');
         }
       } else {
-        setError(response.message || 'Invalid verification code. Please try again.');
+        setError(response.message || 'Invalid verification code.');
       }
-      
-    } catch (error) {
-      console.error('Email verification error:', error);
-      setError('Network error. Please check your connection and try again.');
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setError('Something went wrong. Please try again.');
     }
+
   };
 
   const handleResendCode = async () => {
     if (!canResend) return;
-    
+
     setCanResend(false);
     setCountdown(60);
     setError('');
-    
+
     try {
-      console.log('Resending verification code to:', email);
-      
-      const response = await authService.resendVerificationCode(email);
-      
-      console.log('Resend verification response:', response);
-      
-      if (!response.success) {
-        setError(response.message || 'Failed to resend code. Please try again.');
-        setCanResend(true);
-        setCountdown(0);
-      }
-      
+      // TODO: Implement resend verification code API call
+      console.log('Resending verification code...');
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
     } catch (error) {
-      console.error('Resend verification error:', error);
-      setError('Network error. Failed to resend code. Please try again.');
+      setError('Failed to resend code. Please try again.');
       setCanResend(true);
       setCountdown(0);
     }
@@ -144,9 +152,9 @@ const EmailVerification: React.FC = () => {
       <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8 border-b-2 border-orange-200">
         <div className="flex items-center justify-between">
           <Link to="/">
-            <img 
-              src={logoFull} 
-              alt="BaoAfrik Logo" 
+            <img
+              src={logoFull}
+              alt="BaoAfrik Logo"
               className="h-8 object-contain"
             />
           </Link>
@@ -157,16 +165,16 @@ const EmailVerification: React.FC = () => {
           </button>
         </div>
       </div>
-      
+
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-8 lg:pt-16">
         <div className="w-full max-w-md text-center">
           {/* Mobile Logo - Centered with Background */}
           <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-4 sm:mb-6">
             <div className="text-center">
               <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 mb-4 sm:mb-6">
-                <img 
-                  src={logoSmall} 
-                  alt="BaoAfrik Logo" 
+                <img
+                  src={logoSmall}
+                  alt="BaoAfrik Logo"
                   className="w-full h-full object-contain"
                 />
               </div>
@@ -178,90 +186,89 @@ const EmailVerification: React.FC = () => {
           <p className="text-body text-gray-500 text-sm mb-6 sm:mb-8 px-2">
             We've sent a 6-digit verification code to <span className="font-medium text-gray-700">{email}</span>
           </p>
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
-            <div className="flex items-center">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              <p className="text-xs sm:text-sm text-red-800">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Verification Code Input */}
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
-              Enter verification code
-            </label>
-            <div className="flex justify-between space-x-1 sm:space-x-2">
-              {verificationCode.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => inputRefs.current[index] = el}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleInputChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={index === 0 ? handlePaste : undefined}
-                  className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
-                  disabled={isLoading}
-                />
-              ))}
-            </div>
-          </div>
-
-           <button
-             type="submit"
-             disabled={isLoading || verificationCode.some(digit => !digit)}
-             className={`w-full disabled:cursor-not-allowed font-semibold py-2.5 sm:py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100 text-sm sm:text-base ${
-               verificationCode.every(digit => digit) && !isLoading
-                 ? 'text-white'
-                 : 'bg-gray-200 text-gray-400'
-             }`}
-             style={verificationCode.every(digit => digit) && !isLoading ? { backgroundColor: '#F9A825' } : {}}
-           >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <LoadingSpinner size="md" color="white" className="mr-2" />
-                <span className="text-sm sm:text-base">Verifying...</span>
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+              <div className="flex items-center">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <p className="text-xs sm:text-sm text-red-800">{error}</p>
               </div>
-            ) : (
-              <span className="text-sm sm:text-base">Confirm email address</span>
-            )}
-          </button>
-        </form>
-
-        {/* Resend Code */}
-        <div className="text-center mt-4 sm:mt-6">
-          <p className="text-xs sm:text-sm text-gray-500 mb-2">
-            Didn't receive the code?
-          </p>
-          {canResend ? (
-            <button
-              onClick={handleResendCode}
-              className="text-orange-600 hover:text-orange-500 font-medium text-xs sm:text-sm"
-            >
-              Resend Code
-            </button>
-          ) : (
-            <p className="text-gray-400 text-xs sm:text-sm">
-              Resend code in {countdown}s
-            </p>
+            </div>
           )}
-        </div>
 
-        {/* Back to Login */}
-        <div className="text-center mt-6 sm:mt-8">
-          <Link to="/login" className="text-gray-500 hover:text-gray-700 text-xs sm:text-sm">
-            ← Back to Sign In
-          </Link>
-        </div>
+          {/* Verification Code Input */}
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+                Enter verification code
+              </label>
+              <div className="flex justify-between space-x-1 sm:space-x-2">
+                {verificationCode.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => inputRefs.current[index] = el}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleInputChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    onPaste={index === 0 ? handlePaste : undefined}
+                    className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+                    disabled={isLoading}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading || verificationCode.some(digit => !digit)}
+              className={`w-full disabled:cursor-not-allowed font-semibold py-2.5 sm:py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100 text-sm sm:text-base ${verificationCode.every(digit => digit) && !isLoading
+                  ? 'text-white'
+                  : 'bg-gray-200 text-gray-400'
+                }`}
+              style={verificationCode.every(digit => digit) && !isLoading ? { backgroundColor: '#F9A825' } : {}}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <LoadingSpinner size="md" color="white" className="mr-2" />
+                  <span className="text-sm sm:text-base">Verifying...</span>
+                </div>
+              ) : (
+                <span className="text-sm sm:text-base">Confirm email address</span>
+              )}
+            </button>
+          </form>
+
+          {/* Resend Code */}
+          <div className="text-center mt-4 sm:mt-6">
+            <p className="text-xs sm:text-sm text-gray-500 mb-2">
+              Didn't receive the code?
+            </p>
+            {canResend ? (
+              <button
+                onClick={handleResendCode}
+                className="text-orange-600 hover:text-orange-500 font-medium text-xs sm:text-sm"
+              >
+                Resend Code
+              </button>
+            ) : (
+              <p className="text-gray-400 text-xs sm:text-sm">
+                Resend code in {countdown}s
+              </p>
+            )}
+          </div>
+
+          {/* Back to Login */}
+          <div className="text-center mt-6 sm:mt-8">
+            <Link to="/login" className="text-gray-500 hover:text-gray-700 text-xs sm:text-sm">
+              ← Back to Sign In
+            </Link>
+          </div>
         </div>
       </div>
 

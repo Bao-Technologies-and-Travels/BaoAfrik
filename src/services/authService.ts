@@ -4,11 +4,9 @@ import { apiClient, ApiResponse, User, LoginResponse } from './api';
 export class AuthService {
   // Register new user
   async register(userData: {
-    name: string;
     email: string;
     password: string;
     confirmPassword: string;
-    phoneNumber?: string;
   }): Promise<ApiResponse<{ message: string; userId: string }>> {
     return apiClient.post('/auth/register', userData);
   }
@@ -19,18 +17,29 @@ export class AuthService {
     password: string;
     rememberMe?: boolean;
   }): Promise<ApiResponse<LoginResponse>> {
-    return apiClient.post('/auth/login', credentials);
+    const response = await apiClient.post('/auth/login', credentials);
+
+    console.log('Raw API response:', response);
+    console.log('Response data structure:', response.data);
+
+    const responseData = response.data as any;
+
+    return {
+      success: responseData.success,
+      data: responseData.data,
+      message: responseData.message
+    };
   }
 
   // Logout user
   async logout(): Promise<ApiResponse<{ message: string }>> {
     const response = await apiClient.post<{ message: string }>('/auth/logout');
-    
+
     // Clear local storage regardless of API response
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
-    
+
     return response;
   }
 
@@ -67,24 +76,11 @@ export class AuthService {
   async updateProfile(profileData: {
     firstName?: string;
     lastName?: string;
-    phoneNumber?: string;
+    gender?: string;
+    birthDate?: string;
     profileImage?: string;
   }): Promise<ApiResponse<User>> {
     return apiClient.put('/auth/profile', profileData);
-  }
-
-  // Forgot password
-  async forgotPassword(email: string): Promise<ApiResponse<{ message: string }>> {
-    return apiClient.post('/auth/forgot-password', { email });
-  }
-
-  // Reset password
-  async resetPassword(data: {
-    token: string;
-    newPassword: string;
-    confirmPassword: string;
-  }): Promise<ApiResponse<{ message: string }>> {
-    return apiClient.post('/auth/reset-password', data);
   }
 
   // Upload profile image
