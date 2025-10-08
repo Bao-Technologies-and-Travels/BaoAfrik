@@ -33,3 +33,5 @@ yarn-error.log*
 # Lock files
 package-lock.json
 **/package-lock.json
+
+**/emailService.ts.backup
