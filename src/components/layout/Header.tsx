@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logo from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import logoIcon from '../../assets/images/logos/ba-brand-icon-colored.png';
@@ -17,6 +17,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
   const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
@@ -266,7 +267,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                           <p className="text-sm text-gray-500">My profile</p>
                           <div className="flex items-center justify-between">
                             <h3 className="text-lg font-bold text-gray-900">{user?.name || 'Jean Kameni'}</h3>
-                            <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
+                            <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center" onClick={() => navigate('/profile-setup')}>
                               <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
