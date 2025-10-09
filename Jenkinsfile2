@@ -16,8 +16,8 @@ pipeline {
     }
 
     stages {
-        stage('Setup server dependncies'){
-            steps{
+        stage('Setup server dependncies') {
+            steps {
                 echo 'Setting up server dependencies...'
 
                 sshagent([env.SSH_KEY_ID]) {
@@ -56,7 +56,53 @@ pipeline {
                     '
                     """
                 }
+            }
+        }
 
+        stage('Setup Environment') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'db_url', variable: 'DATABASE_URL'),
+                    string(credentialsId: 'jwt_secret', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'jwt_refresh_secret', variable: 'JWT_REFRESH_SECRET'),
+                    string(credentialsId: 'resend_api_key', variable: 'RESEND_API_KEY'),
+                ]) {
+                    sshagent([env.SSH_KEY_ID]) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                            cd ${BACKEND_DIR}
+
+                            # Create .env file with actual secrets
+                            cat > .env << EOF
+NODE_ENV=staging
+PORT=3001
+DATABASE_URL="${DATABASE_URL}"
+JWT_SECRET="${JWT_SECRET}"
+JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}"
+JWT_EXPIRE_TIME="30m"
+JWT_REFRESH_EXPIRE_TIME="7d"
+EMAIL_SERVICE="resend"
+RESEND_API_KEY="${RESEND_API_KEY}"
+EMAIL_FROM_ADDRESS="noreply@baoafrik.com"
+EMAIL_FROM_NAME="BaoAfrik Team"
+STORAGE_SERVICE="cloudinary"
+CLOUDINARY_CLOUD_NAME="${CLOUDINARY_CLOUD_NAME}"
+CLOUDINARY_API_KEY="${CLOUDINARY_API_KEY}"
+CLOUDINARY_API_SECRET="${CLOUDINARY_API_SECRET}"
+FRONTEND_URL="https://${DOMAIN}"
+CORS_ORIGINS="https://${DOMAIN}"
+BCRYPT_ROUNDS=12
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+EOF
+
+                            # Set secure permissions
+                            chmod 600 .env
+                            echo "Environment file created securely."
+                        '
+                        """
+                    }
+                }
             }
         }
 
@@ -78,7 +124,6 @@ pipeline {
                         echo "starting backend deployment..."
 
                         cd ${BACKEND_DIR}
-                        mv .env.example .env
                         rm -rf node_modules package-lock.json
 
                         npm install
@@ -125,13 +170,13 @@ pipeline {
         //             sh """
         //             ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
         //                 set -e  # Exit on error
-                        
+
         //                 # Create nginx configuration
         //                 sudo bash -c "cat > /etc/nginx/sites-available/${DOMAIN}" << EOL
         //                 server {
         //                     listen 80;
         //                     server_name staging.baoafrik.com;
-                            
+
         //                     location / {
         //                         proxy_pass http://localhost:3000;
         //                         proxy_set_header Host \\$host;
@@ -139,7 +184,7 @@ pipeline {
         //                         proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
         //                         proxy_set_header X-Forwarded-Proto \\$scheme;
         //                     }
-                            
+
         //                     location /api/ {
         //                         proxy_pass http://localhost:3001;
         //                         proxy_set_header Host \\$host;
@@ -227,7 +272,7 @@ pipeline {
             emailext(
                 subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - ${currentBuild.currentResult}!",
                 from: 'ashprincepageo@gmail.com',
-                to: 'pageo.fonsah@baotechnologiesandtravels.com',
+                to: "${EMAIL}",
                 mimeType: 'text/html',
                 body: """
                     <html>
