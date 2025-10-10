@@ -6,6 +6,7 @@ import logoLarge from '../../assets/images/logos/Frame 656.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { authService } from '../../services/authService';
 import { log } from 'console';
+import generate from '@babel/generator';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -77,20 +78,36 @@ const Login: React.FC = () => {
 
     if (!email.trim()) {
       newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = 'Please enter a valid email address of format name@example.com'
     }
+
     if (!password) {
       newErrors.password = 'Password is required';
     } else if (password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters long';
-    } else if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
-      newErrors.password = 'Password must contain both letters and numbers';
+    } else if (!/(?=.*[a-z])/.test(password)) {
+      newErrors.password = 'Password must contain at least one lowercase letter';
+    } else if (!/(?=.*[A-Z])/.test(password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter';
+    } else if (!/(?=.*\d)/.test(password)) {
+      newErrors.password = 'Password must contain at least one number';
+    } else if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password)) {
+      newErrors.password = 'Password must contain at least one special character';
     }
 
     // Show password requirements if password field has content but criteria not met
-    if (password && password.length > 0 && password.length < 8) {
-      newErrors.passwordHint = 'Password must be at least 8 characters with letters and numbers';
-    } else if (password && password.length >= 8 && !/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
-      newErrors.passwordHint = 'Password must contain both letters and numbers';
+    if (password && password.length > 0) {
+      const requirements = [];
+      if (password.length < 8) requirements.push('at least 8 characters');
+      if (!/(?=.*[a-z])/.test(password)) requirements.push('one lowercase letter');
+      if (!/(?=.*[A-Z])/.test(password)) requirements.push('one uppercase letter');
+      if (!/(?=.*\d)/.test(password)) requirements.push('one number');
+      if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password)) requirements.push('one special character');
+
+      if (requirements.length > 0) {
+        newErrors.passwordHint = `Password must contain: ${requirements.join(', ')}`;
+      }
     }
 
     setErrors(newErrors);
@@ -106,41 +123,92 @@ const Login: React.FC = () => {
     setErrors({});
     setSuccessMessage('');
 
-    try {
-      const response = await authService.login({ email, password });
-      console.log('Login response:', response);
-
-      if (!response.success || !response.data) {
-        throw new Error(response.message || 'Invalid backend response');
-      }
-
-      const { user, accessToken, refreshToken } = response.data; 
-
+    // Move completeLogin outside so it's accessible in both paths
+    const completeLogin = async (user: any, accessToken: string, refreshToken?: string) => {
+      // Store tokens and user data
       localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
+      }
       localStorage.setItem('user', JSON.stringify(user));
 
+      // Handle remember me
       if (rememberMe) {
         rememberMeService.saveRememberedEmail(email);
       } else {
         rememberMeService.clearRememberedEmail();
       }
 
+      // Update auth context
       login({
         id: user.id,
-        name: user.name,
         email: user.email,
+        firstName: user.firstName || undefined,
+        lastName: user.lastName || undefined,
         profileImage: user.profileImage,
       });
 
       navigate('/');
+    };
+
+    try {
+      console.log(' COMPONENT: Calling authService.login');
+      const response = await authService.login({
+        email: email.toLowerCase(),
+        password,
+        rememberMe
+      });
+
+      console.log(' COMPONENT: Response from authService:', response);
+
+      if (!response.success) {
+        // Handle error cases
+        if (response.message === 'User does not exist') {
+          setErrors({
+            email: 'No account found with this email address.'
+          });
+        } else if (response.message === 'Invalid password') {
+          setErrors({
+            password: 'Incorrect password. Please try again.'
+          });
+        } else {
+          throw new Error(response.message || 'Login failed');
+        }
+        return;
+      }
+
+      const loginData = response.data;
+
+      if (!loginData) {
+        throw new Error('No login data received from server');
+      }
+
+      const { user, accessToken, refreshToken } = loginData;
+
+      console.log(' COMPONENT: Extracted data:', {
+        user,
+        hasAccessToken: !!accessToken,
+        hasUser: !!user
+      });
+
+      if (!user || !accessToken) {
+        const nestedData = (loginData as any).data;
+        if (nestedData) {
+          const { user: nestedUser, accessToken: nestedAccessToken, refreshToken: nestedRefreshToken } = nestedData;
+          if (nestedUser && nestedAccessToken) {
+            // Use the nested data
+            await completeLogin(nestedUser, nestedAccessToken, nestedRefreshToken);
+            return;
+          }
+        }
+        throw new Error('Missing user data or access token');
+      }
+
+      await completeLogin(user, accessToken, refreshToken);
+
     } catch (error: any) {
       console.error('Login failed:', error);
-      const message =
-        error.message ||
-        error.response?.data?.message ||
-        'Login failed. Please check your credentials and try again.';
-      setErrors({ general: message });
+      setErrors({ general: error.message || 'Login failed. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -253,7 +321,6 @@ const Login: React.FC = () => {
                     autoComplete="current-password"
                     required
                     minLength={8}
-                    pattern="^(?=.*[a-zA-Z])(?=.*\d).{8,}$"
                     disabled={isLoading}
                     className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.password ? 'border-red-500' : 'border-gray-200'
                       }`}

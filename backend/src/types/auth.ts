@@ -1,7 +1,8 @@
 export interface User {
   id: string;
-  name: string;
   email: string;
+  firstName?: string;
+  lastName?: string;
   phoneNumber?: string;
   profileImage?: string;
   emailVerified: boolean;
@@ -15,7 +16,6 @@ export interface User {
 }
 
 export interface RegisterRequest {
-  name: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -30,8 +30,9 @@ export interface LoginRequest {
 
 export interface PublicUser {
   id: string;
-  name: string;
   email: string;
+  firstName?: string;
+  lastName?: string;
   phoneNumber?: string;
   profileImage?: string;
   emailVerified: boolean;

@@ -12,7 +12,8 @@ export interface ApiResponse<T = any> {
 export interface User {
   id: string;
   email: string;
-  name: string;
+  firstName?: string;
+  lastName?: string;
   profileImage?: string;
   gender?: string;
   birthDate?: string;

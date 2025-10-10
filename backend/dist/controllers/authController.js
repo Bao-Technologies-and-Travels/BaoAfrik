@@ -13,7 +13,7 @@ const emailService_1 = require("../utils/emailService");
 const logger_1 = __importDefault(require("../config/logger"));
 const prisma = new client_1.PrismaClient();
 exports.register = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
-    const { name, email, password, confirmPassword, phoneNumber } = req.body;
+    const { email, password, confirmPassword, phoneNumber } = req.body;
     if (password !== confirmPassword) {
         throw (0, errorMiddleware_2.createValidationError)('Passwords do not match');
     }
@@ -29,7 +29,6 @@ exports.register = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const user = await prisma.user.create({
         data: {
-            name,
             email: email.toLowerCase(),
             phoneNumber,
             passwordHash,
@@ -39,7 +38,6 @@ exports.register = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
         },
         select: {
             id: true,
-            name: true,
             email: true,
             phoneNumber: true,
             emailVerified: true,
@@ -47,7 +45,7 @@ exports.register = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
         }
     });
     try {
-        await (0, emailService_1.sendVerificationEmail)(user.email, user.name, verificationCode);
+        await (0, emailService_1.sendVerificationEmail)(user.email, verificationCode);
     }
     catch (error) {
         logger_1.default.error('Failed to send verification email:', error);
@@ -68,6 +66,7 @@ exports.register = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
 });
 exports.login = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
     const { email, password, rememberMe = false } = req.body;
+    console.log('BACKEND: Login attempt for:', email);
     const user = await prisma.user.findUnique({
         where: {
             email: email.toLowerCase(),
@@ -75,8 +74,9 @@ exports.login = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
         },
         select: {
             id: true,
-            name: true,
             email: true,
+            firstName: true,
+            lastName: true,
             phoneNumber: true,
             passwordHash: true,
             profileImage: true,
@@ -86,12 +86,15 @@ exports.login = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
             lastLoginAt: true,
         }
     });
+    console.log('BACKEND: User found:', user);
+    console.log('BACKEND: firstName value:', user?.firstName);
+    console.log('BACKEND: lastName value:', user?.lastName);
     if (!user || !user.passwordHash) {
         throw (0, errorMiddleware_2.createUnauthorizedError)('Invalid email or password');
     }
     const isPasswordValid = await bcryptjs_1.default.compare(password, user.passwordHash);
     if (!isPasswordValid) {
-        throw (0, errorMiddleware_2.createUnauthorizedError)('Invalid email or password');
+        throw (0, errorMiddleware_2.createUnauthorizedError)('Invalid password');
     }
     if (!user.emailVerified) {
         throw (0, errorMiddleware_2.createUnauthorizedError)('Please verify your email before logging in');
@@ -112,8 +115,9 @@ exports.login = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
     });
     const publicUser = {
         id: user.id,
-        name: user.name,
         email: user.email,
+        firstName: user.firstName || undefined,
+        lastName: user.lastName || undefined,
         phoneNumber: user.phoneNumber || undefined,
         profileImage: user.profileImage || undefined,
         emailVerified: user.emailVerified,
@@ -244,7 +248,7 @@ exports.resendVerificationCode = (0, errorMiddleware_1.asyncHandler)(async (req,
         }
     });
     try {
-        await (0, emailService_1.sendVerificationEmail)(user.email, user.name, verificationCode);
+        await (0, emailService_1.sendVerificationEmail)(user.email, verificationCode);
     }
     catch (error) {
         logger_1.default.error('Failed to resend verification email:', error);
@@ -268,8 +272,9 @@ exports.getCurrentUser = (0, errorMiddleware_1.asyncHandler)(async (req, res) =>
         where: { id: req.user.id },
         select: {
             id: true,
-            name: true,
             email: true,
+            firstName: true,
+            lastName: true,
             phoneNumber: true,
             profileImage: true,
             emailVerified: true,
@@ -304,8 +309,9 @@ exports.updateProfile = (0, errorMiddleware_1.asyncHandler)(async (req, res) => 
         },
         select: {
             id: true,
-            name: true,
             email: true,
+            firstName: true,
+            lastName: true,
             phoneNumber: true,
             profileImage: true,
             emailVerified: true,
@@ -342,7 +348,7 @@ exports.forgotPassword = (0, errorMiddleware_1.asyncHandler)(async (req, res) =>
             }
         });
         try {
-            await (0, emailService_1.sendPasswordResetEmail)(user.email, user.name, resetToken);
+            await (0, emailService_1.sendPasswordResetEmail)(user.email, resetToken);
         }
         catch (error) {
             logger_1.default.error('Failed to send password reset email:', error);

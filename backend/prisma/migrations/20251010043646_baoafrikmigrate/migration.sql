@@ -1,11 +1,12 @@
 -- CreateEnum
-CREATE TYPE "public"."MessageType" AS ENUM ('INQUIRY', 'NEGOTIATION', 'ORDER', 'COMPLAINT', 'GENERAL');
+CREATE TYPE "MessageType" AS ENUM ('INQUIRY', 'NEGOTIATION', 'ORDER', 'COMPLAINT', 'GENERAL');
 
 -- CreateTable
-CREATE TABLE "public"."users" (
+CREATE TABLE "users" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "firstName" TEXT,
+    "lastName" TEXT,
     "phone_number" TEXT,
     "password_hash" TEXT,
     "profile_image" TEXT,
@@ -28,7 +29,7 @@ CREATE TABLE "public"."users" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."refresh_tokens" (
+CREATE TABLE "refresh_tokens" (
     "id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
@@ -39,7 +40,7 @@ CREATE TABLE "public"."refresh_tokens" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."products" (
+CREATE TABLE "products" (
     "id" TEXT NOT NULL,
     "seller_id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -67,7 +68,7 @@ CREATE TABLE "public"."products" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."product_likes" (
+CREATE TABLE "product_likes" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
@@ -77,7 +78,7 @@ CREATE TABLE "public"."product_likes" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."product_saves" (
+CREATE TABLE "product_saves" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
@@ -87,7 +88,7 @@ CREATE TABLE "public"."product_saves" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."messages" (
+CREATE TABLE "messages" (
     "id" TEXT NOT NULL,
     "sender_id" TEXT NOT NULL,
     "receiver_id" TEXT NOT NULL,
@@ -95,7 +96,7 @@ CREATE TABLE "public"."messages" (
     "subject" TEXT,
     "content" TEXT NOT NULL,
     "is_read" BOOLEAN NOT NULL DEFAULT false,
-    "message_type" "public"."MessageType" NOT NULL DEFAULT 'INQUIRY',
+    "message_type" "MessageType" NOT NULL DEFAULT 'INQUIRY',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -103,7 +104,7 @@ CREATE TABLE "public"."messages" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."categories" (
+CREATE TABLE "categories" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
@@ -118,7 +119,7 @@ CREATE TABLE "public"."categories" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."countries" (
+CREATE TABLE "countries" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "code" TEXT NOT NULL,
@@ -131,52 +132,52 @@ CREATE TABLE "public"."countries" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_email_key" ON "public"."users"("email");
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "refresh_tokens_token_key" ON "public"."refresh_tokens"("token");
+CREATE UNIQUE INDEX "refresh_tokens_token_key" ON "refresh_tokens"("token");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "product_likes_user_id_product_id_key" ON "public"."product_likes"("user_id", "product_id");
+CREATE UNIQUE INDEX "product_likes_user_id_product_id_key" ON "product_likes"("user_id", "product_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "product_saves_user_id_product_id_key" ON "public"."product_saves"("user_id", "product_id");
+CREATE UNIQUE INDEX "product_saves_user_id_product_id_key" ON "product_saves"("user_id", "product_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "categories_name_key" ON "public"."categories"("name");
+CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "categories_slug_key" ON "public"."categories"("slug");
+CREATE UNIQUE INDEX "categories_slug_key" ON "categories"("slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "countries_name_key" ON "public"."countries"("name");
+CREATE UNIQUE INDEX "countries_name_key" ON "countries"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "countries_code_key" ON "public"."countries"("code");
+CREATE UNIQUE INDEX "countries_code_key" ON "countries"("code");
 
 -- AddForeignKey
-ALTER TABLE "public"."refresh_tokens" ADD CONSTRAINT "refresh_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."products" ADD CONSTRAINT "products_seller_id_fkey" FOREIGN KEY ("seller_id") REFERENCES "public"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "products" ADD CONSTRAINT "products_seller_id_fkey" FOREIGN KEY ("seller_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."product_likes" ADD CONSTRAINT "product_likes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "product_likes" ADD CONSTRAINT "product_likes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."product_likes" ADD CONSTRAINT "product_likes_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "product_likes" ADD CONSTRAINT "product_likes_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."product_saves" ADD CONSTRAINT "product_saves_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "product_saves" ADD CONSTRAINT "product_saves_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."product_saves" ADD CONSTRAINT "product_saves_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "product_saves" ADD CONSTRAINT "product_saves_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."messages" ADD CONSTRAINT "messages_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "public"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "messages" ADD CONSTRAINT "messages_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."messages" ADD CONSTRAINT "messages_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "public"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "messages" ADD CONSTRAINT "messages_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."messages" ADD CONSTRAINT "messages_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "messages" ADD CONSTRAINT "messages_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE SET NULL ON UPDATE CASCADE;

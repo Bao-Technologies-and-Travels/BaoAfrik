@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { Prisma } from '@prisma/client';
 export interface AppError extends Error {
     statusCode: number;
     isOperational: boolean;
@@ -10,7 +9,7 @@ export declare class CustomError extends Error implements AppError {
     constructor(message: string, statusCode?: number, isOperational?: boolean);
 }
 export declare const notFound: (req: Request, res: Response, next: NextFunction) => void;
-export declare const errorHandler: (error: Error | AppError | Prisma.PrismaClientKnownRequestError, req: Request, res: Response, next: NextFunction) => void;
+export declare const errorHandler: (error: unknown, req: Request, res: Response, next: NextFunction) => void;
 export declare const asyncHandler: (fn: Function) => (req: Request, res: Response, next: NextFunction) => void;
 export declare const createValidationError: (message: string, field?: string) => CustomError;
 export declare const createNotFoundError: (resource?: string) => CustomError;

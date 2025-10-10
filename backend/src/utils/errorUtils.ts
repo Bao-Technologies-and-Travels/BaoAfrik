@@ -47,6 +47,19 @@ export const createTooManyRequestsError = (message: string = 'Too many requests'
   return new AppError(message, 429, 'TOO_MANY_REQUESTS');
 };
 
+export class CustomError extends Error {
+  statusCode: number;
+  isOperational: boolean;
+
+  constructor(message: string, statusCode: number = 500, isOperational: boolean = true) {
+    super(message);
+    this.statusCode = statusCode;
+    this.isOperational = isOperational;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
 /**
  * Check if error is operational (known error vs programming error)
  */

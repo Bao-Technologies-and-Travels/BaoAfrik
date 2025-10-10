@@ -2,18 +2,18 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { asyncHandler } from '@/middleware/errorMiddleware';
-import { 
-  createValidationError, 
+import {
+  createValidationError,
   createUnauthorizedError,
-  createConflictError 
+  createConflictError
 } from '@/middleware/errorMiddleware';
-import { 
-  generateTokenPair, 
+import {
+  generateTokenPair,
   verifyRefreshToken,
   generateVerificationCode,
-  generateSecureToken 
+  generateSecureToken
 } from '@/utils/jwtUtils';
-import { 
+import {
   RegisterRequest,
   LoginRequest,
   LoginResponse,
@@ -25,7 +25,7 @@ import {
   ChangePasswordRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
-  ApiResponse 
+  ApiResponse
 } from '@/types/auth';
 import { sendVerificationEmail, sendPasswordResetEmail } from '@/utils/emailService';
 import logger from '@/config/logger';
@@ -36,7 +36,7 @@ const prisma = new PrismaClient();
  * Register new user
  */
 export const register = asyncHandler(async (req: Request<{}, {}, RegisterRequest>, res: Response) => {
-  const { name, email, password, confirmPassword, phoneNumber } = req.body;
+  const { email, password, confirmPassword, phoneNumber } = req.body;
 
   // Check if passwords match
   if (password !== confirmPassword) {
@@ -63,7 +63,6 @@ export const register = asyncHandler(async (req: Request<{}, {}, RegisterRequest
   // Create user
   const user = await prisma.user.create({
     data: {
-      name,
       email: email.toLowerCase(),
       phoneNumber,
       passwordHash,
@@ -73,7 +72,6 @@ export const register = asyncHandler(async (req: Request<{}, {}, RegisterRequest
     },
     select: {
       id: true,
-      name: true,
       email: true,
       phoneNumber: true,
       emailVerified: true,
@@ -83,23 +81,23 @@ export const register = asyncHandler(async (req: Request<{}, {}, RegisterRequest
 
   // Send verification email
   try {
-    await sendVerificationEmail(user.email, user.name, verificationCode);
+    await sendVerificationEmail(user.email, verificationCode);
   } catch (error) {
     logger.error('Failed to send verification email:', error);
     // Don't fail registration if email sending fails
   }
 
-  logger.info('User registered successfully', { 
-    userId: user.id, 
-    email: user.email 
+  logger.info('User registered successfully', {
+    userId: user.id,
+    email: user.email
   });
 
   const response: ApiResponse = {
     success: true,
     message: 'Registration successful. Please check your email for verification code.',
-    data: { 
+    data: {
       message: 'Registration successful. Please check your email for verification code.',
-      userId: user.id 
+      userId: user.id
     }
   };
 
@@ -112,16 +110,19 @@ export const register = asyncHandler(async (req: Request<{}, {}, RegisterRequest
 export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res: Response) => {
   const { email, password, rememberMe = false } = req.body;
 
+  console.log('BACKEND: Login attempt for:', email);
+
   // Find user with password
   const user = await prisma.user.findUnique({
-    where: { 
+    where: {
       email: email.toLowerCase(),
-      isActive: true 
+      isActive: true
     },
     select: {
       id: true,
-      name: true,
       email: true,
+      firstName: true,
+      lastName: true,
       phoneNumber: true,
       passwordHash: true,
       profileImage: true,
@@ -132,6 +133,10 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
     }
   });
 
+  console.log('BACKEND: User found:', user);
+  console.log('BACKEND: firstName value:', user?.firstName);
+  console.log('BACKEND: lastName value:', user?.lastName);
+
   if (!user || !user.passwordHash) {
     throw createUnauthorizedError('Invalid email or password');
   }
@@ -139,7 +144,7 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
   // Verify password
   const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
   if (!isPasswordValid) {
-    throw createUnauthorizedError('Invalid email or password');
+    throw createUnauthorizedError('Invalid password');
   }
 
   // Check email verification
@@ -172,8 +177,9 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
   // Create public user object
   const publicUser: PublicUser = {
     id: user.id,
-    name: user.name,
     email: user.email,
+    firstName: user.firstName || undefined,
+    lastName: user.lastName || undefined,
     phoneNumber: user.phoneNumber || undefined,
     profileImage: user.profileImage || undefined,
     emailVerified: user.emailVerified,
@@ -182,10 +188,10 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
     lastLoginAt: user.lastLoginAt || undefined,
   };
 
-  logger.info('User logged in successfully', { 
-    userId: user.id, 
+  logger.info('User logged in successfully', {
+    userId: user.id,
     email: user.email,
-    rememberMe 
+    rememberMe
   });
 
   const responseData: LoginResponse = {
@@ -245,7 +251,7 @@ export const refreshToken = asyncHandler(async (req: Request<{}, {}, RefreshToke
 
   // Check if refresh token exists in database and is not expired
   const storedToken = await prisma.refreshToken.findUnique({
-    where: { 
+    where: {
       token: refreshToken,
       expiresAt: { gt: new Date() }
     },
@@ -267,12 +273,12 @@ export const refreshToken = asyncHandler(async (req: Request<{}, {}, RefreshToke
 
   // Generate new access token
   const { accessToken: newAccessToken } = generateTokenPair(
-    storedToken.user.id, 
+    storedToken.user.id,
     storedToken.user.email
   );
 
-  logger.info('Token refreshed successfully', { 
-    userId: storedToken.user.id 
+  logger.info('Token refreshed successfully', {
+    userId: storedToken.user.id
   });
 
   const response: ApiResponse = {
@@ -293,7 +299,7 @@ export const verifyEmail = asyncHandler(async (req: Request<{}, {}, EmailVerific
   const { email, verificationCode } = req.body;
 
   const user = await prisma.user.findUnique({
-    where: { 
+    where: {
       email: email.toLowerCase(),
       emailVerificationCode: verificationCode,
       emailVerificationExpires: { gt: new Date() }
@@ -314,9 +320,9 @@ export const verifyEmail = asyncHandler(async (req: Request<{}, {}, EmailVerific
     }
   });
 
-  logger.info('Email verified successfully', { 
-    userId: user.id, 
-    email: user.email 
+  logger.info('Email verified successfully', {
+    userId: user.id,
+    email: user.email
   });
 
   const response: ApiResponse = {
@@ -334,9 +340,9 @@ export const resendVerificationCode = asyncHandler(async (req: Request<{}, {}, R
   const { email } = req.body;
 
   const user = await prisma.user.findUnique({
-    where: { 
+    where: {
       email: email.toLowerCase(),
-      emailVerified: false 
+      emailVerified: false
     }
   });
 
@@ -359,15 +365,15 @@ export const resendVerificationCode = asyncHandler(async (req: Request<{}, {}, R
 
   // Send verification email
   try {
-    await sendVerificationEmail(user.email, user.name, verificationCode);
+    await sendVerificationEmail(user.email, verificationCode);
   } catch (error) {
     logger.error('Failed to resend verification email:', error);
     throw new Error('Failed to send verification email');
   }
 
-  logger.info('Verification code resent', { 
-    userId: user.id, 
-    email: user.email 
+  logger.info('Verification code resent', {
+    userId: user.id,
+    email: user.email
   });
 
   const response: ApiResponse = {
@@ -390,8 +396,9 @@ export const getCurrentUser = asyncHandler(async (req: Request, res: Response) =
     where: { id: req.user.id },
     select: {
       id: true,
-      name: true,
       email: true,
+      firstName: true,
+      lastName: true,
       phoneNumber: true,
       profileImage: true,
       emailVerified: true,
@@ -424,7 +431,7 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
   }
 
   const { firstName, lastName, phoneNumber, profileImage } = req.body;
-  
+
   // Combine first and last name if provided
   const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;
 
@@ -437,8 +444,9 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
     },
     select: {
       id: true,
-      name: true,
       email: true,
+      firstName: true,
+      lastName: true,
       phoneNumber: true,
       profileImage: true,
       emailVerified: true,
@@ -450,8 +458,8 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
     }
   });
 
-  logger.info('Profile updated successfully', { 
-    userId: req.user.id 
+  logger.info('Profile updated successfully', {
+    userId: req.user.id
   });
 
   const response: ApiResponse = {
@@ -487,7 +495,7 @@ export const forgotPassword = asyncHandler(async (req: Request<{}, {}, ForgotPas
     });
 
     try {
-      await sendPasswordResetEmail(user.email, user.name, resetToken);
+      await sendPasswordResetEmail(user.email, resetToken);
     } catch (error) {
       logger.error('Failed to send password reset email:', error);
       // Do not leak errors to client to prevent token enumeration
@@ -598,8 +606,8 @@ export const changePassword = asyncHandler(async (req: Request<{}, {}, ChangePas
     where: { userId: req.user.id }
   });
 
-  logger.info('Password changed successfully', { 
-    userId: req.user.id 
+  logger.info('Password changed successfully', {
+    userId: req.user.id
   });
 
   const response: ApiResponse = {

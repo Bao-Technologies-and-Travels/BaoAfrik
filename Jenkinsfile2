@@ -269,7 +269,7 @@ EOF
             emailext(
                 subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - ${currentBuild.currentResult}!",
                 from: 'ashprincepageo@gmail.com',
-                to: "${EMAIL}",
+                to: "${env.EMAIL}",
                 mimeType: 'text/html',
                 body: """
                     <html>

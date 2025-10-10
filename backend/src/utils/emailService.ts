@@ -349,8 +349,8 @@ class EmailService {
     return { subject, html, text };
   }
 
-  async sendVerificationEmail(email: string, name: string, verificationCode: string): Promise<boolean> {
-    const template = this.getVerificationEmailTemplate(name, verificationCode);
+  async sendVerificationEmail(email: string, verificationCode: string): Promise<boolean> {
+    const template = this.getVerificationEmailTemplate(email, verificationCode);
 
     return await this.sendEmail({
       to: email,
@@ -360,8 +360,8 @@ class EmailService {
     });
   }
 
-  async sendPasswordResetEmail(email: string, name: string, resetToken: string): Promise<boolean> {
-    const template = this.getPasswordResetEmailTemplate(name, resetToken);
+  async sendPasswordResetEmail(email: string, resetToken: string): Promise<boolean> {
+    const template = this.getPasswordResetEmailTemplate(email, resetToken);
 
     return await this.sendEmail({
       to: email,

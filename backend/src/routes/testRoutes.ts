@@ -86,7 +86,7 @@ router.post('/send-email', async (req: Request, res: Response) => {
     // Generate a test verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     
-    const emailSent = await sendVerificationEmail(email, name, verificationCode);
+    const emailSent = await sendVerificationEmail(email, verificationCode);
     
     if (emailSent) {
       return res.json({

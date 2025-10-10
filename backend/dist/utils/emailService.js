@@ -6,8 +6,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.testEmailConnection = exports.sendWelcomeEmail = exports.sendPasswordResetEmail = exports.sendVerificationEmail = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const logger_1 = __importDefault(require("../config/logger"));
+const resend_1 = require("resend");
 class EmailService {
     constructor() {
+        this.transporter = null;
+        this.resend = null;
+        this.emailService = process.env.EMAIL_SERVICE || 'smtp';
+        switch (this.emailService) {
+            case 'resend':
+                this.setupResend();
+                break;
+            case 'sendgrid':
+                this.setupSendGrid();
+                break;
+            default:
+                this.setupSMTP();
+                break;
+        }
+    }
+    setupSMTP() {
         this.transporter = nodemailer_1.default.createTransport({
             host: process.env.SMTP_HOST || 'smtp.gmail.com',
             port: parseInt(process.env.SMTP_PORT || '587'),
@@ -21,18 +38,6 @@ class EmailService {
             }
         });
         this.verifyConnection();
-        if (process.env.EMAIL_SERVICE === 'sendgrid') {
-            this.setupSendGrid();
-        }
-    }
-    async verifyConnection() {
-        try {
-            await this.transporter.verify();
-            logger_1.default.info('SMTP connection verified successfully');
-        }
-        catch (error) {
-            logger_1.default.error('SMTP connection verification failed:', error);
-        }
     }
     setupSendGrid() {
         this.transporter = nodemailer_1.default.createTransport({
@@ -43,28 +48,68 @@ class EmailService {
             },
         });
     }
+    setupResend() {
+        if (!process.env.RESEND_API_KEY) {
+            logger_1.default.error('RESEND_API_KEY is not set');
+            return;
+        }
+        this.resend = new resend_1.Resend(process.env.RESEND_API_KEY);
+        logger_1.default.info('Resend email service initialized');
+    }
+    async verifyConnection() {
+        if (!this.transporter)
+            return;
+        try {
+            await this.transporter.verify();
+            logger_1.default.info('SMTP connection verified successfully');
+        }
+        catch (error) {
+            logger_1.default.error('SMTP connection verification failed:', error);
+        }
+    }
     async sendEmail(options) {
         try {
-            const mailOptions = {
-                from: `${process.env.EMAIL_FROM_NAME || 'BaoAfrik Team'} <${process.env.EMAIL_FROM_ADDRESS}>`,
-                to: options.to,
-                subject: options.subject,
-                html: options.html,
-                text: options.text,
-            };
-            const info = await this.transporter.sendMail(mailOptions);
-            logger_1.default.info('Email sent successfully', {
-                messageId: info.messageId,
-                to: options.to,
-                subject: options.subject,
-            });
-            return true;
+            if (this.emailService === 'resend' && this.resend) {
+                const result = await this.resend.emails.send({
+                    from: `${process.env.EMAIL_FROM_NAME || 'BaoAfrik Team'} <${process.env.EMAIL_FROM_ADDRESS}>`,
+                    to: options.to,
+                    subject: options.subject,
+                    html: options.html,
+                    text: options.text,
+                });
+                if (result.error) {
+                    throw new Error(result.error.message);
+                }
+                logger_1.default.info('Email sent successfully via Resend', {
+                    to: options.to,
+                    subject: options.subject,
+                });
+                return true;
+            }
+            if (this.transporter) {
+                const mailOptions = {
+                    from: `${process.env.EMAIL_FROM_NAME || 'BaoAfrik Team'} <${process.env.EMAIL_FROM_ADDRESS}>`,
+                    to: options.to,
+                    subject: options.subject,
+                    html: options.html,
+                    text: options.text,
+                };
+                const info = await this.transporter.sendMail(mailOptions);
+                logger_1.default.info('Email sent successfully via SMTP', {
+                    messageId: info.messageId,
+                    to: options.to,
+                    subject: options.subject,
+                });
+                return true;
+            }
+            throw new Error('No email service configured');
         }
         catch (error) {
             logger_1.default.error('Failed to send email', {
                 error: error instanceof Error ? error.message : 'Unknown error',
                 to: options.to,
                 subject: options.subject,
+                service: this.emailService,
             });
             return false;
         }
@@ -270,8 +315,8 @@ class EmailService {
     `;
         return { subject, html, text };
     }
-    async sendVerificationEmail(email, name, verificationCode) {
-        const template = this.getVerificationEmailTemplate(name, verificationCode);
+    async sendVerificationEmail(email, verificationCode) {
+        const template = this.getVerificationEmailTemplate(email, verificationCode);
         return await this.sendEmail({
             to: email,
             subject: template.subject,
@@ -279,8 +324,8 @@ class EmailService {
             text: template.text,
         });
     }
-    async sendPasswordResetEmail(email, name, resetToken) {
-        const template = this.getPasswordResetEmailTemplate(name, resetToken);
+    async sendPasswordResetEmail(email, resetToken) {
+        const template = this.getPasswordResetEmailTemplate(email, resetToken);
         return await this.sendEmail({
             to: email,
             subject: template.subject,
@@ -407,9 +452,24 @@ class EmailService {
     }
     async testEmailConnection() {
         try {
-            await this.transporter.verify();
-            logger_1.default.info('Email service connection test successful');
-            return true;
+            if (this.emailService === 'resend') {
+                if (this.resend) {
+                    const result = await this.resend.emails.send({
+                        from: `${process.env.EMAIL_FROM_NAME || 'BaoAfrik Team'} <${process.env.EMAIL_FROM_ADDRESS}>`,
+                        to: process.env.EMAIL_FROM_ADDRESS,
+                        subject: 'BaoAfrik Email Test',
+                        html: '<p>This is a test email from BaoAfrik</p>',
+                    });
+                    return !result.error;
+                }
+                return false;
+            }
+            else if (this.transporter) {
+                await this.transporter.verify();
+                logger_1.default.info('Email service connection test successful');
+                return true;
+            }
+            return false;
         }
         catch (error) {
             logger_1.default.error('Email service connection test failed:', error);

@@ -69,7 +69,7 @@ router.post('/send-email', async (req, res) => {
             });
         }
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        const emailSent = await (0, emailService_1.sendVerificationEmail)(email, name, verificationCode);
+        const emailSent = await (0, emailService_1.sendVerificationEmail)(email, verificationCode);
         if (emailSent) {
             return res.json({
                 success: true,

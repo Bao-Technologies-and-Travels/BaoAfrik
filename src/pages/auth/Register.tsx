@@ -22,9 +22,6 @@ const Register: React.FC = () => {
     const newErrors: { [key: string]: string } = {};
 
     // Required field validation
-    if (!formData.name.trim()) {
-      newErrors.email = 'Name is required';
-    }
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     }
@@ -131,22 +128,6 @@ const Register: React.FC = () => {
           <form className="mt-6 sm:mt-8 space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4 sm:space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.email ? 'border-red-500' : 'border-gray-200'
-                    }`}
-                    placeholder={"Enter your full name"}
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
-              <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email address
                 </label>
@@ -180,7 +161,6 @@ const Register: React.FC = () => {
                     autoComplete="new-password"
                     required
                     minLength={8}
-                    pattern="^(?=.*[a-zA-Z])(?=.*\d).{8,}$"
                     disabled={isLoading}
                     className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.password ? 'border-red-500' : 'border-gray-200'
                       }`}

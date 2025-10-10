@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.requireResourceOwnership = exports.requireVerifiedSeller = exports.optionalAuth = exports.authenticateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client_1 = require("@prisma/client");
-const asyncHandler_1 = require("..//utils/asyncHandler");
-const errorUtils_1 = require("..//utils/errorUtils");
+const asyncHandler_1 = require("../utils/asyncHandler");
+const errorUtils_1 = require("../utils/errorUtils");
 const logger_1 = __importDefault(require("../config/logger"));
 const prisma = new client_1.PrismaClient();
 exports.authenticateToken = (0, asyncHandler_1.asyncHandler)(async (req, res, next) => {
@@ -29,8 +29,9 @@ exports.authenticateToken = (0, asyncHandler_1.asyncHandler)(async (req, res, ne
             },
             select: {
                 id: true,
-                name: true,
                 email: true,
+                firstName: true,
+                lastName: true,
                 profileImage: true,
                 isVerifiedSeller: true,
                 emailVerified: true,
@@ -82,8 +83,9 @@ exports.optionalAuth = (0, asyncHandler_1.asyncHandler)(async (req, res, next) =
             },
             select: {
                 id: true,
-                name: true,
                 email: true,
+                firstName: true,
+                lastName: true,
                 profileImage: true,
                 isVerifiedSeller: true,
             },

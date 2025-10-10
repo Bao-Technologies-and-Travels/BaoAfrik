@@ -202,8 +202,9 @@ The frontend uses React Context for authentication state management:
 ```typescript
 interface User {
   id: string;
-  name: string;
   email: string;
+  firstName?: string;
+  lastName?: string;
   profileImage?: string;
   provider?: string;
 }

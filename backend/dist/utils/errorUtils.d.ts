@@ -11,5 +11,10 @@ export declare const createForbiddenError: (message?: string) => AppError;
 export declare const createNotFoundError: (message?: string) => AppError;
 export declare const createConflictError: (message?: string) => AppError;
 export declare const createTooManyRequestsError: (message?: string) => AppError;
+export declare class CustomError extends Error {
+    statusCode: number;
+    isOperational: boolean;
+    constructor(message: string, statusCode?: number, isOperational?: boolean);
+}
 export declare const isOperationalError: (error: Error) => boolean;
 //# sourceMappingURL=errorUtils.d.ts.map

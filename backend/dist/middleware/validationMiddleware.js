@@ -12,24 +12,21 @@ const handleValidationErrors = (req, res, next) => {
                 errorMessages[error.path] = error.msg;
             }
         });
-        const validationError = (0, errorUtils_1.createValidationError)('Validation failed');
+        const validationError = new errorUtils_1.CustomError('Validation failed.Please check your input and try again.', 400);
         validationError.errors = errorMessages;
-        throw validationError;
+        next(validationError);
+        return;
     }
     next();
 };
 exports.handleValidationErrors = handleValidationErrors;
 exports.validateRegister = [
-    (0, express_validator_1.body)('name')
-        .trim()
-        .notEmpty()
-        .withMessage('Name is required')
-        .isLength({ min: 2, max: 100 })
-        .withMessage('Name must be between 2 and 100 characters'),
     (0, express_validator_1.body)('email')
         .trim()
+        .notEmpty()
+        .withMessage('Email address is required')
         .isEmail()
-        .withMessage('Please provide a valid email address')
+        .withMessage('Please provide a valid email address in the format name@domain.com')
         .normalizeEmail(),
     (0, express_validator_1.body)('phoneNumber')
         .optional()
@@ -37,14 +34,18 @@ exports.validateRegister = [
         .isMobilePhone('any')
         .withMessage('Please provide a valid phone number'),
     (0, express_validator_1.body)('password')
+        .notEmpty()
+        .withMessage('Password is required')
         .isLength({ min: 8 })
         .withMessage('Password must be at least 8 characters long')
-        .matches(/^(?=.*[a-zA-Z])(?=.*\d)/)
-        .withMessage('Password must contain both letters and numbers'),
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
+        .withMessage('Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character'),
     (0, express_validator_1.body)('confirmPassword')
+        .notEmpty()
+        .withMessage('Please confirm your password')
         .custom((value, { req }) => {
         if (value !== req.body.password) {
-            throw new Error('Passwords do not match');
+            throw new Error('Passwords do not match. Please enter the same password in both fields.');
         }
         return true;
     }),
@@ -54,7 +55,7 @@ exports.validateLogin = [
     (0, express_validator_1.body)('email')
         .trim()
         .isEmail()
-        .withMessage('Please provide a valid email address')
+        .withMessage('Please provide a valid email address  in the format name@domain.com')
         .normalizeEmail(),
     (0, express_validator_1.body)('password')
         .notEmpty()
@@ -69,7 +70,7 @@ exports.validateEmailVerification = [
     (0, express_validator_1.body)('email')
         .trim()
         .isEmail()
-        .withMessage('Please provide a valid email address')
+        .withMessage('Please provide a valid email address  in the format name@domain.com')
         .normalizeEmail(),
     (0, express_validator_1.body)('verificationCode')
         .isLength({ min: 6, max: 6 })
@@ -261,12 +262,16 @@ exports.validateUpdateProfile = [
         .optional()
         .trim()
         .isLength({ min: 1, max: 50 })
-        .withMessage('First name must be between 1 and 50 characters'),
+        .withMessage('First name must be between 1 and 50 characters')
+        .matches(/^[a-zA-Z\s]+$/)
+        .withMessage('First name can only contain letters and spaces'),
     (0, express_validator_1.body)('lastName')
         .optional()
         .trim()
         .isLength({ min: 1, max: 50 })
-        .withMessage('Last name must be between 1 and 50 characters'),
+        .withMessage('Last name must be between 1 and 50 characters')
+        .matches(/^[a-zA-Z\s]+$/)
+        .withMessage('Last name can only contain letters and spaces'),
     (0, express_validator_1.body)('phoneNumber')
         .optional()
         .trim()

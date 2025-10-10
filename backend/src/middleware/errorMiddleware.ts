@@ -14,7 +14,7 @@ export class CustomError extends Error implements AppError {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = isOperational;
-    
+
     Error.captureStackTrace(this, this.constructor);
   }
 }
@@ -50,7 +50,12 @@ export const errorHandler = (
   if (error instanceof CustomError) {
     statusCode = error.statusCode;
     message = error.message;
-  } 
+  }
+
+  if ((error as any).errors) {
+    errors = (error as any).errors;
+  }
+
   // Prisma Known Request Errors
   else if (typeof error === 'object' && error !== null && (error as any).name === 'PrismaClientKnownRequestError') {
     const prismaError = error as any;
@@ -80,21 +85,21 @@ export const errorHandler = (
         message = 'Database error occurred';
         break;
     }
-  } 
+  }
   // JWT Errors
   else if (typeof error === 'object' && error !== null && (error as any).name === 'JsonWebTokenError') {
     statusCode = 401;
     message = 'Invalid token';
-  } 
+  }
   else if (typeof error === 'object' && error !== null && (error as any).name === 'TokenExpiredError') {
     statusCode = 401;
     message = 'Token expired';
-  } 
+  }
   // Validation Errors (express-validator)
   else if (typeof error === 'object' && error !== null && (error as any).name === 'ValidationError') {
     statusCode = 400;
     message = 'Validation failed';
-  } 
+  }
   // Multer Errors
   else if (typeof error === 'object' && error !== null && (error as any).name === 'MulterError') {
     statusCode = 400;
@@ -106,7 +111,7 @@ export const errorHandler = (
     } else {
       message = 'File upload error';
     }
-  } 
+  }
   // Rate Limit
   else if (typeof error === 'object' && error !== null && (error as any).message?.includes('Too many requests')) {
     statusCode = 429;
@@ -123,7 +128,7 @@ export const errorHandler = (
     success: false,
     message,
     ...(Object.keys(errors).length > 0 && { errors }),
-    ...(process.env.NODE_ENV === 'development' && { 
+    ...(process.env.NODE_ENV === 'development' && {
       stack: (error as any).stack,
       originalError: (error as any).message
     }),

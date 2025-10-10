@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isOperationalError = exports.createTooManyRequestsError = exports.createConflictError = exports.createNotFoundError = exports.createForbiddenError = exports.createUnauthorizedError = exports.createValidationError = exports.createError = exports.AppError = void 0;
+exports.isOperationalError = exports.CustomError = exports.createTooManyRequestsError = exports.createConflictError = exports.createNotFoundError = exports.createForbiddenError = exports.createUnauthorizedError = exports.createValidationError = exports.createError = exports.AppError = void 0;
 class AppError extends Error {
     constructor(message, statusCode = 500, code = 'INTERNAL_ERROR') {
         super(message);
@@ -39,6 +39,15 @@ const createTooManyRequestsError = (message = 'Too many requests') => {
     return new AppError(message, 429, 'TOO_MANY_REQUESTS');
 };
 exports.createTooManyRequestsError = createTooManyRequestsError;
+class CustomError extends Error {
+    constructor(message, statusCode = 500, isOperational = true) {
+        super(message);
+        this.statusCode = statusCode;
+        this.isOperational = isOperational;
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
+exports.CustomError = CustomError;
 const isOperationalError = (error) => {
     if (error instanceof AppError) {
         return error.isOperational;

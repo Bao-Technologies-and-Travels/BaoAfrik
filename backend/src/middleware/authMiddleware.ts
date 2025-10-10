@@ -20,7 +20,6 @@ declare global {
     interface Request {
       user?: {
         id: string;
-        name: string;
         email: string;
         profileImage?: string | null;  // Allow null for profileImage
         isVerifiedSeller: boolean;
@@ -55,8 +54,9 @@ export const authenticateToken = asyncHandler(async (req: Request, res: Response
       },
       select: {
         id: true,
-        name: true,
         email: true,
+        firstName: true,
+        lastName: true,
         profileImage: true,
         isVerifiedSeller: true,
         emailVerified: true,
@@ -117,8 +117,9 @@ export const optionalAuth = asyncHandler(async (req: Request, res: Response, nex
       },
       select: {
         id: true,
-        name: true,
         email: true,
+        firstName: true,
+        lastName: true,
         profileImage: true,
         isVerifiedSeller: true,
       },

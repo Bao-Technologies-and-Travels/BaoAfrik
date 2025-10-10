@@ -17,18 +17,28 @@ export class AuthService {
     password: string;
     rememberMe?: boolean;
   }): Promise<ApiResponse<LoginResponse>> {
-    const response = await apiClient.post('/auth/login', credentials);
+    try {
+      console.log('AUTH SERVICE: Making login request with:', credentials);
+      const response = await apiClient.post<LoginResponse>('/auth/login', credentials);
+      console.log('AUTH SERVICE: Raw response from apiClient:', response);
 
-    console.log('Raw API response:', response);
-    console.log('Response data structure:', response.data);
+      return response;
 
-    const responseData = response.data as any;
+    } catch (error: any) {
+      console.error('Login service error: ', error);
 
-    return {
-      success: responseData.success,
-      data: responseData.data,
-      message: responseData.message
-    };
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        'Login failed due to network error';
+
+      return {
+        success: false,
+        message: errorMessage,
+        data: undefined
+      };
+    }
   }
 
   // Logout user

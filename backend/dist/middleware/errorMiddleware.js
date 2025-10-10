@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createConflictError = exports.createForbiddenError = exports.createUnauthorizedError = exports.createNotFoundError = exports.createValidationError = exports.asyncHandler = exports.errorHandler = exports.notFound = exports.CustomError = void 0;
-const client_1 = require("@prisma/client");
 const logger_1 = __importDefault(require("../config/logger"));
 class CustomError extends Error {
     constructor(message, statusCode = 500, isOperational = true) {
@@ -36,12 +35,16 @@ const errorHandler = (error, req, res, next) => {
         statusCode = error.statusCode;
         message = error.message;
     }
-    else if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
-        switch (error.code) {
+    if (error.errors) {
+        errors = error.errors;
+    }
+    else if (typeof error === 'object' && error !== null && error.name === 'PrismaClientKnownRequestError') {
+        const prismaError = error;
+        switch (prismaError.code) {
             case 'P2002':
                 statusCode = 409;
                 message = 'Resource already exists';
-                const target = error.meta?.target;
+                const target = prismaError.meta?.target;
                 if (target?.includes('email')) {
                     errors.email = 'An account with this email already exists';
                 }
@@ -64,35 +67,32 @@ const errorHandler = (error, req, res, next) => {
                 break;
         }
     }
-    else if (error instanceof client_1.Prisma.PrismaClientValidationError) {
-        statusCode = 400;
-        message = 'Invalid data provided';
-    }
-    else if (error.name === 'JsonWebTokenError') {
+    else if (typeof error === 'object' && error !== null && error.name === 'JsonWebTokenError') {
         statusCode = 401;
         message = 'Invalid token';
     }
-    else if (error.name === 'TokenExpiredError') {
+    else if (typeof error === 'object' && error !== null && error.name === 'TokenExpiredError') {
         statusCode = 401;
         message = 'Token expired';
     }
-    else if (error.name === 'ValidationError') {
+    else if (typeof error === 'object' && error !== null && error.name === 'ValidationError') {
         statusCode = 400;
         message = 'Validation failed';
     }
-    else if (error.name === 'MulterError') {
+    else if (typeof error === 'object' && error !== null && error.name === 'MulterError') {
         statusCode = 400;
-        if (error.message.includes('File too large')) {
+        const errMessage = error.message || '';
+        if (errMessage.includes('File too large')) {
             message = 'File size too large';
         }
-        else if (error.message.includes('Unexpected field')) {
+        else if (errMessage.includes('Unexpected field')) {
             message = 'Unexpected file field';
         }
         else {
             message = 'File upload error';
         }
     }
-    else if (error.message.includes('Too many requests')) {
+    else if (typeof error === 'object' && error !== null && error.message?.includes('Too many requests')) {
         statusCode = 429;
         message = 'Too many requests, please try again later';
     }
@@ -120,26 +120,17 @@ const asyncHandler = (fn) => {
 exports.asyncHandler = asyncHandler;
 const createValidationError = (message, field) => {
     const error = new CustomError(message, 400);
-    if (field) {
+    if (field)
         error.field = field;
-    }
     return error;
 };
 exports.createValidationError = createValidationError;
-const createNotFoundError = (resource = 'Resource') => {
-    return new CustomError(`${resource} not found`, 404);
-};
+const createNotFoundError = (resource = 'Resource') => new CustomError(`${resource} not found`, 404);
 exports.createNotFoundError = createNotFoundError;
-const createUnauthorizedError = (message = 'Unauthorized') => {
-    return new CustomError(message, 401);
-};
+const createUnauthorizedError = (message = 'Unauthorized') => new CustomError(message, 401);
 exports.createUnauthorizedError = createUnauthorizedError;
-const createForbiddenError = (message = 'Forbidden') => {
-    return new CustomError(message, 403);
-};
+const createForbiddenError = (message = 'Forbidden') => new CustomError(message, 403);
 exports.createForbiddenError = createForbiddenError;
-const createConflictError = (message = 'Resource already exists') => {
-    return new CustomError(message, 409);
-};
+const createConflictError = (message = 'Resource already exists') => new CustomError(message, 409);
 exports.createConflictError = createConflictError;
 //# sourceMappingURL=errorMiddleware.js.map
