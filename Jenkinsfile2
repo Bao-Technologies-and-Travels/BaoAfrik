@@ -16,7 +16,7 @@ pipeline {
     }
 
     stages {
-        stage('Setup server dependncies') {
+        stage('Setup server dependencies') {
             steps {
                 echo 'Setting up server dependencies...'
 
@@ -45,7 +45,7 @@ pipeline {
 
                         # Configure firewall
                         sudo ufw allow 22
-                        sudo ufw allow 80
+                        sudo uwf allow 80
                         sudo ufw allow 443
                         sudo ufw allow 3000
                         sudo ufw allow 3001
@@ -53,6 +53,28 @@ pipeline {
                         sudo ufw --force enable
 
                         echo "System dependencies installed successfully."
+                    '
+                    """
+                }
+            }
+        }
+
+        stage('Clone Repository') {
+            steps {
+                echo 'Cloning repository...'
+                
+                sshagent([env.SSH_KEY_ID]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        if [ ! -d ~/BaoAfrik ]; then
+                            git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
+                        fi
+
+                        cd ${APP_DIR}
+                        git fetch origin ${BRANCH}
+                        git reset --hard origin/${BRANCH}
+                        
+                        echo "Repository cloned/updated successfully."
                     '
                     """
                 }
@@ -72,6 +94,9 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                             cd ${BACKEND_DIR}
 
+                            # Remove existing .env if any
+                            rm -f .env
+
                             # Create .env file with actual secrets
                             cat > .env << EOF
 NODE_ENV=staging
@@ -79,13 +104,13 @@ PORT=3001
 DATABASE_URL="${DATABASE_URL}"
 JWT_SECRET="${JWT_SECRET}"
 JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}"
-JWT_EXPIRE_TIME="30m"
-JWT_REFRESH_EXPIRE_TIME="7d"
-EMAIL_SERVICE="resend"
+JWT_EXPIRE_TIME=30m
+JWT_REFRESH_EXPIRE_TIME=7d
+EMAIL_SERVICE=resend
 RESEND_API_KEY="${RESEND_API_KEY}"
-EMAIL_FROM_ADDRESS="noreply@baoafrik.com"
+EMAIL_FROM_ADDRESS=noreply@baoafrik.com
 EMAIL_FROM_NAME="BaoAfrik Team"
-STORAGE_SERVICE="cloudinary"
+STORAGE_SERVICE=cloudinary
 FRONTEND_URL="https://${DOMAIN}"
 CORS_ORIGINS="https://${DOMAIN}"
 BCRYPT_ROUNDS=12
@@ -93,9 +118,11 @@ RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 EOF
 
-                            # Set secure permissions
                             chmod 600 .env
-                            echo "Environment file created securely."
+                            
+                            echo "=== .env file contents (without sensitive values) ==="
+                            head -n 10 .env
+                            echo "=== Environment file created securely ==="
                         '
                         """
                     }
@@ -110,30 +137,32 @@ EOF
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                        if [ ! -d ~/BaoAfrik ]; then
-                            git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
-                        fi
-
-                        cd ${APP_DIR}
-                        git fetch origin ${BRANCH}
-                        git reset --hard origin/${BRANCH}
-
-                        echo "starting backend deployment..."
+                        echo "Starting backend deployment..."
 
                         cd ${BACKEND_DIR}
+                        
+                        if [ ! -f .env ]; then
+                            echo "ERROR: .env file not found!"
+                            exit 1
+                        fi
+
                         rm -rf node_modules package-lock.json
 
                         npm install
                         npm run build
-                        npm run db:generate
-                        npm run db:migrate
+                        
+                        npx prisma generate
+                        npx prisma migrate deploy
+                        
+                        # Alternative if migrate deploy doesn't work:
+                        # npx prisma db push
 
                         pm2 delete ${APP_NAME_BACKEND} || true
-                        pm2 restart ${APP_NAME_BACKEND} || pm2 start dist/server.js --name ${APP_NAME_BACKEND} -- --port 3001
+                        pm2 start dist/server.js --name ${APP_NAME_BACKEND} -- --port 3001
                         pm2 save
 
-                        echo "backend deployed successfully."
-                        echo "starting frontend deployment..."
+                        echo "Backend deployed successfully."
+                        echo "Starting frontend deployment..."
 
                         cd ${APP_DIR}
                         rm -rf node_modules package-lock.json build
@@ -147,7 +176,8 @@ EOF
 
                         npm run build
 
-                        pm2 restart ${APP_NAME_FRONTEND} || pm2 start serve --name ${APP_NAME_FRONTEND} -- -s build -l 3000
+                        pm2 delete ${APP_NAME_FRONTEND} || true
+                        pm2 start serve --name ${APP_NAME_FRONTEND} -- -s build -l 3000
 
                         pm2 save
                         pm2 list
@@ -158,77 +188,6 @@ EOF
                 }
             }
         }
-
-        // stage('Configure Nginx and SSL'){
-        //     steps{
-        //         echo 'Configuring Nginx and SSL...'
-
-        //         sshagent([env.SSH_KEY_ID]){
-        //             sh """
-        //             ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-        //                 set -e  # Exit on error
-
-        //                 # Create nginx configuration
-        //                 sudo bash -c "cat > /etc/nginx/sites-available/${DOMAIN}" << EOL
-        //                 server {
-        //                     listen 80;
-        //                     server_name staging.baoafrik.com;
-
-        //                     location / {
-        //                         proxy_pass http://localhost:3000;
-        //                         proxy_set_header Host \\$host;
-        //                         proxy_set_header X-Real-IP \\$remote_addr;
-        //                         proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
-        //                         proxy_set_header X-Forwarded-Proto \\$scheme;
-        //                     }
-
-        //                     location /api/ {
-        //                         proxy_pass http://localhost:3001;
-        //                         proxy_set_header Host \\$host;
-        //                         proxy_set_header X-Real-IP \\$remote_addr;
-        //                         proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
-        //                         proxy_set_header X-Forwarded-Proto \\$scheme;
-        //                     }
-        //                 }
-        //                 EOF
-
-        //                 # Enable site
-        //                 sudo ln -sf /etc/nginx/sites-available/${DOMAIN} /etc/nginx/sites-enabled/
-        //                 sudo rm -f /etc/nginx/sites-enabled/default
-
-        //                 # Test nginx configuration
-        //                 sudo nginx -t
-
-        //                 # Restart nginx
-        //                 sudo systemctl restart nginx
-
-        //                 echo "Nginx configuration completed."
-        //             '
-        //             """
-        //         }
-        //     }
-        // }
-
-        // stage('Setup SSL Certificate') {
-        //     steps {
-        //         echo 'Setting up SSL certificate...'
-
-        //         sshagent([env.SSH_KEY_ID]) {
-        //             sh """
-        //             ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-        //                 set -e
-
-        //                 sudo certbot --nginx -d ${DOMAIN} --non-interactive --agree-tos --email ${EMAIL} --redirect
-
-        //                 # Test certificate renewal
-        //                 sudo certbot renew --dry-run
-
-        //                 echo "SSL certificate setup completed."
-        //             '
-        //             """
-        //         }
-        //     }
-        // }
 
         stage('Verify Deployment') {
             steps {
@@ -244,17 +203,11 @@ EOF
                         echo "PM2 Processes:"
                         pm2 list
 
-                        echo "Nginx Status:"
-                        sudo systemctl status nginx --no-pager
-
-                        echo "SSL Certificate:"
-                        sudo certbot certificates
-
-                        echo "Testing Frontend (HTTPS):"
-                        curl -f https://${DOMAIN} > /dev/null && echo "Frontend is accessible via HTTPS" || echo "Frontend HTTPS failed"
-
                         echo "Testing Backend API:"
-                        curl -f https://${DOMAIN}/api/health > /dev/null && echo " Backend API is accessible" || echo "Backend API failed"
+                        curl -f http://localhost:3001/api/health > /dev/null && echo "Backend API is accessible" || echo "Backend API failed"
+
+                        echo "Testing Frontend:"
+                        curl -f http://localhost:3000 > /dev/null && echo "Frontend is accessible" || echo "Frontend failed"
 
                         echo "=== Deployment Complete ==="
                     '

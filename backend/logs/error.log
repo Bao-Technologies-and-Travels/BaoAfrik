@@ -5209,3 +5209,167 @@
   message: 'Error response',
   timestamp: '2025-10-10 07:25:40'
 }
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/register',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 08:36:38'
+}
+{
+  requestId: '292fe02e-5f6f-4c89-84d3-7de3200c4a68',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: {
+      password: 'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character'
+    },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 08:36:38'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:210:61',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 08:40:20'
+}
+{
+  requestId: 'f9fe638d-8d7c-491a-b8e0-dc778a953f13',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid or expired verification code',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:210:61',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 08:40:20'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:210:61',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 08:40:53'
+}
+{
+  requestId: 'ef85928f-95eb-46c0-a7fc-00e5711f0a9e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid or expired verification code',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:210:61',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 08:40:53'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:210:61',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 08:41:13'
+}
+{
+  requestId: 'e1ebea9a-6c39-402d-9d32-b45645473bea',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid or expired verification code',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:210:61',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 08:41:13'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired verification code',
+  stack: 'Error: Invalid or expired verification code\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:210:61',
+  url: '/api/auth/verify-email',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 08:41:23'
+}
+{
+  requestId: '823153b0-7597-4996-9451-8420aa79ba67',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid or expired verification code',
+    stack: 'Error: Invalid or expired verification code\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:210:61',
+    originalError: 'Invalid or expired verification code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 08:41:23'
+}

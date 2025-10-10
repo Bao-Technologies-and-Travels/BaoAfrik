@@ -18,9 +18,7 @@ export class AuthService {
     rememberMe?: boolean;
   }): Promise<ApiResponse<LoginResponse>> {
     try {
-      console.log('AUTH SERVICE: Making login request with:', credentials);
       const response = await apiClient.post<LoginResponse>('/auth/login', credentials);
-      console.log('AUTH SERVICE: Raw response from apiClient:', response);
 
       return response;
 

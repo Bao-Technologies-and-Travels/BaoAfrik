@@ -152,14 +152,11 @@ const Login: React.FC = () => {
     };
 
     try {
-      console.log(' COMPONENT: Calling authService.login');
       const response = await authService.login({
         email: email.toLowerCase(),
         password,
         rememberMe
       });
-
-      console.log(' COMPONENT: Response from authService:', response);
 
       if (!response.success) {
         // Handle error cases
@@ -184,12 +181,6 @@ const Login: React.FC = () => {
       }
 
       const { user, accessToken, refreshToken } = loginData;
-
-      console.log(' COMPONENT: Extracted data:', {
-        user,
-        hasAccessToken: !!accessToken,
-        hasUser: !!user
-      });
 
       if (!user || !accessToken) {
         const nestedData = (loginData as any).data;

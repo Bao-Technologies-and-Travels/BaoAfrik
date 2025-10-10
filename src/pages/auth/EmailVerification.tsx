@@ -78,30 +78,6 @@ const EmailVerification: React.FC = () => {
     setIsLoading(true);
     setError('');
 
-    // try {
-    //   // TODO: Implement email verification API call
-    //   console.log('Verifying code:', code);
-
-    //   // Simulate API call
-    //   await new Promise(resolve => setTimeout(resolve, 2000));
-
-    //   // On success, redirect to login or dashboard
-    //   console.log('Email verified successfully!');
-
-    //   if (fromRegistration) {
-    //     // If coming from registration, redirect to verification success page
-    //     navigate('/email-verification-success');
-    //   } else {
-    //     // If verifying existing account, redirect to dashboard/profile
-    //     navigate('/profile');
-    //   }
-
-    // } catch (error) {
-    //   setError('Invalid verification code. Please try again.');
-    // } finally {
-    //   setIsLoading(false);
-    // }
-
     try {
       const response = await authService.verifyEmail({
         email,

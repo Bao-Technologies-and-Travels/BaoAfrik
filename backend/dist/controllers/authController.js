@@ -66,7 +66,6 @@ exports.register = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
 });
 exports.login = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
     const { email, password, rememberMe = false } = req.body;
-    console.log('BACKEND: Login attempt for:', email);
     const user = await prisma.user.findUnique({
         where: {
             email: email.toLowerCase(),
@@ -86,9 +85,6 @@ exports.login = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
             lastLoginAt: true,
         }
     });
-    console.log('BACKEND: User found:', user);
-    console.log('BACKEND: firstName value:', user?.firstName);
-    console.log('BACKEND: lastName value:', user?.lastName);
     if (!user || !user.passwordHash) {
         throw (0, errorMiddleware_2.createUnauthorizedError)('Invalid email or password');
     }
