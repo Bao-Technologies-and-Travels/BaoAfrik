@@ -152,11 +152,13 @@ const Login: React.FC = () => {
     };
 
     try {
+      console.log('Attempting to login user.');
       const response = await authService.login({
         email: email.toLowerCase(),
         password,
         rememberMe
       });
+      console.log('Login response:', response);
 
       if (!response.success) {
         // Handle error cases

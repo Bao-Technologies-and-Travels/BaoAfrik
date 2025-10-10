@@ -17,6 +17,7 @@ const Register: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -64,6 +65,7 @@ const Register: React.FC = () => {
 
     setIsLoading(true);
     setErrors({});
+    setSuccessMessage('');
 
     try {
       console.log("Sending registration request to backend...");

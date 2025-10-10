@@ -1,27 +1,30 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import lilLogo from '../../assets/images/pre/lil.png';
+import { UpdateProfileData, apiClient } from '../../services/api';
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { updateUserProfile } = useAuth();
+  const { user, logout } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Check if coming from social login
   const fromSocialLogin = location.state?.fromSocialLogin || false;
   const provider = location.state?.provider || null;
+
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
     gender: '',
     birthDate: ''
   });
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(user?.profileImage || null);
 
   // Load social login data if available
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -32,6 +35,18 @@ const ProfileSetup: React.FC = () => {
     formData.lastName.trim() &&
     formData.gender &&
     formData.birthDate;
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        gender: user.gender || '',
+        birthDate: user.gender || ''
+      });
+      setProfileImage(user.profileImage || null);
+    }
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -52,11 +67,39 @@ const ProfileSetup: React.FC = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      const maxSize = 8 * 1024 * 1024;
+
+      if (!validTypes.includes(file.type)) {
+        setErrors(
+          prev => ({
+            ...prev, general: 'Please select a valid image (JPEG, PNG GIF)'
+          }));
+        return;
+      }
+
+      if (file.size > maxSize) {
+        setErrors(
+          prev => ({
+            ...prev, general: 'Image size must be lest than 5mb'
+          })
+        );
+        return;
+      }
+
+      setSelectedFile(file);
+
       const reader = new FileReader();
       reader.onload = (event) => {
         setProfileImage(event.target?.result as string);
       };
       reader.readAsDataURL(file);
+
+      if (errors.general) {
+        setErrors(prev => ({
+          ...prev, general: ''
+        }));
+      }
     }
   };
 
@@ -66,6 +109,7 @@ const ProfileSetup: React.FC = () => {
 
   const handleRemoveImage = () => {
     setProfileImage(null);
+    setSelectedFile(null);
   };
 
   const validateForm = () => {
@@ -104,9 +148,9 @@ const ProfileSetup: React.FC = () => {
       }
 
       if (birthDate > today) {
-        newErrors.birthDate = 'Birth date cannot be in the future';
+        newErrors.birthDate = 'Birth date cannot be after today\'s date';
       } else if (age < 13) {
-        newErrors.birthDate = 'You must be at least 13 years old';
+        newErrors.birthDate = 'You must be at least 13 years old to access the platform';
       } else if (age > 120) {
         newErrors.birthDate = 'Please enter a valid birth date';
       }
@@ -126,54 +170,33 @@ const ProfileSetup: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Implement profile setup API call
-      console.log('Setting up profile:', formData);
+      const profileData: UpdateProfileData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        gender: formData.gender,
+        birthDate: formData.birthDate
+      };
 
-      // Store profile data temporarily for use after preferences
-      let profileData;
-      if (fromSocialLogin) {
-        const socialUserData = JSON.parse(localStorage.getItem('tempSocialUser') || '{}');
-        profileData = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: socialUserData.email || 'user@example.com',
-          profileImage: profileImage || undefined,
-          provider: provider
-        };
-      } else {
-        // For regular registration, get user data from localStorage
-        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-        const currentUserEmail = localStorage.getItem('currentUserEmail'); // We'll set this during registration
-        const currentUser = registeredUsers.find((u: any) => u.email === currentUserEmail);
+      console.log('Updating profile with:', profileData);
 
-        profileData = {
-          firstName: formData.firstName || undefined,
-          lastName: formData.lastName || undefined,
-          email: currentUser?.email || 'user@example.com',
-          profileImage: profileImage || undefined
-        };
-
-        // Update the user's profile image in the registered users list
-        if (currentUser) {
-          currentUser.profileImage = profileImage;
-          currentUser.name = `${formData.firstName} ${formData.lastName}`;
-          localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-        }
+      const response = await apiClient.updateProfile(profileData);
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to update profile.');
       }
-      localStorage.setItem('tempUserProfile', JSON.stringify(profileData));
+      console.log('Profile updated successfully!');
 
-      // Update user profile with image
-      updateUserProfile(profileData);
+      setErrors({ general: 'Profile updated successfully! You will be redirected automatically to login again to see changes.' });
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      setTimeout(() => {
+        logout();
+        navigate('/login');
+      }, 5000);
 
-      // On success, redirect to questions page
-      navigate('/user-preferences');
-
-    } catch (error) {
+    } catch (error: any) {
       console.error('Profile setup failed:', error);
-      setErrors({ general: 'Failed to save profile information. Please try again.' });
+      setErrors({
+        general: error.message || 'Failed to save profile information. Please try again.'
+      });
     } finally {
       setIsLoading(false);
     }

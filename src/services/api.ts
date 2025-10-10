@@ -40,6 +40,18 @@ export interface LoginResponse {
   user: User;
 }
 
+export interface UpdateProfileData {
+  firstName?: string;
+  lastName?: string;
+  profileImage?: string;
+  gender?: string;
+  birthDate?: string;
+}
+
+export interface UpdateProfileResponse {
+  user: User;
+}
+
 // HTTP Client
 class ApiClient {
   private baseURL: string;
@@ -140,6 +152,18 @@ class ApiClient {
       },
       body: formData,
     });
+  }
+
+  async updateProfile(profileData: UpdateProfileData): Promise<ApiResponse<UpdateProfileResponse>> {
+    return this.put<UpdateProfileResponse>('/auth/profile', profileData);
+  }
+
+  async getCurrentUser(): Promise<ApiResponse<User>> {
+    return this.get<User>('/auth/me');
+  }
+
+  async uploadProfileImage(file: File): Promise<ApiResponse<{ imageUrl: string }>> {
+    return this.uploadFile<{ imageUrl: string }>('/auth/upload-profile-image', file);
   }
 }
 

@@ -149,6 +149,7 @@ exports.logout = (0, errorMiddleware_1.asyncHandler)(async (req, res) => {
     if (req.user) {
         logger_1.default.info('User logged out', { userId: req.user.id });
     }
+    console.log('Logged out user successfully');
     const response = {
         success: true,
         message: 'Logged out successfully'
@@ -294,15 +295,21 @@ exports.updateProfile = (0, errorMiddleware_1.asyncHandler)(async (req, res) => 
     if (!req.user) {
         throw (0, errorMiddleware_2.createUnauthorizedError)('User not authenticated');
     }
-    const { firstName, lastName, phoneNumber, profileImage } = req.body;
-    const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;
+    const { firstName, lastName, gender, birthDate, profileImage, } = req.body;
+    const updateData = {};
+    if (firstName !== undefined)
+        updateData.firstName = firstName;
+    if (lastName !== undefined)
+        updateData.lastName = lastName;
+    if (profileImage !== undefined)
+        updateData.profileImage = profileImage;
+    if (gender !== undefined)
+        updateData.gender = gender;
+    if (birthDate !== undefined)
+        updateData.birthDate = new Date(birthDate);
     const updatedUser = await prisma.user.update({
         where: { id: req.user.id },
-        data: {
-            ...(name && { name }),
-            ...(phoneNumber && { phoneNumber }),
-            ...(profileImage && { profileImage }),
-        },
+        data: updateData,
         select: {
             id: true,
             email: true,
@@ -310,6 +317,8 @@ exports.updateProfile = (0, errorMiddleware_1.asyncHandler)(async (req, res) => 
             lastName: true,
             phoneNumber: true,
             profileImage: true,
+            gender: true,
+            birthDate: true,
             emailVerified: true,
             isVerifiedSeller: true,
             provider: true,

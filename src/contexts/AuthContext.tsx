@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { apiClient } from '../services';
 
 interface User {
   id: string;
@@ -7,6 +8,8 @@ interface User {
   lastName?: string;
   profileImage?: string;
   provider?: string;
+  gender?: string;
+  birthDate?: string;
 }
 
 interface AuthContextType {
@@ -41,6 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return null;
     }
   });
+
   const [isVisitor, setIsVisitor] = useState(false);
 
   const login = (userData: User) => {
@@ -64,9 +68,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const updateUserProfile = (profileData: Partial<User>) => {
-    if (user) {
-      setUser({ ...user, ...profileData });
-    }
+    setUser(prevUser => {
+      if (!prevUser) return prevUser;
+
+      const updatedUser = { ...prevUser, ...profileData };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      console.log('User profile updated in context:', updatedUser);
+      return updatedUser;
+    })
   };
 
   const value = {

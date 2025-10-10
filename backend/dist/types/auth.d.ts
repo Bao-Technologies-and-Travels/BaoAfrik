@@ -67,6 +67,8 @@ export interface UpdateProfileRequest {
     lastName?: string;
     phoneNumber?: string;
     profileImage?: string;
+    gender?: string;
+    birthDate?: string;
 }
 export interface ChangePasswordRequest {
     currentPassword: string;

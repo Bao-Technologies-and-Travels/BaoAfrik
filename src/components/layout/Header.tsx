@@ -271,7 +271,9 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                                   ? user.firstName
                                   : user?.lastName
                                     ? user.lastName
-                                    : 'Jean Kameni'
+                                    : user?.email
+                                      ? user.email.split('@')[0]
+                                      : 'User'
                               }
                             </h3>
                             <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center" onClick={() => navigate('/profile-setup')}>

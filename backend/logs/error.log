@@ -5373,3 +5373,2157 @@
   message: 'Error response',
   timestamp: '2025-10-10 08:41:23'
 }
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 12:26:45'
+}
+{
+  requestId: '6a53b458-1e64-4608-9cda-30bd2843ec5c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 12:26:45'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 12:26:57'
+}
+{
+  requestId: '7e919a2e-188c-43ad-951c-5f6b50742060',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 12:26:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+    '\n' +
+    '  296 }\n' +
+    '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+    '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+    '→ 299 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          name: "Fonsah Pageo",\n' +
+    '          ~~~~\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+    '\n' +
+    '  296 }\n' +
+    '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+    '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+    '→ 299 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          name: "Fonsah Pageo",\n' +
+    '          ~~~~\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 12:28:12'
+}
+{
+  requestId: '47c67647-9008-4833-8362-0c352870cd5a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+      '\n' +
+      '  296 }\n' +
+      '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+      '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+      '→ 299 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          name: "Fonsah Pageo",\n' +
+      '          ~~~~\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+      '\n' +
+      '  296 }\n' +
+      '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+      '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+      '→ 299 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          name: "Fonsah Pageo",\n' +
+      '          ~~~~\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 12:28:12'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+    '\n' +
+    '  296 }\n' +
+    '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+    '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+    '→ 299 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          name: "Fonsah Ashu",\n' +
+    '          ~~~~\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+    '\n' +
+    '  296 }\n' +
+    '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+    '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+    '→ 299 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          name: "Fonsah Ashu",\n' +
+    '          ~~~~\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 12:28:54'
+}
+{
+  requestId: 'd34a267a-3562-49bd-82c5-babfafb24d28',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+      '\n' +
+      '  296 }\n' +
+      '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+      '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+      '→ 299 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          name: "Fonsah Ashu",\n' +
+      '          ~~~~\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+      '\n' +
+      '  296 }\n' +
+      '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+      '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+      '→ 299 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          name: "Fonsah Ashu",\n' +
+      '          ~~~~\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 12:28:54'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:33:13'
+}
+{
+  requestId: 'b42ef1fa-0224-461f-afef-86c0545b9507',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:33:13'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:89:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:34:37'
+}
+{
+  requestId: 'c0f6e18d-ef1b-4751-b831-c74ac8e54050',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid email or password',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:89:61',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:34:37'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:43:15'
+}
+{
+  requestId: '2c657831-37ae-4836-a136-66d1529662ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:43:15'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:43:37'
+}
+{
+  requestId: 'd4fde157-676f-4dce-a24b-8a93649850a2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:43:37'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:43:56'
+}
+{
+  requestId: 'c8589672-3011-4bde-aa9c-658aad90716b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:43:56'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: `Error occurred: Unexpected token '-', "------WebK"... is not valid JSON`,
+  stack: `SyntaxError: Unexpected token '-', "------WebK"... is not valid JSON\n` +
+    '    at JSON.parse (<anonymous>)\n' +
+    '    at createStrictSyntaxError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\types\\json.js:169:10)\n' +
+    '    at parse (D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\types\\json.js:86:15)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\read.js:128:18\n' +
+    '    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n' +
+    '    at invokeCallback (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:238:16)\n' +
+    '    at done (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:227:7)\n' +
+    '    at IncomingMessage.onEnd (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:287:7)\n' +
+    '    at IncomingMessage.emit (node:events:519:28)\n' +
+    '    at endReadableNT (node:internal/streams/readable:1698:12)',
+  url: '/api/auth/upload-profile-image',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 14:33:54'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+    '\n' +
+    '  306     updateData.gender = gender;\n' +
+    '  307 if (birthDate !== undefined)\n' +
+    '  308     updateData.birthDate = new Date(birthDate);\n' +
+    '→ 309 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          firstName: "Fonsah",\n' +
+    '          lastName: "Pageo",\n' +
+    '          gender: "male",\n' +
+    '          ~~~~~~\n' +
+    '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `gender`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+    '\n' +
+    '  306     updateData.gender = gender;\n' +
+    '  307 if (birthDate !== undefined)\n' +
+    '  308     updateData.birthDate = new Date(birthDate);\n' +
+    '→ 309 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          firstName: "Fonsah",\n' +
+    '          lastName: "Pageo",\n' +
+    '          gender: "male",\n' +
+    '          ~~~~~~\n' +
+    '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `gender`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 14:34:05'
+}
+{
+  requestId: '049a9fe9-0bb1-4cc3-8946-66bbaa908eca',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+      '\n' +
+      '  306     updateData.gender = gender;\n' +
+      '  307 if (birthDate !== undefined)\n' +
+      '  308     updateData.birthDate = new Date(birthDate);\n' +
+      '→ 309 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          firstName: "Fonsah",\n' +
+      '          lastName: "Pageo",\n' +
+      '          gender: "male",\n' +
+      '          ~~~~~~\n' +
+      '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `gender`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+      '\n' +
+      '  306     updateData.gender = gender;\n' +
+      '  307 if (birthDate !== undefined)\n' +
+      '  308     updateData.birthDate = new Date(birthDate);\n' +
+      '→ 309 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          firstName: "Fonsah",\n' +
+      '          lastName: "Pageo",\n' +
+      '          gender: "male",\n' +
+      '          ~~~~~~\n' +
+      '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `gender`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 14:34:05'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+    '\n' +
+    '  306     updateData.gender = gender;\n' +
+    '  307 if (birthDate !== undefined)\n' +
+    '  308     updateData.birthDate = new Date(birthDate);\n' +
+    '→ 309 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          firstName: "Fonsah",\n' +
+    '          lastName: "Pageo",\n' +
+    '          gender: "male",\n' +
+    '          ~~~~~~\n' +
+    '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `gender`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+    '\n' +
+    '  306     updateData.gender = gender;\n' +
+    '  307 if (birthDate !== undefined)\n' +
+    '  308     updateData.birthDate = new Date(birthDate);\n' +
+    '→ 309 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          firstName: "Fonsah",\n' +
+    '          lastName: "Pageo",\n' +
+    '          gender: "male",\n' +
+    '          ~~~~~~\n' +
+    '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `gender`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 14:34:12'
+}
+{
+  requestId: 'dfaf892a-521c-4688-88b9-adc4f961746f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+      '\n' +
+      '  306     updateData.gender = gender;\n' +
+      '  307 if (birthDate !== undefined)\n' +
+      '  308     updateData.birthDate = new Date(birthDate);\n' +
+      '→ 309 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          firstName: "Fonsah",\n' +
+      '          lastName: "Pageo",\n' +
+      '          gender: "male",\n' +
+      '          ~~~~~~\n' +
+      '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `gender`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+      '\n' +
+      '  306     updateData.gender = gender;\n' +
+      '  307 if (birthDate !== undefined)\n' +
+      '  308     updateData.birthDate = new Date(birthDate);\n' +
+      '→ 309 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          firstName: "Fonsah",\n' +
+      '          lastName: "Pageo",\n' +
+      '          gender: "male",\n' +
+      '          ~~~~~~\n' +
+      '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `gender`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 14:34:12'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: `Error occurred: Unexpected token '-', "------WebK"... is not valid JSON`,
+  stack: `SyntaxError: Unexpected token '-', "------WebK"... is not valid JSON\n` +
+    '    at JSON.parse (<anonymous>)\n' +
+    '    at createStrictSyntaxError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\types\\json.js:169:10)\n' +
+    '    at parse (D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\types\\json.js:86:15)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\read.js:128:18\n' +
+    '    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n' +
+    '    at invokeCallback (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:238:16)\n' +
+    '    at done (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:227:7)\n' +
+    '    at IncomingMessage.onEnd (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:287:7)\n' +
+    '    at IncomingMessage.emit (node:events:519:28)\n' +
+    '    at endReadableNT (node:internal/streams/readable:1698:12)',
+  url: '/api/auth/upload-profile-image',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 15:10:41'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: User not found or inactive',
+  stack: 'Error: User not found or inactive\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 16:33:02'
+}
+{
+  requestId: 'c82b0dc7-e620-420e-9b8f-5e67a3e2fe78',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: User not found or inactive\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+    originalError: 'User not found or inactive'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 16:33:02'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: User not found or inactive',
+  stack: 'Error: User not found or inactive\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 16:34:14'
+}
+{
+  requestId: '81f7a94f-422f-4fb2-abb9-c351f5a8da0b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: User not found or inactive\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+    originalError: 'User not found or inactive'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 16:34:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: User not found or inactive',
+  stack: 'Error: User not found or inactive\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 16:34:23'
+}
+{
+  requestId: '74396481-04a1-4b4b-bf6e-912fa908b0a3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: User not found or inactive\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+    originalError: 'User not found or inactive'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 16:34:23'
+}

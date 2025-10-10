@@ -13,11 +13,13 @@ datasource db {
 model User {
   id                String    @id @default(uuid())
   email             String    @unique
-  firstName         String?   
-  lastName          String?   
+  firstName         String?   @map("first_name")
+  lastName          String?   @map("last_name")
   phoneNumber       String?   @map("phone_number")
   passwordHash      String?   @map("password_hash")
   profileImage      String?   @map("profile_image")
+  gender            String?
+  birthDate         DateTime? @map("birth_date")
   emailVerified     Boolean   @default(false) @map("email_verified")
   emailVerificationCode String? @map("email_verification_code")
   emailVerificationExpires DateTime? @map("email_verification_expires")

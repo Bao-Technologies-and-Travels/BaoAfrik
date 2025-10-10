@@ -18268,3 +18268,4351 @@
   environment: 'development',
   timestamp: '2025-10-10 08:42:17'
 }
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:25:26'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:25:27'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:25:27'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:25:27'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:25:27'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:25:27'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:25:27'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:25:27'
+}
+{
+  requestId: '6a53b458-1e64-4608-9cda-30bd2843ec5c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '2011-07-30'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 12:26:45'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 12:26:45'
+}
+{
+  requestId: '6a53b458-1e64-4608-9cda-30bd2843ec5c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '11ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 12:26:45'
+}
+{
+  requestId: '6a53b458-1e64-4608-9cda-30bd2843ec5c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 12:26:45'
+}
+{
+  message: '::1 - - [10/Oct/2025:11:26:45 +0000] "PUT /api/auth/profile HTTP/1.1" 500 875 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:26:45'
+}
+{
+  requestId: '7e919a2e-188c-43ad-951c-5f6b50742060',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '2011-07-30'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 12:26:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 12:26:57'
+}
+{
+  requestId: '7e919a2e-188c-43ad-951c-5f6b50742060',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '4ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 12:26:57'
+}
+{
+  requestId: '7e919a2e-188c-43ad-951c-5f6b50742060',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 12:26:57'
+}
+{
+  message: '::1 - - [10/Oct/2025:11:26:57 +0000] "PUT /api/auth/profile HTTP/1.1" 500 875 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:26:57'
+}
+{
+  requestId: '9d4504f1-738d-4e38-911c-0e292dae2425',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'pageo.fonsah@baotechnologiesandtravels.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 12:27:42'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'c8c63618-b76e-4d44-9519-2e56a15d36a5',
+  email: 'pageo.fonsah@baotechnologiesandtravels.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 12:27:43'
+}
+{
+  requestId: '9d4504f1-738d-4e38-911c-0e292dae2425',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '845ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 12:27:43'
+}
+{
+  message: '::1 - - [10/Oct/2025:11:27:43 +0000] "POST /api/auth/login HTTP/1.1" 200 827 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:27:43'
+}
+{
+  requestId: '47c67647-9008-4833-8362-0c352870cd5a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '2008-02-20'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 12:28:11'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'c8c63618-b76e-4d44-9519-2e56a15d36a5',
+  email: 'pageo.fonsah@baotechnologiesandtravels.com',
+  requestId: '47c67647-9008-4833-8362-0c352870cd5a',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 12:28:12'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+    '\n' +
+    '  296 }\n' +
+    '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+    '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+    '→ 299 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          name: "Fonsah Pageo",\n' +
+    '          ~~~~\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+    '\n' +
+    '  296 }\n' +
+    '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+    '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+    '→ 299 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          name: "Fonsah Pageo",\n' +
+    '          ~~~~\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 12:28:12'
+}
+{
+  requestId: '47c67647-9008-4833-8362-0c352870cd5a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '105ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 12:28:12'
+}
+{
+  requestId: '47c67647-9008-4833-8362-0c352870cd5a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+      '\n' +
+      '  296 }\n' +
+      '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+      '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+      '→ 299 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          name: "Fonsah Pageo",\n' +
+      '          ~~~~\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+      '\n' +
+      '  296 }\n' +
+      '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+      '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+      '→ 299 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          name: "Fonsah Pageo",\n' +
+      '          ~~~~\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 12:28:12'
+}
+{
+  message: '::1 - - [10/Oct/2025:11:28:12 +0000] "PUT /api/auth/profile HTTP/1.1" 500 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:28:12'
+}
+{
+  requestId: 'd34a267a-3562-49bd-82c5-babfafb24d28',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '2006-02-01'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 12:28:54'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'c8c63618-b76e-4d44-9519-2e56a15d36a5',
+  email: 'pageo.fonsah@baotechnologiesandtravels.com',
+  requestId: 'd34a267a-3562-49bd-82c5-babfafb24d28',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 12:28:54'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+    '\n' +
+    '  296 }\n' +
+    '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+    '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+    '→ 299 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          name: "Fonsah Ashu",\n' +
+    '          ~~~~\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+    '\n' +
+    '  296 }\n' +
+    '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+    '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+    '→ 299 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          name: "Fonsah Ashu",\n' +
+    '          ~~~~\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 12:28:54'
+}
+{
+  requestId: 'd34a267a-3562-49bd-82c5-babfafb24d28',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '14ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 12:28:54'
+}
+{
+  requestId: 'd34a267a-3562-49bd-82c5-babfafb24d28',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+      '\n' +
+      '  296 }\n' +
+      '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+      '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+      '→ 299 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          name: "Fonsah Ashu",\n' +
+      '          ~~~~\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:43\n' +
+      '\n' +
+      '  296 }\n' +
+      '  297 const { firstName, lastName, phoneNumber, profileImage } = req.body;\n' +
+      '  298 const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;\n' +
+      '→ 299 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          name: "Fonsah Ashu",\n' +
+      '          ~~~~\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 12:28:54'
+}
+{
+  message: '::1 - - [10/Oct/2025:11:28:54 +0000] "PUT /api/auth/profile HTTP/1.1" 500 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 12:28:54'
+}
+{
+  requestId: 'b42ef1fa-0224-461f-afef-86c0545b9507',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '2006-02-01'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 13:33:13'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid access token',
+  stack: 'Error: Invalid access token\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:33:13'
+}
+{
+  requestId: 'b42ef1fa-0224-461f-afef-86c0545b9507',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '104ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 13:33:13'
+}
+{
+  requestId: 'b42ef1fa-0224-461f-afef-86c0545b9507',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: Invalid access token\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:56:60\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\asyncHandler.js:6:25\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:807:7\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-rate-limit\\dist\\index.cjs:691:5',
+    originalError: 'Invalid access token'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:33:13'
+}
+{
+  message: '::1 - - [10/Oct/2025:12:33:13 +0000] "PUT /api/auth/profile HTTP/1.1" 500 875 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 13:33:13'
+}
+{
+  requestId: 'c0f6e18d-ef1b-4751-b831-c74ac8e54050',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 13:34:37'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid email or password',
+  stack: 'Error: Invalid email or password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:89:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:34:37'
+}
+{
+  requestId: 'c0f6e18d-ef1b-4751-b831-c74ac8e54050',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  duration: '316ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 13:34:37'
+}
+{
+  requestId: 'c0f6e18d-ef1b-4751-b831-c74ac8e54050',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid email or password',
+    stack: 'Error: Invalid email or password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:89:61',
+    originalError: 'Invalid email or password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:34:37'
+}
+{
+  message: '::1 - - [10/Oct/2025:12:34:37 +0000] "POST /api/auth/login HTTP/1.1" 401 331 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 13:34:37'
+}
+{
+  requestId: 'c0f45d9e-f37c-4d37-9906-5a5c49ee5809',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'pageo.fonsah@baotechnologiesandtravels.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 13:42:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'c8c63618-b76e-4d44-9519-2e56a15d36a5',
+  email: 'pageo.fonsah@baotechnologiesandtravels.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 13:42:47'
+}
+{
+  requestId: 'c0f45d9e-f37c-4d37-9906-5a5c49ee5809',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '768ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 13:42:47'
+}
+{
+  message: '::1 - - [10/Oct/2025:12:42:47 +0000] "POST /api/auth/login HTTP/1.1" 200 827 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 13:42:47'
+}
+{
+  requestId: '2c657831-37ae-4836-a136-66d1529662ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '2004-02-20'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 13:43:15'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'c8c63618-b76e-4d44-9519-2e56a15d36a5',
+  email: 'pageo.fonsah@baotechnologiesandtravels.com',
+  requestId: '2c657831-37ae-4836-a136-66d1529662ff',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 13:43:15'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:43:15'
+}
+{
+  requestId: '2c657831-37ae-4836-a136-66d1529662ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '244ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 13:43:15'
+}
+{
+  requestId: '2c657831-37ae-4836-a136-66d1529662ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:43:15'
+}
+{
+  message: '::1 - - [10/Oct/2025:12:43:15 +0000] "PUT /api/auth/profile HTTP/1.1" 500 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 13:43:15'
+}
+{
+  requestId: 'd4fde157-676f-4dce-a24b-8a93649850a2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '2004-02-20'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 13:43:37'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'c8c63618-b76e-4d44-9519-2e56a15d36a5',
+  email: 'pageo.fonsah@baotechnologiesandtravels.com',
+  requestId: 'd4fde157-676f-4dce-a24b-8a93649850a2',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 13:43:37'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:43:37'
+}
+{
+  requestId: 'd4fde157-676f-4dce-a24b-8a93649850a2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '28ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 13:43:37'
+}
+{
+  requestId: 'd4fde157-676f-4dce-a24b-8a93649850a2',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:43:37'
+}
+{
+  message: '::1 - - [10/Oct/2025:12:43:37 +0000] "PUT /api/auth/profile HTTP/1.1" 500 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 13:43:37'
+}
+{
+  requestId: 'c8589672-3011-4bde-aa9c-658aad90716b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '2004-02-20'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 13:43:56'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'c8c63618-b76e-4d44-9519-2e56a15d36a5',
+  email: 'pageo.fonsah@baotechnologiesandtravels.com',
+  requestId: 'c8589672-3011-4bde-aa9c-658aad90716b',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 13:43:56'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation:\n' +
+    '\n' +
+    '{\n' +
+    '  where: {\n' +
+    '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+    '  },\n' +
+    '  data: {\n' +
+    '    name: "Fonsah Ashu",\n' +
+    '    ~~~~\n' +
+    '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '  },\n' +
+    '  select: {\n' +
+    '    id: true,\n' +
+    '    email: true,\n' +
+    '    firstName: true,\n' +
+    '    lastName: true,\n' +
+    '    phoneNumber: true,\n' +
+    '    profileImage: true,\n' +
+    '    emailVerified: true,\n' +
+    '    isVerifiedSeller: true,\n' +
+    '    provider: true,\n' +
+    '    lastLoginAt: true,\n' +
+    '    createdAt: true,\n' +
+    '    updatedAt: true\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'Unknown argument `name`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 13:43:56'
+}
+{
+  requestId: 'c8589672-3011-4bde-aa9c-658aad90716b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '16ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 13:43:56'
+}
+{
+  requestId: 'c8589672-3011-4bde-aa9c-658aad90716b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:299:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation:\n' +
+      '\n' +
+      '{\n' +
+      '  where: {\n' +
+      '    id: "c8c63618-b76e-4d44-9519-2e56a15d36a5"\n' +
+      '  },\n' +
+      '  data: {\n' +
+      '    name: "Fonsah Ashu",\n' +
+      '    ~~~~\n' +
+      '?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '?   firstName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   lastName?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '  },\n' +
+      '  select: {\n' +
+      '    id: true,\n' +
+      '    email: true,\n' +
+      '    firstName: true,\n' +
+      '    lastName: true,\n' +
+      '    phoneNumber: true,\n' +
+      '    profileImage: true,\n' +
+      '    emailVerified: true,\n' +
+      '    isVerifiedSeller: true,\n' +
+      '    provider: true,\n' +
+      '    lastLoginAt: true,\n' +
+      '    createdAt: true,\n' +
+      '    updatedAt: true\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'Unknown argument `name`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 13:43:56'
+}
+{
+  message: '::1 - - [10/Oct/2025:12:43:56 +0000] "PUT /api/auth/profile HTTP/1.1" 500 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 13:43:56'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:30:08'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:30:57'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:30:58'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:30:58'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:30:58'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:30:58'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:30:58'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:30:58'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:30:58'
+}
+{
+  requestId: 'b49af7d9-d3bf-4bbd-84b0-c23f703f6d4e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    name: '',
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 14:32:27'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-10 14:32:28'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  level: 'info',
+  message: 'User registered successfully',
+  timestamp: '2025-10-10 14:32:28'
+}
+{
+  requestId: 'b49af7d9-d3bf-4bbd-84b0-c23f703f6d4e',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 201,
+  duration: '1619ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 14:32:28'
+}
+{
+  message: '::1 - - [10/Oct/2025:13:32:28 +0000] "POST /api/auth/register HTTP/1.1" 201 241 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:32:28'
+}
+{
+  requestId: '25e51e82-8355-41de-b4d4-242d2c67eab0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', verificationCode: '291096' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 14:33:07'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  level: 'info',
+  message: 'Email verified successfully',
+  timestamp: '2025-10-10 14:33:07'
+}
+{
+  requestId: '25e51e82-8355-41de-b4d4-242d2c67eab0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '45ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 14:33:07'
+}
+{
+  message: '::1 - - [10/Oct/2025:13:33:07 +0000] "POST /api/auth/verify-email HTTP/1.1" 200 56 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:33:07'
+}
+{
+  requestId: '12c0c717-0214-4950-99f5-6757c7e8a698',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 14:33:19'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 14:33:19'
+}
+{
+  requestId: '12c0c717-0214-4950-99f5-6757c7e8a698',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '510ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 14:33:19'
+}
+{
+  message: '::1 - - [10/Oct/2025:13:33:19 +0000] "POST /api/auth/login HTTP/1.1" 200 720 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:33:19'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: `Error occurred: Unexpected token '-', "------WebK"... is not valid JSON`,
+  stack: `SyntaxError: Unexpected token '-', "------WebK"... is not valid JSON\n` +
+    '    at JSON.parse (<anonymous>)\n' +
+    '    at createStrictSyntaxError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\types\\json.js:169:10)\n' +
+    '    at parse (D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\types\\json.js:86:15)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\read.js:128:18\n' +
+    '    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n' +
+    '    at invokeCallback (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:238:16)\n' +
+    '    at done (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:227:7)\n' +
+    '    at IncomingMessage.onEnd (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:287:7)\n' +
+    '    at IncomingMessage.emit (node:events:519:28)\n' +
+    '    at endReadableNT (node:internal/streams/readable:1698:12)',
+  url: '/api/auth/upload-profile-image',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 14:33:54'
+}
+{
+  requestId: '049a9fe9-0bb1-4cc3-8946-66bbaa908eca',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '2010-06-29'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 14:34:05'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '049a9fe9-0bb1-4cc3-8946-66bbaa908eca',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 14:34:05'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+    '\n' +
+    '  306     updateData.gender = gender;\n' +
+    '  307 if (birthDate !== undefined)\n' +
+    '  308     updateData.birthDate = new Date(birthDate);\n' +
+    '→ 309 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          firstName: "Fonsah",\n' +
+    '          lastName: "Pageo",\n' +
+    '          gender: "male",\n' +
+    '          ~~~~~~\n' +
+    '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `gender`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+    '\n' +
+    '  306     updateData.gender = gender;\n' +
+    '  307 if (birthDate !== undefined)\n' +
+    '  308     updateData.birthDate = new Date(birthDate);\n' +
+    '→ 309 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          firstName: "Fonsah",\n' +
+    '          lastName: "Pageo",\n' +
+    '          gender: "male",\n' +
+    '          ~~~~~~\n' +
+    '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `gender`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 14:34:05'
+}
+{
+  requestId: '049a9fe9-0bb1-4cc3-8946-66bbaa908eca',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '99ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 14:34:05'
+}
+{
+  requestId: '049a9fe9-0bb1-4cc3-8946-66bbaa908eca',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+      '\n' +
+      '  306     updateData.gender = gender;\n' +
+      '  307 if (birthDate !== undefined)\n' +
+      '  308     updateData.birthDate = new Date(birthDate);\n' +
+      '→ 309 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          firstName: "Fonsah",\n' +
+      '          lastName: "Pageo",\n' +
+      '          gender: "male",\n' +
+      '          ~~~~~~\n' +
+      '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `gender`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+      '\n' +
+      '  306     updateData.gender = gender;\n' +
+      '  307 if (birthDate !== undefined)\n' +
+      '  308     updateData.birthDate = new Date(birthDate);\n' +
+      '→ 309 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          firstName: "Fonsah",\n' +
+      '          lastName: "Pageo",\n' +
+      '          gender: "male",\n' +
+      '          ~~~~~~\n' +
+      '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `gender`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 14:34:05'
+}
+{
+  message: '::1 - - [10/Oct/2025:13:34:05 +0000] "PUT /api/auth/profile HTTP/1.1" 500 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:34:05'
+}
+{
+  requestId: 'dfaf892a-521c-4688-88b9-adc4f961746f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '2010-06-29'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 14:34:12'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  requestId: 'dfaf892a-521c-4688-88b9-adc4f961746f',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 14:34:12'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+    '\n' +
+    '  306     updateData.gender = gender;\n' +
+    '  307 if (birthDate !== undefined)\n' +
+    '  308     updateData.birthDate = new Date(birthDate);\n' +
+    '→ 309 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          firstName: "Fonsah",\n' +
+    '          lastName: "Pageo",\n' +
+    '          gender: "male",\n' +
+    '          ~~~~~~\n' +
+    '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `gender`. Available options are marked with ?.',
+  stack: 'PrismaClientValidationError: \n' +
+    'Invalid `prisma.user.update()` invocation in\n' +
+    'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+    '\n' +
+    '  306     updateData.gender = gender;\n' +
+    '  307 if (birthDate !== undefined)\n' +
+    '  308     updateData.birthDate = new Date(birthDate);\n' +
+    '→ 309 const updatedUser = await prisma.user.update({\n' +
+    '        where: {\n' +
+    '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+    '        },\n' +
+    '        data: {\n' +
+    '          firstName: "Fonsah",\n' +
+    '          lastName: "Pageo",\n' +
+    '          gender: "male",\n' +
+    '          ~~~~~~\n' +
+    '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+    '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+    '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+    '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+    '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+    '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+    '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+    '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+    '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+    '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+    '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+    '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+    '        },\n' +
+    '        select: {\n' +
+    '          id: true,\n' +
+    '          email: true,\n' +
+    '          firstName: true,\n' +
+    '          lastName: true,\n' +
+    '          phoneNumber: true,\n' +
+    '          profileImage: true,\n' +
+    '          emailVerified: true,\n' +
+    '          isVerifiedSeller: true,\n' +
+    '          provider: true,\n' +
+    '          lastLoginAt: true,\n' +
+    '          createdAt: true,\n' +
+    '          updatedAt: true\n' +
+    '        }\n' +
+    '      })\n' +
+    '\n' +
+    'Unknown argument `gender`. Available options are marked with ?.\n' +
+    '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+    '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+    '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+    '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+    '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+    '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:25',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 14:34:12'
+}
+{
+  requestId: 'dfaf892a-521c-4688-88b9-adc4f961746f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '20ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 14:34:12'
+}
+{
+  requestId: 'dfaf892a-521c-4688-88b9-adc4f961746f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'PrismaClientValidationError: \n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+      '\n' +
+      '  306     updateData.gender = gender;\n' +
+      '  307 if (birthDate !== undefined)\n' +
+      '  308     updateData.birthDate = new Date(birthDate);\n' +
+      '→ 309 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          firstName: "Fonsah",\n' +
+      '          lastName: "Pageo",\n' +
+      '          gender: "male",\n' +
+      '          ~~~~~~\n' +
+      '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `gender`. Available options are marked with ?.\n' +
+      '    at Nn (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n' +
+      '    at ei.handleRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6911)\n' +
+      '    at ei.handleAndLogRequestError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6593)\n' +
+      '    at ei.request (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:121:6300)\n' +
+      '    at async a (D:\\pageo\\BaoAfrik\\backend\\node_modules\\@prisma\\client\\runtime\\library.js:130:9551)\n' +
+      '    at async D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:25',
+    originalError: '\n' +
+      'Invalid `prisma.user.update()` invocation in\n' +
+      'D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:309:43\n' +
+      '\n' +
+      '  306     updateData.gender = gender;\n' +
+      '  307 if (birthDate !== undefined)\n' +
+      '  308     updateData.birthDate = new Date(birthDate);\n' +
+      '→ 309 const updatedUser = await prisma.user.update({\n' +
+      '        where: {\n' +
+      '          id: "93deed67-22e9-4ea6-a608-f45dbca47ff5"\n' +
+      '        },\n' +
+      '        data: {\n' +
+      '          firstName: "Fonsah",\n' +
+      '          lastName: "Pageo",\n' +
+      '          gender: "male",\n' +
+      '          ~~~~~~\n' +
+      '          birthDate: new Date("2010-06-29T00:00:00.000Z"),\n' +
+      '      ?   id?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   email?: String | StringFieldUpdateOperationsInput,\n' +
+      '      ?   phoneNumber?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordHash?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   profileImage?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   isActive?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   isVerifiedSeller?: Boolean | BoolFieldUpdateOperationsInput,\n' +
+      '      ?   rating?: Float | NullableFloatFieldUpdateOperationsInput | Null,\n' +
+      '      ?   totalSales?: Int | IntFieldUpdateOperationsInput,\n' +
+      '      ?   createdAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   updatedAt?: DateTime | DateTimeFieldUpdateOperationsInput,\n' +
+      '      ?   lastLoginAt?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
+      '      ?   products?: ProductUpdateManyWithoutSellerNestedInput,\n' +
+      '      ?   productLikes?: ProductLikeUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   productSaves?: ProductSaveUpdateManyWithoutUserNestedInput,\n' +
+      '      ?   sentMessages?: MessageUpdateManyWithoutSenderNestedInput,\n' +
+      '      ?   receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput,\n' +
+      '      ?   refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput\n' +
+      '        },\n' +
+      '        select: {\n' +
+      '          id: true,\n' +
+      '          email: true,\n' +
+      '          firstName: true,\n' +
+      '          lastName: true,\n' +
+      '          phoneNumber: true,\n' +
+      '          profileImage: true,\n' +
+      '          emailVerified: true,\n' +
+      '          isVerifiedSeller: true,\n' +
+      '          provider: true,\n' +
+      '          lastLoginAt: true,\n' +
+      '          createdAt: true,\n' +
+      '          updatedAt: true\n' +
+      '        }\n' +
+      '      })\n' +
+      '\n' +
+      'Unknown argument `gender`. Available options are marked with ?.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 14:34:12'
+}
+{
+  message: '::1 - - [10/Oct/2025:13:34:12 +0000] "PUT /api/auth/profile HTTP/1.1" 500 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:34:12'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:36:53'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:40:26'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:40:26'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:40:26'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:40:26'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:40:26'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:40:26'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:40:26'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:40:26'
+}
+{
+  requestId: 'e3522ccc-fc57-410d-b447-7dbd8f2ee455',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 14:44:16'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 14:44:17'
+}
+{
+  requestId: 'e3522ccc-fc57-410d-b447-7dbd8f2ee455',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '657ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 14:44:17'
+}
+{
+  message: '::1 - - [10/Oct/2025:13:44:17 +0000] "POST /api/auth/login HTTP/1.1" 200 761 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:44:17'
+}
+{
+  requestId: '0a41f53b-908b-4f68-83d8-1df62f748690',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '1998-04-18'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 14:45:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '0a41f53b-908b-4f68-83d8-1df62f748690',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 14:45:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-10-10 14:45:47'
+}
+{
+  requestId: '0a41f53b-908b-4f68-83d8-1df62f748690',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '99ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 14:45:47'
+}
+{
+  message: '::1 - - [10/Oct/2025:13:45:47 +0000] "PUT /api/auth/profile HTTP/1.1" 200 408 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:45:47'
+}
+{
+  requestId: 'b300b310-bd65-4162-ba12-928c42cadb48',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 14:51:19'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 14:51:19'
+}
+{
+  requestId: 'b300b310-bd65-4162-ba12-928c42cadb48',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '506ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 14:51:19'
+}
+{
+  message: '::1 - - [10/Oct/2025:13:51:19 +0000] "POST /api/auth/login HTTP/1.1" 200 801 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 14:51:19'
+}
+{
+  requestId: '079eaf2f-bb27-41a2-8c07-a8b198d551e7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '1992-11-30'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 15:09:53'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '079eaf2f-bb27-41a2-8c07-a8b198d551e7',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 15:09:54'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-10-10 15:09:54'
+}
+{
+  requestId: '079eaf2f-bb27-41a2-8c07-a8b198d551e7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '506ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 15:09:54'
+}
+{
+  message: '::1 - - [10/Oct/2025:14:09:54 +0000] "PUT /api/auth/profile HTTP/1.1" 200 408 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 15:09:54'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: `Error occurred: Unexpected token '-', "------WebK"... is not valid JSON`,
+  stack: `SyntaxError: Unexpected token '-', "------WebK"... is not valid JSON\n` +
+    '    at JSON.parse (<anonymous>)\n' +
+    '    at createStrictSyntaxError (D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\types\\json.js:169:10)\n' +
+    '    at parse (D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\types\\json.js:86:15)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\body-parser\\lib\\read.js:128:18\n' +
+    '    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n' +
+    '    at invokeCallback (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:238:16)\n' +
+    '    at done (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:227:7)\n' +
+    '    at IncomingMessage.onEnd (D:\\pageo\\BaoAfrik\\backend\\node_modules\\raw-body\\index.js:287:7)\n' +
+    '    at IncomingMessage.emit (node:events:519:28)\n' +
+    '    at endReadableNT (node:internal/streams/readable:1698:12)',
+  url: '/api/auth/upload-profile-image',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 15:10:41'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:04:23'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:05:50'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:05:51'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:05:51'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:05:51'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:05:51'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:05:51'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:05:51'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:05:51'
+}
+{
+  requestId: '8de94b2c-a833-4357-a5ee-870e4c0986c8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:11:51'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 16:11:52'
+}
+{
+  requestId: '8de94b2c-a833-4357-a5ee-870e4c0986c8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '704ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:11:52'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:11:52 +0000] "POST /api/auth/login HTTP/1.1" 200 801 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:11:52'
+}
+{
+  requestId: '62775346-5164-42ae-9f40-ac814ce6cc59',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '1992-06-26'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:12:33'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '62775346-5164-42ae-9f40-ac814ce6cc59',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 16:12:33'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-10-10 16:12:33'
+}
+{
+  requestId: '62775346-5164-42ae-9f40-ac814ce6cc59',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '88ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:12:33'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:12:33 +0000] "PUT /api/auth/profile HTTP/1.1" 200 462 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:12:33'
+}
+{
+  requestId: '5f175ec8-8be8-47fb-817b-c700198292ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:12:33'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '93deed67-22e9-4ea6-a608-f45dbca47ff5',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '5f175ec8-8be8-47fb-817b-c700198292ff',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 16:12:33'
+}
+{
+  requestId: '5f175ec8-8be8-47fb-817b-c700198292ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '8ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:12:33'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:12:33 +0000] "GET /api/auth/me HTTP/1.1" 200 366 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:12:33'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:20:34'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:30:13'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:30:14'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:30:14'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:30:14'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:30:14'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:30:14'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:30:14'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:30:14'
+}
+{
+  requestId: 'c82b0dc7-e620-420e-9b8f-5e67a3e2fe78',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'female',
+    birthDate: '1997-02-08'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:33:02'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: User not found or inactive',
+  stack: 'Error: User not found or inactive\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 16:33:02'
+}
+{
+  requestId: 'c82b0dc7-e620-420e-9b8f-5e67a3e2fe78',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '276ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:33:02'
+}
+{
+  requestId: 'c82b0dc7-e620-420e-9b8f-5e67a3e2fe78',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: User not found or inactive\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+    originalError: 'User not found or inactive'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 16:33:02'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:33:02 +0000] "PUT /api/auth/profile HTTP/1.1" 500 317 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:33:02'
+}
+{
+  requestId: 'd46948cc-cce8-4282-b14d-604af778ba67',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    name: '',
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:33:25'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-10 16:33:27'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  level: 'info',
+  message: 'User registered successfully',
+  timestamp: '2025-10-10 16:33:27'
+}
+{
+  requestId: 'd46948cc-cce8-4282-b14d-604af778ba67',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 201,
+  duration: '1599ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:33:27'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:33:27 +0000] "POST /api/auth/register HTTP/1.1" 201 241 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:33:27'
+}
+{
+  requestId: 'f54b51da-4a2e-422a-a77f-634eeade6083',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', verificationCode: '632655' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:33:53'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  level: 'info',
+  message: 'Email verified successfully',
+  timestamp: '2025-10-10 16:33:53'
+}
+{
+  requestId: 'f54b51da-4a2e-422a-a77f-634eeade6083',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '45ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:33:53'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:33:53 +0000] "POST /api/auth/verify-email HTTP/1.1" 200 56 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:33:53'
+}
+{
+  requestId: '81f7a94f-422f-4fb2-abb9-c351f5a8da0b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '1983-02-20'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:34:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: User not found or inactive',
+  stack: 'Error: User not found or inactive\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 16:34:14'
+}
+{
+  requestId: '81f7a94f-422f-4fb2-abb9-c351f5a8da0b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '8ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:34:14'
+}
+{
+  requestId: '81f7a94f-422f-4fb2-abb9-c351f5a8da0b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: User not found or inactive\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+    originalError: 'User not found or inactive'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 16:34:14'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:34:14 +0000] "PUT /api/auth/profile HTTP/1.1" 500 317 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:34:14'
+}
+{
+  requestId: '74396481-04a1-4b4b-bf6e-912fa908b0a3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '1983-02-20'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:34:23'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: User not found or inactive',
+  stack: 'Error: User not found or inactive\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+  url: '/api/auth/profile',
+  method: 'PUT',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-10 16:34:23'
+}
+{
+  requestId: '74396481-04a1-4b4b-bf6e-912fa908b0a3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '7ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:34:23'
+}
+{
+  requestId: '74396481-04a1-4b4b-bf6e-912fa908b0a3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    stack: 'Error: User not found or inactive\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\utils\\errorUtils.js:23:12)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\authMiddleware.js:41:60',
+    originalError: 'User not found or inactive'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-10 16:34:23'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:34:23 +0000] "PUT /api/auth/profile HTTP/1.1" 500 317 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:34:23'
+}
+{
+  requestId: '58b1b04f-1ce2-4646-b001-1240f27df754',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:34:46'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 16:34:46'
+}
+{
+  requestId: '58b1b04f-1ce2-4646-b001-1240f27df754',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '581ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:34:46'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:34:46 +0000] "POST /api/auth/login HTTP/1.1" 200 720 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:34:46'
+}
+{
+  requestId: '56e05f75-4ee8-4f7c-8b64-46dbe4644bbc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '2000-04-15'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:38:35'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '56e05f75-4ee8-4f7c-8b64-46dbe4644bbc',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 16:38:35'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-10-10 16:38:35'
+}
+{
+  requestId: '56e05f75-4ee8-4f7c-8b64-46dbe4644bbc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '309ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:38:35'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:38:35 +0000] "PUT /api/auth/profile HTTP/1.1" 200 463 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:38:35'
+}
+{
+  requestId: '063c0323-1f14-476e-b82f-9fb139496dd8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'GET',
+  url: '/api/auth/me',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:38:35'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '063c0323-1f14-476e-b82f-9fb139496dd8',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 16:38:35'
+}
+{
+  requestId: '063c0323-1f14-476e-b82f-9fb139496dd8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '10ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:38:35'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:38:35 +0000] "GET /api/auth/me HTTP/1.1" 200 367 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:38:35'
+}
+{
+  requestId: '5d09746b-7c9f-405b-95da-0d394dd6b490',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:41:58'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 16:41:58'
+}
+{
+  requestId: '5d09746b-7c9f-405b-95da-0d394dd6b490',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '540ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:41:58'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:41:58 +0000] "POST /api/auth/login HTTP/1.1" 200 801 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:41:58'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:53:29'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:53:45'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:53:45'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:53:45'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:53:45'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:53:45'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:53:45'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:53:45'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:53:45'
+}
+{
+  requestId: '1ead0a4a-5dd7-4e9b-af72-664ee1a1074c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:54:40'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 16:54:40'
+}
+{
+  requestId: '1ead0a4a-5dd7-4e9b-af72-664ee1a1074c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '634ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:54:40'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:54:40 +0000] "POST /api/auth/login HTTP/1.1" 200 801 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:54:40'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:57:37'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:59:17'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:59:18'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:59:18'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:59:18'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:59:18'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:59:18'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:59:18'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:59:18'
+}
+{
+  requestId: '618f7f88-edd1-473d-b245-4d93595d54fa',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 16:59:32'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 16:59:33'
+}
+{
+  requestId: '618f7f88-edd1-473d-b245-4d93595d54fa',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '689ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 16:59:33'
+}
+{
+  message: '::1 - - [10/Oct/2025:15:59:33 +0000] "POST /api/auth/login HTTP/1.1" 200 801 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 16:59:33'
+}
+{
+  requestId: '0a9df67c-56e4-4a13-aa21-5ef293f043cb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '1934-03-01'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 17:01:40'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '0a9df67c-56e4-4a13-aa21-5ef293f043cb',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 17:01:40'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-10-10 17:01:40'
+}
+{
+  requestId: '0a9df67c-56e4-4a13-aa21-5ef293f043cb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '98ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 17:01:40'
+}
+{
+  message: '::1 - - [10/Oct/2025:16:01:40 +0000] "PUT /api/auth/profile HTTP/1.1" 200 463 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:01:40'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:02:30'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:02:40'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:02:40'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:02:40'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:02:40'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:02:40'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:02:40'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:02:40'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:02:40'
+}
+{
+  requestId: '76d0dc99-f550-4d2e-85ed-6bc6001df6da',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 17:04:48'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-10 17:04:48'
+}
+{
+  requestId: '76d0dc99-f550-4d2e-85ed-6bc6001df6da',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '622ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 17:04:48'
+}
+{
+  message: '::1 - - [10/Oct/2025:16:04:48 +0000] "POST /api/auth/login HTTP/1.1" 200 801 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:04:48'
+}
+{
+  requestId: 'dac28588-3d9c-4684-9c87-3d3e9510da19',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Pageo',
+    gender: 'male',
+    birthDate: '2010-10-10'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-10 17:05:08'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  requestId: 'dac28588-3d9c-4684-9c87-3d3e9510da19',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-10 17:05:08'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-10-10 17:05:08'
+}
+{
+  requestId: 'dac28588-3d9c-4684-9c87-3d3e9510da19',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '136ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-10 17:05:08'
+}
+{
+  message: '::1 - - [10/Oct/2025:16:05:08 +0000] "PUT /api/auth/profile HTTP/1.1" 200 463 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-10 17:05:08'
+}

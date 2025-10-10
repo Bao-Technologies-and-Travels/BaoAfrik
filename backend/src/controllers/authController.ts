@@ -222,6 +222,8 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
     logger.info('User logged out', { userId: req.user.id });
   }
 
+  console.log('Logged out user successfully');
+
   const response: ApiResponse = {
     success: true,
     message: 'Logged out successfully'
@@ -424,18 +426,25 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
     throw createUnauthorizedError('User not authenticated');
   }
 
-  const { firstName, lastName, phoneNumber, profileImage } = req.body;
+  const {
+    firstName,
+    lastName,
+    gender,
+    birthDate,
+    profileImage,
+  } = req.body;
 
-  // Combine first and last name if provided
-  const name = firstName && lastName ? `${firstName} ${lastName}`.trim() : undefined;
+  const updateData: any = {};
+
+  if(firstName !== undefined) updateData.firstName = firstName;
+  if(lastName !== undefined) updateData.lastName = lastName;
+  if(profileImage !== undefined) updateData.profileImage = profileImage;
+  if(gender !== undefined) updateData.gender = gender;
+  if(birthDate !== undefined) updateData.birthDate = new Date(birthDate);
 
   const updatedUser = await prisma.user.update({
     where: { id: req.user.id },
-    data: {
-      ...(name && { name }),
-      ...(phoneNumber && { phoneNumber }),
-      ...(profileImage && { profileImage }),
-    },
+    data: updateData,
     select: {
       id: true,
       email: true,
@@ -443,6 +452,8 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
       lastName: true,
       phoneNumber: true,
       profileImage: true,
+      gender: true,
+      birthDate: true,
       emailVerified: true,
       isVerifiedSeller: true,
       provider: true,
