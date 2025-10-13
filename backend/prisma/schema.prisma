@@ -23,8 +23,12 @@ model User {
   emailVerified     Boolean   @default(false) @map("email_verified")
   emailVerificationCode String? @map("email_verification_code")
   emailVerificationExpires DateTime? @map("email_verification_expires")
+  
   passwordResetToken String? @map("password_reset_token")
-  passwordResetExpires DateTime? @map("password_reset_expires")
+  passwordResetTokenExpires DateTime? @map("password_reset_token_expires")
+  passwordResetCode String? @map("password_reset_code")
+  passwordResetExpires DateTime?  @map("password_reset_expires")
+
   provider          String?   // 'local', 'google', 'facebook', 'github'
   providerId        String?   @map("provider_id")
   isActive          Boolean   @default(true) @map("is_active")

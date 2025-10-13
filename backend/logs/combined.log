@@ -18586,7 +18586,7 @@
     '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -18645,7 +18645,7 @@
     '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -18736,7 +18736,7 @@
       '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -18801,7 +18801,7 @@
       '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -18904,7 +18904,7 @@
     '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -18963,7 +18963,7 @@
     '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19054,7 +19054,7 @@
       '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19119,7 +19119,7 @@
       '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19411,7 +19411,7 @@
     '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19466,7 +19466,7 @@
     '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19553,7 +19553,7 @@
       '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19614,7 +19614,7 @@
       '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19713,7 +19713,7 @@
     '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19768,7 +19768,7 @@
     '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19855,7 +19855,7 @@
       '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -19916,7 +19916,7 @@
       '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20015,7 +20015,7 @@
     '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20070,7 +20070,7 @@
     '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20157,7 +20157,7 @@
       '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20218,7 +20218,7 @@
       '?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20549,7 +20549,7 @@
     '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20609,7 +20609,7 @@
     '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20701,7 +20701,7 @@
       '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20767,7 +20767,7 @@
       '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20871,7 +20871,7 @@
     '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -20931,7 +20931,7 @@
     '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
     '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-    '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+    '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
     '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
     '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -21023,7 +21023,7 @@
       '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -21089,7 +21089,7 @@
       '      ?   emailVerified?: Boolean | BoolFieldUpdateOperationsInput,\n' +
       '      ?   emailVerificationCode?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   emailVerificationExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
-      '      ?   passwordResetToken?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
+      '      ?   passworden?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   passwordResetExpires?: DateTime | NullableDateTimeFieldUpdateOperationsInput | Null,\n' +
       '      ?   provider?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
       '      ?   providerId?: String | NullableStringFieldUpdateOperationsInput | Null,\n' +
@@ -22615,4 +22615,4145 @@
   service: 'baoafrik-api',
   environment: 'development',
   timestamp: '2025-10-10 17:05:08'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 14:11:58'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 14:12:03'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 14:12:03'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 14:12:03'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 14:12:03'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 14:12:03'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 14:12:03'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 14:12:03'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 14:12:03'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:36:15'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:36:15'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:36:15'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:36:15'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:36:15'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:36:15'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:36:15'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:36:15'
+}
+{
+  requestId: 'a2140760-53f7-40fe-a92d-138da8046574',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 17:38:04'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-12 17:38:05'
+}
+{
+  requestId: 'a2140760-53f7-40fe-a92d-138da8046574',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '644ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 17:38:05'
+}
+{
+  message: '::1 - - [12/Oct/2025:16:38:05 +0000] "POST /api/auth/login HTTP/1.1" 200 801 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:38:05'
+}
+{
+  requestId: 'f02cf0f7-5bae-4df3-b10c-b5e14a8f4c6a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 17:38:27'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-12 17:38:28'
+}
+{
+  message: 'Password has been sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:38:28'
+}
+{
+  requestId: 'f02cf0f7-5bae-4df3-b10c-b5e14a8f4c6a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '994ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 17:38:28'
+}
+{
+  message: '::1 - - [12/Oct/2025:16:38:28 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 102 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:38:28'
+}
+{
+  requestId: 'b28ffe68-a9b1-4389-b5c9-2a720e40a7bd',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '598866' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 17:39:08'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api/auth/verify-reset-code',
+  stack: 'Error: Not Found - /api/auth/verify-reset-code\n' +
+    '    at notFound (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:18:19)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+    '    at Function.handle (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+    '    at router (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 17:39:08'
+}
+{
+  requestId: 'b28ffe68-a9b1-4389-b5c9-2a720e40a7bd',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  duration: '7ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 17:39:08'
+}
+{
+  requestId: 'b28ffe68-a9b1-4389-b5c9-2a720e40a7bd',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api/auth/verify-reset-code',
+    stack: 'Error: Not Found - /api/auth/verify-reset-code\n' +
+      '    at notFound (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:18:19)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+      '    at Function.handle (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+      '    at router (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+    originalError: 'Not Found - /api/auth/verify-reset-code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 17:39:08'
+}
+{
+  message: '::1 - - [12/Oct/2025:16:39:08 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 404 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:39:08'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:51:28'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:56:08'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:56:08'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:56:08'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:56:08'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:56:08'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:56:08'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:56:08'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:56:08'
+}
+{
+  requestId: 'a99284f5-7eff-411a-b403-44cea6b14d8d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 17:57:52'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: 'd06d105f-38e7-491c-b5d9-3873a4b5c57b',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-12 17:57:52'
+}
+{
+  requestId: 'a99284f5-7eff-411a-b403-44cea6b14d8d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '572ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 17:57:52'
+}
+{
+  message: '::1 - - [12/Oct/2025:16:57:52 +0000] "POST /api/auth/login HTTP/1.1" 200 801 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:57:52'
+}
+{
+  requestId: '5efc00b5-a090-4700-b0e1-b622ea696ff8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'pageo.fonsah@baotechnologiesandtravels.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 17:58:32'
+}
+{
+  requestId: '5efc00b5-a090-4700-b0e1-b622ea696ff8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '11ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 17:58:32'
+}
+{
+  message: '::1 - - [12/Oct/2025:16:58:32 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 102 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 17:58:32'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:25:22'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:25:54'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:25:55'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:25:55'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:25:55'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:25:55'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:25:55'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:25:55'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:25:55'
+}
+{
+  requestId: '360c94e9-c6df-487a-a3e7-7898c59acaf6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:26:20'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:26:20'
+}
+{
+  requestId: '360c94e9-c6df-487a-a3e7-7898c59acaf6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  duration: '162ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:26:20'
+}
+{
+  requestId: '360c94e9-c6df-487a-a3e7-7898c59acaf6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:26:20'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:26:20 +0000] "POST /api/auth/forgot-password HTTP/1.1" 400 648 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:26:20'
+}
+{
+  requestId: '22f09f14-ef1c-43cd-896b-4b34172a872d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:26:44'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:26:44'
+}
+{
+  requestId: '22f09f14-ef1c-43cd-896b-4b34172a872d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  duration: '11ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:26:44'
+}
+{
+  requestId: '22f09f14-ef1c-43cd-896b-4b34172a872d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:26:44'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:26:44 +0000] "POST /api/auth/forgot-password HTTP/1.1" 400 648 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:26:44'
+}
+{
+  requestId: 'c55a528f-fa85-4881-9c43-368f22b2d422',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/register',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    name: '',
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:27:36'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Verify your BaoAfrik account',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-12 18:27:38'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  level: 'info',
+  message: 'User registered successfully',
+  timestamp: '2025-10-12 18:27:38'
+}
+{
+  requestId: 'c55a528f-fa85-4881-9c43-368f22b2d422',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 201,
+  duration: '1478ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:27:38'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:27:38 +0000] "POST /api/auth/register HTTP/1.1" 201 241 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:27:38'
+}
+{
+  requestId: 'a68c7af1-c0f4-42f4-be64-ba1cb31bad4f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-email',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', verificationCode: '918415' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:27:50'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  level: 'info',
+  message: 'Email verified successfully',
+  timestamp: '2025-10-12 18:27:50'
+}
+{
+  requestId: 'a68c7af1-c0f4-42f4-be64-ba1cb31bad4f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '22ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:27:50'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:27:50 +0000] "POST /api/auth/verify-email HTTP/1.1" 200 56 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:27:50'
+}
+{
+  requestId: '434a77b6-c151-40f2-a46c-06e7b7eb3c13',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:27:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-12 18:27:57'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:27:57'
+}
+{
+  requestId: '434a77b6-c151-40f2-a46c-06e7b7eb3c13',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '715ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:27:57'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:27:57 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:27:57'
+}
+{
+  requestId: 'b1bbd44d-cde1-47aa-ada7-135c0ea3cd39',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '964651' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:28:15'
+}
+{
+  requestId: 'b1bbd44d-cde1-47aa-ada7-135c0ea3cd39',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '10ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:28:15'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:28:15 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:28:15'
+}
+{
+  requestId: '9ee2c2c5-40e4-4846-b1e5-8f9d3c3ec071',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { newPassword: 'Testpass@10', confirmPassword: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:30:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:30:14'
+}
+{
+  requestId: '9ee2c2c5-40e4-4846-b1e5-8f9d3c3ec071',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '7ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:30:14'
+}
+{
+  requestId: '9ee2c2c5-40e4-4846-b1e5-8f9d3c3ec071',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: { token: 'Reset token is required' },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:30:14'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:30:14 +0000] "POST /api/auth/reset-password HTTP/1.1" 500 777 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:30:14'
+}
+{
+  requestId: '187000d4-48b3-4bd8-823d-9ebb44bb426d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { newPassword: 'Testpass@10', confirmPassword: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:30:39'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:30:39'
+}
+{
+  requestId: '187000d4-48b3-4bd8-823d-9ebb44bb426d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '4ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:30:39'
+}
+{
+  requestId: '187000d4-48b3-4bd8-823d-9ebb44bb426d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: { token: 'Reset token is required' },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:30:39'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:30:39 +0000] "POST /api/auth/reset-password HTTP/1.1" 500 777 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:30:39'
+}
+{
+  requestId: '06e46809-5818-4b86-a8fc-987a08b5c449',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { newPassword: 'Testpass@10', confirmPassword: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:36:27'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:36:27'
+}
+{
+  requestId: '06e46809-5818-4b86-a8fc-987a08b5c449',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '8ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:36:27'
+}
+{
+  requestId: '06e46809-5818-4b86-a8fc-987a08b5c449',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: { token: 'Reset token is required' },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:36:27'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:36:27 +0000] "POST /api/auth/reset-password HTTP/1.1" 500 777 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:36:27'
+}
+{
+  requestId: '24f78082-3715-4a5b-8229-6881770fd6eb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '964651' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:36:38'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired reset code',
+  stack: 'Error: Invalid or expired reset code\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:459:59',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:36:38'
+}
+{
+  requestId: '24f78082-3715-4a5b-8229-6881770fd6eb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  duration: '144ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:36:38'
+}
+{
+  requestId: '24f78082-3715-4a5b-8229-6881770fd6eb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'Invalid or expired reset code',
+    stack: 'Error: Invalid or expired reset code\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:459:59',
+    originalError: 'Invalid or expired reset code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:36:38'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:36:38 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 400 342 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:36:38'
+}
+{
+  requestId: '490e07a9-82cd-4b10-86a1-c709fbdf01af',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:36:46'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:36:46'
+}
+{
+  requestId: '490e07a9-82cd-4b10-86a1-c709fbdf01af',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  duration: '12ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:36:46'
+}
+{
+  requestId: '490e07a9-82cd-4b10-86a1-c709fbdf01af',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:36:46'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:36:46 +0000] "POST /api/auth/forgot-password HTTP/1.1" 400 648 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:36:46'
+}
+{
+  requestId: '1aed2023-43f7-4c40-8e16-c7a5b9746fb0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:37:11'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-12 18:37:11'
+}
+{
+  requestId: '1aed2023-43f7-4c40-8e16-c7a5b9746fb0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '536ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:37:11'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:37:11 +0000] "POST /api/auth/login HTTP/1.1" 200 720 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:37:11'
+}
+{
+  requestId: '110711c6-bfac-403a-8471-582b31219180',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:37:25'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:37:25'
+}
+{
+  requestId: '110711c6-bfac-403a-8471-582b31219180',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  duration: '10ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:37:25'
+}
+{
+  requestId: '110711c6-bfac-403a-8471-582b31219180',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:37:25'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:37:25 +0000] "POST /api/auth/forgot-password HTTP/1.1" 400 648 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:37:25'
+}
+{
+  requestId: '51dcda91-9957-4519-8692-9ea9656a11b6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:38:30'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:38:30'
+}
+{
+  requestId: '51dcda91-9957-4519-8692-9ea9656a11b6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  duration: '9ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:38:30'
+}
+{
+  requestId: '51dcda91-9957-4519-8692-9ea9656a11b6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:38:30'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:38:30 +0000] "POST /api/auth/forgot-password HTTP/1.1" 400 648 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:38:30'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:38:34'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:38:59'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:38:59'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:38:59'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:38:59'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:38:59'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:39:00'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:39:00'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:39:00'
+}
+{
+  requestId: 'cc3156aa-28be-4afa-bf1e-d1784a33e413',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:44:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-12 18:44:02'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:44:02'
+}
+{
+  requestId: 'cc3156aa-28be-4afa-bf1e-d1784a33e413',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1022ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:44:02'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:44:02 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:44:02'
+}
+{
+  requestId: 'a4db972d-c486-4e92-ada8-4c71d4ce7301',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '445981' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:44:22'
+}
+{
+  requestId: 'a4db972d-c486-4e92-ada8-4c71d4ce7301',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '18ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:44:22'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:44:22 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:44:22'
+}
+{
+  requestId: 'ec9a9875-ead8-41fa-8d06-37796ebad7c5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { newPassword: 'Testpass@10', confirmPassword: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 18:44:43'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:44:43'
+}
+{
+  requestId: 'ec9a9875-ead8-41fa-8d06-37796ebad7c5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '5ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 18:44:43'
+}
+{
+  requestId: 'ec9a9875-ead8-41fa-8d06-37796ebad7c5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: { resetToken: 'Reset token is required' },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:44:43'
+}
+{
+  message: '::1 - - [12/Oct/2025:17:44:43 +0000] "POST /api/auth/reset-password HTTP/1.1" 500 782 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:44:43'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 18:59:05'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:06:30'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:06:30'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:06:30'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:06:30'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:06:30'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:06:30'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:06:30'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:06:30'
+}
+{
+  requestId: '4c52c349-5828-4d03-996c-daa7ce4b630c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 19:08:18'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-12 19:08:19'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:08:19'
+}
+{
+  requestId: '4c52c349-5828-4d03-996c-daa7ce4b630c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1232ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 19:08:19'
+}
+{
+  message: '::1 - - [12/Oct/2025:18:08:19 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:08:19'
+}
+{
+  requestId: '9b76228f-f5c0-4b89-8cf6-b31aea06799a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '315996' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 19:08:30'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired reset code',
+  stack: 'Error: Invalid or expired reset code\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:448:59',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 19:08:30'
+}
+{
+  requestId: '9b76228f-f5c0-4b89-8cf6-b31aea06799a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  duration: '18ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 19:08:30'
+}
+{
+  requestId: '9b76228f-f5c0-4b89-8cf6-b31aea06799a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'Invalid or expired reset code',
+    stack: 'Error: Invalid or expired reset code\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:448:59',
+    originalError: 'Invalid or expired reset code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 19:08:30'
+}
+{
+  message: '::1 - - [12/Oct/2025:18:08:30 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 400 342 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:08:30'
+}
+{
+  requestId: 'a57e4af6-6964-4122-9ffd-f8c18ef60d33',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '315994' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 19:08:33'
+}
+{
+  requestId: 'a57e4af6-6964-4122-9ffd-f8c18ef60d33',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '12ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 19:08:33'
+}
+{
+  message: '::1 - - [12/Oct/2025:18:08:33 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:08:33'
+}
+{
+  requestId: '94ec92f1-fb45-45da-9845-ac4c16315dd6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { newPassword: 'Testpass@10', confirmPassword: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 19:08:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 19:08:47'
+}
+{
+  requestId: '94ec92f1-fb45-45da-9845-ac4c16315dd6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '6ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 19:08:47'
+}
+{
+  requestId: '94ec92f1-fb45-45da-9845-ac4c16315dd6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: {
+      resetToken: 'Reset token is required',
+      '': 'Reset token is required'
+    },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 19:08:47'
+}
+{
+  message: '::1 - - [12/Oct/2025:18:08:47 +0000] "POST /api/auth/reset-password HTTP/1.1" 500 811 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:08:47'
+}
+{
+  requestId: 'b5e9aa2d-a311-4cf7-954b-524f68870091',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '315994' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 19:09:11'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired reset code',
+  stack: 'Error: Invalid or expired reset code\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:448:59',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 19:09:11'
+}
+{
+  requestId: 'b5e9aa2d-a311-4cf7-954b-524f68870091',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  duration: '6ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 19:09:11'
+}
+{
+  requestId: 'b5e9aa2d-a311-4cf7-954b-524f68870091',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'Invalid or expired reset code',
+    stack: 'Error: Invalid or expired reset code\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:448:59',
+    originalError: 'Invalid or expired reset code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 19:09:11'
+}
+{
+  message: '::1 - - [12/Oct/2025:18:09:11 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 400 342 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:09:11'
+}
+{
+  requestId: 'ccd3b258-efe9-436a-a4e9-793800834c62',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 19:09:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-12 19:09:15'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:09:15'
+}
+{
+  requestId: 'ccd3b258-efe9-436a-a4e9-793800834c62',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '894ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 19:09:15'
+}
+{
+  message: '::1 - - [12/Oct/2025:18:09:15 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:09:15'
+}
+{
+  requestId: 'c91ccb6c-9abf-4b7c-b558-3e18a8105083',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '745317' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 19:10:02'
+}
+{
+  requestId: 'c91ccb6c-9abf-4b7c-b558-3e18a8105083',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '7ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 19:10:02'
+}
+{
+  message: '::1 - - [12/Oct/2025:18:10:02 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:10:02'
+}
+{
+  requestId: 'fc707795-2ebd-40f9-8296-58e8dd986042',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { newPassword: 'Testpass@10', confirmPassword: '[REDACTED]' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-12 19:10:21'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 19:10:21'
+}
+{
+  requestId: 'fc707795-2ebd-40f9-8296-58e8dd986042',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  duration: '3ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-12 19:10:21'
+}
+{
+  requestId: 'fc707795-2ebd-40f9-8296-58e8dd986042',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: {
+      resetToken: 'Reset token is required',
+      '': 'Reset token is required'
+    },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 19:10:21'
+}
+{
+  message: '::1 - - [12/Oct/2025:18:10:21 +0000] "POST /api/auth/reset-password HTTP/1.1" 500 811 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-12 19:10:21'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:06:36'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:06:57'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:06:57'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:06:57'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:06:57'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:06:57'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:06:57'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:06:57'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:06:57'
+}
+{
+  requestId: '07e233c4-9297-434d-8338-5c2fb3bd4138',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:07:52'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 08:07:53'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:07:53'
+}
+{
+  requestId: '07e233c4-9297-434d-8338-5c2fb3bd4138',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1116ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:07:53'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:07:53 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:07:53'
+}
+{
+  requestId: 'e8e0e230-03c1-4f36-a942-22b53274d5dc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '169466' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:08:07'
+}
+{
+  requestId: 'e8e0e230-03c1-4f36-a942-22b53274d5dc',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '17ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:08:08'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:08:08 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:08:08'
+}
+{
+  requestId: 'aa819f36-82a2-489a-83b3-ef323817168c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:09:05'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-13 08:09:05'
+}
+{
+  requestId: 'aa819f36-82a2-489a-83b3-ef323817168c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '441ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:09:05'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:09:05 +0000] "POST /api/auth/login HTTP/1.1" 200 761 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:09:05'
+}
+{
+  requestId: 'e57c816c-0db6-45bf-9e3c-038a9b35bc3b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:09:17'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 08:09:17'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:09:17'
+}
+{
+  requestId: 'e57c816c-0db6-45bf-9e3c-038a9b35bc3b',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '608ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:09:17'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:09:17 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:09:17'
+}
+{
+  requestId: 'f293f141-98da-4112-bc82-4e337aab35b7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '848738' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:09:31'
+}
+{
+  requestId: 'f293f141-98da-4112-bc82-4e337aab35b7',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '8ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:09:31'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:09:31 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:09:31'
+}
+{
+  requestId: '5ed2a79b-21cf-4ebd-9097-1783812b8841',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:10:28'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 08:10:29'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:10:29'
+}
+{
+  requestId: '5ed2a79b-21cf-4ebd-9097-1783812b8841',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '620ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:10:29'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:10:29 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:10:29'
+}
+{
+  requestId: 'ff04aac4-21e6-46af-93f0-83fc1985d932',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '386576' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:10:47'
+}
+{
+  requestId: 'ff04aac4-21e6-46af-93f0-83fc1985d932',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '7ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:10:47'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:10:47 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:10:47'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:23:18'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:23:37'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:23:38'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:23:38'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:23:38'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:23:38'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:23:38'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:23:38'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:23:38'
+}
+{
+  requestId: '97b57c18-1cf3-4415-9e76-5a1c09e13bb3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:25:00'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid password',
+  stack: 'Error: Invalid password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:93:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-13 08:25:01'
+}
+{
+  requestId: '97b57c18-1cf3-4415-9e76-5a1c09e13bb3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  duration: '549ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:25:01'
+}
+{
+  requestId: '97b57c18-1cf3-4415-9e76-5a1c09e13bb3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid password',
+    stack: 'Error: Invalid password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:93:61',
+    originalError: 'Invalid password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-13 08:25:01'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:25:01 +0000] "POST /api/auth/login HTTP/1.1" 401 304 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:25:01'
+}
+{
+  requestId: '4d47ec5f-b7ba-4fc8-b3c5-167e74356179',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:25:07'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 08:25:08'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:25:08'
+}
+{
+  requestId: '4d47ec5f-b7ba-4fc8-b3c5-167e74356179',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '895ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:25:08'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:25:08 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:25:08'
+}
+{
+  requestId: 'b52927c2-efe4-43a5-9393-9f39bd9cf816',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '972304' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:25:23'
+}
+{
+  requestId: 'b52927c2-efe4-43a5-9393-9f39bd9cf816',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '20ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:25:23'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:25:23 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:25:23'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:34:59'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:35:18'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:35:19'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:35:19'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:35:19'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:35:19'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:35:19'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:35:19'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:35:19'
+}
+{
+  requestId: '597458ec-6c79-48da-9dea-170ed66d6bf8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:36:10'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 08:36:11'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:36:11'
+}
+{
+  requestId: '597458ec-6c79-48da-9dea-170ed66d6bf8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1035ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:36:11'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:36:11 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:36:11'
+}
+{
+  requestId: 'cfce7e15-6bc5-4c5b-ada4-910da62592ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '267426' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:36:26'
+}
+{
+  requestId: 'cfce7e15-6bc5-4c5b-ada4-910da62592ff',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '19ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:36:26'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:36:26 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:36:26'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:41:47'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:42:24'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:42:24'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:42:24'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:42:24'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:42:24'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:42:24'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:42:24'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:42:24'
+}
+{
+  requestId: 'cc74e692-6488-4d92-af42-a3cd95c3f7eb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:43:20'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 08:43:21'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:43:21'
+}
+{
+  requestId: 'cc74e692-6488-4d92-af42-a3cd95c3f7eb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '984ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:43:21'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:43:21 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:43:21'
+}
+{
+  requestId: 'ad3cb7be-89fa-41b4-9242-f16213dd9f65',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '290503' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:43:43'
+}
+{
+  requestId: 'ad3cb7be-89fa-41b4-9242-f16213dd9f65',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '24ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:43:43'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:43:43 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:43:43'
+}
+{
+  requestId: '4a8a074a-b0ce-4d1d-a20a-5f04f8953aba',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '290503' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:44:06'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired reset code',
+  stack: 'Error: Invalid or expired reset code\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:451:59',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-13 08:44:06'
+}
+{
+  requestId: '4a8a074a-b0ce-4d1d-a20a-5f04f8953aba',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  duration: '12ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:44:06'
+}
+{
+  requestId: '4a8a074a-b0ce-4d1d-a20a-5f04f8953aba',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'Invalid or expired reset code',
+    stack: 'Error: Invalid or expired reset code\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:451:59',
+    originalError: 'Invalid or expired reset code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-13 08:44:06'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:44:06 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 400 342 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:44:06'
+}
+{
+  requestId: 'dc1656a0-e418-4ee1-8df9-d31c6eedf8d5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:44:10'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 08:44:11'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:44:11'
+}
+{
+  requestId: 'dc1656a0-e418-4ee1-8df9-d31c6eedf8d5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '607ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:44:11'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:44:11 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:44:11'
+}
+{
+  requestId: '5627415d-5318-4efa-89b0-7dd5af30d317',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '249077' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:44:25'
+}
+{
+  requestId: '5627415d-5318-4efa-89b0-7dd5af30d317',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '13ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:44:25'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:44:25 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:44:25'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:53:25'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:53:44'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:53:44'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:53:44'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:53:44'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:53:44'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:53:44'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:53:44'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:53:44'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:54:25'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:54:56'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:54:57'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:54:57'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:54:57'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:54:57'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:54:57'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:54:57'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:54:57'
+}
+{
+  requestId: '2cb5e753-ca16-4fc8-8e46-fc1bc4f93a23',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:55:58'
+}
+{
+  service: 'resend',
+  environment: 'development',
+  error: 'Unable to fetch data. The request could not be resolved.',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'error',
+  message: 'Failed to send email',
+  timestamp: '2025-10-13 08:55:58'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:55:58'
+}
+{
+  requestId: '2cb5e753-ca16-4fc8-8e46-fc1bc4f93a23',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '444ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:55:58'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:55:58 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:55:58'
+}
+{
+  requestId: '9d97fdef-b48a-4ee6-9f52-36ba87caca62',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:56:29'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 08:56:30'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:56:30'
+}
+{
+  requestId: '9d97fdef-b48a-4ee6-9f52-36ba87caca62',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '787ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:56:30'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:56:30 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:56:30'
+}
+{
+  requestId: '6f8e5762-fc66-4648-bb9a-54ad7a7ef7fb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '398562' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:56:47'
+}
+{
+  requestId: '6f8e5762-fc66-4648-bb9a-54ad7a7ef7fb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '27ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:56:47'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:56:47 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:56:47'
+}
+{
+  requestId: 'fb12d939-cb4c-40ee-b2bf-11754331fa7f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    resetToken: '5e9d5815c4cfbae9d2b6c45ba36908a6c444a1539540058a333759ada2786fce',
+    newPassword: 'Testpass@10',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:57:02'
+}
+{
+  message: 'Password reset successful for user: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:57:02'
+}
+{
+  requestId: 'fb12d939-cb4c-40ee-b2bf-11754331fa7f',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '439ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:57:02'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:57:02 +0000] "POST /api/auth/reset-password HTTP/1.1" 200 108 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:57:02'
+}
+{
+  requestId: '8b22e581-29de-417b-baaa-a7569d673149',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:57:11'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid password',
+  stack: 'Error: Invalid password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:93:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-13 08:57:11'
+}
+{
+  requestId: '8b22e581-29de-417b-baaa-a7569d673149',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  duration: '428ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:57:11'
+}
+{
+  requestId: '8b22e581-29de-417b-baaa-a7569d673149',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid password',
+    stack: 'Error: Invalid password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:93:61',
+    originalError: 'Invalid password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-13 08:57:11'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:57:11 +0000] "POST /api/auth/login HTTP/1.1" 401 304 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:57:11'
+}
+{
+  requestId: '03ab8b9e-042f-4a4c-be4b-847f8c0aebef',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 08:57:16'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-13 08:57:16'
+}
+{
+  requestId: '03ab8b9e-042f-4a4c-be4b-847f8c0aebef',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '409ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 08:57:16'
+}
+{
+  message: '::1 - - [13/Oct/2025:07:57:16 +0000] "POST /api/auth/login HTTP/1.1" 200 761 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 08:57:16'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:00:53'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:01:33'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:01:33'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:01:33'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:01:33'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:01:33'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:01:33'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:01:33'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:01:33'
+}
+{
+  requestId: 'c43247e6-d95e-4322-81a1-8786c153a618',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:02:56'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 09:02:57'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:02:57'
+}
+{
+  requestId: 'c43247e6-d95e-4322-81a1-8786c153a618',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '1006ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:02:57'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:02:57 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:02:57'
+}
+{
+  requestId: '403034ea-6499-40ca-bf49-4cf58eba49fb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '977953' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:03:15'
+}
+{
+  requestId: '403034ea-6499-40ca-bf49-4cf58eba49fb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '15ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:03:15'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:03:15 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:03:15'
+}
+{
+  requestId: 'dbb99837-ec1f-4975-90e0-c88b462393be',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    resetToken: '4ba71097d30510d57591c8519ef1924796fade1892bd99bfac93e38809f81a85',
+    newPassword: 'Testpass@11',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:03:39'
+}
+{
+  message: 'Password reset successful for user: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:03:39'
+}
+{
+  requestId: 'dbb99837-ec1f-4975-90e0-c88b462393be',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '411ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:03:39'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:03:39 +0000] "POST /api/auth/reset-password HTTP/1.1" 200 108 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:03:39'
+}
+{
+  requestId: '9745bb47-e8b6-4933-8d47-4487c1723422',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/forgot-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:04:57'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'info',
+  message: 'Email sent successfully via Resend',
+  timestamp: '2025-10-13 09:04:58'
+}
+{
+  message: 'Password reset code sent to: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:04:58'
+}
+{
+  requestId: '9745bb47-e8b6-4933-8d47-4487c1723422',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '591ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:04:58'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:04:58 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 118 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:04:58'
+}
+{
+  requestId: 'b742b929-dd8f-4a7c-9e0b-0c722ba7cdbf',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/verify-reset-code',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: { email: 'ashprincepageo@gmail.com', code: '465958' },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:05:44'
+}
+{
+  requestId: 'b742b929-dd8f-4a7c-9e0b-0c722ba7cdbf',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '8ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:05:44'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:05:44 +0000] "POST /api/auth/verify-reset-code HTTP/1.1" 200 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:05:44'
+}
+{
+  requestId: '08cd87b1-9cbb-4c8c-bc58-c8bf6aede7b1',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/reset-password',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    resetToken: 'd6be0b4dc57567f7835b8864351eace3925e02fd4f2309c522e466ee8083043c',
+    newPassword: 'Testpass@10',
+    confirmPassword: '[REDACTED]'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:06:07'
+}
+{
+  message: 'Password reset successful for user: ashprincepageo@gmail.com',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:06:08'
+}
+{
+  requestId: '08cd87b1-9cbb-4c8c-bc58-c8bf6aede7b1',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '382ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:06:08'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:06:08 +0000] "POST /api/auth/reset-password HTTP/1.1" 200 108 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:06:08'
+}
+{
+  requestId: '953d7105-f826-4bd7-80d8-c8e194030ab5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:06:15'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-13 09:06:15'
+}
+{
+  requestId: '953d7105-f826-4bd7-80d8-c8e194030ab5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '482ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:06:15'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:06:15 +0000] "POST /api/auth/login HTTP/1.1" 200 761 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:06:15'
+}
+{
+  requestId: '5e7e6a51-a661-4cc7-9021-6737f5422f3c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '2001-10-15'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:06:38'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '5e7e6a51-a661-4cc7-9021-6737f5422f3c',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-13 09:06:39'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-10-13 09:06:39'
+}
+{
+  requestId: '5e7e6a51-a661-4cc7-9021-6737f5422f3c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '91ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:06:39'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:06:39 +0000] "PUT /api/auth/profile HTTP/1.1" 200 462 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:06:39'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:10:57'
+}
+{
+  message: 'Resend email service initialized',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:11:23'
+}
+{
+  message: 'Successfully connected to PostgreSQL database',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:11:23'
+}
+{
+  message: 'Database connected successfully',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:11:23'
+}
+{
+  message: 'REDIS_URL not set, Redis will be disabled in development mode',
+  level: 'warn',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:11:23'
+}
+{
+  message: 'Redis disabled, continuing without caching',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:11:23'
+}
+{
+  message: '🚀 BaoAfrik API server running on port 3001',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:11:23'
+}
+{
+  message: '📚 API Documentation available at http://localhost:3001/api-docs',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:11:23'
+}
+{
+  message: '🏥 Health check available at http://localhost:3001/health',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:11:23'
+}
+{
+  requestId: 'b552ccc3-afe2-4e22-bec0-cb1186e9acd0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: true
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:12:09'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: true,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-13 09:12:10'
+}
+{
+  requestId: 'b552ccc3-afe2-4e22-bec0-cb1186e9acd0',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '707ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:12:10'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:12:10 +0000] "POST /api/auth/login HTTP/1.1" 200 800 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:12:10'
+}
+{
+  requestId: '4cd9a926-82de-4a40-b27e-ccdaefe06e53',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '2007-07-04'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:12:39'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '4cd9a926-82de-4a40-b27e-ccdaefe06e53',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-13 09:12:39'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-10-13 09:12:39'
+}
+{
+  requestId: '4cd9a926-82de-4a40-b27e-ccdaefe06e53',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '94ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:12:39'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:12:39 +0000] "PUT /api/auth/profile HTTP/1.1" 200 462 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:12:39'
+}
+{
+  requestId: '29aac491-6b3f-4e31-92b4-210a82f7472c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:13:02'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-13 09:13:02'
+}
+{
+  requestId: '29aac491-6b3f-4e31-92b4-210a82f7472c',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '353ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:13:02'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:13:02 +0000] "POST /api/auth/login HTTP/1.1" 200 800 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:13:02'
+}
+{
+  requestId: '6bfe3e67-cf22-4743-926f-f560497e4f11',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'PUT',
+  url: '/api/auth/profile',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    firstName: 'Fonsah',
+    lastName: 'Ashu',
+    gender: 'male',
+    birthDate: '2003-04-25'
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:14:00'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  requestId: '6bfe3e67-cf22-4743-926f-f560497e4f11',
+  level: 'info',
+  message: 'User authenticated successfully',
+  timestamp: '2025-10-13 09:14:00'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  level: 'info',
+  message: 'Profile updated successfully',
+  timestamp: '2025-10-13 09:14:00'
+}
+{
+  requestId: '6bfe3e67-cf22-4743-926f-f560497e4f11',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '16ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:14:00'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:14:00 +0000] "PUT /api/auth/profile HTTP/1.1" 200 462 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:14:00'
+}
+{
+  requestId: '96423691-c470-4f33-ae58-675e18237bf8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  method: 'POST',
+  url: '/api/auth/login',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  ip: '::1',
+  query: {},
+  body: {
+    email: 'ashprincepageo@gmail.com',
+    password: '[REDACTED]',
+    rememberMe: false
+  },
+  level: 'info',
+  message: 'Incoming request',
+  timestamp: '2025-10-13 09:14:13'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  userId: '40a5e55e-996e-42cb-91ef-cdf5adcd86ce',
+  email: 'ashprincepageo@gmail.com',
+  rememberMe: false,
+  level: 'info',
+  message: 'User logged in successfully',
+  timestamp: '2025-10-13 09:14:14'
+}
+{
+  requestId: '96423691-c470-4f33-ae58-675e18237bf8',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 200,
+  duration: '354ms',
+  contentLength: undefined,
+  level: 'info',
+  message: 'Outgoing response',
+  timestamp: '2025-10-13 09:14:14'
+}
+{
+  message: '::1 - - [13/Oct/2025:08:14:14 +0000] "POST /api/auth/login HTTP/1.1" 200 800 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:14:14'
+}
+{
+  message: 'Received SIGINT. Starting graceful shutdown...',
+  level: 'info',
+  service: 'baoafrik-api',
+  environment: 'development',
+  timestamp: '2025-10-13 09:15:30'
 }

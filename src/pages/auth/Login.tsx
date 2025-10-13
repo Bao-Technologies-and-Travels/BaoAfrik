@@ -158,7 +158,6 @@ const Login: React.FC = () => {
         password,
         rememberMe
       });
-      console.log('Login response:', response);
 
       if (!response.success) {
         // Handle error cases

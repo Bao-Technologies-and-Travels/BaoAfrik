@@ -117,7 +117,7 @@ export const validateForgotPassword = [
 ];
 
 export const validateResetPassword = [
-  body('token')
+  body('resetToken')
     .notEmpty()
     .withMessage('Reset token is required'),
 
@@ -128,14 +128,28 @@ export const validateResetPassword = [
     .withMessage('New password must contain both letters and numbers'),
 
   body('confirmPassword')
-    .custom((value, { req }) => {
-      if (value !== req.body.newPassword) {
-        throw new Error('Passwords do not match');
-      }
-      return true;
-    }),
+    .custom((value, { req }) => value === req.body.newPassword)
+    .withMessage('Passwords do not match'),
+  body().custom((value, { req }) => {
+    if (!value.resetToken && !value.token) {
+      throw new Error('Reset token is required');
+    }
+    return true;
+  }),
 
   handleValidationErrors,
+];
+
+export const validateVerifyResetCode = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address'),
+  body('code')
+    .isLength({ min: 6, max: 6 })
+    .isNumeric()
+    .withMessage('Reset code must be a 6-digit number'),
+  handleValidationErrors
 ];
 
 export const validateRefreshToken = [

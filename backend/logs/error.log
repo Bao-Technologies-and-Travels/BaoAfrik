@@ -7527,3 +7527,635 @@
   message: 'Error response',
   timestamp: '2025-10-10 16:34:23'
 }
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Not Found - /api/auth/verify-reset-code',
+  stack: 'Error: Not Found - /api/auth/verify-reset-code\n' +
+    '    at notFound (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:18:19)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+    '    at Function.process_params (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+    '    at Function.handle (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+    '    at router (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 17:39:08'
+}
+{
+  requestId: 'b28ffe68-a9b1-4389-b5c9-2a720e40a7bd',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 404,
+  response: {
+    success: false,
+    message: 'Not Found - /api/auth/verify-reset-code',
+    stack: 'Error: Not Found - /api/auth/verify-reset-code\n' +
+      '    at notFound (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:18:19)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at trim_prefix (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:286:9\n' +
+      '    at Function.process_params (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:646:15\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:265:14)\n' +
+      '    at Function.handle (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n' +
+      '    at router (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\index.js:47:12)',
+    originalError: 'Not Found - /api/auth/verify-reset-code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 17:39:08'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:26:20'
+}
+{
+  requestId: '360c94e9-c6df-487a-a3e7-7898c59acaf6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:26:20'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:26:44'
+}
+{
+  requestId: '22f09f14-ef1c-43cd-896b-4b34172a872d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:26:44'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:30:14'
+}
+{
+  requestId: '9ee2c2c5-40e4-4846-b1e5-8f9d3c3ec071',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: { token: 'Reset token is required' },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:30:14'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:30:39'
+}
+{
+  requestId: '187000d4-48b3-4bd8-823d-9ebb44bb426d',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: { token: 'Reset token is required' },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:30:39'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:36:27'
+}
+{
+  requestId: '06e46809-5818-4b86-a8fc-987a08b5c449',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: { token: 'Reset token is required' },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:36:27'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired reset code',
+  stack: 'Error: Invalid or expired reset code\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:459:59',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:36:38'
+}
+{
+  requestId: '24f78082-3715-4a5b-8229-6881770fd6eb',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'Invalid or expired reset code',
+    stack: 'Error: Invalid or expired reset code\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:459:59',
+    originalError: 'Invalid or expired reset code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:36:38'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:36:46'
+}
+{
+  requestId: '490e07a9-82cd-4b10-86a1-c709fbdf01af',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:36:46'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:37:25'
+}
+{
+  requestId: '110711c6-bfac-403a-8471-582b31219180',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:37:25'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+  stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+  url: '/api/auth/forgot-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:38:30'
+}
+{
+  requestId: '51dcda91-9957-4519-8692-9ea9656a11b6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.',
+    stack: 'Error: A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:375:59',
+    originalError: 'A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:38:30'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 18:44:43'
+}
+{
+  requestId: 'ec9a9875-ead8-41fa-8d06-37796ebad7c5',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: { resetToken: 'Reset token is required' },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 18:44:43'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired reset code',
+  stack: 'Error: Invalid or expired reset code\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:448:59',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 19:08:30'
+}
+{
+  requestId: '9b76228f-f5c0-4b89-8cf6-b31aea06799a',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'Invalid or expired reset code',
+    stack: 'Error: Invalid or expired reset code\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:448:59',
+    originalError: 'Invalid or expired reset code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 19:08:30'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 19:08:47'
+}
+{
+  requestId: '94ec92f1-fb45-45da-9845-ac4c16315dd6',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: {
+      resetToken: 'Reset token is required',
+      '': 'Reset token is required'
+    },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 19:08:47'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired reset code',
+  stack: 'Error: Invalid or expired reset code\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:448:59',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 19:09:11'
+}
+{
+  requestId: 'b5e9aa2d-a311-4cf7-954b-524f68870091',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'Invalid or expired reset code',
+    stack: 'Error: Invalid or expired reset code\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:448:59',
+    originalError: 'Invalid or expired reset code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 19:09:11'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Validation failed.Please check your input and try again.',
+  stack: 'Error: Validation failed.Please check your input and try again.\n' +
+    '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+    '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+  url: '/api/auth/reset-password',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-12 19:10:21'
+}
+{
+  requestId: 'fc707795-2ebd-40f9-8296-58e8dd986042',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 500,
+  response: {
+    success: false,
+    message: 'Internal Server Error',
+    errors: {
+      resetToken: 'Reset token is required',
+      '': 'Reset token is required'
+    },
+    stack: 'Error: Validation failed.Please check your input and try again.\n' +
+      '    at handleValidationErrors (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\validationMiddleware.js:15:33)\n' +
+      '    at Layer.handle [as handle_request] (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+      '    at next (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+      '    at middleware (D:\\pageo\\BaoAfrik\\backend\\node_modules\\express-validator\\lib\\middlewares\\check.js:16:13)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)',
+    originalError: 'Validation failed.Please check your input and try again.'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-12 19:10:21'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid password',
+  stack: 'Error: Invalid password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:93:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-13 08:25:01'
+}
+{
+  requestId: '97b57c18-1cf3-4415-9e76-5a1c09e13bb3',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid password',
+    stack: 'Error: Invalid password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:93:61',
+    originalError: 'Invalid password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-13 08:25:01'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid or expired reset code',
+  stack: 'Error: Invalid or expired reset code\n' +
+    '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:451:59',
+  url: '/api/auth/verify-reset-code',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-13 08:44:06'
+}
+{
+  requestId: '4a8a074a-b0ce-4d1d-a20a-5f04f8953aba',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 400,
+  response: {
+    success: false,
+    message: 'Invalid or expired reset code',
+    stack: 'Error: Invalid or expired reset code\n' +
+      '    at createValidationError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:122:19)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:451:59',
+    originalError: 'Invalid or expired reset code'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-13 08:44:06'
+}
+{
+  service: 'resend',
+  environment: 'development',
+  error: 'Unable to fetch data. The request could not be resolved.',
+  to: 'ashprincepageo@gmail.com',
+  subject: 'Reset your BaoAfrik password',
+  level: 'error',
+  message: 'Failed to send email',
+  timestamp: '2025-10-13 08:55:58'
+}
+{
+  service: 'baoafrik-api',
+  environment: 'development',
+  message: 'Error occurred: Invalid password',
+  stack: 'Error: Invalid password\n' +
+    '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+    '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:93:61',
+  url: '/api/auth/login',
+  method: 'POST',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+  level: 'error',
+  timestamp: '2025-10-13 08:57:11'
+}
+{
+  requestId: '8b22e581-29de-417b-baaa-a7569d673149',
+  service: 'baoafrik-api',
+  environment: 'development',
+  statusCode: 401,
+  response: {
+    success: false,
+    message: 'Invalid password',
+    stack: 'Error: Invalid password\n' +
+      '    at createUnauthorizedError (D:\\pageo\\BaoAfrik\\backend\\dist\\middleware\\errorMiddleware.js:130:63)\n' +
+      '    at D:\\pageo\\BaoAfrik\\backend\\dist\\controllers\\authController.js:93:61',
+    originalError: 'Invalid password'
+  },
+  level: 'error',
+  message: 'Error response',
+  timestamp: '2025-10-13 08:57:11'
+}

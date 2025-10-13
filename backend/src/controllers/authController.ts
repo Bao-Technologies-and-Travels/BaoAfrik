@@ -24,13 +24,23 @@ import {
   UpdateProfileRequest,
   ChangePasswordRequest,
   ForgotPasswordRequest,
-  ResetPasswordRequest,
   ApiResponse
 } from '@/types/auth';
 import { sendVerificationEmail, sendPasswordResetEmail } from '@/utils/emailService';
 import logger from '@/config/logger';
 
 const prisma = new PrismaClient();
+
+interface VerifyResetCodeRequest {
+  email: string;
+  code: string;
+}
+
+interface ResetPasswordRequest {
+  resetToken: string;
+  newPassword: string;
+  confirmPassword: string;
+}
 
 /**
  * Register new user
@@ -436,11 +446,11 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
 
   const updateData: any = {};
 
-  if(firstName !== undefined) updateData.firstName = firstName;
-  if(lastName !== undefined) updateData.lastName = lastName;
-  if(profileImage !== undefined) updateData.profileImage = profileImage;
-  if(gender !== undefined) updateData.gender = gender;
-  if(birthDate !== undefined) updateData.birthDate = new Date(birthDate);
+  if (firstName !== undefined) updateData.firstName = firstName;
+  if (lastName !== undefined) updateData.lastName = lastName;
+  if (profileImage !== undefined) updateData.profileImage = profileImage;
+  if (gender !== undefined) updateData.gender = gender;
+  if (birthDate !== undefined) updateData.birthDate = new Date(birthDate);
 
   const updatedUser = await prisma.user.update({
     where: { id: req.user.id },
@@ -482,44 +492,86 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
 export const forgotPassword = asyncHandler(async (req: Request<{}, {}, ForgotPasswordRequest>, res: Response) => {
   const { email } = req.body;
 
-  // Always return a success message to avoid account enumeration
-  const user = await prisma.user.findUnique({
-    where: { email: email.toLowerCase() }
-  });
-
-  if (user) {
-    const resetToken = generateSecureToken();
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        passwordResetToken: resetToken,
-        passwordResetExpires: expiresAt,
-      }
-    });
-
-    try {
-      await sendPasswordResetEmail(user.email, resetToken);
-    } catch (error) {
-      logger.error('Failed to send password reset email:', error);
-      // Do not leak errors to client to prevent token enumeration
-    }
+  if (!email) {
+    throw createValidationError('Email is required');
   }
 
-  const response: ApiResponse = {
-    success: true,
-    message: 'If an account exists for that email, a password reset link has been sent.'
-  };
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw createValidationError('Please provide a valid email address');
+  }
 
-  res.json(response);
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email.toLowerCase(),
+      isActive: true
+    },
+    select: {
+      id: true,
+      email: true,
+      emailVerified: true
+    }
+  });
+
+  if (!user) {
+    throw createValidationError('If an account exists with this email, a reset code will be sent. Please check your email and spam folder.');
+  }
+
+  if (!user.emailVerified) {
+    throw createValidationError('Please verify your email address before resetting your password. Check your inbox for the verification email.');
+  }
+
+  // Check for recent reset attempts (prevent spam)
+  // const recentReset = await prisma.user.findFirst({
+  //   where: {
+  //     id: user.id,
+  //     passwordResetExpires: {
+  //       gt: new Date() 
+  //     }
+  //   }
+  // });
+
+  // if (recentReset) {
+  //   throw createValidationError('A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.');
+  // }
+
+  const resetCode = generateVerificationCode();
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      passwordResetCode: resetCode,
+      passwordResetExpires: expiresAt,
+    }
+  });
+
+  try {
+    await sendPasswordResetEmail(user.email, resetCode);
+    logger.info(`Password reset code sent to: ${user.email}`);
+
+    const response: ApiResponse = {
+      success: true,
+      message: 'Password reset code has been sent to your email. Please check your inbox and spam folder.'
+    };
+
+    res.json(response);
+
+  } catch (error) {
+    logger.error('Failed to send password reset email:', error);
+
+    throw createValidationError('Failed to send reset email. Please try again in a few minutes or contact support if the problem persists.');
+  }
 });
 
 /**
  * Reset password
  */
+/**
+ * Reset password with token from code verification
+ */
 export const resetPassword = asyncHandler(async (req: Request<{}, {}, ResetPasswordRequest>, res: Response) => {
-  const { token, newPassword, confirmPassword } = req.body;
+  const { resetToken, newPassword, confirmPassword } = req.body;
 
   if (newPassword !== confirmPassword) {
     throw createValidationError('New passwords do not match');
@@ -528,39 +580,99 @@ export const resetPassword = asyncHandler(async (req: Request<{}, {}, ResetPassw
   // Find user with valid reset token
   const user = await prisma.user.findFirst({
     where: {
-      passwordResetToken: token,
-      passwordResetExpires: { gt: new Date() },
-      isActive: true,
+      passwordResetToken: resetToken,
+      passwordResetTokenExpires: {  // CORRECT: Using passwordResetTokenExpires
+        gt: new Date() // Token hasn't expired
+      }
     },
-    select: { id: true }
+    select: {
+      id: true,
+      email: true  // CORRECT: Including email in select
+    }
   });
 
   if (!user) {
-    throw createUnauthorizedError('Invalid or expired password reset token');
+    throw createValidationError('Invalid or expired reset token');
   }
 
-  // Hash new password
+  // Hash new password and update user
   const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12');
-  const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
+  const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-  // Update user password and clear reset token
   await prisma.user.update({
     where: { id: user.id },
     data: {
-      passwordHash: newPasswordHash,
+      passwordHash: hashedPassword,
       passwordResetToken: null,
+      passwordResetTokenExpires: null,
       passwordResetExpires: null,
+      passwordResetCode: null,
+      updatedAt: new Date()
     }
   });
 
   // Invalidate all refresh tokens for security
-  await prisma.refreshToken.deleteMany({ where: { userId: user.id } });
+  await prisma.refreshToken.deleteMany({
+    where: { userId: user.id }
+  });
 
-  logger.info('Password reset successfully', { userId: user.id });
+  logger.info(`Password reset successful for user: ${user.email}`);
 
   const response: ApiResponse = {
     success: true,
-    message: 'Password has been reset successfully. You can now log in.'
+    message: 'Password has been reset successfully. You can now login with your new password.'
+  };
+
+  res.json(response);
+});
+
+export const verifyResetCode = asyncHandler(async (req: Request<{}, {}, VerifyResetCodeRequest>, res: Response) => {
+  const { email, code } = req.body;
+
+  const user = await prisma.user.findFirst({
+    where: {
+      email: email.toLowerCase(),
+      passwordResetCode: code,
+      passwordResetExpires: {
+        gt: new Date() // Code hasn't expired
+      }
+    },
+    select: {
+      id: true,
+      email: true
+    }
+  });
+
+  if (!user) {
+    throw createValidationError('Invalid or expired reset code');
+  }
+
+  // Generate a temporary token for password reset
+  const resetToken = generateSecureToken();
+  const tokenExpiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken: resetToken,
+        passwordResetTokenExpires: tokenExpiresAt,
+        passwordResetCode: null,
+      }
+    });
+
+  } catch (updateError) {
+    console.error('[Backend] Failed to update user:', updateError);
+    throw new Error('Failed to process reset request');
+  }
+
+  // Prepare response
+  const response: ApiResponse = {
+    success: true,
+    data: {
+      resetToken: resetToken // Explicitly setting it
+    },
+    message: 'Reset code verified successfully'
   };
 
   res.json(response);
@@ -635,4 +747,5 @@ export default {
   forgotPassword,
   resetPassword,
   changePassword,
+  verifyResetCode
 };

@@ -1,22 +1,142 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
+// ResetPassword.tsx - Combined component
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import { authService } from '../../services/authService';
 
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || '';
-  
+
+  // State for the entire flow
+  const [step, setStep] = useState<'code' | 'password'>('code');
+  const [code, setCode] = useState(['', '', '', '', '', '']);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [countdown, setCountdown] = useState(0);
+  const [resetToken, setResetToken] = useState<string>('');
 
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
+  // Code input handlers
+  const handleCodeChange = (index: number, value: string) => {
+    if (!/^\d?$/.test(value)) return;
+
+    const newCode = [...code];
+    newCode[index] = value;
+    setCode(newCode);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+
+    // Auto-verify when all digits are entered
+    if (newCode.every(digit => digit !== '') && index === 5) {
+      handleVerifyCode(newCode.join(''));
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !code[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text');
+    const digits = pastedData.replace(/\D/g, '').split('').slice(0, 6);
+
+    if (digits.length === 6) {
+      const newCode = [...code];
+      digits.forEach((digit, index) => {
+        newCode[index] = digit;
+      });
+      setCode(newCode);
+      inputRefs.current[5]?.focus();
+
+      // Auto-verify
+      setTimeout(() => handleVerifyCode(newCode.join('')), 100);
+    }
+  };
+
+  // Code verification
+  const handleVerifyCode = async (submittedCode = code.join('')) => {
+    if (submittedCode.length !== 6) {
+      setErrors({ code: 'Please enter the 6-digit code' });
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      const response = await authService.verifyResetCode(email, submittedCode);
+
+      if (response.success && response.data) {
+        setResetToken(response.data.resetToken);
+        setStep('password');
+        setErrors({});
+      } else {
+        setErrors({
+          code: response.message || 'Invalid verification code'
+        });
+      }
+    } catch (error: any) {
+      console.error('Code verification failed:', error);
+      setErrors({
+        code: error.response?.data?.message || 'Failed to verify code. Please try again.'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Resend code
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      const response = await authService.forgotPassword(email);
+
+      if (response.success) {
+        setCountdown(60); // 60 seconds countdown
+        setErrors({});
+        // Clear the code inputs
+        setCode(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
+      } else {
+        setErrors({
+          general: response.message || 'Failed to resend code'
+        });
+      }
+    } catch (error: any) {
+      console.error('Resend code failed:', error);
+      setErrors({
+        general: error.response?.data?.message || 'Failed to resend code. Please try again.'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Password validation
   const validatePassword = (password: string) => {
     if (password.length < 8) {
       return 'Password must be at least 8 characters long';
@@ -27,24 +147,32 @@ const ResetPassword: React.FC = () => {
     return '';
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Password reset
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const newErrors: {[key: string]: string} = {};
-    
+
+    console.log('Attempting password reset');
+
+    const newErrors: { [key: string]: string } = {};
+
     // Validate password
     const passwordError = validatePassword(password);
     if (passwordError) {
       newErrors.password = passwordError;
     }
-    
+
     // Validate confirm password
     if (!confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
+    if (!resetToken) {
+      newErrors.general = 'Reset session expired. Please start over.';
+      console.error('Reset token is undefined!');
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -54,30 +182,301 @@ const ResetPassword: React.FC = () => {
     setErrors({});
 
     try {
-      // Simulate API call to reset password
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Update password in localStorage for demo
-      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-      const userIndex = registeredUsers.findIndex((user: any) => user.email.toLowerCase() === email.toLowerCase());
-      
-      if (userIndex !== -1) {
-        registeredUsers[userIndex].password = password;
-        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+      const response = await authService.resetPassword({
+        resetToken: resetToken,
+        newPassword: password,
+        confirmPassword: confirmPassword
+      });
+
+      console.log('Password reset successfully')
+
+      if (response.success) {
+        navigate('/password-reset-success');
+      } else {
+        setErrors({
+          general: response.message || 'Failed to reset password. Please try again.'
+        });
       }
-      
-      console.log('Password reset successful for:', email);
-      
-      // Navigate to password reset success page
-      navigate('/password-reset-success');
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('Password reset failed:', error);
-      setErrors({ general: 'Failed to reset password. Please try again.' });
+      setErrors({
+        general: error.response?.data?.message || 'Failed to reset password. Please try again.'
+      });
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Go back to code entry
+  const handleBackToCode = () => {
+    setStep('code');
+    setErrors({});
+    setPassword('');
+    setConfirmPassword('');
+  };
+
+  // Render code verification step
+  const renderCodeStep = () => (
+    <>
+      <div className="text-center mb-8">
+        <div className="mx-auto w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+          <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+
+        <h1 className="text-2xl font-medium text-gray-900 mb-3">
+          Enter Verification Code
+        </h1>
+        <p className="text-gray-500 text-sm mb-2">
+          We sent a 6-digit code to <strong>{email}</strong>
+        </p>
+        <p className="text-gray-500 text-sm">
+          Enter the code below to reset your password
+        </p>
+      </div>
+
+      {errors.general && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-600 text-sm">{errors.general}</p>
+        </div>
+      )}
+
+      <form onSubmit={(e) => { e.preventDefault(); handleVerifyCode(); }} className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
+            6-Digit Verification Code
+          </label>
+          <div className="flex justify-center space-x-2 mb-2">
+            {code.map((digit, index) => (
+              <input
+                key={index}
+                ref={el => inputRefs.current[index] = el}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleCodeChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                onPaste={index === 0 ? handlePaste : undefined}
+                className={`w-12 h-12 text-center text-lg font-semibold border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.code ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                disabled={isLoading}
+                autoFocus={index === 0}
+              />
+            ))}
+          </div>
+          {errors.code && (
+            <p className="text-center mt-2 text-sm text-red-600">{errors.code}</p>
+          )}
+        </div>
+
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={isLoading || code.some(digit => digit === '')}
+            className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${!code.some(digit => digit === '') && !isLoading
+                ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <LoadingSpinner size="md" color="white" className="mr-2" />
+                Verifying...
+              </div>
+            ) : (
+              'Verify Code'
+            )}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-6 text-center">
+        <p className="text-gray-600 text-sm mb-4">
+          Didn't receive the code?
+        </p>
+        <button
+          onClick={handleResendCode}
+          disabled={isLoading || countdown > 0}
+          className={`text-sm font-medium ${countdown > 0 || isLoading
+              ? 'text-gray-400 cursor-not-allowed'
+              : 'text-orange-500 hover:text-orange-600'
+            }`}
+        >
+          {countdown > 0
+            ? `Resend code in ${countdown}s`
+            : 'Resend verification code'
+          }
+        </button>
+      </div>
+    </>
+  );
+
+  // Render password reset step
+  const renderPasswordStep = () => (
+    <>
+      <div className="text-center mb-8">
+        <div className="mx-auto w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mb-6">
+          <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+        </div>
+
+        <h1 className="text-2xl font-medium text-gray-900 mb-3">
+          Reset Password
+        </h1>
+        <p className="text-gray-500 text-sm">
+          Please enter your new password
+        </p>
+      </div>
+
+      {errors.general && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-600 text-sm">{errors.general}</p>
+        </div>
+      )}
+
+      <form onSubmit={handleResetPassword} className="space-y-6">
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm bg-white ${errors.password ? 'border-red-500' : 'border-gray-300'
+                }`}
+              placeholder="Enter new password"
+              required
+              disabled={isLoading}
+              minLength={8}
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={isLoading}
+            >
+              {showPassword ? (
+                <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              )}
+            </button>
+          </div>
+          {errors.password && (
+            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+          )}
+          <p className="mt-1 text-xs text-gray-500">
+            Password must be at least 8 characters and contain both letters and numbers
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+            Confirm password
+          </label>
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm bg-white ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                }`}
+              placeholder="Confirm new password"
+              required
+              disabled={isLoading}
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              disabled={isLoading}
+            >
+              {showConfirmPassword ? (
+                <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              )}
+            </button>
+          </div>
+          {errors.confirmPassword && (
+            <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+          )}
+        </div>
+
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={isLoading || !password.trim() || !confirmPassword.trim()}
+            className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${password.trim() && confirmPassword.trim() && !isLoading
+                ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <LoadingSpinner size="md" color="white" className="mr-2" />
+                Saving new password...
+              </div>
+            ) : (
+              'Save new password'
+            )}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-6 text-center">
+        <button
+          onClick={handleBackToCode}
+          className="text-orange-500 hover:text-orange-600 font-medium text-sm"
+        >
+          ← Back to code verification
+        </button>
+      </div>
+    </>
+  );
+
+  if (!email) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-8">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Email Required</h1>
+            <p className="text-gray-600 mb-6">
+              Please go back and enter your email address to receive a verification code.
+            </p>
+            <Link
+              to="/forgot-password"
+              className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+            >
+              Back to Forgot Password
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -85,23 +484,18 @@ const ResetPassword: React.FC = () => {
       <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8 border-b-2 border-orange-200">
         <div className="flex items-center justify-between">
           <Link to="/">
-            <img 
-              src={logoFull} 
-              alt="BaoAfrik Logo" 
+            <img
+              src={logoFull}
+              alt="BaoAfrik Logo"
               className="h-8 object-contain cursor-pointer"
             />
           </Link>
-          <button className="p-2 rounded-lg hover:bg-orange-100 transition-colors">
-            <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
         </div>
       </div>
-      
+
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
-          {/* Mobile Header - Fixed Position */}
+          {/* Mobile Header */}
           <div className="lg:hidden fixed top-5 right-5 z-50">
             <div className="flex items-center space-x-2">
               <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
@@ -110,148 +504,17 @@ const ResetPassword: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors bg-white border border-gray-200">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
             </div>
           </div>
 
-          {/* Main content with border and shadow */}
+          {/* Main content */}
           <div className="bg-white border-0 lg:border border-gray-200 rounded-lg shadow-none lg:shadow-lg p-8 mt-0 lg:mt-16">
-            <div className="text-center mb-8">
-              {/* Reset Password Icon */}
-              <div className="mx-auto w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                </svg>
-              </div>
-              
-              <h1 className="text-2xl font-medium text-gray-900 mb-3">
-                Reset Password
-              </h1>
-              <p className="text-gray-500 text-sm">
-                Please enter your new password
-              </p>
-            </div>
-
-            {/* Display general error if any */}
-            {errors.general && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm">{errors.general}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm bg-white ${
-                      errors.password ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter new password"
-                    required
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
-                  >
-                    {showPassword ? (
-                      <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                      </svg>
-                    ) : (
-                      <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    id="confirmPassword"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm bg-white ${
-                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Confirm new password"
-                    required
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    disabled={isLoading}
-                  >
-                    {showConfirmPassword ? (
-                      <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                      </svg>
-                    ) : (
-                      <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
-                )}
-              </div>
-
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={isLoading || !password.trim() || !confirmPassword.trim()}
-                  className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${
-                    password.trim() && confirmPassword.trim() && !isLoading
-                      ? 'text-white'
-                      : 'bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-700'
-                  }`}
-                  style={password.trim() && confirmPassword.trim() && !isLoading ? { backgroundColor: '#F9A825' } : {}}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <LoadingSpinner size="md" color={password.trim() && confirmPassword.trim() ? 'white' : 'gray'} className="mr-2" />
-                      Saving new password...
-                    </div>
-                  ) : (
-                    'Save new password'
-                  )}
-                </button>
-              </div>
-            </form>
+            {step === 'code' ? renderCodeStep() : renderPasswordStep()}
           </div>
-
         </div>
       </div>
 
-      {/* Footer - Hidden on mobile */}
+      {/* Footer */}
       <div className="hidden lg:block py-6 px-4">
         <div className="border-t border-gray-200 pt-4">
           <div className="flex items-center justify-between text-xs text-gray-400">

@@ -74,7 +74,7 @@ class EmailService {
 
   private async verifyConnection(): Promise<void> {
     if (!this.transporter) return;
-    
+
     try {
       await this.transporter.verify();
       logger.info('SMTP connection verified successfully');
@@ -117,7 +117,7 @@ class EmailService {
         };
 
         const info = await this.transporter.sendMail(mailOptions);
-        
+
         logger.info('Email sent successfully via SMTP', {
           messageId: info.messageId,
           to: options.to,
@@ -127,7 +127,7 @@ class EmailService {
       }
 
       throw new Error('No email service configured');
-      
+
     } catch (error) {
       logger.error('Failed to send email', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -246,105 +246,123 @@ class EmailService {
     return { subject, html, text };
   }
 
-  getPasswordResetEmailTemplate(name: string, resetToken: string): EmailTemplate {
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+  getPasswordResetEmailTemplate(name: string, resetCode: string): EmailTemplate {
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetCode}`;
     const subject = 'Reset your BaoAfrik password';
 
     const html = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Password Reset - BaoAfrik</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #F9A825; }
-          .logo { font-size: 28px; font-weight: bold; color: #F9A825; }
-          .content { padding: 30px 0; }
-          .btn {
-            display: inline-block;
-            background: #F9A825;
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            margin: 20px 0;
-          }
-          .footer { 
-            text-align: center; 
-            padding: 20px 0; 
-            border-top: 1px solid #eee; 
-            color: #666; 
-            font-size: 14px;
-          }
-          .warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            padding: 15px;
-            border-radius: 6px;
-            margin: 20px 0;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <div class="logo">BaoAfrik</div>
-            <p>African Marketplace</p>
-          </div>
-          
-          <div class="content">
-            <h2>Password Reset Request</h2>
-            
-            <p>Hello ${name},</p>
-            
-            <p>We received a request to reset the password for your BaoAfrik account. If you made this request, click the button below to reset your password:</p>
-            
-            <div style="text-align: center;">
-              <a href="${resetUrl}" class="btn">Reset Password</a>
-            </div>
-            
-            <p>Or copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #666;">${resetUrl}</p>
-            
-            <div class="warning">
-              <strong>Important:</strong> This link will expire in 1 hour for security purposes. If you didn't request a password reset, you can safely ignore this email.
-            </div>
-            
-            <p>If you continue to have problems, please contact our support team.</p>
-            
-            <p>Best regards,<br>The BaoAfrik Team</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated email. Please do not reply to this message.</p>
-            <p>&copy; 2024 BaoAfrik. All rights reserved.</p>
-          </div>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Password Reset - BaoAfrik</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #F9A825; }
+        .logo { font-size: 28px; font-weight: bold; color: #F9A825; }
+        .content { padding: 30px 0; }
+        .verification-code { 
+          background: #f8f9fa; 
+          border: 2px dashed #F9A825; 
+          padding: 20px; 
+          text-align: center; 
+          margin: 20px 0;
+          border-radius: 8px;
+        }
+        .code { 
+          font-size: 32px; 
+          font-weight: bold; 
+          color: #F9A825; 
+          letter-spacing: 4px;
+          font-family: monospace;
+        }
+        .btn {
+          display: inline-block;
+          background: #F9A825;
+          color: white;
+          padding: 12px 24px;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: bold;
+          margin: 20px 0;
+        }
+        .footer { 
+          text-align: center; 
+          padding: 20px 0; 
+          border-top: 1px solid #eee; 
+          color: #666; 
+          font-size: 14px;
+        }
+        .warning {
+          background: #fff3cd;
+          border: 1px solid #ffeaa7;
+          padding: 15px;
+          border-radius: 6px;
+          margin: 20px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <div class="logo">BaoAfrik</div>
+          <p>African Marketplace</p>
         </div>
-      </body>
-      </html>
-    `;
+        
+        <div class="content">
+          <h2>Password Reset Request</h2>
+          
+          <p>Hello <strong>${name}</strong>,</p>
+          
+          <p>We received a request to reset the password for your BaoAfrik account. Use the verification code below to reset your password:</p>
+          
+          <div class="verification-code">
+            <p><strong>Your verification code is:</strong></p>
+            <div class="code">${resetCode}</div>
+          </div>
+          
+          <p style="text-align: center;">
+            <strong>Enter this 6-digit code on the password reset page to continue.</strong>
+          </p>
+          
+          <div class="warning">
+            <strong>Important:</strong> This code will expire in 15 minutes for security purposes. If you didn't request a password reset, you can safely ignore this email.
+          </div>
+          
+          <p>If you continue to have problems, please contact our support team.</p>
+          
+          <p>Best regards,<br>The BaoAfrik Team</p>
+        </div>
+        
+        <div class="footer">
+          <p>This is an automated email. Please do not reply to this message.</p>
+          <p>&copy; 2024 BaoAfrik. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
 
     const text = `
-      Password Reset Request - BaoAfrik
-      
-      Hello ${name},
-      
-      We received a request to reset the password for your BaoAfrik account.
-      
-      If you made this request, click the link below to reset your password:
-      ${resetUrl}
-      
-      This link will expire in 1 hour for security purposes.
-      
-      If you didn't request a password reset, you can safely ignore this email.
-      
-      Best regards,
-      The BaoAfrik Team
-    `;
+    Password Reset Request - BaoAfrik
+    
+    Hello ${name},
+    
+    We received a request to reset the password for your BaoAfrik account.
+    
+    Your verification code is: ${resetCode}
+    
+    Enter this 6-digit code on the password reset page to continue.
+    
+    This code will expire in 15 minutes for security purposes.
+    
+    If you didn't request a password reset, you can safely ignore this email.
+    
+    Best regards,
+    The BaoAfrik Team
+  `;
 
     return { subject, html, text };
   }
@@ -360,8 +378,8 @@ class EmailService {
     });
   }
 
-  async sendPasswordResetEmail(email: string, resetToken: string): Promise<boolean> {
-    const template = this.getPasswordResetEmailTemplate(email, resetToken);
+  async sendPasswordResetEmail(email: string, resetCode: string): Promise<boolean> {
+    const template = this.getPasswordResetEmailTemplate(email, resetCode);
 
     return await this.sendEmail({
       to: email,

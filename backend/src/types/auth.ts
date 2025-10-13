@@ -92,7 +92,7 @@ export interface ForgotPasswordRequest {
 }
 
 export interface ResetPasswordRequest {
-  token: string;
+  resetToken: string;
   newPassword: string;
   confirmPassword: string;
 }
@@ -102,4 +102,9 @@ export interface ApiResponse<T = any> {
   message?: string;
   data?: T;
   errors?: Record<string, string>;
+}
+
+export interface VerifyResetCodeRequest {
+  email: string;
+  code: string;
 }

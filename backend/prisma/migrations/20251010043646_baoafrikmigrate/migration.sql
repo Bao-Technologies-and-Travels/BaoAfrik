@@ -16,6 +16,8 @@ CREATE TABLE "users" (
     "email_verification_code" TEXT,
     "email_verification_expires" TIMESTAMP(3),
     "password_reset_token" TEXT,
+    "password_reset_token_expires" TIMESTAMP(3),
+    "password_reset_code" TEXT,
     "password_reset_expires" TIMESTAMP(3),
     "provider" TEXT,
     "provider_id" TEXT,

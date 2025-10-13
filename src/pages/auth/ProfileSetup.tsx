@@ -28,6 +28,7 @@ const ProfileSetup: React.FC = () => {
 
   // Load social login data if available
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [successMessage, setSuccessMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
   // Form validation state
@@ -42,7 +43,7 @@ const ProfileSetup: React.FC = () => {
         firstName: user.firstName || '',
         lastName: user.lastName || '',
         gender: user.gender || '',
-        birthDate: user.gender || ''
+        birthDate: user.birthDate || ''
       });
       setProfileImage(user.profileImage || null);
     }
@@ -168,6 +169,8 @@ const ProfileSetup: React.FC = () => {
     }
 
     setIsLoading(true);
+    setErrors({});
+    setSuccessMessage('');
 
     try {
       const profileData: UpdateProfileData = {
@@ -177,7 +180,7 @@ const ProfileSetup: React.FC = () => {
         birthDate: formData.birthDate
       };
 
-      console.log('Updating profile with:', profileData);
+      console.log('Updating profile');
 
       const response = await apiClient.updateProfile(profileData);
       if (!response.success) {
@@ -185,7 +188,7 @@ const ProfileSetup: React.FC = () => {
       }
       console.log('Profile updated successfully!');
 
-      setErrors({ general: 'Profile updated successfully! You will be redirected automatically to login again to see changes.' });
+      setSuccessMessage('Profile updated successfully! You will be redirected automatically to login again to see changes.');
 
       setTimeout(() => {
         logout();
@@ -246,6 +249,13 @@ const ProfileSetup: React.FC = () => {
               1
             </div>
           </div>
+
+          {/* Display success message if any */}
+          {successMessage && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-600 text-sm">{successMessage}</p>
+            </div>
+          )}
 
           {/* Display general error if any */}
           {errors.general && (

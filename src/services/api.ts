@@ -90,19 +90,20 @@ class ApiClient {
         headers,
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
       if (!response.ok) {
         return {
           success: false,
-          message: data.message || 'An error occurred',
-          errors: data.errors,
+          message: responseData.message || 'An error occurred',
+          errors: responseData.errors,
         };
       }
 
       return {
         success: true,
-        data,
+        data: responseData.data,
+        message: responseData.message,
       };
     } catch (error) {
       console.error('API Request Error:', error);

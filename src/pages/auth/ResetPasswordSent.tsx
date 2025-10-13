@@ -71,9 +71,7 @@ const ResetPasswordSent: React.FC = () => {
     setError('');
 
     try {
-      // TODO: Implement verification API call
-      console.log('Verifying reset code:', code, 'for email:', email);
-      
+      // TODO: Implement verification API call      
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
       

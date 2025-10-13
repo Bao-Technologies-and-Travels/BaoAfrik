@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import authController from '@/controllers/authController';
+import authController, { verifyResetCode } from '@/controllers/authController';
 import { authenticateToken } from '@/middleware/authMiddleware';
 import { 
   validateRegister,
@@ -11,6 +11,7 @@ import {
   validateChangePassword,
   validateForgotPassword,
   validateResetPassword,
+  validateVerifyResetCode,
 } from '@/middleware/validationMiddleware';
 
 const router = Router();
@@ -46,6 +47,7 @@ router.post('/login', authLimiter, validateLogin, authController.login);
 router.post('/verify-email', generalLimiter, validateEmailVerification, authController.verifyEmail);
 router.post('/resend-verification', generalLimiter, validateResendVerification, authController.resendVerificationCode);
 router.post('/forgot-password', generalLimiter, validateForgotPassword, authController.forgotPassword);
+router.post('/verify-reset-code', generalLimiter, validateVerifyResetCode, authController.verifyResetCode);
 router.post('/reset-password', generalLimiter, validateResetPassword, authController.resetPassword);
 
 // Token refresh

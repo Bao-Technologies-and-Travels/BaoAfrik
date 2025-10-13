@@ -101,6 +101,43 @@ export class AuthService {
     return apiClient.put('/auth/preferences', { preferences });
   }
 
+  // forgot user password
+  async forgotPassword(email: string): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.post('/auth/forgot-password', { email });
+  }
+
+  async verifyResetCode(email: string, code: string): Promise<ApiResponse<{ resetToken: string }>> {
+    try {
+
+      const response = await apiClient.post<{ resetToken: string }>('/auth/verify-reset-code', { email, code });
+      // More defensive check
+      if (response.success && response.data) {
+      } else {
+        console.warn('Response indicates failure or missing data');
+      }
+
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message
+      };
+    } catch (error: any) {
+      console.error('Verify reset code service error:', error);
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        'Failed to verify reset code';
+
+      return {
+        success: false,
+        message: errorMessage,
+        data: undefined
+      };
+    }
+  }
+
   // Change password
   async changePassword(data: {
     currentPassword: string;
@@ -108,6 +145,14 @@ export class AuthService {
     confirmPassword: string;
   }): Promise<ApiResponse<{ message: string }>> {
     return apiClient.put('/auth/change-password', data);
+  }
+
+  async resetPassword(data: {
+    resetToken: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.post('/auth/reset-password', data);
   }
 }
 
