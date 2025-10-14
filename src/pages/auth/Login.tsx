@@ -7,6 +7,7 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { authService } from '../../services/authService';
 import { log } from 'console';
 import generate from '@babel/generator';
+import { useToast } from '../../contexts/ToastContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +18,7 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [successMessage, setSuccessMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const { addToast } = useToast();
 
   const { login, setVisitorMode } = useAuth();
   const navigate = useNavigate();
@@ -85,7 +87,7 @@ const Login: React.FC = () => {
     if (!password) {
       newErrors.password = 'Password is required';
     }
-  
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -121,6 +123,18 @@ const Login: React.FC = () => {
         firstName: user.firstName || undefined,
         lastName: user.lastName || undefined,
         profileImage: user.profileImage || undefined,
+      }, accessToken, refreshToken);
+
+      addToast({
+        type: 'success',
+        title: 'Login successful',
+        message: `Welcome back, ${user?.firstName && user?.lastName
+            ? `${user.firstName} ${user.lastName}`
+            : user?.firstName
+              ? user.firstName
+              : user?.email?.split('@')[0] || 'User'
+          }!`,
+        duration: 4000
       });
 
       navigate('/');
@@ -184,7 +198,13 @@ const Login: React.FC = () => {
 
   const handleSocialLogin = (provider: string) => {
     // Show alert that social login is not available yet
-    alert('Social login not available yet. Backend coming soon.');
+    // alert('Social login not available yet. Backend coming soon.');
+    addToast({
+      type: 'info',
+      title: 'Feature coming soon',
+      message: `Social login with ${provider} coming soon. Please login with email and password`,
+      duration: 4000
+    });
   };
 
   const handleVisitorAccess = () => {

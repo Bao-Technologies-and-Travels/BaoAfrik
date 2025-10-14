@@ -19,8 +19,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setIsMobileMenuOpen(false);
   };
 

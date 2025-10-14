@@ -41,14 +41,38 @@ export class AuthService {
 
   // Logout user
   async logout(): Promise<ApiResponse<{ message: string }>> {
-    const response = await apiClient.post<{ message: string }>('/auth/logout');
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      const accessToken = localStorage.getItem('accessToken');
 
-    // Clear local storage regardless of API response
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
+      const response = await apiClient.post<{ message: string }>('/auth/logout', {
+        refreshToken: refreshToken || undefined
+      });
 
-    return response;
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+
+      return response;
+    } catch (error: any) {
+      console.error('Logout service error:', error);
+
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        'Logout completed locally (backend unreachable';
+
+      return {
+        success: true,
+        message: errorMessage,
+        data: { message: errorMessage }
+      };
+    }
   }
 
   // Verify email with code

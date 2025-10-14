@@ -4,9 +4,11 @@ import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { authService } from '../../services/authService';
+import { useToast } from '../../contexts/ToastContext';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -84,7 +86,14 @@ const Register: React.FC = () => {
       console.log("Registration response:", response);
 
       if (response.success) {
-        alert("Registration successful! Please verify your email.");
+        // alert("Registration successful! Please verify your email.");
+        addToast({
+          type: 'success',
+          title: 'Registration Successfull!',
+          message: 'Please check your email to verify your account.',
+          duration: 6000
+        });
+
         navigate('/verify-email', {
           state: {
             email: formData.email,
@@ -97,7 +106,13 @@ const Register: React.FC = () => {
 
     } catch (error) {
       console.error("Registration failed:", error);
-      setErrors({ general: "Network or server error occurred." });
+      // setErrors({ general: "Network or server error occurred." });
+      addToast({
+        type: 'error',
+        title: 'Registration failed',
+        message: 'Network or server error occurred. Please try again.',
+        duration: 6000
+      });
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +146,13 @@ const Register: React.FC = () => {
 
   const handleSocialLogin = (provider: string) => {
     // Show alert that social login is not available yet
-    alert('Social login not available yet. Backend coming soon.');
+    // alert('Social login not available yet. Backend coming soon.');
+    addToast({
+      type: 'info',
+      title: 'Feature coming soon',
+      message: `Social login with ${provider} coming soon.`,
+      duration: 4000
+    });
   };
 
   return (

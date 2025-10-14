@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { apiClient } from '../services';
+import { authService, AuthService } from '../services/authService';
+import { useToast } from './ToastContext';
 
 interface User {
   id: string;
@@ -15,10 +17,11 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isVisitor: boolean;
-  login: (user: User) => void;
-  logout: () => void;
+  login: (user: User, accessToken?: string, refreshToken?: string) => void;
+  logout: () => Promise<void>;
   setVisitorMode: (isVisitor: boolean) => void;
   updateUserProfile: (profileData: Partial<User>) => void;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,18 +49,73 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   });
 
   const [isVisitor, setIsVisitor] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { addToast } = useToast();
 
-  const login = (userData: User) => {
+  const login = (userData: User, accessToken?: string, refreshToken?: string) => {
     setUser(userData);
     setIsVisitor(false);
     localStorage.setItem('user', JSON.stringify(userData));
+
+    if (accessToken) {
+      localStorage.setItem('acessToken', accessToken);
+    }
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken);
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    // Clear remembered email on explicit logout
-    localStorage.removeItem('rememberedEmail');
+  const logout = async (): Promise<void> => {
+    try {
+      setIsLoading(true);
+
+      const response = await authService.logout();
+
+      setUser(null);
+      setIsVisitor(false);
+
+      localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('rememberedEmail');
+
+      console.log('User logged out successfully.')
+
+      if (response.success) {
+        addToast({
+          type: 'success',
+          title: 'Logged out successfully',
+          message: 'You have been successfully logged out.',
+          duration: 3000,
+        });
+      } else {
+        addToast({
+          type: 'info',
+          title: 'Logged out',
+          message: response.message || 'You have been logged out locally.',
+          duration: 3000,
+        });
+      }
+    } catch (error: any) {
+      console.error('Logout error in context:', error);
+
+      // clear frontend even when there is an error
+      setUser(null);
+      setIsVisitor(false);
+      localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('rememberedEmail');
+
+      addToast({
+        type: 'success',
+        title: 'Logged out',
+        message: 'You have been logged out from this device.',
+        duration: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const setVisitorMode = (visitor: boolean) => {
@@ -79,13 +137,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     })
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     isVisitor,
     login,
     logout,
     setVisitorMode,
     updateUserProfile,
+    isLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

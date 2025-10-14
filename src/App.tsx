@@ -23,6 +23,7 @@ import Messages from './pages/Messages';
 import Listings from './pages/Listings';
 import CreateListing from './pages/CreateListing';
 import './App.css';
+import { ToastProvider } from './contexts/ToastContext';
 
 function AppContent() {
   const location = useLocation();
@@ -91,11 +92,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 
