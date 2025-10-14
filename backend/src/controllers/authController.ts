@@ -142,7 +142,7 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
   });
 
   if (!user) {
-    throw createUnauthorizedError('Invalid email or password');
+    throw createUnauthorizedError('Invalid email');
   }
 
   if(!user.passwordHash) {

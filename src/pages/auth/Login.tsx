@@ -136,7 +136,7 @@ const Login: React.FC = () => {
 
       if (!response.success) {
         // Handle error cases
-        if (response.message === 'User does not exist') {
+        if (response.message === 'Invalid email') {
           setErrors({
             email: 'No account found with this email address.'
           });
