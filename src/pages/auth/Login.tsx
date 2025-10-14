@@ -197,6 +197,7 @@ const Login: React.FC = () => {
       }
 
       await completeLogin(user, accessToken, refreshToken);
+      console.log('User logged in successfully')
 
     } catch (error: any) {
       console.error('Login failed:', error);

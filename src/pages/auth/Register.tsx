@@ -22,36 +22,47 @@ const Register: React.FC = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    // Required field validation
+    // email validation
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    }
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    }
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.email = 'Email address is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address of format name@example.com';
     }
 
-    // Password validation
-    if (formData.password) {
-      if (formData.password.length < 8) {
-        newErrors.password = 'Password must be at least 8 characters long';
-      } else if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
-        newErrors.password = 'Password must contain both letters and numbers';
+    // password validation
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters long';
+    } else if (!/(?=.*[a-z])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one lowercase letter';
+    } else if (!/(?=.*[A-Z])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at lease one uppercase letter';
+    } else if (!/(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain at one number (0-9)'
+    } else if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one special character'
+    }
+
+    // show password requirements if password field has content but criteria not met
+    if (formData.password && formData.password.length > 0) {
+      const requirements = [];
+      if (formData.password.length < 8) requirements.push('at least 8 characters');
+      if (!/(?=.*[a-z])/.test(formData.password)) requirements.push('one lowercase letter');
+      if (!/(?=.*[A-Z])/.test(formData.password)) requirements.push('one uppercase letter');
+      if (!/(?=.*\d)/.test(formData.password)) requirements.push('one number');
+      if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(formData.password)) requirements.push('one special character');
+
+      if (requirements.length > 0) {
+        newErrors.passwordHint = `Password must contain: ${requirements.join(', ')}`;
       }
     }
 
-    // Show password requirements if password field is focused but criteria not met
-    if (formData.password && formData.password.length > 0 && formData.password.length < 8) {
-      newErrors.passwordHint = 'Password must be at least 8 characters with letters and numbers';
-    } else if (formData.password && formData.password.length >= 8 && !/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.passwordHint = 'Password must contain both letters and numbers';
-    }
-
-    // Confirm password validation
-    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+    // conform password validation
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match. Please enter the same password in both fields.'
     }
 
     setErrors(newErrors);
@@ -98,6 +109,24 @@ const Register: React.FC = () => {
       ...prev,
       [name]: value
     }));
+
+    // Clear specific error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+
+    // Clear confirm password error when either password field changes
+    if ((name === 'password' || name === 'confirmPassword') && errors.confirmPassword) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.confirmPassword;
+        return newErrors;
+      });
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
@@ -127,6 +156,19 @@ const Register: React.FC = () => {
             </p>
           </div>
 
+          {/* General Error Message */}
+          {errors.general && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <p className="text-sm text-red-800">{errors.general}</p>
+              </div>
+            </div>
+          )}
+
+          {/* email field */}
           <form className="mt-6 sm:mt-8 space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4 sm:space-y-5">
               <div>
@@ -151,6 +193,7 @@ const Register: React.FC = () => {
                 )}
               </div>
 
+              {/* password field */}
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                   Password
@@ -191,6 +234,15 @@ const Register: React.FC = () => {
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
               )}
+              {errors.passwordHint && !errors.password && (
+                <div className="mt-1 flex items-center text-sm text-orange-600">
+                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.passwordHint}
+                </div>
+              )}
+
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
                   Confirm password

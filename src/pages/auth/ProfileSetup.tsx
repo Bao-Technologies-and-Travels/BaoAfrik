@@ -21,8 +21,8 @@ const ProfileSetup: React.FC = () => {
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
-    gender: '',
-    birthDate: ''
+    gender: user?.gender || '',
+    birthDate: user?.birthDate || ''
   });
   const [profileImage, setProfileImage] = useState<string | null>(user?.profileImage || null);
 
@@ -69,7 +69,7 @@ const ProfileSetup: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-      const maxSize = 8 * 1024 * 1024;
+      const maxSize = 8 * 1024 * 1024; // 8mb
 
       if (!validTypes.includes(file.type)) {
         setErrors(
@@ -82,7 +82,7 @@ const ProfileSetup: React.FC = () => {
       if (file.size > maxSize) {
         setErrors(
           prev => ({
-            ...prev, general: 'Image size must be lest than 5mb'
+            ...prev, general: 'Image size must be less than 8mb'
           })
         );
         return;
