@@ -23,7 +23,7 @@ declare global {
         email: string;
         profileImage?: string | null;  // Allow null for profileImage
         isVerifiedSeller: boolean;
-        emailVerified?: boolean;  // Add this line to match the user object from Prisma
+        emailVerified?: boolean; 
       };
     }
   }

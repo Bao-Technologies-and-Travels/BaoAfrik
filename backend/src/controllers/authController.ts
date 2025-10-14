@@ -141,8 +141,12 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
     }
   });
 
-  if (!user || !user.passwordHash) {
+  if (!user) {
     throw createUnauthorizedError('Invalid email or password');
+  }
+
+  if(!user.passwordHash) {
+    throw createUnauthorizedError('This account uses social login. Please sign in with your provider.');
   }
 
   // Verify password

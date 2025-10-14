@@ -84,32 +84,8 @@ const Login: React.FC = () => {
 
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters long';
-    } else if (!/(?=.*[a-z])/.test(password)) {
-      newErrors.password = 'Password must contain at least one lowercase letter';
-    } else if (!/(?=.*[A-Z])/.test(password)) {
-      newErrors.password = 'Password must contain at least one uppercase letter';
-    } else if (!/(?=.*\d)/.test(password)) {
-      newErrors.password = 'Password must contain at least one number';
-    } else if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password)) {
-      newErrors.password = 'Password must contain at least one special character';
     }
-
-    // Show password requirements if password field has content but criteria not met
-    if (password && password.length > 0) {
-      const requirements = [];
-      if (password.length < 8) requirements.push('at least 8 characters');
-      if (!/(?=.*[a-z])/.test(password)) requirements.push('one lowercase letter');
-      if (!/(?=.*[A-Z])/.test(password)) requirements.push('one uppercase letter');
-      if (!/(?=.*\d)/.test(password)) requirements.push('one number');
-      if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password)) requirements.push('one special character');
-
-      if (requirements.length > 0) {
-        newErrors.passwordHint = `Password must contain: ${requirements.join(', ')}`;
-      }
-    }
-
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -123,7 +99,6 @@ const Login: React.FC = () => {
     setErrors({});
     setSuccessMessage('');
 
-    // Move completeLogin outside so it's accessible in both paths
     const completeLogin = async (user: any, accessToken: string, refreshToken?: string) => {
       // Store tokens and user data
       localStorage.setItem('accessToken', accessToken);
@@ -145,7 +120,7 @@ const Login: React.FC = () => {
         email: user.email,
         firstName: user.firstName || undefined,
         lastName: user.lastName || undefined,
-        profileImage: user.profileImage,
+        profileImage: user.profileImage || undefined,
       });
 
       navigate('/');
@@ -170,7 +145,7 @@ const Login: React.FC = () => {
             password: 'Incorrect password. Please try again.'
           });
         } else {
-          throw new Error(response.message || 'Login failed');
+          throw new Error(response.message || 'Login failed.');
         }
         return;
       }
