@@ -213,6 +213,9 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     className="w-8 h-8 rounded-full object-cover"
                     width="32"
                     height="32"
+                    onError={(e) => {
+                      e.currentTarget.src = avatar;
+                    }}
                   />
                 </Link>
 
@@ -260,6 +263,9 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                           className="w-16 h-16 rounded-full object-cover"
                           width="64"
                           height="64"
+                          onError={(e) => {
+                            e.currentTarget.src = avatar;
+                          }}
                         />
                         <div className="flex-1">
                           <p className="text-sm text-gray-500">My profile</p>
@@ -1099,6 +1105,9 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       className="w-16 h-16 rounded-full object-cover"
                       width="64"
                       height="64"
+                      onError={(e) => {
+                        e.currentTarget.src = avatar;
+                      }}
                     />
                     <div className="flex-1">
                       <p className="text-sm text-gray-500">My profile</p>

@@ -138,14 +138,14 @@ const ProfileSetup: React.FC = () => {
 
   const handleRemoveImage = async () => {
     try {
-      if (existingImageUrl && existingImageUrl.includes('amazonaws.com')) {
-        await s3Service.deleteImage(existingImageUrl);
-      }
-
       setProfileImage(null);
       setSelectedFile(null);
       setExistingImageUrl(null);
       setImageRemoved(true);
+
+      if (existingImageUrl && existingImageUrl.includes('amazonaws.com')) {
+        await s3Service.deleteImage(existingImageUrl);
+      }
 
       if (errors.general) {
         setErrors(prev => ({ ...prev, general: '' }));
@@ -239,7 +239,7 @@ const ProfileSetup: React.FC = () => {
     setSuccessMessage('');
 
     try {
-      let imageUrl: string | undefined | null = undefined;
+      let imageUrl: string | null = null;
 
       if (selectedFile) {
         // Upload new image to S3
@@ -250,10 +250,13 @@ const ProfileSetup: React.FC = () => {
         if (existingImageUrl && existingImageUrl !== uploadedUrl) {
           await s3Service.deleteImage(existingImageUrl);
         }
-      } else if (imageRemoved && existingImageUrl) {
-        // Image was removed, delete from S3 and set to null
-        await s3Service.deleteImage(existingImageUrl);
-        // imageUrl = undefined; // to clear the profile image
+      } else if (imageRemoved) {
+        imageUrl = null;
+        if (existingImageUrl) {
+          await s3Service.deleteImage(existingImageUrl);
+        }
+      } else {
+        imageUrl = existingImageUrl;
       }
 
       const profileData: UpdateProfileData = {
@@ -261,10 +264,8 @@ const ProfileSetup: React.FC = () => {
         lastName: formData.lastName.trim(),
         gender: formData.gender,
         birthDate: formData.birthDate,
+        profileImage: imageUrl
       };
-      if (selectedFile && imageUrl !== undefined) {
-        profileData.profileImage = imageUrl;
-      }
 
       const response = await apiClient.updateProfile(profileData);
 
