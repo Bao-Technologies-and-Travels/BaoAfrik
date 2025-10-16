@@ -129,7 +129,7 @@ EOF
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '   
+                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                             set -e
                             cd ${BACKEND_DIR}
 
@@ -158,7 +158,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 EOF
 
                             chmod 600 .env
-                            
+
                             echo "=== .env file contents (without sensitive values) ==="
                             head -n 10 .env
                             echo "=== Environment file created securely ==="
@@ -179,7 +179,7 @@ EOF
                         echo "Starting backend deployment..."
 
                         cd ${BACKEND_DIR}
-                        
+
                         if [ ! -f .env ]; then
                             echo "ERROR: .env file not found!"
                             exit 1
@@ -189,7 +189,7 @@ EOF
 
                         npm install
                         npm run build
-                        
+
                         npx prisma db push
 
                         pm2 delete ${APP_NAME_BACKEND} || true
@@ -254,25 +254,28 @@ EOF
 
     post {
         always {
-            emailext(
-                subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - ${currentBuild.currentResult}!",
-                from: 'ashprincepageo@gmail.com',
+            script {
+                emailext(
+                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
                 to: "${env.EMAIL}",
-                mimeType: 'text/html',
+                from: 'ashprincepageo@gmail.com',
+                replyTo: 'no-reply@baoafrik.com',
                 body: """
                     <html>
-                        <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-                            <h2 style="color: #2E86C1;">Jenkins Build Notification</h2>
-                            <p><strong>Job:</strong> ${env.JOB_NAME}</p>
-                            <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
-                            <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p>Check the <a href="${env.BUILD_URL}">console output</a> for details.</p>
+                        <body style="font-family: Arial, sans-serif;">
+                            <h2>Jenkins Build Report</h2>
+                            <p><b>Job:</b> ${env.JOB_NAME}</p>
+                            <p><b>Build:</b> #${env.BUILD_NUMBER}</p>
+                            <p><b>Status:</b> ${currentBuild.currentResult}</p>
+                            <p><b>Link:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
                             <hr>
-                            <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
+                            <p style="font-size: 0.9em; color: #666;">This is an automated email from Jenkins. Do not reply</p>
                         </body>
                     </html>
-                """
+                """,
+                mimeType: 'text/html'
             )
+            }
         }
     }
 }
