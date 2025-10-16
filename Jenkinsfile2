@@ -23,6 +23,7 @@ pipeline {
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    set -e
                         # Update and upgrade server packages
                         sudo apt update && sudo apt upgrade -y
 
@@ -45,7 +46,7 @@ pipeline {
 
                         # Configure firewall
                         sudo ufw allow 22
-                        sudo uwf allow 80
+                        sudo ufw allow 80
                         sudo ufw allow 443
                         sudo ufw allow 3000
                         sudo ufw allow 3001
@@ -62,18 +63,18 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 echo 'Cloning repository...'
-                
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        set -e
                         if [ ! -d ~/BaoAfrik ]; then
                             git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
                         fi
 
                         cd ${APP_DIR}
                         git fetch origin ${BRANCH}
+                        git checkout ${BRANCH}
                         git reset --hard origin/${BRANCH}
-                        
                         echo "Repository cloned/updated successfully."
                     '
                     """
@@ -81,7 +82,44 @@ pipeline {
             }
         }
 
-        stage('Setup Environment') {
+        stage('Setup frontend Environment') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'aws_access_key_id', variable: 'REACT_APP_AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws_secret_access_key', variable: 'REACT_APP_AWS_SECRET_ACCESS_KEY'),
+                    string(credentialsId: 'aws_region', variable: 'REACT_APP_AWS_REGION'),
+                    string(credentialsId: 'aws_bucket', variable: 'REACT_APP_S3_BUCKET_NAME'),
+                ]) {
+                    sshagent([env.SSH_KEY_ID]) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                            set -e
+                            cd ${APP_DIR}
+
+                            # Remove existing .env if any
+                            rm -f .env
+
+                            # Create .env file with actual secrets
+                            cat > .env << EOF
+REACT_APP_API_URL=https://${DOMAIN})/api
+REACT_APP_AWS_ACCESS_KEY_ID="${REACT_APP_AWS_ACCESS_KEY_ID}"
+REACT_APP_AWS_SECRET_ACCESS_KEY="${REACT_APP_AWS_SECRET_ACCESS_KEY}"
+REACT_APP_AWS_REGION="${REACT_APP_AWS_REGION}"
+REACT_APP_S3_BUCKET_NAME="${REACT_APP_S3_BUCKET_NAME}"
+EOF
+
+                            chmod 600 .env
+                            echo "=== .env file contents (without sensitive values) ==="
+                            head -n 10 .env
+                            echo "=== Environment file created securely ==="
+                        '
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Setup Backend Environment') {
             steps {
                 withCredentials([
                     string(credentialsId: 'db_url', variable: 'DATABASE_URL'),
@@ -91,7 +129,8 @@ pipeline {
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '   
+                            set -e
                             cd ${BACKEND_DIR}
 
                             # Remove existing .env if any
