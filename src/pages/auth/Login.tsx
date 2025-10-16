@@ -141,7 +141,6 @@ const Login: React.FC = () => {
     };
 
     try {
-      console.log('Attempting to login user.');
       const response = await authService.login({
         email: email.toLowerCase(),
         password,
@@ -186,7 +185,6 @@ const Login: React.FC = () => {
       }
 
       await completeLogin(user, accessToken, refreshToken);
-      console.log('User logged in successfully')
 
     } catch (error: any) {
       console.error('Login failed:', error);

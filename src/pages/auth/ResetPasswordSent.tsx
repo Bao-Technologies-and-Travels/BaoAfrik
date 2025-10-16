@@ -98,7 +98,6 @@ const ResetPasswordSent: React.FC = () => {
       setError('');
       
       // TODO: Implement resend API call
-      console.log('Resending verification code to:', email);
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));

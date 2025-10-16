@@ -85,7 +85,6 @@ const EmailVerification: React.FC = () => {
       });
 
       if (response.success) {
-        console.log('Email verified successfully!');
         if (fromRegistration) {
           navigate('/email-verification-success');
         } else {
@@ -110,7 +109,6 @@ const EmailVerification: React.FC = () => {
 
     try {
       // TODO: Implement resend verification code API call
-      console.log('Resending verification code...');
 
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));

@@ -6,6 +6,8 @@ import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.pn
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import lilLogo from '../../assets/images/pre/lil.png';
 import { UpdateProfileData, apiClient } from '../../services/api';
+import { s3Service } from '../../services/s3Service';
+import { useToast } from '../../contexts/ToastContext';
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -13,26 +15,26 @@ const ProfileSetup: React.FC = () => {
   const { user, logout } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  // Check if coming from social login
-  const fromSocialLogin = location.state?.fromSocialLogin || false;
-  const provider = location.state?.provider || null;
+  const { addToast } = useToast();
 
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    gender: user?.gender || '',
-    birthDate: user?.birthDate || ''
+    firstName: '',
+    lastName: '',
+    gender: '',
+    birthDate: ''
   });
-  const [profileImage, setProfileImage] = useState<string | null>(user?.profileImage || null);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
 
-  // Load social login data if available
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingImage, setIsUpLoadingImage] = useState(false);
 
   // Form validation state
-  const isFormValid = formData.firstName.trim() &&
+  const isFormValid =
+    formData.firstName.trim() &&
     formData.lastName.trim() &&
     formData.gender &&
     formData.birthDate;
@@ -43,11 +45,36 @@ const ProfileSetup: React.FC = () => {
         firstName: user.firstName || '',
         lastName: user.lastName || '',
         gender: user.gender || '',
-        birthDate: user.birthDate || ''
+        birthDate: user.birthDate ? formatDateForInput(user.birthDate) : ''
       });
-      setProfileImage(user.profileImage || null);
+
+      if (user.profileImage) {
+        setProfileImage(user.profileImage);
+        setExistingImageUrl(user.profileImage);
+      }
     }
   }, [user]);
+
+  const formatDateForInput = (dateString: string): string => {
+    if (!dateString) return '';
+
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date string:', dateString);
+        return '';
+      }
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
+    }
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -69,7 +96,7 @@ const ProfileSetup: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-      const maxSize = 8 * 1024 * 1024; // 8mb
+      const maxSize = 5 * 1024 * 1024; // 5mb
 
       if (!validTypes.includes(file.type)) {
         setErrors(
@@ -82,13 +109,14 @@ const ProfileSetup: React.FC = () => {
       if (file.size > maxSize) {
         setErrors(
           prev => ({
-            ...prev, general: 'Image size must be less than 8mb'
+            ...prev, general: 'Image size must be less than 5MB'
           })
         );
         return;
       }
 
       setSelectedFile(file);
+      setImageRemoved(false);
 
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -108,9 +136,47 @@ const ProfileSetup: React.FC = () => {
     fileInputRef.current?.click();
   };
 
-  const handleRemoveImage = () => {
-    setProfileImage(null);
-    setSelectedFile(null);
+  const handleRemoveImage = async () => {
+    try {
+      if (existingImageUrl && existingImageUrl.includes('amazonaws.com')) {
+        await s3Service.deleteImage(existingImageUrl);
+      }
+
+      setProfileImage(null);
+      setSelectedFile(null);
+      setExistingImageUrl(null);
+      setImageRemoved(true);
+
+      if (errors.general) {
+        setErrors(prev => ({ ...prev, general: '' }));
+      }
+    } catch (error) {
+      console.error('Error removing image:', error);
+      setErrors(prev => ({
+        ...prev,
+        general: 'Failed to remove image from storage'
+      }));
+    }
+  };
+
+  const uploadImageToS3 = async (): Promise<string | null> => {
+    if (!selectedFile || !user) return null;
+
+    setIsUpLoadingImage(true);
+    try {
+      const uploadResult = await s3Service.uploadImage(selectedFile, user.id);
+
+      if (uploadResult.success && uploadResult.imageUrl) {
+        return uploadResult.imageUrl;
+      } else {
+        throw new Error(uploadResult.error || 'Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Imagde upload error:', error);
+      throw error;
+    } finally {
+      setIsUpLoadingImage(false);
+    }
   };
 
   const validateForm = () => {
@@ -141,11 +207,11 @@ const ProfileSetup: React.FC = () => {
     } else {
       const birthDate = new Date(formData.birthDate);
       const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
+      let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
 
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        // age--;
+        age--;
       }
 
       if (birthDate > today) {
@@ -173,37 +239,96 @@ const ProfileSetup: React.FC = () => {
     setSuccessMessage('');
 
     try {
+      let imageUrl: string | undefined | null = undefined;
+
+      if (selectedFile) {
+        // Upload new image to S3
+        const uploadedUrl = await uploadImageToS3();
+        imageUrl = uploadedUrl;
+
+        // delete old image if it exists and is different from new one
+        if (existingImageUrl && existingImageUrl !== uploadedUrl) {
+          await s3Service.deleteImage(existingImageUrl);
+        }
+      } else if (imageRemoved && existingImageUrl) {
+        // Image was removed, delete from S3 and set to null
+        await s3Service.deleteImage(existingImageUrl);
+        // imageUrl = undefined; // to clear the profile image
+      }
+
       const profileData: UpdateProfileData = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         gender: formData.gender,
-        birthDate: formData.birthDate
+        birthDate: formData.birthDate,
       };
-
-      console.log('Updating profile');
+      if (selectedFile && imageUrl !== undefined) {
+        profileData.profileImage = imageUrl;
+      }
 
       const response = await apiClient.updateProfile(profileData);
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to update profile.');
-      }
-      console.log('Profile updated successfully!');
 
-      setSuccessMessage('Profile updated successfully! You will be redirected automatically to login again to see changes.');
+      if (!response.success) {
+        if (response.errors) {
+          const apiErrors: { [key: string]: string } = {};
+          Object.entries(response.errors).forEach(([key, value]) => {
+            if (Array.isArray(value)) {
+              apiErrors[key] = value.join(', ');
+            } else if (typeof value === 'string') {
+              apiErrors[key] = value;
+            } else {
+              apiErrors[key] = 'Invalid field value'
+            }
+          });
+          setErrors(apiErrors);
+          throw new Error('Please fix the validation errors');
+        } else {
+          throw new Error(response.message || 'Failed to update profile');
+        }
+      }
+
+      addToast({
+        type: 'success',
+        title: 'Profile modified',
+        message: 'Profile updated successfully. Redirecting automatically in 3 seeconds...',
+        duration: 3000
+      });
 
       setTimeout(() => {
         logout();
         navigate('/login');
-      }, 5000);
+      }, 3000)
 
     } catch (error: any) {
       console.error('Profile setup failed:', error);
-      setErrors({
-        general: error.message || 'Failed to save profile information. Please try again.'
-      });
+      if (error.message.includes('S3') || error.message.includes('storage')) {
+        addToast({
+          type: 'error',
+          title: 'Image Error',
+          message: 'Failed to process image. Please try again.',
+          duration: 5000
+        });
+      } else if (error.message.includes('validation')) {
+        addToast({
+          type: 'error',
+          title: 'Validation Error',
+          message: 'Please fix the form errors and try again.',
+          duration: 5000
+        });
+      } else {
+        addToast({
+          type: 'error',
+          title: 'Update Failed',
+          message: error.message || 'Failed to save profile information. Please try again.',
+          duration: 5000
+        });
+      }
     } finally {
       setIsLoading(false);
     }
   };
+
+  const hasExistingData = user?.firstName || user?.lastName || user?.gender || user?.birthDate || user?.profileImage;
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -254,6 +379,11 @@ const ProfileSetup: React.FC = () => {
           {successMessage && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-green-600 text-sm">{successMessage}</p>
+              {!user?.firstName && (
+                <p className="text-green-600 text-sm mt-1">
+                  You will be redirected to login in 3 seconds...
+                </p>
+              )}
             </div>
           )}
 
@@ -288,6 +418,11 @@ const ProfileSetup: React.FC = () => {
                       <svg className="w-20 h-20 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
+                    )}
+                    {isUploadingImage && (
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-2xl">
+                        <LoadingSpinner size="sm" color="white" />
+                      </div>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -326,6 +461,7 @@ const ProfileSetup: React.FC = () => {
                   <input
                     type="text"
                     id="firstName"
+                    name="firstName"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50"
@@ -344,6 +480,7 @@ const ProfileSetup: React.FC = () => {
                   <input
                     type="text"
                     id="lastName"
+                    name="lastName"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                     className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50"
@@ -408,20 +545,20 @@ const ProfileSetup: React.FC = () => {
             <div className="pt-8 pb-8 md:pb-0">
               <button
                 type="submit"
-                disabled={isLoading || !isFormValid}
-                className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer ${isFormValid && !isLoading
+                disabled={isLoading || !isFormValid || isUploadingImage}
+                className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer ${isFormValid && !isLoading && !isUploadingImage
                   ? 'text-white'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
-                style={isFormValid && !isLoading ? { backgroundColor: '#F9A825' } : {}}
+                style={isFormValid && !isLoading && !isUploadingImage ? { backgroundColor: '#F9A825' } : {}}
               >
-                {isLoading ? (
+                {isLoading || isUploadingImage ? (
                   <div className="flex items-center justify-center">
                     <LoadingSpinner size="sm" color="white" className="mr-2" />
-                    <span>Saving information...</span>
+                    <span>{isUploadingImage ? 'Uploading image....' : 'Saving information'}</span>
                   </div>
                 ) : (
-                  'Save information'
+                  hasExistingData ? 'Update Profile' : 'Save Information'
                 )}
               </button>
             </div>

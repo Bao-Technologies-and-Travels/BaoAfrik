@@ -81,15 +81,13 @@ const Register: React.FC = () => {
     setSuccessMessage('');
 
     try {
-      console.log("Sending registration request to backend...");
       const response = await authService.register(formData);
-      console.log("Registration response:", response);
 
       if (response.success) {
         // alert("Registration successful! Please verify your email.");
         addToast({
           type: 'success',
-          title: 'Registration Successfull!',
+          title: 'Registration Successful!',
           message: 'Please check your email to verify your account.',
           duration: 6000
         });

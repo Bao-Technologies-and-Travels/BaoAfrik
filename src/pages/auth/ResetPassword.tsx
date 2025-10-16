@@ -5,11 +5,13 @@ import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.pn
 import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { authService } from '../../services/authService';
+import { useToast } from '../../contexts/ToastContext';
 
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || '';
+  const { addToast } = useToast();
 
   // State for the entire flow
   const [step, setStep] = useState<'code' | 'password'>('code');
@@ -151,8 +153,6 @@ const ResetPassword: React.FC = () => {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('Attempting password reset');
-
     const newErrors: { [key: string]: string } = {};
 
     // Validate password
@@ -188,7 +188,12 @@ const ResetPassword: React.FC = () => {
         confirmPassword: confirmPassword
       });
 
-      console.log('Password reset successfully')
+      addToast({
+        type: 'success',
+        title: 'Password modified',
+        message: 'Your password has been reset. Redirecting to login in 3 seconds...',
+        duration: 3000
+      })
 
       if (response.success) {
         navigate('/password-reset-success');
@@ -276,8 +281,8 @@ const ResetPassword: React.FC = () => {
             type="submit"
             disabled={isLoading || code.some(digit => digit === '')}
             className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${!code.some(digit => digit === '') && !isLoading
-                ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              ? 'bg-orange-500 hover:bg-orange-600 text-white'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
           >
             {isLoading ? (
@@ -300,8 +305,8 @@ const ResetPassword: React.FC = () => {
           onClick={handleResendCode}
           disabled={isLoading || countdown > 0}
           className={`text-sm font-medium ${countdown > 0 || isLoading
-              ? 'text-gray-400 cursor-not-allowed'
-              : 'text-orange-500 hover:text-orange-600'
+            ? 'text-gray-400 cursor-not-allowed'
+            : 'text-orange-500 hover:text-orange-600'
             }`}
         >
           {countdown > 0
@@ -425,8 +430,8 @@ const ResetPassword: React.FC = () => {
             type="submit"
             disabled={isLoading || !password.trim() || !confirmPassword.trim()}
             className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${password.trim() && confirmPassword.trim() && !isLoading
-                ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              ? 'bg-orange-500 hover:bg-orange-600 text-white'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
           >
             {isLoading ? (

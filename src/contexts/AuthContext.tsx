@@ -9,9 +9,15 @@ interface User {
   firstName?: string;
   lastName?: string;
   profileImage?: string;
-  provider?: string;
   gender?: string;
   birthDate?: string;
+  phoneNumber?: string;
+  emailVerified?: boolean;
+  isVerifiedSeller?: boolean;
+  provider?: string;
+  lastLoginAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface AuthContextType {
@@ -79,8 +85,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('rememberedEmail');
 
-      console.log('User logged out successfully.')
-
       if (response.success) {
         addToast({
           type: 'success',
@@ -131,8 +135,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const updatedUser = { ...prevUser, ...profileData };
       localStorage.setItem('user', JSON.stringify(updatedUser));
-
-      console.log('User profile updated in context:', updatedUser);
       return updatedUser;
     })
   };

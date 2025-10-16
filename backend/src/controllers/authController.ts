@@ -236,8 +236,6 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
     logger.info('User logged out', { userId: req.user.id });
   }
 
-  console.log('Logged out user successfully');
-
   const response: ApiResponse = {
     success: true,
     message: 'Logged out successfully'
@@ -411,6 +409,8 @@ export const getCurrentUser = asyncHandler(async (req: Request, res: Response) =
       lastName: true,
       phoneNumber: true,
       profileImage: true,
+      gender: true,
+      birthDate: true,
       emailVerified: true,
       isVerifiedSeller: true,
       provider: true,
@@ -525,20 +525,6 @@ export const forgotPassword = asyncHandler(async (req: Request<{}, {}, ForgotPas
     throw createValidationError('Please verify your email address before resetting your password. Check your inbox for the verification email.');
   }
 
-  // Check for recent reset attempts (prevent spam)
-  // const recentReset = await prisma.user.findFirst({
-  //   where: {
-  //     id: user.id,
-  //     passwordResetExpires: {
-  //       gt: new Date() 
-  //     }
-  //   }
-  // });
-
-  // if (recentReset) {
-  //   throw createValidationError('A password reset has already been requested. Please check your email for the reset code or wait a few minutes to request a new one.');
-  // }
-
   const resetCode = generateVerificationCode();
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
@@ -585,13 +571,13 @@ export const resetPassword = asyncHandler(async (req: Request<{}, {}, ResetPassw
   const user = await prisma.user.findFirst({
     where: {
       passwordResetToken: resetToken,
-      passwordResetTokenExpires: {  // CORRECT: Using passwordResetTokenExpires
+      passwordResetTokenExpires: { 
         gt: new Date() // Token hasn't expired
       }
     },
     select: {
       id: true,
-      email: true  // CORRECT: Including email in select
+      email: true
     }
   });
 
@@ -674,7 +660,7 @@ export const verifyResetCode = asyncHandler(async (req: Request<{}, {}, VerifyRe
   const response: ApiResponse = {
     success: true,
     data: {
-      resetToken: resetToken // Explicitly setting it
+      resetToken: resetToken 
     },
     message: 'Reset code verified successfully'
   };

@@ -43,7 +43,7 @@ export interface LoginResponse {
 export interface UpdateProfileData {
   firstName?: string;
   lastName?: string;
-  profileImage?: string;
+  profileImage?: string | null;
   gender?: string;
   birthDate?: string;
 }

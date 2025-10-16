@@ -255,8 +255,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       {/* Profile Section */}
                       <div className="flex items-center space-x-3 px-4 py-4 border-b border-gray-100">
                         <img
-                          src={user?.profileImage || avatar}
-                          alt="User avatar"
+                          src={user?.profileImage}
+                          alt={avatar}
                           className="w-16 h-16 rounded-full object-cover"
                           width="64"
                           height="64"
@@ -1094,8 +1094,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                   {/* Profile Section */}
                   <div className="flex items-center space-x-3 py-4">
                     <img
-                      src={user.profileImage || avatar}
-                      alt="User avatar"
+                      src={user.profileImage}
+                      alt={avatar}
                       className="w-16 h-16 rounded-full object-cover"
                       width="64"
                       height="64"
