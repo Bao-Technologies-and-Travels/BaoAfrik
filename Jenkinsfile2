@@ -259,7 +259,7 @@ EOF
                 subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
                 to: "${env.EMAIL}",
                 from: 'ashprincepageo@gmail.com',
-                replyTo: 'no-reply@baoafrik.com',
+                replyTo: 'no-reply@baotechnologiesandtravels.com',
                 body: """
                     <html>
                         <body style="font-family: Arial, sans-serif;">

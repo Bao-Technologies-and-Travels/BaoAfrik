@@ -365,17 +365,6 @@ const Register: React.FC = () => {
                   </p>
                 )}
               </div>
-              {/* {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-              )}
-              {errors.passwordHint && !errors.password && (
-                <div className="mt-1 flex items-center text-sm text-orange-600">
-                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {errors.passwordHint}
-                </div>
-              )} */}
 
               {/* Confirm Password Field */}
               <div>
@@ -432,9 +421,6 @@ const Register: React.FC = () => {
                     Passwords match
                   </p>
                 )}
-                {/* {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
-                )} */}
               </div>
             </div>
 
