@@ -1,22 +1,2179 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import EmojiPicker from 'emoji-picker-react';
+import logo from '../assets/images/pre/logo.png';
+import sideIcon from '../assets/images/pre/side.png';
+import lilLogo from '../assets/images/pre/lil.png';
+import messagesIcon from '../assets/images/pre/messages.png';
+import filterIcon from '../assets/images/pre/filter.png';
+import ssIcon from '../assets/images/pre/ss.png';
+import mainIcon from '../assets/images/pre/main.png';
+import avatarIcon from '../assets/images/pre/avatar.png';
+import basketIcon from '../assets/images/pre/basket.png';
+import leftIcon from '../assets/images/pre/left.png';
+import fiIcon from '../assets/images/pre/fi.png';
+import faIcon from '../assets/images/pre/fa.png';
+import eboAvatar from '../assets/images/pre/ebo.png';
+import earthIcon from '../assets/images/pre/earth.png';
+import locIcon from '../assets/images/pre/loc.png';
+import profileIcon from '../assets/images/pre/profile.png';
+import faceIcon from '../assets/images/pre/face.png';
+import pinIcon from '../assets/images/pre/pin.png';
+import bluIcon from '../assets/images/pre/blu.png';
+import audioIcon from '../assets/images/pre/audio.svg';
+import swiIcon from '../assets/images/pre/swi.svg';
+import messageIcon from '../assets/images/pre/message.svg';
+import boxIcon from '../assets/images/pre/box.svg';
+import groupIcon from '../assets/images/pre/group.svg';
+import frameIcon from '../assets/images/pre/frame.svg';
+import podsIcon from '../assets/images/pre/pods.svg';
+import settingIcon from '../assets/images/pre/setting.svg';
+import reactionIcon from '../assets/images/pre/reaction.svg';
+import optionIcon from '../assets/images/pre/option.svg';
+import notificationIcon from '../assets/images/pre/notification.svg';
+import actionIcon01 from '../assets/images/pre/01.svg';
+import actionIcon02 from '../assets/images/pre/02.svg';
+import actionIcon03 from '../assets/images/pre/03.svg';
+import actionIcon04 from '../assets/images/pre/04.svg';
+import actionIcon05 from '../assets/images/pre/05.svg';
+import actionIcon06 from '../assets/images/pre/06.svg';
+import productImage1 from '../assets/images/pre/1.png';
 
 const Messages: React.FC = () => {
+  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('EN');
+  const [productData, setProductData] = useState<any>(null);
+  const [preFilledMessage, setPreFilledMessage] = useState('');
+  const [messageText, setMessageText] = useState('');
+  const [messages, setMessages] = useState<any[]>([]);
+  const [isMessageSent, setIsMessageSent] = useState(false);
+  const [chatEntry, setChatEntry] = useState<any>(null);
+  const [selectedTab, setSelectedTab] = useState('All');
+  const [messageStatuses, setMessageStatuses] = useState<{[key: number]: 'sending' | 'delivered' | 'read'}>({});
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null);
+  const [soundDetected, setSoundDetected] = useState(false);
+  const [soundTimer, setSoundTimer] = useState<NodeJS.Timeout | null>(null);
+  const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [showFilePreview, setShowFilePreview] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedEmoji, setSelectedEmoji] = useState<string>('');
+  const [isAttachActive, setIsAttachActive] = useState(false);
+  const [showTypingIndicator, setShowTypingIndicator] = useState(false);
+  const [isUserTyping, setIsUserTyping] = useState(false);
+  const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout | null>(null);
+  const [clickedMessageId, setClickedMessageId] = useState<number | null>(null);
+  const [isReplyRead, setIsReplyRead] = useState(false);
+  const [isSellerTyping, setIsSellerTyping] = useState(false);
+  const [hasIncomingReply, setHasIncomingReply] = useState(false);
+  const [activeChatId, setActiveChatId] = useState<number | null>(null);
+  const [actionsMenuOpen, setActionsMenuOpen] = useState<number | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleHomepageClick = () => {
+    // Navigate to home page while preserving login state
+    navigate('/', { replace: false });
+  };
+
+  const handleMenuClick = () => {
+    // Navigate to home page with menu opened and highlight Chats option
+    navigate('/', { 
+      replace: false,
+      state: { 
+        openMenu: true, 
+        highlightChats: true 
+      }
+    });
+  };
+
+  // File attachment handlers
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    // Reset attach button state when file dialog closes (whether files selected or cancelled)
+    setIsAttachActive(false);
+    
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files);
+      setSelectedFiles(prev => [...prev, ...newFiles]);
+      setShowFilePreview(true);
+    }
+  };
+
+  const handleAttachClick = () => {
+    setIsAttachActive(true);
+    const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    if (selectedFiles.length === 1) {
+      setShowFilePreview(false);
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const handleFileClick = (file: any) => {
+    // For now, we'll create a download link since we don't have the actual file data
+    // In a real app, you would fetch the file from the server
+    const link = document.createElement('a');
+    link.href = '#'; // Placeholder - in real app this would be the file URL
+    link.download = file.name;
+    link.click();
+    
+      // Show a message to the user
+      alert(`Opening file: ${file.name} (${formatFileSize(file.size)})`);
+    };
+
+    const handleIncomingMessageClick = (messageId: number) => {
+      // Toggle the clicked message - if already clicked, hide icons; if not clicked, show icons
+      setClickedMessageId(clickedMessageId === messageId ? null : messageId);
+      
+      // Mark reply as read when user clicks on incoming message
+      const message = messages.find(m => m.id === messageId);
+      if (message && message.isIncoming) {
+        setIsReplyRead(true);
+      }
+    };
+
+    const handleActionsMenuClick = (chatId: number, event: React.MouseEvent) => {
+      event.stopPropagation(); // Prevent chat selection
+      setActionsMenuOpen(actionsMenuOpen === chatId ? null : chatId);
+    };
+
+    const handleActionSelect = (action: string, chatId: number) => {
+      console.log(`Action: ${action} for chat: ${chatId}`);
+      setActionsMenuOpen(null);
+      // Here you would implement the actual action logic
+    };
+
+  // Emoji picker handlers
+  const handleEmojiClick = () => {
+    setShowEmojiPicker(!showEmojiPicker);
+  };
+
+  const onEmojiClick = (emojiObject: any) => {
+    setSelectedEmoji(emojiObject.emoji);
+    // Add the emoji to the message input
+    setMessageText(prev => prev + emojiObject.emoji);
+    setShowEmojiPicker(false);
+    // Trigger typing detection when emoji is added
+    handleTypingDetection();
+  };
+
+  // Typing detection logic
+  const handleTypingDetection = () => {
+    setIsUserTyping(true);
+    
+    // Clear existing timer
+    if (typingTimer) {
+      clearTimeout(typingTimer);
+    }
+    
+    // Set new timer to stop typing indicator after 1.5 seconds of inactivity
+    const timer = setTimeout(() => {
+      setIsUserTyping(false);
+    }, 1500);
+    
+    setTypingTimer(timer);
+  };
+
+  // Render sidebar status indicator
+  const renderSidebarStatus = (messageId: number) => {
+    const status = messageStatuses[messageId] || 'sending';
+    
+    switch (status) {
+      case 'sending':
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="card">
-        <h1 className="font-display font-bold text-2xl mb-6">Messages</h1>
-        <p className="text-gray-600 mb-6">Chat with buyers and sellers directly.</p>
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        );
+      case 'delivered':
+        return (
+          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+          </svg>
+        );
+      case 'read':
+        return (
+          <div className="flex items-center">
+            <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+            </svg>
+            <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+            </svg>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Render message status indicator
+  const renderMessageStatus = (messageId: number) => {
+    const status = messageStatuses[messageId] || 'sending';
+    
+    switch (status) {
+      case 'sending':
+        return (
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        );
+      case 'delivered':
+        return (
+          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+          </svg>
+        );
+      case 'read':
+        return (
+          <div className="flex items-center">
+            <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+            </svg>
+            <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+            </svg>
+        </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const handleLanguageSelect = (language: string) => {
+    setSelectedLanguage(language);
+    setIsLanguageDropdownOpen(false);
+  };
+
+  // Handle incoming product data from Product Detail page
+  useEffect(() => {
+    if (location.state) {
+      const { productData, preFilledMessage } = location.state;
+      if (productData) {
+        setProductData(productData);
+        setPreFilledMessage(preFilledMessage || '');
+        // Only set messageText if no messages have been sent yet
+        if (!isMessageSent) {
+          setMessageText(preFilledMessage || '');
+        }
+      }
+    }
+  }, [location.state, isMessageSent]);
+
+  const handleSendMessage = () => {
+    // Check if user has typed additional text beyond the prefilled message
+    const userTypedText = messageText.trim();
+    const hasUserTyped = userTypedText && userTypedText !== preFilledMessage.trim();
+    
+    // Only include text if user has typed something new, or if there are no files
+    const messageToSend = selectedFiles.length > 0 
+      ? (hasUserTyped ? userTypedText : '') 
+      : (userTypedText || preFilledMessage.trim());
+    
+    if (messageToSend || selectedFiles.length > 0) {
+      const currentTime = new Date();
+      const timeString = currentTime.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
+      const dateString = currentTime.toLocaleDateString('en-US', { 
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const newMessage = {
+        id: Date.now(),
+        text: messageToSend,
+        timestamp: timeString,
+        dateString: `Today, ${timeString}`,
+        productData: isMessageSent ? null : productData, // Only attach product data for first message
+        isProductInquiry: !isMessageSent && !!productData,
+        sentAt: currentTime,
+        attachments: selectedFiles.length > 0 ? selectedFiles.map(file => ({
+          name: file.name,
+          size: file.size,
+          type: file.type
+        })) : null
+      };
+
+           setMessages(prev => [...prev, newMessage]);
+           setIsMessageSent(true);
+           setMessageText('');
+           setPreFilledMessage('');
+           setSelectedFiles([]);
+           setShowFilePreview(false);
+           
+           // Reset incoming reply state when user sends new message
+           setHasIncomingReply(false);
+           setIsReplyRead(false);
+
+      // Set initial status as 'sending'
+      setMessageStatuses(prev => ({
+        ...prev,
+        [newMessage.id]: 'sending'
+      }));
+
+      // Simulate status progression
+      setTimeout(() => {
+        setMessageStatuses(prev => ({
+          ...prev,
+          [newMessage.id]: 'delivered'
+        }));
+      }, 2000); // 2 seconds for delivered
+
+          setTimeout(() => {
+            setMessageStatuses(prev => ({
+              ...prev,
+              [newMessage.id]: 'read'
+            }));
+            
+             // Show typing indicator after 2 seconds (for mock data)
+             // In real system, this would be triggered by actual seller typing
+             setTimeout(() => {
+               setShowTypingIndicator(true);
+               setIsSellerTyping(true); // Update sidebar typing status
+               
+               // Show seller reply after typing indicator
+               setTimeout(() => {
+                 const replyTime = new Date();
+                 const replyTimeString = replyTime.toLocaleTimeString('en-US', {
+                   hour: '2-digit',
+                   minute: '2-digit',
+                   hour12: false
+                 });
+                 
+                 const sellerReply = {
+                   id: Date.now() + 1,
+                   text: "Hello my dear, Yes this item is still available, how much do you want for ?",
+                   timestamp: replyTimeString,
+                   dateString: `Today, ${replyTimeString}`,
+                   isIncoming: true,
+                   sentAt: replyTime
+                 };
+                 
+                 setMessages(prev => [...prev, sellerReply]);
+                 setShowTypingIndicator(false);
+                 setIsSellerTyping(false); // Stop typing indicator
+                 setHasIncomingReply(true); // Mark that there's an incoming reply
+                 setIsReplyRead(false); // Mark reply as unread
+                 
+                 // Auto-transition to read state after 3 seconds since chat is open
+                 setTimeout(() => {
+                   setIsReplyRead(true);
+                 }, 3000);
+               }, 2000); // 2 seconds of typing indicator
+             }, 2000); // 2 seconds delay before showing typing indicator
+          }, 5000); // 5 seconds for read
+
+      // Create or update chat entry for sidebar
+      if (productData) {
+        const chatId = chatEntry?.id || Date.now();
+        setChatEntry({
+          id: chatId,
+          name: 'Joaquin EDIMO',
+          avatar: eboAvatar,
+          lastMessage: messageToSend.length > 30 ? messageToSend.substring(0, 30) + '...' : messageToSend,
+          timestamp: `Today, ${timeString}`,
+          isRead: false,
+          isActive: true,
+          messageId: newMessage.id // Link to the latest message for status sync
+        });
+        setActiveChatId(chatId); // Set as active chat
+      }
+    }
+  };
+
+  const handleAudioRecord = () => {
+    setIsRecording(true);
+    setRecordingTime(0);
+    setSoundDetected(false);
+    
+    // Start recording timer
+    const timer = setInterval(() => {
+      setRecordingTime(prev => prev + 1);
+    }, 1000);
+    
+    setRecordingTimer(timer);
+    
+    // Simulate sound detection with random intervals
+    const simulateSoundDetection = () => {
+      // Randomly detect sound (70% chance every 500ms)
+      if (Math.random() > 0.3) {
+        setSoundDetected(true);
         
-        <div className="space-y-4 text-sm text-gray-500">
-          <p>• In-app messaging system</p>
-          <p>• Message notifications</p>
-          <p>• Chat history storage</p>
-          <p>• Real-time communication</p>
+        // Stop sound detection after random duration (1-3 seconds)
+        const soundDuration = Math.random() * 2000 + 1000;
+        setTimeout(() => {
+          setSoundDetected(false);
+        }, soundDuration);
+      }
+      
+      // Continue checking for sound
+      setTimeout(simulateSoundDetection, Math.random() * 1000 + 500);
+    };
+    
+    // Start sound detection simulation
+    simulateSoundDetection();
+  };
+
+  const handleStopRecording = () => {
+    setIsRecording(false);
+    setSoundDetected(false);
+    
+    if (recordingTimer) {
+      clearInterval(recordingTimer);
+      setRecordingTimer(null);
+    }
+    
+    if (soundTimer) {
+      clearTimeout(soundTimer);
+      setSoundTimer(null);
+    }
+    // Keep the recording time for display purposes
+  };
+
+  const handleSendVoiceMessage = () => {
+    if (recordingTime > 0) {
+      const currentTime = new Date();
+      const timeString = currentTime.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
+      const dateString = currentTime.toLocaleDateString('en-US', { 
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const newMessage = {
+        id: Date.now(),
+        type: 'voice',
+        duration: recordingTime,
+        timestamp: timeString,
+        dateString: `Today, ${timeString}`,
+        sentAt: currentTime
+      };
+      
+      setMessages(prev => [...prev, newMessage]);
+      setRecordingTime(0);
+      setIsMessageSent(true);
+      
+      // Set initial status as 'sending'
+      setMessageStatuses(prev => ({
+        ...prev,
+        [newMessage.id]: 'sending'
+      }));
+
+      // Simulate status progression
+      setTimeout(() => {
+        setMessageStatuses(prev => ({
+          ...prev,
+          [newMessage.id]: 'delivered'
+        }));
+      }, 2000);
+
+      setTimeout(() => {
+        setMessageStatuses(prev => ({
+          ...prev,
+          [newMessage.id]: 'read'
+        }));
+      }, 5000);
+
+      // Update chat entry with latest message
+      const chatId = chatEntry?.id || Date.now();
+      setChatEntry({
+        id: chatId,
+        name: 'Joaquin EDIMO',
+        avatar: eboAvatar,
+        lastMessage: 'You Audio',
+        timestamp: `Today, ${timeString}`,
+        isRead: false,
+        isActive: true,
+        messageId: newMessage.id
+      });
+      setActiveChatId(chatId); // Set as active chat
+    }
+  };
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (recordingTimer) {
+        clearInterval(recordingTimer);
+      }
+      if (soundTimer) {
+        clearTimeout(soundTimer);
+      }
+    };
+  }, [recordingTimer, soundTimer]);
+
+  // Handle clicks outside dropdowns
+  useEffect(() => {
+     const handleClickOutside = (event: MouseEvent) => {
+       const target = event.target as HTMLElement;
+       const languageSelector = target.closest('.language-selector');
+       const menuDropdown = target.closest('.menu-dropdown');
+       const emojiPicker = target.closest('.emoji-picker-container');
+       const actionsMenu = target.closest('.actions-menu');
+
+       if (!languageSelector && isLanguageDropdownOpen) {
+         setIsLanguageDropdownOpen(false);
+       }
+
+       if (!menuDropdown && isMenuDropdownOpen) {
+         setIsMenuDropdownOpen(false);
+       }
+
+       if (!emojiPicker && showEmojiPicker) {
+         setShowEmojiPicker(false);
+       }
+
+       if (!actionsMenu && actionsMenuOpen !== null) {
+         setActionsMenuOpen(null);
+       }
+     };
+
+     const handleEscapeKey = (event: KeyboardEvent) => {
+       if (event.key === 'Escape' && actionsMenuOpen !== null) {
+         setActionsMenuOpen(null);
+       }
+     };
+
+     document.addEventListener('mousedown', handleClickOutside);
+     document.addEventListener('keydown', handleEscapeKey);
+     return () => {
+       document.removeEventListener('mousedown', handleClickOutside);
+       document.removeEventListener('keydown', handleEscapeKey);
+     };
+   }, [isLanguageDropdownOpen, isMenuDropdownOpen, showEmojiPicker, actionsMenuOpen]);
+
+  // Cleanup typing timer on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimer) {
+        clearTimeout(typingTimer);
+      }
+    };
+  }, [typingTimer]);
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Hidden file input for file attachments */}
+      <input
+        id="file-upload"
+        type="file"
+        multiple
+        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+        onChange={handleFileSelect}
+        style={{ display: 'none' }}
+      />
+      {/* Left Sidebar - Fixed Height */}
+      <div className="w-1/4 bg-white border-r-2 border-gray-300 flex flex-col h-screen relative" style={{ minHeight: '100vh' }}>
+        {/* Header */}
+        <header className="bg-white">
+          <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
+            <div className="flex items-center justify-between h-16">
+              {/* Left side - Logo and sidebar button */}
+              <div className="flex items-center space-x-36 pr-0">
+                <img 
+                  src={logo} 
+                  alt="bao'Afrik" 
+                  className="h-8 w-auto"
+                />
+                <button className="bg-white hover:bg-gray-50 rounded-lg transition-colors w-10 h-10 flex items-center justify-center">
+                  <img 
+                    src={sideIcon} 
+                    alt="Minimize sidebar" 
+                    className="w-5 h-5"
+                  />
+                </button>
+        </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Chats List */}
+        <div className="flex-1 flex flex-col">
+          {/* Chats Header */}
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-xl text-black">Chats</h1>
+              <button className="p-2 hover:bg-gray-200 rounded">
+                <img 
+                  src={filterIcon} 
+                  alt="Filter" 
+                  className="w-5 h-5"
+                />
+              </button>
+            </div>
+            
+            {/* Search Bar */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search a chat?"
+                className="w-full px-4 py-3 bg-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+              />
+            </div>
+          </div>
+
+          {/* Chat List or Empty State */}
+          {chatEntry ? (
+            <div className="flex-1 flex flex-col">
+              {/* Filter Tabs */}
+              <div className="px-4 py-3">
+                <div className="relative">
+                  {/* Gray baseline */}
+                  <div className="absolute bottom-0 left-4 right-4 h-px bg-gray-200"></div>
+                  
+                  <div className="flex space-x-6 relative">
+                    <button 
+                      onClick={() => setSelectedTab('All')}
+                      className={`text-sm font-medium pb-1 relative ${
+                        selectedTab === 'All' 
+                          ? 'text-gray-900' 
+                          : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                      style={{ 
+                        color: selectedTab === 'All' ? '#64B5F6' : undefined
+                      }}
+                    >
+                      All
+                      {selectedTab === 'All' && (
+                        <div 
+                          className="absolute bottom-0 left-0 right-0 h-0.5"
+                          style={{ backgroundColor: '#64B5F6' }}
+                        ></div>
+                      )}
+                    </button>
+                    <button 
+                      onClick={() => setSelectedTab('Unreads')}
+                      className={`text-sm font-medium pb-1 relative ${
+                        selectedTab === 'Unreads' 
+                          ? 'text-gray-900' 
+                          : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                      style={{ 
+                        color: selectedTab === 'Unreads' ? '#64B5F6' : undefined
+                      }}
+                    >
+                      Unreads
+                      {selectedTab === 'Unreads' && (
+                        <div 
+                          className="absolute bottom-0 left-0 right-0 h-0.5"
+                          style={{ backgroundColor: '#64B5F6' }}
+                        ></div>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Chat Entry */}
+              <div className="flex-1 p-1">
+                <div 
+                  className={`p-2 rounded-lg cursor-pointer transition-colors ${activeChatId === chatEntry.id ? 'hover:bg-gray-100' : 'hover:bg-gray-50'}`} 
+                  style={{ 
+                    backgroundColor: actionsMenuOpen === chatEntry.id 
+                      ? '#FFFFFF' 
+                      : activeChatId === chatEntry.id 
+                        ? '#F5F5F5' 
+                        : '#FFFFFF',
+                    boxShadow: actionsMenuOpen === chatEntry.id 
+                      ? '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)' 
+                      : 'none',
+                    zIndex: actionsMenuOpen === chatEntry.id ? 45 : 'auto',
+                    position: actionsMenuOpen === chatEntry.id ? 'relative' : 'static'
+                  }}
+                  onClick={() => setActiveChatId(chatEntry.id)}
+                >
+                    <div className="flex items-center space-x-2">
+                      <img 
+                        src={chatEntry.avatar} 
+                        alt={chatEntry.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-900 truncate">{chatEntry.name}</h3>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-xs text-gray-500">{chatEntry.timestamp}</span>
+                          <button
+                            onClick={(e) => handleActionsMenuClick(chatEntry.id, e)}
+                            className="p-1 rounded transition-colors"
+                            style={{ 
+                              color: actionsMenuOpen === chatEntry.id ? '#64B5F6' : '#000000'
+                            }}
+                          >
+                            <span className="text-lg">⋯</span>
+                          </button>
+                        </div>
+                      </div>
+                        <div className="flex items-center justify-between mt-1">
+                         <p className="text-sm truncate">
+                           {isSellerTyping ? (
+                             <span style={{ color: '#64B5F6' }}>Typing...</span>
+                           ) : hasIncomingReply && !isReplyRead ? (
+                             <span style={{ color: '#64B5F6' }}>New message</span>
+                           ) : hasIncomingReply && isReplyRead ? (
+                             <span className="text-gray-600">
+                               {messages.find(m => m.isIncoming)?.text || 'Message'}
+                             </span>
+                           ) : (
+                             <>
+                               <span 
+                                 className="px-1 py-0.5 rounded text-xs font-medium mr-1"
+                                 style={{ 
+                                   backgroundColor: '#E3F2FD',
+                                   color: '#64B5F6'
+                                 }}
+                               >
+                                 You
+                               </span>
+                               <span className="text-gray-600">{chatEntry.lastMessage}</span>
+                             </>
+                           )}
+                          </p>
+                          <div className="flex items-center ml-2">
+                           {isSellerTyping ? (
+                             // No indicator when typing
+                             <div></div>
+                           ) : hasIncomingReply && !isReplyRead ? (
+                             // Unread reply - solid blue dot
+                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#64B5F6' }}></div>
+                           ) : hasIncomingReply && isReplyRead ? (
+                             // Read reply - empty circle
+                             <div className="w-3 h-3 border-2 border-gray-400 rounded-full"></div>
+                           ) : (
+                             // User message - show status indicators
+                             chatEntry.messageId ? renderSidebarStatus(chatEntry.messageId) : (
+                               <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                               </svg>
+                             )
+                           )}
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+          ) : (
+            /* Empty State */
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+              <div className="flex items-center justify-center mb-4">
+                <img 
+                  src={messagesIcon} 
+                  alt="Messages" 
+                  className="w-12 h-12"
+                />
+              </div>
+              <p className="text-center mb-2" style={{ color: '#999999' }}>Your chats will appear here</p>
+              <p className="text-sm text-center flex items-start justify-center">
+                <img 
+                  src={ssIcon} 
+                  alt="Search status" 
+                  className="w-4 h-4 mr-0.5 mt-0.5"
+                />
+                <span style={{ color: '#64B5F6' }}>Love what you see? <span className="cursor-pointer">Reach out to the seller and make it yours.</span></span>
+              </p>
+            </div>
+          )}
         </div>
         
-        <div className="mt-8 text-center">
-          <p className="text-gray-400">No messages yet. Start browsing products to connect with sellers!</p>
+        {/* Actions Menu Overlay and Popup - Sidebar Level */}
+        {actionsMenuOpen !== null && (
+          <>
+            {/* Semi-transparent overlay for sidebar only */}
+            <div 
+              className="absolute inset-0 bg-black bg-opacity-20 z-40"
+              onClick={() => setActionsMenuOpen(null)}
+            ></div>
+            
+            {/* Actions Menu */}
+            <div className="actions-menu absolute right-4 top-96 bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48" style={{ borderRadius: '24px' }}>
+              <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
+                <h3 className="text-sm font-thin" style={{ color: '#BABABA' }}>Actions</h3>
+                <button
+                  onClick={() => setActionsMenuOpen(null)}
+                  className="transition-colors"
+                  style={{ color: '#374151' }}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="py-1">
+                  <button
+                    onClick={() => handleActionSelect('Mark as read', actionsMenuOpen)}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                  >
+                    <img src={actionIcon01} alt="Mark as read" className="w-4 h-4" />
+                    <span className="font-light" style={{ color: '#374151' }}>Mark as read</span>
+                  </button>
+                
+                <button
+                  onClick={() => handleActionSelect('Add label', actionsMenuOpen)}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                >
+                  <img src={actionIcon02} alt="Add label" className="w-4 h-4" />
+                  <span className="font-light" style={{ color: '#374151' }}>Add label</span>
+                </button>
+                
+                <button
+                  onClick={() => handleActionSelect('Mute the chat', actionsMenuOpen)}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                >
+                  <img src={actionIcon03} alt="Mute the chat" className="w-4 h-4" />
+                  <span className="font-light" style={{ color: '#374151' }}>Mute the chat</span>
+                  <svg className="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+                
+                <button
+                  onClick={() => handleActionSelect('Pin the chat', actionsMenuOpen)}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                >
+                  <img src={actionIcon04} alt="Pin the chat" className="w-4 h-4" />
+                  <span className="font-light" style={{ color: '#374151' }}>Pin the chat</span>
+                </button>
+                
+                <button
+                  onClick={() => handleActionSelect('Archive the chat', actionsMenuOpen)}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                >
+                  <img src={actionIcon05} alt="Archive the chat" className="w-4 h-4" />
+                  <span className="font-light" style={{ color: '#374151' }}>Archive the chat</span>
+                </button>
+                
+                <button
+                  onClick={() => handleActionSelect('Delete the chat', actionsMenuOpen)}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 flex items-center space-x-3"
+                >
+                  <img src={actionIcon06} alt="Delete the chat" className="w-4 h-4" />
+                  <span className="font-light" style={{ color: '#374151' }}>Delete the chat</span>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+        
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-screen">
+        {/* Header */}
+        <header className="bg-gray-50">
+          <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
+            <div className="flex items-center justify-between h-16">
+              {/* Center - Breadcrumb */}
+              <div className="hidden md:flex items-center space-x-2 text-sm">
+                <img 
+                  src={leftIcon} 
+                  alt="Back" 
+                  className="w-5 h-5 cursor-pointer"
+                  onClick={handleHomepageClick}
+                />
+                <span 
+                  className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                  onClick={handleHomepageClick}
+                >
+                  Homepage
+                </span>
+                <span className="text-gray-400">/</span>
+                <span 
+                  className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                  onClick={handleMenuClick}
+                >
+                  Menu
+                </span>
+                <span className="text-gray-400">/</span>
+                <span className="text-gray-900 font-medium">Chats</span>
+              </div>
+
+              {/* Right side - Language, button, profile, notifications */}
+              <div className="flex items-center space-x-4 bg-gray-50 px-4 py-2 rounded-lg">
+                {/* Language Selector */}
+                <div className="relative language-selector">
+                  <button 
+                    onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                    className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    <span>{selectedLanguage}</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {/* Dropdown Menu */}
+                  {isLanguageDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      <div className="py-1">
+                        <button
+                          onClick={() => handleLanguageSelect('EN')}
+                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                            selectedLanguage === 'EN' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          English
+                        </button>
+                        <button
+                          onClick={() => handleLanguageSelect('FR')}
+                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                            selectedLanguage === 'FR' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          French
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Become Seller Button */}
+                <button 
+                  className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center space-x-2"
+                  style={{ 
+                    backgroundColor: '#FEF6E9', 
+                    color: '#F9A825'
+                  }}
+                >
+                  <img 
+                    src={basketIcon} 
+                    alt="Basket" 
+                    className="w-4 h-4"
+                  />
+                  <span>Start selling</span>
+                </button>
+
+                {/* Notification Button */}
+                <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
+                  <img src={notificationIcon} alt="Notifications" className="w-6 h-6" />
+                </button>
+
+                {/* Profile Picture */}
+                <div className="w-10 h-10 rounded-full overflow-hidden">
+                  <img 
+                    src={avatarIcon} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                 {/* Menu Button */}
+                 <div className="relative menu-dropdown">
+                   <button 
+                     onClick={() => setIsMenuDropdownOpen(!isMenuDropdownOpen)}
+                     className="p-2 text-gray-600 hover:text-gray-900"
+                   >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                     <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                       +9
+                     </div>
+                    </button>
+                   
+                   {/* Dropdown Menu */}
+        {isMenuDropdownOpen && (
+          <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-[80vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
+                       {/* Start selling button with exit */}
+                       <div className="px-3 pb-3 flex items-center justify-between">
+                         <Link 
+                              to="/register" 
+                              className="inline-flex items-center px-3 py-1.5 rounded-lg font-medium text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
+                              style={{backgroundColor: '#FFF8F0', color: '#F9A822'}}
+                              onMouseEnter={(e) => {
+                                (e.target as HTMLElement).style.backgroundColor = '#FFF0E6';
+                              }}
+                              onMouseLeave={(e) => {
+                                (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
+                              }}
+                           onClick={() => setIsMenuDropdownOpen(false)}
+                         >
+                              <svg className="w-3 h-3 mr-1.5 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
+                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
+                             </svg>
+                             Start selling
+                           </Link>
+                           <button
+                             onClick={() => setIsMenuDropdownOpen(false)}
+                             className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                           >
+                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                             </svg>
+                           </button>
+                         </div>
+
+            {/* Profile Section */}
+            <div className="flex items-center space-x-2 px-3 py-3 border-b border-gray-100">
+                             <img 
+                               src={avatarIcon} 
+                           alt="User avatar" 
+                           className="w-12 h-12 rounded-full object-cover"
+                           width="48"
+                           height="48"
+                         />
+                         <div className="flex-1">
+                           <p className="text-xs text-gray-500">My profile</p>
+                           <div className="flex items-center justify-between">
+                             <h3 className="text-sm font-bold text-gray-900">Jean Kameni</h3>
+                             <div className="w-6 h-6 rounded flex items-center justify-center" style={{backgroundColor: '#E3F2FD'}}>
+                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#64B5F6'}}>
+                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                             </svg>
+                             </div>
+                           </div>
+                         </div>
+                       </div>
+
+            {/* Create a new listing button */}
+            <div className="px-3 py-3">
+              <Link
+                to="/create-listing"
+                className="block w-full px-3 py-2 rounded-lg font-medium text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                           style={{backgroundColor: '#E3F2FD', color: '#64B5F6'}}
+                           onClick={() => setIsMenuDropdownOpen(false)}
+                         >
+                           <div className="flex items-center justify-center space-x-1.5">
+                             <span>Create a new listing</span>
+                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#64B5F6'}}>
+                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                             </svg>
+                           </div>
+                         </Link>
+                       </div>
+
+            {/* Navigation Menu Items */}
+            <div className="space-y-0.5 px-2">
+                         {/* Chats */}
+                         <Link 
+                           to="/messages" 
+                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                           onClick={() => setIsMenuDropdownOpen(false)}
+                         >
+                           <div className="flex items-center space-x-2">
+                             <img src={messageIcon} alt="Message" className="w-4 h-4" style={{color: '#64B5F6'}} />
+                           <div>
+                               <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Chats</div>
+                             </div>
+                           </div>
+                        </Link>
+
+                        {/* My listings */}
+                        <Link 
+                          to="/my-listings" 
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                          onClick={() => setIsMenuDropdownOpen(false)}
+                        >
+                           <div className="flex items-center space-x-2">
+                               <img src={boxIcon} alt="Box" className="w-4 h-4" style={{color: '#64B5F6'}} />
+                            <div>
+                              <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>My listings</div>
+                              </div>
+                            </div>
+                        </Link>
+
+                          {/* My requests */}
+                        <Link 
+                            to="/my-requests" 
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                          onClick={() => setIsMenuDropdownOpen(false)}
+                        >
+                           <div className="flex items-center space-x-2">
+                               <img src={groupIcon} alt="Group" className="w-4 h-4" style={{color: '#64B5F6'}} />
+                            <div>
+                                <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>My requests</div>
+                              </div>
+                            </div>
+                        </Link>
+
+
+                        {/* Bookmarks */}
+                        <Link 
+                          to="/bookmarks" 
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                          onClick={() => setIsMenuDropdownOpen(false)}
+                        >
+                           <div className="flex items-center space-x-2">
+                             <img src={frameIcon} alt="Frame" className="w-4 h-4" style={{color: '#64B5F6'}} />
+                            <div>
+                              <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Bookmarks</div>
+                              </div>
+                            </div>
+                           </Link>
+
+                           {/* Help Center */}
+                           <Link 
+                             to="/help" 
+                             className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                             onClick={() => setIsMenuDropdownOpen(false)}
+                           >
+                              <div className="flex items-center space-x-2">
+                                <img src={podsIcon} alt="Pods" className="w-4 h-4" style={{color: '#64B5F6'}} />
+                               <div>
+                                 <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Help Center</div>
+                               </div>
+                             </div>
+                            </Link>
+
+                            {/* Settings */}
+                            <Link 
+                              to="/settings" 
+                              className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                              onClick={() => setIsMenuDropdownOpen(false)}
+                            >
+                               <div className="flex items-center space-x-2">
+                                 <img src={settingIcon} alt="Setting" className="w-4 h-4" style={{color: '#64B5F6'}} />
+                                <div>
+                                  <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Settings</div>
+                                </div>
+                              </div>
+                             </Link>
+
+                             {/* Log Out */}
+                             <div className="px-3 pt-3 border-t border-gray-100">
+                               <button 
+                                 onClick={() => setIsMenuDropdownOpen(false)}
+                                 className="w-full bg-gray-100 px-3 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                               >
+                                 <div className="flex items-center space-x-2">
+                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#6A6A6A'}}>
+                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                   </svg>
+                                   <div className="text-left">
+                                     <div className="font-medium text-xs" style={{color: '#6A6A6A'}}>Log Out</div>
+                                     <div className="text-xs" style={{color: '#6A6A6A'}}>Log out of BAO Afrik</div>
+                                   </div>
+                                 </div>
+                               </button>
+                             </div>
+                       </div>
+                     </div>
+                   )}
+                 </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content Area */}
+        <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 my-8 flex flex-col" style={{ height: messages.length > 1 ? 'calc(100vh - 8rem)' : 'auto', overflow: messages.length > 1 ? 'hidden' : 'visible' }}>
+          {productData ? (
+            // Product Inquiry View
+            <div className="flex-1 flex flex-col">
+              {/* Dynamic Seller Profile Header */}
+              {messages.length <= 1 ? (
+                // Full Profile View (when 1 or fewer messages)
+                <div className="p-6">
+                  {/* Top Right Icons */}
+                  <div className="flex justify-end space-x-3 mb-6">
+                    <button className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
+                      <img 
+                        src={fiIcon} 
+                        alt="Search" 
+                        className="w-6 h-6"
+                      />
+                    </button>
+                    <button className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
+                      <img 
+                        src={faIcon} 
+                        alt="Settings" 
+                        className="w-6 h-6"
+                      />
+                    </button>
+                  </div>
+
+                  {/* Profile Card */}
+                  <div className="bg-white rounded-lg p-6 pt-2 max-w-4xl mx-auto">
+                    <div className="text-center">
+                      {/* Avatar */}
+                      <img 
+                        src={eboAvatar} 
+                        alt={productData.seller.name}
+                        className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
+                      />
+                      
+                      {/* Name and Rating */}
+                      <div className="flex items-center justify-center space-x-2 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900">Joaquin EDIMO</h3>
+                        <div className="flex items-center space-x-2">
+                          <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                          <span className="text-lg" style={{ color: '#BABABA' }}>4.3</span>
+                        </div>
+                      </div>
+
+                      {/* Seller Info */}
+                      <div className="flex items-center justify-center space-x-6 text-sm mb-4">
+                        <div className="flex items-center space-x-2">
+                          <img 
+                            src={earthIcon} 
+                            alt="Website" 
+                            className="w-4 h-4"
+                          />
+                          <span style={{ color: '#64B5F6' }}>user-randomlink.com</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <img 
+                            src={locIcon} 
+                            alt="Location" 
+                            className="w-4 h-4"
+                          />
+                          <span style={{ color: '#64B5F6' }}>London, United Kingdom</span>
+                        </div>
+                      </div>
+
+                      {/* Join Date */}
+                      <div className="flex items-center justify-center space-x-2 text-sm mb-4">
+                        <img 
+                          src={profileIcon} 
+                          alt="Profile" 
+                          className="w-4 h-4"
+                        />
+                        <span style={{ color: '#BABABA' }}>Joined BAO' Afrik in June 2018</span>
+                      </div>
+
+                      {/* Description */}
+                      <div className="text-left">
+                        <p className="text-sm leading-relaxed mb-4 text-justify" style={{ color: '#BABABA' }}>
+                          Passionate about discovering unique products and always on the lookout for great deals. I enjoy exploring new brands, trying out innovative items, and supporting businesses that deliver quality and creativity.
+                        </p>
+                      </div>
+
+                      {/* See User Profile Button */}
+                      <button 
+                        className="px-6 py-2 rounded-lg text-sm font-medium transition-colors"
+                        style={{ 
+                          backgroundColor: '#F0F8FE', 
+                          color: '#64B5F6' 
+                        }}
+                      >
+                        See user profile
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Compressed Header View (when multiple messages)
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    {/* Left: Profile Info */}
+                    <div className="flex items-center space-x-3">
+                      <img 
+                        src={eboAvatar} 
+                        alt={productData.seller.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Joaquin EDIMO</h3>
+                        <div className="flex items-center space-x-1">
+                          <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                          <span className="text-sm" style={{ color: '#BABABA' }}>4.3</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Right: Action Buttons */}
+                    <div className="flex space-x-2">
+                      <button className="p-2 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
+                        <img 
+                          src={fiIcon} 
+                          alt="Search" 
+                          className="w-5 h-5"
+                        />
+                      </button>
+                      <button className="p-2 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
+                        <img 
+                          src={faIcon} 
+                          alt="Settings" 
+                          className="w-5 h-5"
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+
+                {/* Chat Messages Area */}
+                {messages.length > 0 && (
+                  <div className="flex-1 px-6 py-4 overflow-y-auto" style={{ maxHeight: messages.length > 1 ? 'calc(100vh - 16rem)' : 'none' }}>
+                  {/* Top Timestamp - Shorter lines */}
+                  <div className="flex items-center justify-center mb-6">
+                    <div className="flex items-center">
+                      <div className="w-16 h-px bg-gray-300"></div>
+                      <span className="px-4 text-sm text-gray-500">{messages[0]?.dateString}</span>
+                      <div className="w-16 h-px bg-gray-300"></div>
+                    </div>
+                  </div>
+
+                  {/* Messages */}
+                    {messages.map((message) => (
+                      <div key={message.id} className={`flex mb-4 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
+                       <div className="max-w-xs lg:max-w-md relative">
+                         <div 
+                           className={`rounded-2xl p-4 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`} 
+                           style={{ 
+                             backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
+                           }}
+                           onClick={message.isIncoming ? () => handleIncomingMessageClick(message.id) : undefined}
+                         >
+                          {message.type === 'voice' ? (
+                            // Voice Message Display
+                            <div className="flex items-center space-x-3">
+                              <div className="relative">
+                                <img src={avatarIcon} alt="Your Avatar" className="w-10 h-10 rounded-full" />
+                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                                  <img src={swiIcon} alt="Waveform" className="w-3.5 h-3.5" />
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                  <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                                </svg>
+                                <span className="text-white text-sm">
+                                  {Math.floor(message.duration / 60).toString().padStart(2, '0')} : {(message.duration % 60).toString().padStart(2, '0')}
+                                </span>
+                                <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
+                                <span className="text-white text-sm">Audio</span>
+                              </div>
+                              <div className="flex items-center justify-center space-x-0.5">
+                                {[4,6,4,8,12,14,16,14,12,8,6,4,8,10,12,10,8,6,4,6].map((h, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-0.5 bg-white rounded-full"
+                                    style={{
+                                      height: `${h}px`,
+                                    }}
+                                  />
+                                ))}
+                                </div>
+                              </div>
+                            ) : message.attachments && message.attachments.length > 0 ? (
+                              // File Attachment Message Display
+                              <div className="space-y-2">
+                                {message.text && (
+                                  <p 
+                                    className="text-sm" 
+                                    style={{ color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                                  >
+                                    {message.text}
+                                  </p>
+                                )}
+                                <div className="space-y-2">
+                                  {message.attachments.map((file: any, index: number) => (
+                                    <div 
+                                      key={index} 
+                                      onClick={() => handleFileClick(file)}
+                                      className="flex items-center space-x-3 p-3 bg-white/20 rounded-lg cursor-pointer hover:bg-white/30 transition-colors"
+                                    >
+                                      <div className="w-10 h-10 bg-white/30 rounded-lg flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                        </svg>
+                                      </div>
+                                      <div className="flex-1">
+                                        <p className="text-white text-sm font-medium">{file.name}</p>
+                                        <p className="text-white/80 text-xs">{formatFileSize(file.size)}</p>
+                                      </div>
+                                      <div className="w-6 h-6 bg-white/30 rounded flex items-center justify-center">
+                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : (
+                              // Text Message Display
+                            <>
+                              <p 
+                                className="text-sm mb-3" 
+                                style={{ color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                              >
+                                {message.text}
+                              </p>
+                              
+                              {/* Product Card in Message - Only for first message */}
+                              {message.isProductInquiry && message.productData && (
+                                <div className="rounded-lg p-3 mt-3">
+                                  <div className="flex space-x-4">
+                                    <div className="relative">
+                                      <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#FFFFFF' }}></div>
+                                      <img 
+                                        src={message.productData.image} 
+                                        alt={message.productData.name}
+                                        className="w-24 h-24 object-cover"
+                                      />
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center justify-between">
+                                        <div className="text-xl font-semibold" style={{ color: '#B8DDFB' }}>${message.productData.price}</div>
+                                        <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#B8DDFB' }}>
+                                          <img src={locIcon} alt="Location" className="w-4 h-4" />
+                                          <span>{message.productData.location}</span>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center justify-between -mt-0.5">
+                                        <h4 className="text-xs font-medium" style={{ color: '#B8DDFB' }}>{message.productData.name}</h4>
+                                        <div className="text-[10px]" style={{ color: '#B8DDFB' }}>
+                                          <span>Category: {message.productData.category}</span>
+                                        </div>
+                                      </div>
+                                      <p className="text-[10px] mt-2 leading-relaxed" style={{ color: '#B8DDFB' }}>
+                                        Premium White Pepper sourced from the fertile soils of Africa.<br/>
+                                        Known for its smooth, aromatic heat and rich flavor...
+                                      </p>
+                                      <a href="#" className="text-xs mt-1 block" style={{ color: '#182073' }}>
+                                        baoafrik.com/product-id-link?
+                                      </a>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                        
+                        {/* Bottom Timestamp */}
+                        <div className={`flex items-center mt-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
+                          <span 
+                            className="text-xs mr-1" 
+                            style={{ color: '#6A6A6A' }}
+                          >
+                            {message.timestamp}
+                          </span>
+                          {!message.isIncoming && renderMessageStatus(message.id)}
+                        </div>
+                      </div>
+                      
+                      {/* Reaction and Option Icons for Incoming Messages - Outside the message bubble */}
+                      {message.isIncoming && clickedMessageId === message.id && (
+                        <div className="flex items-center ml-1 self-center">
+                          <button className="p-1 hover:opacity-70 transition-opacity">
+                            <img src={reactionIcon} alt="Reaction" className="w-6 h-6" />
+                          </button>
+                          <button className="p-1 hover:opacity-70 transition-opacity">
+                            <img src={optionIcon} alt="Options" className="w-6 h-6" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* Typing Indicator */}
+                  {showTypingIndicator && (
+                    <div className="flex justify-start mb-4">
+                      <div className="max-w-20">
+                        <div 
+                          className="rounded-2xl rounded-bl-md px-3 py-2 flex items-center" 
+                          style={{ backgroundColor: '#F0F8FE' }}
+                        >
+                          <div className="flex space-x-1">
+                            <div 
+                              className="w-1.5 h-1.5 rounded-full animate-bounce" 
+                              style={{ 
+                                backgroundColor: '#64B5F6',
+                                animationDelay: '0ms'
+                              }}
+                            ></div>
+                            <div 
+                              className="w-1.5 h-1.5 rounded-full animate-bounce" 
+                              style={{ 
+                                backgroundColor: '#64B5F6',
+                                animationDelay: '150ms'
+                              }}
+                            ></div>
+                            <div 
+                              className="w-1.5 h-1.5 rounded-full animate-bounce" 
+                              style={{ 
+                                backgroundColor: '#64B5F6',
+                                animationDelay: '300ms'
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+                {/* Message Input */}
+                <div className={`px-6 pb-6 ${messages.length > 0 ? 'py-2' : '-mt-2'}`}>
+                  {/* Permanent Gray Separator Line */}
+                  <div className="mb-3 -mx-6">
+                    <div className="w-full bg-gray-200 rounded-full" style={{ height: '0.5px' }}></div>
+                  </div>
+                  
+                  {/* Product Inquiry Card - Only show before sending first message */}
+                  {!isMessageSent && productData && (
+                    <div className="mb-3">
+                      <div className="flex items-start space-x-3">
+                        {/* Product Detail Card */}
+                        <div className="bg-gray-50 rounded-xl p-3 flex-1 max-w-lg">
+                          <div className="flex items-start justify-between mb-1">
+                            <span className="text-xs font-medium" style={{ color: '#83C4F8' }}>From Bao'Afrik</span>
+                            <button className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" style={{ backgroundColor: '#6A6A6A' }}>
+                              <svg className="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#000000' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+                              </svg>
+                            </button>
+                          </div>
+                          <div className="flex space-x-4">
+                            <div className="relative">
+                              <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#83C4F8' }}></div>
+                              <img 
+                                src={productImage1} 
+                                alt={productData.name}
+                                className="w-24 h-24 object-cover"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <div className="text-xl font-semibold" style={{ color: '#6A6A6A' }}>${productData.price}</div>
+                                <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#BABABA' }}>
+                                  <img src={locIcon} alt="Location" className="w-4 h-4" />
+                                  <span>{productData.location}</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between -mt-0.5">
+                                <h4 className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{productData.name}</h4>
+                                <div className="text-[10px]" style={{ color: '#BABABA' }}>
+                                  <span>Category: {productData.category}</span>
+                                </div>
+                              </div>
+                              <p className="text-[10px] mt-2 leading-relaxed" style={{ color: '#6A6A6A' }}>
+                                Premium White Pepper sourced from the fertile soils of Africa.<br/>
+                                Known for its smooth, aromatic heat and rich flavor...
+                              </p>
+                              <a href="#" className="text-xs mt-1 block" style={{ color: '#83C4F8' }}>
+                                baoafrik.com/product-id-link?
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* File Attachment Indicator - Inline with Product Card */}
+                        {selectedFiles.length > 0 && (
+                          <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#F0F8FE' }}>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                              </svg>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>
+                                  {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} attached
+                                </span>
+                                <div className="text-xs" style={{ color: '#64B5F6' }}>
+                                  {selectedFiles.map((file, index) => (
+                                    <span key={index}>
+                                      {file.name} ({formatFileSize(file.size)})
+                                      {index < selectedFiles.length - 1 ? ', ' : ''}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  setSelectedFiles([]);
+                                  setShowFilePreview(false);
+                                }}
+                                className="ml-2 hover:opacity-70"
+                                style={{ color: '#64B5F6' }}
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* File Attachment Indicator - Only show when no product detail popup */}
+                  {selectedFiles.length > 0 && isMessageSent && (
+                    <div className="mb-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#F0F8FE' }}>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>
+                              {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} attached
+                            </span>
+                            <div className="text-xs" style={{ color: '#64B5F6' }}>
+                              {selectedFiles.map((file, index) => (
+                                <span key={index}>
+                                  {file.name} ({formatFileSize(file.size)})
+                                  {index < selectedFiles.length - 1 ? ', ' : ''}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setSelectedFiles([]);
+                              setShowFilePreview(false);
+                            }}
+                            className="ml-2 hover:opacity-70"
+                            style={{ color: '#64B5F6' }}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isRecording ? (
+                    // Recording Interface with inline file attachment
+                    <div className="space-y-3">
+                      {/* Main Recording Interface */}
+                      <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '6px' }}>
+                        <div className="relative emoji-picker-container">
+                          <button 
+                            onClick={handleEmojiClick}
+                            className="p-1.5 hover:text-gray-600 opacity-0 pointer-events-none"
+                          >
+                            <img 
+                              src={faceIcon} 
+                              alt="emoji" 
+                              className="w-6 h-6" 
+                              style={{ 
+                                filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                              }}
+                            />
+                          </button>
+                          
+                          {/* Emoji Picker */}
+                          {showEmojiPicker && (
+                            <div className="absolute bottom-full left-0 mb-2 z-50">
+                              <style>{`
+                                .emoji-picker-react {
+                                  border: none !important;
+                                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                                }
+                                .emoji-picker-react .emoji-search {
+                                  border: 1px solid #e5e5e5 !important;
+                                  box-shadow: none !important;
+                                  outline: none !important;
+                                  background-color: #f8f8f8 !important;
+                                }
+                                .emoji-picker-react .emoji-search:focus {
+                                  border: 1px solid #e5e5e5 !important;
+                                  box-shadow: none !important;
+                                  outline: none !important;
+                                }
+                                .emoji-picker-react .emoji-group:before {
+                                  color: #666 !important;
+                                  font-weight: bold !important;
+                                  font-size: 12px !important;
+                                }
+                                .emoji-picker-react .emoji-categories button {
+                                  border-radius: 50% !important;
+                                  width: 32px !important;
+                                  height: 32px !important;
+                                  margin: 2px !important;
+                                }
+                                .emoji-picker-react .emoji-categories button.active {
+                                  background-color: #64B5F6 !important;
+                                }
+                                .emoji-picker-react .emoji-categories button svg {
+                                  width: 16px !important;
+                                  height: 16px !important;
+                                }
+                              `}</style>
+                              <EmojiPicker
+                                onEmojiClick={onEmojiClick}
+                                width={350}
+                                height={450}
+                                searchDisabled={false}
+                                skinTonesDisabled={true}
+                                previewConfig={{
+                                  showPreview: false
+                                }}
+                                searchPlaceHolder="Search Emoji"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <button 
+                          onClick={handleAttachClick}
+                          className="p-1.5 text-gray-400 hover:text-gray-600"
+                        >
+                          <img 
+                            src={pinIcon} 
+                            alt="attachment" 
+                            className="w-6 h-6" 
+                            style={{ 
+                              filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                            }}
+                          />
+                        </button>
+                        <div className="flex-1 flex justify-start">
+                          <div 
+                            className="rounded-full px-8 py-1 flex items-center justify-between -ml-16"
+                            style={{ 
+                              background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
+                              width: '500px'
+                            }}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)' }}></div>
+                              <span className="text-white text-sm">
+                                {Math.floor(recordingTime / 60).toString().padStart(2, '0')}:
+                                {(recordingTime % 60).toString().padStart(2, '0')} - Audio recording
+                              </span>
+                            </div>
+                            <div className="flex space-x-0.5">
+                              {[...Array(20)].map((_, i) => {
+                                // Generate waveform heights based on sound detection
+                                let height;
+                                if (soundDetected) {
+                                  // Long bars when sound is detected (like screenshot 3)
+                                  height = `${Math.random() * 20 + 8}px`;
+                                } else {
+                                  // Short bars when no sound (like screenshot 2)
+                                  height = `${Math.random() * 4 + 2}px`;
+                                }
+                                
+                                return (
+                                  <div
+                                    key={i}
+                                    className="w-0.5 bg-white rounded-full"
+                                    style={{
+                                      height: height,
+                                      animation: soundDetected ? 'pulse 0.5s ease-in-out infinite alternate' : 'pulse 1.5s ease-in-out infinite alternate'
+                                    }}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <button 
+                          onClick={handleStopRecording}
+                          className="w-8 h-8 border-2 border-red-500 rounded-full flex items-center justify-center hover:bg-red-50 transition-colors"
+                          style={{ backgroundColor: '#F5F5F5' }}
+                        >
+                          <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
+                        </button>
+                      </div>
+                      
+                      {/* File Attachment Indicator - Inline with Recording */}
+                      {selectedFiles.length > 0 && (
+                        <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#F0F8FE' }}>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>
+                                {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} attached
+                              </span>
+                              <div className="text-xs" style={{ color: '#64B5F6' }}>
+                                {selectedFiles.map((file, index) => (
+                                  <span key={index}>
+                                    {file.name} ({formatFileSize(file.size)})
+                                    {index < selectedFiles.length - 1 ? ', ' : ''}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setSelectedFiles([]);
+                                setShowFilePreview(false);
+                              }}
+                              className="ml-2 hover:opacity-70"
+                              style={{ color: '#64B5F6' }}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : recordingTime > 0 ? (
+                    // Show audio preview bubble and send button after recording
+                    <div className="flex flex-col">
+                      
+                      {/* Audio Preview Bubble - Outside message input */}
+                      <div className="mb-3">
+                        <div 
+                          className="flex items-center justify-between rounded-md px-4 py-2"
+                          style={{ 
+                            background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
+                            borderRadius: '12px',
+                            width: '300px'
+                          }}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <button className="hover:opacity-80 transition-opacity">
+                              <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                              </svg>
+                            </button>
+                            <span className="text-white text-sm">
+                              {Math.floor(recordingTime / 60).toString().padStart(2, '0')} : {(recordingTime % 60).toString().padStart(2, '0')}
+                            </span>
+                            <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
+                            <span className="text-white text-sm">Audio</span>
+                            <div className="flex items-center justify-center space-x-0.5">
+                              {[6,8,4,6,12,16,14,18,20,16,12,8,6,10,14,12,8,6,4,8].map((h, i) => (
+                                <div
+                                  key={i}
+                                  className="w-0.5 bg-white rounded-full"
+                                  style={{ height: `${h}px` }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => setRecordingTime(0)}
+                            className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+                            style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
+                          >
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Message Input with Send Button */}
+                      <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '6px' }}>
+                        <div className="relative emoji-picker-container">
+                          <button 
+                            onClick={handleEmojiClick}
+                            className="p-1.5 hover:text-gray-600"
+                          >
+                            <img 
+                              src={faceIcon} 
+                              alt="emoji" 
+                              className="w-6 h-6" 
+                              style={{ 
+                                filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                              }}
+                            />
+                          </button>
+                          
+                          {/* Emoji Picker */}
+                          {showEmojiPicker && (
+                            <div className="absolute bottom-full left-0 mb-2 z-50">
+                              <style>{`
+                                .emoji-picker-react {
+                                  border: none !important;
+                                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                                }
+                                .emoji-picker-react .emoji-search {
+                                  border: 1px solid #e5e5e5 !important;
+                                  box-shadow: none !important;
+                                  outline: none !important;
+                                  background-color: #f8f8f8 !important;
+                                }
+                                .emoji-picker-react .emoji-search:focus {
+                                  border: 1px solid #e5e5e5 !important;
+                                  box-shadow: none !important;
+                                  outline: none !important;
+                                }
+                                .emoji-picker-react .emoji-group:before {
+                                  color: #666 !important;
+                                  font-weight: bold !important;
+                                  font-size: 12px !important;
+                                }
+                                .emoji-picker-react .emoji-categories button {
+                                  border-radius: 50% !important;
+                                  width: 32px !important;
+                                  height: 32px !important;
+                                  margin: 2px !important;
+                                }
+                                .emoji-picker-react .emoji-categories button.active {
+                                  background-color: #64B5F6 !important;
+                                }
+                                .emoji-picker-react .emoji-categories button svg {
+                                  width: 16px !important;
+                                  height: 16px !important;
+                                }
+                              `}</style>
+                              <EmojiPicker
+                                onEmojiClick={onEmojiClick}
+                                width={350}
+                                height={450}
+                                searchDisabled={false}
+                                skinTonesDisabled={true}
+                                previewConfig={{
+                                  showPreview: false
+                                }}
+                                searchPlaceHolder="Search Emoji"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <button 
+                          onClick={handleAttachClick}
+                          className="p-1.5 text-gray-400 hover:text-gray-600"
+                        >
+                          <img 
+                            src={pinIcon} 
+                            alt="attachment" 
+                            className="w-6 h-6" 
+                            style={{ 
+                              filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                            }}
+                          />
+                        </button>
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            placeholder="...Write your message"
+                            className="w-full px-3 py-2 focus:outline-none bg-transparent"
+                            style={{ 
+                              border: 'none',
+                              caretColor: '#64B5F6'
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleSendVoiceMessage();
+                              }
+                            }}
+                          />
+                        </div>
+                        <button 
+                          onClick={handleSendVoiceMessage}
+                          className="p-2 text-blue-600 hover:text-blue-800"
+                        >
+                          <img src={bluIcon} alt="send" className="w-7 h-7" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // Normal Message Input
+                    <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '6px' }}>
+                      <div className="relative emoji-picker-container">
+                        <button 
+                          onClick={handleEmojiClick}
+                          className="p-1.5 hover:text-gray-600"
+                        >
+                          <img 
+                            src={faceIcon} 
+                            alt="emoji" 
+                            className="w-6 h-6" 
+                            style={{ 
+                              filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                            }}
+                          />
+                        </button>
+                        
+                        {/* Emoji Picker */}
+                        {showEmojiPicker && (
+                          <div className="absolute bottom-full left-0 mb-2 z-50">
+                            <style>{`
+                              .emoji-picker-react {
+                                border: none !important;
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                              }
+                              .emoji-picker-react .emoji-search {
+                                border: 1px solid #e5e5e5 !important;
+                                box-shadow: none !important;
+                                outline: none !important;
+                                background-color: #f8f8f8 !important;
+                              }
+                              .emoji-picker-react .emoji-search:focus {
+                                border: 1px solid #e5e5e5 !important;
+                                box-shadow: none !important;
+                                outline: none !important;
+                              }
+                              .emoji-picker-react .emoji-group:before {
+                                color: #666 !important;
+                                font-weight: bold !important;
+                                font-size: 12px !important;
+                              }
+                              .emoji-picker-react .emoji-categories button {
+                                border-radius: 0 !important;
+                                width: 32px !important;
+                                height: 32px !important;
+                                margin: 2px !important;
+                                border: none !important;
+                                outline: none !important;
+                              }
+                              .emoji-picker-react .emoji-categories button.active {
+                                background-color: #64B5F6 !important;
+                                border: none !important;
+                                border-radius: 0 !important;
+                                outline: none !important;
+                              }
+                              .emoji-picker-react .emoji-categories button:hover {
+                                border-radius: 0 !important;
+                                outline: none !important;
+                              }
+                              .emoji-picker-react .emoji-categories button:focus {
+                                border-radius: 0 !important;
+                                outline: none !important;
+                              }
+                              .emoji-picker-react .emoji-categories button svg {
+                                width: 16px !important;
+                                height: 16px !important;
+                              }
+                            `}</style>
+                            <EmojiPicker
+                              onEmojiClick={onEmojiClick}
+                              width={350}
+                              height={450}
+                              searchDisabled={false}
+                              skinTonesDisabled={true}
+                              previewConfig={{
+                                showPreview: false
+                              }}
+                              searchPlaceHolder="Search Emoji"
+                            />
+                          </div>
+                        )}
+                        </div>
+                        <button 
+                          onClick={handleAttachClick}
+                          className="p-1.5 text-gray-400 hover:text-gray-600"
+                        >
+                          <img 
+                            src={pinIcon} 
+                            alt="attachment" 
+                            className="w-6 h-6" 
+                            style={{ 
+                              filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                            }}
+                          />
+                        </button>
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={messageText}
+                            onChange={(e) => {
+                              setMessageText(e.target.value);
+                              handleTypingDetection();
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleSendMessage();
+                              }
+                            }}
+                            placeholder="...Write your message"
+                            className="w-full px-3 py-2 focus:outline-none bg-transparent"
+                            style={{ 
+                              border: 'none',
+                              caretColor: '#64B5F6'
+                            }}
+                          />
+                      </div>
+                      
+                      <button 
+                        onClick={messageText.trim() || selectedFiles.length > 0 ? handleSendMessage : handleAudioRecord}
+                        className="p-2 text-blue-600 hover:text-blue-800"
+                      >
+                        {messageText.trim() || selectedFiles.length > 0 ? (
+                          <img src={bluIcon} alt="send" className="w-7 h-7" />
+                        ) : (
+                          <img src={audioIcon} alt="audio" className="w-7 h-7" />
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+            </div>
+          ) : (
+            // Default Secure Messaging View
+            <div className="flex-1 flex flex-col items-center justify-center p-8">
+              {/* Secure Messaging Icon */}
+              <div className="flex items-center justify-center mb-6">
+                <img 
+                  src={mainIcon} 
+                  alt="Secure Messaging" 
+                  className="w-32 h-32"
+                />
+              </div>
+
+              {/* Secure Messaging Content */}
+              <h2 className="text-2xl text-black mb-4">Secure Messaging</h2>
+              <div className="max-w-md text-center">
+                <div className="flex items-start space-x-2 mb-4">
+                  <svg className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                  </svg>
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    End-to-end encryption: Only the sender and recipient can read messages, not the service provider. <span className="underline cursor-pointer" style={{ color: '#64B5F6' }}>Learn more</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Footer */}
+        <footer className="bg-gray-50">
+          <div className="px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between text-sm" style={{ color: '#BABABA' }}>
+              <div className="flex items-center space-x-2">
+                <img 
+                  src={lilLogo} 
+                  alt="lil" 
+                  className="w-6 h-6"
+                />
+                <span>©</span>
+                <span>All rights reserved</span>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Link to="/contact" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Contact Us</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/terms" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/privacy" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Privacy policies</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/cookies" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Cookies</Link>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );

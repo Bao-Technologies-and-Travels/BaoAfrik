@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -31,6 +32,7 @@ import scanIcon from '../assets/images/logos/scanner (1).png';
 
 
 const Home: React.FC = () => {
+  const { user, isVisitor } = useAuth();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
