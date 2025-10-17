@@ -843,14 +843,14 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Textiles</h3>
+                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Textiles</h3>
                   
                   {/* Location and Bookmark Row */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1 flex items-center text-xs text-gray-500">
                       <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
                       <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                     </div>
                     
@@ -875,8 +875,8 @@ const SellerProfile: React.FC = () => {
                       >
                         <div className="relative">
                           <svg className="w-6 h-6" fill={wishlistProducts.has('textiles-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
                           {!wishlistProducts.has('textiles-1') && (
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className="text-xs font-bold">+</span>
@@ -917,14 +917,14 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Fresh Tomatoes</h3>
+                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Fresh Tomatoes</h3>
                   
                   {/* Location and Bookmark Row */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1 flex items-center text-xs text-gray-500">
                       <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
                       <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                     </div>
                     
@@ -949,8 +949,8 @@ const SellerProfile: React.FC = () => {
                       >
                         <div className="relative">
                           <svg className="w-6 h-6" fill={wishlistProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
                           {!wishlistProducts.has('tomatoes-1') && (
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className="text-xs font-bold">+</span>
@@ -991,14 +991,14 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Dried Shrimp</h3>
+                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Dried Shrimp</h3>
                   
                   {/* Location and Bookmark Row */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1 flex items-center text-xs text-gray-500">
                       <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
                       <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                     </div>
                     
@@ -1023,8 +1023,8 @@ const SellerProfile: React.FC = () => {
                       >
                         <div className="relative">
                           <svg className="w-6 h-6" fill={wishlistProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
                           {!wishlistProducts.has('shrimp-1') && (
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className="text-xs font-bold">+</span>
@@ -1065,14 +1065,14 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Ndolé Leaves</h3>
+                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Ndolé Leaves</h3>
                   
                   {/* Location and Bookmark Row */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1 flex items-center text-xs text-gray-500">
                       <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
                       <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                     </div>
                     
@@ -1097,8 +1097,8 @@ const SellerProfile: React.FC = () => {
                       >
                         <div className="relative">
                           <svg className="w-6 h-6" fill={wishlistProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
                           {!wishlistProducts.has('ndole-1') && (
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className="text-xs font-bold">+</span>
@@ -1139,14 +1139,14 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Plantain Chips</h3>
+                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Plantain Chips</h3>
                   
                   {/* Location and Bookmark Row */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1 flex items-center text-xs text-gray-500">
                       <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
                       <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                     </div>
                     
@@ -1171,8 +1171,8 @@ const SellerProfile: React.FC = () => {
                       >
                         <div className="relative">
                           <svg className="w-6 h-6" fill={wishlistProducts.has('plantain-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
                           {!wishlistProducts.has('plantain-1') && (
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className="text-xs font-bold">+</span>
@@ -1213,14 +1213,14 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Yam Flour</h3>
+                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Yam Flour</h3>
                   
                   {/* Location and Bookmark Row */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1 flex items-center text-xs text-gray-500">
                       <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
                       <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                     </div>
                     
@@ -1245,8 +1245,8 @@ const SellerProfile: React.FC = () => {
                       >
                         <div className="relative">
                           <svg className="w-6 h-6" fill={wishlistProducts.has('yam-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
                           {!wishlistProducts.has('yam-1') && (
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className="text-xs font-bold">+</span>
@@ -1287,14 +1287,14 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Palm Oil</h3>
+                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Palm Oil</h3>
                   
                   {/* Location and Bookmark Row */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1 flex items-center text-xs text-gray-500">
                       <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
                       <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                     </div>
                     
@@ -1319,8 +1319,8 @@ const SellerProfile: React.FC = () => {
                       >
                         <div className="relative">
                           <svg className="w-6 h-6" fill={wishlistProducts.has('palm-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
                           {!wishlistProducts.has('palm-1') && (
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className="text-xs font-bold">+</span>
@@ -1361,14 +1361,14 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Spices</h3>
+                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Spices</h3>
                   
                   {/* Location and Bookmark Row */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1 flex items-center text-xs text-gray-500">
                       <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
                       <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                     </div>
                     
@@ -1393,8 +1393,8 @@ const SellerProfile: React.FC = () => {
                       >
                         <div className="relative">
                           <svg className="w-6 h-6" fill={wishlistProducts.has('spices-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
                           {!wishlistProducts.has('spices-1') && (
                             <div className="absolute inset-0 flex items-center justify-center">
                               <span className="text-xs font-bold">+</span>

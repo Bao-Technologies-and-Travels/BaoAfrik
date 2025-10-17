@@ -32,12 +32,18 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    // Initialize user from localStorage if available
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [isVisitor, setIsVisitor] = useState(false);
 
   const login = (userData: User) => {
     setUser(userData);
     setIsVisitor(false);
+    // Save user to localStorage to persist across page navigations
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const logout = () => {

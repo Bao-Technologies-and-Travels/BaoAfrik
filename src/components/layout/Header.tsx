@@ -5,6 +5,12 @@ import logo from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import logoIcon from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoPre from '../../assets/images/pre/logo.png';
 import avatar from '../../assets/images/logos/avatar.png';
+import messageIcon from '../../assets/images/pre/message.svg';
+import boxIcon from '../../assets/images/pre/box.svg';
+import groupIcon from '../../assets/images/pre/group.svg';
+import frameIcon from '../../assets/images/pre/frame.svg';
+import podsIcon from '../../assets/images/pre/pods.svg';
+import settingIcon from '../../assets/images/pre/setting.svg';
 
 interface HeaderProps {
   showSearchBar?: boolean;
@@ -197,10 +203,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
                   }}
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
+                  <svg className="w-4 h-4 mr-2 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
                   </svg>
-                  Become a seller
+                  Start selling
                 </Link>
                 <Link 
                   to="/profile" 
@@ -230,13 +236,13 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                   </button>
                   
                   {/* Desktop Dropdown Menu */}
-                  {isDesktopMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-4 z-50 max-h-[80vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
-                      {/* Become a seller button */}
-                      <div className="px-4 pb-4">
+        {isDesktopMenuOpen && (
+          <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-[80vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
+                      {/* Start selling button with exit */}
+                      <div className="px-3 pb-3 flex items-center justify-between">
                       <Link 
                            to="/register" 
-                           className="inline-flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
+                           className="inline-flex items-center px-3 py-1.5 rounded-lg font-medium text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
                            style={{backgroundColor: '#FFF8F0', color: '#F9A822'}}
                            onMouseEnter={(e) => {
                              (e.target as HTMLElement).style.backgroundColor = '#FFF0E6';
@@ -246,45 +252,54 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                            }}
                         onClick={() => setIsDesktopMenuOpen(false)}
                       >
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
+                            <svg className="w-3 h-3 mr-1.5 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
                           </svg>
-                          Become a seller
+                            Start selling
                         </Link>
+                          <button
+                            onClick={() => setIsDesktopMenuOpen(false)}
+                            className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
                       </div>
 
                       {/* Profile Section */}
-                      <div className="flex items-center space-x-3 px-4 py-4 border-b border-gray-100">
+                      <div className="flex items-center space-x-2 px-3 py-3 border-b border-gray-100">
                             <img 
                               src={user?.profileImage || avatar} 
                           alt="User avatar" 
-                          className="w-16 h-16 rounded-full object-cover"
-                          width="64"
-                          height="64"
+                          className="w-12 h-12 rounded-full object-cover"
+                          width="48"
+                          height="48"
                         />
                         <div className="flex-1">
-                          <p className="text-sm text-gray-500">My profile</p>
+                          <p className="text-xs text-gray-500">My profile</p>
                           <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-bold text-gray-900">{user?.name || 'Jean Kameni'}</h3>
-                            <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                              <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
+                            <h3 className="text-sm font-bold text-gray-900">{user?.name || 'Jean Kameni'}</h3>
+                            <div className="w-6 h-6 rounded flex items-center justify-center" style={{backgroundColor: '#E3F2FD'}}>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#64B5F6'}}>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Create a new listing button */}
-                      <div className="px-4 py-4">
+                      <div className="px-3 py-3">
                         <Link 
                           to="/create-listing" 
-                          className="block w-full bg-blue-50 text-blue-600 px-4 py-3 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2" 
+                          className="block w-full px-3 py-2 rounded-lg font-medium text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
+                          style={{backgroundColor: '#E3F2FD', color: '#64B5F6'}}
                           onClick={() => setIsDesktopMenuOpen(false)}
                         >
-                          <div className="flex items-center justify-center space-x-2">
+                          <div className="flex items-center justify-center space-x-1.5">
                             <span>Create a new listing</span>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#64B5F6'}}>
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
                           </div>
@@ -292,195 +307,112 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       </div>
 
                       {/* Navigation Menu Items */}
-                      <div className="space-y-1 px-2">
+                      <div className="space-y-0.5 px-2">
                         {/* Chats */}
                         <Link 
                           to="/messages" 
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                          className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                           onClick={() => setIsDesktopMenuOpen(false)}
                         >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                              </svg>
-                          </div>
-                          <div>
-                              <div className="font-medium text-gray-900">Chats</div>
-                              <div className="text-sm text-gray-500">Check your discussions in your inbox</div>
+                          <div className="flex items-center space-x-2">
+                             <img src={messageIcon} alt="Message" className="w-4 h-4" style={{color: '#64B5F6'}} />
+                           <div>
+                              <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Chats</div>
                             </div>
                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                        </div>
                       </Link>
 
-                      {/* Notifications */}
+                      {/* My listings */}
                       <Link 
-                        to="/notifications" 
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                        to="/my-listings" 
+                          className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsDesktopMenuOpen(false)}
                       >
-                        <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10.07 2.82l3.12 3.12M7.05 5.84L10.17 8.96M3.98 8.91l3.12 3.12M1 12.03l3.12 3.12M3.98 15.15l3.12 3.12M7.05 18.2l3.12 3.12M10.07 21.22l3.12 3.12" />
-                            </svg>
-                          </div>
+                        <div className="flex items-center space-x-2">
+                            <img src={boxIcon} alt="Box" className="w-4 h-4" style={{color: '#64B5F6'}} />
                           <div>
-                            <div className="font-medium text-gray-900">Notifications</div>
-                              <div className="text-sm text-gray-500">Don't miss anything about your activities</div>
+                             <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>My listings</div>
                             </div>
                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                        </div>
                       </Link>
 
-                        {/* Request & Bring */}
+                        {/* My requests */}
                       <Link 
-                          to="/request-bring" 
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                          to="/my-requests" 
+                          className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsDesktopMenuOpen(false)}
                       >
-                        <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                          </div>
+                        <div className="flex items-center space-x-2">
+                            <img src={groupIcon} alt="Group" className="w-4 h-4" style={{color: '#64B5F6'}} />
                           <div>
-                              <div className="font-medium text-gray-900">Request & Bring</div>
-                              <div className="text-sm text-gray-500">Lorem ipsum dolor sit amet consectetur.</div>
+                               <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>My requests</div>
                             </div>
                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                        </div>
                       </Link>
 
-                        {/* Become a seller */}
-                      <Link 
-                          to="/register" 
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                        onClick={() => setIsDesktopMenuOpen(false)}
-                      >
-                        <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                            </svg>
-                          </div>
-                          <div>
-                              <div className="font-medium text-gray-900">Become a seller</div>
-                              <div className="text-sm text-gray-500">Publish and manage your articles better</div>
-                            </div>
-                          </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                        </div>
-                      </Link>
 
                       {/* Bookmarks */}
                       <Link 
                         to="/bookmarks" 
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                          className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsDesktopMenuOpen(false)}
                       >
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                            </svg>
-                          </div>
+                        <div className="flex items-center space-x-2">
+                          <img src={frameIcon} alt="Frame" className="w-4 h-4" style={{color: '#64B5F6'}} />
                           <div>
-                            <div className="font-medium text-gray-900">Bookmarks</div>
-                              <div className="text-sm text-gray-500">Find your saved posts here</div>
+                            <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Bookmarks</div>
                             </div>
                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                           </div>
                         </Link>
 
                         {/* Help Center */}
                         <Link 
                           to="/help" 
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                          className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                           onClick={() => setIsDesktopMenuOpen(false)}
                         >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
-                              </svg>
-                            </div>
+                          <div className="flex items-center space-x-2">
+                            <img src={podsIcon} alt="Pods" className="w-4 h-4" style={{color: '#64B5F6'}} />
                             <div>
-                              <div className="font-medium text-gray-900">Help Center</div>
-                              <div className="text-sm text-gray-500">Need to talk ? We're listening</div>
+                              <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Help Center</div>
                             </div>
                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                           </div>
                         </Link>
 
                         {/* Settings */}
                         <Link 
                           to="/settings" 
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                          className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                           onClick={() => setIsDesktopMenuOpen(false)}
                         >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                            </div>
+                          <div className="flex items-center space-x-2">
+                            <img src={settingIcon} alt="Setting" className="w-4 h-4" style={{color: '#64B5F6'}} />
                             <div>
-                              <div className="font-medium text-gray-900">Settings</div>
-                              <div className="text-sm text-gray-500">Set your account preferences</div>
+                              <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Settings</div>
+                              <div className="text-xs text-gray-500">Set your account preferences</div>
+                            </div>
                           </div>
-                        </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                        </div>
                       </Link>
                       </div>
 
                       {/* Logout Button */}
-                      <div className="px-4 pt-4 border-t border-gray-100">
+                      <div className="px-3 pt-3 border-t border-gray-100">
                         <button 
                           onClick={() => {
                             handleLogout();
                             setIsDesktopMenuOpen(false);
                           }}
-                          className="w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                          className="w-full bg-gray-100 px-3 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                              </svg>
-                              <span>Log Out</span>
+                          <div className="flex items-center space-x-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#6A6A6A'}}>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <div className="text-left">
+                              <div className="font-medium text-xs" style={{color: '#6A6A6A'}}>Log Out</div>
+                              <div className="text-xs" style={{color: '#6A6A6A'}}>Log out of BAO Afrik</div>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-500 text-left ml-8">Log out of BAO Afrik</p>
                         </button>
                       </div>
                     </div>
@@ -638,120 +570,74 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                          {/* Notifications */}
                          <Link 
                            to="/notifications" 
-                           className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                            onClick={() => setIsDesktopMenuOpen(false)}
                          >
                            <div className="flex items-center space-x-3">
-                             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10.07 2.82l3.12 3.12M7.05 5.84L10.17 8.96M3.98 8.91l3.12 3.12M1 12.03l3.12 3.12M3.98 15.15l3.12 3.12M7.05 18.2l3.12 3.12M10.07 21.22l3.12 3.12" />
-                               </svg>
-                             </div>
+                             <img src={boxIcon} alt="Box" className="w-5 h-5" style={{color: '#64B5F6'}} />
                              <div>
-                               <div className="font-medium text-gray-900">Notifications</div>
+                               <div className="font-medium" style={{color: '#6A6A6A'}}>Notifications</div>
                                <div className="text-sm text-gray-500">Don't miss anything about your activities</div>
                              </div>
-                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
                            </div>
                          </Link>
 
                          {/* Request & Bring */}
                          <Link 
                            to="/request-bring" 
-                           className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                            onClick={() => setIsDesktopMenuOpen(false)}
                          >
                            <div className="flex items-center space-x-3">
-                             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                               </svg>
-                             </div>
+                             <img src={groupIcon} alt="Group" className="w-5 h-5" style={{color: '#64B5F6'}} />
                              <div>
-                               <div className="font-medium text-gray-900">Request & Bring</div>
+                               <div className="font-medium" style={{color: '#6A6A6A'}}>Request & Bring</div>
                                <div className="text-sm text-gray-500">Lorem ipsum dolor sit amet consectetur.</div>
                              </div>
-                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
                            </div>
                          </Link>
 
                          {/* Bookmarks */}
                          <Link 
                            to="/bookmarks" 
-                           className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                            onClick={() => setIsDesktopMenuOpen(false)}
                          >
                            <div className="flex items-center space-x-3">
-                             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                               </svg>
-                             </div>
+                             <img src={frameIcon} alt="Frame" className="w-5 h-5" style={{color: '#64B5F6'}} />
                              <div>
-                               <div className="font-medium text-gray-900">Bookmarks</div>
-                               <div className="text-sm text-gray-500">Find your saved posts here</div>
+                               <div className="font-medium" style={{color: '#6A6A6A'}}>Bookmarks</div>
                              </div>
-                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
                            </div>
                          </Link>
 
                          {/* Become a seller */}
                          <Link 
                            to="/register" 
-                           className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                            onClick={() => setIsDesktopMenuOpen(false)}
                          >
                            <div className="flex items-center space-x-3">
-                             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                               </svg>
-                             </div>
+                             <img src={boxIcon} alt="Box" className="w-5 h-5" style={{color: '#64B5F6'}} />
                              <div>
-                               <div className="font-medium text-gray-900">Become a seller</div>
+                               <div className="font-medium" style={{color: '#6A6A6A'}}>Start selling</div>
                                <div className="text-sm text-gray-500">Publish and manage your articles better</div>
                              </div>
-                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
                            </div>
                          </Link>
 
                          {/* Help Center */}
                          <Link 
                            to="/help" 
-                           className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                            onClick={() => setIsDesktopMenuOpen(false)}
                          >
                            <div className="flex items-center space-x-3">
-                             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
-                               </svg>
-                             </div>
+                             <img src={podsIcon} alt="Pods" className="w-5 h-5" style={{color: '#64B5F6'}} />
                              <div>
-                               <div className="font-medium text-gray-900">Help Center</div>
+                               <div className="font-medium" style={{color: '#6A6A6A'}}>Help Center</div>
                                <div className="text-sm text-gray-500">Need to talk ? We're listening</div>
                              </div>
-                           </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
                            </div>
                          </Link>
                        </div>
@@ -834,10 +720,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                      (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
                    }}
                 >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
+                  <svg className="w-4 h-4 mr-1 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
               </svg>
-              Become a seller
+              Start selling
             </Link>
             
             {/* Burger Menu Button */}
@@ -1099,11 +985,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       height="64"
                     />
                     <div className="flex-1">
-                      <p className="text-sm text-gray-500">My profile</p>
+                      <p className="text-sm" style={{color: '#64B5F6'}}>My profile</p>
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-bold text-gray-900">{user.name || 'Jean Kameni'}</h3>
-                        <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                          <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-8 h-8 rounded flex items-center justify-center" style={{backgroundColor: '#E3F2FD'}}>
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#64B5F6'}}>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                         </div>
@@ -1130,17 +1016,13 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     {/* Chats */}
                     <Link 
                       to="/messages" 
-                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                          </svg>
-                        </div>
+                        <img src={messageIcon} alt="Message" className="w-5 h-5" style={{color: '#64B5F6'}} />
                       <div>
-                          <div className="font-medium text-gray-900">Chats</div>
+                          <div className="font-medium" style={{color: '#6A6A6A'}}>Chats</div>
                           <div className="text-sm text-gray-500">Check your discussions in your inbox</div>
                       </div>
                     </div>
@@ -1151,21 +1033,17 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                            </div>
                   </Link>
 
-                  {/* Notifications */}
+                  {/* My listings */}
                   <Link 
-                    to="/notifications" 
-                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                    to="/my-listings" 
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10.07 2.82l3.12 3.12M7.05 5.84L10.17 8.96M3.98 8.91l3.12 3.12M1 12.03l3.12 3.12M3.98 15.15l3.12 3.12M7.05 18.2l3.12 3.12M10.07 21.22l3.12 3.12" />
-                        </svg>
-                      </div>
+                      <img src={boxIcon} alt="Box" className="w-5 h-5" style={{color: '#64B5F6'}} />
                       <div>
-                        <div className="font-medium text-gray-900">Notifications</div>
-                          <div className="text-sm text-gray-500">Don't miss anything about your activities</div>
+                        <div className="font-medium text-gray-900">My listings</div>
+                          <div className="text-sm text-gray-500">Manage your published listings</div>
                         </div>
                       </div>
                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
@@ -1175,21 +1053,17 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     </div>
                   </Link>
 
-                    {/* Request & Bring */}
+                    {/* My requests */}
                   <Link 
-                      to="/request-bring" 
-                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                      to="/my-requests" 
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                      </div>
+                        <img src={groupIcon} alt="Group" className="w-5 h-5" style={{color: '#64B5F6'}} />
                       <div>
-                        <div className="font-medium text-gray-900">Request & Bring</div>
-                          <div className="text-sm text-gray-500">Lorem ipsum dolor sit amet consectetur.</div>
+                        <div className="font-medium text-gray-900">My requests</div>
+                          <div className="text-sm text-gray-500">View and manage your requests</div>
                         </div>
                       </div>
                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
@@ -1199,45 +1073,17 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     </div>
                   </Link>
 
-                    {/* Become a seller */}
-                  <Link 
-                    to="/register" 
-                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                        </svg>
-                      </div>
-                      <div>
-                          <div className="font-medium text-gray-900">Become a seller</div>
-                          <div className="text-sm text-gray-500">Publish and manage your articles better</div>
-                        </div>
-                      </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                    </div>
-                  </Link>
 
                   {/* Bookmarks */}
                   <Link 
                     to="/bookmarks" 
-                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                      </div>
+                      <img src={frameIcon} alt="Frame" className="w-5 h-5" style={{color: '#64B5F6'}} />
                       <div>
                         <div className="font-medium text-gray-900">Bookmarks</div>
-                          <div className="text-sm text-gray-500">Find your saved posts here</div>
                         </div>
                       </div>
                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
@@ -1250,50 +1096,31 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     {/* Help Center */}
                     <Link 
                       to="/help" 
-                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                       onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
-                        </svg>
-                      </div>
+                        <img src={podsIcon} alt="Pods" className="w-5 h-5" style={{color: '#64B5F6'}} />
                       <div>
                           <div className="font-medium text-gray-900">Help Center</div>
                           <div className="text-sm text-gray-500">Need to talk ? We're listening</div>
                         </div>
                       </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                           </div>
                     </Link>
 
                     {/* Settings */}
                     <Link 
                       to="/settings" 
-                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        </div>
+                        <img src={settingIcon} alt="Setting" className="w-5 h-5" style={{color: '#64B5F6'}} />
                         <div>
-                          <div className="font-medium text-gray-900">Settings</div>
+                               <div className="font-medium" style={{color: '#6A6A6A'}}>Settings</div>
                           <div className="text-sm text-gray-500">Set your account preferences</div>
                         </div>
                       </div>
-                           <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                             </svg>
-                           </div>
                     </Link>
                   </div>
 
@@ -1364,15 +1191,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                      {/* Notifications */}
                      <Link 
                        to="/notifications" 
-                       className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                        onClick={() => setIsMobileMenuOpen(false)}
                      >
                        <div className="flex items-center space-x-3">
-                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10.07 2.82l3.12 3.12M7.05 5.84L10.17 8.96M3.98 8.91l3.12 3.12M1 12.03l3.12 3.12M3.98 15.15l3.12 3.12M7.05 18.2l3.12 3.12M10.07 21.22l3.12 3.12" />
-                           </svg>
-                         </div>
+                         <img src={boxIcon} alt="Box" className="w-5 h-5" style={{color: '#64B5F6'}} />
                          <div>
                            <div className="font-medium text-gray-900">Notifications</div>
                            <div className="text-sm text-gray-500">Don't miss anything about your activities</div>
@@ -1388,15 +1211,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                      {/* Request & Bring */}
                      <Link 
                        to="/request-bring" 
-                       className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                        onClick={() => setIsMobileMenuOpen(false)}
                      >
                        <div className="flex items-center space-x-3">
-                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                           </svg>
-                         </div>
+                         <img src={groupIcon} alt="Group" className="w-5 h-5" style={{color: '#64B5F6'}} />
                          <div>
                            <div className="font-medium text-gray-900">Request & Bring</div>
                            <div className="text-sm text-gray-500">Lorem ipsum dolor sit amet consectetur.</div>
@@ -1412,18 +1231,13 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                      {/* Bookmarks */}
                      <Link 
                        to="/bookmarks" 
-                       className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                        onClick={() => setIsMobileMenuOpen(false)}
                      >
                        <div className="flex items-center space-x-3">
-                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                           </svg>
-                         </div>
+                         <img src={frameIcon} alt="Frame" className="w-5 h-5" style={{color: '#64B5F6'}} />
                          <div>
                            <div className="font-medium text-gray-900">Bookmarks</div>
-                           <div className="text-sm text-gray-500">Find your saved posts here</div>
                          </div>
                        </div>
                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
@@ -1436,17 +1250,13 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                      {/* Become a seller */}
                      <Link 
                        to="/register" 
-                       className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                        onClick={() => setIsMobileMenuOpen(false)}
                      >
                        <div className="flex items-center space-x-3">
-                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                           </svg>
-                         </div>
+                         <img src={boxIcon} alt="Box" className="w-5 h-5" style={{color: '#64B5F6'}} />
                          <div>
-                           <div className="font-medium text-gray-900">Become a seller</div>
+                           <div className="font-medium text-gray-900">Start selling</div>
                            <div className="text-sm text-gray-500">Publish and manage your articles better</div>
                          </div>
                        </div>
@@ -1460,15 +1270,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                      {/* Help Center */}
                      <Link 
                        to="/help" 
-                       className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                        onClick={() => setIsMobileMenuOpen(false)}
                      >
                        <div className="flex items-center space-x-3">
-                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
-                           </svg>
-                         </div>
+                         <img src={podsIcon} alt="Pods" className="w-5 h-5" style={{color: '#64B5F6'}} />
                          <div>
                            <div className="font-medium text-gray-900">Help Center</div>
                            <div className="text-sm text-gray-500">Need to talk ? We're listening</div>

@@ -29,7 +29,9 @@ function AppContent() {
   const isProductDetailPage = location.pathname.startsWith('/product/');
   const isSellerProfilePage = location.pathname.startsWith('/seller/');
   const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success'];
+  const customLayoutPages = ['/messages'];
   const isAuthPage = authPages.includes(location.pathname);
+  const isCustomLayoutPage = customLayoutPages.includes(location.pathname);
 
   // For auth pages, render without header/footer
   if (isAuthPage) {
@@ -48,6 +50,17 @@ function AppContent() {
           <Route path="/reset-password-sent" element={<ResetPasswordSent />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/password-reset-success" element={<PasswordResetSuccess />} />
+        </Routes>
+      </div>
+    );
+  }
+
+  // For custom layout pages (like Messages), render without global header/footer
+  if (isCustomLayoutPage) {
+    return (
+      <div className="min-h-screen">
+        <Routes>
+          <Route path="/messages" element={<Messages />} />
         </Routes>
       </div>
     );
@@ -80,7 +93,6 @@ function AppContent() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/create-listing" element={<CreateListing />} />
-          <Route path="/messages" element={<Messages />} />
           <Route path="/product/:id" element={<ProductDetail />} />
         </Routes>
       </main>

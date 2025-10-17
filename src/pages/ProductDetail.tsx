@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 // Import product images
 import mainImage from '../assets/images/logos/0.png'; // New main white pepper image
@@ -63,6 +64,7 @@ const ProductDetail: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [location, setLocation] = useState('');
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
+  const [isContactingSeller, setIsContactingSeller] = useState(false);
 
   // Product images array - main image first, then thumbnail images
   const images = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
@@ -112,7 +114,11 @@ const ProductDetail: React.FC = () => {
       avatar: sellerAvatar,
       rating: 4.8,
       reviewCount: 124,
-      verified: true
+      verified: true,
+      location: 'London, United Kingdom',
+      joinDate: 'June 2018',
+      description: 'Passionate about discovering unique products and always on the lookout for great deals. I enjoy exploring new brands, trying out innovative items, and supporting businesses that deliver quality and creativity.',
+      website: 'user-randomlink.com'
     }
   };
 
@@ -152,8 +158,36 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleContactSeller = () => {
-    console.log('Contact seller clicked');
-    // TODO: Implement messaging functionality
+    setIsContactingSeller(true);
+    
+    // Simulate loading time
+    setTimeout(() => {
+      const productData = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        location: product.location,
+        category: product.category,
+        description: product.description,
+        image: images[selectedImageIndex],
+        seller: {
+          name: product.seller.name,
+          avatar: product.seller.avatar,
+          rating: product.seller.rating,
+          location: product.seller.location,
+          joinDate: product.seller.joinDate,
+          description: product.seller.description,
+          website: product.seller.website
+        }
+      };
+      
+      navigate('/messages', { 
+        state: { 
+          productData,
+          preFilledMessage: "Hello, I am interested by this item, is it still available please ?"
+        } 
+      });
+    }, 1500); // 1.5 second loading time
   };
 
 
@@ -466,14 +500,24 @@ const ProductDetail: React.FC = () => {
               <button 
                 onClick={handleContactSeller}
                 className="w-full flex items-center justify-center space-x-2 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-                style={{backgroundColor: '#F9A825'}}
-                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+                style={{backgroundColor: isContactingSeller ? '#ccc' : '#F9A825'}}
+                disabled={!user || isContactingSeller}
+                onMouseEnter={!isContactingSeller ? (e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F' : undefined}
+                onMouseLeave={!isContactingSeller ? (e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825' : undefined}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                </svg>
-                <span>Contact Seller</span>
+                {isContactingSeller ? (
+                  <div className="flex items-center justify-center">
+                    <LoadingSpinner size="md" color="white" className="mr-2" />
+                    <span>Connecting...</span>
+                  </div>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
+                    </svg>
+                    <span>Contact Seller</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
