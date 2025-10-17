@@ -16,7 +16,7 @@ export class AppError extends Error {
 /**
  * Create standardized error
  */
-export const createError = (message: string, statusCode: number = 500, code: string = 'INTERNAL_ERROR'): AppError => {
+export const createError = (message: string, statusCode: number = 500, code: string = 'INTERNAL_ERROR'): CustomError => {
   return new AppError(message, statusCode, code);
 };
 

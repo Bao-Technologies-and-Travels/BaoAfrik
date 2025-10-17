@@ -8,11 +8,12 @@ import lilLogo from '../../assets/images/pre/lil.png';
 import { UpdateProfileData, apiClient } from '../../services/api';
 import { s3Service } from '../../services/s3Service';
 import { useToast } from '../../contexts/ToastContext';
+import avatar from '../../assets/images/logos/avatar.png';
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, updateUserProfile, refreshUserProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { addToast } = useToast();
@@ -23,6 +24,7 @@ const ProfileSetup: React.FC = () => {
     gender: '',
     birthDate: ''
   });
+
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [imageRemoved, setImageRemoved] = useState(false);
@@ -32,6 +34,14 @@ const ProfileSetup: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingImage, setIsUpLoadingImage] = useState(false);
 
+  // Track initial form data to detect changes
+  const [initialFormData, setInitialFormData] = useState({
+    firstName: '',
+    lastName: '',
+    gender: '',
+    birthDate: '',
+  });
+
   // Form validation state
   const isFormValid =
     formData.firstName.trim() &&
@@ -40,20 +50,52 @@ const ProfileSetup: React.FC = () => {
     formData.birthDate;
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        gender: user.gender || '',
-        birthDate: user.birthDate ? formatDateForInput(user.birthDate) : ''
-      });
+    const initializeUserData = async () => {
+      if (user) {
+        let userData = user;
 
-      if (user.profileImage) {
-        setProfileImage(user.profileImage);
-        setExistingImageUrl(user.profileImage);
+        if (!user.gender || !user.birthDate) {
+          try {
+            const response = await apiClient.getCurrentUser();
+            if (response.success && response.data) {
+              userData = response.data;
+              updateUserProfile(response.data);
+            }
+          } catch (error) {
+            console.error('Failed to fetch complete user profile:', error);
+          }
+        }
+
+        const initialData = {
+          firstName: userData.firstName || '',
+          lastName: userData.lastName || '',
+          gender: userData.gender || '',
+          birthDate: userData.birthDate ? formatDateForInput(userData.birthDate) : ''
+        };
+
+        setFormData(initialData);
+        setInitialFormData(initialData);
+
+        if (userData.profileImage) {
+          setProfileImage(userData.profileImage);
+          setExistingImageUrl(userData.profileImage);
+        }
       }
-    }
-  }, [user]);
+    };
+
+    initializeUserData();
+  }, [user, updateUserProfile]);
+
+  const hasFormChanges = () => {
+    return (
+      formData.firstName !== initialFormData.firstName ||
+      formData.lastName !== initialFormData.lastName ||
+      formData.gender !== initialFormData.gender ||
+      formData.birthDate !== initialFormData.birthDate ||
+      selectedFile !== null ||
+      imageRemoved
+    );
+  };
 
   const formatDateForInput = (dateString: string): string => {
     if (!dateString) return '';
@@ -227,6 +269,20 @@ const ProfileSetup: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if(!hasFormChanges()) {
+      addToast({
+        type: 'info',
+        title: 'No changes made',
+        message: 'Nothing was modified, profile remains unchanged',
+        duration: 3000,
+      });
+
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -236,33 +292,27 @@ const ProfileSetup: React.FC = () => {
     setSuccessMessage('');
 
     try {
-      let imageUrl: string | null = null;
+      const profileData: UpdateProfileData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        gender: formData.gender,
+        birthDate: formData.birthDate,
+      };
 
       if (selectedFile) {
         // Upload new image to S3
         const uploadedUrl = await uploadImageToS3();
-        imageUrl = uploadedUrl;
+        profileData.profileImage = uploadedUrl;
 
         // delete old image if it exists and is different from new one
         if (existingImageUrl && existingImageUrl !== uploadedUrl) {
           await s3Service.deleteImage(existingImageUrl);
         }
       } else if (imageRemoved) {
-        imageUrl = null;
         if (existingImageUrl) {
           await s3Service.deleteImage(existingImageUrl);
         }
-      } else {
-        imageUrl = existingImageUrl;
       }
-
-      const profileData: UpdateProfileData = {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        gender: formData.gender,
-        birthDate: formData.birthDate,
-        profileImage: imageUrl
-      };
 
       const response = await apiClient.updateProfile(profileData);
 
@@ -400,7 +450,7 @@ const ProfileSetup: React.FC = () => {
                     {profileImage ? (
                       <>
                         <img
-                          src={profileImage}
+                          src={profileImage || avatar}
                           alt="Profile"
                           className="w-full h-full object-cover rounded-2xl"
                         />

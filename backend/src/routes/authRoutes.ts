@@ -50,6 +50,11 @@ router.post('/forgot-password', generalLimiter, validateForgotPassword, authCont
 router.post('/verify-reset-code', generalLimiter, validateVerifyResetCode, authController.verifyResetCode);
 router.post('/reset-password', generalLimiter, validateResetPassword, authController.resetPassword);
 
+router.get('/api/test-401', (req, res, next) => {
+  const { createUnauthorizedError } = require('@/utils/errorUtils');
+  next(createUnauthorizedError('This should return 401'));
+});
+
 // Token refresh
 router.post('/refresh', generalLimiter, authController.refreshToken);
 

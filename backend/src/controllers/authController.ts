@@ -134,6 +134,8 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
       phoneNumber: true,
       passwordHash: true,
       profileImage: true,
+      gender: true,
+      birthDate: true,
       emailVerified: true,
       isVerifiedSeller: true,
       provider: true,
