@@ -20,6 +20,61 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [touched, setTouched] = useState({
+    email: false,
+    password: false,
+    confirmPassword: false
+  });
+
+  const validateField = (name: string, value: string) => {
+    const newErrors: { [key: string]: string } = { ...errors };
+
+    switch (name) {
+      case 'email':
+        if (!value.trim()) {
+          newErrors.email = 'Email address is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          newErrors.email = 'Please enter a valid email address of format name@example.com';
+        } else {
+          delete newErrors.email;
+        }
+        break;
+
+      case 'password':
+        if (!value) {
+          newErrors.password = 'Password is required';
+        } else {
+          delete newErrors.password;
+
+          // show password requirements as hint
+          const requirements = [];
+          if (value.length < 8) requirements.push('at least 8 characters');
+          if (!/(?=.*[a-z])/.test(value)) requirements.push('one lowercase letter');
+          if (!/(?=.*[A-Z])/.test(value)) requirements.push('one uppercase letter');
+          if (!/(?=.*\d)/.test(value)) requirements.push('one number');
+          if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(value)) requirements.push('one special character');
+
+          if (requirements.length > 0) {
+            newErrors.passwordHint = `Password must contain: ${requirements.join(', ')}`;
+          } else {
+            delete newErrors.passwordHint;
+          }
+        }
+        break;
+
+      case 'confirmPassword':
+        if (!value) {
+          newErrors.confirmPassword = 'Password confirmation is required';
+        } else if (formData.password && value !== formData.password) {
+          newErrors.confirmPassword = 'Passwords do not match. Please repeat the same password entered above';
+        } else {
+          delete newErrors.confirmPassword;
+        }
+        break;
+    }
+
+    setErrors(newErrors);
+  };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -31,23 +86,10 @@ const Register: React.FC = () => {
       newErrors.email = 'Please enter a valid email address of format name@example.com';
     }
 
-    // password validation
+    // show password requirements if password field has content but criteria not met
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters long';
-    } else if (!/(?=.*[a-z])/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one lowercase letter';
-    } else if (!/(?=.*[A-Z])/.test(formData.password)) {
-      newErrors.password = 'Password must contain at lease one uppercase letter';
-    } else if (!/(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Password must contain at one number (0-9)'
-    } else if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one special character'
-    }
-
-    // show password requirements if password field has content but criteria not met
-    if (formData.password && formData.password.length > 0) {
+    } else {
       const requirements = [];
       if (formData.password.length < 8) requirements.push('at least 8 characters');
       if (!/(?=.*[a-z])/.test(formData.password)) requirements.push('one lowercase letter');
@@ -63,16 +105,44 @@ const Register: React.FC = () => {
     // conform password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match. Please enter the same password in both fields.'
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match. Please repeat the password entered above.'
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name } = e.target;
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    validateField(name, value);
+
+    if (name === 'password' && formData.confirmPassword) {
+      validateField('confirmPassword', formData.confirmPassword);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setTouched({
+      email: true,
+      password: true,
+      confirmPassword: true
+    });
 
     if (!validateForm()) return;
 
@@ -84,7 +154,6 @@ const Register: React.FC = () => {
       const response = await authService.register(formData);
 
       if (response.success) {
-        // alert("Registration successful! Please verify your email.");
         addToast({
           type: 'success',
           title: 'Registration Successful!',
@@ -104,7 +173,6 @@ const Register: React.FC = () => {
 
     } catch (error) {
       console.error("Registration failed:", error);
-      // setErrors({ general: "Network or server error occurred." });
       addToast({
         type: 'error',
         title: 'Registration failed',
@@ -116,41 +184,29 @@ const Register: React.FC = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear specific error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-
-    // Clear confirm password error when either password field changes
-    if ((name === 'password' || name === 'confirmPassword') && errors.confirmPassword) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.confirmPassword;
-        return newErrors;
-      });
-    }
-  };
-
   const handleSocialLogin = (provider: string) => {
-    // Show alert that social login is not available yet
-    // alert('Social login not available yet. Backend coming soon.');
     addToast({
       type: 'info',
       title: 'Feature coming soon',
       message: `Social login with ${provider} coming soon.`,
       duration: 4000
     });
+  };
+
+  const getPasswordRequirements = () => {
+    const password = formData.password;
+    return [
+      { text: 'At least 8 characters', met: password.length >= 8 },
+      { text: 'One lowercase letter (a-z)', met: /(?=.*[a-z])/.test(password) },
+      { text: 'One uppercase letter (A-Z)', met: /(?=.*[A-Z])/.test(password) },
+      { text: 'One number (0-9)', met: /(?=.*\d)/.test(password) },
+      { text: 'One special character', met: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password) }
+    ];
+  };
+
+  const isPasswordValid = () => {
+    const requirements = getPasswordRequirements();
+    return requirements.every(req => req.met);
   };
 
   return (
@@ -201,14 +257,38 @@ const Register: React.FC = () => {
                   autoComplete="email"
                   required
                   disabled={isLoading}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.email ? 'border-red-500' : 'border-gray-200'
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${touched.email && errors.email ? 'border-red-500' :
+                    !touched.email ? 'border-gray-200' :
+                      'border-green-500'
                     }`}
                   placeholder="Enter your email address"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value.toLowerCase() })}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                {touched.email && errors.email && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.email}
+                  </p>
+                )}
+                {touched.email && !formData.email && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    Email is required
+                  </p>
+                )}
+                {touched.email && formData.email && !errors.email && (
+                  <p className="mt-1 text-sm text-green-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Valid email address
+                  </p>
                 )}
               </div>
 
@@ -226,11 +306,14 @@ const Register: React.FC = () => {
                     required
                     minLength={8}
                     disabled={isLoading}
-                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.password ? 'border-red-500' : 'border-gray-200'
+                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${touched.password && errors.password ? 'border-red-500' :
+                      !touched.password ? 'border-gray-200' :
+                        isPasswordValid() ? 'border-green-500' : 'border-orange-500'
                       }`}
                     placeholder="Enter your password"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                   />
                   <button
                     type="button"
@@ -249,8 +332,40 @@ const Register: React.FC = () => {
                     )}
                   </button>
                 </div>
+                {/* Password requirements checklist */}
+                {(touched.password || formData.password) && (
+                  <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Password must contain:</p>
+                    <div className="space-y-1">
+                      {getPasswordRequirements().map((req, index) => (
+                        <div key={index} className="flex items-center text-sm">
+                          {req.met ? (
+                            <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                          <span className={req.met ? 'text-green-600' : 'text-gray-500'}>
+                            {req.text}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {touched.password && errors.password && !errors.passwordHint && (
+                  <p className="mt-2 text-sm text-red-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.password}
+                  </p>
+                )}
               </div>
-              {errors.password && (
+              {/* {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
               )}
               {errors.passwordHint && !errors.password && (
@@ -260,8 +375,9 @@ const Register: React.FC = () => {
                   </svg>
                   {errors.passwordHint}
                 </div>
-              )}
+              )} */}
 
+              {/* Confirm Password Field */}
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
                   Confirm password
@@ -274,11 +390,14 @@ const Register: React.FC = () => {
                     autoComplete="new-password"
                     required
                     disabled={isLoading}
-                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.confirmPassword ? 'border-red-500' : 'border-gray-200'
+                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${touched.confirmPassword && errors.confirmPassword ? 'border-red-500' :
+                      !touched.confirmPassword ? 'border-gray-200' :
+                        formData.confirmPassword && !errors.confirmPassword ? 'border-green-500' : 'border-gray-200'
                       }`}
                     placeholder="Confirm your password"
                     value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                   />
                   <button
                     type="button"
@@ -297,9 +416,25 @@ const Register: React.FC = () => {
                     )}
                   </button>
                 </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                {touched.confirmPassword && errors.confirmPassword && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.confirmPassword}
+                  </p>
                 )}
+                {touched.confirmPassword && formData.confirmPassword && !errors.confirmPassword && (
+                  <p className="mt-1 text-sm text-green-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Passwords match
+                  </p>
+                )}
+                {/* {errors.confirmPassword && (
+                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                )} */}
               </div>
             </div>
 

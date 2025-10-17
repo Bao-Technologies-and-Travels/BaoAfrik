@@ -129,10 +129,10 @@ const Login: React.FC = () => {
         type: 'success',
         title: 'Login successful',
         message: `Welcome back, ${user?.firstName && user?.lastName
-            ? `${user.firstName} ${user.lastName}`
-            : user?.firstName
-              ? user.firstName
-              : user?.email?.split('@')[0] || 'User'
+          ? `${user.firstName} ${user.lastName}`
+          : user?.firstName
+            ? user.firstName
+            : user?.email?.split('@')[0] || 'User'
           }!`,
         duration: 4000
       });
@@ -188,7 +188,20 @@ const Login: React.FC = () => {
 
     } catch (error: any) {
       console.error('Login failed:', error);
-      setErrors({ general: error.message || 'Login failed. Please try again.' });
+      if (error.message === 'Please verify your email before logging in') {
+        setErrors({
+          general: 'Please verify your email before logging in. Redirecting to verification page in 3 seconds...'
+        });
+        setTimeout(() => {
+          navigate('/verify-email', {
+            state: {
+              email: email.toLowerCase(),
+              message: 'Please verify your email address to continue',
+              type: 'info'
+            }
+          });
+        }, 3000);
+      } else { setErrors({ general: error.message || 'Login failed. Please try again.' }); }
     } finally {
       setIsLoading(false);
     }
