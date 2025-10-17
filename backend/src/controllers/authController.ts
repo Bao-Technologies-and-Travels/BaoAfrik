@@ -347,6 +347,10 @@ export const verifyEmail = asyncHandler(async (req: Request<{}, {}, EmailVerific
 export const resendVerificationCode = asyncHandler(async (req: Request<{}, {}, ResendVerificationRequest>, res: Response) => {
   const { email } = req.body;
 
+  if(!email) {
+    throw createValidationError('Email is required');
+  }
+
   const user = await prisma.user.findUnique({
     where: {
       email: email.toLowerCase(),
@@ -371,12 +375,12 @@ export const resendVerificationCode = asyncHandler(async (req: Request<{}, {}, R
     }
   });
 
-  // Send verification email
+  // Send new verification email
   try {
     await sendVerificationEmail(user.email, verificationCode);
   } catch (error) {
     logger.error('Failed to resend verification email:', error);
-    throw new Error('Failed to send verification email');
+    throw new Error('Failed to send verification email. Please try again.');
   }
 
   logger.info('Verification code resent', {
@@ -386,7 +390,10 @@ export const resendVerificationCode = asyncHandler(async (req: Request<{}, {}, R
 
   const response: ApiResponse = {
     success: true,
-    message: 'Verification code sent successfully'
+    message: 'New Verification code sent successfully',
+    data: {
+      message: 'New verification code sent successfully'
+    }
   };
 
   res.json(response);
@@ -652,7 +659,6 @@ export const verifyResetCode = asyncHandler(async (req: Request<{}, {}, VerifyRe
     });
 
   } catch (updateError) {
-    console.error('[Backend] Failed to update user:', updateError);
     throw new Error('Failed to process reset request');
   }
 

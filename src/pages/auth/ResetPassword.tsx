@@ -100,7 +100,6 @@ const ResetPassword: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error('Code verification failed:', error);
       setErrors({
         code: error.response?.data?.message || 'Failed to verify code. Please try again.'
       });
@@ -129,7 +128,6 @@ const ResetPassword: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error('Resend code failed:', error);
       setErrors({
         general: error.response?.data?.message || 'Failed to resend code. Please try again.'
       });
@@ -170,7 +168,6 @@ const ResetPassword: React.FC = () => {
 
     if (!resetToken) {
       newErrors.general = 'Reset session expired. Please start over.';
-      console.error('Reset token is undefined!');
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -203,7 +200,6 @@ const ResetPassword: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error('Password reset failed:', error);
       setErrors({
         general: error.response?.data?.message || 'Failed to reset password. Please try again.'
       });

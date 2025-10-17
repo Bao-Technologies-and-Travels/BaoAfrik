@@ -83,7 +83,6 @@ const ResetPasswordSent: React.FC = () => {
       });
       
     } catch (error) {
-      console.error('Verification failed:', error);
       setError('Invalid verification code. Please try again.');
     } finally {
       setIsLoading(false);

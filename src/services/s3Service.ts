@@ -37,7 +37,6 @@ export const s3Service = {
                 imageUrl: result.Location
             };
         } catch (error) {
-            console.error('S3 Upload error:', error);
             return {
                 success: false,
                 error: 'Failed to upload image'

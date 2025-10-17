@@ -6,6 +6,7 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 import { authService } from '../../services/authService';
+import { useToast } from '../../contexts/ToastContext';
 
 const EmailVerification: React.FC = () => {
   const location = useLocation();
@@ -16,12 +17,15 @@ const EmailVerification: React.FC = () => {
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const { addToast } = useToast();
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Get email from navigation state
   const email = location.state?.email || 'your email';
   const fromRegistration = location.state?.fromRegistration || false;
 
   // Countdown timer for resend functionality
+
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -92,10 +96,15 @@ const EmailVerification: React.FC = () => {
         }
       } else {
         setError(response.message || 'Invalid verification code.');
+        setVerificationCode(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
       }
     } catch (err) {
-      console.error(err);
       setError('Something went wrong. Please try again.');
+      setVerificationCode(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
+    } finally {
+      setIsLoading(false);
     }
 
   };
@@ -106,15 +115,37 @@ const EmailVerification: React.FC = () => {
     setCanResend(false);
     setCountdown(60);
     setError('');
+    setSuccessMessage('');
 
     try {
-      // TODO: Implement resend verification code API call
+      if (!email) {
+        setError('Email address is missing. Please try registering again.');
+        setCanResend(true);
+        setCountdown(0);
+        return;
+      }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await authService.resendVerificationCode({ email });
 
-    } catch (error) {
-      setError('Failed to resend code. Please try again.');
+      if (response.success) {
+        setVerificationCode(['', '', '', '', '', '']);
+        setError('New verification code sent! Please check your email.');
+        inputRefs.current[0]?.focus();
+
+        addToast({
+          type: 'info',
+          title: 'Verification code resent',
+          message: 'New verification code sent! Please check your email.',
+          duration: 4000
+        });
+
+      } else {
+        setError(response.message || 'Failed to resend code. Please try again');
+        setCanResend(true);
+        setCountdown(0);
+      }
+    } catch (error: any) {
+      setError(error.message || 'Failed to resend code. Please try again.');
       setCanResend(true);
       setCountdown(0);
     }
@@ -192,7 +223,6 @@ const EmailVerification: React.FC = () => {
                     onKeyDown={(e) => handleKeyDown(index, e)}
                     onPaste={index === 0 ? handlePaste : undefined}
                     className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
-                    disabled={isLoading}
                   />
                 ))}
               </div>
@@ -202,8 +232,8 @@ const EmailVerification: React.FC = () => {
               type="submit"
               disabled={isLoading || verificationCode.some(digit => !digit)}
               className={`w-full disabled:cursor-not-allowed font-semibold py-2.5 sm:py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100 text-sm sm:text-base ${verificationCode.every(digit => digit) && !isLoading
-                  ? 'text-white'
-                  : 'bg-gray-200 text-gray-400'
+                ? 'text-white'
+                : 'bg-gray-200 text-gray-400'
                 }`}
               style={verificationCode.every(digit => digit) && !isLoading ? { backgroundColor: '#F9A825' } : {}}
             >

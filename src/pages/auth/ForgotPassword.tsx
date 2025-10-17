@@ -61,8 +61,6 @@ const ForgotPassword: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error('Forgot password failed:', error);
-
       // Handle different error types
       if (error.response?.data?.error) {
         setErrors({ general: error.response.data.error });

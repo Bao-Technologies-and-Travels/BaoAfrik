@@ -71,7 +71,6 @@ const ProfileSetup: React.FC = () => {
 
       return `${year}-${month}-${day}`;
     } catch (error) {
-      console.error('Error formatting date:', error);
       return '';
     }
   }
@@ -151,7 +150,6 @@ const ProfileSetup: React.FC = () => {
         setErrors(prev => ({ ...prev, general: '' }));
       }
     } catch (error) {
-      console.error('Error removing image:', error);
       setErrors(prev => ({
         ...prev,
         general: 'Failed to remove image from storage'
@@ -172,7 +170,6 @@ const ProfileSetup: React.FC = () => {
         throw new Error(uploadResult.error || 'Failed to upload image');
       }
     } catch (error) {
-      console.error('Imagde upload error:', error);
       throw error;
     } finally {
       setIsUpLoadingImage(false);
@@ -301,7 +298,6 @@ const ProfileSetup: React.FC = () => {
       }, 3000)
 
     } catch (error: any) {
-      console.error('Profile setup failed:', error);
       if (error.message.includes('S3') || error.message.includes('storage')) {
         addToast({
           type: 'error',

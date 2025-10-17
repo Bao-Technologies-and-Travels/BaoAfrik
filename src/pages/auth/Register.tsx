@@ -172,7 +172,6 @@ const Register: React.FC = () => {
       }
 
     } catch (error) {
-      console.error("Registration failed:", error);
       addToast({
         type: 'error',
         title: 'Registration failed',

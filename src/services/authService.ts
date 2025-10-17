@@ -23,7 +23,6 @@ export class AuthService {
       return response;
 
     } catch (error: any) {
-      console.error('Login service error: ', error);
 
       const errorMessage =
         error.response?.data?.message ||
@@ -55,7 +54,6 @@ export class AuthService {
 
       return response;
     } catch (error: any) {
-      console.error('Logout service error:', error);
 
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
@@ -84,8 +82,16 @@ export class AuthService {
   }
 
   // Resend email verification code
-  async resendVerificationCode(email: string): Promise<ApiResponse<{ message: string }>> {
-    return apiClient.post('/auth/resend-verification', { email });
+  async resendVerificationCode(data: { email: string }): Promise<ApiResponse<{ message: string }>> {
+    try {
+      return await apiClient.post<{ message: string }>('/auth/resend-verification', data);
+    } catch (error: any) {
+
+      return {
+        success: false,
+        message: error.message || 'Failed to resend verification code',
+      };
+    }
   }
 
   // Social login (Google, Facebook, GitHub)
@@ -146,7 +152,6 @@ export class AuthService {
         message: response.message
       };
     } catch (error: any) {
-      console.error('Verify reset code service error:', error);
 
       const errorMessage =
         error.response?.data?.message ||

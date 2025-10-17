@@ -187,7 +187,6 @@ const Login: React.FC = () => {
       await completeLogin(user, accessToken, refreshToken);
 
     } catch (error: any) {
-      console.error('Login failed:', error);
       if (error.message === 'Please verify your email before logging in') {
         setErrors({
           general: 'Please verify your email before logging in. Redirecting to verification page in 3 seconds...'

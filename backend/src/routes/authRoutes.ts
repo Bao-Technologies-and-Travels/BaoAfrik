@@ -45,7 +45,7 @@ const generalLimiter = rateLimit({
 router.post('/register', authLimiter, validateRegister, authController.register);
 router.post('/login', authLimiter, validateLogin, authController.login);
 router.post('/verify-email', generalLimiter, validateEmailVerification, authController.verifyEmail);
-router.post('/resend-verification', generalLimiter, validateResendVerification, authController.resendVerificationCode);
+router.post('/resend-verification', generalLimiter, authController.resendVerificationCode);
 router.post('/forgot-password', generalLimiter, validateForgotPassword, authController.forgotPassword);
 router.post('/verify-reset-code', generalLimiter, validateVerifyResetCode, authController.verifyResetCode);
 router.post('/reset-password', generalLimiter, validateResetPassword, authController.resetPassword);

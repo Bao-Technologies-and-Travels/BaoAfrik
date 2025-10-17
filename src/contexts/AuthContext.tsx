@@ -101,8 +101,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error: any) {
-      console.error('Logout error in context:', error);
-
       // clear frontend even when there is an error
       setUser(null);
       setIsVisitor(false);

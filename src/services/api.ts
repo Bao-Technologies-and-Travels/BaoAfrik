@@ -83,7 +83,6 @@ class ApiClient {
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
-
     try {
       const response = await fetch(url, {
         ...options,
@@ -100,13 +99,14 @@ class ApiClient {
         };
       }
 
+      const responseDataToUse = responseData.data !== undefined ? responseData.data : responseData;
+
       return {
         success: true,
-        data: responseData.data,
+        data: responseDataToUse,
         message: responseData.message,
       };
     } catch (error) {
-      console.error('API Request Error:', error);
       return {
         success: false,
         message: 'Network error. Please check your connection.',
