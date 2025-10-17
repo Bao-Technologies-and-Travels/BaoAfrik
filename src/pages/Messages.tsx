@@ -588,8 +588,8 @@ const Messages: React.FC = () => {
         onChange={handleFileSelect}
         style={{ display: 'none' }}
       />
-      {/* Left Sidebar - Fixed Height */}
-      <div className="w-1/4 bg-white border-r-2 border-gray-300 flex flex-col h-screen relative" style={{ minHeight: '100vh' }}>
+      {/* Left Sidebar - Full Height */}
+      <div className="w-1/4 bg-white border-r-2 border-gray-300 flex flex-col min-h-screen relative">
         {/* Header */}
         <header className="bg-white">
           <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
@@ -888,7 +888,7 @@ const Messages: React.FC = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-screen">
+      <div className="flex-1 flex flex-col min-h-screen">
         {/* Header */}
         <header className="bg-gray-50">
           <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
@@ -1186,150 +1186,107 @@ const Messages: React.FC = () => {
         </header>
 
         {/* Main Content Area */}
-        <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 my-8 flex flex-col" style={{ height: messages.length > 1 ? 'calc(100vh - 8rem)' : 'auto', overflow: messages.length > 1 ? 'hidden' : 'visible' }}>
+        <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 my-8 flex flex-col">
           {productData ? (
             // Product Inquiry View
             <div className="flex-1 flex flex-col">
-              {/* Dynamic Seller Profile Header */}
-              {messages.length <= 1 ? (
-                // Full Profile View (when 1 or fewer messages)
-                <div className="p-6">
-                  {/* Top Right Icons */}
-                  <div className="flex justify-end space-x-3 mb-6">
-                    <button className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
-                      <img 
-                        src={fiIcon} 
-                        alt="Search" 
-                        className="w-6 h-6"
-                      />
-                    </button>
-                    <button className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
-                      <img 
-                        src={faIcon} 
-                        alt="Settings" 
-                        className="w-6 h-6"
-                      />
-                    </button>
-                  </div>
+              {/* Seller Profile Header */}
+              <div className="p-6">
+                {/* Top Right Icons */}
+                <div className="flex justify-end space-x-3 mb-6">
+                  <button className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
+                    <img 
+                      src={fiIcon} 
+                      alt="Search" 
+                      className="w-6 h-6"
+                    />
+                  </button>
+                  <button className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
+                    <img 
+                      src={faIcon} 
+                      alt="Settings" 
+                      className="w-6 h-6"
+                    />
+                  </button>
+                </div>
 
-                  {/* Profile Card */}
-                  <div className="bg-white rounded-lg p-6 pt-2 max-w-4xl mx-auto">
-                    <div className="text-center">
-                      {/* Avatar */}
-                      <img 
-                        src={eboAvatar} 
-                        alt={productData.seller.name}
-                        className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
-                      />
-                      
-                      {/* Name and Rating */}
-                      <div className="flex items-center justify-center space-x-2 mb-4">
-                        <h3 className="text-xl font-semibold text-gray-900">Joaquin EDIMO</h3>
-                        <div className="flex items-center space-x-2">
-                          <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                          </svg>
-                          <span className="text-lg" style={{ color: '#BABABA' }}>4.3</span>
-                        </div>
+                {/* Profile Card */}
+                <div className="bg-white rounded-lg p-6 pt-2 max-w-4xl mx-auto">
+                  <div className="text-center">
+                    {/* Avatar */}
+                    <img 
+                      src={eboAvatar} 
+                      alt={productData.seller.name}
+                      className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
+                    />
+                    
+                    {/* Name and Rating */}
+                    <div className="flex items-center justify-center space-x-2 mb-4">
+                      <h3 className="text-xl font-semibold text-gray-900">Joaquin EDIMO</h3>
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <span className="text-lg" style={{ color: '#BABABA' }}>4.3</span>
                       </div>
+                    </div>
 
-                      {/* Seller Info */}
-                      <div className="flex items-center justify-center space-x-6 text-sm mb-4">
-                        <div className="flex items-center space-x-2">
-                          <img 
-                            src={earthIcon} 
-                            alt="Website" 
-                            className="w-4 h-4"
-                          />
-                          <span style={{ color: '#64B5F6' }}>user-randomlink.com</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <img 
-                            src={locIcon} 
-                            alt="Location" 
-                            className="w-4 h-4"
-                          />
-                          <span style={{ color: '#64B5F6' }}>London, United Kingdom</span>
-                        </div>
-                      </div>
-
-                      {/* Join Date */}
-                      <div className="flex items-center justify-center space-x-2 text-sm mb-4">
+                    {/* Seller Info */}
+                    <div className="flex items-center justify-center space-x-6 text-sm mb-4">
+                      <div className="flex items-center space-x-2">
                         <img 
-                          src={profileIcon} 
-                          alt="Profile" 
+                          src={earthIcon} 
+                          alt="Website" 
                           className="w-4 h-4"
                         />
-                        <span style={{ color: '#BABABA' }}>Joined BAO' Afrik in June 2018</span>
+                        <span style={{ color: '#64B5F6' }}>user-randomlink.com</span>
                       </div>
-
-                      {/* Description */}
-                      <div className="text-left">
-                        <p className="text-sm leading-relaxed mb-4 text-justify" style={{ color: '#BABABA' }}>
-                          Passionate about discovering unique products and always on the lookout for great deals. I enjoy exploring new brands, trying out innovative items, and supporting businesses that deliver quality and creativity.
-                        </p>
+                      <div className="flex items-center space-x-2">
+                        <img 
+                          src={locIcon} 
+                          alt="Location" 
+                          className="w-4 h-4"
+                        />
+                        <span style={{ color: '#64B5F6' }}>London, United Kingdom</span>
                       </div>
-
-                      {/* See User Profile Button */}
-                      <button 
-                        className="px-6 py-2 rounded-lg text-sm font-medium transition-colors"
-                        style={{ 
-                          backgroundColor: '#F0F8FE', 
-                          color: '#64B5F6' 
-                        }}
-                      >
-                        See user profile
-                      </button>
                     </div>
-                  </div>
-                </div>
-              ) : (
-                // Compressed Header View (when multiple messages)
-                <div className="p-4 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    {/* Left: Profile Info */}
-                    <div className="flex items-center space-x-3">
+
+                    {/* Join Date */}
+                    <div className="flex items-center justify-center space-x-2 text-sm mb-4">
                       <img 
-                        src={eboAvatar} 
-                        alt={productData.seller.name}
-                        className="w-10 h-10 rounded-full object-cover"
+                        src={profileIcon} 
+                        alt="Profile" 
+                        className="w-4 h-4"
                       />
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Joaquin EDIMO</h3>
-                        <div className="flex items-center space-x-1">
-                          <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                          </svg>
-                          <span className="text-sm" style={{ color: '#BABABA' }}>4.3</span>
-                        </div>
-                      </div>
+                      <span style={{ color: '#BABABA' }}>Joined BAO' Afrik in June 2018</span>
                     </div>
-                    
-                    {/* Right: Action Buttons */}
-                    <div className="flex space-x-2">
-                      <button className="p-2 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
-                        <img 
-                          src={fiIcon} 
-                          alt="Search" 
-                          className="w-5 h-5"
-                        />
-                      </button>
-                      <button className="p-2 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
-                        <img 
-                          src={faIcon} 
-                          alt="Settings" 
-                          className="w-5 h-5"
-                        />
-                      </button>
+
+                    {/* Description */}
+                    <div className="text-left">
+                      <p className="text-sm leading-relaxed mb-4 text-justify" style={{ color: '#BABABA' }}>
+                        Passionate about discovering unique products and always on the lookout for great deals. I enjoy exploring new brands, trying out innovative items, and supporting businesses that deliver quality and creativity.
+                      </p>
                     </div>
+
+
+                    {/* See User Profile Button */}
+                    <button 
+                      className="px-6 py-2 rounded-lg text-sm font-medium transition-colors"
+                      style={{ 
+                        backgroundColor: '#F0F8FE', 
+                        color: '#64B5F6' 
+                      }}
+                    >
+                      See user profile
+                    </button>
                   </div>
                 </div>
-              )}
+              </div>
 
 
-                {/* Chat Messages Area */}
-                {messages.length > 0 && (
-                  <div className="flex-1 px-6 py-4 overflow-y-auto" style={{ maxHeight: messages.length > 1 ? 'calc(100vh - 16rem)' : 'none' }}>
+              {/* Chat Messages Area */}
+              {messages.length > 0 && (
+                <div className="flex-1 px-6 py-4 overflow-y-auto">
                   {/* Top Timestamp - Shorter lines */}
                   <div className="flex items-center justify-center mb-6">
                     <div className="flex items-center">
