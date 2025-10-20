@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import EmojiPicker from 'emoji-picker-react';
+import EmojiPicker, { Emoji } from 'emoji-picker-react';
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
 import lilLogo from '../assets/images/pre/lil.png';
@@ -31,12 +31,28 @@ import settingIcon from '../assets/images/pre/setting.svg';
 import reactionIcon from '../assets/images/pre/reaction.svg';
 import optionIcon from '../assets/images/pre/option.svg';
 import notificationIcon from '../assets/images/pre/notification.svg';
+import emoji1 from '../assets/images/pre/s1.svg';
+import emoji2 from '../assets/images/pre/s2.svg';
+import emoji3 from '../assets/images/pre/s3.svg';
+import emoji4 from '../assets/images/pre/s4.svg';
+import emoji5 from '../assets/images/pre/s5.svg';
+import emoji6 from '../assets/images/pre/s6.svg';
 import actionIcon01 from '../assets/images/pre/01.svg';
 import actionIcon02 from '../assets/images/pre/02.svg';
 import actionIcon03 from '../assets/images/pre/03.svg';
 import actionIcon04 from '../assets/images/pre/04.svg';
 import actionIcon05 from '../assets/images/pre/05.svg';
 import actionIcon06 from '../assets/images/pre/06.svg';
+import muteArrowIcon from '../assets/images/pre/mute.svg';
+import archiveIcon from '../assets/images/pre/archive.svg';
+import starIcon from '../assets/images/pre/star.svg';
+import translationToggleIcon from '../assets/images/pre/tt.svg';
+import replyIcon from '../assets/images/pre/reply.svg';
+import copyIcon from '../assets/images/pre/copy.svg';
+import tickIcon from '../assets/images/pre/tick.svg';
+import pinMenuIcon from '../assets/images/pre/pin.svg';
+import trashIcon from '../assets/images/pre/trash.svg';
+import replyCloseIcon from '../assets/images/pre/re.svg';
 import productImage1 from '../assets/images/pre/1.png';
 
 const Messages: React.FC = () => {
@@ -55,6 +71,8 @@ const Messages: React.FC = () => {
   const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null);
   const [soundDetected, setSoundDetected] = useState(false);
   const [soundTimer, setSoundTimer] = useState<NodeJS.Timeout | null>(null);
+  const [audioLevels, setAudioLevels] = useState<number[]>([]);
+  const [waveformTimer, setWaveformTimer] = useState<NodeJS.Timeout | null>(null);
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [showFilePreview, setShowFilePreview] = useState(false);
@@ -70,6 +88,16 @@ const Messages: React.FC = () => {
   const [hasIncomingReply, setHasIncomingReply] = useState(false);
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
   const [actionsMenuOpen, setActionsMenuOpen] = useState<number | null>(null);
+  const [chatSearchQuery, setChatSearchQuery] = useState('');
+  const [showCondensedHeader, setShowCondensedHeader] = useState(false);
+  const [visibleMessages, setVisibleMessages] = useState<any[]>([]);
+  const [fadingOutMessageIds, setFadingOutMessageIds] = useState<number[]>([]);
+  const [activeReactionMessageId, setActiveReactionMessageId] = useState<number | null>(null);
+  const [showAllMessages, setShowAllMessages] = useState(false);
+  const [activeMessageOptionsId, setActiveMessageOptionsId] = useState<number | null>(null);
+  const [replyToMessage, setReplyToMessage] = useState<any>(null);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -88,6 +116,53 @@ const Messages: React.FC = () => {
       }
     });
   };
+
+  // Limit visible messages to last 3 with smooth fade-out (unless showing all)
+  useEffect(() => {
+    const MAX_VISIBLE_MESSAGES = 3;
+    
+    if (messages.length > 0) {
+      // If showing all messages, display everything; otherwise show last 3
+      const messagesToShow = showAllMessages ? messages : messages.slice(-MAX_VISIBLE_MESSAGES);
+      const newMessageIds = messagesToShow.map(m => m.id);
+      const currentMessageIds = visibleMessages.map(m => m.id);
+      
+      // Find messages that need to fade out (old messages not in new list)
+      const messagesToFadeOut = visibleMessages.filter(
+        msg => !newMessageIds.includes(msg.id)
+      );
+      
+      if (messagesToFadeOut.length > 0 && !showAllMessages) {
+        // Start fade-out animation for old messages
+        setFadingOutMessageIds(messagesToFadeOut.map(m => m.id));
+        
+        // After animation completes, remove them and show new messages
+        setTimeout(() => {
+          setVisibleMessages(messagesToShow);
+          setFadingOutMessageIds([]);
+          
+          // Auto-scroll to bottom (only if not showing all messages)
+          setTimeout(() => {
+            if (messagesEndRef.current) {
+              messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+          }, 100);
+        }, 500); // Match fade-out animation duration
+      } else {
+        // No messages to fade out, just update
+        setVisibleMessages(messagesToShow);
+        
+        // Auto-scroll to bottom (only if not showing all messages)
+        if (!showAllMessages) {
+          setTimeout(() => {
+            if (messagesEndRef.current) {
+              messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+          }, 100);
+        }
+      }
+    }
+  }, [messages, showAllMessages]);
 
   // File attachment handlers
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,6 +298,73 @@ const Messages: React.FC = () => {
     }
   };
 
+  // Handle reaction button click
+  const handleReactionClick = (messageId: number, event: React.MouseEvent) => {
+    event.stopPropagation();
+    // Close message options popup if open
+    setActiveMessageOptionsId(null);
+    // Toggle reaction popup
+    setActiveReactionMessageId(activeReactionMessageId === messageId ? null : messageId);
+  };
+
+  // Handle reaction selection
+  const handleReactionSelect = (reaction: string) => {
+    console.log('Selected reaction:', reaction);
+    // TODO: Save reaction to message
+    setActiveReactionMessageId(null);
+  };
+
+  // Handle message options click
+  const handleMessageOptionsClick = (messageId: number, event: React.MouseEvent) => {
+    event.stopPropagation();
+    // Close reaction popup if open
+    setActiveReactionMessageId(null);
+    // Toggle message options popup
+    setActiveMessageOptionsId(activeMessageOptionsId === messageId ? null : messageId);
+  };
+
+  // Handle message option selection
+  const handleMessageOptionSelect = (action: string, messageId?: number) => {
+    console.log('Selected action:', action);
+    
+    if (action === 'reply' && messageId) {
+      // Find the message to reply to
+      const message = messages.find(m => m.id === messageId);
+      if (message) {
+        setReplyToMessage(message);
+      }
+    }
+    
+    // Close the options menu
+    setActiveMessageOptionsId(null);
+  };
+
+  // Close message options popup on click outside or Escape key
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (activeMessageOptionsId !== null) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.reaction-container')) {
+          setActiveMessageOptionsId(null);
+        }
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && activeMessageOptionsId !== null) {
+        setActiveMessageOptionsId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [activeMessageOptionsId]);
+
   // Render message status indicator
   const renderMessageStatus = (messageId: number) => {
     const status = messageStatuses[messageId] || 'sending';
@@ -310,17 +452,22 @@ const Messages: React.FC = () => {
         sentAt: currentTime,
         attachments: selectedFiles.length > 0 ? selectedFiles.map(file => ({
           name: file.name,
-          size: file.size,
-          type: file.type
-        })) : null
-      };
+        size: file.size,
+        type: file.type
+      })) : null,
+      replyTo: replyToMessage ? {
+        text: replyToMessage.text,
+        sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'
+      } : null
+    };
 
-           setMessages(prev => [...prev, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
            setIsMessageSent(true);
            setMessageText('');
            setPreFilledMessage('');
            setSelectedFiles([]);
            setShowFilePreview(false);
+           setReplyToMessage(null);
            
            // Reset incoming reply state when user sends new message
            setHasIncomingReply(false);
@@ -370,33 +517,46 @@ const Messages: React.FC = () => {
                    sentAt: replyTime
                  };
                  
-                 setMessages(prev => [...prev, sellerReply]);
-                 setShowTypingIndicator(false);
-                 setIsSellerTyping(false); // Stop typing indicator
-                 setHasIncomingReply(true); // Mark that there's an incoming reply
-                 setIsReplyRead(false); // Mark reply as unread
-                 
-                 // Auto-transition to read state after 3 seconds since chat is open
-                 setTimeout(() => {
-                   setIsReplyRead(true);
-                 }, 3000);
+                setMessages(prev => [...prev, sellerReply]);
+                setShowTypingIndicator(false);
+                setIsSellerTyping(false); // Stop typing indicator
+                setHasIncomingReply(true); // Mark that there's an incoming reply
+                setIsReplyRead(false); // Mark reply as unread
+                setShowCondensedHeader(true); // Collapse header when seller replies
+                
+                // Update chat entry with seller's reply
+                setChatEntry((prev: any) => ({
+                  ...prev,
+                  lastMessage: sellerReply.text.length > 30 ? sellerReply.text.substring(0, 30) + '...' : sellerReply.text,
+                  timestamp: `Today, ${replyTimeString}`
+                }));
+                
+                // Auto-transition to read state after 3 seconds since chat is open
+                setTimeout(() => {
+                  setIsReplyRead(true);
+                }, 3000);
                }, 2000); // 2 seconds of typing indicator
              }, 2000); // 2 seconds delay before showing typing indicator
           }, 5000); // 5 seconds for read
 
       // Create or update chat entry for sidebar
-      if (productData) {
-        const chatId = chatEntry?.id || Date.now();
-        setChatEntry({
-          id: chatId,
-          name: 'Joaquin EDIMO',
-          avatar: eboAvatar,
-          lastMessage: messageToSend.length > 30 ? messageToSend.substring(0, 30) + '...' : messageToSend,
-          timestamp: `Today, ${timeString}`,
-          isRead: false,
-          isActive: true,
-          messageId: newMessage.id // Link to the latest message for status sync
-        });
+      const chatId = chatEntry?.id || Date.now();
+      const displayMessage = selectedFiles.length > 0 && !messageToSend 
+        ? `📎 ${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''}` 
+        : messageToSend.length > 30 ? messageToSend.substring(0, 30) + '...' : messageToSend;
+      
+      setChatEntry({
+        id: chatId,
+        name: 'Joaquin EDIMO',
+        avatar: eboAvatar,
+        lastMessage: displayMessage,
+        timestamp: `Today, ${timeString}`,
+        isRead: false,
+        isActive: true,
+        messageId: newMessage.id // Link to the latest message for status sync
+      });
+      
+      if (!activeChatId) {
         setActiveChatId(chatId); // Set as active chat
       }
     }
@@ -407,12 +567,39 @@ const Messages: React.FC = () => {
     setRecordingTime(0);
     setSoundDetected(false);
     
+    // Initialize waveform with 20 bars
+    setAudioLevels(Array(20).fill(0.1));
+    
     // Start recording timer
     const timer = setInterval(() => {
       setRecordingTime(prev => prev + 1);
     }, 1000);
     
     setRecordingTimer(timer);
+    
+    // Start waveform animation timer
+    const waveformTimer = setInterval(() => {
+      setAudioLevels(prevLevels => {
+        // Simulate realistic audio levels (0.1 to 1.0)
+        const newLevels = prevLevels.map(() => {
+          // Higher chance of louder sounds (like real speech patterns)
+          const random = Math.random();
+          if (random > 0.7) {
+            // Loud sounds (30% chance)
+            return Math.random() * 0.6 + 0.4; // 0.4 to 1.0
+          } else if (random > 0.3) {
+            // Medium sounds (40% chance)
+            return Math.random() * 0.3 + 0.2; // 0.2 to 0.5
+          } else {
+            // Quiet sounds (30% chance)
+            return Math.random() * 0.2 + 0.1; // 0.1 to 0.3
+          }
+        });
+        return newLevels;
+      });
+    }, 150); // Update every 150ms for smooth animation
+    
+    setWaveformTimer(waveformTimer);
     
     // Simulate sound detection with random intervals
     const simulateSoundDetection = () => {
@@ -448,6 +635,15 @@ const Messages: React.FC = () => {
       clearTimeout(soundTimer);
       setSoundTimer(null);
     }
+    
+    if (waveformTimer) {
+      clearInterval(waveformTimer);
+      setWaveformTimer(null);
+    }
+    
+    // Reset waveform to flat line
+    setAudioLevels(Array(20).fill(0.1));
+    
     // Keep the recording time for display purposes
   };
 
@@ -472,7 +668,11 @@ const Messages: React.FC = () => {
         duration: recordingTime,
         timestamp: timeString,
         dateString: `Today, ${timeString}`,
-        sentAt: currentTime
+        sentAt: currentTime,
+        replyTo: replyToMessage ? {
+          text: replyToMessage.text,
+          sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'
+        } : null
       };
       
       setMessages(prev => [...prev, newMessage]);
@@ -506,13 +706,18 @@ const Messages: React.FC = () => {
         id: chatId,
         name: 'Joaquin EDIMO',
         avatar: eboAvatar,
-        lastMessage: 'You Audio',
+        lastMessage: '🎤 You: Audio message',
         timestamp: `Today, ${timeString}`,
         isRead: false,
         isActive: true,
         messageId: newMessage.id
       });
       setActiveChatId(chatId); // Set as active chat
+      
+      // Clear reply preview after sending voice message
+      setReplyToMessage(null);
+      
+      // No seller reply for voice messages - voice messages don't trigger responses
     }
   };
 
@@ -568,6 +773,23 @@ const Messages: React.FC = () => {
      };
    }, [isLanguageDropdownOpen, isMenuDropdownOpen, showEmojiPicker, actionsMenuOpen]);
 
+  // Close reaction popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (activeReactionMessageId !== null && !target.closest('.reaction-container')) {
+        setActiveReactionMessageId(null);
+      }
+    };
+
+    if (activeReactionMessageId !== null) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [activeReactionMessageId]);
+
   // Cleanup typing timer on unmount
   useEffect(() => {
     return () => {
@@ -578,6 +800,36 @@ const Messages: React.FC = () => {
   }, [typingTimer]);
 
   return (
+    <>
+      {/* CSS for smooth fade animations */}
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes fadeOutUp {
+          from {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          to {
+            opacity: 0;
+            transform: translateY(-30px);
+          }
+        }
+        
+        .message-fade-out {
+          animation: fadeOutUp 0.5s ease-in-out forwards;
+        }
+      `}</style>
+      
     <div className="min-h-screen bg-gray-50 flex">
       {/* Hidden file input for file attachments */}
       <input
@@ -589,7 +841,7 @@ const Messages: React.FC = () => {
         style={{ display: 'none' }}
       />
       {/* Left Sidebar - Full Height */}
-      <div className="w-1/4 bg-white border-r-2 border-gray-300 flex flex-col min-h-screen relative">
+      <div className="w-1/4 bg-white border-r-2 border-gray-300 flex flex-col h-screen sticky top-0 relative">
         {/* Header */}
         <header className="bg-white">
           <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
@@ -609,8 +861,8 @@ const Messages: React.FC = () => {
                   />
                 </button>
         </div>
-            </div>
-          </div>
+      </div>
+    </div>
         </header>
 
         {/* Chats List */}
@@ -633,13 +885,17 @@ const Messages: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search a chat?"
+                value={chatSearchQuery}
+                onChange={(e) => setChatSearchQuery(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
               />
             </div>
           </div>
 
           {/* Chat List or Empty State */}
-          {chatEntry ? (
+          {chatEntry && (!chatSearchQuery || 
+            chatEntry.name.toLowerCase().includes(chatSearchQuery.toLowerCase()) || 
+            chatEntry.lastMessage.toLowerCase().includes(chatSearchQuery.toLowerCase())) ? (
             <div className="flex-1 flex flex-col">
               {/* Filter Tabs */}
               <div className="px-4 py-3">
@@ -691,7 +947,7 @@ const Messages: React.FC = () => {
               </div>
               
               {/* Chat Entry */}
-              <div className="flex-1 p-1">
+              <div className="flex-1 overflow-y-auto p-1">
                 <div 
                   className={`p-2 rounded-lg cursor-pointer transition-colors ${activeChatId === chatEntry.id ? 'hover:bg-gray-100' : 'hover:bg-gray-50'}`} 
                   style={{ 
@@ -712,7 +968,7 @@ const Messages: React.FC = () => {
                       <img 
                         src={chatEntry.avatar} 
                         alt={chatEntry.name}
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="w-10 h-10 rounded-sm object-cover"
                       />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
@@ -730,7 +986,7 @@ const Messages: React.FC = () => {
                           </button>
                         </div>
                       </div>
-                        <div className="flex items-center justify-between mt-1">
+                        <div className="flex items-center justify-between -mt-1">
                          <p className="text-sm truncate">
                            {isSellerTyping ? (
                              <span style={{ color: '#64B5F6' }}>Typing...</span>
@@ -815,7 +1071,7 @@ const Messages: React.FC = () => {
             ></div>
             
             {/* Actions Menu */}
-            <div className="actions-menu absolute right-4 top-96 bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48" style={{ borderRadius: '24px' }}>
+             <div className="actions-menu absolute right-4 top-[21rem] bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48" style={{ borderRadius: '24px' }}>
               <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="text-sm font-thin" style={{ color: '#BABABA' }}>Actions</h3>
                 <button
@@ -852,9 +1108,7 @@ const Messages: React.FC = () => {
                 >
                   <img src={actionIcon03} alt="Mute the chat" className="w-4 h-4" />
                   <span className="font-light" style={{ color: '#374151' }}>Mute the chat</span>
-                  <svg className="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <img src={muteArrowIcon} alt="Arrow" className="w-4 h-4 ml-auto" />
                 </button>
                 
                 <button
@@ -883,6 +1137,30 @@ const Messages: React.FC = () => {
               </div>
             </div>
           </>
+        )}
+        
+        {/* Archive and Important Section - At Bottom of Sidebar - Only show when there are conversations */}
+        {chatEntry && (
+          <div className="mt-auto bg-white px-4 py-3">
+            <div className="border-t border-gray-300 mx-1 mb-3"></div>
+            {/* Archived */}
+            <div className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors">
+              <div className="flex items-center space-x-3">
+                <img src={archiveIcon} alt="Archived" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
+                <span className="text-sm" style={{ color: '#6A6A6A' }}>Archived</span>
+              </div>
+              <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>4</span>
+            </div>
+            
+            {/* Mark as important */}
+            <div className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors">
+              <div className="flex items-center space-x-3">
+                <img src={starIcon} alt="Mark as important" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
+                <span className="text-sm" style={{ color: '#6A6A6A' }}>Mark as important</span>
+              </div>
+              <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>+9</span>
+            </div>
+          </div>
         )}
         
       </div>
@@ -927,9 +1205,7 @@ const Messages: React.FC = () => {
                     className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
                     <span>{selectedLanguage}</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <img src={translationToggleIcon} alt="Toggle" className="w-4 h-4" />
                   </button>
                   
                   {/* Dropdown Menu */}
@@ -1003,7 +1279,7 @@ const Messages: React.FC = () => {
                    
                    {/* Dropdown Menu */}
         {isMenuDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-[80vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
+          <div className="fixed right-8 top-0 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-screen overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
                        {/* Start selling button with exit */}
                        <div className="px-3 pb-3 flex items-center justify-between">
                          <Link 
@@ -1186,12 +1462,18 @@ const Messages: React.FC = () => {
         </header>
 
         {/* Main Content Area */}
-        <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 my-8 flex flex-col">
+        <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 my-8 flex flex-col" style={{ height: 'calc(100vh - 8rem)' }}>
           {productData ? (
             // Product Inquiry View
-            <div className="flex-1 flex flex-col">
-              {/* Seller Profile Header */}
-              <div className="p-6">
+            <div className="flex-1 flex flex-col overflow-hidden relative">
+              {/* Dimmed Overlay when reaction or message options popup is active */}
+              {(activeReactionMessageId !== null || activeMessageOptionsId !== null) && (
+                <div className="absolute inset-0 bg-black bg-opacity-10 z-40 pointer-events-none rounded-2xl"></div>
+              )}
+              {/* Seller Profile Header - Conditional Rendering */}
+              {!showCondensedHeader ? (
+                // Full Profile Header
+                <div className="p-6 transition-all duration-500 ease-in-out">
                 {/* Top Right Icons */}
                 <div className="flex justify-end space-x-3 mb-6">
                   <button className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
@@ -1282,23 +1564,94 @@ const Messages: React.FC = () => {
                   </div>
                 </div>
               </div>
-
+              ) : (
+                // Condensed Header Bar
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 transition-all duration-500 ease-in-out">
+                  <div className="flex items-center space-x-3">
+                    {/* Profile Picture */}
+                    <img 
+                      src={eboAvatar} 
+                      alt="Joaquin EDIMO"
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    {/* Name and Rating */}
+                    <div>
+                      <h3 className="text-base font-semibold text-gray-900">Joaquin EDIMO</h3>
+                      <div className="flex items-center space-x-1">
+                        <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <span className="text-sm" style={{ color: '#BABABA' }}>4.3</span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Right Icons */}
+                  <div className="flex space-x-2">
+                    <button className="p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                      <img 
+                        src={fiIcon} 
+                        alt="Search" 
+                        className="w-5 h-5"
+                      />
+                    </button>
+                    <button className="p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                      <img 
+                        src={faIcon} 
+                        alt="Settings" 
+                        className="w-5 h-5"
+                      />
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Chat Messages Area */}
-              {messages.length > 0 && (
-                <div className="flex-1 px-6 py-4 overflow-y-auto">
+              {visibleMessages.length > 0 && (
+                <div 
+                  ref={messagesContainerRef}
+                  className="flex-1 px-6 py-4 overflow-y-auto scroll-smooth"
+                  style={{ scrollBehavior: 'smooth', overflowX: 'visible' }}
+                >
+                  {/* View Older Messages Button */}
+                  {messages.length > 3 && !showAllMessages && (
+                    <div className="flex justify-center mb-4">
+                      <button
+                        onClick={() => setShowAllMessages(true)}
+                        className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors hover:opacity-80"
+                        style={{
+                          backgroundColor: '#E3F2FD',
+                          color: '#64B5F6'
+                        }}
+                      >
+                        View older messages
+                      </button>
+                    </div>
+                  )}
+
                   {/* Top Timestamp - Shorter lines */}
                   <div className="flex items-center justify-center mb-6">
                     <div className="flex items-center">
                       <div className="w-16 h-px bg-gray-300"></div>
-                      <span className="px-4 text-sm text-gray-500">{messages[0]?.dateString}</span>
+                      <span className="px-4 text-sm text-gray-500">{visibleMessages[0]?.dateString}</span>
                       <div className="w-16 h-px bg-gray-300"></div>
                     </div>
                   </div>
 
                   {/* Messages */}
-                    {messages.map((message) => (
-                      <div key={message.id} className={`flex mb-4 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
+                    {visibleMessages.map((message, index) => {
+                      const isFadingOut = fadingOutMessageIds.includes(message.id);
+                      const isReactionActive = activeReactionMessageId === message.id;
+                      return (
+                      <div 
+                        key={message.id} 
+                        className={`flex mb-4 ${message.isIncoming ? 'justify-start' : 'justify-end'} ${isFadingOut ? 'message-fade-out' : ''}`}
+                        style={{
+                          animation: isFadingOut ? 'fadeOutUp 0.5s ease-in-out forwards' : 'fadeIn 0.5s ease-in-out',
+                          opacity: isFadingOut ? 0 : 1,
+                          position: isReactionActive ? 'relative' : 'static',
+                          zIndex: isReactionActive ? 50 : 'auto'
+                        }}
+                      >
                        <div className="max-w-xs lg:max-w-md relative">
                          <div 
                            className={`rounded-2xl p-4 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`} 
@@ -1309,35 +1662,59 @@ const Messages: React.FC = () => {
                          >
                           {message.type === 'voice' ? (
                             // Voice Message Display
-                            <div className="flex items-center space-x-3">
-                              <div className="relative">
-                                <img src={avatarIcon} alt="Your Avatar" className="w-10 h-10 rounded-full" />
-                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                                  <img src={swiIcon} alt="Waveform" className="w-3.5 h-3.5" />
-                                </div>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
-                                  <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
-                                </svg>
-                                <span className="text-white text-sm">
-                                  {Math.floor(message.duration / 60).toString().padStart(2, '0')} : {(message.duration % 60).toString().padStart(2, '0')}
-                                </span>
-                                <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
-                                <span className="text-white text-sm">Audio</span>
-                              </div>
-                              <div className="flex items-center justify-center space-x-0.5">
-                                {[4,6,4,8,12,14,16,14,12,8,6,4,8,10,12,10,8,6,4,6].map((h, i) => (
-                                  <div
-                                    key={i}
-                                    className="w-0.5 bg-white rounded-full"
-                                    style={{
-                                      height: `${h}px`,
+                            <div className="space-y-2">
+                              {/* Reply Preview for Voice Messages */}
+                              {message.replyTo && (
+                                <div className="flex items-stretch">
+                                  <div 
+                                    className="rounded-full mr-2" 
+                                    style={{ 
+                                      width: '2px', 
+                                      backgroundColor: '#FFFFFF' 
                                     }}
-                                  />
-                                ))}
+                                  ></div>
+                                  <div className="flex-1">
+                                    <p className="text-xs font-medium" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                                      {message.replyTo.sender}
+                                    </p>
+                                    <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                      {message.replyTo.text}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {/* Voice Message Content */}
+                              <div className="flex items-center space-x-3">
+                                <div className="relative">
+                                  <img src={avatarIcon} alt="Your Avatar" className="w-10 h-10 rounded-full" />
+                                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                                    <img src={swiIcon} alt="Waveform" className="w-3.5 h-3.5" />
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                    <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                                  </svg>
+                                  <span className="text-white text-sm">
+                                    {Math.floor(message.duration / 60).toString().padStart(2, '0')} : {(message.duration % 60).toString().padStart(2, '0')}
+                                  </span>
+                                  <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
+                                  <span className="text-white text-sm">Audio</span>
+                                </div>
+                                <div className="flex items-center justify-center space-x-0.5">
+                                  {[4,6,4,8,12,14,16,14,12,8,6,4,8,10,12,10,8,6,4,6].map((h, i) => (
+                                    <div
+                                      key={i}
+                                      className="w-0.5 bg-white rounded-full"
+                                      style={{
+                                        height: `${h}px`,
+                                      }}
+                                    />
+                                  ))}
                                 </div>
                               </div>
+                            </div>
                             ) : message.attachments && message.attachments.length > 0 ? (
                               // File Attachment Message Display
                               <div className="space-y-2">
@@ -1377,12 +1754,48 @@ const Messages: React.FC = () => {
                             ) : (
                               // Text Message Display
                             <>
-                              <p 
-                                className="text-sm mb-3" 
-                                style={{ color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
-                              >
-                                {message.text}
-                              </p>
+                              {/* Reply Section */}
+                              {message.replyTo && (
+                                <div className="mb-3">
+                                  {/* User's reply text at top */}
+                                  <p className="text-sm mb-2" style={{ color: '#FFFFFF' }}>
+                                    {message.text}
+                                  </p>
+                                  
+                                  {/* White line and quoted message */}
+                                  <div className="flex items-stretch">
+                                    {/* Vertical white line */}
+                                    <div 
+                                      className="rounded-full mr-2"
+                                      style={{ 
+                                        width: '2px',
+                                        backgroundColor: '#FFFFFF',
+                                        flexShrink: 0
+                                      }}
+                                    ></div>
+                                    
+                                    {/* Quoted message info */}
+                                    <div className="flex-1">
+                                      <p className="text-xs font-medium mb-0.5" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                                        {message.replyTo.sender}
+                                      </p>
+                                      <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                        {message.replyTo.text}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {/* Regular message text (only show if no reply) */}
+                              {!message.replyTo && (
+                                <p 
+                                  className="text-sm mb-3" 
+                                  style={{ color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                                >
+                                  {message.text}
+                                </p>
+                              )}
                               
                               {/* Product Card in Message - Only for first message */}
                               {message.isProductInquiry && message.productData && (
@@ -1439,17 +1852,161 @@ const Messages: React.FC = () => {
                       
                       {/* Reaction and Option Icons for Incoming Messages - Outside the message bubble */}
                       {message.isIncoming && clickedMessageId === message.id && (
-                        <div className="flex items-center ml-1 self-center">
-                          <button className="p-1 hover:opacity-70 transition-opacity">
-                            <img src={reactionIcon} alt="Reaction" className="w-6 h-6" />
+                        <div className="flex items-center ml-1 self-center reaction-container relative" style={{ zIndex: (activeReactionMessageId === message.id || activeMessageOptionsId === message.id) ? 999 : 'auto' }}>
+                          <button 
+                            className="p-1 hover:opacity-70 transition-opacity"
+                            onClick={(e) => handleReactionClick(message.id, e)}
+                          >
+                            <img 
+                              src={reactionIcon} 
+                              alt="Reaction" 
+                              className="w-6 h-6" 
+                              style={{
+                                filter: activeReactionMessageId === message.id 
+                                  ? 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' 
+                                  : 'none'
+                              }}
+                            />
                           </button>
-                          <button className="p-1 hover:opacity-70 transition-opacity">
-                            <img src={optionIcon} alt="Options" className="w-6 h-6" />
+                          <button 
+                            className="p-1 hover:opacity-70 transition-opacity"
+                            onClick={(e) => handleMessageOptionsClick(message.id, e)}
+                          >
+                            <img 
+                              src={optionIcon} 
+                              alt="Options" 
+                              className="w-6 h-6" 
+                              style={{
+                                filter: activeMessageOptionsId === message.id 
+                                  ? 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' 
+                                  : 'none'
+                              }}
+                            />
                           </button>
+                          
+                          {/* Reaction Popup */}
+                          {activeReactionMessageId === message.id && (
+                            <div className="absolute bottom-full mb-2" style={{ left: '-24px', right: '-24px', zIndex: 999 }}>
+                              {/* Speech bubble with tail */}
+                              <div className="relative bg-white shadow-lg px-4 py-2.5 flex items-center justify-center space-x-1.5 border border-gray-200" style={{ borderRadius: '20px', minWidth: '280px' }}>
+                                <button onClick={() => handleReactionSelect('👍')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="1f44d" size={24} />
+                                </button>
+                                <button onClick={() => handleReactionSelect('❤️')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="2764-fe0f" size={24} />
+                                </button>
+                                <button onClick={() => handleReactionSelect('✅')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="2705" size={24} />
+                                </button>
+                                <button onClick={() => handleReactionSelect('😂')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="1f602" size={24} />
+                                </button>
+                                <button onClick={() => handleReactionSelect('😊')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="1f60a" size={24} />
+                                </button>
+                                <button onClick={() => handleReactionSelect('+')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <img src={emoji6} alt="More reactions" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+                                </button>
+                                {/* Triangle tail pointing to reaction button */}
+                                <div 
+                                  style={{
+                                    position: 'absolute',
+                                    left: 'calc(16px + 4px + 16px)', // px-4 (16px) + space-x-1.5 (6px) + half button width (16px)
+                                    bottom: '-6px',
+                                    width: 0,
+                                    height: 0,
+                                    borderLeft: '6px solid transparent',
+                                    borderRight: '6px solid transparent',
+                                    borderTop: '6px solid white',
+                                  }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Message Options Popup */}
+                          {activeMessageOptionsId === message.id && (
+                            <div 
+                              className="absolute -left-12" 
+                              style={{ 
+                                zIndex: 999,
+                                top: index <= 1 ? '-200px' : 'auto',
+                                bottom: index > 1 ? '100%' : 'auto',
+                                marginBottom: index > 1 ? '8px' : '0'
+                              }}
+                            >
+                              <div className="relative bg-white rounded-2xl shadow-xl py-2 px-1 border border-gray-200" style={{ minWidth: '180px' }}>
+                                {/* Header */}
+                                <div className="flex items-center justify-between px-3 mb-1">
+                                  <span className="font-medium" style={{ color: '#9CA3AF', fontSize: '10px' }}>Actions</span>
+                                  <button 
+                                    onClick={() => setActiveMessageOptionsId(null)}
+                                    className="text-gray-500 hover:text-gray-700"
+                                  >
+                                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                      <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                    </svg>
+                                  </button>
+                                </div>
+                                
+                                {/* Menu Items */}
+                                <div className="space-y-0.5">
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('reply', message.id)}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={replyIcon} alt="Reply" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Reply the message</span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('important')}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={starIcon} alt="Star" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Mark as important</span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('copy')}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={copyIcon} alt="Copy" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Copy the message</span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('select')}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={tickIcon} alt="Select" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Select the message</span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('pin')}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={pinMenuIcon} alt="Pin" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Pin the message</span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('delete')}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={trashIcon} alt="Delete" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Delete for me</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
-                  ))}
+    </div>
+                  );
+                    })}
                   
                   {/* Typing Indicator */}
                   {showTypingIndicator && (
@@ -1486,6 +2043,25 @@ const Messages: React.FC = () => {
                       </div>
                     </div>
                   )}
+                  
+                  {/* View Latest Messages Button */}
+                  {showAllMessages && messages.length > 3 && (
+                    <div className="flex justify-center mt-4 mb-4">
+                      <button
+                        onClick={() => setShowAllMessages(false)}
+                        className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors hover:opacity-80"
+                        style={{
+                          backgroundColor: '#E3F2FD',
+                          color: '#64B5F6'
+                        }}
+                      >
+                        View latest messages
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* Scroll anchor for auto-scroll */}
+                  <div ref={messagesEndRef} />
                 </div>
               )}
 
@@ -1495,6 +2071,46 @@ const Messages: React.FC = () => {
                   <div className="mb-3 -mx-6">
                     <div className="w-full bg-gray-200 rounded-full" style={{ height: '0.5px' }}></div>
                   </div>
+                  
+                  {/* Reply Preview */}
+                  {replyToMessage && (
+                    <div className="mb-2 relative">
+                      <div 
+                        className="rounded-lg p-2 pl-4 pr-8 relative flex"
+                        style={{ 
+                          backgroundColor: '#FAFAFA'
+                        }}
+                      >
+                        {/* Blue line inside */}
+                        <div 
+                          className="rounded-full mr-3"
+                          style={{ 
+                            width: '2px',
+                            backgroundColor: '#64B5F6',
+                            flexShrink: 0
+                          }}
+                        ></div>
+                        
+                        {/* Content */}
+                        <div className="flex-1">
+                          <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
+                            {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
+                          </div>
+                          <div className="text-xs" style={{ color: '#6A6A6A' }}>
+                            {replyToMessage.text}
+                          </div>
+                        </div>
+                        
+                        {/* Close button */}
+                        <button
+                          onClick={() => setReplyToMessage(null)}
+                          className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
+                        >
+                          <img src={replyCloseIcon} alt="Close" className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Product Inquiry Card - Only show before sending first message */}
                   {!isMessageSent && productData && (
@@ -1708,38 +2324,33 @@ const Messages: React.FC = () => {
                         </button>
                         <div className="flex-1 flex justify-start">
                           <div 
-                            className="rounded-full px-8 py-1 flex items-center justify-between -ml-16"
+                            className="rounded-full px-6 py-0.5 flex items-center -ml-12 relative"
                             style={{ 
                               background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
-                              width: '500px'
+                              width: '550px',
+                              height: '28px' // Fixed height to prevent container movement
                             }}
                           >
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 flex-shrink-0">
                               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)' }}></div>
                               <span className="text-white text-sm">
                                 {Math.floor(recordingTime / 60).toString().padStart(2, '0')}:
                                 {(recordingTime % 60).toString().padStart(2, '0')} - Audio recording
                               </span>
                             </div>
-                            <div className="flex space-x-0.5">
-                              {[...Array(20)].map((_, i) => {
-                                // Generate waveform heights based on sound detection
-                                let height;
-                                if (soundDetected) {
-                                  // Long bars when sound is detected (like screenshot 3)
-                                  height = `${Math.random() * 20 + 8}px`;
-                                } else {
-                                  // Short bars when no sound (like screenshot 2)
-                                  height = `${Math.random() * 4 + 2}px`;
-                                }
+                            <div className="flex space-x-0.5 absolute right-8 top-1/2 transform -translate-y-1/2 items-end">
+                              {audioLevels.map((level, i) => {
+                                // Convert audio level (0.1 to 1.0) to height (2px to 24px)
+                                const height = `${level * 24}px`;
+                                const minHeight = '2px';
                                 
                                 return (
                                   <div
                                     key={i}
-                                    className="w-0.5 bg-white rounded-full"
+                                    className="w-0.5 bg-white rounded-full transition-all duration-150 ease-out"
                                     style={{
-                                      height: height,
-                                      animation: soundDetected ? 'pulse 0.5s ease-in-out infinite alternate' : 'pulse 1.5s ease-in-out infinite alternate'
+                                      height: Math.max(parseFloat(height), parseFloat(minHeight)) + 'px',
+                                      minHeight: minHeight
                                     }}
                                   />
                                 );
@@ -2079,8 +2690,8 @@ const Messages: React.FC = () => {
                 </div>
             </div>
           ) : (
-            // Default Secure Messaging View
-            <div className="flex-1 flex flex-col items-center justify-center p-8">
+            // Default Secure Messaging View - Empty State with Fixed Height
+            <div className="flex flex-col items-center justify-center p-8" style={{ height: 'calc(50vh - 4rem)' }}>
               {/* Secure Messaging Icon */}
               <div className="flex items-center justify-center mb-6">
                 <img 
@@ -2133,6 +2744,7 @@ const Messages: React.FC = () => {
         </footer>
       </div>
     </div>
+    </>
   );
 };
 

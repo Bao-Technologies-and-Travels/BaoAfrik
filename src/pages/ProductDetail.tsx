@@ -512,10 +512,10 @@ const ProductDetail: React.FC = () => {
                   </div>
                 ) : (
                   <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                    </svg>
-                    <span>Contact Seller</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
+                </svg>
+                <span>Contact Seller</span>
                   </>
                 )}
               </button>
@@ -710,7 +710,7 @@ const ProductDetail: React.FC = () => {
                 <span className="text-xs font-medium text-gray-800">
                   {getProductCountry(1).abbreviation}
                 </span>
-              </div>
+            </div>
             </div>
             <div className="p-3 pb-2">
               {/* Price and Verified Badge Row */}
@@ -723,14 +723,14 @@ const ProductDetail: React.FC = () => {
               </div>
               
               {/* Product Name */}
-              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Textiles</h3>
+                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Textiles</h3>
               
               {/* Location and Bookmark Row */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 flex items-center text-xs text-gray-500">
                   <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
                   <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
                 
@@ -755,8 +755,8 @@ const ProductDetail: React.FC = () => {
                   >
                     <div className="relative">
                       <svg className="w-6 h-6" fill={wishlistProducts.has('textiles-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
                       {!wishlistProducts.has('textiles-1') && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-xs font-bold">+</span>
@@ -784,7 +784,7 @@ const ProductDetail: React.FC = () => {
                 <span className="text-xs font-medium text-gray-800">
                   {getProductCountry(3).abbreviation}
                 </span>
-              </div>
+            </div>
             </div>
             <div className="p-3 pb-2">
               {/* Price and Verified Badge Row */}
@@ -797,14 +797,14 @@ const ProductDetail: React.FC = () => {
               </div>
               
               {/* Product Name */}
-              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Fresh Tomatoes</h3>
+                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Fresh Tomatoes</h3>
               
               {/* Location and Bookmark Row */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 flex items-center text-xs text-gray-500">
                   <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
                   <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
                 
@@ -829,8 +829,8 @@ const ProductDetail: React.FC = () => {
                   >
                     <div className="relative">
                       <svg className="w-6 h-6" fill={wishlistProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
                       {!wishlistProducts.has('tomatoes-1') && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-xs font-bold">+</span>
@@ -858,7 +858,7 @@ const ProductDetail: React.FC = () => {
                 <span className="text-xs font-medium text-gray-800">
                   {getProductCountry(4).abbreviation}
                 </span>
-              </div>
+            </div>
             </div>
             <div className="p-3 pb-2">
               {/* Price and Verified Badge Row */}
@@ -871,14 +871,14 @@ const ProductDetail: React.FC = () => {
               </div>
               
               {/* Product Name */}
-              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Dried Shrimp</h3>
+                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Dried Shrimp</h3>
               
               {/* Location and Bookmark Row */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 flex items-center text-xs text-gray-500">
                   <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
                   <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
                 
@@ -903,8 +903,8 @@ const ProductDetail: React.FC = () => {
                   >
                     <div className="relative">
                       <svg className="w-6 h-6" fill={wishlistProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
                       {!wishlistProducts.has('shrimp-1') && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-xs font-bold">+</span>
@@ -932,7 +932,7 @@ const ProductDetail: React.FC = () => {
                 <span className="text-xs font-medium text-gray-800">
                   {getProductCountry(5).abbreviation}
                 </span>
-              </div>
+            </div>
             </div>
             <div className="p-3 pb-2">
               {/* Price and Verified Badge Row */}
@@ -945,14 +945,14 @@ const ProductDetail: React.FC = () => {
               </div>
               
               {/* Product Name */}
-              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Ndolè Leaves</h3>
+                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Ndolè Leaves</h3>
               
               {/* Location and Bookmark Row */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 flex items-center text-xs text-gray-500">
                   <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
                   <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
                 
@@ -977,8 +977,8 @@ const ProductDetail: React.FC = () => {
                   >
                     <div className="relative">
                       <svg className="w-6 h-6" fill={wishlistProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
                       {!wishlistProducts.has('ndole-1') && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-xs font-bold">+</span>
@@ -1034,7 +1034,7 @@ const ProductDetail: React.FC = () => {
                 <span className="text-xs font-medium text-gray-800">
                   {getProductCountry(6).abbreviation}
                 </span>
-              </div>
+            </div>
             </div>
             <div className="p-3 pb-2">
               {/* Price and Verified Badge Row */}
@@ -1047,14 +1047,14 @@ const ProductDetail: React.FC = () => {
               </div>
               
               {/* Product Name */}
-              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Handwoven Basket</h3>
+                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Handwoven Basket</h3>
               
               {/* Location and Bookmark Row */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 flex items-center text-xs text-gray-500">
                   <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
                   <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
                 
@@ -1079,8 +1079,8 @@ const ProductDetail: React.FC = () => {
                   >
                     <div className="relative">
                       <svg className="w-6 h-6" fill={wishlistProducts.has('basket-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
                       {!wishlistProducts.has('basket-1') && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-xs font-bold">+</span>
@@ -1108,7 +1108,7 @@ const ProductDetail: React.FC = () => {
                 <span className="text-xs font-medium text-gray-800">
                   {getProductCountry(7).abbreviation}
                 </span>
-              </div>
+            </div>
             </div>
             <div className="p-3 pb-2">
               {/* Price and Verified Badge Row */}
@@ -1121,14 +1121,14 @@ const ProductDetail: React.FC = () => {
               </div>
               
               {/* Product Name */}
-              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Wooden Combs</h3>
+                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Wooden Combs</h3>
               
               {/* Location and Bookmark Row */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 flex items-center text-xs text-gray-500">
                   <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
                   <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
                 
@@ -1153,8 +1153,8 @@ const ProductDetail: React.FC = () => {
                   >
                     <div className="relative">
                       <svg className="w-6 h-6" fill={wishlistProducts.has('combs-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
                       {!wishlistProducts.has('combs-1') && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-xs font-bold">+</span>
@@ -1182,7 +1182,7 @@ const ProductDetail: React.FC = () => {
                 <span className="text-xs font-medium text-gray-800">
                   {getProductCountry(1).abbreviation}
                 </span>
-              </div>
+            </div>
             </div>
             <div className="p-3 pb-2">
               {/* Price and Verified Badge Row */}
@@ -1195,14 +1195,14 @@ const ProductDetail: React.FC = () => {
               </div>
               
               {/* Product Name */}
-              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">White Beans</h3>
+                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">White Beans</h3>
               
               {/* Location and Bookmark Row */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 flex items-center text-xs text-gray-500">
                   <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
                   <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
                 
@@ -1227,8 +1227,8 @@ const ProductDetail: React.FC = () => {
                   >
                     <div className="relative">
                       <svg className="w-6 h-6" fill={wishlistProducts.has('beans-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
                       {!wishlistProducts.has('beans-1') && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-xs font-bold">+</span>
@@ -1256,7 +1256,7 @@ const ProductDetail: React.FC = () => {
                 <span className="text-xs font-medium text-gray-800">
                   {getProductCountry(6).abbreviation}
                 </span>
-              </div>
+            </div>
             </div>
             <div className="p-3 pb-2">
               {/* Price and Verified Badge Row */}
@@ -1269,14 +1269,14 @@ const ProductDetail: React.FC = () => {
               </div>
               
               {/* Product Name */}
-              <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Cassava Flour</h3>
+                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Cassava Flour</h3>
               
               {/* Location and Bookmark Row */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1 flex items-center text-xs text-gray-500">
                   <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
                   <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
                 </div>
                 
@@ -1301,8 +1301,8 @@ const ProductDetail: React.FC = () => {
                   >
                     <div className="relative">
                       <svg className="w-6 h-6" fill={wishlistProducts.has('cassava-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
                       {!wishlistProducts.has('cassava-1') && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-xs font-bold">+</span>

@@ -830,7 +830,7 @@ const SellerProfile: React.FC = () => {
                     <span className="text-xs font-medium text-gray-800">
                       {getProductCountry(1).abbreviation}
                     </span>
-                  </div>
+                </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -904,7 +904,7 @@ const SellerProfile: React.FC = () => {
                     <span className="text-xs font-medium text-gray-800">
                       {getProductCountry(2).abbreviation}
                     </span>
-                  </div>
+                </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -978,7 +978,7 @@ const SellerProfile: React.FC = () => {
                     <span className="text-xs font-medium text-gray-800">
                       {getProductCountry(3).abbreviation}
                     </span>
-                  </div>
+                </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -1052,7 +1052,7 @@ const SellerProfile: React.FC = () => {
                     <span className="text-xs font-medium text-gray-800">
                       {getProductCountry(4).abbreviation}
                     </span>
-                  </div>
+                </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -1126,7 +1126,7 @@ const SellerProfile: React.FC = () => {
                     <span className="text-xs font-medium text-gray-800">
                       {getProductCountry(5).abbreviation}
                     </span>
-                  </div>
+                </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -1200,7 +1200,7 @@ const SellerProfile: React.FC = () => {
                     <span className="text-xs font-medium text-gray-800">
                       {getProductCountry(6).abbreviation}
                     </span>
-                  </div>
+                </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -1274,7 +1274,7 @@ const SellerProfile: React.FC = () => {
                     <span className="text-xs font-medium text-gray-800">
                       {getProductCountry(7).abbreviation}
                     </span>
-                  </div>
+                </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
@@ -1348,7 +1348,7 @@ const SellerProfile: React.FC = () => {
                     <span className="text-xs font-medium text-gray-800">
                       {getProductCountry(8).abbreviation}
                     </span>
-                  </div>
+                </div>
                 </div>
                 <div className="p-3 pb-2">
                   {/* Price and Verified Badge Row */}
