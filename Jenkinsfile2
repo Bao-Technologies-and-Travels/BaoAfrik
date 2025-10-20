@@ -13,6 +13,7 @@ pipeline {
         BRANCH = 'fonsah-staging'
         DOMAIN = 'staging.baoafrik.com'
         EMAIL = 'pageo.fonsah@baotechnologiesandtravels.com'
+        BACKEND_DOMAIN = 'api.staging.baoafrik.com'
     }
 
     stages {
@@ -101,7 +102,7 @@ pipeline {
 
                             # Create .env file with actual secrets
                             cat > .env << EOF
-REACT_APP_API_URL=https://${DOMAIN}/api
+REACT_APP_API_URL=https://api.${DOMAIN}/api
 REACT_APP_AWS_ACCESS_KEY_ID="${REACT_APP_AWS_ACCESS_KEY_ID}"
 REACT_APP_AWS_SECRET_ACCESS_KEY="${REACT_APP_AWS_SECRET_ACCESS_KEY}"
 REACT_APP_AWS_REGION="${REACT_APP_AWS_REGION}"
