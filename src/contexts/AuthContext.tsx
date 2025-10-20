@@ -27,7 +27,6 @@ interface AuthContextType {
   logout: () => Promise<void>;
   setVisitorMode: (isVisitor: boolean) => void;
   updateUserProfile: (profileData: Partial<User>) => void;
-  refreshUserProfile: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -58,19 +57,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isVisitor, setIsVisitor] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { addToast } = useToast();
-
-  const fetchCompleteUserProfile = async (): Promise<User | null> => {
-    try {
-      const response = await apiClient.getCurrentUser();
-      if (response.success && response.data) {
-        return response.data;
-      }
-      return null;
-    } catch (error) {
-      console.error('Failed to fetch complete user profile:', error);
-      return null;
-    }
-  };
 
   const login = (userData: User, accessToken?: string, refreshToken?: string) => {
     setUser(userData);
@@ -151,18 +137,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     })
   };
 
-  const refreshUserProfile = async () => {
-    try {
-      const completeUser = await fetchCompleteUserProfile();
-      if (completeUser) {
-        setUser(completeUser);
-        localStorage.setItem('user', JSON.stringify(completeUser));
-      }
-    } catch (error) {
-      console.error('Failed to refresh user profile:', error);
-    }
-  };
-
   const value: AuthContextType = {
     user,
     isVisitor,
@@ -170,7 +144,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     setVisitorMode,
     updateUserProfile,
-    refreshUserProfile,
     isLoading,
   };
 

@@ -121,8 +121,6 @@ export const optionalAuth = asyncHandler(async (req: Request, res: Response, nex
         firstName: true,
         lastName: true,
         profileImage: true,
-        gender: true,
-        birthDate: true,
         isVerifiedSeller: true,
       },
     });
