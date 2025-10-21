@@ -1016,6 +1016,11 @@ const Messages: React.FC = () => {
         .message-fade-out {
           animation: fadeOutUp 0.5s ease-in-out forwards;
         }
+        
+        /* Hide scrollbar for webkit browsers (Chrome, Safari, Edge) */
+        .overflow-y-auto::-webkit-scrollbar {
+          display: none;
+        }
       `}</style>
       
     <div className="h-screen bg-gray-50 flex overflow-hidden">
@@ -1653,11 +1658,14 @@ const Messages: React.FC = () => {
         <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 my-8 flex flex-col" style={{ height: 'calc(100vh - 8rem)' }}>
           {productData ? (
             // Product Inquiry View
-            <div className="flex-1 flex flex-col overflow-hidden relative">
+            <div className="flex flex-col h-full relative">
               {/* Dimmed Overlay when reaction or message options popup is active */}
               {(activeReactionMessageId !== null || activeMessageOptionsId !== null) && (
                 <div className="absolute inset-0 bg-black bg-opacity-10 z-40 pointer-events-none rounded-2xl"></div>
               )}
+              
+              {/* Scrollable Content Area (Profile + Product + Messages) */}
+              <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {/* Seller Profile Header - Conditional Rendering */}
               {!showCondensedHeader ? (
                 // Full Profile Header
@@ -2297,9 +2305,11 @@ const Messages: React.FC = () => {
                   <div ref={messagesEndRef} />
                 </div>
               )}
+              </div>
+              {/* End Scrollable Content Area */}
 
-                {/* Message Input */}
-                <div className={`px-6 pb-6 ${messages.length > 0 ? 'py-2' : '-mt-2'}`}>
+                {/* Message Input - Fixed at Bottom */}
+                <div className={`px-6 pb-6 flex-shrink-0 ${messages.length > 0 ? 'py-2' : '-mt-2'}`}>
                   {/* Permanent Gray Separator Line */}
                   <div className="mb-3 -mx-6">
                     <div className="w-full bg-gray-200 rounded-full" style={{ height: '0.5px' }}></div>
