@@ -73,6 +73,17 @@ const Messages: React.FC = () => {
   const [soundTimer, setSoundTimer] = useState<NodeJS.Timeout | null>(null);
   const [audioLevels, setAudioLevels] = useState<number[]>([]);
   const [waveformTimer, setWaveformTimer] = useState<NodeJS.Timeout | null>(null);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const [playingMessageId, setPlayingMessageId] = useState<number | null>(null);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [audioPlaybackTime, setAudioPlaybackTime] = useState<{[key: number]: number}>({});
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
+  const [previewPlaybackTime, setPreviewPlaybackTime] = useState(0);
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [showFilePreview, setShowFilePreview] = useState(false);
@@ -95,6 +106,7 @@ const Messages: React.FC = () => {
   const [activeReactionMessageId, setActiveReactionMessageId] = useState<number | null>(null);
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [activeMessageOptionsId, setActiveMessageOptionsId] = useState<number | null>(null);
+  const [showReactionEmojiPicker, setShowReactionEmojiPicker] = useState(false);
   const [replyToMessage, setReplyToMessage] = useState<any>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
@@ -119,10 +131,10 @@ const Messages: React.FC = () => {
 
   // Limit visible messages to last 3 with smooth fade-out (unless showing all)
   useEffect(() => {
-    const MAX_VISIBLE_MESSAGES = 3;
+    const MAX_VISIBLE_MESSAGES = 10;
     
     if (messages.length > 0) {
-      // If showing all messages, display everything; otherwise show last 3
+      // If showing all messages, display everything; otherwise show last 10
       const messagesToShow = showAllMessages ? messages : messages.slice(-MAX_VISIBLE_MESSAGES);
       const newMessageIds = messagesToShow.map(m => m.id);
       const currentMessageIds = visibleMessages.map(m => m.id);
@@ -317,8 +329,9 @@ const Messages: React.FC = () => {
   // Handle message options click
   const handleMessageOptionsClick = (messageId: number, event: React.MouseEvent) => {
     event.stopPropagation();
-    // Close reaction popup if open
+    // Close reaction popup and emoji picker if open
     setActiveReactionMessageId(null);
+    setShowReactionEmojiPicker(false);
     // Toggle message options popup
     setActiveMessageOptionsId(activeMessageOptionsId === messageId ? null : messageId);
   };
@@ -562,7 +575,7 @@ const Messages: React.FC = () => {
     }
   };
 
-  const handleAudioRecord = () => {
+  const handleAudioRecord = async () => {
     setIsRecording(true);
     setRecordingTime(0);
     setSoundDetected(false);
@@ -577,49 +590,82 @@ const Messages: React.FC = () => {
     
     setRecordingTimer(timer);
     
-    // Start waveform animation timer
-    const waveformTimer = setInterval(() => {
-      setAudioLevels(prevLevels => {
-        // Simulate realistic audio levels (0.1 to 1.0)
-        const newLevels = prevLevels.map(() => {
-          // Higher chance of louder sounds (like real speech patterns)
-          const random = Math.random();
-          if (random > 0.7) {
-            // Loud sounds (30% chance)
-            return Math.random() * 0.6 + 0.4; // 0.4 to 1.0
-          } else if (random > 0.3) {
-            // Medium sounds (40% chance)
-            return Math.random() * 0.3 + 0.2; // 0.2 to 0.5
-          } else {
-            // Quiet sounds (30% chance)
-            return Math.random() * 0.2 + 0.1; // 0.1 to 0.3
-          }
-        });
-        return newLevels;
-      });
-    }, 150); // Update every 150ms for smooth animation
-    
-    setWaveformTimer(waveformTimer);
-    
-    // Simulate sound detection with random intervals
-    const simulateSoundDetection = () => {
-      // Randomly detect sound (70% chance every 500ms)
-      if (Math.random() > 0.3) {
-        setSoundDetected(true);
-        
-        // Stop sound detection after random duration (1-3 seconds)
-        const soundDuration = Math.random() * 2000 + 1000;
-        setTimeout(() => {
-          setSoundDetected(false);
-        }, soundDuration);
-      }
+    try {
+      // Request microphone access
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setMediaStream(stream);
       
-      // Continue checking for sound
-      setTimeout(simulateSoundDetection, Math.random() * 1000 + 500);
-    };
-    
-    // Start sound detection simulation
-    simulateSoundDetection();
+      // Create MediaRecorder for actual recording
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+      
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+      
+      recorder.onstop = () => {
+        setAudioChunks(chunks);
+      };
+      
+      recorder.start();
+      setMediaRecorder(recorder);
+      
+      // Create audio context and analyser for visualization
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const analyserNode = audioCtx.createAnalyser();
+      const source = audioCtx.createMediaStreamSource(stream);
+      
+      analyserNode.fftSize = 256;
+      analyserNode.smoothingTimeConstant = 0.8;
+      source.connect(analyserNode);
+      
+      setAudioContext(audioCtx);
+      setAnalyser(analyserNode);
+      
+      // Buffer for audio data
+      const bufferLength = analyserNode.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      
+      // Start waveform animation timer using real audio data
+      const waveformTimer = setInterval(() => {
+        analyserNode.getByteFrequencyData(dataArray);
+        
+        // Calculate average volume and create waveform
+        const newLevels = Array(20).fill(0).map((_, index) => {
+          // Sample different frequency ranges for each bar
+          const startIndex = Math.floor((index / 20) * bufferLength);
+          const endIndex = Math.floor(((index + 1) / 20) * bufferLength);
+          
+          // Get average amplitude for this frequency range
+          let sum = 0;
+          for (let i = startIndex; i < endIndex; i++) {
+            sum += dataArray[i];
+          }
+          const average = sum / (endIndex - startIndex);
+          
+          // Normalize to 0.1-1.0 range (0-255 -> 0.1-1.0)
+          const normalized = Math.max(0.1, Math.min(1.0, (average / 255) * 1.2 + 0.1));
+          
+          return normalized;
+        });
+        
+        setAudioLevels(newLevels);
+        
+        // Update sound detection based on overall volume
+        const averageVolume = newLevels.reduce((a, b) => a + b, 0) / newLevels.length;
+        setSoundDetected(averageVolume > 0.3);
+        
+      }, 50); // Update every 50ms for smooth animation
+      
+      setWaveformTimer(waveformTimer);
+      
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      // Fallback to visual-only recording if mic access fails
+      alert('Could not access microphone. Recording will continue without audio visualization.');
+    }
   };
 
   const handleStopRecording = () => {
@@ -640,6 +686,24 @@ const Messages: React.FC = () => {
       clearInterval(waveformTimer);
       setWaveformTimer(null);
     }
+    
+    // Stop MediaRecorder
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+    
+    // Stop microphone and clean up audio resources
+    if (mediaStream) {
+      mediaStream.getTracks().forEach(track => track.stop());
+      setMediaStream(null);
+    }
+    
+    if (audioContext) {
+      audioContext.close();
+      setAudioContext(null);
+    }
+    
+    setAnalyser(null);
     
     // Reset waveform to flat line
     setAudioLevels(Array(20).fill(0.1));
@@ -662,6 +726,10 @@ const Messages: React.FC = () => {
         day: 'numeric'
       });
 
+      // Create audio blob from recorded chunks
+      const audioBlob = audioChunks.length > 0 ? new Blob(audioChunks, { type: 'audio/webm' }) : null;
+      const audioUrl = audioBlob ? URL.createObjectURL(audioBlob) : null;
+
       const newMessage = {
         id: Date.now(),
         type: 'voice',
@@ -669,6 +737,7 @@ const Messages: React.FC = () => {
         timestamp: timeString,
         dateString: `Today, ${timeString}`,
         sentAt: currentTime,
+        audioUrl: audioUrl,
         replyTo: replyToMessage ? {
           text: replyToMessage.text,
           sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'
@@ -714,11 +783,129 @@ const Messages: React.FC = () => {
       });
       setActiveChatId(chatId); // Set as active chat
       
-      // Clear reply preview after sending voice message
+      // Clear reply preview and audio chunks after sending voice message
       setReplyToMessage(null);
+      setAudioChunks([]);
+      setMediaRecorder(null);
+      
+      // Clean up preview audio if playing
+      if (previewAudio) {
+        previewAudio.pause();
+        setPreviewAudio(null);
+      }
+      setIsPreviewPlaying(false);
+      setPreviewPlaybackTime(0);
       
       // No seller reply for voice messages - voice messages don't trigger responses
     }
+  };
+
+  // Handle audio preview playback (before sending)
+  const handlePreviewPlayback = () => {
+    // If already playing, pause it
+    if (isPreviewPlaying && previewAudio) {
+      previewAudio.pause();
+      setIsPreviewPlaying(false);
+      return;
+    }
+
+    // Create audio from recorded chunks
+    if (audioChunks.length === 0) return;
+    
+    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    
+    setPreviewAudio(audio);
+    setIsPreviewPlaying(true);
+    setPreviewPlaybackTime(recordingTime);
+
+    // Update countdown timer
+    const updateTimer = setInterval(() => {
+      setPreviewPlaybackTime(prev => {
+        const remaining = Math.max(0, prev - 1);
+        if (remaining === 0) {
+          clearInterval(updateTimer);
+        }
+        return remaining;
+      });
+    }, 1000);
+
+    // Handle audio end
+    audio.onended = () => {
+      setIsPreviewPlaying(false);
+      setPreviewAudio(null);
+      clearInterval(updateTimer);
+      setPreviewPlaybackTime(recordingTime);
+      URL.revokeObjectURL(audioUrl);
+    };
+
+    // Handle audio pause
+    audio.onpause = () => {
+      clearInterval(updateTimer);
+    };
+
+    audio.play();
+  };
+
+  // Handle audio playback with play/pause toggle and countdown
+  const handleAudioPlayback = (messageId: number, audioUrl: string, duration: number) => {
+    // If this message is already playing, pause it
+    if (playingMessageId === messageId && currentAudio) {
+      currentAudio.pause();
+      setPlayingMessageId(null);
+      setCurrentAudio(null);
+      return;
+    }
+
+    // Stop any currently playing audio
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+
+    // Create and play new audio
+    const audio = new Audio(audioUrl);
+    setCurrentAudio(audio);
+    setPlayingMessageId(messageId);
+    
+    // Initialize playback time to full duration
+    setAudioPlaybackTime(prev => ({
+      ...prev,
+      [messageId]: duration
+    }));
+
+    // Update countdown timer
+    const updateTimer = setInterval(() => {
+      setAudioPlaybackTime(prev => {
+        const remaining = Math.max(0, (prev[messageId] || duration) - 1);
+        if (remaining === 0) {
+          clearInterval(updateTimer);
+        }
+        return {
+          ...prev,
+          [messageId]: remaining
+        };
+      });
+    }, 1000);
+
+    // Handle audio end
+    audio.onended = () => {
+      setPlayingMessageId(null);
+      setCurrentAudio(null);
+      clearInterval(updateTimer);
+      setAudioPlaybackTime(prev => ({
+        ...prev,
+        [messageId]: duration
+      }));
+    };
+
+    // Handle audio pause
+    audio.onpause = () => {
+      clearInterval(updateTimer);
+    };
+
+    audio.play();
   };
 
   // Cleanup timers on unmount
@@ -779,6 +966,7 @@ const Messages: React.FC = () => {
       const target = event.target as HTMLElement;
       if (activeReactionMessageId !== null && !target.closest('.reaction-container')) {
         setActiveReactionMessageId(null);
+        setShowReactionEmojiPicker(false);
       }
     };
 
@@ -830,7 +1018,7 @@ const Messages: React.FC = () => {
         }
       `}</style>
       
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Hidden file input for file attachments */}
       <input
         id="file-upload"
@@ -1166,7 +1354,7 @@ const Messages: React.FC = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header */}
         <header className="bg-gray-50">
           <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
@@ -1613,7 +1801,7 @@ const Messages: React.FC = () => {
                   style={{ scrollBehavior: 'smooth', overflowX: 'visible' }}
                 >
                   {/* View Older Messages Button */}
-                  {messages.length > 3 && !showAllMessages && (
+                  {messages.length > 10 && !showAllMessages && (
                     <div className="flex justify-center mb-4">
                       <button
                         onClick={() => setShowAllMessages(true)}
@@ -1693,11 +1881,31 @@ const Messages: React.FC = () => {
                                   </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
-                                    <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
-                                  </svg>
+                                  <button
+                                    onClick={() => {
+                                      if (message.audioUrl) {
+                                        handleAudioPlayback(message.id, message.audioUrl, message.duration);
+                                      }
+                                    }}
+                                    className="hover:opacity-80 transition-opacity"
+                                  >
+                                    {playingMessageId === message.id ? (
+                                      // Pause icon
+                                      <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" style={{ fillRule: 'evenodd' }}/>
+                                      </svg>
+                                    ) : (
+                                      // Play icon
+                                      <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                        <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                                      </svg>
+                                    )}
+                                  </button>
                                   <span className="text-white text-sm">
-                                    {Math.floor(message.duration / 60).toString().padStart(2, '0')} : {(message.duration % 60).toString().padStart(2, '0')}
+                                    {(() => {
+                                      const time = audioPlaybackTime[message.id] !== undefined ? audioPlaybackTime[message.id] : message.duration;
+                                      return `${Math.floor(time / 60).toString().padStart(2, '0')} : ${(time % 60).toString().padStart(2, '0')}`;
+                                    })()}
                                   </span>
                                   <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
                                   <span className="text-white text-sm">Audio</span>
@@ -1904,7 +2112,14 @@ const Messages: React.FC = () => {
                                 <button onClick={() => handleReactionSelect('😊')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
                                   <Emoji unified="1f60a" size={24} />
                                 </button>
-                                <button onClick={() => handleReactionSelect('+')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowReactionEmojiPicker(!showReactionEmojiPicker);
+                                  }} 
+                                  className="hover:scale-110 transition-transform flex items-center justify-center" 
+                                  style={{ width: '32px', height: '32px' }}
+                                >
                                   <img src={emoji6} alt="More reactions" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
                                 </button>
                                 {/* Triangle tail pointing to reaction button */}
@@ -1921,6 +2136,24 @@ const Messages: React.FC = () => {
                                   }}
                                 ></div>
                               </div>
+                              
+                              {/* Emoji Picker for Reactions */}
+                              {showReactionEmojiPicker && (
+                                <div 
+                                  className="absolute top-full mt-2 z-50"
+                                  style={{ left: '50%', transform: 'translateX(-50%)' }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <EmojiPicker
+                                    onEmojiClick={(emojiObject) => {
+                                      handleReactionSelect(emojiObject.emoji);
+                                      setShowReactionEmojiPicker(false);
+                                    }}
+                                    width={300}
+                                    height={400}
+                                  />
+                                </div>
+                              )}
                             </div>
                           )}
 
@@ -2045,7 +2278,7 @@ const Messages: React.FC = () => {
                   )}
                   
                   {/* View Latest Messages Button */}
-                  {showAllMessages && messages.length > 3 && (
+                  {showAllMessages && messages.length > 10 && (
                     <div className="flex justify-center mt-4 mb-4">
                       <button
                         onClick={() => setShowAllMessages(false)}
@@ -2419,13 +2652,27 @@ const Messages: React.FC = () => {
                           }}
                         >
                           <div className="flex items-center space-x-3">
-                            <button className="hover:opacity-80 transition-opacity">
-                              <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
-                                <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
-                              </svg>
+                            <button 
+                              onClick={handlePreviewPlayback}
+                              className="hover:opacity-80 transition-opacity"
+                            >
+                              {isPreviewPlaying ? (
+                                // Pause icon
+                                <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" style={{ fillRule: 'evenodd' }}/>
+                                </svg>
+                              ) : (
+                                // Play icon
+                                <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                  <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                                </svg>
+                              )}
                             </button>
                             <span className="text-white text-sm">
-                              {Math.floor(recordingTime / 60).toString().padStart(2, '0')} : {(recordingTime % 60).toString().padStart(2, '0')}
+                              {(() => {
+                                const time = previewPlaybackTime > 0 ? previewPlaybackTime : recordingTime;
+                                return `${Math.floor(time / 60).toString().padStart(2, '0')} : ${(time % 60).toString().padStart(2, '0')}`;
+                              })()}
                             </span>
                             <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
                             <span className="text-white text-sm">Audio</span>
@@ -2440,7 +2687,17 @@ const Messages: React.FC = () => {
                             </div>
                           </div>
                           <button 
-                            onClick={() => setRecordingTime(0)}
+                            onClick={() => {
+                              // Stop preview audio if playing
+                              if (previewAudio) {
+                                previewAudio.pause();
+                                setPreviewAudio(null);
+                              }
+                              setIsPreviewPlaying(false);
+                              setPreviewPlaybackTime(0);
+                              setRecordingTime(0);
+                              setAudioChunks([]);
+                            }}
                             className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                             style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
                           >
