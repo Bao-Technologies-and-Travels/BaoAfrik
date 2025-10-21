@@ -65,8 +65,8 @@ export class ErrorHandler {
       case API_ERROR_CODES.FORBIDDEN:
         return 'You do not have permission to perform this action';
       
-      case API_ERROR_CODES.RATE_LIMIT_EXCEEDED:
-        return 'Too many requests. Please try again later';
+      // case API_ERROR_CODES.RATE_LIMIT_EXCEEDED:
+      //   return 'Too many requests. Please try again later';
       
       case API_ERROR_CODES.FILE_TOO_LARGE:
         return 'File size is too large. Maximum size is 10MB';
