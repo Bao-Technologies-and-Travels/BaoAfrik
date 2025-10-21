@@ -321,9 +321,28 @@ const Messages: React.FC = () => {
 
   // Handle reaction selection
   const handleReactionSelect = (reaction: string) => {
-    console.log('Selected reaction:', reaction);
-    // TODO: Save reaction to message
+    if (activeReactionMessageId !== null) {
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg.id === activeReactionMessageId 
+            ? { ...msg, reaction } 
+            : msg
+        )
+      );
+    }
     setActiveReactionMessageId(null);
+    setShowReactionEmojiPicker(false);
+  };
+
+  // Handle reaction removal
+  const handleRemoveReaction = (messageId: number) => {
+    setMessages(prevMessages => 
+      prevMessages.map(msg => 
+        msg.id === messageId 
+          ? { ...msg, reaction: undefined } 
+          : msg
+      )
+    );
   };
 
   // Handle message options click
@@ -2063,6 +2082,30 @@ const Messages: React.FC = () => {
                             {message.timestamp}
                           </span>
                           {!message.isIncoming && renderMessageStatus(message.id)}
+                          
+                          {/* Reaction Display - inline after timestamp */}
+                          {message.reaction && (
+                            <div 
+                              className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => handleRemoveReaction(message.id)}
+                              style={{
+                                backgroundColor: '#F0F8FE',
+                                border: '1px solid #CFE8FC',
+                                borderRadius: '12px',
+                                padding: '4px 10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                minWidth: '40px',
+                                height: '24px',
+                                marginTop: '-2px'
+                              }}
+                            >
+                              <span style={{ fontSize: '14px', lineHeight: 1 }}>
+                                {message.reaction}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                       
