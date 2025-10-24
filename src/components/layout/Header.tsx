@@ -11,6 +11,7 @@ import groupIcon from '../../assets/images/pre/group.svg';
 import frameIcon from '../../assets/images/pre/frame.svg';
 import podsIcon from '../../assets/images/pre/pods.svg';
 import settingIcon from '../../assets/images/pre/setting.svg';
+import basketIcon from '../../assets/images/pre/basket.png';
 
 interface HeaderProps {
   showSearchBar?: boolean;
@@ -62,8 +63,31 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
     }
   }, [location]);
 
+  // Handle clicks outside dropdowns to close them
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const languageSelector = target.closest('.language-selector');
+      const desktopMenuDropdown = target.closest('.desktop-menu-dropdown');
+      const mobileMenuOverlay = target.closest('.mobile-menu-overlay');
+
+      if (!languageSelector && isLanguageDropdownOpen) {
+        setIsLanguageDropdownOpen(false);
+      }
+
+      if (!desktopMenuDropdown && isDesktopMenuOpen) {
+        setIsDesktopMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isLanguageDropdownOpen, isDesktopMenuOpen]);
+
   return (
-    <header className={`shadow-sm border-b border-orange-100 relative ${isProductDetailPage ? 'lg:block hidden' : ''}`} style={{backgroundColor: user ? '#FFFFFF' : '#FFFBF5'}}>
+    <header className={`shadow-sm border-b border-orange-100 relative ${isProductDetailPage ? 'lg:block hidden' : ''}`} style={{backgroundColor: user ? '#FFFFFF' : '#FFFBF5', fontFamily: 'Poppins, sans-serif'}}>
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo - Positioned further left */}
@@ -185,21 +209,21 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       <div className="py-2">
                         <button
                           onClick={() => handleLanguageChange('EN')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'EN' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'EN' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'EN' ? '#64B5F6' : '#374151'
+                          }}
                         >
                           English
                         </button>
                         <button
                           onClick={() => handleLanguageChange('FR')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'FR' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'FR' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'FR' ? '#64B5F6' : '#374151'
+                          }}
                         >
                           French
                         </button>
@@ -210,19 +234,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 
                 <Link 
                   to="/register" 
-                  className="inline-flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
-                  style={{backgroundColor: '#FFF8F0', color: '#F9A822'}}
-                  onMouseEnter={(e) => {
-                    (e.target as HTMLElement).style.backgroundColor = '#FFF0E6';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
-                  }}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
+                  style={{backgroundColor: '#FEF6E9'}}
                 >
-                  <svg className="w-4 h-4 mr-2 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                  </svg>
-                  Start selling
+                  <img src={basketIcon} alt="Basket" className="w-5 h-5" style={{filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)'}} />
+                  <span className="text-sm font-normal" style={{color: '#F9A825'}}>Start selling</span>
                 </Link>
                 <Link 
                   to="/profile" 
@@ -240,7 +256,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 </Link>
                 
                 {/* Desktop Burger Menu */}
-                <div className="relative">
+                <div className="relative desktop-menu-dropdown">
                   <button
                     onClick={toggleDesktopMenu}
                     className="p-3 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none transition-colors duration-200"
@@ -253,12 +269,12 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                   
                   {/* Desktop Dropdown Menu */}
                   {isDesktopMenuOpen && (
-          <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-[80vh] overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
+          <div className="fixed right-8 top-0 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-screen overflow-y-auto custom-scrollbar desktop-menu-dropdown" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
                       {/* Start selling button with exit */}
                       <div className="px-3 pb-3 flex items-center justify-between">
                       <Link 
                            to="/register" 
-                           className="inline-flex items-center px-3 py-1.5 rounded-lg font-medium text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
+                           className="inline-flex items-center px-3 py-1.5 rounded-lg font-normal text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
                            style={{backgroundColor: '#FFF8F0', color: '#F9A822'}}
                            onMouseEnter={(e) => {
                              (e.target as HTMLElement).style.backgroundColor = '#FFF0E6';
@@ -470,21 +486,21 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       <div className="py-2">
                         <button
                           onClick={() => handleLanguageChange('EN')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'EN' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'EN' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'EN' ? '#64B5F6' : '#374151'
+                          }}
                         >
                           English
                         </button>
                         <button
                           onClick={() => handleLanguageChange('FR')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'FR' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'FR' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'FR' ? '#64B5F6' : '#374151'
+                          }}
                         >
                           French
                         </button>
@@ -701,21 +717,21 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       <div className="py-2">
                         <button
                           onClick={() => handleLanguageChange('EN')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'EN' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'EN' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'EN' ? '#64B5F6' : '#374151'
+                          }}
                         >
                           English
                         </button>
                         <button
                           onClick={() => handleLanguageChange('FR')}
-                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                            selectedLanguage === 'FR' 
-                              ? 'bg-blue-50 text-blue-600' 
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'FR' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'FR' ? '#64B5F6' : '#374151'
+                          }}
                         >
                           French
                         </button>
@@ -727,19 +743,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 {/* Become a seller button - only for logged in users */}
             <Link 
               to="/register" 
-                   className="inline-flex items-center px-3 py-2 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
-                   style={{backgroundColor: '#FFF8F0', color: '#F9A822'}}
-                   onMouseEnter={(e) => {
-                     (e.target as HTMLElement).style.backgroundColor = '#FFF0E6';
-                   }}
-                   onMouseLeave={(e) => {
-                     (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
-                   }}
+                   className="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors"
+                   style={{backgroundColor: '#FEF6E9'}}
                 >
-                  <svg className="w-4 h-4 mr-1 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-              </svg>
-              Start selling
+                  <img src={basketIcon} alt="Basket" className="w-5 h-5" style={{filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)'}} />
+                  <span className="text-sm font-normal" style={{color: '#F9A825'}}>Start selling</span>
             </Link>
             
             {/* Burger Menu Button */}
@@ -820,11 +828,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                          </button>
                          <button
                            onClick={() => handleLanguageChange('DE')}
-                           className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                             selectedLanguage === 'DE' 
-                               ? 'bg-blue-50 text-blue-600' 
-                               : 'text-gray-700 hover:bg-gray-50'
-                           }`}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'DE' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'DE' ? '#64B5F6' : '#374151'
+                          }}
                          >
                           <img 
                             src="https://flagcdn.com/w20/de.png" 
@@ -837,11 +845,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                          </button>
                          <button
                            onClick={() => handleLanguageChange('ES')}
-                           className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                             selectedLanguage === 'ES' 
-                               ? 'bg-blue-50 text-blue-600' 
-                               : 'text-gray-700 hover:bg-gray-50'
-                           }`}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'ES' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'ES' ? '#64B5F6' : '#374151'
+                          }}
                          >
                           <img 
                             src="https://flagcdn.com/w20/es.png" 

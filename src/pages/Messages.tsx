@@ -1042,7 +1042,7 @@ const Messages: React.FC = () => {
         }
       `}</style>
       
-    <div className="h-screen bg-gray-50 flex overflow-hidden">
+    <div className="h-screen bg-gray-50 flex overflow-hidden" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Hidden file input for file attachments */}
       <input
         id="file-upload"
@@ -1426,17 +1426,21 @@ const Messages: React.FC = () => {
                       <div className="py-1">
                         <button
                           onClick={() => handleLanguageSelect('EN')}
-                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                            selectedLanguage === 'EN' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'
-                          }`}
+                          className="w-full text-left px-4 py-2 text-sm transition-colors"
+                          style={{
+                            backgroundColor: selectedLanguage === 'EN' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'EN' ? '#64B5F6' : '#374151'
+                          }}
                         >
                           English
                         </button>
                         <button
                           onClick={() => handleLanguageSelect('FR')}
-                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                            selectedLanguage === 'FR' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'
-                          }`}
+                          className="w-full text-left px-4 py-2 text-sm transition-colors"
+                          style={{
+                            backgroundColor: selectedLanguage === 'FR' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'FR' ? '#64B5F6' : '#374151'
+                          }}
                         >
                           French
                         </button>
@@ -1446,20 +1450,19 @@ const Messages: React.FC = () => {
                 </div>
 
                 {/* Become Seller Button */}
-                <button 
-                  className="px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center space-x-2"
-                  style={{ 
-                    backgroundColor: '#FEF6E9', 
-                    color: '#F9A825'
-                  }}
+                <Link
+                  to="/register"
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
+                  style={{ backgroundColor: '#FEF6E9' }}
                 >
                   <img 
                     src={basketIcon} 
                     alt="Basket" 
-                    className="w-4 h-4"
+                    className="w-5 h-5"
+                    style={{filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)'}}
                   />
-                  <span>Start selling</span>
-                </button>
+                  <span className="text-sm font-normal" style={{ color: '#F9A825' }}>Start Selling</span>
+                </Link>
 
                 {/* Notification Button */}
                 <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
@@ -1496,7 +1499,7 @@ const Messages: React.FC = () => {
                        <div className="px-3 pb-3 flex items-center justify-between">
                          <Link 
                               to="/register" 
-                              className="inline-flex items-center px-3 py-1.5 rounded-lg font-medium text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
+                              className="inline-flex items-center px-3 py-1.5 rounded-lg font-normal text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2" 
                               style={{backgroundColor: '#FFF8F0', color: '#F9A822'}}
                               onMouseEnter={(e) => {
                                 (e.target as HTMLElement).style.backgroundColor = '#FFF0E6';

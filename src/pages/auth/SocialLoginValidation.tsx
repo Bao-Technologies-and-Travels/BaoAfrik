@@ -43,7 +43,7 @@ const SocialLoginValidation: React.FC<SocialLoginValidationProps> = () => {
 
 
   return (
-    <div className="min-h-screen bg-white flex flex-col px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex flex-col px-4 sm:px-6 lg:px-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Desktop Logo - Top Left */}
       <div className="hidden lg:block absolute top-6 left-8">
         <img 

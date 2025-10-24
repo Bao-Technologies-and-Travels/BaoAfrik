@@ -4,7 +4,7 @@ import footerLogo from '../../assets/images/logos/text.png';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-white border-t border-gray-200">
+    <footer className="bg-white border-t border-gray-200" style={{ fontFamily: 'Poppins, sans-serif' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
           {/* Brand */}

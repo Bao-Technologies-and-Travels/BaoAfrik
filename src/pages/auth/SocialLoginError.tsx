@@ -20,7 +20,7 @@ const SocialLoginError: React.FC<SocialLoginErrorProps> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* BaoAfrik Logo */}
       <div className="w-12 h-12 sm:w-16 sm:h-16 mb-8 sm:mb-12">
         <img 

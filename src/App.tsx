@@ -29,7 +29,7 @@ function AppContent() {
   const isProductDetailPage = location.pathname.startsWith('/product/');
   const isSellerProfilePage = location.pathname.startsWith('/seller/');
   const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success'];
-  const customLayoutPages = ['/messages'];
+  const customLayoutPages = ['/messages', '/create-listing'];
   const isAuthPage = authPages.includes(location.pathname);
   const isCustomLayoutPage = customLayoutPages.includes(location.pathname);
 
@@ -61,6 +61,7 @@ function AppContent() {
       <div className="min-h-screen">
         <Routes>
           <Route path="/messages" element={<Messages />} />
+          <Route path="/create-listing" element={<CreateListing />} />
         </Routes>
       </div>
     );
@@ -92,7 +93,6 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/listings" element={<Listings />} />
-          <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/product/:id" element={<ProductDetail />} />
         </Routes>
       </main>
