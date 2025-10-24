@@ -879,8 +879,7 @@ const CreateListing: React.FC = () => {
                           className="relative"
                           style={{ 
                             width: imageUrls.length >= 10 ? '540px' : '420px',
-                            height: '115px',
-                            paddingTop: '15px',
+                            height: '100px',
                             overflow: 'hidden'
                           }}
                         >
