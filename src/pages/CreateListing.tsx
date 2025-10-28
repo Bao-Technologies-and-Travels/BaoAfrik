@@ -47,6 +47,8 @@ const CreateListing: React.FC = () => {
     const [isCurrencyDropdownOpen, setIsCurrencyDropdownOpen] = useState(false);
     const [primaryImageIndex, setPrimaryImageIndex] = useState(0);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
+    const [draggedImagesTotal, setDraggedImagesTotal] = useState(0);
+    const [currentDraggedImageIndex, setCurrentDraggedImageIndex] = useState(0);
 
   // Check if all required fields are filled
   const isFormComplete = title.trim() !== '' && 
@@ -224,9 +226,13 @@ const CreateListing: React.FC = () => {
     const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
     
     if (images.length + files.length <= 10) {
-      files.forEach((file) => {
+      // Set total dragged images count
+      setDraggedImagesTotal(files.length);
+      
+      files.forEach((file, index) => {
         setIsImageLoading(true);
         setUploadProgress(0);
+        setCurrentDraggedImageIndex(index + 1); // Start from 1
         
         // Simulate realistic loading progress
         const reader = new FileReader();
@@ -252,8 +258,14 @@ const CreateListing: React.FC = () => {
               setPrimaryImageIndex(newUrls.length - 1);
               return newUrls;
             });
-            setIsImageLoading(false);
-            setUploadProgress(0);
+            
+            // Reset counters when all images are done
+            if (index === files.length - 1) {
+              setIsImageLoading(false);
+              setUploadProgress(0);
+              setDraggedImagesTotal(0);
+              setCurrentDraggedImageIndex(0);
+            }
           }, 2000); // Total loading time ~2 seconds
         };
         
@@ -741,7 +753,7 @@ const CreateListing: React.FC = () => {
           </div>
 
           {/* Main Form Container */}
-          <div className="bg-white rounded-2xl border border-gray-300 shadow-sm pt-6 px-6 pb-16">
+          <div className="bg-white rounded-2xl border border-gray-300 shadow-sm pt-10 px-6 pb-16">
             {/* Form Header */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               {/* Title Section */}
@@ -865,9 +877,16 @@ const CreateListing: React.FC = () => {
                              />
                            </div>
                          </div>
-                         <p className="text-base font-semibold" style={{ color: '#83C4F8' }}>
-                           {uploadProgress}%
-                         </p>
+                         <div className="flex items-center gap-2">
+                           <p className="text-base font-normal" style={{ color: '#83C4F8' }}>
+                             {uploadProgress}%
+                           </p>
+                           {draggedImagesTotal >= 2 && (
+                             <p className="text-base font-normal" style={{ color: '#83C4F8' }}>
+                               {currentDraggedImageIndex}/{draggedImagesTotal}
+                             </p>
+                           )}
+                         </div>
                        </div>
                     ) : imageUrls.length > 0 ? (
                        <div className="absolute inset-0 flex items-center justify-center" style={{ borderRadius: '16px', overflow: 'hidden' }}>
