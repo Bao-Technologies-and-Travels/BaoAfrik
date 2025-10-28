@@ -12,6 +12,8 @@ import frameIcon from '../../assets/images/pre/frame.svg';
 import podsIcon from '../../assets/images/pre/pods.svg';
 import settingIcon from '../../assets/images/pre/setting.svg';
 import basketIcon from '../../assets/images/pre/basket.png';
+import notificationIcon from '../../assets/images/pre/notification.svg';
+import arrowDownIcon from '../../assets/images/pre/arrow-down.svg';
 
 interface HeaderProps {
   showSearchBar?: boolean;
@@ -86,12 +88,23 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
     };
   }, [isLanguageDropdownOpen, isDesktopMenuOpen]);
 
+  const isHomePage = location.pathname === '/';
+
   return (
-    <header className={`shadow-sm border-b border-orange-100 relative ${isProductDetailPage ? 'lg:block hidden' : ''}`} style={{backgroundColor: user ? '#FFFFFF' : '#FFFBF5', fontFamily: 'Poppins, sans-serif'}}>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex justify-between items-center h-16">
+    <>
+      {/* Overlay for Home page when menu is open */}
+      {isHomePage && isDesktopMenuOpen && (
+        <div 
+          className="fixed inset-0 z-40"
+          style={{ backgroundColor: '#0000001A' }}
+        />
+      )}
+      
+      <header className={`shadow-sm relative ${isProductDetailPage ? 'lg:block hidden' : ''} ${!user ? 'border-b border-orange-100' : ''}`} style={{backgroundColor: user ? '#FFFFFF' : '#FFFBF5', fontFamily: 'Poppins, sans-serif'}}>
+      <div className="max-w-7xl mx-auto px-1 sm:px-2 lg:px-3">
+        <div className="flex justify-between items-center h-20">
           {/* Logo - Positioned further left */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 -ml-6 sm:-ml-12">
             <Link 
               to="/" 
               className="flex items-center focus:outline-none rounded transition-all duration-200"
@@ -173,7 +186,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
           )}
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6 ml-auto">
+          <div className="hidden md:flex items-center space-x-6 ml-auto -mr-6 sm:-mr-12">
             {user ? (
               // Logged in user buttons
               <>
@@ -181,12 +194,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 <div className="relative">
                   <button
                     onClick={toggleLanguageDropdown}
-                    className="flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                    className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                    style={{ borderColor: '#E4E4E4', color: '#BABABA' }}
                   >
                     {selectedLanguage}
-                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <img src={arrowDownIcon} alt="Arrow" className="ml-1 w-4 h-4" />
                   </button>
                   
                   {/* Language Dropdown */}
@@ -240,9 +252,25 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                   <img src={basketIcon} alt="Basket" className="w-5 h-5" style={{filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)'}} />
                   <span className="text-sm font-normal" style={{color: '#F9A825'}}>Start selling</span>
                 </Link>
+                
+                {/* Notification Icon */}
+                <Link 
+                  to="/notifications" 
+                  className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 relative"
+                  title="Notifications"
+                  aria-label="View notifications"
+                >
+                  <img 
+                    src={notificationIcon} 
+                    alt="Notifications" 
+                    className="w-6 h-6"
+                    style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
+                  />
+                </Link>
+                
                 <Link 
                   to="/profile" 
-                  className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full hover:ring-2 hover:ring-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                  className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full hover:ring-1 hover:ring-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
                   title="Profile"
                   aria-label="Go to profile page"
                 >
@@ -259,11 +287,12 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 <div className="relative desktop-menu-dropdown">
                   <button
                     onClick={toggleDesktopMenu}
-                    className="p-3 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none transition-colors duration-200"
+                    className="p-3 rounded-md hover:bg-gray-100 focus:outline-none transition-colors duration-200"
+                    style={{ color: '#171717' }}
                     aria-label="Open user menu"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                   </button>
                   
@@ -458,12 +487,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 <div className="relative">
                   <button
                     onClick={toggleLanguageDropdown}
-                    className="flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                    className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                    style={{ borderColor: '#E4E4E4', color: '#BABABA' }}
                   >
                     {selectedLanguage}
-                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <img src={arrowDownIcon} alt="Arrow" className="ml-1 w-4 h-4" />
                   </button>
                   
                   {/* Language Dropdown */}
@@ -531,151 +559,6 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                  >
                    Sign Up
                 </Link>
-                
-                 {/* Desktop Burger Menu */}
-                 <div className="relative">
-                   <button
-                     onClick={toggleDesktopMenu}
-                     className="p-3 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
-                     style={{color: '#F9A822'}}
-                     onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#E6941F'}
-                     onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#F9A822'}
-                     aria-label="Open menu"
-                   >
-                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                     </svg>
-                   </button>
-                  
-                   {/* Desktop Dropdown Menu for visitors */}
-                   {isDesktopMenuOpen && (
-                     <div 
-                       className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-4 z-50 max-h-[80vh] overflow-y-auto custom-scrollbar"
-                       style={{
-                         scrollbarWidth: 'thin',
-                         scrollbarColor: 'white #f3f4f6'
-                       }}
-                     >
-                       {/* Profile Section */}
-                       <div className="flex items-center space-x-3 px-4 py-4 border-b border-gray-100">
-                         <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                           <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                           </svg>
-                         </div>
-                         <div className="flex-1">
-                           <p className="text-sm text-gray-500">My profile</p>
-                           <h3 className="text-lg font-bold text-gray-900">Me</h3>
-                         </div>
-                       </div>
-
-                       {/* Sign In and Sign Up Buttons */}
-                       <div className="px-4 py-4 space-y-3">
-                <Link 
-                  to="/login" 
-                           className="block w-full text-center px-6 py-3 rounded-lg text-white font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                           style={{backgroundColor: '#F9A822'}}
-                           onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-                           onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A822'}
-                           onClick={() => setIsDesktopMenuOpen(false)}
-                         >
-                           Sign In
-                </Link>
-                <Link 
-                  to="/register" 
-                           className="block w-full text-center px-6 py-3 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 border"
-                           style={{borderColor: '#F9A822', color: '#F9A822'}}
-                           onMouseEnter={(e) => {
-                             (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
-                           }}
-                           onMouseLeave={(e) => {
-                             (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                           }}
-                           onClick={() => setIsDesktopMenuOpen(false)}
-                >
-                  Sign Up
-                </Link>
-                       </div>
-
-                       {/* Menu Items */}
-                       <div className="space-y-1 px-2">
-                         {/* Notifications */}
-                         <Link 
-                           to="/notifications" 
-                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                           onClick={() => setIsDesktopMenuOpen(false)}
-                         >
-                           <div className="flex items-center space-x-3">
-                             <img src={boxIcon} alt="Box" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                             <div>
-                               <div className="font-medium" style={{color: '#6A6A6A'}}>Notifications</div>
-                               <div className="text-sm text-gray-500">Don't miss anything about your activities</div>
-                             </div>
-                           </div>
-                         </Link>
-
-                         {/* Request & Bring */}
-                         <Link 
-                           to="/request-bring" 
-                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                           onClick={() => setIsDesktopMenuOpen(false)}
-                         >
-                           <div className="flex items-center space-x-3">
-                             <img src={groupIcon} alt="Group" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                             <div>
-                               <div className="font-medium" style={{color: '#6A6A6A'}}>Request & Bring</div>
-                               <div className="text-sm text-gray-500">Lorem ipsum dolor sit amet consectetur.</div>
-                             </div>
-                           </div>
-                         </Link>
-
-                         {/* Bookmarks */}
-                         <Link 
-                           to="/bookmarks" 
-                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                           onClick={() => setIsDesktopMenuOpen(false)}
-                         >
-                           <div className="flex items-center space-x-3">
-                             <img src={frameIcon} alt="Frame" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                             <div>
-                               <div className="font-medium" style={{color: '#6A6A6A'}}>Bookmarks</div>
-                             </div>
-                           </div>
-                         </Link>
-
-                         {/* Become a seller */}
-                         <Link 
-                           to="/register" 
-                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                           onClick={() => setIsDesktopMenuOpen(false)}
-                         >
-                           <div className="flex items-center space-x-3">
-                             <img src={boxIcon} alt="Box" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                             <div>
-                               <div className="font-medium" style={{color: '#6A6A6A'}}>Start selling</div>
-                               <div className="text-sm text-gray-500">Publish and manage your articles better</div>
-                             </div>
-                           </div>
-                         </Link>
-
-                         {/* Help Center */}
-                         <Link 
-                           to="/help" 
-                           className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                           onClick={() => setIsDesktopMenuOpen(false)}
-                         >
-                           <div className="flex items-center space-x-3">
-                             <img src={podsIcon} alt="Pods" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                             <div>
-                               <div className="font-medium" style={{color: '#6A6A6A'}}>Help Center</div>
-                               <div className="text-sm text-gray-500">Need to talk ? We're listening</div>
-                             </div>
-                           </div>
-                         </Link>
-                       </div>
-                     </div>
-                   )}
-                </div>
               </>
             )}
           </div>
@@ -1318,6 +1201,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
         )}
       </div>
     </header>
+    </>
   );
 };
 

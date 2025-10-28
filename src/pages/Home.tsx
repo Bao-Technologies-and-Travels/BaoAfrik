@@ -21,6 +21,18 @@ import pre15 from '../assets/images/pre/15.png';
 import pre16 from '../assets/images/pre/16.png';
 import pre17 from '../assets/images/pre/17.png';
 import pre18 from '../assets/images/pre/18.png';
+import earthIcon from '../assets/images/pre/earth.svg';
+import arrowDownIcon from '../assets/images/pre/arrow-down.svg';
+import grayArrowIcon from '../assets/images/pre/gray.svg';
+import blackArrowIcon from '../assets/images/pre/black.svg';
+import locationIcon from '../assets/images/pre/PL.svg';
+import bookmarkIcon from '../assets/images/pre/bm.svg';
+import verifyIcon from '../assets/images/pre/verify.svg';
+import unverifyIcon from '../assets/images/pre/unverify.svg';
+import globyIcon from '../assets/images/pre/globy.svg';
+import buyerIcon from '../assets/images/pre/buyer.svg';
+import moneyIcon from '../assets/images/pre/money.svg';
+import bitIcon from '../assets/images/pre/bit.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -34,6 +46,7 @@ import scanIcon from '../assets/images/logos/scanner (1).png';
 const Home: React.FC = () => {
   const { user, isVisitor } = useAuth();
   const navigationLocation = useLocation();
+  const productGridRef = React.useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -60,34 +73,37 @@ const Home: React.FC = () => {
   }>>([]);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imageFormData, setImageFormData] = useState<FormData | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+  const totalPages = 48;
 
   // Banner slides data
   const bannerSlides = [
     {
       id: 1,
       title: "Cameroonian Spices & Sauces",
-      description: "Discover our authentic spices from Cameroon",
+      description: "Discover our authentic spices and traditional blends from Cameroon",
       image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&h=300&fit=crop",
       category: "Food & Spices"
     },
     {
       id: 2,
       title: "Cameroonian Fashion",
-      description: "Beautiful traditional Kente and African fabrics",
+      description: "Beautiful traditional Kente and handwoven African fabrics",
       image: cameroonianFashion, // Traditional fabrics image
       category: "Fashion & Textiles"
     },
     {
       id: 3,
       title: "Cameroonian Decor",
-      description: "Handcrafted wooden combs and traditional accessories",
+      description: "Handcrafted wooden combs and authentic traditional accessories",
       image: cameroonianDecor, // Wooden combs image
       category: "Home & Decor"
     },
     {
       id: 4,
       title: "Cameroonian Culture",
-      description: "Traditional woven bags and cultural crafts",
+      description: "Traditional woven bags and unique handmade cultural crafts",
       image: cameroonianCulture, // Traditional woven bag image
       category: "Books & Media"
     }
@@ -96,14 +112,32 @@ const Home: React.FC = () => {
   const categories = ['All', 'Food & Spices', 'Fashion & Textiles', 'Beauty & Wellness', 'Home & Decor', 'Books & Media'];
 
   const africanCountries = [
+    { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png' },
+    { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png' },
+    { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png' },
+    { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png' },
     { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png' },
-    { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png' }, 
-    { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png' },
-    { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png' },
-    { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png' },
     { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png' },
-    { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png' }
-  ];
+    { name: 'Congo', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png' },
+    { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png' },
+    { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png' },
+    { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png' },
+    { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png' },
+    { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png' },
+    { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png' },
+    { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png' },
+    { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png' },
+    { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png' },
+    { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png' },
+    { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png' },
+    { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png' },
+    { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png' },
+    { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png' },
+    { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png' },
+    { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png' },
+    { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png' },
+    { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png' }
+  ].sort((a, b) => a.name.localeCompare(b.name));
 
   // Country mapping for products
   const getProductCountry = (productId: number) => {
@@ -439,6 +473,25 @@ const Home: React.FC = () => {
     }
   };
 
+  // Product grid scroll functions
+  const scrollProductsLeft = () => {
+    if (productGridRef.current) {
+      productGridRef.current.scrollBy({
+        left: -400,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const scrollProductsRight = () => {
+    if (productGridRef.current) {
+      productGridRef.current.scrollBy({
+        left: 400,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   // Handle scan functionality - trigger file input
   const handleScan = () => {
     const fileInput = document.getElementById('image-upload') as HTMLInputElement;
@@ -619,7 +672,7 @@ const Home: React.FC = () => {
   }, [isFilterDropdownOpen]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Hidden file input for image selection */}
       <input
         id="image-upload"
@@ -848,17 +901,21 @@ const Home: React.FC = () => {
       </div>
 
       {/* Hero Banner - Auto Sliding */}
-      <section className="text-white relative overflow-hidden mt-4 sm:mt-6" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-12 sm:mx-16 lg:mx-24 rounded-2xl" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-1 md:py-1">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 md:gap-0">
             <div className="flex-1 text-center md:text-left px-2 md:pl-2 w-full md:w-auto">
-              <div className="bg-white bg-opacity-20 rounded-lg px-2 sm:px-3 py-1 inline-block mb-2 sm:mb-3">
-                <span className="text-xs font-medium">Featured</span>
-              </div>
+              <button 
+                onClick={() => setActiveCategory(bannerSlides[currentSlide].category)}
+                className="bg-white px-3 sm:px-4 py-1 rounded text-xs sm:text-sm font-medium hover:bg-orange-50 transition-all duration-300 transform hover:scale-105 touch-manipulation mb-2 sm:mb-3"
+                style={{ color: '#F9A822' }}
+              >
+                Explore {bannerSlides[currentSlide].category}
+              </button>
               <div className="relative overflow-hidden min-h-[2rem] sm:min-h-[2.5rem] md:min-h-[3rem]">
                 <h1 
                   key={`title-${currentSlide}`}
-                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 animate-fade-in-up leading-tight"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-2 animate-fade-in-up leading-tight"
                 >
                   {bannerSlides[currentSlide].title}
                 </h1>
@@ -866,17 +923,11 @@ const Home: React.FC = () => {
               <div className="relative overflow-hidden min-h-[1.5rem] sm:min-h-[2rem]">
                 <p 
                   key={`desc-${currentSlide}`}
-                  className="text-orange-100 text-xs sm:text-sm md:text-base mb-3 sm:mb-4 animate-fade-in-up animation-delay-100 leading-relaxed"
+                  className="text-orange-100 text-xs sm:text-sm md:text-base mb-0 animate-fade-in-up animation-delay-100 leading-relaxed"
                 >
                   {bannerSlides[currentSlide].description}
                 </p>
               </div>
-              <button 
-                onClick={() => setActiveCategory(bannerSlides[currentSlide].category)}
-                className="bg-white text-orange-600 px-3 sm:px-4 md:px-5 py-2 rounded-full text-xs sm:text-sm font-medium hover:bg-orange-50 transition-all duration-300 transform hover:scale-105 touch-manipulation"
-              >
-                Explore {bannerSlides[currentSlide].category}
-              </button>
             </div>
             <div className="block md:hidden w-full px-2 sm:px-4">
               <div className="relative overflow-hidden rounded-lg aspect-[16/9] sm:aspect-[2/1]">
@@ -884,7 +935,13 @@ const Home: React.FC = () => {
                   key={`img-mobile-${currentSlide}`}
                   src={bannerSlides[currentSlide].image}
                   alt={bannerSlides[currentSlide].title}
-                  className="w-full h-full object-cover shadow-lg animate-slide-in-right"
+                  className="w-full h-full object-cover animate-slide-in-right"
+                  style={{
+                    maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+                    maskComposite: 'intersect',
+                    WebkitMaskComposite: 'source-in'
+                  }}
                   loading="eager"
                   width="400"
                   height="200"
@@ -897,7 +954,13 @@ const Home: React.FC = () => {
                   key={`img-${currentSlide}`}
                   src={bannerSlides[currentSlide].image}
                   alt={bannerSlides[currentSlide].title}
-                  className="w-64 lg:w-80 h-40 lg:h-48 object-cover shadow-lg animate-slide-in-right"
+                  className="w-64 lg:w-80 h-32 lg:h-40 object-cover animate-slide-in-right"
+                  style={{
+                    maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+                    maskComposite: 'intersect',
+                    WebkitMaskComposite: 'source-in'
+                  }}
                   loading="eager"
                   width="320"
                   height="192"
@@ -906,8 +969,8 @@ const Home: React.FC = () => {
             </div>
           </div>
           
-          {/* Slide Indicators */}
-          <div className="flex justify-center mt-4 sm:mt-6 space-x-2">
+          {/* Slide Indicators - Hidden but functionality remains */}
+          <div className="hidden">
             {bannerSlides.map((_, index) => (
               <button
                 key={index}
@@ -925,11 +988,11 @@ const Home: React.FC = () => {
 
       {/* Category Navigation */}
       <section className="bg-white py-4 sm:py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-center space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide relative">
-            {/* Gray line background - extends beyond container */}
-            <div className="absolute bottom-0 left-[-1rem] right-[-1rem] h-0.5 bg-gray-200"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            {/* Gray line background - full width at category bottom */}
+            <div className="absolute bottom-0 left-[calc(-50vw+50%)] right-[calc(-50vw+50%)] h-0.5 bg-gray-200"></div>
             
+            <div className="flex justify-center space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide relative">
             {categories.map((category) => (
               <button
                 key={category}
@@ -938,16 +1001,16 @@ const Home: React.FC = () => {
                   setIsSearchActive(false);
                   setSearchQuery('');
                 }}
-                className={`whitespace-nowrap pb-3 sm:pb-4 px-1 font-medium text-sm sm:text-lg transition-colors flex-shrink-0 relative ${
-                  activeCategory === category
-                    ? 'text-orange-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
+                className={`whitespace-nowrap pb-3 sm:pb-4 px-1 font-normal transition-colors flex-shrink-0 relative`}
+                style={{
+                  fontSize: '16px',
+                  fontFamily: 'Poppins, sans-serif',
+                  color: activeCategory === category ? '#64B5F6' : '#BABABA'
+                }}
               >
                 {category}
-                {/* Orange line for active category */}
                 {activeCategory === category && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: '#64B5F6' }}></div>
                 )}
               </button>
             ))}
@@ -956,41 +1019,110 @@ const Home: React.FC = () => {
       </section>
           
           {/* Filter Button - Desktop Only */}
-      <section className="bg-white py-2 sm:py-4">
+      <section className="bg-white pt-0 pb-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="relative filter-dropdown hidden md:block">
             <button
               onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-              className="flex items-center space-x-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg text-gray-600 hover:text-gray-800 hover:bg-blue-100 transition-colors"
+              className="flex items-center space-x-2 border rounded-lg transition-colors"
+              style={{
+                padding: '8px 10px',
+                backgroundColor: '#FAFAFA',
+                borderColor: '#E4E4E4',
+                fontFamily: 'Poppins, sans-serif'
+              }}
             >
-                <span className="text-base font-medium text-gray-500">Filter :</span>
-                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-                <span className="text-base font-medium text-blue-600">{selectedCountry || 'Africa'}</span>
-              <svg className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+                <span className="text-base font-normal" style={{ color: '#BABABA' }}>Filter :</span>
+                <img src={earthIcon} alt="Earth" style={{ width: '22px', height: '22px' }} />
+                <span className="text-base font-medium" style={{ color: '#6A6A6A' }}>{selectedCountry || 'Africa'}</span>
+              <img
+                src={arrowDownIcon}
+                alt="Arrow"
+                className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`}
+              />
             </button>
             
             {/* Dropdown Menu */}
             {isFilterDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                <div className="py-2">
+              <div 
+                className="absolute left-0 bg-white border border-gray-200 z-10"
+                style={{ 
+                  width: '200px', 
+                  flexShrink: 0, 
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  top: '0'
+                }}
+              >
+                <style>
+                  {`
+                    .filter-dropdown-scroll::-webkit-scrollbar {
+                      width: 2px;
+                    }
+                    .filter-dropdown-scroll::-webkit-scrollbar-track {
+                      background: transparent;
+                    }
+                    .filter-dropdown-scroll::-webkit-scrollbar-thumb {
+                      background-color: #E4E4E4;
+                      border-radius: 10px;
+                    }
+                  `}
+                </style>
+                
+                {/* Search Input at Top */}
+                <div className="px-3 pt-3 pb-2 border-b border-gray-200">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Filter :"
+                      className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none"
+                      style={{ 
+                        backgroundColor: '#FFFFFF',
+                        color: '#6A6A6A',
+                        border: 'none'
+                      }}
+                    />
+                    <button
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                      onClick={() => setIsFilterDropdownOpen(false)}
+                    >
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Scrollable Country List */}
+                <div 
+                  className="py-2 overflow-y-auto filter-dropdown-scroll"
+                  style={{
+                    maxHeight: 'calc(6 * 44px)',
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#E4E4E4 transparent'
+                  }}
+                >
                   <button
                     onClick={() => {
                       setSelectedCountry('');
                       setIsFilterDropdownOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                      !selectedCountry ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
-                    }`}
+                    style={{
+                      backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
+                      color: !selectedCountry ? '#64B5F6' : '#BABABA'
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <img 
+                        src={globyIcon} 
+                        alt="Globe"
+                        className="w-4 h-4 mr-2"
+                        style={{
+                          filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                        }}
+                      />
                       <span>Africa</span>
                     </div>
                   </button>
@@ -1001,9 +1133,11 @@ const Home: React.FC = () => {
                         setSelectedCountry(country.name);
                         setIsFilterDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                        selectedCountry === country.name ? 'text-orange-600 bg-orange-50' : 'text-gray-700'
-                      }`}
+                      style={{
+                        backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
+                        color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
                     >
                       <span className="flex items-center space-x-2">
                         <img 
@@ -1147,13 +1281,137 @@ const Home: React.FC = () => {
             </div>
           </div>
 
+          {/* Conditional Layout: Category Sections for "All" or Regular Grid for Specific Category */}
+          {activeCategory === 'All' && !isSearchActive ? (
+            // Category Sections Layout
+            <div className="space-y-8">
+              {categories.filter(cat => cat !== 'All').map((category) => {
+                const categoryProducts = (allProducts[category as keyof typeof allProducts] || []);
+                if (categoryProducts.length === 0) return null;
+                
+                return (
+                  <div key={category} className="mb-8">
+                    {/* Category Header */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center">
+                        <h2 className="text-[20px] font-semibold text-gray-900">{category}</h2>
+                        <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <button 
+                          className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                          aria-label="Scroll left"
+                        >
+                          <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                        </button>
+                        <button 
+                          className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                          aria-label="Scroll right"
+                        >
+                          <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {/* Category Products - Horizontal Scroll */}
+                    <div className="overflow-x-auto scrollbar-hide">
+                      <div className="flex gap-5 sm:gap-6">
+                        {categoryProducts.slice(0, 12).map((product) => (
+                          <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group flex-shrink-0" style={{ width: '200px' }}>
+                            {/* Product Image - Top */}
+                            <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
+                              <img 
+                                src={product.image} 
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
+                                loading="lazy"
+                                width="200"
+                                height="200"
+                              />
+                              
+                              {/* Country Badge */}
+                              <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+                                <img 
+                                  src={getProductCountry(product.id).flag} 
+                                  alt={getProductCountry(product.id).name}
+                                  className="w-3 h-2 object-cover rounded-sm"
+                                />
+                                <span className="text-xs font-medium text-gray-800">
+                                  {getProductCountry(product.id).abbreviation}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Product Content */}
+                            <div className="px-2 pb-2 sm:px-3 sm:pb-3 flex flex-col">
+                              {/* Price and Verified Badge Row */}
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
+                                ${product.price}
+                              </div>
+                                {product.verified ? (
+                                  <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                                    <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
+                                    <span>Verified seller</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                                    <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
+                                    <span>Unverified Seller</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Product Name */}
+                              <h3 className="mb-1 line-clamp-2 font-medium" style={{ fontSize: '13px', color: '#212121' }}>{product.name}</h3>
+                              
+                              {/* Location and Bookmark Row - Below Product Name */}
+                              <div className="flex items-center justify-between">
+                                {/* Location */}
+                                <div className="flex items-center text-gray-500 flex-1">
+                                  <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                                  <span className="truncate font-normal" style={{ fontSize: '10px' }}>{product.location}</span>
+                              </div>
+                                
+                                {/* Bookmark Button */}
+                                <div className="ml-2">
+                                    <button 
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleSave(product.id);
+                                      }}
+                                   className="transition-colors touch-manipulation"
+                                      title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                                      style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >
+                                      <img src={bookmarkIcon} alt="Bookmark" className="w-5 h-5" style={{
+                                        filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                                      }} />
+                                    </button>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            // Regular Grid Layout for Specific Category or Search
+            <>
           {/* Section Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
-              <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="text-[20px] font-semibold text-gray-900">
                 {isSearchActive 
                   ? `Search Results (${filteredProducts().length} found)` 
-                  : activeCategory === 'All' ? 'All Products' : activeCategory
+                      : activeCategory
                 }
               </h2>
               {isSearchActive && (
@@ -1168,16 +1426,20 @@ const Home: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
-            <div className="flex items-center space-x-2">
-              <button className="p-2 rounded-full border border-gray-300 hover:bg-gray-50">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+                <div className="flex items-center space-x-3">
+                  <button 
+                    onClick={scrollProductsLeft}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                    aria-label="Scroll products left"
+                  >
+                    <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
               </button>
-              <button className="p-2 rounded-full border border-gray-300 hover:bg-gray-50">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                  <button 
+                    onClick={scrollProductsRight}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                    aria-label="Scroll products right"
+                  >
+                    <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
               </button>
             </div>
           </div>
@@ -1200,22 +1462,25 @@ const Home: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
+            <div 
+              ref={productGridRef}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6 overflow-x-auto scrollbar-hide"
+            >
               {getProductsToDisplay().map((product) => (
-              <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200 block group">
+              <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 block group">
                 {/* Product Image - Top */}
-                <div className="aspect-square relative overflow-hidden">
+                <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
                     loading="lazy"
                     width="200"
                     height="200"
                   />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
                     <img 
                       src={getProductCountry(product.id).flag} 
                       alt={getProductCountry(product.id).name}
@@ -1228,81 +1493,60 @@ const Home: React.FC = () => {
                 </div>
                 
                 {/* Product Content */}
-                <div className="p-2 sm:p-3 flex flex-col">
+                <div className="px-2 pb-2 sm:px-3 sm:pb-3 flex flex-col">
                   {/* Price and Verified Badge Row */}
                   <div className="flex items-center justify-between mb-1">
-                    <div className="text-sm sm:text-lg font-bold text-gray-900">
+                    <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
                     ${product.price}
                   </div>
                     {product.verified ? (
-                      <div className="flex items-center text-xs text-green-600 bg-green-50 px-1 py-0.5 rounded text-xs">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
-                        <span className="text-xs">Verified seller</span>
-                      </div>
+                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                        <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
+                        <span>Verified seller</span>
+                  </div>
                     ) : (
-                      <div className="flex items-center text-xs sm:text-xs text-gray-600 bg-gray-100 px-0.5 sm:px-1 py-0.5 rounded text-xs">
-                        <svg className="w-1.5 h-1.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2l2.5 5.5L20 8l-4.5 4.5L17 18l-5-2.5L7 18l1.5-5.5L4 8l5.5-.5L12 2z" stroke="currentColor" strokeWidth="1" fill="none"/>
-                          <text x="12" y="16" textAnchor="middle" fontSize="4" fill="currentColor" fontWeight="bold">!</text>
-                        </svg>
-                        <span className="text-xs sm:text-xs">Unverified Seller</span>
+                      <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                        <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
+                        <span>Unverified Seller</span>
                       </div>
                     )}
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="text-xs sm:text-sm text-gray-600 mb-1 line-clamp-2 font-medium">{product.name}</h3>
+                  <h3 className="mb-1 line-clamp-2 font-medium" style={{ fontSize: '13px', color: '#212121' }}>{product.name}</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
-                  <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
-                      <svg className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 mr-0.5 sm:mr-1 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                      <span className="truncate text-xs sm:text-xs font-normal max-w-[60px] sm:max-w-none">{product.location}</span>
-                  </div>
+                      <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>{product.location}</span>
+                      </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-2 sm:ml-4">
+                    <div className="ml-2">
                         <button 
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             handleSave(product.id);
                           }}
-                       className={`p-2 sm:p-2 transition-colors touch-manipulation ${
-                            savedProducts.has(product.id) 
-                          ? 'text-blue-500 hover:text-blue-600' 
-                              : 'text-gray-400 hover:text-gray-600'
-                          }`}
+                       className="transition-colors touch-manipulation"
                           title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                          style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
-                      <div className="relative">
-                         <svg className="w-5 h-5 sm:w-6 sm:h-6" fill={savedProducts.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                        {savedProducts.has(product.id) && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+                          <img src={bookmarkIcon} alt="Bookmark" className="w-5 h-5" style={{
+                            filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                          }} />
+                        </button>
                       </div>
-                        )}
-                        {!savedProducts.has(product.id) && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-xs font-bold">+</span>
                     </div>
-                  )}
-                      </div>
-                    </button>
-                    </div>
-                  </div>
                 </div>
               </Link>
               ))}
             </div>
+          )}
+            </>
           )}
         </div>
       </section>
@@ -1346,27 +1590,299 @@ const Home: React.FC = () => {
           </div>
           
           {/* Desktop Pagination */}
-          <div className="hidden md:flex items-center justify-center">
+          <div className="hidden md:flex items-center justify-center relative">
             <div className="flex items-center space-x-4">
-              <button className="px-4 py-2 text-base text-black hover:text-gray-700 font-medium transition-colors">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontSize: '18px', color: '#BABABA' }}
+              >
                 Previous
               </button>
-              <div className="flex space-x-2">
-                {[1, 2, 3, 4, 5, 6, 7, 8, '...', 48].map((page, index) => (
+              <div className="flex space-x-1">
+                {(() => {
+                  const pages = [];
+                  const showPages = [];
+                  
+                  if (totalPages <= 7) {
+                    for (let i = 1; i <= totalPages; i++) showPages.push(i);
+                  } else {
+                    if (currentPage <= 4) {
+                      showPages.push(1, 2, 3, 4, 5, '...', totalPages);
+                    } else if (currentPage >= totalPages - 3) {
+                      showPages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+                    } else {
+                      showPages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+                    }
+                  }
+                  
+                  return (
+                    <>
+                      {showPages.map((page, index) => (
+                        page === '...' ? (
+                          <span key={`ellipsis-${index}`} className="px-4 py-2 font-normal" style={{ fontSize: '18px', color: '#BABABA' }}>
+                            ...
+                          </span>
+                        ) : (
                   <button
-                    key={index}
-                    className={`px-4 py-2 text-base rounded-lg font-medium transition-colors ${
-                      page === 1
-                        ? 'bg-orange-500 text-white'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    }`}
+                            key={page}
+                            onClick={() => setCurrentPage(page as number)}
+                            className="px-4 py-2 font-normal transition-colors relative"
+                            style={{ fontSize: '18px', color: page === currentPage ? '#212121' : '#BABABA' }}
                   >
                     {page}
+                            {page === currentPage && (
+                              <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-0.5" style={{ backgroundColor: '#212121' }}></div>
+                            )}
                   </button>
+                        )
                 ))}
+                    </>
+                  );
+                })()}
               </div>
-              <button className="px-4 py-2 text-base text-black hover:text-gray-700 font-medium transition-colors">
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontSize: '18px', color: '#212121' }}
+              >
                 Next
+              </button>
+              <div className="flex items-center absolute right-0">
+                <span className="px-4 py-0.5 rounded-lg font-normal border" style={{ fontSize: '18px', color: '#212121', backgroundColor: '#F5F5F5', borderColor: '#E4E4E4' }}>
+                  {currentPage}
+                </span>
+                <span className="mx-2 font-normal" style={{ fontSize: '18px', color: '#BABABA' }}>
+                  /
+                </span>
+                <span className="font-normal" style={{ fontSize: '18px', color: '#BABABA' }}>
+                  {totalPages}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Buy & Sell Instantly Section */}
+      <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="max-w-7xl mx-auto">
+          {/* Header Section */}
+          <div className="flex items-start justify-between mb-8">
+            <div className="flex-1">
+              <h2 className="mb-4" style={{ fontSize: '44px', fontWeight: '600', lineHeight: '1.2' }}>
+                <span style={{ color: '#212121' }}>Buy & Sell </span>
+                <span style={{ 
+                  background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+                  Instantly
+                </span>
+              </h2>
+              <p style={{ fontSize: '16px', color: '#9C9C9C', maxWidth: '600px', lineHeight: '1.6' }}>
+                Turn unmet needs into instant deals, discover what people are looking for, grab it, and sell it right where demand begins
+              </p>
+            </div>
+            <div className="text-right">
+              <div style={{ 
+                fontSize: '44px', 
+                fontWeight: '600',
+                background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                Over 400
+              </div>
+              <div style={{ fontSize: '18px', color: '#9C9C9C', marginTop: '4px' }}>
+                Request availables
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Bar Section */}
+          <div className="flex items-center gap-4 mb-8 mt-20">
+            {/* Filter Button */}
+            <button 
+              className="flex items-center border transition-colors hover:bg-gray-50"
+              style={{ 
+                backgroundColor: '#FAFAFA',
+                borderColor: '#E4E4E4',
+                padding: '8px 10px',
+                borderRadius: '8px',
+                fontFamily: 'Poppins, sans-serif',
+                gap: '6px'
+              }}
+            >
+              <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Filter :</span>
+              <img src={earthIcon} alt="Globe" style={{ width: '22px', height: '22px' }} />
+              <span style={{ color: '#6A6A6A', fontSize: '14px' }}>Africa</span>
+              <img src={arrowDownIcon} alt="Arrow" style={{ width: '16px', height: '16px' }} />
+            </button>
+
+            {/* Price Button */}
+            <button 
+              className="flex items-center border transition-colors hover:bg-gray-50"
+              style={{ 
+                backgroundColor: '#FAFAFA',
+                borderColor: '#E4E4E4',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                fontFamily: 'Poppins, sans-serif',
+                gap: '6px'
+              }}
+            >
+              <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Price :</span>
+              <span style={{ color: '#6A6A6A', fontSize: '14px' }}>All</span>
+              <img src={arrowDownIcon} alt="Arrow" style={{ width: '16px', height: '16px' }} />
+            </button>
+
+            {/* Buyer Location Search Bar */}
+            <div className="ml-auto" style={{ width: '380px' }}>
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  placeholder="Buyer location ?"
+                  className="w-full px-4 py-2.5 pr-28 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
+                  style={{ 
+                    backgroundColor: '#FFFFFF',
+                    borderColor: '#E4E4E4',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '14px',
+                    color: '#6A6A6A'
+                  }}
+                />
+                <div 
+                  className="absolute right-2 flex items-center"
+                  style={{ 
+                    backgroundColor: '#F9A825',
+                    height: '28px',
+                    paddingLeft: '18px',
+                    paddingRight: '18px',
+                    borderRadius: '8px'
+                  }}
+                >
+                  <img src={buyerIcon} alt="Search" className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Request Cards Section */}
+          <div className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6">
+              {[1, 2, 3].map((index) => (
+                <div 
+                  key={index}
+                  className="bg-white rounded-xl p-4 hover:shadow-md transition-shadow"
+                  style={{ boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', height: 'auto' }}
+                >
+                  {/* Product Name Label and Button */}
+                  <div className="flex items-center justify-between mb-1">
+                    <span style={{ fontSize: '12px', color: '#9C9C9C' }}>Product name</span>
+                    <button 
+                      className="px-3 py-1 rounded-lg text-white"
+                      style={{ backgroundColor: '#F9A825', fontWeight: 'normal', fontSize: '12px' }}
+                    >
+                      Manage request
+                    </button>
+                  </div>
+
+                  {/* Product Title */}
+                  <h3 className="mb-2" style={{ fontSize: '14px', fontWeight: '500', color: '#212121' }}>
+                    Snails from South Africa
+                  </h3>
+
+                  {/* Description */}
+                  <p className="mb-3" style={{ fontSize: '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </p>
+
+                  {/* Tags and User Info Row */}
+                  <div className="flex items-end justify-between">
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {/* Location Tag */}
+                      <div 
+                        className="flex items-center gap-1.5 px-3 py-1.5"
+                        style={{ backgroundColor: '#E3F2FD', borderRadius: '6px' }}
+                      >
+                        <img 
+                          src={locationIcon} 
+                          alt="Location"
+                          className="w-3 h-3"
+                          style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6' }}>London, United Kingdom</span>
+                      </div>
+
+                      {/* Price Tag */}
+                      <div 
+                        className="flex items-center gap-1.5 px-3 py-1.5"
+                        style={{ backgroundColor: '#E3F2FD', borderRadius: '6px' }}
+                      >
+                        <img 
+                          src={moneyIcon} 
+                          alt="Money"
+                          className="w-3 h-3"
+                          style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                      </div>
+
+                      {/* Country Tag */}
+                      <div 
+                        className="flex items-center gap-1.5 px-3 py-1.5"
+                        style={{ backgroundColor: '#E3F2FD', borderRadius: '6px' }}
+                      >
+                        <img 
+                          src="https://flagcdn.com/w20/za.png" 
+                          alt="South Africa"
+                          className="w-4 h-3 object-cover rounded-sm"
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
+                      </div>
+                    </div>
+
+                    {/* User Info */}
+                    <div className="flex flex-col items-center">
+                      <img 
+                        src={bitIcon} 
+                        alt="User"
+                        className="w-12 h-12 mb-1"
+                      />
+                      <div 
+                        className="flex items-center justify-center gap-1 px-2 py-0.5 rounded border"
+                        style={{ borderColor: '#E4E4E4', backgroundColor: '#FFFFFF' }}
+                      >
+                        <svg className="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span style={{ fontSize: '12px', color: '#212121', fontWeight: '500' }}>4.3</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Arrows */}
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button 
+                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                aria-label="Previous"
+              >
+                <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+              </button>
+              <button 
+                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                aria-label="Next"
+              >
+                <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
               </button>
             </div>
           </div>
