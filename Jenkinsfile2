@@ -11,7 +11,6 @@ pipeline {
         REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
         BRANCH = 'fonsah-staging'
         DOMAIN = 'staging.baoafrik.com'
-        EMAIL = 'pageo.fonsah@baotechnologiesandtravels.com'
     }
 
     stages {
@@ -257,7 +256,7 @@ EOF
         always {
             emailext(
             subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
-            to: "${EMAIL}",
+            to: 'pageo.fonsah@baotechnologiesandtravels.com',
             from: 'ashprincepageo@gmail.com',
             replyTo: 'no-reply@baotechnologiesandtravels.com',
             body: """
