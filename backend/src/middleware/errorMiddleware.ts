@@ -3,9 +3,9 @@ import logger from '@/config/logger';
 
 export interface AppError extends Error {
   statusCode: number;
+  status?: string;
   isOperational: boolean;
 }
-
 export class CustomError extends Error implements AppError {
   statusCode: number;
   isOperational: boolean;

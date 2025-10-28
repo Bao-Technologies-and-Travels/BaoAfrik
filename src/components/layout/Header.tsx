@@ -22,6 +22,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
   const handleLogout = async () => {
     await logout();
     setIsMobileMenuOpen(false);
+    navigate('/login');
   };
 
   const toggleMobileMenu = () => {

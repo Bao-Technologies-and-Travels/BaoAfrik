@@ -1,68 +1,51 @@
-import AWS from 'aws-sdk';
-
-AWS.config.update({
-    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-    region: process.env.REACT_APP_AWS_REGION,
-});
-
-const s3 = new AWS.S3();
-
-export interface S3UploadResponse {
-    success: boolean;
-    imageUrl?: string;
-    error?: string;
-}
-
 export const s3Service = {
-    // Image uploading to AWS S3
-    uploadImage: async (file: File, userId: string): Promise<S3UploadResponse> => {
-        try {
-            // Generate a unique filename
-            const fileExtension = file.name.split('.').pop();
-            const timestamp = Date.now();
-            const uniqueFileName = `profile-images/${userId}/profile-${timestamp}.${fileExtension}`;
+    async getPresignedUrlForProfile(file: File, userId: string) {
+        const token = localStorage.getItem('accessToken');
+        if (!token) throw new Error('User not authenticated');
 
-            const params = {
-                Bucket: process.env.REACT_APP_S3_BUCKET_NAME!,
-                Key: uniqueFileName,
-                Body: file,
-                ContentType: file.type,
-            };
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/upload/upload-url`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                fileName: file.name,
+                fileType: file.type,
+                uploadType: 'profile',
+                userId,
+            }),
+        });
 
-            const result = await s3.upload(params).promise();
-
-            return {
-                success: true,
-                imageUrl: result.Location
-            };
-        } catch (error) {
-            return {
-                success: false,
-                error: 'Failed to upload image'
-            };
-        }
+        if (!res.ok) throw new Error('Failed to get presigned URL');
+        return res.json();
     },
 
-    // delete image from S3
-    deleteImage: async (imageUrl: string): Promise<{ success: boolean; error?: string }> => {
-        try {
-            const url = new URL(imageUrl);
-            const key = decodeURIComponent(url.pathname.substring(1));
+    uploadFile: async (file: File, uploadUrl: string) => {
+        const res = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': file.type },
+            body: file,
+        });
 
-            const params =  {
-                Bucket: process.env.REACT_APP_S3_BUCKET_NAME!,
-                Key: key
-            };
+        if (!res.ok) throw new Error('Upload failed');
+        return true;
+    },
 
-            await s3.deleteObject(params).promise();
+    deleteFile: async (fileUrl: string) => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) throw new Error('User not authenticated');
+        
+        const key = decodeURIComponent(new URL(fileUrl).pathname.substring(1));
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/upload/delete-image`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+             },
+            body: JSON.stringify({ key }),
+        });
 
-            return {success: true};
-        } catch (error) {
-            return {
-                success: false,
-                error: 'Failed to delete image'
-            };
-        }
-    }
+        if (!res.ok) throw new Error('Failed to delete file');
+        return true;
+    },
 };
