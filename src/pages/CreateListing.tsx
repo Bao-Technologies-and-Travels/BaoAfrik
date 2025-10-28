@@ -46,6 +46,7 @@ const CreateListing: React.FC = () => {
     const [isSaleTypeDropdownOpen, setIsSaleTypeDropdownOpen] = useState(false);
     const [isCurrencyDropdownOpen, setIsCurrencyDropdownOpen] = useState(false);
     const [primaryImageIndex, setPrimaryImageIndex] = useState(0);
+    const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   // Check if all required fields are filled
   const isFormComplete = title.trim() !== '' && 
@@ -196,13 +197,68 @@ const CreateListing: React.FC = () => {
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    // Only set to false if we're leaving the drop zone entirely
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    if (x <= rect.left || x >= rect.right || y <= rect.top || y >= rect.bottom) {
+      setIsDraggingOver(false);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
+    setIsDraggingOver(false);
+    
+    const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+    
     if (images.length + files.length <= 10) {
-      setImages([...images, ...files]);
+      files.forEach((file) => {
+        setIsImageLoading(true);
+        setUploadProgress(0);
+        
+        // Simulate realistic loading progress
+        const reader = new FileReader();
+        
+        // Simulate progress updates with realistic timing
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+          progress += Math.random() * 15 + 5; // Random increment between 5-20
+          if (progress > 100) progress = 100;
+          setUploadProgress(Math.floor(progress));
+          
+          if (progress >= 100) {
+            clearInterval(progressInterval);
+          }
+        }, 200); // Update every 200ms
+        
+        reader.onload = (event) => {
+          setTimeout(() => {
+            setImages(prev => [...prev, file]);
+            setImageUrls(prev => {
+              const newUrls = [...prev, event.target?.result as string];
+              // Set the newly uploaded image as primary
+              setPrimaryImageIndex(newUrls.length - 1);
+              return newUrls;
+            });
+            setIsImageLoading(false);
+            setUploadProgress(0);
+          }, 2000); // Total loading time ~2 seconds
+        };
+        
+        reader.readAsDataURL(file);
+      });
     } else {
       alert('You can only upload up to 10 images');
     }
@@ -309,6 +365,13 @@ const CreateListing: React.FC = () => {
         input[type="number"] {
           -moz-appearance: textfield;
         }
+        /* Drag and drop cursor */
+        .image-upload-area {
+          cursor: pointer;
+        }
+        .image-upload-area.dragging-over {
+          cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g><path fill="white" stroke="black" stroke-width="2" d="M8 6 v12 l2 2 v6 a2 2 0 004 0 v-8 h2 v4 a2 2 0 004 0 v-4 h2 v2 a2 2 0 004 0 v-2 h1 v-1 a2 2 0 00-4 0 v-9 l-2-2 h-8 l-5-1 z"/></g></svg>') 12 12, grab !important;
+        }
         /* Custom select dropdown arrow */
         .create-listing-select,
         select.custom-select-arrow {
@@ -406,8 +469,8 @@ const CreateListing: React.FC = () => {
                     </div>
                   </div>
                 )}
-              </div>
-
+        </div>
+        
               {/* Start Selling Button */}
               <Link
                 to="/create-listing"
@@ -423,7 +486,7 @@ const CreateListing: React.FC = () => {
               {/* Notification Icon */}
               <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <img src={notificationIcon} alt="Notifications" className="w-6 h-6" />
-              </button>
+          </button>
 
               {/* Profile Picture */}
               <button className="p-0.5 hover:opacity-80 transition-opacity">
@@ -441,7 +504,7 @@ const CreateListing: React.FC = () => {
                   </svg>
                   <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                     +9
-                  </div>
+        </div>
                 </button>
                 
                 {/* Dropdown Menu */}
@@ -678,7 +741,7 @@ const CreateListing: React.FC = () => {
           </div>
 
           {/* Main Form Container */}
-          <div className="bg-white rounded-2xl border border-gray-300 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-300 shadow-sm pt-6 px-6 pb-16">
             {/* Form Header */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               {/* Title Section */}
@@ -743,14 +806,16 @@ const CreateListing: React.FC = () => {
                 <div>
                       <div
                         onDragOver={handleDragOver}
+                        onDragEnter={handleDragEnter}
+                        onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
-                        className="rounded-2xl text-center relative"
+                        className={`rounded-2xl text-center relative image-upload-area ${isDraggingOver ? 'dragging-over' : ''}`}
                         style={{
-                          backgroundColor: isImageLoading ? 'transparent' : (imageUrls.length > 0 ? 'transparent' : '#F5F5F5'),
-                          background: isImageLoading 
+                          backgroundColor: isImageLoading ? 'transparent' : (isDraggingOver ? 'transparent' : (imageUrls.length > 0 ? 'transparent' : '#F5F5F5')),
+                          background: (isImageLoading || isDraggingOver)
                             ? 'repeating-linear-gradient(-45deg, #F5FBFF, #F5FBFF 18px, #F8FCFF 18px, #F8FCFF 36px)'
                             : (imageUrls.length > 0 ? 'transparent' : '#F5F5F5'),
-                          border: isImageLoading ? '2px dashed #83C4F8' : 'none',
+                          border: (isImageLoading || isDraggingOver) ? '2px dashed #83C4F8' : 'none',
                           borderRadius: '16px',
                           height: imageUrls.length > 0 ? '433px' : 'auto',
                           display: imageUrls.length > 0 ? 'flex' : 'block',
@@ -817,7 +882,8 @@ const CreateListing: React.FC = () => {
                          <img
                            src={imageIcon}
                            alt="Upload"
-                           className="w-10 h-10 mx-auto mb-4 opacity-60"
+                           className="mx-auto mb-4 opacity-60"
+                           style={{ width: '24px', height: '24px' }}
                          />
                          <p className="text-xs mb-2" style={{ color: '#2D2D2D' }}>
                            Drag and drop product images here
@@ -879,7 +945,11 @@ const CreateListing: React.FC = () => {
                           className="relative"
                           style={{ 
                             width: imageUrls.length >= 10 ? '540px' : '420px',
-                            height: '100px',
+                            height: '130px',
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            marginTop: '-15px',
+                            marginBottom: '-15px',
                             overflow: 'hidden'
                           }}
                         >
@@ -890,7 +960,11 @@ const CreateListing: React.FC = () => {
                               overflowY: 'visible',
                               scrollbarWidth: 'none',
                               msOverflowStyle: 'none',
-                              height: '100%'
+                              height: '100px',
+                              paddingLeft: '15px',
+                              paddingRight: '15px',
+                              marginLeft: '-15px',
+                              marginRight: '-15px'
                             }}
                           >
                             {imageUrls.map((url, index) => (
@@ -996,10 +1070,11 @@ const CreateListing: React.FC = () => {
                           
                           {/* Fade effect on left - only with 4+ images */}
                           <div 
-                            className="absolute left-0 top-0 pointer-events-none"
+                            className="absolute left-0 pointer-events-none"
                             style={{
                               width: '40px',
-                              height: '100px',
+                              height: '130px',
+                              top: '0',
                               background: 'linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))',
                               zIndex: 15
                             }}
@@ -1007,10 +1082,11 @@ const CreateListing: React.FC = () => {
                           
                           {/* Fade effect on right - only with 4+ images */}
                           <div 
-                            className="absolute right-0 top-0 pointer-events-none"
+                            className="absolute right-0 pointer-events-none"
                             style={{
                               width: '40px',
-                              height: '100px',
+                              height: '130px',
+                              top: '0',
                               background: 'linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))',
                               zIndex: 15
                             }}
@@ -1719,8 +1795,8 @@ const CreateListing: React.FC = () => {
                     className="flex items-center space-x-2 rounded-xl border-2 font-medium transition-colors text-sm"
                     style={{ borderColor: '#F9A825', color: '#F9A825', paddingLeft: '4rem', paddingRight: '4.5rem', paddingTop: '0.625rem', paddingBottom: '0.625rem' }}
                   >
-                    <img src={draft2Icon} alt="Save" className="w-5 h-5" />
                     <span>Save as draft</span>
+                    <img src={draft2Icon} alt="Save" className="w-5 h-5" />
                   </button>
                   <button
                     onClick={handlePostListing}
@@ -1731,6 +1807,7 @@ const CreateListing: React.FC = () => {
                       cursor: isFormComplete ? 'pointer' : 'not-allowed'
                     }}
                   >
+                    <span>Post listing</span>
                     <img 
                       src={flyIcon} 
                       alt="Post" 
@@ -1741,7 +1818,6 @@ const CreateListing: React.FC = () => {
                           : 'none'
                       }}
                     />
-                    <span>Post listing</span>
           </button>
                 </div>
               </div>
