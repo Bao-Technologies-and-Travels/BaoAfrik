@@ -43,7 +43,13 @@ pipeline {
                             fi
 
                             # Configure firewall
-                            sudo ufw allow 22 80 443 3000 3001 8080
+                            sudo ufw allow 22/tcp
+                            sudo ufw allow 80/tcp
+                            sudo ufw allow 443/tcp
+                            sudo ufw allow 3000/tcp
+                            sudo ufw allow 3001/tcp
+                            sudo ufw allow 8080/tcp
+                            
                             sudo ufw --force enable
 
                             pm2 startup systemd
