@@ -20,39 +20,39 @@ pipeline {
                 echo 'Setting up server dependencies...'
                 withCredentials([string(credentialsId: 'ssh_host', variable: 'SSH_HOST')]) {
                     sshagent([env.SSH_KEY_ID]) {
-                        sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                    set -e
-                        # Update and upgrade server packages
-                        sudo apt update && sudo apt upgrade -y
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no $SSH_HOST '
+                        set -eo pipefail
+                            # Update and upgrade server packages
+                            sudo apt update && sudo apt upgrade -y
 
-                        # Install Node.js and npm if not already installed
-                        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-                        sudo apt-get install -y nodejs
+                            # Install Node.js and npm if not already installed
+                            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+                            sudo apt-get install -y nodejs
 
-                        # Install PM2 globally
-                        sudo npm install -g pm2@latest
+                            # Install PM2 globally
+                            sudo npm install -g pm2@latest
 
-                        # Install Nginx if not already installed
-                        if ! command -v nginx &> /dev/null; then
-                            sudo apt install -y nginx
-                        fi
+                            # Install Nginx if not already installed
+                            if ! command -v nginx &> /dev/null; then
+                                sudo apt install -y nginx
+                            fi
 
-                        # Install certbot for SSL if not present
-                        if ! command -v certbot &> /dev/null; then
-                            sudo apt install -y certbot python3-certbot-nginx
-                        fi
+                            # Install certbot for SSL if not present
+                            if ! command -v certbot &> /dev/null; then
+                                sudo apt install -y certbot python3-certbot-nginx
+                            fi
 
-                        # Configure firewall
-                        sudo ufw allow 22 80 443 3000 3001 8080
-                        sudo ufw --force enable
+                            # Configure firewall
+                            sudo ufw allow 22 80 443 3000 3001 8080
+                            sudo ufw --force enable
 
-                        pm2 startup systemd
-                        pm2 set pm2-logrotate:max_size 10M
+                            pm2 startup systemd
+                            pm2 set pm2-logrotate:max_size 10M
 
-                        echo "System dependencies installed successfully."
-                    '
-                    """
+                            echo "System dependencies installed successfully."
+                        '
+                        '''
                     }
                 }
             }
@@ -62,20 +62,20 @@ pipeline {
             steps {
                 echo 'Cloning repository...'
                 sshagent([env.SSH_KEY_ID]) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                        set -e
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no $SSH_HOST '
+                        set -eo pipefail
                         if [ ! -d ~/BaoAfrik ]; then
-                            git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
+                            git clone -b $BRANCH $REPO_URL ~/BaoAfrik
                         fi
 
-                        cd ${APP_DIR}
-                        git fetch origin ${BRANCH}
-                        git checkout ${BRANCH}
-                        git reset --hard origin/${BRANCH}
+                        cd $APP_DIR
+                        git fetch origin $BRANCH
+                        git checkout $BRANCH
+                        git reset --hard origin/$BRANCH
                         echo "Repository cloned/updated successfully."
                     '
-                    """
+                    '''
                 }
             }
         }
@@ -87,17 +87,17 @@ pipeline {
                     string(credentialsId: 'aws_bucket', variable: 'REACT_APP_S3_BUCKET_NAME'),
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                            set -e
-                            cd ${APP_DIR}
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no $SSH_HOST '
+                            set -eo pipefail
+                            cd $APP_DIR
 
                             # Remove existing .env if any
                             rm -f .env
 
                             # Create .env file with actual secrets
-                            cat > .env << EOF
-REACT_APP_API_URL=https://${DOMAIN}/api
+                            cat > .env << 'EOF'
+REACT_APP_API_URL=https://$DOMAIN/api
 EOF
 
                             chmod 600 .env
@@ -105,7 +105,7 @@ EOF
                             head -n 10 .env
                             echo "=== Environment file created securely ==="
                         '
-                        """
+                        '''
                     }
                 }
             }
@@ -123,34 +123,34 @@ EOF
                     string(credentialsId: 's3_bucket_attachments', variable: 'S3_BUCKET_ATTACHMENTS')
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                            set -e
-                            cd ${BACKEND_DIR}
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no $SSH_HOST '
+                            set -eo pipefail
+                            cd $BACKEND_DIR
 
                             # Remove existing .env if any
                             rm -f .env
 
                             # Create .env file with actual secrets
-                            cat > .env << EOF
+                            cat > .env << 'EOF'
 NODE_ENV=staging
 PORT=3001
-DATABASE_URL="${DATABASE_URL}"
-JWT_SECRET="${JWT_SECRET}"
-JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}"
+DATABASE_URL="$DATABASE_URL"
+JWT_SECRET="$JWT_SECRET"
+JWT_REFRESH_SECRET="$JWT_REFRESH_SECRET"
 JWT_EXPIRE_TIME=30m
 JWT_REFRESH_EXPIRE_TIME=7d
 EMAIL_SERVICE=resend
-RESEND_API_KEY="${RESEND_API_KEY}"
+RESEND_API_KEY="$RESEND_API_KEY"
 EMAIL_FROM_ADDRESS=noreply@baoafrik.com
 EMAIL_FROM_NAME="BaoAfrik Team"
 
-AWS_REGION="${AWS_REGION}"
-S3_BUCKET_PROFILE="${S3_BUCKET_PROFILE}"
-S3_BUCKET_ATTACHMENTS="${S3_BUCKET_ATTACHMENTS}"
+AWS_REGION="$AWS_REGION"
+S3_BUCKET_PROFILE="$S3_BUCKET_PROFILE"
+S3_BUCKET_ATTACHMENTS="$S3_BUCKET_ATTACHMENTS"
 
-FRONTEND_URL="https://${DOMAIN}"
-CORS_ORIGINS="https://${DOMAIN}"
+FRONTEND_URL="https://$DOMAIN"
+CORS_ORIGINS="https://$DOMAIN"
 BCRYPT_ROUNDS=12
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
@@ -162,7 +162,7 @@ EOF
                             head -n 10 .env
                             echo "=== Environment file created securely ==="
                         '
-                        """
+                        '''
                     }
                 }
             }
@@ -170,14 +170,14 @@ EOF
 
         stage('Deploy Application') {
             steps {
-                echo "Deploying frontend and backend on server ${SSH_HOST}..."
+                echo "Deploying frontend and backend on server $SSH_HOST..."
 
                 sshagent([env.SSH_KEY_ID]) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no $SSH_HOST '
                         echo "Starting backend deployment..."
 
-                        cd ${BACKEND_DIR}
+                        cd $BACKEND_DIR
 
                         if [ ! -f .env ]; then
                             echo "ERROR: .env file not found!"
@@ -191,14 +191,15 @@ EOF
 
                         npx prisma db push
 
-                        pm2 delete ${APP_NAME_BACKEND} || true
-                        pm2 start dist/server.js --name ${APP_NAME_BACKEND} -- --port 3001
+                        pm2 delete $APP_NAME_BACKEND || true
+                        sleep 5
+                        pm2 start dist/server.js --name $APP_NAME_BACKEND -- --port 3001
                         pm2 save
 
                         echo "Backend deployed successfully."
                         echo "Starting frontend deployment..."
 
-                        cd ${APP_DIR}
+                        cd $APP_DIR
                         rm -rf node_modules package-lock.json build
 
                         npm install
@@ -210,15 +211,16 @@ EOF
 
                         npm run build
 
-                        pm2 delete ${APP_NAME_FRONTEND} || true
-                        pm2 start serve --name ${APP_NAME_FRONTEND} -- -s build -l 3000
+                        pm2 delete $APP_NAME_FRONTEND || true
+                        sleep 5
+                        pm2 start serve --name $APP_NAME_FRONTEND -- -s build -l 3000
 
                         pm2 save
                         pm2 list
 
                         echo "Frontend deployment completed successfully."
                     '
-                    """
+                    '''
                 }
             }
         }
@@ -228,8 +230,8 @@ EOF
                 echo 'Verifying deployment...'
 
                 sshagent([env.SSH_KEY_ID]) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no $SSH_HOST '
                         # Wait for services to start
                         sleep 10
 
@@ -245,7 +247,7 @@ EOF
 
                         echo "=== Deployment Complete ==="
                     '
-                    """
+                    '''
                 }
             }
         }
