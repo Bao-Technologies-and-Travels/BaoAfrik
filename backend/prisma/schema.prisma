@@ -1,5 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -46,6 +44,8 @@ model User {
   sentMessages      Message[] @relation("MessageSender")
   receivedMessages  Message[] @relation("MessageReceiver")
   refreshTokens     RefreshToken[]
+  conversationParticipants ConversationParticipant[]
+  sentMessageStatuses MessageStatus[]
 
   @@map("users")
 }
@@ -57,7 +57,6 @@ model RefreshToken {
   expiresAt DateTime @map("expires_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
@@ -92,6 +91,7 @@ model Product {
   likes         ProductLike[]
   saves         ProductSave[]
   messages      Message[]
+  conversations Conversation[]
 
   @@map("products")
 }
@@ -102,7 +102,6 @@ model ProductLike {
   productId String   @map("product_id")
   createdAt DateTime @default(now()) @map("created_at")
 
-  // Relations
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -116,7 +115,6 @@ model ProductSave {
   productId String   @map("product_id")
   createdAt DateTime @default(now()) @map("created_at")
 
-  // Relations
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -129,6 +127,14 @@ model Message {
   senderId   String      @map("sender_id")
   receiverId String      @map("receiver_id")
   productId  String?     @map("product_id")
+  conversationId String? @map("conversation_id")
+  imageUrl   String?     @map("image_url")
+  audioUrl   String?     @map("audio_url")
+  fileUrl    String?     @map("file_url")
+  fileName   String?     @map("file_name")
+  fileSize   Int?        @map("file_size")
+  replyToId  String?     @map("reply_to_id")
+  productSnapshot Json?  @map("product_snapshot")
   subject    String?
   content    String
   isRead     Boolean     @default(false) @map("is_read")
@@ -140,8 +146,28 @@ model Message {
   sender   User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
   receiver User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
   product  Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  conversation Conversation? @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
+  replyTo  Message? @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies  Message[] @relation("MessageReplies")
+  statuses MessageStatus[]
+  conversationAsLastMessage Conversation[] @relation("ConversationLastMessage")
 
   @@map("messages")
+}
+
+model MessageStatus {
+  id        String   @id @default(uuid())
+  messageId String   @map("message_id")
+  userId    String   @map("user_id")
+  status    String   @default("sent") // sent, delivered, read
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@map("message_status")
 }
 
 model Category {
@@ -170,10 +196,53 @@ model Country {
   @@map("countries")
 }
 
+model Conversation {
+  id          String  @id @default(uuid())
+  productId   String?  @map("product_id")
+  lastMessageId String? @map("last_message_id")
+  lastMessageAt DateTime? @map("last_message_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  lastMessage Message? @relation("ConversationLastMessage", fields: [lastMessageId], references: [id], onDelete: SetNull)
+  participants ConversationParticipant[]
+  messages Message[] @relation("ConversationMessages")
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id  String  @id @default(uuid())
+  conversationId  String  @map("conversation_id")
+  userId  String @map("user_id")
+  joinedAt  DateTime @default(now()) @map("joined_at")
+  lastReadAt  DateTime @default(now())  @map("last_read_at")
+  createdAt DateTime @default(now())
+
+  // Relations
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+}
+
 enum MessageType {
   INQUIRY
   NEGOTIATION
   ORDER
   COMPLAINT
   GENERAL
+  TEXT
+  IMAGE
+  AUDIO
+  FILE
+}
+
+enum MessageStatusType {
+  SENT
+  DELIVERED
+  READ
 }

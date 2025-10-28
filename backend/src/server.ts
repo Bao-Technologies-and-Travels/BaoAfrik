@@ -8,20 +8,39 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import 'dotenv/config';
 
+import { createServer } from 'http';
+import { WebSocketService } from './socket/webSocketService';
+import { Server } from 'socket.io';
+
 import { errorHandler, notFound } from '@/middleware/errorMiddleware';
 import { requestLogger } from '@/middleware/loggingMiddleware';
 import logger from '@/config/logger';
 import { connectDatabase } from '@/config/database';
 import { connectRedis } from '@/config/redis';
 
-// Import routes
 import authRoutes from '@/routes/authRoutes';
 import testRoutes from '@/routes/testRoutes';
-
-// Environment variables already loaded via import 'dotenv/config'
+import chatRoutes from '@/routes/chatRoutes';
+import s3Routes from '@/routes/s3Routes';
 
 const app = express();
+const server = createServer(app);
 const PORT = process.env.PORT || 3001;
+
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CORS_ORIGINS?.split(',') || [
+      'http://localhost:3000',
+      'http://localhost:3001'],
+    methods: ['GET', 'POST'],
+    credentials: true
+  },
+  transports: ['websocket', 'polling'],
+});
+
+new WebSocketService(io);
+console.log('Web socket service initialized');
+
 
 // Swagger configuration
 const swaggerOptions = {
@@ -38,8 +57,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: process.env.NODE_ENV === 'production' 
-          ? 'https://api.baoafrik.com' 
+        url: process.env.NODE_ENV === 'production'
+          ? 'https://api.baoafrik.com'
           : `http://localhost:${PORT}`,
         description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server',
       },
@@ -68,6 +87,7 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       scriptSrc: ["'self'"],
+      connectSrc: ["'self'", "ws:", "wss:", "http://localhost:3001"]
     },
   },
   crossOriginEmbedderPolicy: false,
@@ -75,7 +95,10 @@ app.use(helmet({
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+  origin: process.env.CORS_ORIGINS?.split(',') || [
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ],
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -85,18 +108,18 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Rate limiting
-// const limiter = rateLimit({
-//   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
-//   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // limit each IP to 100 requests per windowMs
-//   message: {
-//     success: false,
-//     message: 'Too many requests from this IP, please try again later.',
-//   },
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// });
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // limit each IP to 100 requests per windowMs
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-// app.use('/api/', limiter);
+app.use('/api/', limiter);
 app.set('trust proxy', 1);
 
 // Body parsing middleware
@@ -132,6 +155,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/test', testRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/upload', s3Routes);
 
 // 404 handler
 app.use(notFound);
@@ -142,7 +167,7 @@ app.use(errorHandler);
 // Graceful shutdown handler
 const gracefulShutdown = (signal: string) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
-  
+
   process.exit(0);
 };
 
@@ -169,10 +194,11 @@ const startServer = async () => {
     }
 
     // Start HTTP server
-    const server = app.listen(PORT, () => {
-      logger.info(`🚀 BaoAfrik API server running on port ${PORT}`);
-      logger.info(`📚 API Documentation available at http://localhost:${PORT}/api-docs`);
-      logger.info(`🏥 Health check available at http://localhost:${PORT}/health`);
+    server.listen(PORT, () => {
+      logger.info(`BaoAfrik API server running on port ${PORT}`);
+      logger.info(`API Documentation available at http://localhost:${PORT}/api-docs`);
+      logger.info(`Health check available at http://localhost:${PORT}/health`);
+      logger.info(`WebSocket server running on port ${PORT}`);
     });
 
     // Handle server errors
@@ -196,4 +222,4 @@ if (process.env.NODE_ENV !== 'test') {
   startServer();
 }
 
-export default app;
+export { app, server, io, WebSocketService };

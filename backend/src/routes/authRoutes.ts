@@ -1,5 +1,5 @@
 import { Router } from 'express';
-// import rateLimit from 'express-rate-limit';
+import rateLimit from 'express-rate-limit';
 import authController, { verifyResetCode } from '@/controllers/authController';
 import { authenticateToken } from '@/middleware/authMiddleware';
 import { 
@@ -17,29 +17,29 @@ import {
 const router = Router();
 
 // Rate limiting for authentication endpoints
-// const authLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 5, // Limit each IP to 5 requests per windowMs
-//   message: {
-//     success: false,
-//     message: 'Too many authentication attempts, please try again later.',
-//     errors: { general: 'Rate limit exceeded' }
-//   },
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// });
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs
+  message: {
+    success: false,
+    message: 'Too many authentication attempts, please try again later.',
+    errors: { general: 'Rate limit exceeded' }
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-// const generalLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 100, // Limit each IP to 100 requests per windowMs
-//   message: {
-//     success: false,
-//     message: 'Too many requests, please try again later.',
-//     errors: { general: 'Rate limit exceeded' }
-//   },
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// });
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: {
+    success: false,
+    message: 'Too many requests, please try again later.',
+    errors: { general: 'Rate limit exceeded' }
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Public routes (no authentication required)
 router.post('/register', validateRegister, authController.register);
