@@ -164,13 +164,11 @@ const ProfileSetup: React.FC = () => {
 
     setIsUpLoadingImage(true);
     try {
-      // Step 1: Ask backend for pre-signed URL
       const { uploadUrl, fileUrl } = await s3Service.getPresignedUrlForProfile(
         selectedFile,
         user.id
       );
 
-      // Step 2: Upload directly to S3
       await s3Service.uploadFile(selectedFile, uploadUrl);
 
       return fileUrl;

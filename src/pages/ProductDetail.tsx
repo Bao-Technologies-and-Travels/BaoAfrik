@@ -211,11 +211,15 @@ const ProductDetail: React.FC = () => {
         } else {
           // Fallback: copy to clipboard
           await navigator.clipboard.writeText(window.location.href);
-          // You could show a toast notification here
-          console.log("Product link copied to clipboard!");
+          addToast({
+            type: "error",
+            title: "Link Copied",
+            message: "Product link copied to clipboard",
+            duration: 3000
+          });
         }
       } catch (error) {
-        console.log("Error sharing:", error);
+        console.error("Error sharing:", error);
       }
     }
     setSharedProducts(newSet);
@@ -249,11 +253,6 @@ const ProductDetail: React.FC = () => {
   const handleSave = () => {
     setIsSaved(!isSaved);
     // In a real app, this would save to user's saved items
-    console.log(
-      isSaved
-        ? "Product removed from saved items"
-        : "Product saved to saved items"
-    );
   };
 
   const handleShare = async () => {
@@ -273,10 +272,15 @@ const ProductDetail: React.FC = () => {
         } else {
           // Fallback: copy to clipboard
           await navigator.clipboard.writeText(window.location.href);
-          console.log("Product link copied to clipboard!");
+          addToast({
+            type: "error",
+            title: "Link Copied",
+            message: "Product link copied to clipboard",
+            duration: 3000
+          });
         }
       } catch (error) {
-        console.log("Error sharing:", error);
+        console.error("Error sharing:", error);
       }
     }
   };
@@ -303,7 +307,6 @@ const ProductDetail: React.FC = () => {
       return;
     }
 
-    console.log("Starting contact seller process...");
     try {
       setIsContactingSeller(true);
       // create conversation by email
@@ -345,10 +348,8 @@ const ProductDetail: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log('Contact seller API Response:', result);
 
       if (result.success) {
-        console.log('Conversation created, navigating to messages...');
         // Navigate to messages with the conversation data
         navigate('/messages', {
           state: {

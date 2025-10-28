@@ -140,15 +140,6 @@ const Messages: React.FC = () => {
   const [isSending, setIsSending] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-
-  console.log('🔍 Messages Component State:', {
-    currentConversation,
-    activeConversationId,
-    conversations: conversations.length,
-    locationState: location.state,
-    socketConnected: isSocketConnected
-  });
-
   // Get current user on component mount
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -157,7 +148,6 @@ const Messages: React.FC = () => {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         setCurrentUser({ id: payload.userId });
-        console.log('👤 Current user ID:', payload.userId);
       } catch (error) {
         console.error('Failed to decode user from token:', error);
       }
@@ -168,34 +158,28 @@ const Messages: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
-      console.log("No token available for Socket.io connection");
       return;
     }
 
     if (socketInitialized && socket) {
-      console.log("✅ Socket already initialized, skipping...");
       return;
     }
 
     // don't create a new socket if one is already connected
     if (socket?.connected) {
-      console.log("Socket already connected, skipping reconnection");
       return;
     }
 
     // if socket exists and is not connected, try to reconnect
     if (socket && !socket.connected) {
-      console.log('Socket exists but disconnected, attempting to reconnect');
       socket.connect();
       return;
     }
 
     if (socketInitialized) {
-      console.log('Socket initialization in progress, skipping');
       return;
     }
 
-    console.log("Initializing Socket.io connection");
     setSocketInitialized(true);
 
     const newSocket = io(process.env.REACT_APP_WS_URL!, {
@@ -215,19 +199,16 @@ const Messages: React.FC = () => {
 
     // Connection events
     newSocket.on("connect", () => {
-      console.log("✅ Connected to chat server, socket ID:", newSocket.id);
       setIsSocketConnected(true);
       newSocket.emit("join_conversations");
 
       // rejoin any active conversation
       if (activeConversationId) {
-        console.log(`re-joining conversation room: ${currentConversation.id}`);
         newSocket.emit("join_conversation", currentConversation.id);
       }
     });
 
     newSocket.on("disconnect", (reason) => {
-      console.log("Socket disconnected:", reason);
       setIsSocketConnected(false);
     });
 
@@ -244,7 +225,6 @@ const Messages: React.FC = () => {
     });
 
     newSocket.on("reconnect", (attemptNumber) => {
-      console.log(`Reconnected after ${attemptNumber} attempts`);
       setIsSocketConnected(true);
       newSocket.emit("join_conversations");
 
@@ -254,7 +234,6 @@ const Messages: React.FC = () => {
     });
 
     newSocket.on("reconnect_attempt", (attemptNumber) => {
-      console.log(`Reconnection attempt ${attemptNumber}`);
     });
 
     newSocket.on("reconnect_error", (error) => {
@@ -268,8 +247,6 @@ const Messages: React.FC = () => {
 
     // message events
     newSocket.on("new_message", (serverMessage) => {
-      console.log("📨 New message received:", serverMessage);
-
       setMessages(prev => {
 
         const isOurMessage = serverMessage.senderId === currentUser?.id;
@@ -281,7 +258,6 @@ const Messages: React.FC = () => {
         );
 
         if (existingMessageIndex >= 0) {
-          console.log('🔄 Message already exists, updating...');
           // Update existing message
           const updatedMessages = [...prev];
           updatedMessages[existingMessageIndex] = {
@@ -320,7 +296,6 @@ const Messages: React.FC = () => {
     });
 
     newSocket.on("message_sent", (data) => {
-      console.log('✅ Message confirmed by server:', data);
       setIsSending(false);
 
       setMessages(prev => prev.map(msg => {
@@ -347,15 +322,14 @@ const Messages: React.FC = () => {
     });
 
     newSocket.on("conversation_joined", (data) => {
-      console.log(`✅ Joined conversation room: ${data.conversationId}`);
     });
 
     newSocket.on("conversation_join_error", (errorData) => {
-      console.error('❌ Failed to join conversation:', errorData);
+      console.error('Failed to join conversation:', errorData);
     });
 
     newSocket.on("message_error", (errorData) => {
-      console.error('❌ Message failed:', errorData);
+      console.error('Message failed:', errorData);
       setIsSending(false); // Reset sending state on error
       addToast({
         type: "error",
@@ -366,7 +340,6 @@ const Messages: React.FC = () => {
     });
 
     newSocket.on("messages_read", (data) => {
-      console.log("Messages read:", data);
       // Update read status for messages
       setMessages((prev) =>
         prev.map((msg) =>
@@ -378,7 +351,6 @@ const Messages: React.FC = () => {
     });
 
     newSocket.on("new_message_notification", (data) => {
-      console.log("New message notification:", data);
       // Show notification for new message
       if (data.conversationId !== activeConversationId) {
         // Show browser notification or update badge count
@@ -387,14 +359,12 @@ const Messages: React.FC = () => {
     });
 
     newSocket.on("user_typing", (data) => {
-      console.log("User typing:", data);
       if (data.conversationId === activeConversationId) {
         setShowTypingIndicator(true);
       }
     });
 
     newSocket.on("user_stop_typing", (data) => {
-      console.log("User stopped typing:", data);
       if (data.conversationId === activeConversationId) {
         setShowTypingIndicator(false);
       }
@@ -406,9 +376,7 @@ const Messages: React.FC = () => {
     });
 
     return () => {
-      console.log("🔄 Socket cleanup - component unmounting");
       if (newSocket) {
-        console.log('Disconnecting socket...');
         newSocket.off("connect");
         newSocket.off("disconnect");
         newSocket.off("connect_error");
@@ -424,16 +392,6 @@ const Messages: React.FC = () => {
       setSocketInitialized(false);
     };
   }, []);
-
-  useEffect(() => {
-    console.log('📨 Current Messages:', messages.map(msg => ({
-      id: msg.id,
-      content: msg.content,
-      text: msg.text,
-      type: msg.type,
-      isIncoming: msg.isIncoming
-    })));
-  }, [messages]);
 
   const fetchConversations = async () => {
     try {
@@ -474,10 +432,8 @@ const Messages: React.FC = () => {
       const locationConversationId = location.state?.conversation?.id;
 
       if (locationConversationId) {
-        console.log('🔄 Loading conversation from navigation:', locationConversationId);
         await fetchConversationMessages(locationConversationId);
       } else {
-        console.log('✅ No conversation to load by default');
         // Clear any active conversation state
         setActiveConversationId(null);
         setCurrentConversation(null);
@@ -490,7 +446,6 @@ const Messages: React.FC = () => {
 
   const fetchConversationMessages = async (conversationId: string) => {
     if (!conversationId) {
-      console.log('❌ No conversation ID provided, clearing state');
       setActiveConversationId(null);
       setCurrentConversation(null);
       setMessages([]);
@@ -498,18 +453,15 @@ const Messages: React.FC = () => {
     }
 
     if (isLoadingMessages) {
-      console.log('Already loading messages, skipping...');
       return;
     }
 
     if (activeConversationId === conversationId && messages.length > 0) {
-      console.log('✅ Already viewing this conversation with messages');
       return;
     }
 
     try {
       setIsLoadingMessages(true);
-      console.log(`Fetching messages for conversation: ${conversationId}`);
 
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/messages`,
@@ -526,14 +478,13 @@ const Messages: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log(`Messages loaded: `, data.data);
 
       const getMessageStatus = (message: any, currentUserId: string) => {
         // For sent messages
         if (message.senderId === currentUserId) {
           // Check if we have status from the server
           if (message.statuses && message.statuses.length > 0) {
-            return message.statuses[0].status; // 'sent', 'delivered', 'read'
+            return message.statuses[0].status; 
           }
 
           // For temporary messages
@@ -583,7 +534,6 @@ const Messages: React.FC = () => {
 
       // join socket room
       if (socket && socket.connected) {
-        console.log(`Joining conversation room: ${conversationId}`);
         socket.emit("join_conversation", conversationId);
       }
     } catch (error) {
@@ -600,7 +550,6 @@ const Messages: React.FC = () => {
   };
 
   const closeActiveConversation = () => {
-    console.log('🗑️ Closing active conversation');
     setActiveConversationId(null);
     setCurrentConversation(null);
     setMessages([]);
@@ -654,8 +603,6 @@ const Messages: React.FC = () => {
       text: messageData.content
     };
 
-    console.log('Adding temporary message:', tempMessage);
-
     // Add message immediately to UI
     setMessages(prev => [...prev, tempMessage]);
 
@@ -666,7 +613,6 @@ const Messages: React.FC = () => {
       timestamp: new Date().toISOString()
     };
 
-    console.log('Sending message via socket:', messageToSend);
     socket.emit('send_message', messageToSend);
   }, [socket, isSocketConnected, currentUser, addToast]);
 
@@ -828,7 +774,6 @@ const Messages: React.FC = () => {
   };
 
   const handleActionSelect = (action: string, conversationId: string) => {
-    console.log(`Action: ${action} for chat: ${conversationId}`);
     setActionsMenuOpen(null);
     // Here you would implement the actual action logic
   };
@@ -1050,7 +995,6 @@ const Messages: React.FC = () => {
 
   // Handle message option selection
   const handleMessageOptionSelect = (action: string, messageId?: number) => {
-    console.log("Selected action:", action);
 
     if (action === "reply" && messageId) {
       // Find the message to reply to
@@ -1166,10 +1110,8 @@ const Messages: React.FC = () => {
 
   // Handle incoming product data from Product Detail page
   useEffect(() => {
-    console.log('Checking location state:', location.state);
 
     if (location.state?.conversation && !currentConversation) {
-      console.log('🔄 Loading conversation from navigation state');
       const conversationId = location.state.conversation.id;
 
       // Only load if we're not already viewing it
@@ -1180,7 +1122,6 @@ const Messages: React.FC = () => {
       // Clear location state after a short delay
       setTimeout(() => {
         navigate(location.pathname, { replace: true, state: {} });
-        console.log('🗑️ Cleared location state');
       }, 100);
     }
   }, [location.state, currentConversation, activeConversationId]);
@@ -1228,10 +1169,8 @@ const Messages: React.FC = () => {
   }, [isSending]);
 
   const handleSendMessage = async () => {
-    console.log('handleSendMessage called');
 
     if (isSending) {
-      console.log('Already sending, skipping...');
       return
     }
 
@@ -1248,7 +1187,6 @@ const Messages: React.FC = () => {
 
     const textToSend = messageText.trim();
     if (!textToSend && selectedFiles.length === 0) {
-      console.log('No content to send')
       return; // Don't send empty messages
     }
 
@@ -1343,7 +1281,6 @@ const Messages: React.FC = () => {
 
       if (textContent && !messageSent) {
         // Send text message
-        console.log('Sending text message via socket');
         sendMessageViaSocket(currentConversation.id, {
           content: textContent,
           messageType: "TEXT",
@@ -1351,7 +1288,6 @@ const Messages: React.FC = () => {
         });
         messageSent = true;
       }
-      console.log('Message sent successfuly');
 
       // Refresh conversations to update last message
       await fetchConversations();
@@ -1375,7 +1311,6 @@ const Messages: React.FC = () => {
 
     const checkConnection = () => {
       if (!socket.connected && !socketInitialized) {
-        console.log("Socket not connected, attempting to reconnect...");
         setSocketInitialized(false);
       }
     };
@@ -1391,13 +1326,11 @@ const Messages: React.FC = () => {
   // manually open conversation from location state if not already opened
   const openConversationFromState = useCallback(async () => {
     if (location.state?.conversation && !currentConversation) {
-      console.log('🔄 Manually opening conversation from state...');
       const conversationId = location.state.conversation.id;
       await fetchConversationMessages(conversationId);
     }
   }, [location.state, currentConversation, fetchConversationMessages]);
 
-  // Call this on mount as backup
   useEffect(() => {
     openConversationFromState();
   }, [openConversationFromState]);
@@ -1418,12 +1351,10 @@ const Messages: React.FC = () => {
     if (savedConversation && savedConversationId && !currentConversation && !location.state?.conversation) {
       try {
         const conversation = JSON.parse(savedConversation);
-        console.log('🔄 Loaded conversation from localStorage:', conversation.id);
 
         setCurrentConversation(conversation);
         setActiveConversationId(savedConversationId);
 
-        console.log('🔄 Loaded conversation from localStorage and messages not fetched');
       } catch (error) {
         console.error('Failed to parse saved conversation:', error);
       }

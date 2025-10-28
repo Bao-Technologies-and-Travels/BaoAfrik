@@ -39,8 +39,6 @@ const io = new Server(server, {
 });
 
 new WebSocketService(io);
-console.log('Web socket service initialized');
-
 
 // Swagger configuration
 const swaggerOptions = {

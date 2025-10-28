@@ -27,8 +27,6 @@ export class WebSocketService {
     this.chatService = new ChatService();
     this.setupMiddleware();
     this.setupEventHandlers();
-
-    console.log('WebSocketService initialized with existing Socket.io instance');
   }
 
   private setupMiddleware() {
@@ -99,8 +97,6 @@ export class WebSocketService {
       const userId = authenticatedSocket.user.id;
       this.userSockets.set(userId, socket.id);
 
-      console.log(`User ${userId} connected`);
-
       // Join user to their personal room
       socket.join(userId);
       socket.emit('connected', { userId });
@@ -139,7 +135,6 @@ export class WebSocketService {
 
       socket.on('disconnect', () => {
         this.userSockets.delete(userId);
-        console.log(`User ${userId} disconnected`);
       });
 
       socket.on('error', (error) => {
@@ -153,11 +148,9 @@ export class WebSocketService {
       const conversations = await this.chatService.getUserConversations(userId);
       conversations.forEach(conv => {
         socket.join(`conversation:${conv.id}`);
-        console.log(`User ${userId} joined conversation ${conv.id}`)
       });
 
       socket.join(userId);
-      console.log(`User ${userId} joined personal room`);
     } catch (error) {
       console.error('Error joining conversations:', error);
     }
@@ -171,7 +164,6 @@ export class WebSocketService {
 
       if (userHasAccess) {
         socket.join(`conversation:${conversationId}`);
-        console.log(`User ${socket.user!.id} joined conversation: ${conversationId}`);
 
         socket.emit('conversation_joined', { conversationId });
       } else {
@@ -220,14 +212,6 @@ export class WebSocketService {
 
   private async handleSendMessage(socket: AuthenticatedSocket, data: any) {
     try {
-      console.log('Received send_message event:', {
-        conversationId: data.conversationId,
-        contentLength: data.content?.length,
-        messageType: data.messageType,
-        tempId: data.tempId,
-        sender: socket.user!.id
-      });
-
       const { conversationId, content, messageType, fileUrl, fileName, fileSize, replyTo, tempId } = data;
       const senderId = socket.user!.id;
 
@@ -252,16 +236,8 @@ export class WebSocketService {
         audioUrl: data.audioUrl || undefined
       };
 
-      console.log('Saving message to database:', messageData);
-
       // Save message to database
       const message = await this.chatService.sendMessage(messageData);
-
-      console.log('Message saved successfully:', {
-        messageId: message.id,
-        conversationId: message.conversationId,
-        senderId: message.senderId
-      });
 
       // Get conversation participants
       const participants = await this.chatService.getConversationParticipants(conversationId);
@@ -377,7 +353,7 @@ export class WebSocketService {
   }
 
   private async sendPushNotification(userId: string, notification: any) {
-    // Implement your push notification service
+    // Implement notification service
     console.log('Sending push notification to user:', userId, notification);
   }
 

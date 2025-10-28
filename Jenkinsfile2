@@ -4,7 +4,6 @@ pipeline {
     environment {
         NODE_ENV = 'staging'
         SSH_KEY_ID = 'baoafrik-key'
-        SSH_HOST = credentials('ssh_host')
         APP_DIR = '~/BaoAfrik'
         BACKEND_DIR = '~/BaoAfrik/backend'
         APP_NAME_FRONTEND = 'baoafrik-frontend'
@@ -19,9 +18,9 @@ pipeline {
         stage('Setup server dependencies') {
             steps {
                 echo 'Setting up server dependencies...'
-
-                sshagent([env.SSH_KEY_ID]) {
-                    sh """
+                withCredentials([string(credentialsId: 'ssh_host', variable: 'SSH_HOST')]) {
+                    sshagent([env.SSH_KEY_ID]) {
+                        sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                     set -e
                         # Update and upgrade server packages
@@ -54,6 +53,7 @@ pipeline {
                         echo "System dependencies installed successfully."
                     '
                     """
+                    }
                 }
             }
         }
