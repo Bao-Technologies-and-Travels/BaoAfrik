@@ -1,4 +1,27 @@
 export const s3Service = {
+
+    async getViewUrl(fileUrl: string) {
+        const token = localStorage.getItem('accessToken');
+        if (!token) throw new Error('User not authenticated');
+
+        // Extract key from the fileUrl
+        const url = new URL(fileUrl);
+        const key = url.pathname.substring(1);
+
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/upload/view-url`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ key }),
+        });
+
+        if (!res.ok) throw new Error('Failed to get view URL');
+        const data = await res.json();
+        return data.viewUrl;
+    },
+    
     async getPresignedUrlForProfile(file: File, userId: string) {
         const token = localStorage.getItem('accessToken');
         if (!token) throw new Error('User not authenticated');

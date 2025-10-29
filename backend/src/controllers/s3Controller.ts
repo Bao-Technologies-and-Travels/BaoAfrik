@@ -1,5 +1,5 @@
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { PutObjectCommand, DeleteObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { PutObjectCommand, DeleteObjectCommand, S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Request, Response } from 'express';
 
 const s3 = new S3({
@@ -52,6 +52,28 @@ export const getPresignedUrl = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Failed to generate pre-signed URL' });
+  }
+};
+
+export const getViewPresignedUrl = async (req: Request, res: Response) => {
+  try {
+    const { key } = req.body;
+    
+    if (!key) {
+      return res.status(400).json({ message: 'Missing key' });
+    }
+
+    const params = new GetObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    });
+
+    const viewUrl = await getSignedUrl(s3, params, { expiresIn: 3600 }); // 1 hour
+
+    return res.json({ viewUrl });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Failed to generate view URL' });
   }
 };
 
