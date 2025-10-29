@@ -143,8 +143,7 @@ EOF
                     string(credentialsId: 'jwt_refresh_secret', variable: 'JWT_REFRESH_SECRET'),
                     string(credentialsId: 'resend_api_key', variable: 'RESEND_API_KEY'),
                     string(credentialsId: 'aws_region', variable: 'AWS_REGION'),
-                    string(credentialsId: 's3_bucket_profile', variable: 'S3_BUCKET_PROFILE'),
-                    string(credentialsId: 's3_bucket_attachments', variable: 'S3_BUCKET_ATTACHMENTS')
+                    string(credentialsId: 'aws_bucket', variable: 'REACT_APP_S3_BUCKET_NAME'),
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
                         sh """
