@@ -395,14 +395,11 @@ const Home: React.FC = () => {
       products = allProducts[activeCategory as keyof typeof allProducts] || [];
     }
     
-    // Apply country filter if selected
+    // Apply country filter if selected (filter by country badge, not seller location)
     if (selectedCountry) {
-      const countryName = africanCountries.find(country => country.code === selectedCountry)?.name;
-      if (countryName) {
-        products = products.filter(product => 
-          product.location.toLowerCase().includes(countryName.toLowerCase())
-        );
-      }
+      products = products.filter(product => 
+        getProductCountry(product.id).name === selectedCountry
+      );
     }
     
     return products;
@@ -1554,7 +1551,11 @@ const Home: React.FC = () => {
             <div className="space-y-8">
               {categories.filter(cat => cat !== 'All').map((category) => {
                 const categoryProducts = (allProducts[category as keyof typeof allProducts] || []);
-                if (categoryProducts.length === 0) return null;
+                // Filter products by selected country
+                const filteredProducts = selectedCountry 
+                  ? categoryProducts.filter(product => getProductCountry(product.id).name === selectedCountry)
+                  : categoryProducts;
+                if (filteredProducts.length === 0) return null;
                 
                 return (
                   <div key={category} className="mb-8">
@@ -1585,7 +1586,7 @@ const Home: React.FC = () => {
                     {/* Category Products - Horizontal Scroll */}
                     <div className="overflow-x-auto scrollbar-hide">
                       <div className="flex gap-5 sm:gap-6">
-                        {categoryProducts.slice(0, 12).map((product) => (
+                        {filteredProducts.slice(0, 12).map((product) => (
                           <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group flex-shrink-0" style={{ width: '200px' }}>
                             {/* Product Image - Top */}
                             <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
