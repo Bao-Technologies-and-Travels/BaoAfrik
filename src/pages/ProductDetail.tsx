@@ -291,7 +291,7 @@ const ProductDetail: React.FC = () => {
 
   const handleContactSeller = async () => {
     const sellerEmail = "pageo.fonsah@baotechnologiesandtravels.com";
-    const preFilledMessage = "Hello, I am interested by this item, is it still available please ?";
+    const preFilledMessage = "Hello, I am interested in this item, is it still available?";
     const sellerName = "Fonsah Pageo";
     const realProductId = "test-product-123"
     const realProductName = "Test iPhone 15";
@@ -371,7 +371,8 @@ const ProductDetail: React.FC = () => {
               lastName: sellerName.split(' ')[1] || '',
               profileImage: null,
               isVerifiedSeller: false
-            }
+            },
+            preFilledMessage
           }
         });
       } else {

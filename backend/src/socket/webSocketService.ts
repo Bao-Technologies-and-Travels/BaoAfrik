@@ -170,7 +170,6 @@ export class WebSocketService {
         socket.emit('conversation_join_error', { error: 'Access denied' });
       }
     } catch (error) {
-      console.error('Error joining conversation:', error);
       socket.emit('conversation_join_error', { error: 'Failed to join conversation' });
     }
   }
@@ -205,7 +204,6 @@ export class WebSocketService {
 
       socket.emit('conversation_created', { conversation });
     } catch (error) {
-      console.error('Contact seller error:', error);
       socket.emit('contact_seller_error', { error: 'Failed to contact seller' });
     }
   }
@@ -347,7 +345,6 @@ export class WebSocketService {
       });
 
     } catch (error) {
-      console.error('Mark as read error:', error);
       socket.emit('read_error', { error: 'Failed to mark messages as read' });
     }
   }

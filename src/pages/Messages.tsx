@@ -119,9 +119,13 @@ const Messages: React.FC = () => {
   const [showCondensedHeader, setShowCondensedHeader] = useState(false);
   const [visibleMessages, setVisibleMessages] = useState<any[]>([]);
   const [fadingOutMessageIds, setFadingOutMessageIds] = useState<number[]>([]);
-  const [activeReactionMessageId, setActiveReactionMessageId] = useState<string | null>(null);
+  const [activeReactionMessageId, setActiveReactionMessageId] = useState<
+    string | null
+  >(null);
   const [showAllMessages, setShowAllMessages] = useState(false);
-  const [activeMessageOptionsId, setActiveMessageOptionsId] = useState<string | null>(null);
+  const [activeMessageOptionsId, setActiveMessageOptionsId] = useState<
+    string | null
+  >(null);
   const [showReactionEmojiPicker, setShowReactionEmojiPicker] = useState(false);
   const [replyToMessage, setReplyToMessage] = useState<any>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
@@ -132,7 +136,9 @@ const Messages: React.FC = () => {
   const { addToast } = useToast();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
   const [conversations, setConversations] = useState<any[]>([]);
   const [currentConversation, setCurrentConversation] = useState<any>(null);
   const [joinedRooms, setJoinedRooms] = useState<Set<string>>(new Set());
@@ -140,16 +146,17 @@ const Messages: React.FC = () => {
   const [isSending, setIsSending] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+
   // Get current user on component mount
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {
       // Decode JWT to get user info (you might need a proper JWT decoding library)
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const payload = JSON.parse(atob(token.split(".")[1]));
         setCurrentUser({ id: payload.userId });
       } catch (error) {
-        console.error('Failed to decode user from token:', error);
+        console.error("Failed to decode user from token:", error);
       }
     }
   }, []);
@@ -191,7 +198,7 @@ const Messages: React.FC = () => {
       reconnection: true,
       reconnectionAttempts: 3,
       reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000
+      reconnectionDelayMax: 5000,
     });
 
     setSocket(newSocket);
@@ -213,7 +220,6 @@ const Messages: React.FC = () => {
     });
 
     newSocket.on("connect_error", (error) => {
-      console.error("WebSocket connection error:", error);
       setIsSocketConnected(false);
 
       addToast({
@@ -233,28 +239,26 @@ const Messages: React.FC = () => {
       }
     });
 
-    newSocket.on("reconnect_attempt", (attemptNumber) => {
-    });
+    newSocket.on("reconnect_attempt", (attemptNumber) => {});
 
     newSocket.on("reconnect_error", (error) => {
       console.error("Reconnection error:", error);
     });
 
     newSocket.on("reconnect_failed", () => {
-      console.error("Reconnection failed");
       setSocketInitialized(false);
     });
 
     // message events
     newSocket.on("new_message", (serverMessage) => {
-      setMessages(prev => {
-
+      setMessages((prev) => {
         const isOurMessage = serverMessage.senderId === currentUser?.id;
 
         // Check if we already have this message (by ID or tempId)
-        const existingMessageIndex = prev.findIndex(msg =>
-          msg.id === serverMessage.id ||
-          (serverMessage.tempId && msg.tempId === serverMessage.tempId)
+        const existingMessageIndex = prev.findIndex(
+          (msg) =>
+            msg.id === serverMessage.id ||
+            (serverMessage.tempId && msg.tempId === serverMessage.tempId)
         );
 
         if (existingMessageIndex >= 0) {
@@ -266,31 +270,40 @@ const Messages: React.FC = () => {
             content: serverMessage.content,
             isIncoming: !isOurMessage,
             timestamp: serverMessage.createdAt,
-            dateString: new Date(serverMessage.createdAt).toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }),
-            status: isOurMessage ? 'delivered' : 'read'
+            dateString: new Date(serverMessage.createdAt).toLocaleDateString(
+              "en-US",
+              {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            ),
+            status: isOurMessage ? "delivered" : "read",
           };
           return updatedMessages;
         } else {
           // Add new message
-          return [...prev, {
-            ...serverMessage,
-            text: serverMessage.content || serverMessage.text,
-            content: serverMessage.content,
-            isIncoming: !isOurMessage,
-            timestamp: serverMessage.createdAt,
-            dateString: new Date(serverMessage.createdAt).toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }),
-            status: isOurMessage ? 'delivered' : 'read'
-          }];
+          return [
+            ...prev,
+            {
+              ...serverMessage,
+              text: serverMessage.content || serverMessage.text,
+              content: serverMessage.content,
+              isIncoming: !isOurMessage,
+              timestamp: serverMessage.createdAt,
+              dateString: new Date(serverMessage.createdAt).toLocaleDateString(
+                "en-US",
+                {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              ),
+              status: isOurMessage ? "delivered" : "read",
+            },
+          ];
         }
       });
     });
@@ -298,38 +311,38 @@ const Messages: React.FC = () => {
     newSocket.on("message_sent", (data) => {
       setIsSending(false);
 
-      setMessages(prev => prev.map(msg => {
-        if (msg.id === `temp-${data.tempId}` || msg.tempId === data.tempId) {
-          return {
-            ...data,
-            text: data.content || data.text,
-            content: data.content,
-            id: data.id,
-            isIncoming: false,
-            timestamp: data.createdAt,
-            dateString: new Date(data.createdAt).toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }),
-            status: 'delivered',
-            tempId: undefined
-          };
-        }
-        return msg;
-      }));
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.id === `temp-${data.tempId}` || msg.tempId === data.tempId) {
+            return {
+              ...data,
+              text: data.content || data.text,
+              content: data.content,
+              id: data.id,
+              isIncoming: false,
+              timestamp: data.createdAt,
+              dateString: new Date(data.createdAt).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }),
+              status: "delivered",
+              tempId: undefined,
+            };
+          }
+          return msg;
+        })
+      );
     });
 
-    newSocket.on("conversation_joined", (data) => {
-    });
+    newSocket.on("conversation_joined", (data) => {});
 
     newSocket.on("conversation_join_error", (errorData) => {
-      console.error('Failed to join conversation:', errorData);
+      console.error("Failed to join conversation:", errorData);
     });
 
     newSocket.on("message_error", (errorData) => {
-      console.error('Message failed:', errorData);
       setIsSending(false); // Reset sending state on error
       addToast({
         type: "error",
@@ -370,11 +383,6 @@ const Messages: React.FC = () => {
       }
     });
 
-    // Handle any other events
-    newSocket.onAny((event, ...args) => {
-      console.log(`Socket event: ${event}`, args);
-    });
-
     return () => {
       if (newSocket) {
         newSocket.off("connect");
@@ -411,8 +419,6 @@ const Messages: React.FC = () => {
         setConversations(data.data);
       }
     } catch (error) {
-      console.error("Failed to fetch conversations:", error);
-
       addToast({
         type: "error",
         title: "Connection Error",
@@ -484,7 +490,7 @@ const Messages: React.FC = () => {
         if (message.senderId === currentUserId) {
           // Check if we have status from the server
           if (message.statuses && message.statuses.length > 0) {
-            return message.statuses[0].status; 
+            return message.statuses[0].status;
           }
 
           // For temporary messages
@@ -493,43 +499,46 @@ const Messages: React.FC = () => {
           }
 
           // Default for sent messages
-          return 'sent';
+          return "sent";
         }
 
         // For received messages, they're always 'read' if we're viewing them
-        return 'read';
+        return "read";
       };
 
       // Transform messages for UI
       const transformedMessages = (data.data || []).map((message: any) => ({
         ...message,
-        text: message.content || '',
-        content: message.content || '',
+        text: message.content || "",
+        content: message.content || "",
         isIncoming: message.senderId !== currentUser?.id,
         timestamp: message.createdAt,
-        dateString: new Date(message.createdAt).toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
+        dateString: new Date(message.createdAt).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         }),
-        type: message.messageType?.toLowerCase() || 'text',
-        status: getMessageStatus(message, currentUser?.id)
+        type: message.messageType?.toLowerCase() || "text",
+        status: getMessageStatus(message, currentUser?.id),
       }));
 
       setMessages(transformedMessages);
       setActiveConversationId(conversationId);
 
       // Find and set current conversation from conversations list
-      const currentConv = conversations.find(c => c.id === conversationId);
+      const currentConv = conversations.find((c) => c.id === conversationId);
       if (currentConv) {
         setCurrentConversation(currentConv);
       }
 
       // save to localStorage
-      localStorage.setItem('activeConversationId', conversationId);
+      localStorage.setItem("activeConversationId", conversationId);
       if (currentConv) {
-        localStorage.setItem('currentConversation', JSON.stringify(currentConv));
+        localStorage.setItem(
+          "currentConversation",
+          JSON.stringify(currentConv)
+        );
       }
 
       // join socket room
@@ -537,12 +546,11 @@ const Messages: React.FC = () => {
         socket.emit("join_conversation", conversationId);
       }
     } catch (error) {
-      console.error('Failed to fetch messages:', error);
       addToast({
         type: "error",
         title: "Error",
         message: "Failed to load messages",
-        duration: 4000
+        duration: 4000,
       });
     } finally {
       setIsLoadingMessages(false);
@@ -556,65 +564,67 @@ const Messages: React.FC = () => {
     setReplyToMessage(null);
 
     // Clear from localStorage as well
-    localStorage.removeItem('activeConversationId');
-    localStorage.removeItem('currentConversation');
+    localStorage.removeItem("activeConversationId");
+    localStorage.removeItem("currentConversation");
   };
 
   const getMessageDisplayText = (message: any) => {
-    return message.content || message.text || '';
+    return message.content || message.text || "";
   };
 
   // Send message function
-  const sendMessageViaSocket = useCallback((conversationId: string, messageData: any) => {
-    if (!socket || !isSocketConnected) {
-      console.error('Socket not connected');
-      addToast({
-        type: "error",
-        title: "Connection Error",
-        message: "Unable to send message. Please check your connection.",
-        duration: 4000,
-      });
-      return;
-    }
+  const sendMessageViaSocket = useCallback(
+    (conversationId: string, messageData: any) => {
+      if (!socket || !isSocketConnected) {
+        addToast({
+          type: "error",
+          title: "Connection Error",
+          message: "Unable to send message. Please check your connection.",
+          duration: 4000,
+        });
+        return;
+      }
 
-    const tempId = Date.now();
-    const tempMessage = {
-      id: `temp-${tempId}`,
-      tempId: tempId,
-      conversationId,
-      content: messageData.content,
-      messageType: messageData.messageType,
-      fileUrl: messageData.fileUrl,
-      fileName: messageData.fileName,
-      fileSize: messageData.fileSize,
-      senderId: currentUser?.id,
-      sender: {
-        id: currentUser?.id,
-        firstName: 'You',
-        lastName: '',
-        profileImage: null,
-        isVerifiedSeller: false
-      },
-      isIncoming: false,
-      timestamp: new Date().toISOString(),
-      dateString: 'Just now',
-      type: messageData.messageType?.toLowerCase() || 'text',
-      status: 'sending',
-      text: messageData.content
-    };
+      const tempId = Date.now();
+      const tempMessage = {
+        id: `temp-${tempId}`,
+        tempId: tempId,
+        conversationId,
+        content: messageData.content,
+        messageType: messageData.messageType,
+        fileUrl: messageData.fileUrl,
+        fileName: messageData.fileName,
+        fileSize: messageData.fileSize,
+        senderId: currentUser?.id,
+        sender: {
+          id: currentUser?.id,
+          firstName: "You",
+          lastName: "",
+          profileImage: null,
+          isVerifiedSeller: false,
+        },
+        isIncoming: false,
+        timestamp: new Date().toISOString(),
+        dateString: "Just now",
+        type: messageData.messageType?.toLowerCase() || "text",
+        status: "sending",
+        text: messageData.content,
+      };
 
-    // Add message immediately to UI
-    setMessages(prev => [...prev, tempMessage]);
+      // Add message immediately to UI
+      setMessages((prev) => [...prev, tempMessage]);
 
-    const messageToSend = {
-      ...messageData,
-      tempId: tempId,
-      conversationId,
-      timestamp: new Date().toISOString()
-    };
+      const messageToSend = {
+        ...messageData,
+        tempId: tempId,
+        conversationId,
+        timestamp: new Date().toISOString(),
+      };
 
-    socket.emit('send_message', messageToSend);
-  }, [socket, isSocketConnected, currentUser, addToast]);
+      socket.emit("send_message", messageToSend);
+    },
+    [socket, isSocketConnected, currentUser, addToast]
+  );
 
   // Mark as read function
   const markAsReadViaSocket = (conversationId: string) => {
@@ -768,9 +778,14 @@ const Messages: React.FC = () => {
     }
   };
 
-  const handleActionsMenuClick = (conversationId: string, event: React.MouseEvent) => {
+  const handleActionsMenuClick = (
+    conversationId: string,
+    event: React.MouseEvent
+  ) => {
     event.stopPropagation();
-    setActionsMenuOpen(actionsMenuOpen === conversationId ? null : conversationId);
+    setActionsMenuOpen(
+      actionsMenuOpen === conversationId ? null : conversationId
+    );
   };
 
   const handleActionSelect = (action: string, conversationId: string) => {
@@ -830,14 +845,13 @@ const Messages: React.FC = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Server response:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
       const conversation = result.data;
 
-      setConversations(prev => [conversation, ...prev]);
+      setConversations((prev) => [conversation, ...prev]);
       setActiveConversationId(conversation.id); // trigger loading messages
 
       navigate("/messages", {
@@ -995,7 +1009,6 @@ const Messages: React.FC = () => {
 
   // Handle message option selection
   const handleMessageOptionSelect = (action: string, messageId?: number) => {
-
     if (action === "reply" && messageId) {
       // Find the message to reply to
       const message = messages.find((m) => m.id === messageId);
@@ -1110,13 +1123,22 @@ const Messages: React.FC = () => {
 
   // Handle incoming product data from Product Detail page
   useEffect(() => {
-
     if (location.state?.conversation && !currentConversation) {
       const conversationId = location.state.conversation.id;
+      const { productData, preFilledMessage } = location.state;
 
       // Only load if we're not already viewing it
       if (activeConversationId !== conversationId) {
         fetchConversationMessages(conversationId);
+      }
+
+      if (productData) {
+        setProductData(productData);
+        setPreFilledMessage(preFilledMessage || "");
+        // Only set messageText if no messages have been sent yet
+        if (!isMessageSent) {
+          setMessageText(preFilledMessage || "");
+        }
       }
 
       // Clear location state after a short delay
@@ -1130,8 +1152,8 @@ const Messages: React.FC = () => {
   useEffect(() => {
     if (messagesEndRef.current && messages.length > 0) {
       messagesEndRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end'
+        behavior: "smooth",
+        block: "end",
       });
     }
   }, [messages.length, activeConversationId]); // Scroll when messages or conversation changes
@@ -1150,8 +1172,8 @@ const Messages: React.FC = () => {
       }
 
       // Clean up any audio URLs in messages
-      messages.forEach(message => {
-        if (message.audioUrl && message.audioUrl.startsWith('blob:')) {
+      messages.forEach((message) => {
+        if (message.audioUrl && message.audioUrl.startsWith("blob:")) {
           URL.revokeObjectURL(message.audioUrl);
         }
       });
@@ -1162,20 +1184,22 @@ const Messages: React.FC = () => {
   useEffect(() => {
     if (isSending && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end'
+        behavior: "smooth",
+        block: "end",
       });
     }
   }, [isSending]);
 
   const handleSendMessage = async () => {
+    const userTypedText = messageText.trim();
+    const hasUserTyped =
+      userTypedText && userTypedText !== preFilledMessage.trim();
 
     if (isSending) {
-      return
+      return;
     }
 
     if (!currentConversation?.id) {
-      console.error('Cannot send: no conversation selected');
       addToast({
         type: "error",
         title: "Error",
@@ -1185,13 +1209,12 @@ const Messages: React.FC = () => {
       return;
     }
 
-    const textToSend = messageText.trim();
+    const textToSend = userTypedText;
     if (!textToSend && selectedFiles.length === 0) {
       return; // Don't send empty messages
     }
 
     if (!socket || !isSocketConnected) {
-      console.error('Cannot send: socket not connected');
       addToast({
         type: "error",
         title: "Connection Error",
@@ -1226,7 +1249,9 @@ const Messages: React.FC = () => {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "accessToken"
+                  )}`,
                 },
                 body: JSON.stringify({
                   fileName: file.name,
@@ -1261,13 +1286,11 @@ const Messages: React.FC = () => {
               fileUrl: uploadData.url,
               fileName: file.name,
               fileSize: file.size,
-              productData: currentConversation.product
+              productData: currentConversation.product,
             });
 
             messageSent = true;
-
           } catch (error) {
-            console.error("File upload failed:", error);
             addToast({
               type: "error",
               title: "File upload failed",
@@ -1284,16 +1307,14 @@ const Messages: React.FC = () => {
         sendMessageViaSocket(currentConversation.id, {
           content: textContent,
           messageType: "TEXT",
-          productData: currentConversation.product
+          productData: currentConversation.product,
         });
         messageSent = true;
       }
 
       // Refresh conversations to update last message
       await fetchConversations();
-
     } catch (error) {
-      console.error("Error sending message:", error);
       addToast({
         type: "error",
         title: "Send Failed",
@@ -1338,25 +1359,32 @@ const Messages: React.FC = () => {
   // Save current conversation to localStorage
   useEffect(() => {
     if (currentConversation) {
-      localStorage.setItem('currentConversation', JSON.stringify(currentConversation));
-      localStorage.setItem('activeConversationId', currentConversation.id);
+      localStorage.setItem(
+        "currentConversation",
+        JSON.stringify(currentConversation)
+      );
+      localStorage.setItem("activeConversationId", currentConversation.id);
     }
   }, [currentConversation]);
 
   // Load current conversation from localStorage on component mount
   useEffect(() => {
-    const savedConversation = localStorage.getItem('currentConversation');
-    const savedConversationId = localStorage.getItem('activeConversationId');
+    const savedConversation = localStorage.getItem("currentConversation");
+    const savedConversationId = localStorage.getItem("activeConversationId");
 
-    if (savedConversation && savedConversationId && !currentConversation && !location.state?.conversation) {
+    if (
+      savedConversation &&
+      savedConversationId &&
+      !currentConversation &&
+      !location.state?.conversation
+    ) {
       try {
         const conversation = JSON.parse(savedConversation);
 
         setCurrentConversation(conversation);
         setActiveConversationId(savedConversationId);
-
       } catch (error) {
-        console.error('Failed to parse saved conversation:', error);
+        console.error("Failed to parse saved conversation:", error);
       }
     }
   }, []);
@@ -1453,7 +1481,6 @@ const Messages: React.FC = () => {
 
       setWaveformTimer(waveformTimer);
     } catch (error) {
-      console.error("Error accessing microphone:", error);
       // Fallback to visual-only recording if mic access fails
       alert(
         "Could not access microphone. Recording will continue without audio visualization."
@@ -1521,7 +1548,7 @@ const Messages: React.FC = () => {
           },
           body: JSON.stringify({
             fileName: `voice-message-${Date.now()}.webm`,
-            fileType: 'audio/webm',
+            fileType: "audio/webm",
           }),
         }
       );
@@ -1537,7 +1564,7 @@ const Messages: React.FC = () => {
         method: "PUT",
         body: audioBlob,
         headers: {
-          "Content-Type": 'audio/webm',
+          "Content-Type": "audio/webm",
         },
       });
 
@@ -1547,20 +1574,18 @@ const Messages: React.FC = () => {
 
       // Send message with audio reference
       sendMessageViaSocket(currentConversation.id, {
-        content: 'Audio message',
-        messageType: 'AUDIO',
+        content: "Audio message",
+        messageType: "AUDIO",
         audioUrl: uploadData.url,
         duration: recordingTime,
-        fileSize: audioBlob.size
+        fileSize: audioBlob.size,
       });
 
       // Reset recording state
       setRecordingTime(0);
       setAudioChunks([]);
       setMediaRecorder(null);
-
     } catch (error) {
-      console.error("Error sending voice message:", error);
       addToast({
         type: "error",
         title: "Audio Send Failed",
@@ -1789,37 +1814,85 @@ const Messages: React.FC = () => {
   }, [socket]);
 
   // Add this component before your return statement
-  const MessageStatus = ({ status, timestamp }: { status: string, timestamp: string }) => {
+  const MessageStatus = ({
+    status,
+    timestamp,
+  }: {
+    status: string;
+    timestamp: string;
+  }) => {
     const getStatusIcon = () => {
       switch (status) {
-        case 'sending':
+        case "sending":
           return (
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-4 h-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           );
-        case 'sent':
+        case "sent":
           return (
-            <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            <svg
+              className="w-4 h-4 text-gray-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
             </svg>
           );
-        case 'delivered':
+        case "delivered":
           return (
             <div className="flex items-center">
-              <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              <svg
+                className="w-4 h-4 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
           );
-        case 'read':
+        case "read":
           return (
             <div className="flex items-center">
-              <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              <svg
+                className="w-4 h-4 text-blue-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
-              <svg className="w-4 h-4 -ml-2.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              <svg
+                className="w-4 h-4 -ml-2.5 text-blue-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
           );
@@ -1832,8 +1905,8 @@ const Messages: React.FC = () => {
       <div className="flex items-center space-x-1">
         <span className="text-xs text-gray-500">
           {new Date(timestamp).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
+            hour: "2-digit",
+            minute: "2-digit",
           })}
         </span>
         {getStatusIcon()}
@@ -1877,7 +1950,10 @@ const Messages: React.FC = () => {
         }
       `}</style>
 
-      <div className="h-screen bg-gray-50 flex overflow-hidden">
+      <div
+        className="h-screen bg-gray-50 flex overflow-hidden"
+        style={{ fontFamily: "Poppins, sans-serif" }}
+      >
         {/* Hidden file input for file attachments */}
         <input
           id="file-upload"
@@ -1889,6 +1965,27 @@ const Messages: React.FC = () => {
         />
         {/* Left Sidebar - Full Height */}
         <div className="w-1/4 bg-white border-r-2 border-gray-300 flex flex-col h-screen sticky top-0 relative">
+          {/* Header */}
+          <header className="bg-white">
+            <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
+              <div className="flex items-center justify-between h-16">
+                {/* Left side - Logo and sidebar button */}
+                <div className="flex items-center space-x-36 pr-0">
+                  <Link to="/">
+                    <img src={logo} alt="bao'Afrik" className="h-8 w-auto" />
+                  </Link>
+                  <button className="bg-white hover:bg-gray-50 rounded-lg transition-colors w-10 h-10 flex items-center justify-center">
+                    <img
+                      src={sideIcon}
+                      alt="Minimize sidebar"
+                      className="w-5 h-5"
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </header>
+
           {/* Chats List */}
           <div className="flex-1 flex flex-col">
             {/* Chats Header */}
@@ -1924,10 +2021,11 @@ const Messages: React.FC = () => {
                     <div className="flex space-x-6 relative">
                       <button
                         onClick={() => setSelectedTab("All")}
-                        className={`text-sm font-medium pb-1 relative ${selectedTab === "All"
-                          ? "text-gray-900"
-                          : "text-gray-500 hover:text-gray-700"
-                          }`}
+                        className={`text-sm font-medium pb-1 relative ${
+                          selectedTab === "All"
+                            ? "text-gray-900"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
                         style={{
                           color: selectedTab === "All" ? "#64B5F6" : undefined,
                         }}
@@ -1942,12 +2040,14 @@ const Messages: React.FC = () => {
                       </button>
                       <button
                         onClick={() => setSelectedTab("Unreads")}
-                        className={`text-sm font-medium pb-1 relative ${selectedTab === "Unreads"
-                          ? "text-gray-900"
-                          : "text-gray-500 hover:text-gray-700"
-                          }`}
+                        className={`text-sm font-medium pb-1 relative ${
+                          selectedTab === "Unreads"
+                            ? "text-gray-900"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
                         style={{
-                          color: selectedTab === "Unreads" ? "#64B5F6" : undefined,
+                          color:
+                            selectedTab === "Unreads" ? "#64B5F6" : undefined,
                         }}
                       >
                         Unreads
@@ -1965,17 +2065,26 @@ const Messages: React.FC = () => {
                 {/* Conversations List */}
                 <div className="flex-1 overflow-y-auto p-1">
                   {conversations
-                    .filter(conversation => {
+                    .filter((conversation) => {
                       // Filter by search query
                       if (chatSearchQuery) {
-                        const participantName = conversation.participants?.[0]?.firstName || 'Fonsah Pageo';
-                        const lastMessage = conversation.lastMessage?.content || '';
-                        return participantName.toLowerCase().includes(chatSearchQuery.toLowerCase()) ||
-                          lastMessage.toLowerCase().includes(chatSearchQuery.toLowerCase());
+                        const participantName =
+                          conversation.participants?.[0]?.firstName ||
+                          "Fonsah Pageo";
+                        const lastMessage =
+                          conversation.lastMessage?.content || "";
+                        return (
+                          participantName
+                            .toLowerCase()
+                            .includes(chatSearchQuery.toLowerCase()) ||
+                          lastMessage
+                            .toLowerCase()
+                            .includes(chatSearchQuery.toLowerCase())
+                        );
                       }
                       return true;
                     })
-                    .filter(conversation => {
+                    .filter((conversation) => {
                       // Filter by selected tab
                       if (selectedTab === "Unreads") {
                         // You might want to add an unread messages count to your conversation model
@@ -1986,10 +2095,11 @@ const Messages: React.FC = () => {
                     .map((conversation) => (
                       <div
                         key={conversation.id}
-                        className={`p-2 rounded-lg cursor-pointer transition-colors ${activeConversationId === conversation.id
-                          ? "bg-gray-100"
-                          : "hover:bg-gray-50"
-                          }`}
+                        className={`p-2 rounded-lg cursor-pointer transition-colors ${
+                          activeConversationId === conversation.id
+                            ? "bg-gray-100"
+                            : "hover:bg-gray-50"
+                        }`}
                         onClick={async () => {
                           setActiveConversationId(conversation.id);
                           await fetchConversationMessages(conversation.id);
@@ -2002,27 +2112,41 @@ const Messages: React.FC = () => {
                       >
                         <div className="flex items-center space-x-2">
                           <img
-                            src={conversation.participants?.[0]?.profileImage || eboAvatar}
-                            alt={conversation.participants?.[0]?.firstName || 'Pageo'}
+                            src={
+                              conversation.participants?.[0]?.profileImage ||
+                              eboAvatar
+                            }
+                            alt={
+                              conversation.participants?.[0]?.firstName ||
+                              "Pageo"
+                            }
                             className="w-10 h-10 rounded-sm object-cover"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <h3 className="font-semibold text-gray-900 truncate">
-                                {conversation.participants?.[0]?.firstName || 'Fonsah'}
+                                {conversation.participants?.[0]?.firstName ||
+                                  "Fonsah"}
                               </h3>
                               <div className="flex items-center space-x-1">
                                 <span className="text-xs text-gray-500">
-                                  {new Date(conversation.updatedAt).toLocaleTimeString([], {
-                                    hour: '2-digit',
-                                    minute: '2-digit'
+                                  {new Date(
+                                    conversation.updatedAt
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
                                   })}
                                 </span>
                                 <button
-                                  onClick={(e) => handleActionsMenuClick(conversation.id, e)}
+                                  onClick={(e) =>
+                                    handleActionsMenuClick(conversation.id, e)
+                                  }
                                   className="p-1 rounded transition-colors"
                                   style={{
-                                    color: actionsMenuOpen === conversation.id ? "#64B5F6" : "#000000",
+                                    color:
+                                      actionsMenuOpen === conversation.id
+                                        ? "#64B5F6"
+                                        : "#000000",
                                   }}
                                 >
                                   <span className="text-lg">⋯</span>
@@ -2031,7 +2155,8 @@ const Messages: React.FC = () => {
                             </div>
                             <div className="flex items-center justify-between -mt-1">
                               <p className="text-sm text-gray-600 truncate">
-                                {conversation.lastMessage?.content || 'No messages yet'}
+                                {conversation.lastMessage?.content ||
+                                  "No messages yet"}
                               </p>
                               {/* You can add unread message indicators here */}
                               {conversation.unreadCount > 0 && (
@@ -2244,7 +2369,7 @@ const Messages: React.FC = () => {
                   style={{ backgroundColor: "#F5F5F5", color: "#6A6A6A" }}
                 >
                   {/* You can calculate archived conversations count here */}
-                  {conversations.filter(conv => conv.isArchived).length}
+                  {conversations.filter((conv) => conv.isArchived).length}
                 </span>
               </div>
 
@@ -2266,7 +2391,7 @@ const Messages: React.FC = () => {
                   style={{ backgroundColor: "#F5F5F5", color: "#6A6A6A" }}
                 >
                   {/* You can calculate important conversations count here */}
-                  {conversations.filter(conv => conv.isImportant).length}
+                  {conversations.filter((conv) => conv.isImportant).length}
                 </span>
               </div>
             </div>
@@ -2275,7 +2400,486 @@ const Messages: React.FC = () => {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
-          {/* Main Content Area */}
+          {/* Header */}
+          <header className="bg-gray-50">
+            <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
+              <div className="flex items-center justify-between h-16">
+                {/* Center - Breadcrumb */}
+                <div className="hidden md:flex items-center space-x-2 text-sm">
+                  <img
+                    src={leftIcon}
+                    alt="Back"
+                    className="w-5 h-5 cursor-pointer"
+                    onClick={handleHomepageClick}
+                  />
+                  <span
+                    className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                    onClick={handleHomepageClick}
+                  >
+                    Homepage
+                  </span>
+                  <span className="text-gray-400">/</span>
+                  <span
+                    className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                    onClick={handleMenuClick}
+                  >
+                    Menu
+                  </span>
+                  <span className="text-gray-400">/</span>
+                  <span className="text-gray-900 font-medium">Chats</span>
+                </div>
+
+                {/* Right side - Language, button, profile, notifications */}
+                <div className="flex items-center space-x-4 bg-gray-50 px-4 py-2 rounded-lg">
+                  {/* Language Selector */}
+                  <div className="relative language-selector">
+                    <button
+                      onClick={() =>
+                        setIsLanguageDropdownOpen(!isLanguageDropdownOpen)
+                      }
+                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    >
+                      <span>{selectedLanguage}</span>
+                      <img
+                        src={translationToggleIcon}
+                        alt="Toggle"
+                        className="w-4 h-4"
+                      />
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {isLanguageDropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                        <div className="py-1">
+                          <button
+                            onClick={() => handleLanguageSelect("EN")}
+                            className="w-full text-left px-4 py-2 text-sm transition-colors"
+                            style={{
+                              backgroundColor:
+                                selectedLanguage === "EN"
+                                  ? "#F0F8FE"
+                                  : "transparent",
+                              color:
+                                selectedLanguage === "EN"
+                                  ? "#64B5F6"
+                                  : "#374151",
+                            }}
+                          >
+                            English
+                          </button>
+                          <button
+                            onClick={() => handleLanguageSelect("FR")}
+                            className="w-full text-left px-4 py-2 text-sm transition-colors"
+                            style={{
+                              backgroundColor:
+                                selectedLanguage === "FR"
+                                  ? "#F0F8FE"
+                                  : "transparent",
+                              color:
+                                selectedLanguage === "FR"
+                                  ? "#64B5F6"
+                                  : "#374151",
+                            }}
+                          >
+                            French
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Become Seller Button */}
+                  <Link
+                    to="/register"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
+                    style={{ backgroundColor: "#FEF6E9" }}
+                  >
+                    <img
+                      src={basketIcon}
+                      alt="Basket"
+                      className="w-5 h-5"
+                      style={{
+                        filter:
+                          "brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)",
+                      }}
+                    />
+                    <span
+                      className="text-sm font-normal"
+                      style={{ color: "#F9A825" }}
+                    >
+                      Start Selling
+                    </span>
+                  </Link>
+
+                  {/* Notification Button */}
+                  <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
+                    <img
+                      src={notificationIcon}
+                      alt="Notifications"
+                      className="w-6 h-6"
+                    />
+                  </button>
+
+                  {/* Profile Picture */}
+                  <div className="w-10 h-10 rounded-full overflow-hidden">
+                    <img
+                      src={avatarIcon}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Menu Button */}
+                  <div className="relative menu-dropdown">
+                    <button
+                      onClick={() => setIsMenuDropdownOpen(!isMenuDropdownOpen)}
+                      className="p-2 text-gray-600 hover:text-gray-900"
+                    >
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 6h16M4 12h16M4 18h16"
+                        />
+                      </svg>
+                      <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        +9
+                      </div>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {isMenuDropdownOpen && (
+                      <div
+                        className="fixed right-8 top-0 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-screen overflow-y-auto custom-scrollbar"
+                        style={{
+                          scrollbarWidth: "thin",
+                          scrollbarColor: "white #f3f4f6",
+                        }}
+                      >
+                        {/* Start selling button with exit */}
+                        <div className="px-3 pb-3 flex items-center justify-between">
+                          <Link
+                            to="/register"
+                            className="inline-flex items-center px-3 py-1.5 rounded-lg font-normal text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                            style={{
+                              backgroundColor: "#FFF8F0",
+                              color: "#F9A822",
+                            }}
+                            onMouseEnter={(e) => {
+                              (e.target as HTMLElement).style.backgroundColor =
+                                "#FFF0E6";
+                            }}
+                            onMouseLeave={(e) => {
+                              (e.target as HTMLElement).style.backgroundColor =
+                                "#FFF8F0";
+                            }}
+                            onClick={() => setIsMenuDropdownOpen(false)}
+                          >
+                            <svg
+                              className="w-3 h-3 mr-1.5 border border-orange-500 rounded-full p-0.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              style={{ color: "#F9A822" }}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z"
+                              />
+                            </svg>
+                            Start selling
+                          </Link>
+                          <button
+                            onClick={() => setIsMenuDropdownOpen(false)}
+                            className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Profile Section */}
+                        <div className="flex items-center space-x-2 px-3 py-3 border-b border-gray-100">
+                          <img
+                            src={avatarIcon}
+                            alt="User avatar"
+                            className="w-12 h-12 rounded-full object-cover"
+                            width="48"
+                            height="48"
+                          />
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-500">My profile</p>
+                            <div className="flex items-center justify-between">
+                              <h3 className="text-sm font-bold text-gray-900">
+                                Jean Kameni
+                              </h3>
+                              <div
+                                className="w-6 h-6 rounded flex items-center justify-center"
+                                style={{ backgroundColor: "#E3F2FD" }}
+                              >
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  style={{ color: "#64B5F6" }}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Create a new listing button */}
+                        <div className="px-3 py-3">
+                          <Link
+                            to="/create-listing"
+                            className="block w-full px-3 py-2 rounded-lg font-medium text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                            style={{
+                              backgroundColor: "#E3F2FD",
+                              color: "#64B5F6",
+                            }}
+                            onClick={() => setIsMenuDropdownOpen(false)}
+                          >
+                            <div className="flex items-center justify-center space-x-1.5">
+                              <span>Create a new listing</span>
+                              <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                style={{ color: "#64B5F6" }}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                />
+                              </svg>
+                            </div>
+                          </Link>
+                        </div>
+
+                        {/* Navigation Menu Items */}
+                        <div className="space-y-0.5 px-2">
+                          {/* Chats */}
+                          <Link
+                            to="/messages"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            onClick={() => setIsMenuDropdownOpen(false)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={messageIcon}
+                                alt="Message"
+                                className="w-4 h-4"
+                                style={{ color: "#64B5F6" }}
+                              />
+                              <div>
+                                <div
+                                  className="font-medium text-sm"
+                                  style={{ color: "#6A6A6A" }}
+                                >
+                                  Chats
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+
+                          {/* My listings */}
+                          <Link
+                            to="/my-listings"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            onClick={() => setIsMenuDropdownOpen(false)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={boxIcon}
+                                alt="Box"
+                                className="w-4 h-4"
+                                style={{ color: "#64B5F6" }}
+                              />
+                              <div>
+                                <div
+                                  className="font-medium text-sm"
+                                  style={{ color: "#6A6A6A" }}
+                                >
+                                  My listings
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+
+                          {/* My requests */}
+                          <Link
+                            to="/my-requests"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            onClick={() => setIsMenuDropdownOpen(false)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={groupIcon}
+                                alt="Group"
+                                className="w-4 h-4"
+                                style={{ color: "#64B5F6" }}
+                              />
+                              <div>
+                                <div
+                                  className="font-medium text-sm"
+                                  style={{ color: "#6A6A6A" }}
+                                >
+                                  My requests
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+
+                          {/* Bookmarks */}
+                          <Link
+                            to="/bookmarks"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            onClick={() => setIsMenuDropdownOpen(false)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={frameIcon}
+                                alt="Frame"
+                                className="w-4 h-4"
+                                style={{ color: "#64B5F6" }}
+                              />
+                              <div>
+                                <div
+                                  className="font-medium text-sm"
+                                  style={{ color: "#6A6A6A" }}
+                                >
+                                  Bookmarks
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+
+                          {/* Help Center */}
+                          <Link
+                            to="/help"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            onClick={() => setIsMenuDropdownOpen(false)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={podsIcon}
+                                alt="Pods"
+                                className="w-4 h-4"
+                                style={{ color: "#64B5F6" }}
+                              />
+                              <div>
+                                <div
+                                  className="font-medium text-sm"
+                                  style={{ color: "#6A6A6A" }}
+                                >
+                                  Help Center
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+
+                          {/* Settings */}
+                          <Link
+                            to="/settings"
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            onClick={() => setIsMenuDropdownOpen(false)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={settingIcon}
+                                alt="Setting"
+                                className="w-4 h-4"
+                                style={{ color: "#64B5F6" }}
+                              />
+                              <div>
+                                <div
+                                  className="font-medium text-sm"
+                                  style={{ color: "#6A6A6A" }}
+                                >
+                                  Settings
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+
+                          {/* Log Out */}
+                          <div className="px-3 pt-3 border-t border-gray-100">
+                            <button
+                              onClick={() => setIsMenuDropdownOpen(false)}
+                              className="w-full bg-gray-100 px-3 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  style={{ color: "#6A6A6A" }}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                  />
+                                </svg>
+                                <div className="text-left">
+                                  <div
+                                    className="font-medium text-xs"
+                                    style={{ color: "#6A6A6A" }}
+                                  >
+                                    Log Out
+                                  </div>
+                                  <div
+                                    className="text-xs"
+                                    style={{ color: "#6A6A6A" }}
+                                  >
+                                    Log out of BAO Afrik
+                                  </div>
+                                </div>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Main Content*/}
           <div
             className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 my-8 flex flex-col"
             style={{ height: "calc(100vh - 8rem)" }}
@@ -2287,8 +2891,8 @@ const Messages: React.FC = () => {
                 {/* Dimmed Overlay when reaction or message options popup is active */}
                 {(activeReactionMessageId !== null ||
                   activeMessageOptionsId !== null) && (
-                    <div className="absolute inset-0 bg-black bg-opacity-10 z-40 pointer-events-none rounded-2xl"></div>
-                  )}
+                  <div className="absolute inset-0 bg-black bg-opacity-10 z-40 pointer-events-none rounded-2xl"></div>
+                )}
 
                 {/* Scrollable Content Area (Profile + Product + Messages) */}
                 <div
@@ -2301,14 +2905,24 @@ const Messages: React.FC = () => {
                     <div className="p-6 transition-all duration-500 ease-in-out">
                       {/* Top Right Icons */}
                       <div className="flex justify-end space-x-3 mb-6">
-                        {/* close conersation button */}
+                        {/* close conversation button */}
                         <button
                           onClick={closeActiveConversation}
                           className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm"
                           title="Close conversation"
                         >
-                          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          <svg
+                            className="w-5 h-5 text-gray-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
                           </svg>
                         </button>
 
@@ -2331,7 +2945,7 @@ const Messages: React.FC = () => {
                           {/* Avatar */}
                           <img
                             src={eboAvatar}
-                            alt={productData?.seller?.name || 'Seller'}
+                            alt={productData?.seller?.name || "Seller"}
                             className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
                           />
 
@@ -2460,8 +3074,18 @@ const Messages: React.FC = () => {
                           className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm"
                           title="Close conversation"
                         >
-                          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          <svg
+                            className="w-5 h-5 text-gray-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
                           </svg>
                         </button>
 
@@ -2476,15 +3100,6 @@ const Messages: React.FC = () => {
                             className="w-5 h-5"
                           />
                         </button>
-                        {/* <button
-                          onClick={closeActiveConversation}
-                          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                          title="Close conversation"
-                        >
-                          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button> */}
                       </div>
                     </div>
                   )}
@@ -2533,10 +3148,11 @@ const Messages: React.FC = () => {
                         return (
                           <div
                             key={message.id}
-                            className={`flex mb-4 ${message.isIncoming
-                              ? "justify-start"
-                              : "justify-end"
-                              } ${isFadingOut ? "message-fade-out" : ""}`}
+                            className={`flex mb-4 ${
+                              message.isIncoming
+                                ? "justify-start"
+                                : "justify-end"
+                            } ${isFadingOut ? "message-fade-out" : ""}`}
                             style={{
                               animation: isFadingOut
                                 ? "fadeOutUp 0.5s ease-in-out forwards"
@@ -2550,10 +3166,11 @@ const Messages: React.FC = () => {
                           >
                             <div className="max-w-xs lg:max-w-md relative">
                               <div
-                                className={`rounded-2xl p-4 ${message.isIncoming
-                                  ? "rounded-bl-md cursor-pointer"
-                                  : "rounded-br-md"
-                                  }`}
+                                className={`rounded-2xl p-4 ${
+                                  message.isIncoming
+                                    ? "rounded-bl-md cursor-pointer"
+                                    : "rounded-br-md"
+                                }`}
                                 style={{
                                   backgroundColor: message.isIncoming
                                     ? "#F0F8FE"
@@ -2562,7 +3179,7 @@ const Messages: React.FC = () => {
                                 onClick={
                                   message.isIncoming
                                     ? () =>
-                                      handleIncomingMessageClick(message.id)
+                                        handleIncomingMessageClick(message.id)
                                     : undefined
                                 }
                               >
@@ -2665,14 +3282,14 @@ const Messages: React.FC = () => {
                                           {(() => {
                                             const time =
                                               audioPlaybackTime[message.id] !==
-                                                undefined
+                                              undefined
                                                 ? audioPlaybackTime[message.id]
                                                 : message.duration;
                                             return `${Math.floor(time / 60)
                                               .toString()
                                               .padStart(2, "0")} : ${(time % 60)
-                                                .toString()
-                                                .padStart(2, "0")}`;
+                                              .toString()
+                                              .padStart(2, "0")}`;
                                           })()}
                                         </span>
                                         <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
@@ -2921,10 +3538,11 @@ const Messages: React.FC = () => {
 
                               {/* Bottom Timestamp */}
                               <div
-                                className={`flex items-center mt-2 ${message.isIncoming
-                                  ? "justify-start"
-                                  : "justify-end"
-                                  }`}
+                                className={`flex items-center mt-2 ${
+                                  message.isIncoming
+                                    ? "justify-start"
+                                    : "justify-end"
+                                }`}
                               >
                                 <span
                                   className="text-xs mr-1"
@@ -2933,7 +3551,10 @@ const Messages: React.FC = () => {
                                   {message.timestamp}
                                 </span>
                                 {!message.isIncoming && (
-                                  <MessageStatus status={message.status} timestamp={message.timestamp} />
+                                  <MessageStatus
+                                    status={message.status}
+                                    timestamp={message.timestamp}
+                                  />
                                 )}
 
                                 {/* Reaction Display - inline after timestamp */}
@@ -2977,7 +3598,7 @@ const Messages: React.FC = () => {
                                   style={{
                                     zIndex:
                                       activeReactionMessageId === message.id ||
-                                        activeMessageOptionsId === message.id
+                                      activeMessageOptionsId === message.id
                                         ? 999
                                         : "auto",
                                   }}
@@ -3407,8 +4028,9 @@ const Messages: React.FC = () => {
 
                 {/* Message Input - Fixed at Bottom */}
                 <div
-                  className={`px-6 pb-6 flex-shrink-0 ${messages.length > 0 ? "py-2" : "-mt-2"
-                    }`}
+                  className={`px-6 pb-6 flex-shrink-0 ${
+                    messages.length > 0 ? "py-2" : "-mt-2"
+                  }`}
                 >
                   {/* Permanent Gray Separator Line */}
                   <div className="mb-3 -mx-6">
@@ -3995,8 +4617,8 @@ const Messages: React.FC = () => {
                                 return `${Math.floor(time / 60)
                                   .toString()
                                   .padStart(2, "0")} : ${(time % 60)
-                                    .toString()
-                                    .padStart(2, "0")}`;
+                                  .toString()
+                                  .padStart(2, "0")}`;
                               })()}
                             </span>
                             <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
@@ -4320,7 +4942,7 @@ const Messages: React.FC = () => {
               // Default Secure Messaging View - Empty State with Fixed Height
               <div
                 className="flex flex-col items-center justify-center p-8"
-                style={{ height: "calc(50vh - 4rem)" }}
+                // style={{ height: "calc(50vh - 4rem)" }}
               >
                 {/* Secure Messaging Icon */}
                 <div className="flex items-center justify-center mb-6">
@@ -4356,7 +4978,8 @@ const Messages: React.FC = () => {
                   {conversations.length > 0 && (
                     <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                       <p className="text-blue-800 text-sm">
-                        <strong>Select a conversation</strong> from the sidebar to start messaging
+                        <strong>Select a conversation</strong> from the sidebar
+                        to start messaging
                       </p>
                     </div>
                   )}

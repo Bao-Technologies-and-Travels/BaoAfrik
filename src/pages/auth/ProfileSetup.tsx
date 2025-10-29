@@ -173,7 +173,6 @@ const ProfileSetup: React.FC = () => {
 
       return fileUrl;
     } catch (error) {
-      console.error("Upload failed", error);
       throw new Error("Failed to upload image to S3");
     } finally {
       setIsUpLoadingImage(false);

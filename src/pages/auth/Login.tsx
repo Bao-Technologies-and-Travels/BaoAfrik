@@ -5,8 +5,6 @@ import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoLarge from '../../assets/images/logos/Frame 656.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { authService } from '../../services/authService';
-import { log } from 'console';
-import generate from '@babel/generator';
 import { useToast } from '../../contexts/ToastContext';
 
 const Login: React.FC = () => {

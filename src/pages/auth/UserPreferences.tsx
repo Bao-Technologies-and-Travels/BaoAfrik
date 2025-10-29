@@ -102,7 +102,6 @@ const UserPreferences: React.FC = () => {
       navigate('/');
 
     } catch (error) {
-      console.error('Failed to save preferences:', error);
       setError('Failed to save preferences. Please try again.');
     } finally {
       setIsLoading(false);

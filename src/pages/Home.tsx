@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import {useToast} from '../contexts/ToastContext';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -22,6 +21,17 @@ import pre15 from '../assets/images/pre/15.png';
 import pre16 from '../assets/images/pre/16.png';
 import pre17 from '../assets/images/pre/17.png';
 import pre18 from '../assets/images/pre/18.png';
+import earthIcon from '../assets/images/pre/earth.svg';
+import arrowDownIcon from '../assets/images/pre/arrow-down.svg';
+import grayArrowIcon from '../assets/images/pre/gray.svg';
+import blackArrowIcon from '../assets/images/pre/black.svg';
+import locationIcon from '../assets/images/pre/PL.svg';
+import bookmarkIcon from '../assets/images/pre/bm.svg';
+import verifyIcon from '../assets/images/pre/verify.svg';
+import unverifyIcon from '../assets/images/pre/unverify.svg';
+import globyIcon from '../assets/images/pre/globy.svg';
+import buyerIcon from '../assets/images/pre/buyer.svg';
+import moneyIcon from '../assets/images/pre/money.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -31,10 +41,10 @@ import cameroonianCulture from '../assets/images/logos/culture.png'; // Traditio
 // Import scan icon
 import scanIcon from '../assets/images/logos/scanner (1).png';
 
-
 const Home: React.FC = () => {
   const { user, isVisitor } = useAuth();
   const navigationLocation = useLocation();
+  const productGridRef = React.useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -61,36 +71,37 @@ const Home: React.FC = () => {
   }>>([]);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imageFormData, setImageFormData] = useState<FormData | null>(null);
-
-  const {addToast} = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+  const totalPages = 48;
 
   // Banner slides data
   const bannerSlides = [
     {
       id: 1,
       title: "Cameroonian Spices & Sauces",
-      description: "Discover our authentic spices from Cameroon",
+      description: "Discover our authentic spices and traditional blends from Cameroon",
       image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&h=300&fit=crop",
       category: "Food & Spices"
     },
     {
       id: 2,
       title: "Cameroonian Fashion",
-      description: "Beautiful traditional Kente and African fabrics",
+      description: "Beautiful traditional Kente and handwoven African fabrics",
       image: cameroonianFashion, // Traditional fabrics image
       category: "Fashion & Textiles"
     },
     {
       id: 3,
       title: "Cameroonian Decor",
-      description: "Handcrafted wooden combs and traditional accessories",
+      description: "Handcrafted wooden combs and authentic traditional accessories",
       image: cameroonianDecor, // Wooden combs image
       category: "Home & Decor"
     },
     {
       id: 4,
       title: "Cameroonian Culture",
-      description: "Traditional woven bags and cultural crafts",
+      description: "Traditional woven bags and unique handmade cultural crafts",
       image: cameroonianCulture, // Traditional woven bag image
       category: "Books & Media"
     }
@@ -99,14 +110,32 @@ const Home: React.FC = () => {
   const categories = ['All', 'Food & Spices', 'Fashion & Textiles', 'Beauty & Wellness', 'Home & Decor', 'Books & Media'];
 
   const africanCountries = [
+    { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png' },
+    { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png' },
+    { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png' },
+    { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png' },
     { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png' },
-    { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png' },
-    { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png' },
-    { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png' },
-    { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png' },
     { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png' },
-    { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png' }
-  ];
+    { name: 'Congo', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png' },
+    { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png' },
+    { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png' },
+    { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png' },
+    { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png' },
+    { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png' },
+    { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png' },
+    { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png' },
+    { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png' },
+    { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png' },
+    { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png' },
+    { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png' },
+    { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png' },
+    { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png' },
+    { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png' },
+    { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png' },
+    { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png' },
+    { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png' },
+    { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png' }
+  ].sort((a, b) => a.name.localeCompare(b.name));
 
   // Country mapping for products
   const getProductCountry = (productId: number) => {
@@ -394,6 +423,7 @@ const Home: React.FC = () => {
 
   // Handle search functionality
   const handleSearch = () => {
+    console.log('Search triggered with:', { searchQuery, selectedCategory, placeOfOrigin, location });
 
     // Get all products
     let products = Object.values(allProducts).flat();
@@ -441,6 +471,25 @@ const Home: React.FC = () => {
     }
   };
 
+  // Product grid scroll functions
+  const scrollProductsLeft = () => {
+    if (productGridRef.current) {
+      productGridRef.current.scrollBy({
+        left: -400,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const scrollProductsRight = () => {
+    if (productGridRef.current) {
+      productGridRef.current.scrollBy({
+        left: 400,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   // Handle scan functionality - trigger file input
   const handleScan = () => {
     const fileInput = document.getElementById('image-upload') as HTMLInputElement;
@@ -475,6 +524,13 @@ const Home: React.FC = () => {
       formData.append('timestamp', new Date().toISOString());
 
       setImageFormData(formData);
+
+      console.log('Image selected:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        formDataReady: true
+      });
     }
   };
 
@@ -502,12 +558,7 @@ const Home: React.FC = () => {
             } else {
               // Fallback: copy to clipboard
               await navigator.clipboard.writeText(window.location.href);
-              addToast({
-                type: "error",
-                title: "Link Copied",
-                message: "Product link copied to clipboard",
-                duration: 3000
-              });
+              console.log('Product link copied to clipboard!');
             }
           } catch (error) {
             console.log('Error sharing:', error);
@@ -527,6 +578,7 @@ const Home: React.FC = () => {
         newSaved.delete(productId);
         // Remove notification if product is unbookmarked
         setNotifications(prev => prev.filter(notif => notif.product.id !== productId));
+        console.log(`Unsaved product ${productId}`);
       } else {
         // Simulate bookmarking attempt with potential failure
         const product = getProductsToDisplay().find(p => p.id === productId);
@@ -561,6 +613,7 @@ const Home: React.FC = () => {
 
               return [...prev, errorNotification];
             });
+            console.log(`Failed to save product ${productId}`);
           } else {
             // Success - add to bookmarks
             newSaved.add(productId);
@@ -589,6 +642,7 @@ const Home: React.FC = () => {
 
               return [...prev, newNotification];
             });
+            console.log(`Saved product ${productId}`);
           }
         }
       }
@@ -616,7 +670,7 @@ const Home: React.FC = () => {
   }, [isFilterDropdownOpen]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Hidden file input for image selection */}
       <input
         id="image-upload"
@@ -629,233 +683,253 @@ const Home: React.FC = () => {
 
       {/* Search Section */}
       <div className="mt-4 sm:mt-6 mx-4 sm:mx-6" style={{ maxWidth: '1200px', margin: '0 auto', marginTop: '20px' }}>
-        <section className="bg-transparent sm:bg-white sm:shadow-sm sm:border sm:border-gray-200 rounded-full">
-          <div className="px-4 sm:px-6 lg:px-8 py-3">
-            {/* Desktop Search */}
-            <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-4">
-              {/* Search Input */}
-              <div className="flex-1 relative min-w-0">
-                <input
-                  type="text"
-                  placeholder="Search for products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleSearchKeyPress}
-                  className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
+        {/* Desktop Unified Search Bar */}
+        <div
+          className="hidden md:flex items-center mx-auto"
+          style={{
+            width: '900px',
+            height: '58px',
+            flexShrink: 0,
+            borderRadius: '30px',
+            border: '1px solid #E4E4E4',
+            background: '#FFF',
+            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+            fontFamily: 'Poppins, sans-serif'
+          }}
+        >
+          {/* Product Section */}
+          <div className="flex flex-col justify-center px-4 flex-1" style={{ borderRight: '1px solid #E4E4E4' }}>
+            <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
+            <input
+              type="text"
+              placeholder="Search a product"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
+              className="border-0 p-0 focus:outline-none focus:ring-0"
+              style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
+            />
+            <style>
+              {`
+                input::placeholder {
+                  color: #E9E9E9;
+                }
+              `}
+            </style>
+          </div>
+
+          {/* Categories Section */}
+          <div className="flex flex-col justify-center px-4 flex-1" style={{ borderRight: '1px solid #E4E4E4' }}>
+            <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Categories</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="border-0 p-0 focus:outline-none focus:ring-0 appearance-none cursor-pointer"
+              style={{ fontSize: '11px', color: selectedCategory ? '#212121' : '#E9E9E9', background: 'transparent' }}
+            >
+              <option value="" style={{ color: '#E9E9E9' }}>Search a category</option>
+              <option value="Food & Spices">Food & Spices</option>
+              <option value="Fashion & Textiles">Fashion & Textiles</option>
+              <option value="Beauty & Wellness">Beauty & Wellness</option>
+              <option value="Home & Decor">Home & Decor</option>
+              <option value="Books & Media">Books & Media</option>
+            </select>
+          </div>
+
+          {/* Place of Origin Section */}
+          <div className="flex flex-col justify-center px-4 flex-1 relative" style={{ borderRight: '1px solid #E4E4E4' }}>
+            <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Place of Origin</label>
+            <select
+              value={placeOfOrigin}
+              onChange={(e) => setPlaceOfOrigin(e.target.value)}
+              className="border-0 p-0 pr-4 focus:outline-none focus:ring-0 appearance-none cursor-pointer"
+              style={{ fontSize: '11px', color: placeOfOrigin ? '#212121' : '#E9E9E9', background: 'transparent' }}
+            >
+              <option value="" style={{ color: '#E9E9E9' }}>Choose a location</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Ghana">Ghana</option>
+              <option value="Kenya">Kenya</option>
+              <option value="South Africa">South Africa</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Morocco">Morocco</option>
+              <option value="Ethiopia">Ethiopia</option>
+              <option value="Tanzania">Tanzania</option>
+              <option value="Uganda">Uganda</option>
+              <option value="Cameroon">Cameroon</option>
+              <option value="Senegal">Senegal</option>
+              <option value="Ivory Coast">Ivory Coast</option>
+              <option value="Mali">Mali</option>
+              <option value="Burkina Faso">Burkina Faso</option>
+              <option value="Niger">Niger</option>
+              <option value="Chad">Chad</option>
+              <option value="Sudan">Sudan</option>
+              <option value="Algeria">Algeria</option>
+              <option value="Tunisia">Tunisia</option>
+              <option value="Libya">Libya</option>
+              <option value="Other">Other</option>
+            </select>
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" />
+            </div>
+          </div>
+
+          {/* Seller Location Section */}
+          <div className="flex flex-col justify-center px-4 flex-1">
+            <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Seller Location</label>
+            <input
+              type="text"
+              placeholder="Insert location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="border-0 p-0 focus:outline-none focus:ring-0"
+              style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
+            />
+          </div>
+
+          {/* Scan Icon */}
+          <button
+            onClick={handleScan}
+            className="flex items-center justify-center px-3 hover:opacity-70 transition-opacity"
+            title="Scan QR code"
+          >
+            <img
+              src={scanIcon}
+              alt="Scan QR code"
+              style={{ width: '20px', height: '20px' }}
+            />
+          </button>
+
+          {/* Search Button */}
+          <button
+            onClick={handleSearch}
+            className="flex items-center justify-center rounded-full mr-2 transition-colors"
+            style={{
+              width: '90px',
+              height: '42px',
+              backgroundColor: '#F9A825'
+            }}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Mobile Search */}
+        <div className="md:hidden">
+          <div className="flex items-center gap-2">
+            {/* Search Input */}
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search for products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+              />
+              <button
+                onClick={handleScan}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 hover:opacity-70 transition-opacity"
+                title="Scan image to search"
+              >
+                <img
+                  src={scanIcon}
+                  alt="Scan"
+                  className="w-4 h-4 opacity-60 hover:opacity-100 transition-opacity"
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-              </div>
+              </button>
+            </div>
 
-              {/* Desktop: Grid for dropdowns and inputs */}
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:contents">
+          </div>
+
+
+          {/* Mobile Filter Dropdown */}
+          {isMobileFilterOpen && (
+            <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="space-y-3">
                 {/* Category Dropdown */}
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base min-w-[140px]"
-                >
-                  <option value="">All Categories</option>
-                  <option value="Food & Spices">Food & Spices</option>
-                  <option value="Fashion & Textiles">Fashion & Textiles</option>
-                  <option value="Beauty & Wellness">Beauty & Wellness</option>
-                  <option value="Home & Decor">Home & Decor</option>
-                  <option value="Books & Media">Books & Media</option>
-                </select>
-
-                {/* Place of Origin Dropdown - Web Only */}
-                <div className="hidden lg:block relative min-w-[160px]">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                   <select
-                    value={placeOfOrigin}
-                    onChange={(e) => setPlaceOfOrigin(e.target.value)}
-                    className="w-full px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base appearance-none"
-                    style={{
-                      backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                      backgroundPosition: 'right 0.5rem center',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundSize: '1.5em 1.5em',
-                      paddingRight: '2.5rem'
-                    }}
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm"
                   >
-                    <option value="">Product Origin</option>
-                    <option value="Nigeria" style={{ backgroundImage: 'url("https://flagcdn.com/w20/ng.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Nigeria</option>
-                    <option value="Ghana" style={{ backgroundImage: 'url("https://flagcdn.com/w20/gh.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Ghana</option>
-                    <option value="Kenya" style={{ backgroundImage: 'url("https://flagcdn.com/w20/ke.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Kenya</option>
-                    <option value="South Africa" style={{ backgroundImage: 'url("https://flagcdn.com/w20/za.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>South Africa</option>
-                    <option value="Egypt" style={{ backgroundImage: 'url("https://flagcdn.com/w20/eg.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Egypt</option>
-                    <option value="Morocco" style={{ backgroundImage: 'url("https://flagcdn.com/w20/ma.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Morocco</option>
-                    <option value="Ethiopia" style={{ backgroundImage: 'url("https://flagcdn.com/w20/et.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Ethiopia</option>
-                    <option value="Tanzania" style={{ backgroundImage: 'url("https://flagcdn.com/w20/tz.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Tanzania</option>
-                    <option value="Uganda" style={{ backgroundImage: 'url("https://flagcdn.com/w20/ug.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Uganda</option>
-                    <option value="Cameroon" style={{ backgroundImage: 'url("https://flagcdn.com/w20/cm.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Cameroon</option>
-                    <option value="Senegal" style={{ backgroundImage: 'url("https://flagcdn.com/w20/sn.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Senegal</option>
-                    <option value="Ivory Coast" style={{ backgroundImage: 'url("https://flagcdn.com/w20/ci.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Ivory Coast</option>
-                    <option value="Mali" style={{ backgroundImage: 'url("https://flagcdn.com/w20/ml.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Mali</option>
-                    <option value="Burkina Faso" style={{ backgroundImage: 'url("https://flagcdn.com/w20/bf.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Burkina Faso</option>
-                    <option value="Niger" style={{ backgroundImage: 'url("https://flagcdn.com/w20/ne.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Niger</option>
-                    <option value="Chad" style={{ backgroundImage: 'url("https://flagcdn.com/w20/td.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Chad</option>
-                    <option value="Sudan" style={{ backgroundImage: 'url("https://flagcdn.com/w20/sd.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Sudan</option>
-                    <option value="Algeria" style={{ backgroundImage: 'url("https://flagcdn.com/w20/dz.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Algeria</option>
-                    <option value="Tunisia" style={{ backgroundImage: 'url("https://flagcdn.com/w20/tn.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Tunisia</option>
-                    <option value="Libya" style={{ backgroundImage: 'url("https://flagcdn.com/w20/ly.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px' }}>Libya</option>
-                    <option value="Other">Other</option>
+                    <option value="">All Categories</option>
+                    <option value="Food & Spices">Food & Spices</option>
+                    <option value="Fashion & Textiles">Fashion & Textiles</option>
+                    <option value="Beauty & Wellness">Beauty & Wellness</option>
+                    <option value="Home & Decor">Home & Decor</option>
+                    <option value="Books & Media">Books & Media</option>
                   </select>
                 </div>
 
-                {/* Location Input */}
-                <input
-                  type="text"
-                  placeholder="Seller Location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="px-3 sm:px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base min-w-[120px]"
-                />
-              </div>
 
-              {/* Mobile: Second row for buttons */}
-              <div className="flex gap-3 lg:contents">
-                {/* Scan Button */}
-                <button
-                  onClick={handleScan}
-                  className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full transition-colors flex-shrink-0 hover:border-orange-500 hover:text-orange-500"
-                  title="Scan QR code"
-                >
-                  <img
-                    src={scanIcon}
-                    alt="Scan QR code"
-                    className="w-4 h-4 sm:w-5 sm:h-5 opacity-60 hover:opacity-100 transition-opacity"
-                  />
-                </button>
-
-                {/* Search Button */}
-                <button
-                  onClick={handleSearch}
-                  className="text-white px-4 sm:px-6 py-2 rounded-full transition-colors font-medium text-sm sm:text-base whitespace-nowrap flex items-center justify-center"
-                  style={{ backgroundColor: '#F9A825' }}
-                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile Search */}
-            <div className="md:hidden">
-              <div className="flex items-center gap-2">
-                {/* Search Input */}
-                <div className="flex-1 relative">
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
                   <input
                     type="text"
-                    placeholder="Search for products..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={handleSearchKeyPress}
-                    className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                    placeholder="Location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
                   />
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-2">
                   <button
                     onClick={handleScan}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 hover:opacity-70 transition-opacity"
-                    title="Scan image to search"
+                    className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg transition-colors hover:border-orange-500 hover:text-orange-500"
+                    title="Scan QR code"
                   >
                     <img
                       src={scanIcon}
-                      alt="Scan"
-                      className="w-4 h-4 opacity-60 hover:opacity-100 transition-opacity"
+                      alt="Scan QR code"
+                      className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
                     />
                   </button>
+                  <button
+                    onClick={() => {
+                      handleSearch();
+                      setIsMobileFilterOpen(false);
+                    }}
+                    className="flex-1 text-white py-2 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center"
+                    style={{ backgroundColor: '#F9A825' }}
+                    onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+                    onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
                 </div>
-
               </div>
-
-
-              {/* Mobile Filter Dropdown */}
-              {isMobileFilterOpen && (
-                <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="space-y-3">
-                    {/* Category Dropdown */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                      <select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm"
-                      >
-                        <option value="">All Categories</option>
-                        <option value="Food & Spices">Food & Spices</option>
-                        <option value="Fashion & Textiles">Fashion & Textiles</option>
-                        <option value="Beauty & Wellness">Beauty & Wellness</option>
-                        <option value="Home & Decor">Home & Decor</option>
-                        <option value="Books & Media">Books & Media</option>
-                      </select>
-                    </div>
-
-
-                    {/* Location */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                      <input
-                        type="text"
-                        placeholder="Location"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
-                      />
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2">
-                      <button
-                        onClick={handleScan}
-                        className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg transition-colors hover:border-orange-500 hover:text-orange-500"
-                        title="Scan QR code"
-                      >
-                        <img
-                          src={scanIcon}
-                          alt="Scan QR code"
-                          className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
-                        />
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleSearch();
-                          setIsMobileFilterOpen(false);
-                        }}
-                        className="flex-1 text-white py-2 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center"
-                        style={{ backgroundColor: '#F9A825' }}
-                        onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-                        onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
-        </section>
+          )}
+        </div>
       </div>
 
       {/* Hero Banner - Auto Sliding */}
-      <section className="text-white relative overflow-hidden mt-4 sm:mt-6" style={{ background: 'linear-gradient(to right, #F9A822, #E55325)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-12 sm:mx-16 lg:mx-24 rounded-2xl" style={{ background: 'linear-gradient(to right, #F9A822, #E55325)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-1 md:py-1">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 md:gap-0">
             <div className="flex-1 text-center md:text-left px-2 md:pl-2 w-full md:w-auto">
-              <div className="bg-white bg-opacity-20 rounded-lg px-2 sm:px-3 py-1 inline-block mb-2 sm:mb-3">
-                <span className="text-xs font-medium">Featured</span>
-              </div>
+              <button
+                onClick={() => setActiveCategory(bannerSlides[currentSlide].category)}
+                className="bg-white px-3 sm:px-4 py-1 rounded text-xs sm:text-sm font-medium hover:bg-orange-50 transition-all duration-300 transform hover:scale-105 touch-manipulation mb-2 sm:mb-3"
+                style={{ color: '#F9A822' }}
+              >
+                Explore {bannerSlides[currentSlide].category}
+              </button>
               <div className="relative overflow-hidden min-h-[2rem] sm:min-h-[2.5rem] md:min-h-[3rem]">
                 <h1
                   key={`title-${currentSlide}`}
-                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 animate-fade-in-up leading-tight"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-2 animate-fade-in-up leading-tight"
                 >
                   {bannerSlides[currentSlide].title}
                 </h1>
@@ -863,17 +937,11 @@ const Home: React.FC = () => {
               <div className="relative overflow-hidden min-h-[1.5rem] sm:min-h-[2rem]">
                 <p
                   key={`desc-${currentSlide}`}
-                  className="text-orange-100 text-xs sm:text-sm md:text-base mb-3 sm:mb-4 animate-fade-in-up animation-delay-100 leading-relaxed"
+                  className="text-orange-100 text-xs sm:text-sm md:text-base mb-0 animate-fade-in-up animation-delay-100 leading-relaxed"
                 >
                   {bannerSlides[currentSlide].description}
                 </p>
               </div>
-              <button
-                onClick={() => setActiveCategory(bannerSlides[currentSlide].category)}
-                className="bg-white text-orange-600 px-3 sm:px-4 md:px-5 py-2 rounded-full text-xs sm:text-sm font-medium hover:bg-orange-50 transition-all duration-300 transform hover:scale-105 touch-manipulation"
-              >
-                Explore {bannerSlides[currentSlide].category}
-              </button>
             </div>
             <div className="block md:hidden w-full px-2 sm:px-4">
               <div className="relative overflow-hidden rounded-lg aspect-[16/9] sm:aspect-[2/1]">
@@ -881,7 +949,13 @@ const Home: React.FC = () => {
                   key={`img-mobile-${currentSlide}`}
                   src={bannerSlides[currentSlide].image}
                   alt={bannerSlides[currentSlide].title}
-                  className="w-full h-full object-cover shadow-lg animate-slide-in-right"
+                  className="w-full h-full object-cover animate-slide-in-right"
+                  style={{
+                    maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+                    maskComposite: 'intersect',
+                    WebkitMaskComposite: 'source-in'
+                  }}
                   loading="eager"
                   width="400"
                   height="200"
@@ -894,7 +968,13 @@ const Home: React.FC = () => {
                   key={`img-${currentSlide}`}
                   src={bannerSlides[currentSlide].image}
                   alt={bannerSlides[currentSlide].title}
-                  className="w-64 lg:w-80 h-40 lg:h-48 object-cover shadow-lg animate-slide-in-right"
+                  className="w-64 lg:w-80 h-32 lg:h-40 object-cover animate-slide-in-right"
+                  style={{
+                    maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+                    maskComposite: 'intersect',
+                    WebkitMaskComposite: 'source-in'
+                  }}
                   loading="eager"
                   width="320"
                   height="192"
@@ -903,8 +983,8 @@ const Home: React.FC = () => {
             </div>
           </div>
 
-          {/* Slide Indicators */}
-          <div className="flex justify-center mt-4 sm:mt-6 space-x-2">
+          {/* Slide Indicators - Hidden but functionality remains */}
+          <div className="hidden">
             {bannerSlides.map((_, index) => (
               <button
                 key={index}
@@ -921,11 +1001,11 @@ const Home: React.FC = () => {
 
       {/* Category Navigation */}
       <section className="bg-white py-4 sm:py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide relative">
-            {/* Gray line background - extends beyond container */}
-            <div className="absolute bottom-0 left-[-1rem] right-[-1rem] h-0.5 bg-gray-200"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          {/* Gray line background - full width at category bottom */}
+          <div className="absolute bottom-0 left-[calc(-50vw+50%)] right-[calc(-50vw+50%)] h-0.5 bg-gray-200"></div>
 
+          <div className="flex justify-center space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide relative">
             {categories.map((category) => (
               <button
                 key={category}
@@ -934,15 +1014,16 @@ const Home: React.FC = () => {
                   setIsSearchActive(false);
                   setSearchQuery('');
                 }}
-                className={`whitespace-nowrap pb-3 sm:pb-4 px-1 font-medium text-sm sm:text-lg transition-colors flex-shrink-0 relative ${activeCategory === category
-                    ? 'text-orange-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                className={`whitespace-nowrap pb-3 sm:pb-4 px-1 font-normal transition-colors flex-shrink-0 relative`}
+                style={{
+                  fontSize: '16px',
+                  fontFamily: 'Poppins, sans-serif',
+                  color: activeCategory === category ? '#64B5F6' : '#BABABA'
+                }}
               >
                 {category}
-                {/* Orange line for active category */}
                 {activeCategory === category && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: '#64B5F6' }}></div>
                 )}
               </button>
             ))}
@@ -951,40 +1032,110 @@ const Home: React.FC = () => {
       </section>
 
       {/* Filter Button - Desktop Only */}
-      <section className="bg-white py-2 sm:py-4">
+      <section className="bg-white pt-0 pb-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="relative filter-dropdown hidden md:block">
               <button
                 onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-                className="flex items-center space-x-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg text-gray-600 hover:text-gray-800 hover:bg-blue-100 transition-colors"
+                className="flex items-center space-x-2 border rounded-lg transition-colors"
+                style={{
+                  padding: '8px 10px',
+                  backgroundColor: '#FAFAFA',
+                  borderColor: '#E4E4E4',
+                  fontFamily: 'Poppins, sans-serif'
+                }}
               >
-                <span className="text-base font-medium text-gray-500">Filter :</span>
-                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-base font-medium text-blue-600">{selectedCountry || 'Africa'}</span>
-                <svg className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                <span className="text-base font-normal" style={{ color: '#BABABA' }}>Filter :</span>
+                <img src={earthIcon} alt="Earth" style={{ width: '22px', height: '22px' }} />
+                <span className="text-base font-medium" style={{ color: '#6A6A6A' }}>{selectedCountry || 'Africa'}</span>
+                <img
+                  src={arrowDownIcon}
+                  alt="Arrow"
+                  className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`}
+                />
               </button>
 
               {/* Dropdown Menu */}
               {isFilterDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                  <div className="py-2">
+                <div
+                  className="absolute left-0 bg-white border border-gray-200 z-10"
+                  style={{
+                    width: '200px',
+                    flexShrink: 0,
+                    borderRadius: '16px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    top: '0'
+                  }}
+                >
+                  <style>
+                    {`
+                    .filter-dropdown-scroll::-webkit-scrollbar {
+                      width: 2px;
+                    }
+                    .filter-dropdown-scroll::-webkit-scrollbar-track {
+                      background: transparent;
+                    }
+                    .filter-dropdown-scroll::-webkit-scrollbar-thumb {
+                      background-color: #E4E4E4;
+                      border-radius: 10px;
+                    }
+                  `}
+                  </style>
+
+                  {/* Search Input at Top */}
+                  <div className="px-3 pt-3 pb-2 border-b border-gray-200">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Filter :"
+                        className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none"
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          color: '#6A6A6A',
+                          border: 'none'
+                        }}
+                      />
+                      <button
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                        onClick={() => setIsFilterDropdownOpen(false)}
+                      >
+                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Scrollable Country List */}
+                  <div
+                    className="py-2 overflow-y-auto filter-dropdown-scroll"
+                    style={{
+                      maxHeight: 'calc(6 * 44px)',
+                      scrollbarWidth: 'thin',
+                      scrollbarColor: '#E4E4E4 transparent'
+                    }}
+                  >
                     <button
                       onClick={() => {
                         setSelectedCountry('');
                         setIsFilterDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${!selectedCountry ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
-                        }`}
+                      style={{
+                        backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
+                        color: !selectedCountry ? '#64B5F6' : '#BABABA'
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-center">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <img
+                          src={globyIcon}
+                          alt="Globe"
+                          className="w-4 h-4 mr-2"
+                          style={{
+                            filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                          }}
+                        />
                         <span>Africa</span>
                       </div>
                     </button>
@@ -995,8 +1146,11 @@ const Home: React.FC = () => {
                           setSelectedCountry(country.name);
                           setIsFilterDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${selectedCountry === country.name ? 'text-orange-600 bg-orange-50' : 'text-gray-700'
-                          }`}
+                        style={{
+                          backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
+                          color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
                       >
                         <span className="flex items-center space-x-2">
                           <img
@@ -1136,161 +1290,272 @@ const Home: React.FC = () => {
             </div>
           </div>
 
-          {/* Section Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {isSearchActive
-                  ? `Search Results (${filteredProducts().length} found)`
-                  : activeCategory === 'All' ? 'All Products' : activeCategory
-                }
-              </h2>
-              {isSearchActive && (
-                <button
-                  onClick={clearSearch}
-                  className="ml-3 text-sm text-orange-600 hover:text-orange-700 font-medium"
-                >
-                  Clear Search
-                </button>
-              )}
-              <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button className="p-2 rounded-full border border-gray-300 hover:bg-gray-50">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button className="p-2 rounded-full border border-gray-300 hover:bg-gray-50">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          {/* Conditional Layout: Category Sections for "All" or Regular Grid for Specific Category */}
+          {activeCategory === 'All' && !isSearchActive ? (
+            // Category Sections Layout
+            <div className="space-y-8">
+              {categories.filter(cat => cat !== 'All').map((category) => {
+                const categoryProducts = (allProducts[category as keyof typeof allProducts] || []);
+                if (categoryProducts.length === 0) return null;
 
-          {/* Products Grid */}
-          {filteredProducts().length === 0 && isSearchActive ? (
-            <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No products found</h3>
-              <p className="mt-1 text-sm text-gray-500">Try adjusting your search criteria or browse our categories.</p>
-              <div className="mt-6">
-                <button
-                  onClick={clearSearch}
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700"
-                >
-                  Browse All Products
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-              {getProductsToDisplay().map((product) => (
-                <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200 block group">
-                  {/* Product Image - Top */}
-                  <div className="aspect-square relative overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      loading="lazy"
-                      width="200"
-                      height="200"
-                    />
-
-                    {/* Country Badge */}
-                    <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
-                      <img
-                        src={getProductCountry(product.id).flag}
-                        alt={getProductCountry(product.id).name}
-                        className="w-3 h-2 object-cover rounded-sm"
-                      />
-                      <span className="text-xs font-medium text-gray-800">
-                        {getProductCountry(product.id).abbreviation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="p-2 sm:p-3 flex flex-col">
-                    {/* Price and Verified Badge Row */}
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="text-sm sm:text-lg font-bold text-gray-900">
-                        ${product.price}
-                      </div>
-                      {product.verified ? (
-                        <div className="flex items-center text-xs text-green-600 bg-green-50 px-1 py-0.5 rounded text-xs">
-                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
-                          <span className="text-xs">Verified seller</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-xs sm:text-xs text-gray-600 bg-gray-100 px-0.5 sm:px-1 py-0.5 rounded text-xs">
-                          <svg className="w-1.5 h-1.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2l2.5 5.5L20 8l-4.5 4.5L17 18l-5-2.5L7 18l1.5-5.5L4 8l5.5-.5L12 2z" stroke="currentColor" strokeWidth="1" fill="none" />
-                            <text x="12" y="16" textAnchor="middle" fontSize="4" fill="currentColor" fontWeight="bold">!</text>
-                          </svg>
-                          <span className="text-xs sm:text-xs">Unverified Seller</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Product Name */}
-                    <h3 className="text-xs sm:text-sm text-gray-600 mb-1 line-clamp-2 font-medium">{product.name}</h3>
-
-                    {/* Location and Bookmark Row - Below Product Name */}
-                    <div className="flex items-center justify-between">
-                      {/* Location */}
-                      <div className="flex items-center text-gray-500 flex-1">
-                        <svg className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 mr-0.5 sm:mr-1 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                return (
+                  <div key={category} className="mb-8">
+                    {/* Category Header */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center">
+                        <h2 className="text-[20px] font-semibold text-gray-900">{category}</h2>
+                        <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
-                        <span className="truncate text-xs sm:text-xs font-normal max-w-[60px] sm:max-w-none">{product.location}</span>
                       </div>
-
-                      {/* Bookmark Button */}
-                      <div className="ml-2 sm:ml-4">
+                      <div className="flex items-center space-x-3">
                         <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleSave(product.id);
-                          }}
-                          className={`p-2 sm:p-2 transition-colors touch-manipulation ${savedProducts.has(product.id)
-                              ? 'text-blue-500 hover:text-blue-600'
-                              : 'text-gray-400 hover:text-gray-600'
-                            }`}
-                          title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                          className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                          aria-label="Scroll left"
                         >
-                          <div className="relative">
-                            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill={savedProducts.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                            </svg>
-                            {savedProducts.has(product.id) && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                            )}
-                            {!savedProducts.has(product.id) && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-xs font-bold">+</span>
-                              </div>
-                            )}
-                          </div>
+                          <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                        </button>
+                        <button
+                          className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                          aria-label="Scroll right"
+                        >
+                          <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
                         </button>
                       </div>
                     </div>
+
+                    {/* Category Products - Horizontal Scroll */}
+                    <div className="overflow-x-auto scrollbar-hide">
+                      <div className="flex gap-5 sm:gap-6">
+                        {categoryProducts.slice(0, 12).map((product) => (
+                          <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group flex-shrink-0" style={{ width: '200px' }}>
+                            {/* Product Image - Top */}
+                            <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
+                                loading="lazy"
+                                width="200"
+                                height="200"
+                              />
+
+                              {/* Country Badge */}
+                              <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+                                <img
+                                  src={getProductCountry(product.id).flag}
+                                  alt={getProductCountry(product.id).name}
+                                  className="w-3 h-2 object-cover rounded-sm"
+                                />
+                                <span className="text-xs font-medium text-gray-800">
+                                  {getProductCountry(product.id).abbreviation}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Product Content */}
+                            <div className="px-2 pb-2 sm:px-3 sm:pb-3 flex flex-col">
+                              {/* Price and Verified Badge Row */}
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
+                                  ${product.price}
+                                </div>
+                                {product.verified ? (
+                                  <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                                    <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
+                                    <span>Verified seller</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                                    <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
+                                    <span>Unverified Seller</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Product Name */}
+                              <h3 className="mb-1 line-clamp-2 font-medium" style={{ fontSize: '13px', color: '#212121' }}>{product.name}</h3>
+
+                              {/* Location and Bookmark Row - Below Product Name */}
+                              <div className="flex items-center justify-between">
+                                {/* Location */}
+                                <div className="flex items-center text-gray-500 flex-1">
+                                  <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                                  <span className="truncate font-normal" style={{ fontSize: '10px' }}>{product.location}</span>
+                                </div>
+
+                                {/* Bookmark Button */}
+                                <div className="ml-2">
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      handleSave(product.id);
+                                    }}
+                                    className="transition-colors touch-manipulation"
+                                    title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                                    style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                  >
+                                    <img src={bookmarkIcon} alt="Bookmark" className="w-5 h-5" style={{
+                                      filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                                    }} />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </Link>
-              ))}
+                );
+              })}
             </div>
+          ) : (
+            // Regular Grid Layout for Specific Category or Search
+            <>
+              {/* Section Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center">
+                  <h2 className="text-[20px] font-semibold text-gray-900">
+                    {isSearchActive
+                      ? `Search Results (${filteredProducts().length} found)`
+                      : activeCategory
+                    }
+                  </h2>
+                  {isSearchActive && (
+                    <button
+                      onClick={clearSearch}
+                      className="ml-3 text-sm text-orange-600 hover:text-orange-700 font-medium"
+                    >
+                      Clear Search
+                    </button>
+                  )}
+                  <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={scrollProductsLeft}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                    aria-label="Scroll products left"
+                  >
+                    <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                  </button>
+                  <button
+                    onClick={scrollProductsRight}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                    aria-label="Scroll products right"
+                  >
+                    <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Products Grid */}
+              {filteredProducts().length === 0 && isSearchActive ? (
+                <div className="text-center py-12">
+                  <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">No products found</h3>
+                  <p className="mt-1 text-sm text-gray-500">Try adjusting your search criteria or browse our categories.</p>
+                  <div className="mt-6">
+                    <button
+                      onClick={clearSearch}
+                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700"
+                    >
+                      Browse All Products
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  ref={productGridRef}
+                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6 overflow-x-auto scrollbar-hide"
+                >
+                  {getProductsToDisplay().map((product) => (
+                    <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 block group">
+                      {/* Product Image - Top */}
+                      <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
+                          loading="lazy"
+                          width="200"
+                          height="200"
+                        />
+
+                        {/* Country Badge */}
+                        <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+                          <img
+                            src={getProductCountry(product.id).flag}
+                            alt={getProductCountry(product.id).name}
+                            className="w-3 h-2 object-cover rounded-sm"
+                          />
+                          <span className="text-xs font-medium text-gray-800">
+                            {getProductCountry(product.id).abbreviation}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Product Content */}
+                      <div className="px-2 pb-2 sm:px-3 sm:pb-3 flex flex-col">
+                        {/* Price and Verified Badge Row */}
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
+                            ${product.price}
+                          </div>
+                          {product.verified ? (
+                            <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                              <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
+                              <span>Verified seller</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                              <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
+                              <span>Unverified Seller</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Product Name */}
+                        <h3 className="mb-1 line-clamp-2 font-medium" style={{ fontSize: '13px', color: '#212121' }}>{product.name}</h3>
+
+                        {/* Location and Bookmark Row - Below Product Name */}
+                        <div className="flex items-center justify-between">
+                          {/* Location */}
+                          <div className="flex items-center text-gray-500 flex-1">
+                            <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                            <span className="truncate font-normal" style={{ fontSize: '10px' }}>{product.location}</span>
+                          </div>
+
+                          {/* Bookmark Button */}
+                          <div className="ml-2">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleSave(product.id);
+                              }}
+                              className="transition-colors touch-manipulation"
+                              title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                              style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                              <img src={bookmarkIcon} alt="Bookmark" className="w-5 h-5" style={{
+                                filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              }} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
@@ -1333,26 +1598,314 @@ const Home: React.FC = () => {
           </div>
 
           {/* Desktop Pagination */}
-          <div className="hidden md:flex items-center justify-center">
+          <div className="hidden md:flex items-center justify-center relative">
             <div className="flex items-center space-x-4">
-              <button className="px-4 py-2 text-base text-black hover:text-gray-700 font-medium transition-colors">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontSize: '18px', color: '#BABABA' }}
+              >
                 Previous
               </button>
-              <div className="flex space-x-2">
-                {[1, 2, 3, 4, 5, 6, 7, 8, '...', 48].map((page, index) => (
-                  <button
-                    key={index}
-                    className={`px-4 py-2 text-base rounded-lg font-medium transition-colors ${page === 1
-                        ? 'bg-orange-500 text-white'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                      }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+              <div className="flex space-x-1">
+                {(() => {
+                  const pages = [];
+                  const showPages = [];
+
+                  if (totalPages <= 7) {
+                    for (let i = 1; i <= totalPages; i++) showPages.push(i);
+                  } else {
+                    if (currentPage <= 4) {
+                      showPages.push(1, 2, 3, 4, 5, '...', totalPages);
+                    } else if (currentPage >= totalPages - 3) {
+                      showPages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+                    } else {
+                      showPages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+                    }
+                  }
+
+                  return (
+                    <>
+                      {showPages.map((page, index) => (
+                        page === '...' ? (
+                          <span key={`ellipsis-${index}`} className="px-4 py-2 font-normal" style={{ fontSize: '18px', color: '#BABABA' }}>
+                            ...
+                          </span>
+                        ) : (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page as number)}
+                            className="px-4 py-2 font-normal transition-colors relative"
+                            style={{ fontSize: '18px', color: page === currentPage ? '#212121' : '#BABABA' }}
+                          >
+                            {page}
+                            {page === currentPage && (
+                              <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-0.5" style={{ backgroundColor: '#212121' }}></div>
+                            )}
+                          </button>
+                        )
+                      ))}
+                    </>
+                  );
+                })()}
               </div>
-              <button className="px-4 py-2 text-base text-black hover:text-gray-700 font-medium transition-colors">
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontSize: '18px', color: '#212121' }}
+              >
                 Next
+              </button>
+              <div className="flex items-center absolute right-0">
+                <span className="px-4 py-0.5 rounded-lg font-normal border" style={{ fontSize: '18px', color: '#212121', backgroundColor: '#F5F5F5', borderColor: '#E4E4E4' }}>
+                  {currentPage}
+                </span>
+                <span className="mx-2 font-normal" style={{ fontSize: '18px', color: '#BABABA' }}>
+                  /
+                </span>
+                <span className="font-normal" style={{ fontSize: '18px', color: '#BABABA' }}>
+                  {totalPages}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Buy & Sell Instantly Section */}
+      <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="max-w-7xl mx-auto">
+          {/* Header Section */}
+          <div className="flex items-start justify-between mb-8">
+            <div className="flex-1">
+              <h2 className="mb-4" style={{ fontSize: '44px', fontWeight: '600', lineHeight: '1.2' }}>
+                <span style={{ color: '#212121' }}>Buy & Sell </span>
+                <span style={{
+                  background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+                  Instantly
+                </span>
+              </h2>
+              <p style={{ fontSize: '16px', color: '#9C9C9C', maxWidth: '600px', lineHeight: '1.6' }}>
+                Turn unmet needs into instant deals, discover what people are looking for, grab it, and sell it right where demand begins
+              </p>
+            </div>
+            <div className="text-right">
+              <div style={{
+                fontSize: '44px',
+                fontWeight: '600',
+                background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                Over 400
+              </div>
+              <div style={{ fontSize: '18px', color: '#9C9C9C', marginTop: '4px' }}>
+                Request availables
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Bar Section */}
+          <div className="flex items-center gap-4 mb-8 mt-20">
+            {/* Filter Button */}
+            <button
+              className="flex items-center border transition-colors hover:bg-gray-50"
+              style={{
+                backgroundColor: '#FAFAFA',
+                borderColor: '#E4E4E4',
+                padding: '8px 10px',
+                borderRadius: '8px',
+                fontFamily: 'Poppins, sans-serif',
+                gap: '6px'
+              }}
+            >
+              <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Filter :</span>
+              <img src={earthIcon} alt="Globe" style={{ width: '22px', height: '22px' }} />
+              <span style={{ color: '#6A6A6A', fontSize: '14px' }}>Africa</span>
+              <img src={arrowDownIcon} alt="Arrow" style={{ width: '16px', height: '16px' }} />
+            </button>
+
+            {/* Price Button */}
+            <button
+              className="flex items-center border transition-colors hover:bg-gray-50"
+              style={{
+                backgroundColor: '#FAFAFA',
+                borderColor: '#E4E4E4',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                fontFamily: 'Poppins, sans-serif',
+                gap: '6px'
+              }}
+            >
+              <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Price :</span>
+              <span style={{ color: '#6A6A6A', fontSize: '14px' }}>All</span>
+              <img src={arrowDownIcon} alt="Arrow" style={{ width: '16px', height: '16px' }} />
+            </button>
+
+            {/* Buyer Location Search Bar */}
+            <div className="ml-auto" style={{ width: '380px' }}>
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  placeholder="Buyer location ?"
+                  className="w-full px-4 py-2.5 pr-28 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderColor: '#E4E4E4',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '14px',
+                    color: '#6A6A6A'
+                  }}
+                />
+                <div
+                  className="absolute right-2 flex items-center"
+                  style={{
+                    backgroundColor: '#F9A825',
+                    height: '28px',
+                    paddingLeft: '18px',
+                    paddingRight: '18px',
+                    borderRadius: '8px'
+                  }}
+                >
+                  <img src={buyerIcon} alt="Search" className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Request Cards Section */}
+          <div className="relative">
+            {/* Fade effect on the right */}
+            <div
+              className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+              style={{
+                background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                height: 'calc(100% - 4rem)' // Exclude the navigation arrows height
+              }}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6">
+              {[1, 2, 3].map((index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl p-4 hover:shadow-md transition-shadow"
+                  style={{ boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', height: 'auto' }}
+                >
+                  {/* Product Name Label and Button */}
+                  <div className="flex items-center justify-between mb-0">
+                    <span style={{ fontSize: '12px', color: '#9C9C9C' }}>Product name</span>
+                    <button
+                      className="px-3 py-1 rounded-lg text-white"
+                      style={{ backgroundColor: '#F9A825', fontWeight: 'normal', fontSize: '12px' }}
+                    >
+                      Manage request
+                    </button>
+                  </div>
+
+                  {/* Product Title */}
+                  <h3 className="mb-3" style={{ fontSize: '14px', fontWeight: '500', color: '#212121' }}>
+                    Snails from South Africa
+                  </h3>
+
+                  {/* Description */}
+                  <p className="mb-4" style={{ fontSize: '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </p>
+
+                  {/* Tags and User Info Row */}
+                  <div className="flex items-end justify-between">
+                    {/* Tags - Stacked Layout */}
+                    <div className="flex flex-col gap-2">
+                      {/* First Row - Location */}
+                      <div
+                        className="flex items-center gap-1 px-2 py-1"
+                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                      >
+                        <img
+                          src={locationIcon}
+                          alt="Location"
+                          className="w-3 h-3"
+                          style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6' }}>London, United Kingdom</span>
+                      </div>
+
+                      {/* Second Row - Price and Country */}
+                      <div className="flex gap-2">
+                        {/* Price Tag */}
+                        <div
+                          className="flex items-center gap-1.5 px-3 py-1.5"
+                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                        >
+                          <img
+                            src={moneyIcon}
+                            alt="Money"
+                            className="w-3 h-3"
+                            style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                          />
+                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                        </div>
+
+                        {/* Country Tag */}
+                        <div
+                          className="flex items-center gap-1.5 px-3 py-1.5"
+                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                        >
+                          <img
+                            src="https://flagcdn.com/w20/za.png"
+                            alt="South Africa"
+                            className="w-4 h-3 object-cover rounded-sm"
+                          />
+                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* User Info */}
+                    <div className="flex flex-col items-center mt-2">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
+                        style={{ backgroundColor: '#F7C9B0' }}
+                      >
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C" />
+                          <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C" />
+                        </svg>
+                      </div>
+                      <div
+                        className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 border -mt-2"
+                        style={{ borderColor: '#F4F4F4', backgroundColor: '#FFFFFF', borderRadius: '12px' }}
+                      >
+                        <svg className="w-2.5 h-2.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span style={{ fontSize: '10px', color: '#212121', fontWeight: '500' }}>4.3</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Arrows */}
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                aria-label="Previous"
+              >
+                <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+              </button>
+              <button
+                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                aria-label="Next"
+              >
+                <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
               </button>
             </div>
           </div>

@@ -19,7 +19,6 @@ export class ChatController {
                 data: conversations
             });
         } catch (error) {
-            console.error('Get conversations error:', error);
             return res.status(500).json({
                 success: false,
                 error: 'Failed to get conversations'
