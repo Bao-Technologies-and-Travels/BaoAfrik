@@ -688,7 +688,7 @@ const Home: React.FC = () => {
         <div 
           className="hidden md:flex items-center mx-auto"
           style={{
-            width: '760px',
+            width: '900px',
             height: '58px',
             flexShrink: 0,
             borderRadius: '30px',
