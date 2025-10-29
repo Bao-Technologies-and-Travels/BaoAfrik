@@ -84,6 +84,13 @@ const Home: React.FC = () => {
   const [selectedCategoryText, setSelectedCategoryText] = useState('');
   const [showPlaceOfOriginDropdown, setShowPlaceOfOriginDropdown] = useState(false);
   const [selectedPlaceOfOriginText, setSelectedPlaceOfOriginText] = useState('');
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestProductName, setRequestProductName] = useState('');
+  const [requestProductOrigin, setRequestProductOrigin] = useState('');
+  const [requestDescription, setRequestDescription] = useState('');
+  const [requestPriceRange, setRequestPriceRange] = useState('');
+  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   // Banner slides data
   const bannerSlides = [
@@ -1747,6 +1754,7 @@ const Home: React.FC = () => {
                 
                 {/* Make a Request Button */}
                 <button
+                  onClick={() => setShowRequestModal(true)}
                   className="inline-flex items-center mx-auto"
                   style={{
                     display: 'flex',
@@ -1839,11 +1847,11 @@ const Home: React.FC = () => {
                             <span className="truncate">{product.location}</span>
                           </div>
                           {/* Bookmark Button */}
-                          <button 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleSave(product.id);
-                            }}
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleSave(product.id);
+                          }}
                             className="flex items-center justify-center flex-shrink-0"
                             style={{ width: '20px', height: '20px' }}
                           >
@@ -1852,7 +1860,7 @@ const Home: React.FC = () => {
                               alt="Bookmark" 
                               className="w-full h-full"
                             />
-                          </button>
+                        </button>
                         </div>
                       </div>
                     </Link>
@@ -2304,6 +2312,341 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Request Modal Overlay */}
+      {showRequestModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#0000001A',
+            zIndex: 9998,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onClick={() => setShowRequestModal(false)}
+        >
+          {/* Request Modal */}
+          <div 
+            style={{
+              width: '580px',
+              height: 'auto',
+              maxHeight: '90vh',
+              flexShrink: 0,
+              borderRadius: '30px',
+              background: '#FFF',
+              padding: '24px 32px',
+              position: 'relative',
+              fontFamily: 'Poppins, sans-serif',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '600' }}>
+                Do a request
+              </h2>
+              <button 
+                onClick={() => setShowRequestModal(false)}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  color: '#212121',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Product Name Input */}
+            <div className="mb-3">
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
+                Product name
+              </label>
+              <input 
+                type="text"
+                value={requestProductName}
+                onChange={(e) => setRequestProductName(e.target.value)}
+                placeholder="Enter product name"
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #E4E4E4',
+                  fontSize: '12px',
+                  fontFamily: 'Poppins, sans-serif',
+                  outline: 'none'
+                }}
+              />
+            </div>
+
+            {/* Product Origin Input */}
+            <div className="mb-3">
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
+                Product Origin
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="text"
+                  value={requestProductOrigin}
+                  onChange={(e) => setRequestProductOrigin(e.target.value)}
+                  placeholder="Choose a location"
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid #E4E4E4',
+                    fontSize: '12px',
+                    fontFamily: 'Poppins, sans-serif',
+                    outline: 'none',
+                    color: requestProductOrigin ? '#212121' : '#D9D9D9'
+                  }}
+                />
+                <svg 
+                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px' }}
+                  fill="none" 
+                  stroke="#6A6A6A" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Description Input */}
+            <div className="mb-3">
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
+                Description
+              </label>
+              <textarea 
+                value={requestDescription}
+                onChange={(e) => setRequestDescription(e.target.value)}
+                placeholder="Add an description"
+                rows={3}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #E4E4E4',
+                  fontSize: '11px',
+                  fontFamily: 'Poppins, sans-serif',
+                  outline: 'none',
+                  resize: 'none',
+                  color: requestDescription ? '#212121' : '#D9D9D9'
+                }}
+              />
+            </div>
+
+            {/* Location Section */}
+            <div className="mb-4">
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '-4px' }}>
+                Your location
+              </label>
+              <div className="flex items-center justify-between">
+                <span style={{ fontSize: '12px', color: '#64B5F6' }}>
+                  London, United Kingdom
+                </span>
+                <button 
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    backgroundColor: '#F0F8FE',
+                    color: '#64B5F6',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  Change location
+                </button>
+              </div>
+            </div>
+
+            {/* Price Range Section */}
+            <div className="mb-4">
+              <h3 style={{ fontSize: '14px', color: '#212121', marginBottom: '10px', fontWeight: '500' }}>
+                How much would you like to pay for the product?
+              </h3>
+              <div className="flex gap-2 mb-2">
+                {['Less than 10 USD', '10 - 50 USD', '50 - 100 USD', '100 - 200 USD'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setRequestPriceRange(range)}
+                    style={{
+                      width: '110px',
+                      padding: '8px 10px',
+                      borderRadius: '8px',
+                      border: `1px solid ${requestPriceRange === range ? '#64B5F6' : '#E4E4E4'}`,
+                      backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFF',
+                      color: requestPriceRange === range ? '#64B5F6' : '#6A6A6A',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif',
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setRequestPriceRange('More than 200 USD')}
+                style={{
+                  width: '228px',
+                  padding: '8px 10px',
+                  borderRadius: '8px',
+                  border: `1px solid ${requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#E4E4E4'}`,
+                  backgroundColor: requestPriceRange === 'More than 200 USD' ? '#F0F8FE' : '#FFF',
+                  color: requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#6A6A6A',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontFamily: 'Poppins, sans-serif',
+                  textAlign: 'center'
+                }}
+              >
+                More than 200 USD
+              </button>
+            </div>
+
+            {/* Create Request Button */}
+            <button
+              style={{
+                display: 'flex',
+                width: '480px',
+                height: '40px',
+                padding: '10px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                flexShrink: 0,
+                borderRadius: '8px',
+                backgroundColor: '#F9A825',
+                color: '#FFF',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: '400',
+                margin: '0 auto'
+              }}
+              onClick={async () => {
+                // Validate form
+                if (!requestProductName || !requestProductOrigin || !requestDescription || !requestPriceRange) {
+                  alert('Please fill all fields');
+                  return;
+                }
+                
+                setIsSubmittingRequest(true);
+                
+                // Simulate API call with loading state
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                setIsSubmittingRequest(false);
+                setShowRequestModal(false);
+                setShowConfirmationModal(true);
+                
+                // Reset form
+                setRequestProductName('');
+                setRequestProductOrigin('');
+                setRequestDescription('');
+                setRequestPriceRange('');
+              }}
+              disabled={isSubmittingRequest}
+            >
+              {isSubmittingRequest ? 'Submitting...' : 'Create the request'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmationModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#0000001A',
+            zIndex: 9998,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onClick={() => setShowConfirmationModal(false)}
+        >
+          {/* Confirmation Modal Content */}
+          <div 
+            style={{
+              width: '520px',
+              height: 'auto',
+              borderRadius: '30px',
+              background: '#FFF',
+              padding: '32px 40px',
+              position: 'relative',
+              fontFamily: 'Poppins, sans-serif',
+              textAlign: 'center'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Verify Icon */}
+            <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+              <img src={verifyIcon} alt="Success" style={{ width: '70px', height: '70px' }} />
+            </div>
+
+            {/* Success Message */}
+            <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '500', marginBottom: '10px' }}>
+              Your request has been registered
+            </h2>
+
+            {/* Description */}
+            <p style={{ fontSize: '13px', color: '#6A6A6A', marginBottom: '24px', lineHeight: '1.6' }}>
+              Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing
+            </p>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowConfirmationModal(false)}
+              style={{
+                display: 'flex',
+                width: '100%',
+                height: '40px',
+                padding: '10px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                flexShrink: 0,
+                borderRadius: '8px',
+                backgroundColor: '#F9A825',
+                color: '#FFF',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: '400',
+                margin: '0 auto'
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
