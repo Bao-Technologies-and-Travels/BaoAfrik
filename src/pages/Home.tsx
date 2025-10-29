@@ -1773,6 +1773,14 @@ const Home: React.FC = () => {
 
           {/* Request Cards Section */}
           <div className="relative">
+            {/* Fade effect on the right */}
+            <div 
+              className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+              style={{
+                background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                height: 'calc(100% - 4rem)' // Exclude the navigation arrows height
+              }}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6">
               {[1, 2, 3].map((index) => (
                 <div 
