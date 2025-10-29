@@ -22,19 +22,42 @@ pipeline {
                 echo 'Setting up server dependencies...'
 
                 sshagent([env.SSH_KEY_ID]) {
+                    // step 1: system updates
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                     set -e
                         # Update and upgrade server packages
                         sudo apt update && sudo apt upgrade -y
+                    '
+                    """
 
+                    // step 2: install Nodejs
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                         # Install Node.js and npm if not already installed
-                        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+                        curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
                         sudo apt-get install -y nodejs
 
+                        # Verify Node.js installation
+                        echo "Node.js version:"
+                        node --version
+                        echo "npm version:"
+                        npm --version
+                    '
+                    """
+
+                    // step 3: install pm2
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                         # Install PM2 globally
                         sudo npm install -g pm2@latest
+                        pm2 --version
+                    '
+                    """
 
+                    // step 4: install other dependencies
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                         # Install Nginx if not already installed
                         if ! command -v nginx &> /dev/null; then
                             sudo apt install -y nginx
