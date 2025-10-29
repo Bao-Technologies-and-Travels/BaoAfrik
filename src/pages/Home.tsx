@@ -415,6 +415,29 @@ const Home: React.FC = () => {
     return products;
   };
 
+  // Check if we should show "no results" state
+  const shouldShowNoResultsState = () => {
+    const products = getProductsToDisplay();
+    const hasNoProducts = products.length === 0;
+    
+    // Show no results if searching and no results
+    if (isSearchActive && hasNoProducts) {
+      return true;
+    }
+    
+    // Show no results if a category is selected (not "All") and it has no products
+    if (activeCategory !== 'All' && hasNoProducts) {
+      return true;
+    }
+    
+    // Show no results if a country filter is applied and no products match
+    if (selectedCountry && hasNoProducts) {
+      return true;
+    }
+    
+    return false;
+  };
+
   // Clear search and return to category view
   const clearSearch = () => {
     setSearchQuery('');
@@ -1577,14 +1600,166 @@ const Home: React.FC = () => {
           {/* Conditional Layout: Category Sections for "All" or Regular Grid for Specific Category */}
           {activeCategory === 'All' && !isSearchActive ? (
             // Category Sections Layout
-            <div className="space-y-8">
-              {categories.filter(cat => cat !== 'All').map((category) => {
+            (() => {
+              // Check if any category has products after country filter
+              const hasAnyProducts = categories.filter(cat => cat !== 'All').some((category) => {
                 const categoryProducts = (allProducts[category as keyof typeof allProducts] || []);
-                // Filter products by selected country
                 const filteredProducts = selectedCountry 
                   ? categoryProducts.filter(product => getProductCountry(product.id).name === selectedCountry)
                   : categoryProducts;
-                if (filteredProducts.length === 0) return null;
+                return filteredProducts.length > 0;
+              });
+
+              // If no products found and country filter is active, show no results state
+              if (!hasAnyProducts && selectedCountry) {
+                return (
+                  <div>
+                    {/* No Results State */}
+                    <div className="text-center py-12">
+                      {/* Shopping Bag with Magnifying Glass Icon */}
+                      <img 
+                        src={bagIcon} 
+                        alt="No products found" 
+                        className="mx-auto mb-4" 
+                        style={{ width: '60px', height: '60px' }}
+                      />
+                      
+                      {/* Message */}
+                      <p className="mb-4" style={{ fontSize: '18px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', maxWidth: '500px', margin: '0 auto 16px' }}>
+                        Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
+                      </p>
+                      
+                      {/* Make a Request Button */}
+                      <button
+                        onClick={() => setShowRequestModal(true)}
+                        className="inline-flex items-center mx-auto"
+                        style={{
+                          display: 'flex',
+                          padding: '10px 20px',
+                          alignItems: 'center',
+                          gap: '6px',
+                          borderRadius: '8px',
+                          backgroundColor: '#F0F8FE',
+                          color: '#64B5F6',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        <img src={draftsIcon} alt="Request" style={{ width: '20px', height: '20px' }} />
+                        Make a request
+                      </button>
+                    </div>
+
+                    {/* Other Products Near You Section */}
+                    <div className="mt-12">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-semibold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                          Other products near you
+                        </h3>
+                        <button className="text-sm font-medium hover:underline" style={{ color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>
+                          View more...
+                        </button>
+                      </div>
+                      
+                      {/* Product Cards */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6">
+                        {Object.values(allProducts).flat().slice(0, 6).map((product) => (
+                          <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                            {/* Product Image - Top */}
+                            <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
+                              <img 
+                                src={product.image} 
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
+                                loading="lazy"
+                                width="200"
+                                height="200"
+                              />
+                              
+                              {/* Country Badge */}
+                              <div className="absolute top-2 left-2" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+                                <div className="bg-white bg-opacity-90 rounded px-2 py-0.5 flex items-center gap-1">
+                                  <img 
+                                    src={`https://flagcdn.com/w20/${getProductCountry(product.id).code}.png`}
+                                    alt={getProductCountry(product.id).name}
+                                    className="w-3 h-2"
+                                  />
+                                  <span className="text-[8px] text-gray-700 font-medium">
+                                    {getProductCountry(product.id).abbreviation}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Product Content */}
+                            <div className="px-2 pb-2 sm:px-3 sm:pb-3">
+                              {/* Product Name */}
+                              <h3 className="font-medium mb-1" style={{ fontSize: '13px', color: '#212121' }}>
+                                {product.name}
+                              </h3>
+                              
+                              {/* Location and Bookmark Row */}
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center text-gray-500 flex-1 mr-2" style={{ fontSize: '10px' }}>
+                                  <img src={locationIcon} alt="Location" className="w-3 h-3 mr-1 flex-shrink-0" />
+                                  <span className="truncate">{product.location}</span>
+                                </div>
+                                {/* Bookmark Button */}
+                                <button 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleSave(product.id);
+                                  }}
+                                  className="flex items-center justify-center flex-shrink-0"
+                                  style={{ width: '20px', height: '20px' }}
+                                >
+                                  <img 
+                                    src={bookmarkIcon} 
+                                    alt="Bookmark" 
+                                    className="w-full h-full"
+                                  />
+                                </button>
+                              </div>
+                              
+                              {/* Price and Verification Badge */}
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
+                                  ${product.price}
+                                </div>
+                                {product.verified ? (
+                                  <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                                    <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
+                                    <span>Verified seller</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                                    <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
+                                    <span>Unverified Seller</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Otherwise, render category sections
+              return (
+                <div className="space-y-8">
+                  {categories.filter(cat => cat !== 'All').map((category) => {
+                    const categoryProducts = (allProducts[category as keyof typeof allProducts] || []);
+                    // Filter products by selected country
+                    const filteredProducts = selectedCountry 
+                      ? categoryProducts.filter(product => getProductCountry(product.id).name === selectedCountry)
+                      : categoryProducts;
+                    if (filteredProducts.length === 0) return null;
                 
                 return (
                   <div key={category} className="mb-8">
@@ -1698,12 +1873,14 @@ const Home: React.FC = () => {
                   </div>
                 );
               })}
-            </div>
+                </div>
+              );
+            })()
           ) : (
             // Regular Grid Layout for Specific Category or Search
             <>
           {/* Section Header - Hide when no search results */}
-          {!(filteredProducts().length === 0 && isSearchActive) && (
+          {!shouldShowNoResultsState() && (
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
                 <h2 className="text-[20px] font-semibold text-gray-900">
@@ -1735,7 +1912,7 @@ const Home: React.FC = () => {
           )}
 
           {/* Products Grid */}
-          {filteredProducts().length === 0 && isSearchActive ? (
+          {shouldShowNoResultsState() ? (
             <div>
               {/* No Results State */}
             <div className="text-center py-12">
@@ -1959,7 +2136,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Pagination - Mobile Responsive - Hide when no search results */}
-      {!(filteredProducts().length === 0 && isSearchActive) && (
+      {!shouldShowNoResultsState() && (
       <section className="py-8 sm:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mobile Pagination */}
