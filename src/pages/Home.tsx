@@ -32,7 +32,6 @@ import unverifyIcon from '../assets/images/pre/unverify.svg';
 import globyIcon from '../assets/images/pre/globy.svg';
 import buyerIcon from '../assets/images/pre/buyer.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
-import bitIcon from '../assets/images/pre/bit.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -1782,7 +1781,7 @@ const Home: React.FC = () => {
                   style={{ boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', height: 'auto' }}
                 >
                   {/* Product Name Label and Button */}
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-0">
                     <span style={{ fontSize: '12px', color: '#9C9C9C' }}>Product name</span>
                     <button 
                       className="px-3 py-1 rounded-lg text-white"
@@ -1793,23 +1792,23 @@ const Home: React.FC = () => {
                   </div>
 
                   {/* Product Title */}
-                  <h3 className="mb-2" style={{ fontSize: '14px', fontWeight: '500', color: '#212121' }}>
+                  <h3 className="mb-3" style={{ fontSize: '14px', fontWeight: '500', color: '#212121' }}>
                     Snails from South Africa
                   </h3>
 
                   {/* Description */}
-                  <p className="mb-3" style={{ fontSize: '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
+                  <p className="mb-4" style={{ fontSize: '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                   </p>
 
                   {/* Tags and User Info Row */}
                   <div className="flex items-end justify-between">
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2">
-                      {/* Location Tag */}
+                    {/* Tags - Stacked Layout */}
+                    <div className="flex flex-col gap-2">
+                      {/* First Row - Location */}
                       <div 
-                        className="flex items-center gap-1.5 px-3 py-1.5"
-                        style={{ backgroundColor: '#E3F2FD', borderRadius: '6px' }}
+                        className="flex items-center gap-1 px-2 py-1"
+                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
                       >
                         <img 
                           src={locationIcon} 
@@ -1820,49 +1819,56 @@ const Home: React.FC = () => {
                         <span style={{ fontSize: '12px', color: '#64B5F6' }}>London, United Kingdom</span>
                       </div>
 
-                      {/* Price Tag */}
-                      <div 
-                        className="flex items-center gap-1.5 px-3 py-1.5"
-                        style={{ backgroundColor: '#E3F2FD', borderRadius: '6px' }}
-                      >
-                        <img 
-                          src={moneyIcon} 
-                          alt="Money"
-                          className="w-3 h-3"
-                          style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
-                        />
-                        <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
-                      </div>
+                      {/* Second Row - Price and Country */}
+                      <div className="flex gap-2">
+                        {/* Price Tag */}
+                        <div 
+                          className="flex items-center gap-1.5 px-3 py-1.5"
+                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                        >
+                          <img 
+                            src={moneyIcon} 
+                            alt="Money"
+                            className="w-3 h-3"
+                            style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                          />
+                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                        </div>
 
-                      {/* Country Tag */}
-                      <div 
-                        className="flex items-center gap-1.5 px-3 py-1.5"
-                        style={{ backgroundColor: '#E3F2FD', borderRadius: '6px' }}
-                      >
-                        <img 
-                          src="https://flagcdn.com/w20/za.png" 
-                          alt="South Africa"
-                          className="w-4 h-3 object-cover rounded-sm"
-                        />
-                        <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
+                        {/* Country Tag */}
+                        <div 
+                          className="flex items-center gap-1.5 px-3 py-1.5"
+                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                        >
+                          <img 
+                            src="https://flagcdn.com/w20/za.png" 
+                            alt="South Africa"
+                            className="w-4 h-3 object-cover rounded-sm"
+                          />
+                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
+                        </div>
                       </div>
                     </div>
 
                     {/* User Info */}
-                    <div className="flex flex-col items-center">
-                      <img 
-                        src={bitIcon} 
-                        alt="User"
-                        className="w-12 h-12 mb-1"
-                      />
+                    <div className="flex flex-col items-center mt-2">
                       <div 
-                        className="flex items-center justify-center gap-1 px-2 py-0.5 rounded border"
-                        style={{ borderColor: '#E4E4E4', backgroundColor: '#FFFFFF' }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
+                        style={{ backgroundColor: '#F7C9B0' }}
                       >
-                        <svg className="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
+                          <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
+                        </svg>
+                      </div>
+                      <div 
+                        className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 border -mt-2"
+                        style={{ borderColor: '#F4F4F4', backgroundColor: '#FFFFFF', borderRadius: '12px' }}
+                      >
+                        <svg className="w-2.5 h-2.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
-                        <span style={{ fontSize: '12px', color: '#212121', fontWeight: '500' }}>4.3</span>
+                        <span style={{ fontSize: '10px', color: '#212121', fontWeight: '500' }}>4.3</span>
                       </div>
                     </div>
                   </div>
