@@ -84,6 +84,7 @@ const Home: React.FC = () => {
   const [selectedCategoryText, setSelectedCategoryText] = useState('');
   const [showPlaceOfOriginDropdown, setShowPlaceOfOriginDropdown] = useState(false);
   const [selectedPlaceOfOriginText, setSelectedPlaceOfOriginText] = useState('');
+  const [focusedSearchSection, setFocusedSearchSection] = useState<string | null>(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestProductName, setRequestProductName] = useState('');
   const [requestProductOrigin, setRequestProductOrigin] = useState('');
@@ -749,13 +750,40 @@ const Home: React.FC = () => {
               flexShrink: 0,
               borderRadius: '30px',
               border: '1px solid #E4E4E4',
-              background: '#FFF',
+              background: focusedSearchSection ? '#F4F4F4' : '#FFF',
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-              fontFamily: 'Poppins, sans-serif'
+              fontFamily: 'Poppins, sans-serif',
+              transition: 'background 0.2s ease'
             }}
           >
             {/* Product Section */}
-            <div className="flex flex-col justify-center px-4 flex-1 relative" style={{ borderRight: '1px solid #E4E4E4' }}>
+            <div 
+              className="flex flex-col justify-center px-4 flex-1 relative" 
+              style={{ 
+                background: focusedSearchSection === 'product' ? '#FFF' : 'transparent',
+                borderTopLeftRadius: '30px',
+                borderBottomLeftRadius: '30px',
+                borderTopRightRadius: focusedSearchSection === 'product' ? '30px' : '0',
+                borderBottomRightRadius: focusedSearchSection === 'product' ? '30px' : '0',
+                boxShadow: focusedSearchSection === 'product' ? '0 2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+                transition: 'all 0.2s ease',
+                zIndex: focusedSearchSection === 'product' ? 10 : 1,
+                height: '58px'
+              }}
+            >
+              {/* Divider */}
+              {!(focusedSearchSection === 'product' || focusedSearchSection === 'categories') && (
+                <div 
+                  style={{ 
+                    position: 'absolute',
+                    right: 0,
+                    top: '12px',
+                    bottom: '12px',
+                    width: '1px',
+                    backgroundColor: '#E4E4E4'
+                  }}
+                />
+              )}
               <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
               <input
                 type="text"
@@ -764,12 +792,16 @@ const Home: React.FC = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleSearchKeyPress}
                 onFocus={() => {
+                  setFocusedSearchSection('product');
                   if (searchHistory.length > 0) {
                     setShowSearchHistory(true);
                   }
                 }}
                 onBlur={() => {
-                  setTimeout(() => setShowSearchHistory(false), 200);
+                  setTimeout(() => {
+                    setFocusedSearchSection(null);
+                    setShowSearchHistory(false);
+                  }, 200);
                 }}
                 className="border-0 p-0 focus:outline-none focus:ring-0 product-search-input"
                 style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
@@ -787,12 +819,45 @@ const Home: React.FC = () => {
             </div>
             
           {/* Categories Section */}
-          <div className="flex flex-col justify-center px-4 flex-1 relative" style={{ borderRight: '1px solid #E4E4E4' }}>
+          <div 
+            className="flex flex-col justify-center px-4 flex-1 relative" 
+            style={{ 
+              background: focusedSearchSection === 'categories' ? '#FFF' : 'transparent',
+              borderTopLeftRadius: focusedSearchSection === 'categories' ? '30px' : '0',
+              borderBottomLeftRadius: focusedSearchSection === 'categories' ? '30px' : '0',
+              borderTopRightRadius: focusedSearchSection === 'categories' ? '30px' : '0',
+              borderBottomRightRadius: focusedSearchSection === 'categories' ? '30px' : '0',
+              boxShadow: focusedSearchSection === 'categories' ? '0 2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+              transition: 'all 0.2s ease',
+              zIndex: focusedSearchSection === 'categories' ? 10 : 1,
+              height: '58px'
+            }}
+          >
+              {/* Divider */}
+              {!(focusedSearchSection === 'categories' || focusedSearchSection === 'placeOfOrigin') && (
+                <div 
+                  style={{ 
+                    position: 'absolute',
+                    right: 0,
+                    top: '12px',
+                    bottom: '12px',
+                    width: '1px',
+                    backgroundColor: '#E4E4E4'
+                  }}
+                />
+              )}
             <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Categories</label>
             <button
-              onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              onClick={() => {
+                setFocusedSearchSection('categories');
+                setShowCategoryDropdown(!showCategoryDropdown);
+              }}
+              onFocus={() => setFocusedSearchSection('categories')}
               onBlur={() => {
-                setTimeout(() => setShowCategoryDropdown(false), 200);
+                setTimeout(() => {
+                  setFocusedSearchSection(null);
+                  setShowCategoryDropdown(false);
+                }, 200);
               }}
               className="border-0 p-0 focus:outline-none text-left flex items-center justify-between w-full"
               style={{ fontSize: '11px', color: selectedCategoryText ? '#212121' : '#E9E9E9', background: 'transparent' }}
@@ -808,12 +873,45 @@ const Home: React.FC = () => {
           </div>
 
           {/* Place of Origin Section */}
-          <div className="flex flex-col justify-center px-4 flex-1 relative" style={{ borderRight: '1px solid #E4E4E4' }}>
+          <div 
+            className="flex flex-col justify-center px-4 flex-1 relative" 
+            style={{ 
+              background: focusedSearchSection === 'placeOfOrigin' ? '#FFF' : 'transparent',
+              borderTopLeftRadius: focusedSearchSection === 'placeOfOrigin' ? '30px' : '0',
+              borderBottomLeftRadius: focusedSearchSection === 'placeOfOrigin' ? '30px' : '0',
+              borderTopRightRadius: focusedSearchSection === 'placeOfOrigin' ? '30px' : '0',
+              borderBottomRightRadius: focusedSearchSection === 'placeOfOrigin' ? '30px' : '0',
+              boxShadow: focusedSearchSection === 'placeOfOrigin' ? '0 2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+              transition: 'all 0.2s ease',
+              zIndex: focusedSearchSection === 'placeOfOrigin' ? 10 : 1,
+              height: '58px'
+            }}
+          >
+              {/* Divider */}
+              {!(focusedSearchSection === 'placeOfOrigin' || focusedSearchSection === 'sellerLocation') && (
+                <div 
+                  style={{ 
+                    position: 'absolute',
+                    right: 0,
+                    top: '12px',
+                    bottom: '12px',
+                    width: '1px',
+                    backgroundColor: '#E4E4E4'
+                  }}
+                />
+              )}
             <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Place of Origin</label>
             <button
-              onClick={() => setShowPlaceOfOriginDropdown(!showPlaceOfOriginDropdown)}
+              onClick={() => {
+                setFocusedSearchSection('placeOfOrigin');
+                setShowPlaceOfOriginDropdown(!showPlaceOfOriginDropdown);
+              }}
+              onFocus={() => setFocusedSearchSection('placeOfOrigin')}
               onBlur={() => {
-                setTimeout(() => setShowPlaceOfOriginDropdown(false), 200);
+                setTimeout(() => {
+                  setFocusedSearchSection(null);
+                  setShowPlaceOfOriginDropdown(false);
+                }, 200);
               }}
               className="border-0 p-0 focus:outline-none text-left flex items-center justify-between w-full"
               style={{ fontSize: '11px', color: selectedPlaceOfOriginText ? '#212121' : '#E9E9E9', background: 'transparent' }}
@@ -829,13 +927,30 @@ const Home: React.FC = () => {
             </div>
             
           {/* Seller Location Section */}
-          <div className="flex flex-col justify-center px-4 flex-1">
+          <div 
+            className="flex flex-col justify-center px-4 flex-1" 
+            style={{ 
+              background: focusedSearchSection === 'sellerLocation' ? '#FFF' : 'transparent',
+              borderTopLeftRadius: focusedSearchSection === 'sellerLocation' ? '30px' : '0',
+              borderBottomLeftRadius: focusedSearchSection === 'sellerLocation' ? '30px' : '0',
+              borderTopRightRadius: focusedSearchSection === 'sellerLocation' ? '30px' : '0',
+              borderBottomRightRadius: focusedSearchSection === 'sellerLocation' ? '30px' : '0',
+              boxShadow: focusedSearchSection === 'sellerLocation' ? '0 2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+              transition: 'all 0.2s ease',
+              zIndex: focusedSearchSection === 'sellerLocation' ? 10 : 1,
+              height: '58px'
+            }}
+          >
             <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Seller Location</label>
               <input
                 type="text"
               placeholder="Insert location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
+                onFocus={() => setFocusedSearchSection('sellerLocation')}
+                onBlur={() => {
+                  setTimeout(() => setFocusedSearchSection(null), 200);
+                }}
               className="border-0 p-0 focus:outline-none focus:ring-0"
               style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
             />
@@ -1655,7 +1770,7 @@ const Home: React.FC = () => {
 
                     {/* Other Products Near You Section */}
                     <div className="mt-12">
-                      <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6">
                         <h3 className="text-xl font-semibold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
                           Other products near you
                         </h3>
@@ -1708,7 +1823,7 @@ const Home: React.FC = () => {
                                   <span className="truncate">{product.location}</span>
                                 </div>
                                 {/* Bookmark Button */}
-                                <button 
+                <button
                                   onClick={(e) => {
                                     e.preventDefault();
                                     handleSave(product.id);
@@ -1721,7 +1836,7 @@ const Home: React.FC = () => {
                                     alt="Bookmark" 
                                     className="w-full h-full"
                                   />
-                                </button>
+                </button>
                               </div>
                               
                               {/* Price and Verification Badge */}
@@ -1767,17 +1882,17 @@ const Home: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
                         <h2 className="text-[20px] font-semibold text-gray-900">{category}</h2>
-                        <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
+              <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
                       <div className="flex items-center space-x-3">
                 <button
                           className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
                           aria-label="Scroll left"
                 >
                           <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                </button>
+              </button>
                         <button 
                           className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
                           aria-label="Scroll right"
@@ -1887,8 +2002,8 @@ const Home: React.FC = () => {
                   {activeCategory}
                 </h2>
               <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
             </div>
               {getProductsToDisplay().length > 0 && (
                 <div className="flex items-center space-x-3">
