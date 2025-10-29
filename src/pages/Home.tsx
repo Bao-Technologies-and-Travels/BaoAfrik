@@ -992,10 +992,13 @@ const Home: React.FC = () => {
           <div 
             className="absolute bg-white z-50"
             style={{
-              width: '180px',
+              width: '160px',
               left: 'calc(50% - 450px + 16px)',
-              top: '54px',
-              borderRadius: '28px',
+              top: '50px',
+              borderTopLeftRadius: '30px',
+              borderTopRightRadius: '30px',
+              borderBottomLeftRadius: '28px',
+              borderBottomRightRadius: '28px',
               background: '#FFF',
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
               fontFamily: 'Poppins, sans-serif'
