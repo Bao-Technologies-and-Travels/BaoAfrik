@@ -723,7 +723,7 @@ const Home: React.FC = () => {
                   setTimeout(() => setShowSearchHistory(false), 200);
                 }}
                 className="border-0 p-0 focus:outline-none focus:ring-0 product-search-input"
-                style={{ fontSize: '11px', color: '#6A6A6A', background: 'transparent' }}
+                style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
               />
               <style>
                 {`
@@ -1168,7 +1168,7 @@ const Home: React.FC = () => {
         </div>
 
       {/* Hero Banner - Auto Sliding */}
-      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-12 sm:mx-16 lg:mx-24 rounded-2xl" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
+      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-20 sm:mx-24 lg:mx-40 rounded-2xl" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-1 md:py-1">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 md:gap-0">
             <div className="flex-1 text-center md:text-left px-2 md:pl-2 w-full md:w-auto">
