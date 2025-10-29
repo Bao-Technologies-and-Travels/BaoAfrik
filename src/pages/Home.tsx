@@ -33,6 +33,7 @@ import globyIcon from '../assets/images/pre/globy.svg';
 import buyerIcon from '../assets/images/pre/buyer.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
 import boxIcon from '../assets/images/pre/box.svg';
+import draftsIcon from '../assets/images/pre/drafts.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -1693,35 +1694,37 @@ const Home: React.FC = () => {
           ) : (
             // Regular Grid Layout for Specific Category or Search
             <>
-          {/* Section Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <h2 className="text-[20px] font-semibold text-gray-900">
-                {activeCategory}
-              </h2>
-              <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+          {/* Section Header - Hide when no search results */}
+          {!(filteredProducts().length === 0 && isSearchActive) && (
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                <h2 className="text-[20px] font-semibold text-gray-900">
+                  {activeCategory}
+                </h2>
+                <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              {getProductsToDisplay().length > 0 && (
+                <div className="flex items-center space-x-3">
+                  <button 
+                    onClick={scrollProductsLeft}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                    aria-label="Scroll products left"
+                  >
+                    <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                </button>
+                  <button 
+                    onClick={scrollProductsRight}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                    aria-label="Scroll products right"
+                  >
+                    <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                </button>
+              </div>
+              )}
             </div>
-            {getProductsToDisplay().length > 0 && (
-              <div className="flex items-center space-x-3">
-                <button 
-                  onClick={scrollProductsLeft}
-                  className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                  aria-label="Scroll products left"
-                >
-                  <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-              </button>
-                <button 
-                  onClick={scrollProductsRight}
-                  className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                  aria-label="Scroll products right"
-                >
-                  <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-              </button>
-            </div>
-            )}
-          </div>
+          )}
 
           {/* Products Grid */}
           {filteredProducts().length === 0 && isSearchActive ? (
@@ -1729,13 +1732,14 @@ const Home: React.FC = () => {
               {/* No Results State */}
               <div className="text-center py-12">
                 {/* Shopping Bag with Magnifying Glass Icon */}
-                <svg className="mx-auto mb-4" width="60" height="60" viewBox="0 0 24 24" fill="none" style={{ color: '#B0B0B0' }}>
-                  <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M3 6H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  {/* Magnifying Glass Overlay */}
-                  <circle cx="14" cy="14" r="3" stroke="currentColor" strokeWidth="2"/>
-                  <path d="M16.5 16.5L19 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <svg className="mx-auto mb-4" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="1.5">
+                  {/* Shopping Bag */}
+                  <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M3 6H21" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" strokeLinecap="round" strokeLinejoin="round"/>
+                  {/* Magnifying Glass - positioned at bottom right */}
+                  <circle cx="15" cy="16" r="2.5"/>
+                  <path d="M16.8 17.8L19 20" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 
                 {/* Message */}
@@ -1761,7 +1765,7 @@ const Home: React.FC = () => {
                     fontWeight: '500'
                   }}
                 >
-                  <img src={boxIcon} alt="Request" style={{ width: '20px', height: '20px' }} />
+                  <img src={draftsIcon} alt="Request" style={{ width: '20px', height: '20px' }} />
                   Make a request
                 </button>
               </div>
@@ -1803,22 +1807,6 @@ const Home: React.FC = () => {
                             {getProductCountry(product.id).abbreviation}
                           </span>
                         </div>
-                        
-                        {/* Bookmark Button */}
-                        <button 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleSave(product.id);
-                          }}
-                          className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-sm hover:shadow-md transition-shadow"
-                          style={{ width: '20px', height: '20px' }}
-                        >
-                          <img 
-                            src={bookmarkIcon} 
-                            alt="Bookmark" 
-                            className="w-full h-full"
-                          />
-                        </button>
                       </div>
                       
                       {/* Product Content */}
@@ -1832,8 +1820,8 @@ const Home: React.FC = () => {
                             <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
                               <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
                               <span>Verified seller</span>
-            </div>
-          ) : (
+                            </div>
+                          ) : (
                             <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
                               <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
                               <span>Unverified Seller</span>
@@ -1846,10 +1834,27 @@ const Home: React.FC = () => {
                           {product.name}
                         </h3>
                         
-                        {/* Location */}
-                        <div className="flex items-center text-gray-500 mb-2" style={{ fontSize: '10px' }}>
-                          <img src={locationIcon} alt="Location" className="w-3 h-3 mr-1" />
-                          <span>{product.location}</span>
+                        {/* Location and Bookmark Row */}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center text-gray-500" style={{ fontSize: '10px' }}>
+                            <img src={locationIcon} alt="Location" className="w-3 h-3 mr-1" />
+                            <span>{product.location}</span>
+                          </div>
+                          {/* Bookmark Button */}
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleSave(product.id);
+                            }}
+                            className="flex items-center justify-center"
+                            style={{ width: '20px', height: '20px' }}
+                          >
+                            <img 
+                              src={bookmarkIcon} 
+                              alt="Bookmark" 
+                              className="w-full h-full"
+                            />
+                          </button>
                         </div>
                       </div>
                     </Link>
