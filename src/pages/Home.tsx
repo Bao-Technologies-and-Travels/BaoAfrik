@@ -397,9 +397,9 @@ const Home: React.FC = () => {
     
     // Apply country filter if selected (filter by country badge, not seller location)
     if (selectedCountry) {
-      products = products.filter(product => 
+        products = products.filter(product => 
         getProductCountry(product.id).name === selectedCountry
-      );
+        );
     }
     
     return products;
@@ -1584,10 +1584,10 @@ const Home: React.FC = () => {
                     </div>
                     
                     {/* Category Products - Horizontal Scroll */}
-                    <div className="overflow-x-auto scrollbar-hide">
-                      <div className="flex gap-5 sm:gap-6">
+                    <div className={filteredProducts.length <= 6 ? '' : 'overflow-x-auto scrollbar-hide'}>
+                      <div className={filteredProducts.length <= 6 ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6' : 'flex gap-5 sm:gap-6'}>
                         {filteredProducts.slice(0, 12).map((product) => (
-                          <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group flex-shrink-0" style={{ width: '200px' }}>
+                          <Link key={product.id} to={`/product/${product.id}`} className={`bg-white rounded-lg overflow-hidden transition-all duration-200 block group ${filteredProducts.length > 6 ? 'flex-shrink-0' : ''}`} style={filteredProducts.length > 6 ? { width: '200px' } : {}}>
                             {/* Product Image - Top */}
                             <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
                               <img 
