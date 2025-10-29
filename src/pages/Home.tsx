@@ -32,6 +32,7 @@ import unverifyIcon from '../assets/images/pre/unverify.svg';
 import globyIcon from '../assets/images/pre/globy.svg';
 import buyerIcon from '../assets/images/pre/buyer.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
+import boxIcon from '../assets/images/pre/box.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -409,7 +410,10 @@ const Home: React.FC = () => {
   const clearSearch = () => {
     setSearchQuery('');
     setSelectedCategory('');
+    setSelectedCategoryText('');
     setLocation('');
+    setPlaceOfOrigin('');
+    setSelectedPlaceOfOriginText('');
     setSearchResults([]);
     setIsSearchActive(false);
   };
@@ -427,42 +431,58 @@ const Home: React.FC = () => {
 
   // Handle search functionality
   const handleSearch = () => {
-    console.log('Search triggered with:', { searchQuery, selectedCategory, placeOfOrigin, location });
+    console.log('=== SEARCH TRIGGERED ===');
+    console.log('Search Query (Product):', searchQuery);
+    console.log('Selected Category:', selectedCategoryText);
+    console.log('Place of Origin (Country Badge):', selectedPlaceOfOriginText);
+    console.log('Seller Location:', location);
     
     // Get all products
     let products = Object.values(allProducts).flat();
+    console.log('Total products before filtering:', products.length);
     
-    // Apply search query filter
+    // Apply search query filter (Product input)
     if (searchQuery.trim()) {
       products = products.filter(product => 
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.location.toLowerCase().includes(searchQuery.toLowerCase())
       );
+      console.log('After product name/location filter:', products.length);
     }
     
-    // Apply category filter
-    if (selectedCategory) {
-      // Filter by category by checking which category array the product belongs to
+    // Apply category filter (Categories dropdown)
+    if (selectedCategoryText) {
+      const beforeCount = products.length;
       products = products.filter(product => {
         return Object.entries(allProducts).some(([category, categoryProducts]) => 
-          category === selectedCategory && categoryProducts.some(p => p.id === product.id)
+          category === selectedCategoryText && categoryProducts.some(p => p.id === product.id)
         );
       });
+      console.log(`After category filter (${selectedCategoryText}):`, products.length, '(was', beforeCount, ')');
     }
     
-    // Apply place of origin filter
-    if (placeOfOrigin) {
-      products = products.filter(product => 
-        product.location.toLowerCase().includes(placeOfOrigin.toLowerCase())
-      );
+    // Apply place of origin filter (Place of Origin dropdown - filters by country badge at top)
+    if (selectedPlaceOfOriginText) {
+      const beforeCount = products.length;
+      products = products.filter(product => {
+        const country = getProductCountry(product.id).name;
+        console.log(`Product ${product.id} country:`, country, 'matches', selectedPlaceOfOriginText, '?', country === selectedPlaceOfOriginText);
+        return country === selectedPlaceOfOriginText;
+      });
+      console.log(`After place of origin filter (${selectedPlaceOfOriginText}):`, products.length, '(was', beforeCount, ')');
     }
     
-    // Apply location filter
+    // Apply seller location filter (Seller Location input - filters by location at bottom)
     if (location.trim()) {
+      const beforeCount = products.length;
       products = products.filter(product => 
         product.location.toLowerCase().includes(location.toLowerCase())
       );
+      console.log(`After seller location filter (${location}):`, products.length, '(was', beforeCount, ')');
     }
+    
+    console.log('Final filtered products:', products.length);
+    console.log('======================');
     
     setSearchResults(products);
     setIsSearchActive(true);
@@ -1560,20 +1580,20 @@ const Home: React.FC = () => {
                 return (
                   <div key={category} className="mb-8">
                     {/* Category Header */}
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
                         <h2 className="text-[20px] font-semibold text-gray-900">{category}</h2>
                         <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <button 
+                <button
                           className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
                           aria-label="Scroll left"
-                        >
+                >
                           <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                        </button>
+                </button>
                         <button 
                           className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
                           aria-label="Scroll right"
@@ -1630,7 +1650,7 @@ const Home: React.FC = () => {
                                     <span>Unverified Seller</span>
                                   </div>
                                 )}
-                              </div>
+            </div>
                               
                               {/* Product Name */}
                               <h3 className="mb-1 line-clamp-2 font-medium" style={{ fontSize: '13px', color: '#212121' }}>{product.name}</h3>
@@ -1658,7 +1678,7 @@ const Home: React.FC = () => {
                                       <img src={bookmarkIcon} alt="Bookmark" className="w-5 h-5" style={{
                                         filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
                                       }} />
-                                    </button>
+              </button>
                                 </div>
                               </div>
                             </div>
@@ -1676,57 +1696,165 @@ const Home: React.FC = () => {
           {/* Section Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
-                  <h2 className="text-[20px] font-semibold text-gray-900">
-                {isSearchActive 
-                  ? `Search Results (${filteredProducts().length} found)` 
-                      : activeCategory
-                }
+              <h2 className="text-[20px] font-semibold text-gray-900">
+                {activeCategory}
               </h2>
-              {isSearchActive && (
-                <button
-                  onClick={clearSearch}
-                  className="ml-3 text-sm text-orange-600 hover:text-orange-700 font-medium"
-                >
-                  Clear Search
-                </button>
-              )}
               <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
-                <div className="flex items-center space-x-3">
-                  <button 
-                    onClick={scrollProductsLeft}
-                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                    aria-label="Scroll products left"
-                  >
-                    <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+            {getProductsToDisplay().length > 0 && (
+              <div className="flex items-center space-x-3">
+                <button 
+                  onClick={scrollProductsLeft}
+                  className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                  aria-label="Scroll products left"
+                >
+                  <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
               </button>
-                  <button 
-                    onClick={scrollProductsRight}
-                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                    aria-label="Scroll products right"
-                  >
-                    <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                <button 
+                  onClick={scrollProductsRight}
+                  className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                  aria-label="Scroll products right"
+                >
+                  <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
               </button>
             </div>
+            )}
           </div>
 
           {/* Products Grid */}
           {filteredProducts().length === 0 && isSearchActive ? (
-            <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No products found</h3>
-              <p className="mt-1 text-sm text-gray-500">Try adjusting your search criteria or browse our categories.</p>
-              <div className="mt-6">
+            <div>
+              {/* No Results State */}
+              <div className="text-center py-12">
+                {/* Shopping Bag with Magnifying Glass Icon */}
+                <svg className="mx-auto mb-4" width="60" height="60" viewBox="0 0 24 24" fill="none" style={{ color: '#B0B0B0' }}>
+                  <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M3 6H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  {/* Magnifying Glass Overlay */}
+                  <circle cx="14" cy="14" r="3" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M16.5 16.5L19 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                
+                {/* Message */}
+                <p className="mb-4" style={{ fontSize: '18px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', maxWidth: '500px', margin: '0 auto 16px' }}>
+                  Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
+                </p>
+                
+                {/* Make a Request Button */}
                 <button
-                  onClick={clearSearch}
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700"
+                  className="inline-flex items-center mx-auto"
+                  style={{
+                    display: 'flex',
+                    padding: '10px 20px',
+                    alignItems: 'center',
+                    gap: '6px',
+                    borderRadius: '8px',
+                    backgroundColor: '#F0F8FE',
+                    color: '#64B5F6',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
                 >
-                  Browse All Products
+                  <img src={boxIcon} alt="Request" style={{ width: '20px', height: '20px' }} />
+                  Make a request
                 </button>
+              </div>
+
+              {/* Other Products Near You Section */}
+              <div className="mt-12">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    Other products near you
+                  </h3>
+                  <button className="text-sm font-medium hover:underline" style={{ color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>
+                    View more...
+                  </button>
+                </div>
+                
+                {/* Product Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6">
+                  {Object.values(allProducts).flat().slice(0, 6).map((product) => (
+                    <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                      {/* Product Image - Top */}
+                      <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
+                        <img 
+                          src={product.image} 
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
+                          loading="lazy"
+                          width="200"
+                          height="200"
+                        />
+                        
+                        {/* Country Badge */}
+                        <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+                          <img 
+                            src={getProductCountry(product.id).flag} 
+                            alt={getProductCountry(product.id).name}
+                            className="w-3 h-2 object-cover rounded-sm"
+                          />
+                          <span className="text-xs font-medium text-gray-800">
+                            {getProductCountry(product.id).abbreviation}
+                          </span>
+                        </div>
+                        
+                        {/* Bookmark Button */}
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleSave(product.id);
+                          }}
+                          className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-sm hover:shadow-md transition-shadow"
+                          style={{ width: '20px', height: '20px' }}
+                        >
+                          <img 
+                            src={bookmarkIcon} 
+                            alt="Bookmark" 
+                            className="w-full h-full"
+                          />
+                        </button>
+                      </div>
+                      
+                      {/* Product Content */}
+                      <div className="px-2 pb-2 sm:px-3 sm:pb-3 flex flex-col">
+                        {/* Price and Verified Badge Row */}
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
+                            ${product.price}
+                          </div>
+                          {product.verified ? (
+                            <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                              <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
+                              <span>Verified seller</span>
+            </div>
+          ) : (
+                            <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                              <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
+                              <span>Unverified Seller</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Product Name */}
+                        <h3 className="font-medium mb-1" style={{ fontSize: '13px', color: '#212121' }}>
+                          {product.name}
+                        </h3>
+                        
+                        {/* Location */}
+                        <div className="flex items-center text-gray-500 mb-2" style={{ fontSize: '10px' }}>
+                          <img src={locationIcon} alt="Location" className="w-3 h-3 mr-1" />
+                          <span>{product.location}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           ) : (
@@ -1819,7 +1947,8 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Pagination - Mobile Responsive */}
+      {/* Pagination - Mobile Responsive - Hide when no search results */}
+      {!(filteredProducts().length === 0 && isSearchActive) && (
       <section className="py-8 sm:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mobile Pagination */}
@@ -1933,6 +2062,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Buy & Sell Instantly Section */}
       <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
