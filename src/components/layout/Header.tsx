@@ -104,7 +104,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
       <div className="max-w-7xl mx-auto px-1 sm:px-2 lg:px-3">
         <div className="flex justify-between items-center h-20">
           {/* Logo - Positioned further left */}
-          <div className="flex-shrink-0 -ml-6 sm:-ml-12">
+          <div className="flex-shrink-0 ml-0 sm:-ml-6 md:-ml-12">
             <Link 
               to="/" 
               className="flex items-center focus:outline-none rounded transition-all duration-200"
@@ -564,20 +564,19 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
           </div>
 
           {/* Mobile Navigation */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center">
             {user ? (
               // Logged in user mobile navigation
               <>
                 {/* Language Toggle for mobile */}
-                <div className="relative">
+                <div className="relative mr-1">
                   <button
                     onClick={toggleLanguageDropdown}
-                    className="flex items-center px-2 py-2 border border-gray-300 rounded-md bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors duration-200"
+                    className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                    style={{ borderColor: '#E4E4E4', color: '#BABABA' }}
                   >
                     {selectedLanguage}
-                    <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <img src={arrowDownIcon} alt="Arrow" className="ml-1 w-4 h-4" />
                   </button>
                   
                   {/* Language Dropdown for mobile */}
@@ -626,25 +625,41 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 {/* Become a seller button - only for logged in users */}
             <Link 
               to="/register" 
-                   className="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors"
+                   className="flex items-center space-x-1.5 px-2.5 py-2 rounded-lg transition-colors mr-1"
                    style={{backgroundColor: '#FEF6E9'}}
                 >
                   <img src={basketIcon} alt="Basket" className="w-5 h-5" style={{filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)'}} />
                   <span className="text-sm font-normal" style={{color: '#F9A825'}}>Start selling</span>
             </Link>
             
+            {/* Notification Icon */}
+            <Link
+              to="/notifications"
+              className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
+              title="Notifications"
+              aria-label="View notifications"
+            >
+              <img 
+                src={notificationIcon} 
+                alt="Notifications" 
+                className="w-5 h-5"
+                style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
+              />
+            </Link>
+            
             {/* Burger Menu Button */}
             <button
               onClick={toggleMobileMenu}
-              className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none transition-all duration-200"
+              className="p-1.5 rounded-md focus:outline-none transition-all duration-200"
+              style={{ color: '#171717' }}
               aria-label="Toggle navigation menu"
               aria-expanded={isMobileMenuOpen}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 {isMobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 )}
                   </svg>
                 </button>
@@ -656,12 +671,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                  <div className="relative">
                    <button
                      onClick={toggleLanguageDropdown}
-                     className="flex items-center px-2 py-2 border border-gray-300 rounded-md bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors duration-200"
+                     className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                     style={{ borderColor: '#E4E4E4', color: '#BABABA' }}
                    >
                      {selectedLanguage}
-                     <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                     </svg>
+                     <img src={arrowDownIcon} alt="Arrow" className="ml-1 w-4 h-4" />
                    </button>
                    
                    {/* Language Dropdown for mobile */}

@@ -35,6 +35,7 @@ import moneyIcon from '../assets/images/pre/money.svg';
 import boxIcon from '../assets/images/pre/box.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
 import bagIcon from '../assets/images/pre/bag.svg';
+import settingIcon from '../assets/images/pre/setting.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -1238,96 +1239,149 @@ const Home: React.FC = () => {
           </div>
 
           {/* Mobile Search */}
-          <div className="md:hidden">
+          <div className="md:hidden px-4">
             <div className="flex items-center gap-2">
               {/* Search Input */}
               <div className="flex-1 relative">
                 <input
                   type="text"
-                  placeholder="Search for products..."
+                  placeholder="What are you looking for today ?"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
-                  className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                  onFocus={() => {
+                    setFocusedSearchSection('mobile-search');
+                    if (searchHistory.length > 0) {
+                      setShowSearchHistory(true);
+                    }
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => {
+                      setFocusedSearchSection(null);
+                      setShowSearchHistory(false);
+                    }, 200);
+                  }}
+                  className="w-full px-4 py-3 pr-12 focus:outline-none text-sm"
+                  style={{
+                    borderRadius: '30px',
+                    border: '1px solid #E9E9E9',
+                    backgroundColor: '#FFF',
+                    fontFamily: 'Poppins, sans-serif',
+                    color: '#212121',
+                    caretColor: '#64B5F6'
+                  }}
                 />
+                <style>{`
+                  .md\\:hidden input::placeholder {
+                    color: #D9D9D9;
+                    font-size: 12px;
+                  }
+                `}</style>
+                {/* Scan Icon */}
                 <button 
                   onClick={handleScan}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 hover:opacity-70 transition-opacity"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
                   title="Scan image to search"
                 >
                   <img 
                     src={scanIcon} 
                     alt="Scan" 
-                    className="w-4 h-4 opacity-60 hover:opacity-100 transition-opacity"
+                    className="w-5 h-5"
+                    style={{ opacity: 0.6 }}
                   />
                 </button>
               </div>
               
-            </div>
-            
-            
-            {/* Mobile Filter Dropdown */}
-            {isMobileFilterOpen && (
-              <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="space-y-3">
-                  {/* Category Dropdown */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm"
-                    >
-                      <option value="">All Categories</option>
-                      <option value="Food & Spices">Food & Spices</option>
-                      <option value="Fashion & Textiles">Fashion & Textiles</option>
-                      <option value="Beauty & Wellness">Beauty & Wellness</option>
-                      <option value="Home & Decor">Home & Decor</option>
-                      <option value="Books & Media">Books & Media</option>
-                    </select>
+              {/* Filter Button */}
+              <button
+                onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+                className="flex items-center justify-center relative flex-shrink-0"
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  border: '0.5px solid #E9E9E9',
+                  backgroundColor: '#FFF'
+                }}
+                aria-label="Filter"
+              >
+                {/* Filter Icon - Two horizontal lines with circles */}
+                <svg 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 20 20" 
+                  fill="none"
+                >
+                  {/* Top line with circle */}
+                  <line x1="3" y1="6" x2="17" y2="6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
+                  
+                  {/* Bottom line with circle */}
+                  <line x1="3" y1="14" x2="17" y2="14" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
+                </svg>
+                
+                {/* Red notification dot */}
+                <div 
+                  className="absolute"
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: '#FF0000',
+                    bottom: '2px',
+                    right: '2px'
+                  }}
+                />
+              </button>
                   </div>
                   
-                  
-                  {/* Location */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <input
-                      type="text"
-                      placeholder="Location"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
-                    />
+            {/* Mobile Search History Dropdown */}
+            {showSearchHistory && searchQuery.length > 0 && focusedSearchSection === 'mobile-search' && (
+              <div 
+                className="mt-2 bg-white rounded-lg shadow-lg border border-gray-100"
+                style={{
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                  <h3 className="font-medium text-sm" style={{ color: '#212121' }}>
+                    Search history
+                  </h3>
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <circle cx="4" cy="10" r="1.5"/>
+                      <circle cx="10" cy="10" r="1.5"/>
+                      <circle cx="16" cy="10" r="1.5"/>
+                    </svg>
+                  </button>
                   </div>
                   
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 pt-2">
+                {/* Search History Items */}
+                <div className="py-1">
+                  {searchHistory.map((item, index) => (
                     <button 
-                      onClick={handleScan}
-                      className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg transition-colors hover:border-orange-500 hover:text-orange-500"
-                      title="Scan QR code"
-                    >
-                      <img 
-                        src={scanIcon} 
-                        alt="Scan QR code" 
-                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
-                      />
-                    </button>
-                    <button 
+                      key={index}
                       onClick={() => {
+                        setSearchQuery(item);
+                        setShowSearchHistory(false);
                         handleSearch();
-                        setIsMobileFilterOpen(false);
                       }}
-                      className="flex-1 text-white py-2 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center"
-                      style={{backgroundColor: '#F9A825'}}
-                      onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-                      onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      <span className="font-normal text-sm" style={{ color: '#6A6A6A' }}>
+                        {item.length > 25 ? item.substring(0, 25) + '...' : item}
+                      </span>
+                      <svg 
+                        className="w-4 h-4 flex-shrink-0 ml-2" 
+                        fill="#6A6A6A" 
+                        viewBox="0 0 20 20"
+                      >
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                       </svg>
                     </button>
-                  </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -1335,60 +1389,41 @@ const Home: React.FC = () => {
         </div>
 
       {/* Hero Banner - Auto Sliding */}
-      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-20 sm:mx-24 lg:mx-40 rounded-2xl" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-1 md:py-1">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 md:gap-0">
-            <div className="flex-1 text-center md:text-left px-2 md:pl-2 w-full md:w-auto">
+      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-4 sm:mx-20 md:mx-24 lg:mx-40 rounded-2xl mb-6 sm:mb-0" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-1 md:py-1">
+          <div className="flex flex-row items-center justify-between gap-1 sm:gap-4 md:gap-0">
+            <div className="flex-1 text-left px-1 sm:px-2 md:pl-2">
               <button 
                 onClick={() => setActiveCategory(bannerSlides[currentSlide].category)}
-                className="bg-white px-3 sm:px-4 py-1 rounded text-xs sm:text-sm font-medium hover:bg-orange-50 transition-all duration-300 transform hover:scale-105 touch-manipulation mb-2 sm:mb-3"
+                className="bg-white px-1.5 sm:px-3 md:px-4 py-0.5 sm:py-1 rounded text-[7px] sm:text-xs md:text-sm font-medium hover:bg-orange-50 transition-all duration-300 transform hover:scale-105 touch-manipulation mb-1 sm:mb-2 md:mb-3"
                 style={{ color: '#F9A822' }}
               >
                 Explore {bannerSlides[currentSlide].category}
               </button>
-              <div className="relative overflow-hidden min-h-[2rem] sm:min-h-[2.5rem] md:min-h-[3rem]">
+              <div className="relative overflow-hidden min-h-[1.5rem] sm:min-h-[2rem] md:min-h-[2.5rem] lg:min-h-[3rem]">
                 <h1 
                   key={`title-${currentSlide}`}
-                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-2 animate-fade-in-up leading-tight"
+                  className="text-[11px] sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-semibold mb-1 sm:mb-2 animate-fade-in-up leading-tight"
                 >
                   {bannerSlides[currentSlide].title}
                 </h1>
               </div>
-              <div className="relative overflow-hidden min-h-[1.5rem] sm:min-h-[2rem]">
+              <div className="relative overflow-hidden min-h-[1.5rem] sm:min-h-[1.5rem] md:min-h-[2rem]">
                 <p 
                   key={`desc-${currentSlide}`}
-                  className="text-orange-100 text-xs sm:text-sm md:text-base mb-0 animate-fade-in-up animation-delay-100 leading-relaxed"
+                  className="text-orange-100 text-[8px] sm:text-xs md:text-sm lg:text-base mb-0 animate-fade-in-up animation-delay-100 leading-relaxed"
                 >
                   {bannerSlides[currentSlide].description}
                 </p>
               </div>
             </div>
-            <div className="block md:hidden w-full px-2 sm:px-4">
-              <div className="relative overflow-hidden rounded-lg aspect-[16/9] sm:aspect-[2/1]">
-                <img 
-                  key={`img-mobile-${currentSlide}`}
-                  src={bannerSlides[currentSlide].image}
-                  alt={bannerSlides[currentSlide].title}
-                  className="w-full h-full object-cover animate-slide-in-right"
-                  style={{
-                    maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
-                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
-                    maskComposite: 'intersect',
-                    WebkitMaskComposite: 'source-in'
-                  }}
-                  loading="eager"
-                  width="400"
-                  height="200"
-                />
-              </div>
-            </div>
-            <div className="hidden md:block pr-2 relative flex-shrink-0">
+            <div className="pr-1 sm:pr-2 relative flex-shrink-0">
               <div className="relative overflow-hidden rounded-lg">
                 <img 
                   key={`img-${currentSlide}`}
                   src={bannerSlides[currentSlide].image}
                   alt={bannerSlides[currentSlide].title}
-                  className="w-64 lg:w-80 h-32 lg:h-40 object-cover animate-slide-in-right"
+                  className="w-20 h-16 sm:w-48 sm:h-24 md:w-64 md:h-32 lg:w-80 lg:h-40 object-cover animate-slide-in-right"
                   style={{
                     maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
                     WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
@@ -1421,12 +1456,12 @@ const Home: React.FC = () => {
       </section>
 
       {/* Category Navigation */}
-      <section className="bg-white py-4 sm:py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <section className="bg-white py-3 sm:py-4 md:py-6 mb-4 md:mb-0">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 relative">
             {/* Gray line background - full width at category bottom */}
-            <div className="absolute bottom-0 left-[calc(-50vw+50%)] right-[calc(-50vw+50%)] h-0.5 bg-gray-200"></div>
+            <div className="absolute bottom-0 left-[calc(-50vw+50%)] right-[calc(-50vw+50%)] bg-gray-200" style={{ height: window.innerWidth < 768 ? '0.5px' : '2px' }}></div>
             
-            <div className="flex justify-center space-x-4 sm:space-x-8 overflow-x-auto scrollbar-hide relative">
+            <div className="flex justify-start md:justify-center space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide relative">
             {categories.map((category) => (
               <button
                 key={category}
@@ -1435,9 +1470,10 @@ const Home: React.FC = () => {
                   setIsSearchActive(false);
                   setSearchQuery('');
                 }}
-                className={`whitespace-nowrap pb-3 sm:pb-4 px-1 font-normal transition-colors flex-shrink-0 relative`}
+                className={`whitespace-nowrap pb-2 sm:pb-3 md:pb-4 px-0.5 sm:px-1 transition-colors flex-shrink-0 relative`}
                 style={{
-                  fontSize: '16px',
+                  fontSize: window.innerWidth < 640 ? '13px' : '16px',
+                  fontWeight: window.innerWidth < 640 ? '300' : 'normal',
                   fontFamily: 'Poppins, sans-serif',
                   color: activeCategory === category ? '#64B5F6' : '#BABABA'
                 }}
@@ -1446,6 +1482,86 @@ const Home: React.FC = () => {
                 {activeCategory === category && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: '#64B5F6' }}></div>
                 )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile Filter Buttons - Horizontal Scroll */}
+      <section className="bg-white pb-4 md:hidden">
+        <div className="px-2">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            {/* More Options Button */}
+            <button
+              className="flex-shrink-0 flex items-center justify-center"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                border: '1px solid #E9E9E9',
+                backgroundColor: '#FFF'
+              }}
+              aria-label="More options"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <circle cx="3.5" cy="7" r="1.25" fill="#6A6A6A"/>
+                <circle cx="7" cy="7" r="1.25" fill="#6A6A6A"/>
+                <circle cx="10.5" cy="7" r="1.25" fill="#6A6A6A"/>
+              </svg>
+            </button>
+
+            {/* Africa Button */}
+            <button
+              onClick={() => setSelectedCountry('')}
+              className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+              style={{
+                backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
+                border: !selectedCountry ? '1px solid #CFE8FC' : 'none',
+                fontFamily: 'Poppins, sans-serif'
+              }}
+            >
+              <img 
+                src={globyIcon} 
+                alt="Globe"
+                className="w-3.5 h-3.5"
+                style={{
+                  filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                }}
+              />
+              <span 
+                className="text-xs font-normal whitespace-nowrap"
+                style={{ 
+                  color: !selectedCountry ? '#5BA5E0' : '#6A6A6A'
+                }}
+              >
+                Africa
+              </span>
+            </button>
+
+            {/* Country Buttons */}
+            {africanCountries.slice(0, 10).map((country) => (
+              <button
+                key={country.name}
+                onClick={() => setSelectedCountry(country.name)}
+                className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+                style={{
+                  backgroundColor: '#FAFAFA',
+                  border: 'none',
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              >
+                <img 
+                  src={country.flag} 
+                  alt={`${country.name} flag`}
+                  className="w-3.5 h-2.5 object-cover rounded-sm"
+                />
+                <span 
+                  className="text-xs font-normal whitespace-nowrap"
+                  style={{ color: '#6A6A6A' }}
+                >
+                  {country.name}
+                </span>
               </button>
             ))}
           </div>
@@ -1660,61 +1776,6 @@ const Home: React.FC = () => {
       {/* Filtered Products Section */}
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Mobile Country Filter Buttons - Above Products */}
-          <div className="md:hidden mb-4 sm:mb-6">
-            <div className="overflow-x-auto">
-              <div className="flex gap-2 pb-2 min-w-max px-1">
-                {/* Three-dot Menu Button - Mobile Only */}
-                <button className="md:hidden flex items-center justify-center w-8 h-8 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-colors touch-manipulation">
-                  <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
-                    <circle cx="6" cy="12" r="2"/>
-                    <circle cx="12" cy="12" r="2"/>
-                    <circle cx="18" cy="12" r="2"/>
-                  </svg>
-                </button>
-                
-                {/* All Africa Button */}
-                <button
-                  onClick={() => setSelectedCountry('')}
-                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md sm:rounded-full whitespace-nowrap text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
-                    selectedCountry === '' 
-                      ? 'bg-blue-100 text-blue-700 border border-blue-200' 
-                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="hidden sm:inline">Afrique</span>
-                  <span className="sm:hidden">Africa</span>
-                </button>
-                
-                {/* Country Buttons */}
-                {africanCountries.map((country) => (
-                  <button
-                    key={country.code}
-                    onClick={() => setSelectedCountry(country.code)}
-                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md sm:rounded-full whitespace-nowrap text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
-                      selectedCountry === country.code 
-                        ? 'bg-orange-100 text-orange-700 border border-orange-200' 
-                        : 'bg-gray-100 sm:bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    <img 
-                      src={country.flag} 
-                      alt={`${country.name} flag`} 
-                      className="w-3 h-2 sm:w-4 sm:h-3 object-cover rounded-sm flex-shrink-0"
-                      loading="lazy"
-                      width="16"
-                      height="12"
-                    />
-                    <span>{country.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
           {/* Conditional Layout: Category Sections for "All" or Regular Grid for Specific Category */}
           {activeCategory === 'All' && !isSearchActive ? (
             // Category Sections Layout
@@ -1748,7 +1809,7 @@ const Home: React.FC = () => {
                       </p>
                       
                       {/* Make a Request Button */}
-                      <button
+                <button
                         onClick={() => setShowRequestModal(true)}
                         className="inline-flex items-center mx-auto"
                         style={{
@@ -1768,7 +1829,7 @@ const Home: React.FC = () => {
                       >
                         <img src={draftsIcon} alt="Request" style={{ width: '20px', height: '20px' }} />
                         Make a request
-                      </button>
+                </button>
                     </div>
 
                     {/* Other Products Near You Section */}
@@ -1826,20 +1887,20 @@ const Home: React.FC = () => {
                                   <span className="truncate">{product.location}</span>
                                 </div>
                                 {/* Bookmark Button */}
-                <button
+                  <button
                                   onClick={(e) => {
                                     e.preventDefault();
                                     handleSave(product.id);
                                   }}
                                   className="flex items-center justify-center flex-shrink-0"
                                   style={{ width: '20px', height: '20px' }}
-                                >
-                                  <img 
+                  >
+                    <img 
                                     src={bookmarkIcon} 
                                     alt="Bookmark" 
                                     className="w-full h-full"
                                   />
-                </button>
+                  </button>
                               </div>
                               
                               {/* Price and Verification Badge */}
@@ -1861,10 +1922,10 @@ const Home: React.FC = () => {
                               </div>
                             </div>
                           </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
                 );
               }
 
@@ -1895,7 +1956,7 @@ const Home: React.FC = () => {
                           aria-label="Scroll left"
                 >
                           <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-              </button>
+                </button>
                         <button 
                           className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
                           aria-label="Scroll right"
@@ -2005,8 +2066,8 @@ const Home: React.FC = () => {
                   {activeCategory}
                 </h2>
               <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </div>
               {getProductsToDisplay().length > 0 && (
                 <div className="flex items-center space-x-3">
@@ -2258,36 +2319,74 @@ const Home: React.FC = () => {
       <section className="py-8 sm:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mobile Pagination */}
-          <div className="md:hidden">
-            <div className="flex items-center justify-between mb-4">
-              <button className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+          <div className="md:hidden flex items-center justify-center relative px-2">
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-2 py-1 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontSize: '14px', color: '#BABABA' }}
+              >
                 Previous
               </button>
-              <span className="text-sm text-gray-600 font-medium">Page 1 of 48</span>
-              <button className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <div className="flex space-x-0.5">
+                {(() => {
+                  const pages = [];
+                  const showPages = [];
+                  
+                  if (totalPages <= 5) {
+                    for (let i = 1; i <= totalPages; i++) showPages.push(i);
+                  } else {
+                    if (currentPage <= 3) {
+                      showPages.push(1, 2, 3, '...', totalPages);
+                    } else if (currentPage >= totalPages - 2) {
+                      showPages.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
+                    } else {
+                      showPages.push(1, '...', currentPage, '...', totalPages);
+                    }
+                  }
+                  
+                  return (
+                    <>
+                      {showPages.map((page, index) => (
+                        page === '...' ? (
+                          <span key={`ellipsis-${index}`} className="px-2 py-1 font-normal" style={{ fontSize: '14px', color: '#BABABA' }}>
+                            ...
+                          </span>
+                        ) : (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page as number)}
+                            className="px-2 py-1 font-normal transition-colors relative"
+                            style={{ fontSize: '14px', color: page === currentPage ? '#212121' : '#BABABA' }}
+                          >
+                            {page}
+                            {page === currentPage && (
+                              <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-4 h-0.5" style={{ backgroundColor: '#212121' }}></div>
+                            )}
+                          </button>
+                        )
+                      ))}
+                    </>
+                  );
+                })()}
+              </div>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-2 py-1 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontSize: '14px', color: '#212121' }}
+              >
                 Next
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
               </button>
-            </div>
-            <div className="flex justify-center">
-              <div className="flex space-x-1 overflow-x-auto pb-2">
-                {[1, 2, 3, '...', 48].map((page, index) => (
-                  <button
-                    key={index}
-                    className={`flex-shrink-0 px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
-                      page === 1
-                        ? 'bg-orange-500 text-white'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-gray-200'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+              <div className="flex items-center ml-2">
+                <span className="px-2 py-0.5 rounded font-normal border text-xs" style={{ color: '#212121', backgroundColor: '#F5F5F5', borderColor: '#E4E4E4' }}>
+                  {currentPage}
+                </span>
+                <span className="mx-1 font-normal" style={{ fontSize: '14px', color: '#BABABA' }}>/</span>
+                <span className="font-normal" style={{ fontSize: '14px', color: '#BABABA' }}>
+                  {totalPages}
+                </span>
               </div>
             </div>
           </div>
