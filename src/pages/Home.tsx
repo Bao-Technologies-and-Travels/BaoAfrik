@@ -75,6 +75,12 @@ const Home: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const totalPages = 48;
+  const [searchHistory, setSearchHistory] = useState<string[]>(['Epices Camerounais', 'Vêtements', 'Produits Nigerians', 'Masque culturel', 'Accessoires traditionnels']);
+  const [showSearchHistory, setShowSearchHistory] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [selectedCategoryText, setSelectedCategoryText] = useState('');
+  const [showPlaceOfOriginDropdown, setShowPlaceOfOriginDropdown] = useState(false);
+  const [selectedPlaceOfOriginText, setSelectedPlaceOfOriginText] = useState('');
 
   // Banner slides data
   const bannerSlides = [
@@ -685,103 +691,102 @@ const Home: React.FC = () => {
       {/* Search Section */}
        <div className="mt-4 sm:mt-6 mx-4 sm:mx-6" style={{maxWidth: '1200px', margin: '0 auto', marginTop: '20px'}}>
         {/* Desktop Unified Search Bar */}
-        <div 
-          className="hidden md:flex items-center mx-auto"
-          style={{
-            width: '900px',
-            height: '58px',
-            flexShrink: 0,
-            borderRadius: '30px',
-            border: '1px solid #E4E4E4',
-            background: '#FFF',
-            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-            fontFamily: 'Poppins, sans-serif'
-          }}
-        >
-          {/* Product Section */}
-          <div className="flex flex-col justify-center px-4 flex-1" style={{ borderRight: '1px solid #E4E4E4' }}>
-            <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
-            <input
-              type="text"
-              placeholder="Search a product"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={handleSearchKeyPress}
-              className="border-0 p-0 focus:outline-none focus:ring-0"
-              style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
-            />
-            <style>
-              {`
-                input::placeholder {
-                  color: #E9E9E9;
-                }
-              `}
-            </style>
-          </div>
-
+        <div className="hidden md:block relative">
+          <div 
+            className="flex items-center mx-auto"
+            style={{
+              width: '900px',
+              height: '58px',
+              flexShrink: 0,
+              borderRadius: '30px',
+              border: '1px solid #E4E4E4',
+              background: '#FFF',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            {/* Product Section */}
+            <div className="flex flex-col justify-center px-4 flex-1 relative" style={{ borderRight: '1px solid #E4E4E4' }}>
+              <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
+              <input
+                type="text"
+                placeholder="Search a product"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                onFocus={() => {
+                  if (searchHistory.length > 0) {
+                    setShowSearchHistory(true);
+                  }
+                }}
+                onBlur={() => {
+                  setTimeout(() => setShowSearchHistory(false), 200);
+                }}
+                className="border-0 p-0 focus:outline-none focus:ring-0 product-search-input"
+                style={{ fontSize: '11px', color: '#6A6A6A', background: 'transparent' }}
+              />
+              <style>
+                {`
+                  .product-search-input::placeholder {
+                    color: #E9E9E9;
+                  }
+                  .product-search-input {
+                    caret-color: #64B5F6;
+                  }
+                `}
+              </style>
+            </div>
+            
           {/* Categories Section */}
-          <div className="flex flex-col justify-center px-4 flex-1" style={{ borderRight: '1px solid #E4E4E4' }}>
+          <div className="flex flex-col justify-center px-4 flex-1 relative" style={{ borderRight: '1px solid #E4E4E4' }}>
             <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Categories</label>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="border-0 p-0 focus:outline-none focus:ring-0 appearance-none cursor-pointer"
-              style={{ fontSize: '11px', color: selectedCategory ? '#212121' : '#E9E9E9', background: 'transparent' }}
+            <button
+              onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              onBlur={() => {
+                setTimeout(() => setShowCategoryDropdown(false), 200);
+              }}
+              className="border-0 p-0 focus:outline-none text-left flex items-center justify-between w-full"
+              style={{ fontSize: '11px', color: selectedCategoryText ? '#212121' : '#E9E9E9', background: 'transparent' }}
             >
-              <option value="" style={{ color: '#E9E9E9' }}>Search a category</option>
-              <option value="Food & Spices">Food & Spices</option>
-              <option value="Fashion & Textiles">Fashion & Textiles</option>
-              <option value="Beauty & Wellness">Beauty & Wellness</option>
-              <option value="Home & Decor">Home & Decor</option>
-              <option value="Books & Media">Books & Media</option>
-            </select>
+              <span>{selectedCategoryText || 'Choose a category'}</span>
+              <img 
+                src={arrowDownIcon} 
+                alt="Arrow" 
+                className="w-3 h-3 ml-2 transition-transform"
+                style={{ transform: showCategoryDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              />
+            </button>
           </div>
 
           {/* Place of Origin Section */}
           <div className="flex flex-col justify-center px-4 flex-1 relative" style={{ borderRight: '1px solid #E4E4E4' }}>
             <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Place of Origin</label>
-            <select
-              value={placeOfOrigin}
-              onChange={(e) => setPlaceOfOrigin(e.target.value)}
-              className="border-0 p-0 pr-4 focus:outline-none focus:ring-0 appearance-none cursor-pointer"
-              style={{ fontSize: '11px', color: placeOfOrigin ? '#212121' : '#E9E9E9', background: 'transparent' }}
+            <button
+              onClick={() => setShowPlaceOfOriginDropdown(!showPlaceOfOriginDropdown)}
+              onBlur={() => {
+                setTimeout(() => setShowPlaceOfOriginDropdown(false), 200);
+              }}
+              className="border-0 p-0 focus:outline-none text-left flex items-center justify-between w-full"
+              style={{ fontSize: '11px', color: selectedPlaceOfOriginText ? '#212121' : '#E9E9E9', background: 'transparent' }}
             >
-              <option value="" style={{ color: '#E9E9E9' }}>Choose a location</option>
-              <option value="Nigeria">Nigeria</option>
-              <option value="Ghana">Ghana</option>
-              <option value="Kenya">Kenya</option>
-              <option value="South Africa">South Africa</option>
-              <option value="Egypt">Egypt</option>
-              <option value="Morocco">Morocco</option>
-              <option value="Ethiopia">Ethiopia</option>
-              <option value="Tanzania">Tanzania</option>
-              <option value="Uganda">Uganda</option>
-              <option value="Cameroon">Cameroon</option>
-              <option value="Senegal">Senegal</option>
-              <option value="Ivory Coast">Ivory Coast</option>
-              <option value="Mali">Mali</option>
-              <option value="Burkina Faso">Burkina Faso</option>
-              <option value="Niger">Niger</option>
-              <option value="Chad">Chad</option>
-              <option value="Sudan">Sudan</option>
-              <option value="Algeria">Algeria</option>
-              <option value="Tunisia">Tunisia</option>
-              <option value="Libya">Libya</option>
-              <option value="Other">Other</option>
-            </select>
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" />
+              <span>{selectedPlaceOfOriginText || 'Choose a location'}</span>
+              <img 
+                src={arrowDownIcon} 
+                alt="Arrow" 
+                className="w-3 h-3 ml-2 transition-transform"
+                style={{ transform: showPlaceOfOriginDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              />
+            </button>
             </div>
-          </div>
-
+            
           {/* Seller Location Section */}
           <div className="flex flex-col justify-center px-4 flex-1">
             <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Seller Location</label>
-            <input
-              type="text"
+              <input
+                type="text"
               placeholder="Insert location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
               className="border-0 p-0 focus:outline-none focus:ring-0"
               style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
             />
@@ -799,24 +804,271 @@ const Home: React.FC = () => {
               style={{ width: '20px', height: '20px' }}
             />
           </button>
-
-          {/* Search Button */}
-          <button 
-            onClick={handleSearch}
+              
+              {/* Search Button */}
+              <button 
+                onClick={handleSearch}
             className="flex items-center justify-center rounded-full mr-2 transition-colors"
             style={{
               width: '90px',
               height: '42px',
               backgroundColor: '#F9A825'
             }}
-            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-          >
+                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+              >
             <svg className="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
         </div>
+
+        {/* Search History Dropdown */}
+        {showSearchHistory && searchQuery.length > 0 && (
+          <div 
+            className="absolute bg-white z-50"
+            style={{
+              width: '180px',
+              left: 'calc(50% - 450px + 16px)',
+              top: '54px',
+              borderRadius: '28px',
+              background: '#FFF',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-2 pb-1">
+              <h3 className="font-medium" style={{ fontSize: '12px', color: '#212121' }}>
+                Search history
+              </h3>
+              <button className="text-gray-400 hover:text-gray-600">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <circle cx="4" cy="10" r="1.5"/>
+                  <circle cx="10" cy="10" r="1.5"/>
+                  <circle cx="16" cy="10" r="1.5"/>
+                </svg>
+              </button>
+            </div>
+
+            {/* Search History Items */}
+            <div className="py-1">
+              {searchHistory.map((item, index) => (
+              <button 
+                  key={index}
+                  onClick={() => {
+                    setSearchQuery(item);
+                    setShowSearchHistory(false);
+                  }}
+                  className="w-full flex items-center justify-between px-4 py-2 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <span className="font-normal" style={{ fontSize: '12px', color: '#6A6A6A' }}>
+                    {item.length > 16 ? item.substring(0, 16) + '...' : item}
+                  </span>
+                  <svg 
+                    className="w-3 h-3 flex-shrink-0 ml-1" 
+                    fill="#6A6A6A" 
+                    viewBox="0 0 20 20"
+                  >
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Category Dropdown */}
+        {showCategoryDropdown && (
+          <div 
+            className="absolute bg-white z-50"
+            style={{
+              width: '180px',
+              left: 'calc(50% - 450px + 200px)',
+              top: '54px',
+              borderRadius: '28px',
+              background: '#FFF',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            {/* Category Items */}
+            <div className="py-2">
+              <button
+                onMouseDown={() => {
+                  setSelectedCategoryText('');
+                  setSelectedCategory('');
+                  setShowCategoryDropdown(false);
+                }}
+                className="w-full text-left px-4 py-1.5 hover:bg-gray-50 transition-colors"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: !selectedCategoryText ? '#64B5F6' : '#6A6A6A',
+                  fontSize: '11px'
+                }}
+              >
+                All Categories
+              </button>
+              {['Beauty & Wellness', 'Books & Media', 'Fashion & Textiles', 'Food & Spices', 'Home & Decor'].map((category) => (
+                <button
+                  key={category}
+                  onMouseDown={() => {
+                    setSelectedCategoryText(category);
+                    setSelectedCategory(category);
+                    setShowCategoryDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-1.5 hover:bg-gray-50 transition-colors"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: selectedCategoryText === category ? '#64B5F6' : '#6A6A6A',
+                    fontSize: '11px'
+                  }}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Place of Origin Dropdown */}
+        {showPlaceOfOriginDropdown && (
+          <div 
+            className="absolute bg-white z-50 place-origin-dropdown"
+            style={{
+              width: '180px',
+              left: 'calc(50% - 450px + 395px)',
+              top: '54px',
+              borderRadius: '28px',
+              background: '#FFF',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              fontFamily: 'Poppins, sans-serif',
+              maxHeight: '280px',
+              overflowY: 'auto'
+            }}
+          >
+            {/* Place of Origin Items */}
+            <div className="py-2">
+              <button
+                onMouseDown={() => {
+                  setSelectedPlaceOfOriginText('');
+                  setPlaceOfOrigin('');
+                  setShowPlaceOfOriginDropdown(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                style={{
+                  backgroundColor: !selectedPlaceOfOriginText || selectedPlaceOfOriginText === 'Africa' ? '#F0F8FE' : 'transparent',
+                  color: !selectedPlaceOfOriginText || selectedPlaceOfOriginText === 'Africa' ? '#64B5F6' : '#6A6A6A',
+                  fontSize: '11px'
+                }}
+              >
+                <img 
+                  src={globyIcon} 
+                  alt="Globe" 
+                  className="w-4 h-4" 
+                  style={{
+                    filter: (!selectedPlaceOfOriginText || selectedPlaceOfOriginText === 'Africa') 
+                      ? 'none' 
+                      : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
+                  }}
+                />
+                <span>Africa</span>
+              </button>
+              {[
+                { name: 'Algeria', flagCode: 'dz' },
+                { name: 'Angola', flagCode: 'ao' },
+                { name: 'Benin', flagCode: 'bj' },
+                { name: 'Botswana', flagCode: 'bw' },
+                { name: 'Burkina Faso', flagCode: 'bf' },
+                { name: 'Burundi', flagCode: 'bi' },
+                { name: 'Cameroon', flagCode: 'cm' },
+                { name: 'Cape Verde', flagCode: 'cv' },
+                { name: 'Central African Republic', flagCode: 'cf' },
+                { name: 'Chad', flagCode: 'td' },
+                { name: 'Comoros', flagCode: 'km' },
+                { name: 'Congo', flagCode: 'cg' },
+                { name: 'Democratic Republic of Congo', flagCode: 'cd' },
+                { name: 'Djibouti', flagCode: 'dj' },
+                { name: 'Egypt', flagCode: 'eg' },
+                { name: 'Equatorial Guinea', flagCode: 'gq' },
+                { name: 'Eritrea', flagCode: 'er' },
+                { name: 'Eswatini', flagCode: 'sz' },
+                { name: 'Ethiopia', flagCode: 'et' },
+                { name: 'Gabon', flagCode: 'ga' },
+                { name: 'Gambia', flagCode: 'gm' },
+                { name: 'Ghana', flagCode: 'gh' },
+                { name: 'Guinea', flagCode: 'gn' },
+                { name: 'Guinea-Bissau', flagCode: 'gw' },
+                { name: 'Ivory Coast', flagCode: 'ci' },
+                { name: 'Kenya', flagCode: 'ke' },
+                { name: 'Lesotho', flagCode: 'ls' },
+                { name: 'Liberia', flagCode: 'lr' },
+                { name: 'Libya', flagCode: 'ly' },
+                { name: 'Madagascar', flagCode: 'mg' },
+                { name: 'Malawi', flagCode: 'mw' },
+                { name: 'Mali', flagCode: 'ml' },
+                { name: 'Mauritania', flagCode: 'mr' },
+                { name: 'Mauritius', flagCode: 'mu' },
+                { name: 'Morocco', flagCode: 'ma' },
+                { name: 'Mozambique', flagCode: 'mz' },
+                { name: 'Namibia', flagCode: 'na' },
+                { name: 'Niger', flagCode: 'ne' },
+                { name: 'Nigeria', flagCode: 'ng' },
+                { name: 'Rwanda', flagCode: 'rw' },
+                { name: 'Sao Tome and Principe', flagCode: 'st' },
+                { name: 'Senegal', flagCode: 'sn' },
+                { name: 'Seychelles', flagCode: 'sc' },
+                { name: 'Sierra Leone', flagCode: 'sl' },
+                { name: 'Somalia', flagCode: 'so' },
+                { name: 'South Africa', flagCode: 'za' },
+                { name: 'South Sudan', flagCode: 'ss' },
+                { name: 'Sudan', flagCode: 'sd' },
+                { name: 'Tanzania', flagCode: 'tz' },
+                { name: 'Togo', flagCode: 'tg' },
+                { name: 'Tunisia', flagCode: 'tn' },
+                { name: 'Uganda', flagCode: 'ug' },
+                { name: 'Zambia', flagCode: 'zm' },
+                { name: 'Zimbabwe', flagCode: 'zw' }
+              ].sort((a, b) => a.name.localeCompare(b.name)).map((country) => (
+                <button
+                  key={country.name}
+                  onMouseDown={() => {
+                    setSelectedPlaceOfOriginText(country.name);
+                    setPlaceOfOrigin(country.name);
+                    setShowPlaceOfOriginDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-1.5 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: selectedPlaceOfOriginText === country.name ? '#64B5F6' : '#6A6A6A',
+                    fontSize: '11px'
+                  }}
+                >
+                  <img 
+                    src={`https://flagcdn.com/w20/${country.flagCode}.png`} 
+                    srcSet={`https://flagcdn.com/w40/${country.flagCode}.png 2x`}
+                    alt={`${country.name} flag`}
+                    style={{ width: '16px', height: '12px', objectFit: 'cover' }}
+                  />
+                  <span>{country.name}</span>
+                </button>
+              ))}
+            </div>
+            <style>
+              {`
+                /* Hide scrollbar completely while keeping scroll functionality */
+                .place-origin-dropdown {
+                  scrollbar-width: none; /* Firefox */
+                  -ms-overflow-style: none; /* IE and Edge */
+                }
+                .place-origin-dropdown::-webkit-scrollbar {
+                  display: none; /* Chrome, Safari, Opera */
+                }
+              `}
+            </style>
+          </div>
+        )}
+          </div>
 
           {/* Mobile Search */}
           <div className="md:hidden">
@@ -913,7 +1165,7 @@ const Home: React.FC = () => {
               </div>
             )}
           </div>
-       </div>
+        </div>
 
       {/* Hero Banner - Auto Sliding */}
       <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-12 sm:mx-16 lg:mx-24 rounded-2xl" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
