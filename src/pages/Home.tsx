@@ -684,121 +684,139 @@ const Home: React.FC = () => {
       
       {/* Search Section */}
        <div className="mt-4 sm:mt-6 mx-4 sm:mx-6" style={{maxWidth: '1200px', margin: '0 auto', marginTop: '20px'}}>
-        <section className="bg-transparent sm:bg-white sm:shadow-sm sm:border sm:border-gray-200 rounded-full">
-          <div className="px-4 sm:px-6 lg:px-8 py-3">
-          {/* Desktop Search */}
-          <div className="hidden md:flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-4">
-            {/* Search Input */}
-            <div className="flex-1 relative min-w-0">
-              <input
-                type="text"
-                placeholder="Search for products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={handleSearchKeyPress}
-                className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
-            
-            {/* Desktop: Grid for dropdowns and inputs */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:contents">
-              {/* Category Dropdown */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base min-w-[140px]"
-              >
-                <option value="">All Categories</option>
-                <option value="Food & Spices">Food & Spices</option>
-                <option value="Fashion & Textiles">Fashion & Textiles</option>
-                <option value="Beauty & Wellness">Beauty & Wellness</option>
-                <option value="Home & Decor">Home & Decor</option>
-                <option value="Books & Media">Books & Media</option>
-              </select>
-              
-              {/* Place of Origin Dropdown - Web Only */}
-              <div className="hidden lg:block relative min-w-[160px]">
-                <select
-                  value={placeOfOrigin}
-                  onChange={(e) => setPlaceOfOrigin(e.target.value)}
-                  className="w-full px-3 sm:px-4 pr-8 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm sm:text-base appearance-none"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                    backgroundPosition: 'right 0.5rem center',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundSize: '1.5em 1.5em',
-                    paddingRight: '2.5rem'
-                  }}
-                >
-                  <option value="">Product Origin</option>
-                  <option value="Nigeria" style={{backgroundImage: 'url("https://flagcdn.com/w20/ng.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Nigeria</option>
-                  <option value="Ghana" style={{backgroundImage: 'url("https://flagcdn.com/w20/gh.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ghana</option>
-                  <option value="Kenya" style={{backgroundImage: 'url("https://flagcdn.com/w20/ke.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Kenya</option>
-                  <option value="South Africa" style={{backgroundImage: 'url("https://flagcdn.com/w20/za.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>South Africa</option>
-                  <option value="Egypt" style={{backgroundImage: 'url("https://flagcdn.com/w20/eg.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Egypt</option>
-                  <option value="Morocco" style={{backgroundImage: 'url("https://flagcdn.com/w20/ma.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Morocco</option>
-                  <option value="Ethiopia" style={{backgroundImage: 'url("https://flagcdn.com/w20/et.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ethiopia</option>
-                  <option value="Tanzania" style={{backgroundImage: 'url("https://flagcdn.com/w20/tz.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Tanzania</option>
-                  <option value="Uganda" style={{backgroundImage: 'url("https://flagcdn.com/w20/ug.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Uganda</option>
-                  <option value="Cameroon" style={{backgroundImage: 'url("https://flagcdn.com/w20/cm.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Cameroon</option>
-                  <option value="Senegal" style={{backgroundImage: 'url("https://flagcdn.com/w20/sn.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Senegal</option>
-                  <option value="Ivory Coast" style={{backgroundImage: 'url("https://flagcdn.com/w20/ci.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Ivory Coast</option>
-                  <option value="Mali" style={{backgroundImage: 'url("https://flagcdn.com/w20/ml.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Mali</option>
-                  <option value="Burkina Faso" style={{backgroundImage: 'url("https://flagcdn.com/w20/bf.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Burkina Faso</option>
-                  <option value="Niger" style={{backgroundImage: 'url("https://flagcdn.com/w20/ne.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Niger</option>
-                  <option value="Chad" style={{backgroundImage: 'url("https://flagcdn.com/w20/td.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Chad</option>
-                  <option value="Sudan" style={{backgroundImage: 'url("https://flagcdn.com/w20/sd.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Sudan</option>
-                  <option value="Algeria" style={{backgroundImage: 'url("https://flagcdn.com/w20/dz.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Algeria</option>
-                  <option value="Tunisia" style={{backgroundImage: 'url("https://flagcdn.com/w20/tn.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Tunisia</option>
-                  <option value="Libya" style={{backgroundImage: 'url("https://flagcdn.com/w20/ly.png")', backgroundRepeat: 'no-repeat', backgroundPosition: 'left 8px center', paddingLeft: '32px'}}>Libya</option>
-                  <option value="Other">Other</option>
-                </select>
-            </div>
-            
-              {/* Location Input */}
-              <input
-                type="text"
-                placeholder="Seller Location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base min-w-[120px]"
-              />
-            </div>
-            
-            {/* Mobile: Second row for buttons */}
-            <div className="flex gap-3 lg:contents">
-              {/* Scan Button */}
-              <button 
-                onClick={handleScan}
-                className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full transition-colors flex-shrink-0 hover:border-orange-500 hover:text-orange-500"
-                title="Scan QR code"
-              >
-                <img 
-                  src={scanIcon} 
-                  alt="Scan QR code" 
-                  className="w-4 h-4 sm:w-5 sm:h-5 opacity-60 hover:opacity-100 transition-opacity"
-                />
-              </button>
-              
-              {/* Search Button */}
-              <button 
-                onClick={handleSearch}
-                className="text-white px-4 sm:px-6 py-2 rounded-full transition-colors font-medium text-sm sm:text-base whitespace-nowrap flex items-center justify-center"
-                style={{backgroundColor: '#F9A825'}}
-                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
+        {/* Desktop Unified Search Bar */}
+        <div 
+          className="hidden md:flex items-center mx-auto"
+          style={{
+            width: '760px',
+            height: '58px',
+            flexShrink: 0,
+            borderRadius: '30px',
+            border: '1px solid #E4E4E4',
+            background: '#FFF',
+            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+            fontFamily: 'Poppins, sans-serif'
+          }}
+        >
+          {/* Product Section */}
+          <div className="flex flex-col justify-center px-4 flex-1" style={{ borderRight: '1px solid #E4E4E4' }}>
+            <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
+            <input
+              type="text"
+              placeholder="Search a product"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
+              className="border-0 p-0 focus:outline-none focus:ring-0"
+              style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
+            />
+            <style>
+              {`
+                input::placeholder {
+                  color: #E9E9E9;
+                }
+              `}
+            </style>
+          </div>
+
+          {/* Categories Section */}
+          <div className="flex flex-col justify-center px-4 flex-1" style={{ borderRight: '1px solid #E4E4E4' }}>
+            <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Categories</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="border-0 p-0 focus:outline-none focus:ring-0 appearance-none cursor-pointer"
+              style={{ fontSize: '11px', color: selectedCategory ? '#212121' : '#E9E9E9', background: 'transparent' }}
+            >
+              <option value="" style={{ color: '#E9E9E9' }}>Search a category</option>
+              <option value="Food & Spices">Food & Spices</option>
+              <option value="Fashion & Textiles">Fashion & Textiles</option>
+              <option value="Beauty & Wellness">Beauty & Wellness</option>
+              <option value="Home & Decor">Home & Decor</option>
+              <option value="Books & Media">Books & Media</option>
+            </select>
+          </div>
+
+          {/* Place of Origin Section */}
+          <div className="flex flex-col justify-center px-4 flex-1 relative" style={{ borderRight: '1px solid #E4E4E4' }}>
+            <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Place of Origin</label>
+            <select
+              value={placeOfOrigin}
+              onChange={(e) => setPlaceOfOrigin(e.target.value)}
+              className="border-0 p-0 pr-4 focus:outline-none focus:ring-0 appearance-none cursor-pointer"
+              style={{ fontSize: '11px', color: placeOfOrigin ? '#212121' : '#E9E9E9', background: 'transparent' }}
+            >
+              <option value="" style={{ color: '#E9E9E9' }}>Choose a location</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Ghana">Ghana</option>
+              <option value="Kenya">Kenya</option>
+              <option value="South Africa">South Africa</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Morocco">Morocco</option>
+              <option value="Ethiopia">Ethiopia</option>
+              <option value="Tanzania">Tanzania</option>
+              <option value="Uganda">Uganda</option>
+              <option value="Cameroon">Cameroon</option>
+              <option value="Senegal">Senegal</option>
+              <option value="Ivory Coast">Ivory Coast</option>
+              <option value="Mali">Mali</option>
+              <option value="Burkina Faso">Burkina Faso</option>
+              <option value="Niger">Niger</option>
+              <option value="Chad">Chad</option>
+              <option value="Sudan">Sudan</option>
+              <option value="Algeria">Algeria</option>
+              <option value="Tunisia">Tunisia</option>
+              <option value="Libya">Libya</option>
+              <option value="Other">Other</option>
+            </select>
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" />
             </div>
           </div>
+
+          {/* Seller Location Section */}
+          <div className="flex flex-col justify-center px-4 flex-1">
+            <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Seller Location</label>
+            <input
+              type="text"
+              placeholder="Insert location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="border-0 p-0 focus:outline-none focus:ring-0"
+              style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
+            />
+          </div>
+
+          {/* Scan Icon */}
+          <button 
+            onClick={handleScan}
+            className="flex items-center justify-center px-3 hover:opacity-70 transition-opacity"
+            title="Scan QR code"
+          >
+            <img 
+              src={scanIcon} 
+              alt="Scan QR code" 
+              style={{ width: '20px', height: '20px' }}
+            />
+          </button>
+
+          {/* Search Button */}
+          <button 
+            onClick={handleSearch}
+            className="flex items-center justify-center rounded-full mr-2 transition-colors"
+            style={{
+              width: '90px',
+              height: '42px',
+              backgroundColor: '#F9A825'
+            }}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+        </div>
 
           {/* Mobile Search */}
           <div className="md:hidden">
@@ -895,9 +913,7 @@ const Home: React.FC = () => {
               </div>
             )}
           </div>
-        </div>
-      </section>
-      </div>
+       </div>
 
       {/* Hero Banner - Auto Sliding */}
       <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-12 sm:mx-16 lg:mx-24 rounded-2xl" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
