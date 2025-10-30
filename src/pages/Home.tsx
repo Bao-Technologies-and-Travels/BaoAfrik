@@ -2354,17 +2354,17 @@ const Home: React.FC = () => {
                             ...
                           </span>
                         ) : (
-                          <button
+                  <button
                             key={page}
                             onClick={() => setCurrentPage(page as number)}
                             className="px-2 py-1 font-normal transition-colors relative"
                             style={{ fontSize: '14px', color: page === currentPage ? '#212121' : '#BABABA' }}
-                          >
-                            {page}
+                  >
+                    {page}
                             {page === currentPage && (
                               <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-4 h-0.5" style={{ backgroundColor: '#212121' }}></div>
                             )}
-                          </button>
+                  </button>
                         )
                       ))}
                     </>
@@ -2473,9 +2473,9 @@ const Home: React.FC = () => {
       <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className="flex items-start justify-between mb-8">
+          <div className="flex items-start justify-between mb-6 sm:mb-8">
             <div className="flex-1">
-              <h2 className="mb-4" style={{ fontSize: '44px', fontWeight: '600', lineHeight: '1.2' }}>
+              <h2 className="mb-3 sm:mb-4" style={{ fontSize: window.innerWidth < 640 ? '20px' : '44px', fontWeight: '600', lineHeight: '1.2' }}>
                 <span style={{ color: '#212121' }}>Buy & Sell </span>
                 <span style={{ 
                   background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
@@ -2486,13 +2486,13 @@ const Home: React.FC = () => {
                   Instantly
                 </span>
               </h2>
-              <p style={{ fontSize: '16px', color: '#9C9C9C', maxWidth: '600px', lineHeight: '1.6' }}>
+              <p style={{ fontSize: window.innerWidth < 640 ? '9px' : '16px', color: '#9C9C9C', maxWidth: window.innerWidth < 640 ? '220px' : '600px', lineHeight: '1.6' }}>
                 Turn unmet needs into instant deals, discover what people are looking for, grab it, and sell it right where demand begins
               </p>
             </div>
             <div className="text-right">
               <div style={{ 
-                fontSize: '44px', 
+                fontSize: window.innerWidth < 640 ? '20px' : '44px', 
                 fontWeight: '600',
                 background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
                 WebkitBackgroundClip: 'text',
@@ -2501,168 +2501,274 @@ const Home: React.FC = () => {
               }}>
                 Over 400
               </div>
-              <div style={{ fontSize: '18px', color: '#9C9C9C', marginTop: '4px' }}>
+              <div style={{ fontSize: window.innerWidth < 640 ? '10px' : '18px', color: '#9C9C9C', marginTop: '4px' }}>
                 Request availables
               </div>
             </div>
           </div>
 
           {/* Filter Bar Section */}
-          <div className="flex items-center gap-4 mb-8 mt-20">
-            {/* Filter Button */}
-            <button 
-              className="flex items-center border transition-colors hover:bg-gray-50"
-              style={{ 
-                backgroundColor: '#FAFAFA',
-                borderColor: '#E4E4E4',
-                padding: '8px 10px',
-                borderRadius: '8px',
-                fontFamily: 'Poppins, sans-serif',
-                gap: '6px'
-              }}
-            >
-              <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Filter :</span>
-              <img src={earthIcon} alt="Globe" style={{ width: '22px', height: '22px' }} />
-              <span style={{ color: '#6A6A6A', fontSize: '14px' }}>Africa</span>
-              <img src={arrowDownIcon} alt="Arrow" style={{ width: '16px', height: '16px' }} />
-            </button>
-
-            {/* Price Button */}
-            <button 
-              className="flex items-center border transition-colors hover:bg-gray-50"
-              style={{ 
-                backgroundColor: '#FAFAFA',
-                borderColor: '#E4E4E4',
-                padding: '8px 14px',
-                borderRadius: '8px',
-                fontFamily: 'Poppins, sans-serif',
-                gap: '6px'
-              }}
-            >
-              <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Price :</span>
-              <span style={{ color: '#6A6A6A', fontSize: '14px' }}>All</span>
-              <img src={arrowDownIcon} alt="Arrow" style={{ width: '16px', height: '16px' }} />
-            </button>
-
-            {/* Buyer Location Search Bar */}
-            <div className="ml-auto" style={{ width: '380px' }}>
+          <div className={window.innerWidth < 640 ? "flex flex-col gap-2 mb-6 mt-8" : "flex items-center gap-4 mb-8 mt-20"}>
+            {/* Buyer Location Search Bar - Top on Mobile */}
+            <div style={{ width: window.innerWidth < 640 ? '100%' : '380px', marginLeft: window.innerWidth < 640 ? '0' : 'auto', order: window.innerWidth < 640 ? 1 : 3 }}>
               <div className="relative flex items-center">
                 <input
                   type="text"
                   placeholder="Buyer location ?"
-                  className="w-full px-4 py-2.5 pr-28 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
+                  className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
                   style={{ 
                     backgroundColor: '#FFFFFF',
                     borderColor: '#E4E4E4',
                     fontFamily: 'Poppins, sans-serif',
-                    fontSize: '14px',
-                    color: '#6A6A6A'
+                    fontSize: window.innerWidth < 640 ? '10px' : '14px',
+                    color: '#6A6A6A',
+                    padding: window.innerWidth < 640 ? '6px 50px 6px 10px' : '10px 112px 10px 16px'
                   }}
                 />
                 <div 
-                  className="absolute right-2 flex items-center"
+                  className="absolute right-2 flex items-center justify-center"
                   style={{ 
                     backgroundColor: '#F9A825',
-                    height: '28px',
-                    paddingLeft: '18px',
-                    paddingRight: '18px',
+                    height: window.innerWidth < 640 ? '20px' : '28px',
+                    paddingLeft: window.innerWidth < 640 ? '10px' : '18px',
+                    paddingRight: window.innerWidth < 640 ? '10px' : '18px',
                     borderRadius: '8px'
                   }}
                 >
-                  <img src={buyerIcon} alt="Search" className="w-4 h-4" />
+                  <img src={buyerIcon} alt="Search" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
                 </div>
               </div>
+            </div>
+
+            {/* Filter and Price Buttons Row - Bottom on Mobile */}
+            <div className={window.innerWidth < 640 ? "flex gap-2" : "contents"} style={{ order: window.innerWidth < 640 ? 2 : 1 }}>
+              {/* Filter Button */}
+              <button 
+                className="flex items-center border transition-colors hover:bg-gray-50"
+                style={{ 
+                  backgroundColor: '#FAFAFA',
+                  borderColor: '#E4E4E4',
+                  padding: window.innerWidth < 640 ? '5px 7px' : '8px 10px',
+                  borderRadius: '8px',
+                  fontFamily: 'Poppins, sans-serif',
+                  gap: window.innerWidth < 640 ? '4px' : '6px',
+                  flex: window.innerWidth < 640 ? '0 0 auto' : 'initial'
+                }}
+              >
+                <span style={{ color: '#BABABA', fontSize: window.innerWidth < 640 ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
+                <img src={earthIcon} alt="Globe" style={{ width: window.innerWidth < 640 ? '16px' : '22px', height: window.innerWidth < 640 ? '16px' : '22px' }} />
+                <span style={{ color: '#6A6A6A', fontSize: window.innerWidth < 640 ? '10px' : '14px' }}>Africa</span>
+                <img src={arrowDownIcon} alt="Arrow" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
+              </button>
+
+              {/* Price Button */}
+              <button 
+                className="flex items-center border transition-colors hover:bg-gray-50"
+                style={{ 
+                  backgroundColor: '#FAFAFA',
+                  borderColor: '#E4E4E4',
+                  padding: window.innerWidth < 640 ? '5px 8px' : '8px 14px',
+                  borderRadius: '8px',
+                  fontFamily: 'Poppins, sans-serif',
+                  gap: window.innerWidth < 640 ? '4px' : '6px',
+                  flex: window.innerWidth < 640 ? '0 0 auto' : 'initial'
+                }}
+              >
+                <span style={{ color: '#BABABA', fontSize: window.innerWidth < 640 ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
+                <span style={{ color: '#6A6A6A', fontSize: window.innerWidth < 640 ? '10px' : '14px' }}>All</span>
+                <img src={arrowDownIcon} alt="Arrow" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
+              </button>
             </div>
           </div>
 
           {/* Request Cards Section */}
           <div className="relative">
-            {/* Fade effect on the right */}
+            {/* Fade effect on the right - Desktop only */}
+            {window.innerWidth >= 640 && (
+              <div 
+                className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                style={{
+                  background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                  height: 'calc(100% - 4rem)'
+                }}
+              />
+            )}
             <div 
-              className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
-              style={{
-                background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
-                height: 'calc(100% - 4rem)' // Exclude the navigation arrows height
+              className="flex gap-4 sm:gap-8 mb-6 overflow-x-auto scrollbar-hide"
+              style={{ 
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
               }}
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6">
+            >
               {[1, 2, 3].map((index) => (
                 <div 
                   key={index}
-                  className="bg-white rounded-xl p-4 hover:shadow-md transition-shadow"
-                  style={{ boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', height: 'auto' }}
+                  className="bg-white rounded-xl hover:shadow-md transition-shadow flex-shrink-0"
+                  style={{ 
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
+                    height: 'auto',
+                    width: window.innerWidth < 640 ? '260px' : 'calc((100% - 64px) / 3)',
+                    padding: window.innerWidth < 640 ? '10px' : '16px'
+                  }}
                 >
-                  {/* Product Name Label and Button */}
-                  <div className="flex items-center justify-between mb-0">
-                    <span style={{ fontSize: '12px', color: '#9C9C9C' }}>Product name</span>
-                    <button 
-                      className="px-3 py-1 rounded-lg text-white"
-                      style={{ backgroundColor: '#F9A825', fontWeight: 'normal', fontSize: '12px' }}
-                    >
-                      Manage request
-                    </button>
-                  </div>
+                  {/* Product Name Label and Button - Desktop only */}
+                  {window.innerWidth >= 640 && (
+                    <div className="flex items-center justify-between mb-0">
+                      <span style={{ fontSize: '12px', color: '#9C9C9C' }}>Product name</span>
+                      <button 
+                        className="rounded-lg text-white"
+                        style={{ 
+                          backgroundColor: '#F9A825', 
+                          fontWeight: 'normal', 
+                          fontSize: '12px',
+                          padding: '4px 12px'
+                        }}
+                      >
+                        Manage request
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Product Name Label Only - Mobile */}
+                  {window.innerWidth < 640 && (
+                    <div className="mb-1">
+                      <span style={{ fontSize: '9px', color: '#9C9C9C' }}>Product name</span>
+                    </div>
+                  )}
 
                   {/* Product Title */}
-                  <h3 className="mb-3" style={{ fontSize: '14px', fontWeight: '500', color: '#212121' }}>
+                  <h3 className="mb-2 sm:mb-3" style={{ fontSize: window.innerWidth < 640 ? '11px' : '14px', fontWeight: '500', color: '#212121' }}>
                     Snails from South Africa
                   </h3>
 
                   {/* Description */}
-                  <p className="mb-4" style={{ fontSize: '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
+                  <p className="mb-3 sm:mb-4" style={{ fontSize: window.innerWidth < 640 ? '7px' : '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                   </p>
 
-                  {/* Tags and User Info Row */}
-                  <div className="flex items-end justify-between">
-                    {/* Tags - Stacked Layout */}
-                    <div className="flex flex-col gap-2">
-                      {/* First Row - Location */}
-                      <div 
-                        className="flex items-center gap-1 px-2 py-1"
-                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
-                      >
-                        <img 
-                          src={locationIcon} 
-                          alt="Location"
-                          className="w-3 h-3"
-                          style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
-                        />
-                        <span style={{ fontSize: '12px', color: '#64B5F6' }}>London, United Kingdom</span>
-                      </div>
-
-                      {/* Second Row - Price and Country */}
-                      <div className="flex gap-2">
-                        {/* Price Tag */}
-                        <div 
-                          className="flex items-center gap-1.5 px-3 py-1.5"
-                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                        >
-                          <img 
-                            src={moneyIcon} 
-                            alt="Money"
-                            className="w-3 h-3"
-                            style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
-                          />
-                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
-                        </div>
-
-                        {/* Country Tag */}
-                        <div 
-                          className="flex items-center gap-1.5 px-3 py-1.5"
-                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                        >
-                          <img 
-                            src="https://flagcdn.com/w20/za.png" 
-                            alt="South Africa"
-                            className="w-4 h-3 object-cover rounded-sm"
-                          />
-                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
-                        </div>
-                      </div>
+                  {/* Tags - Full Width */}
+                  <div className="flex flex-col gap-1.5 sm:gap-2 mb-3">
+                    {/* First Row - Location */}
+                    <div 
+                      className="flex items-center gap-1 py-1"
+                      style={{ 
+                        backgroundColor: '#F0F8FE', 
+                        borderRadius: '6px', 
+                        width: 'fit-content',
+                        padding: window.innerWidth < 640 ? '2px 5px' : '4px 8px'
+                      }}
+                    >
+                      <img 
+                        src={locationIcon} 
+                        alt="Location"
+                        style={{ 
+                          width: window.innerWidth < 640 ? '9px' : '12px',
+                          height: window.innerWidth < 640 ? '9px' : '12px',
+                          filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' 
+                        }}
+                      />
+                      <span style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px', color: '#64B5F6', fontWeight: window.innerWidth < 640 ? '300' : 'normal' }}>London, United Kingdom</span>
                     </div>
 
-                    {/* User Info */}
+                    {/* Second Row - Price and Country */}
+                    <div className="flex gap-1.5 sm:gap-2">
+                      {/* Price Tag */}
+                      <div 
+                        className="flex items-center gap-1"
+                        style={{ 
+                          backgroundColor: '#F0F8FE', 
+                          borderRadius: '6px',
+                          padding: window.innerWidth < 640 ? '2px 5px' : '6px 12px'
+                        }}
+                      >
+                        <img 
+                          src={moneyIcon} 
+                          alt="Money"
+                          style={{ 
+                            width: window.innerWidth < 640 ? '9px' : '12px',
+                            height: window.innerWidth < 640 ? '9px' : '12px',
+                            filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' 
+                          }}
+                        />
+                        <span style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px', color: '#64B5F6', fontWeight: window.innerWidth < 640 ? '300' : 'normal' }}>50 ~ 100 USD</span>
+                      </div>
+
+                      {/* Country Tag */}
+                      <div 
+                        className="flex items-center gap-1"
+                        style={{ 
+                          backgroundColor: '#F0F8FE', 
+                          borderRadius: '6px',
+                          padding: window.innerWidth < 640 ? '2px 5px' : '6px 12px'
+                        }}
+                      >
+                        <img 
+                          src="https://flagcdn.com/w20/za.png" 
+                          alt="South Africa"
+                          style={{ 
+                            width: window.innerWidth < 640 ? '11px' : '16px',
+                            height: window.innerWidth < 640 ? '8px' : '12px',
+                            objectFit: 'cover',
+                            borderRadius: '2px'
+                          }}
+                        />
+                        <span style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px', color: '#64B5F6', fontWeight: window.innerWidth < 640 ? '300' : 'normal' }}>South Africa</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* User Profile Section */}
+                  {window.innerWidth < 640 ? (
+                    /* Mobile Layout - Horizontal with gray divider */
+                    <>
+                      <div style={{ borderTop: '1px solid #E4E4E4', marginBottom: '8px' }}></div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="rounded-full flex items-center justify-center overflow-hidden"
+                            style={{ 
+                              backgroundColor: '#F7C9B0',
+                              width: '28px',
+                              height: '28px'
+                            }}
+                          >
+                            <svg 
+                              style={{ 
+                                width: '16px',
+                                height: '16px'
+                              }} 
+                              viewBox="0 0 24 24" 
+                              fill="none" 
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
+                              <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
+                            </svg>
+                          </div>
+                          <div className="flex flex-col">
+                            <span style={{ fontSize: '7px', color: '#BABABA' }}>User profile</span>
+                            <span style={{ fontSize: '9px', color: '#212121', fontWeight: '500' }}>Seraphin DIKOUM</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <svg 
+                            className="text-yellow-500" 
+                            fill="currentColor" 
+                            viewBox="0 0 20 20"
+                            style={{ 
+                              width: '10px',
+                              height: '10px'
+                            }}
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <span style={{ fontSize: '9px', color: '#212121', fontWeight: '500' }}>4.3</span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    /* Desktop Layout - Vertical */
                     <div className="flex flex-col items-center mt-2">
                       <div 
                         className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
@@ -2683,21 +2789,44 @@ const Home: React.FC = () => {
                         <span style={{ fontSize: '10px', color: '#212121', fontWeight: '500' }}>4.3</span>
                       </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Respond to the request button - Mobile only */}
+                  {window.innerWidth < 640 && (
+                    <button 
+                      className="w-full mt-3 rounded-lg text-white"
+                      style={{ 
+                        backgroundColor: '#F9A825', 
+                        fontWeight: 'normal', 
+                        fontSize: '9px',
+                        padding: '6px 10px'
+                      }}
+                    >
+                      Respond to the request
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
 
             {/* Navigation Arrows */}
-            <div className="flex items-center justify-end gap-3 mt-6">
+            <div className="flex items-center justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
               <button 
-                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                className="rounded-full flex items-center justify-center transition-all duration-200"
+                style={{ 
+                  width: window.innerWidth < 640 ? '18px' : '24px',
+                  height: window.innerWidth < 640 ? '18px' : '24px'
+                }}
                 aria-label="Previous"
               >
                 <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
               </button>
               <button 
-                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                className="rounded-full flex items-center justify-center transition-all duration-200"
+                style={{ 
+                  width: window.innerWidth < 640 ? '18px' : '24px',
+                  height: window.innerWidth < 640 ? '18px' : '24px'
+                }}
                 aria-label="Next"
               >
                 <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
