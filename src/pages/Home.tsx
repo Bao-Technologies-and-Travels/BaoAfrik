@@ -1304,7 +1304,7 @@ const Home: React.FC = () => {
                   backgroundColor: '#FFF'
                 }}
                 aria-label="Filter"
-              >
+                    >
                 {/* Filter Icon - Two horizontal lines with circles */}
                 <svg 
                   width="20" 
@@ -1899,7 +1899,7 @@ const Home: React.FC = () => {
                                     src={bookmarkIcon} 
                                     alt="Bookmark" 
                                     className="w-full h-full"
-                                  />
+                    />
                   </button>
                               </div>
                               
@@ -1942,92 +1942,130 @@ const Home: React.FC = () => {
                 
                 return (
                   <div key={category} className="mb-8">
-                    {/* Category Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-                        <h2 className="text-[20px] font-semibold text-gray-900">{category}</h2>
-              <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-                      <div className="flex items-center space-x-3">
-                <button
-                          className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                          aria-label="Scroll left"
-                >
-                          <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                </button>
-                        <button 
-                          className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                          aria-label="Scroll right"
-                        >
-                          <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-                        </button>
+                    {/* Category Header - Hidden on Mobile */}
+          {window.innerWidth >= 640 && (
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                          <h2 className="text-[20px] font-semibold text-gray-900">{category}</h2>
+                <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+                        <div className="flex items-center space-x-3">
+                  <button
+                            className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                            aria-label="Scroll left"
+                  >
+                            <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                  </button>
+                          <button 
+                            className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                            aria-label="Scroll right"
+                          >
+                            <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
+          )}
                     
                     {/* Category Products - Horizontal Scroll */}
                     <div className={filteredProducts.length <= 6 ? '' : 'overflow-x-auto scrollbar-hide'}>
-                      <div className={filteredProducts.length <= 6 ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6' : 'flex gap-5 sm:gap-6'}>
+                      <div className={filteredProducts.length <= 6 ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6' : 'flex gap-5 sm:gap-6'}>
                         {filteredProducts.slice(0, 12).map((product) => (
                           <Link key={product.id} to={`/product/${product.id}`} className={`bg-white rounded-lg overflow-hidden transition-all duration-200 block group ${filteredProducts.length > 6 ? 'flex-shrink-0' : ''}`} style={filteredProducts.length > 6 ? { width: '200px' } : {}}>
                             {/* Product Image - Top */}
-                            <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
+                            <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
                               <img 
                                 src={product.image} 
                                 alt={product.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
                                 loading="lazy"
                                 width="200"
                                 height="200"
                               />
                               
                               {/* Country Badge */}
-                              <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+                              <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                                display: 'flex', 
+                                padding: window.innerWidth < 640 ? '1px 4px' : '2px 6px', 
+                                justifyContent: 'center', 
+                                alignItems: 'center', 
+                                gap: window.innerWidth < 640 ? '2px' : '4px',
+                                top: window.innerWidth < 640 ? '6px' : '8px',
+                                left: window.innerWidth < 640 ? '6px' : '8px'
+                              }}>
                                 <img 
                                   src={getProductCountry(product.id).flag} 
                                   alt={getProductCountry(product.id).name}
-                                  className="w-3 h-2 object-cover rounded-sm"
+                                  style={{ 
+                                    width: window.innerWidth < 640 ? '10px' : '12px',
+                                    height: window.innerWidth < 640 ? '7px' : '8px',
+                                    objectFit: 'cover',
+                                    borderRadius: '2px'
+                                  }}
                                 />
-                                <span className="text-xs font-medium text-gray-800">
+                                <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
                                   {getProductCountry(product.id).abbreviation}
                                 </span>
                               </div>
                             </div>
                             
                             {/* Product Content */}
-                            <div className="px-2 pb-2 sm:px-3 sm:pb-3 flex flex-col">
+                            <div className="flex flex-col" style={{ padding: window.innerWidth < 640 ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
                               {/* Price and Verified Badge Row */}
-                              <div className="flex items-center justify-between mb-1">
-                                <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
+                              <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
+                                <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
                                 ${product.price}
                               </div>
                                 {product.verified ? (
-                                  <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
-                                    <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
+                                  <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                                    display: 'flex', 
+                                    padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: '1px', 
+                                    fontSize: window.innerWidth < 640 ? '7px' : '9px' 
+                                  }}>
+                                    <img src={verifyIcon} alt="Verified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                     <span>Verified seller</span>
                                   </div>
                                 ) : (
-                                  <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
-                                    <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
+                                  <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ 
+                                    display: 'flex', 
+                                    padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: '1px', 
+                                    fontSize: window.innerWidth < 640 ? '7px' : '9px' 
+                                  }}>
+                                    <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                     <span>Unverified Seller</span>
                                   </div>
                                 )}
             </div>
                               
                               {/* Product Name */}
-                              <h3 className="mb-1 line-clamp-2 font-medium" style={{ fontSize: '13px', color: '#212121' }}>{product.name}</h3>
+                              <h3 className="line-clamp-2 font-medium" style={{ 
+                                fontSize: window.innerWidth < 640 ? '10px' : '13px', 
+                                color: '#212121',
+                                marginBottom: window.innerWidth < 640 ? '4px' : '4px'
+                              }}>{product.name}</h3>
                               
                               {/* Location and Bookmark Row - Below Product Name */}
                               <div className="flex items-center justify-between">
                                 {/* Location */}
                                 <div className="flex items-center text-gray-500 flex-1">
-                                  <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
-                                  <span className="truncate font-normal" style={{ fontSize: '10px' }}>{product.location}</span>
+                                  <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                                    width: window.innerWidth < 640 ? '8px' : '10px',
+                                    height: window.innerWidth < 640 ? '8px' : '10px',
+                                    marginRight: window.innerWidth < 640 ? '3px' : '4px'
+                                  }} />
+                                  <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
                               </div>
                                 
                                 {/* Bookmark Button */}
-                                <div className="ml-2">
+                                <div style={{ marginLeft: window.innerWidth < 640 ? '4px' : '8px' }}>
                                     <button 
                                       onClick={(e) => {
                                         e.preventDefault();
@@ -2036,9 +2074,17 @@ const Home: React.FC = () => {
                                       }}
                                    className="transition-colors touch-manipulation"
                                       title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
-                                      style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                      style={{ 
+                                        width: window.innerWidth < 640 ? '16px' : '20px', 
+                                        height: window.innerWidth < 640 ? '16px' : '20px', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center' 
+                                      }}
                                     >
-                                      <img src={bookmarkIcon} alt="Bookmark" className="w-5 h-5" style={{
+                                      <img src={bookmarkIcon} alt="Bookmark" style={{
+                                        width: window.innerWidth < 640 ? '16px' : '20px',
+                                        height: window.innerWidth < 640 ? '16px' : '20px',
                                         filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
                                       }} />
               </button>
@@ -2210,7 +2256,7 @@ const Home: React.FC = () => {
                           }}
                             className="flex items-center justify-center flex-shrink-0"
                             style={{ width: '20px', height: '20px' }}
-                          >
+                        >
                             <img 
                               src={bookmarkIcon} 
                               alt="Bookmark" 
@@ -2366,7 +2412,7 @@ const Home: React.FC = () => {
                             )}
                   </button>
                         )
-                      ))}
+                ))}
                     </>
                   );
                 })()}
