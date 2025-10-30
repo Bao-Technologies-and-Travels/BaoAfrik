@@ -1389,8 +1389,8 @@ const Home: React.FC = () => {
         </div>
 
       {/* Hero Banner - Auto Sliding */}
-      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-4 sm:mx-20 md:mx-24 lg:mx-40 rounded-2xl mb-6 sm:mb-0" style={{background: 'linear-gradient(to right, #F9A822, #E55325)'}}>
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-1 md:py-1">
+      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-4 sm:mx-20 md:mx-24 lg:mx-40 rounded-2xl mb-6 sm:mb-0" style={{background: 'linear-gradient(to right, #F9A822, #E55325)', height: window.innerWidth < 640 ? '100px' : 'auto'}}>
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-1 md:py-1" style={{height: window.innerWidth < 640 ? '100%' : 'auto'}}>
           <div className="flex flex-row items-center justify-between gap-1 sm:gap-4 md:gap-0">
             <div className="flex-1 text-left px-1 sm:px-2 md:pl-2">
               <button 
@@ -2216,7 +2216,7 @@ const Home: React.FC = () => {
                   <img 
                     src={product.image} 
                     alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
                     loading="lazy"
                     width="200"
@@ -2293,7 +2293,7 @@ const Home: React.FC = () => {
                         </h3>
                         
                         {/* Location and Bookmark Row */}
-                        <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                           <div className="flex items-center text-gray-500 flex-1">
                             <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
                               width: window.innerWidth < 640 ? '8px' : '10px',
@@ -2301,7 +2301,7 @@ const Home: React.FC = () => {
                               marginRight: window.innerWidth < 640 ? '3px' : '4px'
                             }} />
                             <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
-                          </div>
+                      </div>
                           {/* Bookmark Button */}
                         <button 
                           onClick={(e) => {
