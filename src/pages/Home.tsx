@@ -2508,7 +2508,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Filter Bar Section */}
-          <div className={window.innerWidth < 640 ? "flex flex-col gap-2 mb-6 mt-8" : "flex items-center gap-4 mb-8 mt-20"}>
+          <div className={window.innerWidth < 640 ? "flex flex-col gap-5 mb-6 mt-8" : "flex items-center gap-4 mb-8 mt-20"}>
             {/* Buyer Location Search Bar - Top on Mobile */}
             <div style={{ width: window.innerWidth < 640 ? '100%' : '380px', marginLeft: window.innerWidth < 640 ? '0' : 'auto', order: window.innerWidth < 640 ? 1 : 3 }}>
               <div className="relative flex items-center">
@@ -2783,7 +2783,7 @@ const Home: React.FC = () => {
                   {window.innerWidth < 640 && (
                     <>
                       {/* Gray Divider */}
-                      <div style={{ width: '100%', height: '1px', backgroundColor: '#E4E4E4', marginBottom: '8px' }}></div>
+                      <div style={{ width: '100%', height: '0.5px', backgroundColor: '#E4E4E4', marginBottom: '8px' }}></div>
                       
                       <div className="flex items-center justify-between">
                         {/* Left: Avatar and User Info */}
@@ -2831,12 +2831,13 @@ const Home: React.FC = () => {
                   {/* Respond to the request button - Mobile only */}
                   {window.innerWidth < 640 && (
                     <button 
-                      className="w-full mt-3 rounded-lg text-white"
+                      className="w-full mt-3 text-white"
                       style={{ 
                         backgroundColor: '#F9A825', 
                         fontWeight: 'normal', 
                         fontSize: '9px',
-                        padding: '6px 10px'
+                        padding: '6px 10px',
+                        borderRadius: '6px'
                       }}
                     >
                       Respond to the request
