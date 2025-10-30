@@ -1794,17 +1794,28 @@ const Home: React.FC = () => {
                 return (
                   <div>
                     {/* No Results State */}
-                    <div className="text-center py-12">
+                    <div className="text-center" style={{ padding: window.innerWidth < 640 ? '32px 16px' : '48px 16px' }}>
                       {/* Shopping Bag with Magnifying Glass Icon */}
                       <img 
                         src={bagIcon} 
                         alt="No products found" 
-                        className="mx-auto mb-4" 
-                        style={{ width: '60px', height: '60px' }}
+                        className="mx-auto" 
+                        style={{ 
+                          width: window.innerWidth < 640 ? '40px' : '60px', 
+                          height: window.innerWidth < 640 ? '40px' : '60px',
+                          marginBottom: window.innerWidth < 640 ? '12px' : '16px'
+                        }}
                       />
                       
                       {/* Message */}
-                      <p className="mb-4" style={{ fontSize: '18px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', maxWidth: '500px', margin: '0 auto 16px' }}>
+                      <p style={{ 
+                        fontSize: window.innerWidth < 640 ? '12px' : '18px', 
+                        color: '#6A6A6A', 
+                        fontFamily: 'Poppins, sans-serif', 
+                        maxWidth: window.innerWidth < 640 ? '280px' : '500px', 
+                        margin: window.innerWidth < 640 ? '0 auto 12px' : '0 auto 16px',
+                        lineHeight: '1.5'
+                      }}>
                         Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
                       </p>
                       
@@ -1814,77 +1825,136 @@ const Home: React.FC = () => {
                         className="inline-flex items-center mx-auto"
                         style={{
                           display: 'flex',
-                          padding: '10px 20px',
+                          padding: window.innerWidth < 640 ? '8px 16px' : '10px 20px',
                           alignItems: 'center',
-                          gap: '6px',
+                          gap: window.innerWidth < 640 ? '4px' : '6px',
                           borderRadius: '8px',
                           backgroundColor: '#F0F8FE',
                           color: '#64B5F6',
                           border: 'none',
                           cursor: 'pointer',
                           fontFamily: 'Poppins, sans-serif',
-                          fontSize: '14px',
+                          fontSize: window.innerWidth < 640 ? '11px' : '14px',
                           fontWeight: '500'
                         }}
                       >
-                        <img src={draftsIcon} alt="Request" style={{ width: '20px', height: '20px' }} />
+                        <img src={draftsIcon} alt="Request" style={{ width: window.innerWidth < 640 ? '14px' : '20px', height: window.innerWidth < 640 ? '14px' : '20px' }} />
                         Make a request
                 </button>
                     </div>
 
                     {/* Other Products Near You Section */}
-                    <div className="mt-12">
-          <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-semibold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    <div style={{ marginTop: window.innerWidth < 640 ? '32px' : '48px' }}>
+          <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '16px' : '24px' }}>
+                        <h3 className="font-semibold text-gray-900" style={{ 
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: window.innerWidth < 640 ? '14px' : '20px'
+                        }}>
                           Other products near you
                         </h3>
-                        <button className="text-sm font-medium hover:underline" style={{ color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>
+                        <button className="font-medium hover:underline" style={{ 
+                          color: '#64B5F6', 
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: window.innerWidth < 640 ? '10px' : '14px'
+                        }}>
                           View more...
                         </button>
                       </div>
                       
                       {/* Product Cards */}
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
                         {Object.values(allProducts).flat().slice(0, 6).map((product) => (
                           <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
                             {/* Product Image - Top */}
-                            <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
+                            <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
                               <img 
                                 src={product.image} 
                                 alt={product.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
                                 loading="lazy"
                                 width="200"
                                 height="200"
                               />
                               
                               {/* Country Badge */}
-                              <div className="absolute top-2 left-2" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
-                                <div className="bg-white bg-opacity-90 rounded px-2 py-0.5 flex items-center gap-1">
+                              <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                                display: 'flex', 
+                                padding: window.innerWidth < 640 ? '1px 4px' : '2px 6px', 
+                                justifyContent: 'center', 
+                                alignItems: 'center', 
+                                gap: window.innerWidth < 640 ? '2px' : '4px',
+                                top: window.innerWidth < 640 ? '6px' : '8px',
+                                left: window.innerWidth < 640 ? '6px' : '8px'
+                              }}>
                                   <img 
                                     src={`https://flagcdn.com/w20/${getProductCountry(product.id).code}.png`}
                                     alt={getProductCountry(product.id).name}
-                                    className="w-3 h-2"
+                                    style={{ 
+                                      width: window.innerWidth < 640 ? '10px' : '12px',
+                                      height: window.innerWidth < 640 ? '7px' : '8px',
+                                      objectFit: 'cover',
+                                      borderRadius: '2px'
+                                    }}
                                   />
-                                  <span className="text-[8px] text-gray-700 font-medium">
+                                  <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
                                     {getProductCountry(product.id).abbreviation}
                                   </span>
-                                </div>
                               </div>
                             </div>
                             
                             {/* Product Content */}
-                            <div className="px-2 pb-2 sm:px-3 sm:pb-3">
+                            <div className="flex flex-col" style={{ padding: window.innerWidth < 640 ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
+                              {/* Price and Verified Badge Row */}
+                              <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
+                                <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
+                                  ${product.price}
+                                </div>
+                                {product.verified ? (
+                                  <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                                    display: 'flex', 
+                                    padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: '1px', 
+                                    fontSize: window.innerWidth < 640 ? '7px' : '9px' 
+                                  }}>
+                                    <img src={verifyIcon} alt="Verified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
+                                    <span>Verified seller</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ 
+                                    display: 'flex', 
+                                    padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: '1px', 
+                                    fontSize: window.innerWidth < 640 ? '7px' : '9px' 
+                                  }}>
+                                    <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
+                                    <span>Unverified Seller</span>
+                                  </div>
+                                )}
+                              </div>
+                              
                               {/* Product Name */}
-                              <h3 className="font-medium mb-1" style={{ fontSize: '13px', color: '#212121' }}>
+                              <h3 className="line-clamp-2 font-medium" style={{ 
+                                fontSize: window.innerWidth < 640 ? '10px' : '13px', 
+                                color: '#212121',
+                                marginBottom: window.innerWidth < 640 ? '4px' : '4px'
+                              }}>
                                 {product.name}
                               </h3>
                               
                               {/* Location and Bookmark Row */}
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center text-gray-500 flex-1 mr-2" style={{ fontSize: '10px' }}>
-                                  <img src={locationIcon} alt="Location" className="w-3 h-3 mr-1 flex-shrink-0" />
-                                  <span className="truncate">{product.location}</span>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center text-gray-500 flex-1">
+                                  <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                                    width: window.innerWidth < 640 ? '8px' : '10px',
+                                    height: window.innerWidth < 640 ? '8px' : '10px',
+                                    marginRight: window.innerWidth < 640 ? '3px' : '4px'
+                                  }} />
+                                  <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
                                 </div>
                                 {/* Bookmark Button */}
                   <button
@@ -1892,33 +1962,26 @@ const Home: React.FC = () => {
                                     e.preventDefault();
                                     handleSave(product.id);
                                   }}
-                                  className="flex items-center justify-center flex-shrink-0"
-                                  style={{ width: '20px', height: '20px' }}
+                                  className="transition-colors touch-manipulation"
+                                  style={{ 
+                                    width: window.innerWidth < 640 ? '16px' : '20px', 
+                                    height: window.innerWidth < 640 ? '16px' : '20px', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center',
+                                    marginLeft: window.innerWidth < 640 ? '4px' : '8px'
+                                  }}
                   >
                     <img 
                                     src={bookmarkIcon} 
                                     alt="Bookmark" 
-                                    className="w-full h-full"
+                                    style={{
+                                      width: window.innerWidth < 640 ? '16px' : '20px',
+                                      height: window.innerWidth < 640 ? '16px' : '20px',
+                                      filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                                    }}
                     />
                   </button>
-                              </div>
-                              
-                              {/* Price and Verification Badge */}
-                              <div className="flex items-center justify-between mb-1">
-                                <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
-                                  ${product.price}
-                                </div>
-                                {product.verified ? (
-                                  <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
-                                    <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
-                                    <span>Verified seller</span>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
-                                    <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
-                                    <span>Unverified Seller</span>
-                                  </div>
-                                )}
                               </div>
                             </div>
                           </Link>
