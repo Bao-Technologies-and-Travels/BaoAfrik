@@ -1489,7 +1489,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Mobile Filter Buttons - Horizontal Scroll */}
-      <section className="bg-white pb-4 md:hidden">
+      <section className="bg-white md:hidden" style={{ marginTop: '-8px', marginBottom: '-8px' }}>
         <div className="px-2">
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
             {/* More Options Button */}
