@@ -2,7 +2,6 @@ import { PrismaClient, MessageType } from '@prisma/client';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
-import { last } from 'lodash';
 
 const prisma = new PrismaClient();
 
@@ -24,6 +23,7 @@ export interface MessageData {
     replyToId?: string;
     imageUrl?: string;
     audioUrl?: string;
+    productData?: any;
 }
 
 export interface CreateConversationData {
@@ -31,6 +31,7 @@ export interface CreateConversationData {
     participantId: string
     productId?: string
     initialMessage?: string
+    productData?: any
 }
 
 export interface CreateConversationByEmailData {
@@ -38,6 +39,7 @@ export interface CreateConversationByEmailData {
     participantEmail: string
     productId?: string
     initialMessage?: string
+    productData?: any
 }
 
 export class ChatService {
@@ -52,7 +54,6 @@ export class ChatService {
             },
         });
     }
-
     async createConversationByEmail(data: CreateConversationByEmailData) {
         return await prisma.$transaction(async (tx) => {
             // find participant by email
@@ -129,53 +130,59 @@ export class ChatService {
                 }
             });
 
+            let lastMessage = null;
+
             // add disclaimer as first message
             const safetyMessage = await tx.message.create({
                 data: {
                     conversationId: conversation.id,
                     senderId: data.creatorId,
-                    receiverId: participant.id,
                     content: this.getSafetyDisclaimer(),
                     messageType: MessageType.TEXT,
+                    productData: null
                 }
             });
+
+            lastMessage = safetyMessage;
+
+            if (data.initialMessage && data.initialMessage.trim() !== this.getSafetyDisclaimer().trim()) {
+                const initialMessage = await tx.message.create({
+                    data: {
+                        conversationId: conversation.id,
+                        senderId: data.creatorId,
+                        content: data.initialMessage,
+                        messageType: MessageType.TEXT,
+                        productData: data.productData ? JSON.stringify(data.productData) : null
+                    }
+                });
+
+                lastMessage = initialMessage;
+            }
 
             // updare conversation with last message
             await tx.conversation.update({
                 where: { id: conversation.id },
                 data: {
-                    lastMessageId: safetyMessage.id,
+                    lastMessageId: lastMessage.id,
                     lastMessageAt: new Date()
                 }
             });
 
-            // add innitial message if provided
-            if (data.initialMessage) {
-                const initialMessage = await tx.message.create({
-                    data: {
-                        conversationId: conversation.id,
-                        senderId: data.creatorId,
-                        receiverId: participant.id,
-                        content: data.initialMessage,
-                        messageType: MessageType.TEXT,
-                    }
-                });
-
-                // Update conversation with initial message as last message
-                await tx.conversation.update({
-                    where: { id: conversation.id },
-                    data: {
-                        lastMessageId: initialMessage.id,
-                        lastMessageAt: new Date()
-                    }
-                });
+            return {
+            ...conversation,
+            lastMessage: {
+                id: lastMessage.id,
+                content: lastMessage.content,
+                messageType: lastMessage.messageType,
+                createdAt: lastMessage.createdAt,
             }
-
-            return conversation;
+        };
         });
     }
 
     async getUserConversations(userId: string) {
+        console.log('getUserConversation called for user:', userId);
+
         const conversations = await prisma.conversation.findMany({
             where: {
                 participants: {
@@ -190,6 +197,7 @@ export class ChatService {
                         user: {
                             select: {
                                 id: true,
+                                email: true,
                                 firstName: true,
                                 lastName: true,
                                 profileImage: true,
@@ -244,19 +252,52 @@ export class ChatService {
             }
         });
 
-        return conversations.map(conv => {
-            const otherParticipant = conv.participants.find(p => p.userId !== userId)?.user;
+        // Debug logging
+        console.log('🔍 getUserConversations - Raw data:', {
+            userId,
+            totalConversationsFound: conversations.length,
+            conversationDetails: conversations.map(conv => ({
+                id: conv.id,
+                allParticipantIds: conv.participants.map(p => p.userId),
+                allParticipantEmails: conv.participants.map(p => p.user?.email || 'no-email'),
+                unreadCount: conv.messages.length,
+                currentUserIsParticipant: conv.participants.some(p => p.userId === userId)
+            }))
+        });
+
+        const processedConversations = conversations.map(conv => {
+            // find the other participant
+            const otherParticipants = conv.participants.filter(p => p.userId !== userId);
+
+            console.log('🔍 Processing conversation:', conv.id, {
+                totalParticipants: conv.participants.length,
+                otherParticipantsCount: otherParticipants.length,
+                otherParticipantEmails: otherParticipants.map(p => p.user?.email || 'no-email'),
+                allParticipants: conv.participants.map(p => ({
+                    userId: p.userId,
+                    email: p.user?.email,
+                    firstName: p.user?.firstName,
+                    lastName: p.user?.lastName
+                }))
+            });
+
+            if (otherParticipants.length === 0) {
+                console.warn('Conversation has no other participant. Conversation:', conv.id, 'All Participants:', conv.participants.map(p => p.user?.email));
+                return null;
+            }
+
+            const otherParticipant = otherParticipants[0]?.user;
+
+            if (!otherParticipant) {
+                console.error('Other participant user data is undefined! Conversation:', conv.id);
+                return null;
+            }
+
             const currentUserParticipant = conv.participants.find(p => p.userId === userId);
 
-            return {
+            const result = {
                 id: conv.id,
-                // participant: otherParticipant,
-                participant: otherParticipant || {
-                    id: 'f41488e9-6f2d-4657-b6f8-5c53b7bea8ae',
-                    email: 'pageo.fonsah@baotechnologiesandtravels.com',
-                    firstName: 'Fonsah',
-                    lastName: 'Pageo'
-                },
+                participant: otherParticipant,
                 product: conv.product,
                 lastMessage: conv.lastMessage,
                 unreadCount: conv.messages.length,
@@ -265,9 +306,21 @@ export class ChatService {
                 createdAt: conv.createdAt,
                 isEmailBased: !conv.productId
             };
-        });
-    }
 
+            console.log('✅ Final conversation object:', {
+                id: result.id,
+                participant: result.participant?.email || 'no-email',
+                unreadCount: result.unreadCount
+            });
+
+            return result;
+        }).filter((conv): conv is NonNullable<typeof conv> => conv !== null);
+
+
+        console.log('🎯 Final filtered conversations count:', processedConversations.length);
+
+        return processedConversations;
+    }
     async getConversationMessages(conversationId: string, userId: string) {
         // Verify user has access to this conversation
         const conversation = await prisma.conversation.findFirst({
@@ -295,14 +348,6 @@ export class ChatService {
                         lastName: true,
                         profileImage: true,
                         isVerifiedSeller: true
-                    }
-                },
-                receiver: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        profileImage: true
                     }
                 },
                 replyTo: {
@@ -336,11 +381,14 @@ export class ChatService {
             }
         })
 
-        // Add safety disclaimer flag for first message
-        return messages.map((message, index) => ({
+        // Parse productData from JSON string and add safety disclaimer flag
+        const processedMessages = messages.map((message, index) => ({
             ...message,
-            showSafetyDisclaimer: index === 0
+            productData: message.productData ? JSON.parse(message.productData) : null,
+            showSafetyDisclaimer: index === 0 && message.content === this.getSafetyDisclaimer()
         }));
+
+        return processedMessages;
     }
 
     async createConversation(data: CreateConversationData) {
@@ -415,7 +463,6 @@ export class ChatService {
                 data: {
                     conversationId: conversation.id,
                     senderId: data.creatorId,
-                    receiverId: data.participantId,
                     content: this.getSafetyDisclaimer(),
                     messageType: MessageType.TEXT,
                     productId: data.productId || null
@@ -430,7 +477,6 @@ export class ChatService {
                     data: {
                         conversationId: conversation.id,
                         senderId: data.creatorId,
-                        receiverId: data.participantId,
                         content: data.initialMessage,
                         messageType: MessageType.TEXT,
                         productId: data.productId || null
@@ -487,7 +533,7 @@ export class ChatService {
             }
 
             // get the receiver
-            const receiver = conversation.participants[0];
+            const receiver = conversation?.participants[0];
             if (!receiver) {
                 throw new Error('No receiver found for this conversation');
             }
@@ -507,12 +553,30 @@ export class ChatService {
                 normalizedMessageType = data.messageType;
             }
 
+            const isDisclaimerMessage = data.content === this.getSafetyDisclaimer();
+
+            // Check if this conversation already has a message with product data
+            const existingProductMessages = await tx.message.count({
+                where: {
+                    conversationId: data.conversationId,
+                    NOT: {
+                        productData: null
+                    }
+                }
+            });
+
+            const hasExistingProductData = existingProductMessages > 0;
+            // Create message - only include productData if:
+            // 1. It's provided in the request
+            // 2. This conversation doesn't already have product data  
+            // 3. It's NOT a disclaimer message
+            const shouldIncludeProductData = data.productData && !hasExistingProductData && !isDisclaimerMessage;
+
             // Create message
             const message = await tx.message.create({
                 data: {
                     conversationId: data.conversationId,
                     senderId: data.senderId,
-                    receiverId: receiver.userId,
                     content: data.content,
                     messageType: normalizedMessageType,
                     fileUrl: data.fileUrl,
@@ -520,7 +584,8 @@ export class ChatService {
                     fileSize: data.fileSize,
                     imageUrl: data.imageUrl,
                     audioUrl: data.audioUrl,
-                    replyToId: data.replyToId
+                    replyToId: data.replyToId,
+                    productData: shouldIncludeProductData ? JSON.stringify(data.productData) : null,
                 },
                 include: {
                     sender: {
@@ -532,14 +597,6 @@ export class ChatService {
                             isVerifiedSeller: true
                         }
                     },
-                    receiver: {
-                        select: {
-                            id: true,
-                            firstName: true,
-                            lastName: true,
-                            profileImage: true
-                        }
-                    }
                 }
             });
 
@@ -562,7 +619,13 @@ export class ChatService {
                 }
             });
 
-            return message;
+            // Parse productData back to object for response
+            const messageWithProductData = {
+                ...message,
+                productData: shouldIncludeProductData ? data.productData : null
+            };
+
+            return messageWithProductData;
         });
     }
 
@@ -698,6 +761,7 @@ export class ChatService {
                         user: {
                             select: {
                                 id: true,
+                                email: true,
                                 firstName: true,
                                 lastName: true,
                                 profileImage: true,

@@ -108,6 +108,8 @@ export class ChatController {
                 });
             }
 
+            console.log('📞 Contact seller request:', { productId, buyerId });
+
             // Get product and seller information
             const product = await prisma.product.findUnique({
                 where: { id: productId },
@@ -117,14 +119,15 @@ export class ChatController {
                             id: true,
                             email: true,
                             firstName: true,
-                            lastName: true
+                            lastName: true,
+                            profileImage: true
                         }
                     }
                 }
             });
 
             if (!product) {
-                return res.status(404).json({
+                return res.status(422).json({
                     success: false,
                     error: 'Product not found'
                 });
@@ -137,19 +140,29 @@ export class ChatController {
                 });
             }
 
+            console.log('🛍️ Product found, seller:', product.seller.email);
+
             // Create conversation
-            const conversation = await this.chatService.createConversation({
+            const conversation = await this.chatService.createConversationByEmail({
                 creatorId: buyerId,
-                participantId: product.seller.id,
+                participantEmail: product.seller.email,
                 productId: product.id,
-                initialMessage
+                initialMessage: initialMessage || `Hello, I am interested in your product: ${product.name}`
             });
+
+            console.log('✅ Conversation created:', conversation.id);
 
             return res.json({
                 success: true,
                 data: {
                     conversation,
-                    seller: product.seller
+                    seller: product.seller,
+                    product: {
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        images: product.images
+                    }
                 }
             });
         } catch (error: any) {
@@ -162,9 +175,23 @@ export class ChatController {
                 });
             }
 
+            if (error.message.includes('User not found')) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Seller not found'
+                });
+            }
+
+            if (error.message.includes('Cannot create conversation with yourself')) {
+                return res.status(422).json({
+                    success: false,
+                    error: 'Cannot contact yourself'
+                });
+            }
+
             return res.status(500).json({
                 success: false,
-                error: 'Failed to contact seller'
+                error: 'Failed to contact seller' + error.message
             });
         }
     };

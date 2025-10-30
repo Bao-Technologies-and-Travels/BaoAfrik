@@ -41,8 +41,7 @@ model User {
   products          Product[]
   productLikes      ProductLike[]
   productSaves      ProductSave[]
-  sentMessages      Message[] @relation("MessageSender")
-  receivedMessages  Message[] @relation("MessageReceiver")
+  sentMessages      Message[]
   refreshTokens     RefreshToken[]
   conversationParticipants ConversationParticipant[]
   sentMessageStatuses MessageStatus[]
@@ -125,7 +124,6 @@ model ProductSave {
 model Message {
   id         String      @id @default(uuid())
   senderId   String      @map("sender_id")
-  receiverId String      @map("receiver_id")
   productId  String?     @map("product_id")
   conversationId String? @map("conversation_id")
   imageUrl   String?     @map("image_url")
@@ -134,6 +132,7 @@ model Message {
   fileName   String?     @map("file_name")
   fileSize   Int?        @map("file_size")
   replyToId  String?     @map("reply_to_id")
+  productData String?
   productSnapshot Json?  @map("product_snapshot")
   subject    String?
   content    String
@@ -143,8 +142,7 @@ model Message {
   updatedAt  DateTime    @updatedAt @map("updated_at")
 
   // Relations
-  sender   User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender   User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
   product  Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   conversation Conversation? @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
   replyTo  Message? @relation("MessageReplies", fields: [replyToId], references: [id])
