@@ -368,14 +368,11 @@ const Home: React.FC = () => {
       );
     }
 
-    // Apply country filter if a specific country is selected
+    // Apply country filter if a specific country is selected (using country filter buttons)
     if (selectedCountry) {
-      const countryName = africanCountries.find(country => country.code === selectedCountry)?.name;
-      if (countryName) {
-        products = products.filter(product => 
-          product.location.toLowerCase().includes(countryName.toLowerCase())
-        );
-      }
+      products = products.filter(product => 
+        getProductCountry(product.id).name === selectedCountry
+      );
     }
 
     return products;
@@ -463,6 +460,51 @@ const Home: React.FC = () => {
     return () => clearInterval(slideInterval);
   }, [bannerSlides.length]);
 
+  // Re-run search when country filter changes and search is active
+  useEffect(() => {
+    if (isSearchActive) {
+      // Automatically apply country filter to current search results
+      let products = Object.values(allProducts).flat();
+      
+      // Reapply all search filters
+      if (searchQuery.trim()) {
+        products = products.filter(product => 
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.location.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      
+      if (selectedCategoryText) {
+        products = products.filter(product => {
+          return Object.entries(allProducts).some(([category, categoryProducts]) => 
+            category === selectedCategoryText && categoryProducts.some(p => p.id === product.id)
+          );
+        });
+      }
+      
+      if (selectedPlaceOfOriginText) {
+        products = products.filter(product => {
+          const country = getProductCountry(product.id).name;
+          return country === selectedPlaceOfOriginText;
+        });
+      }
+      
+      if (selectedCountry) {
+        products = products.filter(product => 
+          getProductCountry(product.id).name === selectedCountry
+        );
+      }
+      
+      if (location.trim()) {
+        products = products.filter(product => 
+          product.location.toLowerCase().includes(location.toLowerCase())
+        );
+      }
+      
+      setSearchResults(products);
+    }
+  }, [selectedCountry]);
+
   // Handle search functionality
   const handleSearch = () => {
     console.log('=== SEARCH TRIGGERED ===');
@@ -470,6 +512,7 @@ const Home: React.FC = () => {
     console.log('Selected Category:', selectedCategoryText);
     console.log('Place of Origin (Country Badge):', selectedPlaceOfOriginText);
     console.log('Seller Location:', location);
+    console.log('Selected Country Filter:', selectedCountry);
     
     // Get all products
     let products = Object.values(allProducts).flat();
@@ -504,6 +547,15 @@ const Home: React.FC = () => {
         return country === selectedPlaceOfOriginText;
       });
       console.log(`After place of origin filter (${selectedPlaceOfOriginText}):`, products.length, '(was', beforeCount, ')');
+    }
+    
+    // Apply country filter from filter buttons (applies to both category view and search)
+    if (selectedCountry) {
+      const beforeCount = products.length;
+      products = products.filter(product => 
+        getProductCountry(product.id).name === selectedCountry
+      );
+      console.log(`After country filter (${selectedCountry}):`, products.length, '(was', beforeCount, ')');
     }
     
     // Apply seller location filter (Seller Location input - filters by location at bottom)
