@@ -817,7 +817,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 <img 
                   src={logoPre} 
                   alt="bao'Afrik" 
-                  className="h-8 w-auto"
+                  className="h-6 w-auto"
                 />
               </div>
               
@@ -827,13 +827,17 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 <div className="relative">
                   <button
                     onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                    className="flex items-center space-x-1 px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 border-2 border-gray-300 rounded-md transition-colors duration-200"
+                    className="flex items-center border rounded-lg bg-white font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                    style={{ 
+                      borderColor: '#E4E4E4', 
+                      color: '#BABABA',
+                      padding: '4px 8px',
+                      fontSize: '11px'
+                    }}
                     aria-label="Select language"
                   >
-                    <span className="text-xs font-medium">{selectedLanguage}</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    {selectedLanguage}
+                    <img src={arrowDownIcon} alt="Arrow" className="ml-1" style={{ width: '12px', height: '12px' }} />
                   </button>
                   
                   {/* Language Dropdown */}
@@ -918,7 +922,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 // Logged in user mobile menu - Matches Desktop
                 <div className="space-y-4">
                   {/* Start selling button */}
-                  <div className="pb-3 border-b border-gray-100">
+                  <div className="pb-2">
                     <Link 
                       to="/register" 
                       className="inline-flex items-center px-3 py-2 rounded-lg font-normal text-sm transition-colors duration-200 focus:outline-none" 

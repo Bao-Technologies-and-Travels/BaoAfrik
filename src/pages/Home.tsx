@@ -1944,20 +1944,20 @@ const Home: React.FC = () => {
                   <div key={category} className="mb-8">
                     {/* Category Header - Hidden on Mobile */}
           {window.innerWidth >= 640 && (
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
                           <h2 className="text-[20px] font-semibold text-gray-900">{category}</h2>
                 <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
                         <div className="flex items-center space-x-3">
-                  <button
+                <button
                             className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
                             aria-label="Scroll left"
-                  >
+                >
                             <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                  </button>
+                </button>
                           <button 
                             className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
                             aria-label="Scroll right"
