@@ -668,14 +668,19 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                // Logged out user mobile navigation
                <>
                  {/* Language Toggle for mobile */}
-                 <div className="relative">
+                 <div className="relative" style={{ marginRight: window.innerWidth < 640 ? '8px' : '4px' }}>
                    <button
                      onClick={toggleLanguageDropdown}
-                     className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
-                     style={{ borderColor: '#E4E4E4', color: '#BABABA' }}
+                     className="flex items-center border rounded-lg bg-white font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                     style={{ 
+                       borderColor: '#E4E4E4', 
+                       color: '#BABABA',
+                       padding: window.innerWidth < 640 ? '4px 8px' : '6px 10px',
+                       fontSize: window.innerWidth < 640 ? '11px' : '14px'
+                     }}
                    >
                      {selectedLanguage}
-                     <img src={arrowDownIcon} alt="Arrow" className="ml-1 w-4 h-4" />
+                     <img src={arrowDownIcon} alt="Arrow" className="ml-1" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
                    </button>
                    
                    {/* Language Dropdown for mobile */}
@@ -690,8 +695,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                          >
                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+             </svg>
+           </button>
                        </div>
                        
                        {/* Language Options */}
@@ -762,24 +767,41 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                    )}
                  </div>
                  
-                 {/* Burger Menu Button */}
-                 <button
-                   onClick={toggleMobileMenu}
-                   className="p-3 rounded-md hover:bg-gray-100 focus:outline-none transition-all duration-200"
-                   style={{color: '#F9A822'}}
-                   onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#E6941F'}
-                   onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#F9A822'}
-                   aria-label="Toggle navigation menu"
-                   aria-expanded={isMobileMenuOpen}
+                 {/* Sign In Button - Mobile */}
+                 <Link 
+                   to="/login" 
+                   className="inline-flex items-center text-white rounded-lg font-medium transition-colors duration-200 focus:outline-none"
+                   style={{
+                     backgroundColor: '#F9A822',
+                     padding: window.innerWidth < 640 ? '4px 12px' : '8px 32px',
+                     fontSize: window.innerWidth < 640 ? '11px' : '14px',
+                     marginRight: window.innerWidth < 640 ? '8px' : '4px'
+                   }}
+                   onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+                   onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A822'}
                  >
-                   <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     {isMobileMenuOpen ? (
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                     ) : (
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                     )}
-                   </svg>
-                 </button>
+                   Sign In
+                 </Link>
+                 
+                 {/* Sign Up Button - Mobile */}
+                <Link 
+                  to="/register" 
+                    className="inline-flex items-center rounded-lg font-medium transition-colors duration-200 focus:outline-none border"
+                    style={{
+                      borderColor: '#F9A822', 
+                      color: '#F9A822',
+                      padding: window.innerWidth < 640 ? '4px 12px' : '8px 32px',
+                      fontSize: window.innerWidth < 640 ? '11px' : '14px'
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                    }}
+                 >
+                   Sign Up
+                </Link>
               </>
             )}
           </div>
