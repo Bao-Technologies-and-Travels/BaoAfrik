@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { apiClient } from '../services';
-import { authService, AuthService } from '../services/authService';
-import { useToast } from './ToastContext';
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import { authService, AuthService } from "../services/authService";
+import { useToast } from "./ToastContext";
 
 interface User {
   id: string;
@@ -35,7 +34,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -47,8 +46,8 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
     try {
-      const stored = localStorage.getItem('user');
-      return stored && stored !== 'undefined' ? JSON.parse(stored) : null;
+      const stored = localStorage.getItem("user");
+      return stored && stored !== "undefined" ? JSON.parse(stored) : null;
     } catch {
       return null;
     }
@@ -58,16 +57,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { addToast } = useToast();
 
-  const login = (userData: User, accessToken?: string, refreshToken?: string) => {
+  const login = (
+    userData: User,
+    accessToken?: string,
+    refreshToken?: string
+  ) => {
     setUser(userData);
     setIsVisitor(false);
-    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem("user", JSON.stringify(userData));
 
     if (accessToken) {
-      localStorage.setItem('acessToken', accessToken);
+      localStorage.setItem("accessToken", accessToken);
     }
     if (refreshToken) {
-      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem("refreshToken", refreshToken);
     }
   };
 
@@ -75,44 +78,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
 
-      const response = await authService.logout();
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("rememberedEmail");
+      localStorage.removeItem("currentConversation");
+      localStorage.removeItem("activeConversationId");
 
+      sessionStorage.clear();
       setUser(null);
       setIsVisitor(false);
 
-      localStorage.removeItem('user');
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('rememberedEmail');
+      try {
+        await authService.logout();
+      } catch (error) {}
 
-      if (response.success) {
-        addToast({
-          type: 'success',
-          title: 'Logged out successfully',
-          message: 'You have been successfully logged out.',
-          duration: 3000,
-        });
-      } else {
-        addToast({
-          type: 'info',
-          title: 'Logged out',
-          message: response.message || 'You have been logged out locally.',
-          duration: 3000,
-        });
-      }
+      addToast({
+        type: "success",
+        title: "Logged out",
+        message: "You have been successfully logged out.",
+        duration: 3000,
+      });
+
+      window.location.href = '/login';
+      
     } catch (error: any) {
       // clear frontend even when there is an error
       setUser(null);
       setIsVisitor(false);
-      localStorage.removeItem('user');
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('rememberedEmail');
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/login';
 
       addToast({
-        type: 'success',
-        title: 'Logged out',
-        message: 'You have been logged out from this device.',
+        type: "success",
+        title: "Logged out",
+        message: "You have been logged out from this device.",
         duration: 3000,
       });
     } finally {
@@ -128,13 +129,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const updateUserProfile = (profileData: Partial<User>) => {
-    setUser(prevUser => {
+    setUser((prevUser) => {
       if (!prevUser) return prevUser;
 
       const updatedUser = { ...prevUser, ...profileData };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem("user", JSON.stringify(updatedUser));
       return updatedUser;
-    })
+    });
   };
 
   const value: AuthContextType = {

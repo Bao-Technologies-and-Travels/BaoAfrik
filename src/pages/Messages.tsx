@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import EmojiPicker, { Emoji } from "emoji-picker-react";
 import logo from "../assets/images/pre/logo.png";
@@ -56,6 +56,7 @@ import replyCloseIcon from "../assets/images/pre/re.svg";
 import productImage1 from "../assets/images/pre/1.png";
 import { io, Socket } from "socket.io-client";
 import { useToast } from "../contexts/ToastContext";
+import { useAuth } from "../contexts/AuthContext";
 
 const Messages: React.FC = () => {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -132,6 +133,7 @@ const Messages: React.FC = () => {
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLoadingConversations, setIsLoadingConversations] = useState(false);
 
   const { addToast } = useToast();
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -146,6 +148,25 @@ const Messages: React.FC = () => {
   const [isSending, setIsSending] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isProductInquiry, setIsProductInquiry] = useState(false);
+  const { user, logout } = useAuth();
+  const [connectionStatus, setConnectionStatus] = useState<
+    "connecting" | "connected" | "disconnected"
+  >("connecting");
+  const hasInitialized = useRef(false);
+  const socketRef = useRef<Socket | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [lastLoadedConversationId, setLastLoadedConversationId] = useState<
+    string | null
+  >(null);
+  const [hasSentInitialProductMessage, setHasSentInitialProductMessage] =
+    useState(false);
+  const [hasSentProductData, setHasSentProductData] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   // Get current user on component mount
   useEffect(() => {
@@ -154,80 +175,66 @@ const Messages: React.FC = () => {
       // Decode JWT to get user info (you might need a proper JWT decoding library)
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
-        setCurrentUser({ id: payload.userId });
+        const userData = {
+          id: payload.userId || payload.sub,
+          email: payload.email,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+        };
+        console.log("Current user from token:", userData);
+        setCurrentUser(userData);
       } catch (error) {
         console.error("Failed to decode user from token:", error);
       }
     }
   }, []);
 
-  // Socket connection
+  // WebSocket useEffect connection plus cleanup
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!token) {
+
+    // Prevent multiple connections
+    if (socketRef.current?.connected) {
+      console.log("✅ WebSocket already connected");
       return;
     }
 
-    if (socketInitialized && socket) {
-      return;
-    }
-
-    // don't create a new socket if one is already connected
-    if (socket?.connected) {
-      return;
-    }
-
-    // if socket exists and is not connected, try to reconnect
-    if (socket && !socket.connected) {
-      socket.connect();
-      return;
-    }
-
-    if (socketInitialized) {
-      return;
-    }
-
-    setSocketInitialized(true);
+    console.log("Establishing WebSocket Connection...");
 
     const newSocket = io(process.env.REACT_APP_WS_URL!, {
       auth: { token },
       transports: ["websocket", "polling"],
-      timeout: 10000,
-      forceNew: true,
-      autoConnect: true,
-      reconnection: true,
-      reconnectionAttempts: 3,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
     });
 
+    socketRef.current = newSocket;
     setSocket(newSocket);
-    // setIsSocketConnected(false);
 
     // Connection events
     newSocket.on("connect", () => {
+      console.log("Websocket connected successfully");
       setIsSocketConnected(true);
+      setConnectionStatus("connected");
+
       newSocket.emit("join_conversations");
+      console.log("📨 Joined conversations room");
 
       // rejoin any active conversation
       if (activeConversationId) {
-        newSocket.emit("join_conversation", currentConversation.id);
+        newSocket.emit("join_conversation", activeConversationId);
+        console.log(`🔗 Rejoined conversation: ${activeConversationId}`);
       }
     });
 
     newSocket.on("disconnect", (reason) => {
+      console.log("WebSocket disconnected:", reason);
       setIsSocketConnected(false);
+      setConnectionStatus("disconnected");
     });
 
     newSocket.on("connect_error", (error) => {
+      console.error("❌ WebSocket connection error:", error);
       setIsSocketConnected(false);
-
-      addToast({
-        type: "error",
-        title: "Connection Error",
-        message: "Unable to connect to chat server. Please refresh the page.",
-        duration: 5000,
-      });
+      setConnectionStatus("disconnected");
     });
 
     newSocket.on("reconnect", (attemptNumber) => {
@@ -251,6 +258,12 @@ const Messages: React.FC = () => {
 
     // message events
     newSocket.on("new_message", (serverMessage) => {
+      console.log("📨 New message received via WebSocket:", serverMessage);
+      console.log(
+        "📦 Product data in received message:",
+        serverMessage.productData
+      );
+
       setMessages((prev) => {
         const isOurMessage = serverMessage.senderId === currentUser?.id;
 
@@ -336,11 +349,11 @@ const Messages: React.FC = () => {
       );
     });
 
-    newSocket.on("conversation_joined", (data) => {});
+    // newSocket.on("conversation_joined", (data) => {});
 
-    newSocket.on("conversation_join_error", (errorData) => {
-      console.error("Failed to join conversation:", errorData);
-    });
+    // newSocket.on("conversation_join_error", (errorData) => {
+    //   console.error("Failed to join conversation:", errorData);
+    // });
 
     newSocket.on("message_error", (errorData) => {
       setIsSending(false); // Reset sending state on error
@@ -363,13 +376,13 @@ const Messages: React.FC = () => {
       );
     });
 
-    newSocket.on("new_message_notification", (data) => {
-      // Show notification for new message
-      if (data.conversationId !== activeConversationId) {
-        // Show browser notification or update badge count
-        console.log("New message in other conversation:", data);
-      }
-    });
+    // newSocket.on("new_message_notification", (data) => {
+    //   // Show notification for new message
+    //   if (data.conversationId !== activeConversationId) {
+    //     // Show browser notification or update badge count
+    //     console.log("New message in other conversation:", data);
+    //   }
+    // });
 
     newSocket.on("user_typing", (data) => {
       if (data.conversationId === activeConversationId) {
@@ -384,99 +397,263 @@ const Messages: React.FC = () => {
     });
 
     return () => {
-      if (newSocket) {
-        newSocket.off("connect");
-        newSocket.off("disconnect");
-        newSocket.off("connect_error");
-        newSocket.off("reconnect");
-        newSocket.off("new_message");
-        newSocket.off("messages_read");
-        newSocket.off("new_message_notification");
-        newSocket.off("user_typing");
-        newSocket.off("user_stop_typing");
-        newSocket.offAny();
-        newSocket.disconnect();
-      }
-      setSocketInitialized(false);
+      console.log("Component unmounting - Cleaning up WebSocket connection");
+      setSocket(null);
     };
   }, []);
 
   const fetchConversations = async () => {
+    if (isLoadingConversations) {
+      console.log("Conversations already loading, skipping...");
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("accessToken");
+      setIsLoadingConversations(true);
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations`,
-        {
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `${process.env.REACT_APP_API_URL}/chat/conversations`
       );
 
-      if (response.ok) {
-        const data = await response.json();
-        setConversations(data.data);
+      console.log("📡 API Response Status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const data = await response.json();
+      console.log("Raw API response", data);
+
+      // Debug each conversation
+      if (data.data && data.data.length > 0) {
+        data.data.forEach((conv: any, index: number) => {
+          console.log(`💬 Conversation ${index + 1} structure:`, {
+            id: conv.id,
+            hasParticipants: !!conv.participants,
+            participantsCount: conv.participants?.length,
+            participants: conv.participants,
+            hasParticipant: !!conv.participant,
+            participant: conv.participant,
+            currentUserId: currentUser?.id,
+          });
+        });
+      }
+
+      setConversations(data.data || []);
     } catch (error) {
-      addToast({
-        type: "error",
-        title: "Connection Error",
-        message: "Unable to load messages. Please try again.",
-        duration: 5000,
-      });
+      console.log("Fetch Conversations error:", error);
+      if (
+        error instanceof Error &&
+        !error.message.includes("Authentication") &&
+        !error.message.includes("token") &&
+        !error.message.includes("No token")
+      ) {
+        addToast({
+          type: "error",
+          title: "Connection Error",
+          message: "Unable to load messages. Please try again.",
+          duration: 4000,
+        });
+      }
     } finally {
-      setIsLoadingMessages(false);
+      setIsLoadingConversations(false);
     }
   };
 
   // initialization useEffect
   useEffect(() => {
+    // prevent multiple initializations
+    if (isInitialized) {
+      return;
+    }
+
     const loadInitialData = async () => {
-      await fetchConversations();
+      console.log("🔄 Loading initial data...");
 
-      const locationConversationId = location.state?.conversation?.id;
+      try {
+        await fetchConversations();
 
-      if (locationConversationId) {
-        await fetchConversationMessages(locationConversationId);
-      } else {
-        // Clear any active conversation state
-        setActiveConversationId(null);
-        setCurrentConversation(null);
-        setMessages([]);
+        const locationState = location.state;
+        console.log("Full location state: ", locationState);
+
+        if (locationState && Object.keys(locationState).length > 0) {
+          const locationConversationId =
+            locationState.conversation?.id || locationState.conversationId;
+          console.log(
+            "Loading conversation from location state:",
+            locationConversationId
+          );
+
+          if (locationConversationId) {
+            // set the active conversation immediately
+            setActiveConversationId(locationConversationId);
+            setLastLoadedConversationId(locationConversationId);
+
+            // load messages for this conversation
+            await fetchConversationMessages(locationConversationId);
+
+            // set product data if available
+            if (locationState.productData) {
+              console.log(
+                "Setting product data from locaton state:",
+                locationState.productData
+              );
+              setProductData(locationState.productData);
+              setPreFilledMessage(locationState.preFilledMessage || "");
+              setMessageText(locationState.preFilledMessage || "");
+              setIsProductInquiry(true);
+            }
+
+            // clear location state after loading
+            navigate(location.pathname, { replace: true, state: {} });
+          }
+        } else {
+          console.log(
+            "No conversation in location state, checking localStorage"
+          );
+          // Check localStorage for saved conversation
+          const savedConversationId = localStorage.getItem(
+            "activeConversationId"
+          );
+          if (savedConversationId) {
+            console.log("Loading saved conversation:", savedConversationId);
+            await fetchConversationMessages(savedConversationId);
+          } else {
+            console.log("No conversation to load");
+            setActiveConversationId(null);
+            setCurrentConversation(null);
+            setMessages([]);
+          }
+        }
+
+        setIsInitialized(true);
+      } catch (error) {
+        console.error("Error loading initial data:", error);
+        setIsInitialized(true);
       }
     };
 
     loadInitialData();
+  }, [
+    location.state?.conversation?.id,
+    location.state?.conversationId,
+    isInitialized,
+    navigate,
+    location.pathname,
+  ]);
+
+  // persist product inquiry state
+  useEffect(() => {
+    if (productData) {
+      localStorage.setItem(
+        "productInquiryData",
+        JSON.stringify({
+          productData,
+          preFilledMessage,
+          isMessageSent,
+        })
+      );
+    }
+  }, [productData, preFilledMessage, isMessageSent]);
+
+  // Load persisted product inquiry state on component mount
+  useEffect(() => {
+    const savedProductInquiry = localStorage.getItem("productInquiryData");
+    if (savedProductInquiry && !productData) {
+      try {
+        const inquiryData = JSON.parse(savedProductInquiry);
+        setProductData(inquiryData.productData);
+        setPreFilledMessage(inquiryData.preFilledMessage || "");
+        setMessageText(inquiryData.preFilledMessage || "");
+        setIsProductInquiry(true);
+        setIsMessageSent(inquiryData.isMessageSent || false);
+      } catch (error) {
+        console.error("Failed to load saved product inquiry:", error);
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleConnect = () => {
+      console.log("✅ WebSocket connected");
+      setIsSocketConnected(true);
+    };
+
+    const handleDisconnect = () => {
+      console.log("❌ WebSocket disconnected");
+      setIsSocketConnected(false);
+    };
+
+    const handleConnectError = (error: any) => {
+      console.error("❌ WebSocket connection error:", error);
+      setIsSocketConnected(false);
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("connect_error", handleConnectError);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("connect_error", handleConnectError);
+    };
+  }, [socket]);
+
+  // seller typing
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("user_typing", (data) => {
+      console.log("⌨️ User typing received:", data);
+      if (
+        data.conversationId === activeConversationId &&
+        data.userId !== currentUser?.id
+      ) {
+        setShowTypingIndicator(true);
+        setIsSellerTyping(true);
+      }
+    });
+
+    socket.on("user_stop_typing", (data) => {
+      console.log("⏹️ User stopped typing:", data);
+      if (
+        data.conversationId === activeConversationId &&
+        data.userId !== currentUser?.id
+      ) {
+        setShowTypingIndicator(false);
+        setIsSellerTyping(false);
+      }
+    });
+
+    return () => {
+      socket.off("user_typing");
+      socket.off("user_stop_typing");
+    };
+  }, [socket, activeConversationId, currentUser?.id]);
 
   const fetchConversationMessages = async (conversationId: string) => {
     if (!conversationId) {
+      console.log("No conversation ID provided");
       setActiveConversationId(null);
       setCurrentConversation(null);
       setMessages([]);
       return;
     }
 
+    // Only prevent if actively loading, but allow same conversation clicks for refresh
     if (isLoadingMessages) {
-      return;
-    }
-
-    if (activeConversationId === conversationId && messages.length > 0) {
+      console.log("Already loading messages, skipping...");
       return;
     }
 
     try {
       setIsLoadingMessages(true);
+      console.log(`Loading messages for conversation: ${conversationId}`);
 
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/messages`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
+        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/messages`
       );
 
       if (!response.ok) {
@@ -484,29 +661,18 @@ const Messages: React.FC = () => {
       }
 
       const data = await response.json();
+      console.log("📨 Messages loaded:", data.data?.length || 0, "messages");
 
       const getMessageStatus = (message: any, currentUserId: string) => {
         // For sent messages
         if (message.senderId === currentUserId) {
-          // Check if we have status from the server
-          if (message.statuses && message.statuses.length > 0) {
-            return message.statuses[0].status;
-          }
-
-          // For temporary messages
-          if (message.status) {
-            return message.status;
-          }
-
-          // Default for sent messages
-          return "sent";
+          return message.status || "sent"; // Simplify this logic
         }
 
         // For received messages, they're always 'read' if we're viewing them
         return "read";
       };
 
-      // Transform messages for UI
       const transformedMessages = (data.data || []).map((message: any) => ({
         ...message,
         text: message.content || "",
@@ -521,6 +687,8 @@ const Messages: React.FC = () => {
         }),
         type: message.messageType?.toLowerCase() || "text",
         status: getMessageStatus(message, currentUser?.id),
+        productData: message.productData || productData,
+        isProductInquiry: !!message.productData && messages.length === 0,
       }));
 
       setMessages(transformedMessages);
@@ -530,6 +698,7 @@ const Messages: React.FC = () => {
       const currentConv = conversations.find((c) => c.id === conversationId);
       if (currentConv) {
         setCurrentConversation(currentConv);
+        console.log("✅ Current conversation set:", currentConv.id);
       }
 
       // save to localStorage
@@ -542,15 +711,15 @@ const Messages: React.FC = () => {
       }
 
       // join socket room
-      if (socket && socket.connected) {
-        socket.emit("join_conversation", conversationId);
+      if (socketRef.current?.connected) {
+        socketRef.current.emit("join_conversation", conversationId);
       }
     } catch (error) {
       addToast({
         type: "error",
         title: "Error",
         message: "Failed to load messages",
-        duration: 4000,
+        duration: 3000,
       });
     } finally {
       setIsLoadingMessages(false);
@@ -563,9 +732,17 @@ const Messages: React.FC = () => {
     setMessages([]);
     setReplyToMessage(null);
 
+    // clear product inquiry data
+    setProductData(null);
+    setPreFilledMessage("");
+    setMessageText("");
+    setIsProductInquiry(false);
+    setIsMessageSent(false);
+
     // Clear from localStorage as well
     localStorage.removeItem("activeConversationId");
     localStorage.removeItem("currentConversation");
+    localStorage.removeItem("productInquiryData");
   };
 
   const getMessageDisplayText = (message: any) => {
@@ -586,6 +763,21 @@ const Messages: React.FC = () => {
       }
 
       const tempId = Date.now();
+
+      const enhancedProductData = messageData.productData
+        ? {
+            ...messageData.productData,
+            // Ensure these critical fields are present
+            id: messageData.productData.id,
+            name: messageData.productData.name,
+            price: messageData.productData.price,
+            image:
+              messageData.productData.images?.[0] ||
+              messageData.productData.image,
+            seller: messageData.productData.seller,
+          }
+        : null;
+
       const tempMessage = {
         id: `temp-${tempId}`,
         tempId: tempId,
@@ -609,19 +801,32 @@ const Messages: React.FC = () => {
         type: messageData.messageType?.toLowerCase() || "text",
         status: "sending",
         text: messageData.content,
+        productData: enhancedProductData,
       };
 
       // Add message immediately to UI
-      setMessages((prev) => [...prev, tempMessage]);
+      setMessages((prev) => {
+        // Check if we already have this temp message (prevent duplicates)
+        const existingIndex = prev.findIndex((msg) => msg.tempId === tempId);
+        if (existingIndex >= 0) {
+          return prev;
+        }
+        return [...prev, tempMessage];
+      });
 
       const messageToSend = {
         ...messageData,
+        productData: enhancedProductData,
         tempId: tempId,
         conversationId,
         timestamp: new Date().toISOString(),
       };
 
       socket.emit("send_message", messageToSend);
+
+      if (messageData.productData) {
+        setHasSentInitialProductMessage(true);
+      }
     },
     [socket, isSocketConnected, currentUser, addToast]
   );
@@ -660,6 +865,29 @@ const Messages: React.FC = () => {
         highlightChats: true,
       },
     });
+  };
+
+  const handleConversationClick = async (conversationId: string) => {
+    // Prevent rapid consecutive clicks on same conversation
+    if (isLoadingMessages) {
+      console.log("Currently loading messages, skipping...");
+      return;
+    }
+
+    // Close any active menus
+    setActionsMenuOpen(null);
+
+    // Set active conversation immediately for UI feedback
+    setActiveConversationId(conversationId);
+    setLastLoadedConversationId(conversationId);
+
+    // Load conversation messages
+    await fetchConversationMessages(conversationId);
+
+    // Mark as read when opening conversation
+    if (socketRef.current?.connected) {
+      socketRef.current.emit("mark_as_read", conversationId);
+    }
   };
 
   // Limit visible messages to last 3 with smooth fade-out (unless showing all)
@@ -775,6 +1003,12 @@ const Messages: React.FC = () => {
     const message = messages.find((m) => m.id === messageId);
     if (message && message.isIncoming) {
       setIsReplyRead(true);
+      setHasIncomingReply(false);
+
+      // mark as read on server
+      if (socket && currentConversation?.id) {
+        socket.emit("mark_as_read", currentConversation.id);
+      }
     }
   };
 
@@ -783,14 +1017,188 @@ const Messages: React.FC = () => {
     event: React.MouseEvent
   ) => {
     event.stopPropagation();
+    event.preventDefault();
     setActionsMenuOpen(
       actionsMenuOpen === conversationId ? null : conversationId
     );
   };
 
-  const handleActionSelect = (action: string, conversationId: string) => {
+  const archiveConversation = async (conversationId: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/archive`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Update local state
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === conversationId ? { ...conv, isArchived: true } : conv
+          )
+        );
+
+        // If currently viewing archived conversation, close it
+        if (activeConversationId === conversationId) {
+          closeActiveConversation();
+        }
+
+        addToast({
+          type: "success",
+          title: "Conversation Archived",
+          message: "The conversation has been moved to archives",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      addToast({
+        type: "error",
+        title: "Archive Failed",
+        message: "Failed to archive conversation",
+        duration: 4000,
+      });
+    }
+  };
+
+  // Mute conversation
+  const muteConversation = async (conversationId: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/mute`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        addToast({
+          type: "success",
+          title: "Conversation Muted",
+          message: "You will no longer receive notifications from this chat",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      addToast({
+        type: "error",
+        title: "Mute Failed",
+        message: "Failed to mute conversation",
+        duration: 4000,
+      });
+    }
+  };
+
+  // Pin conversation
+  const pinConversation = async (conversationId: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/pin`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Re-fetch conversations to get updated order
+        await fetchConversations();
+        addToast({
+          type: "success",
+          title: "Conversation Pinned",
+          message: "Conversation pinned to top",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      addToast({
+        type: "error",
+        title: "Pin Failed",
+        message: "Failed to pin conversation",
+        duration: 4000,
+      });
+    }
+  };
+
+  // Delete conversation function
+  const deleteConversation = async (conversationId: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Remove from local state
+        setConversations((prev) =>
+          prev.filter((conv) => conv.id !== conversationId)
+        );
+
+        // If currently viewing deleted conversation, close it
+        if (activeConversationId === conversationId) {
+          closeActiveConversation();
+        }
+
+        addToast({
+          type: "success",
+          title: "Conversation Deleted",
+          message: "The conversation has been deleted",
+          duration: 3000,
+        });
+      } else {
+        throw new Error("Delete failed");
+      }
+    } catch (error) {
+      addToast({
+        type: "error",
+        title: "Delete Failed",
+        message: "Failed to delete conversation",
+        duration: 4000,
+      });
+    }
+  };
+
+  const handleActionSelect = async (action: string, conversationId: string) => {
     setActionsMenuOpen(null);
-    // Here you would implement the actual action logic
+
+    switch (action) {
+      case "Mark as read":
+        markConversationAsRead(conversationId);
+        break;
+      case "Add label":
+        // Implement label functionality
+        console.log("Add label to:", conversationId);
+        break;
+      case "Mute the chat":
+        await muteConversation(conversationId);
+        break;
+      case "Pin the chat":
+        await pinConversation(conversationId);
+        break;
+      case "Archive the chat":
+        await archiveConversation(conversationId);
+        break;
+      case "Delete the chat":
+        await deleteConversation(conversationId);
+        break;
+      default:
+        console.log("Unknown action:", action);
+    }
   };
 
   // Emoji picker handlers
@@ -808,21 +1216,56 @@ const Messages: React.FC = () => {
   };
 
   // Typing detection logic
-  const handleTypingDetection = () => {
-    setIsUserTyping(true);
+  const handleTypingDetection = useCallback(() => {
+    if (!currentConversation?.id || !socket || !isSocketConnected) return;
 
-    // Clear existing timer
+    setIsUserTyping(true);
+    startTyping(currentConversation.id);
+
+    // Send typing start event
+    socket.emit("typing_start", {
+      conversationId: currentConversation.id,
+      userId: currentUser?.id,
+    });
+
+    // clear existing timer
     if (typingTimer) {
       clearTimeout(typingTimer);
     }
 
-    // Set new timer to stop typing indicator after 1.5 seconds of inactivity
+    // set new timer to stop typing indicator
     const timer = setTimeout(() => {
       setIsUserTyping(false);
-    }, 1500);
+      // Send typing stop event
+
+      socket.emit("typing_stop", {
+        conversationId: currentConversation.id,
+        userId: currentUser?.id,
+      });
+    }, 1000);
 
     setTypingTimer(timer);
+  }, [
+    currentConversation?.id,
+    socket,
+    isSocketConnected,
+    typingTimer,
+    currentUser?.id,
+  ]);
+
+  const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessageText(e.target.value);
+    handleTypingDetection();
   };
+
+  // Cleanup when conversation changes
+  useEffect(() => {
+    return () => {
+      // Clear file preview when switching conversations
+      setSelectedFiles([]);
+      setShowFilePreview(false);
+    };
+  }, [activeConversationId]);
 
   const startChatByEmail = async (email: string, message?: string) => {
     try {
@@ -845,23 +1288,19 @@ const Messages: React.FC = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error("❌ Create conversation error:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
+      console.log("Conversation created:", result.data);
       const conversation = result.data;
 
       setConversations((prev) => [conversation, ...prev]);
       setActiveConversationId(conversation.id); // trigger loading messages
+      setCurrentConversation(conversation);
 
-      navigate("/messages", {
-        state: {
-          ...location.state,
-          conversationId: conversation.id,
-        },
-        replace: true,
-      });
-
+      await fetchConversations();
       return conversation;
     } catch (error) {
       console.error("Error starting chat:", error);
@@ -1123,30 +1562,76 @@ const Messages: React.FC = () => {
 
   // Handle incoming product data from Product Detail page
   useEffect(() => {
-    if (location.state?.conversation && !currentConversation) {
-      const conversationId = location.state.conversation.id;
-      const { productData, preFilledMessage } = location.state;
+    if (location.state && Object.keys(location.state).length > 0) {
+      console.log("📍 Location state received:", location.state);
 
-      // Only load if we're not already viewing it
-      if (activeConversationId !== conversationId) {
-        fetchConversationMessages(conversationId);
-      }
+      const {
+        productData: stateProductData,
+        preFilledMessage: statePreFilledMessage,
+        conversation,
+        conversationId,
+      } = location.state;
 
-      if (productData) {
-        setProductData(productData);
-        setPreFilledMessage(preFilledMessage || "");
-        // Only set messageText if no messages have been sent yet
+      if (stateProductData) {
+        console.log(
+          "📦 Product data received from location:",
+          stateProductData
+        );
+        setProductData(stateProductData);
+        setPreFilledMessage(statePreFilledMessage || "");
+        // only set messageText if no messages have been sent yet
         if (!isMessageSent) {
-          setMessageText(preFilledMessage || "");
+          setMessageText(statePreFilledMessage || "");
         }
+        setIsProductInquiry(true);
       }
 
-      // Clear location state after a short delay
-      setTimeout(() => {
-        navigate(location.pathname, { replace: true, state: {} });
-      }, 100);
+      // Handle conversation from product details
+      const targetConversationId = conversation?.id || conversationId;
+      if (
+        targetConversationId &&
+        targetConversationId !== activeConversationId
+      ) {
+        console.log(
+          "💬 Loading conversation from location state:",
+          targetConversationId
+        );
+
+        // force load the conversation immediately
+        setActiveConversationId(targetConversationId);
+        setLastLoadedConversationId(targetConversationId);
+
+        // load messages for this conversation
+        fetchConversationMessages(targetConversationId);
+      }
+
+      // Clear location state immediately after processing
+      navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state, currentConversation, activeConversationId]);
+  }, [
+    location.state,
+    navigate,
+    location.pathname,
+    isMessageSent,
+    activeConversationId,
+  ]);
+
+  // Add debug logging to track conversation state
+  useEffect(() => {
+    console.log("🔍 Current conversation state:", {
+      activeConversationId,
+      currentConversation,
+      productData: !!productData,
+      isProductInquiry,
+      locationState: location.state,
+    });
+  }, [
+    activeConversationId,
+    currentConversation,
+    productData,
+    isProductInquiry,
+    location.state,
+  ]);
 
   // Auto-scroll when new messages arrive
   useEffect(() => {
@@ -1194,9 +1679,47 @@ const Messages: React.FC = () => {
     const userTypedText = messageText.trim();
     const hasUserTyped =
       userTypedText && userTypedText !== preFilledMessage.trim();
+    const textToSend =
+      isProductInquiry && !isMessageSent ? preFilledMessage : userTypedText;
+    const hasContent = textToSend && textToSend.trim().length > 0;
+
+    const isDisclaimerMessage =
+      textToSend.includes("Secure Messaging") ||
+      textToSend.includes("safety") ||
+      textToSend.includes("BAO'Afrik");
 
     if (isSending) {
       return;
+    }
+
+    // create new conversation if we have product data but no conversation exists
+    if (!currentConversation?.id && productData) {
+      // start new chat with the seller
+      const sellerEmail = productData.seller?.email;
+      if (sellerEmail) {
+        const newConversation = await startChatByEmail(
+          sellerEmail,
+          textToSend || preFilledMessage
+        );
+
+        if (newConversation) {
+          setCurrentConversation(newConversation);
+          setActiveConversationId(newConversation.id);
+
+          // clear states after sending
+          setMessageText("");
+          setPreFilledMessage("");
+          setSelectedFiles([]);
+          setShowFilePreview(false);
+          setReplyToMessage(null);
+
+          // mark as sent
+          setIsMessageSent(true);
+          setIsProductInquiry(false);
+          setHasSentProductData(true);
+        }
+        return;
+      }
     }
 
     if (!currentConversation?.id) {
@@ -1209,7 +1732,6 @@ const Messages: React.FC = () => {
       return;
     }
 
-    const textToSend = userTypedText;
     if (!textToSend && selectedFiles.length === 0) {
       return; // Don't send empty messages
     }
@@ -1227,11 +1749,11 @@ const Messages: React.FC = () => {
     setIsSending(true);
 
     try {
-      const textContent = textToSend;
       const filesToSend = [...selectedFiles];
 
       // Clear input immediately
       setMessageText("");
+      setPreFilledMessage("");
       setSelectedFiles([]);
       setShowFilePreview(false);
       setReplyToMessage(null);
@@ -1279,17 +1801,30 @@ const Messages: React.FC = () => {
               throw new Error("Upload failed");
             }
 
+            console.log("📤 Sending message with product data:", {
+              content: textToSend,
+              hasProductData: !!productData,
+              productData: productData,
+              isFirstMessage: !isMessageSent,
+            });
+
             // Send message with file reference
             sendMessageViaSocket(currentConversation.id, {
-              content: textContent || `Sent ${file.name}`,
+              content: textToSend || `Sent ${file.name}`,
               messageType: "FILE",
               fileUrl: uploadData.url,
               fileName: file.name,
               fileSize: file.size,
-              productData: currentConversation.product,
+              productData:
+                !isMessageSent && !hasSentProductData && !isDisclaimerMessage
+                  ? productData
+                  : null,
             });
 
             messageSent = true;
+            if (productData && !isDisclaimerMessage) {
+              setHasSentProductData(true);
+            }
           } catch (error) {
             addToast({
               type: "error",
@@ -1302,14 +1837,36 @@ const Messages: React.FC = () => {
         }
       }
 
-      if (textContent && !messageSent) {
+      if (textToSend && !messageSent) {
+        console.log("📤 SENDING PRODUCT INQUIRY:", {
+          content: textToSend,
+          hasProductData: !!productData,
+          isFirstMessage: !isMessageSent,
+          productData: productData,
+          isDisclaimerMessage,
+          hasSentProductData,
+        });
+
         // Send text message
         sendMessageViaSocket(currentConversation.id, {
-          content: textContent,
+          content: textToSend,
           messageType: "TEXT",
-          productData: currentConversation.product,
+          productData:
+            !isMessageSent && !isDisclaimerMessage && !hasSentProductData
+              ? productData
+              : null,
         });
         messageSent = true;
+      }
+
+      // Mark as message sent after successful sending
+      if (messageSent) {
+        setIsMessageSent(true);
+
+        // clear product inquiry data after sending
+        if (productData && !isDisclaimerMessage) {
+          localStorage.removeItem("productInquiryData");
+        }
       }
 
       // Refresh conversations to update last message
@@ -1343,6 +1900,83 @@ const Messages: React.FC = () => {
       clearInterval(interval);
     };
   }, [socket, socketInitialized]);
+
+  // WebSocket message handler to prevent re-renders
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewMessage = (serverMessage: any) => {
+      console.log("📨 New message received via WebSocket:", serverMessage);
+
+      setMessages((prev) => {
+        const isOurMessage = serverMessage.senderId === currentUser?.id;
+
+        // Check if we already have this message (by ID or tempId)
+        const existingMessageIndex = prev.findIndex(
+          (msg) =>
+            msg.id === serverMessage.id ||
+            (serverMessage.tempId && msg.tempId === serverMessage.tempId)
+        );
+
+        if (existingMessageIndex >= 0) {
+          // Update existing message - only update if necessary
+          const existingMessage = prev[existingMessageIndex];
+          if (existingMessage.status === "sending" && serverMessage.id) {
+            const updatedMessages = [...prev];
+            updatedMessages[existingMessageIndex] = {
+              ...serverMessage,
+              text: serverMessage.content || serverMessage.text,
+              content: serverMessage.content,
+              isIncoming: !isOurMessage,
+              timestamp: serverMessage.createdAt,
+              dateString: new Date(serverMessage.createdAt).toLocaleDateString(
+                "en-US",
+                {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              ),
+              status: isOurMessage ? "delivered" : "read",
+              productData: serverMessage.productData || null,
+            };
+            return updatedMessages;
+          }
+          return prev; // No changes needed
+        } else {
+          // Add new message
+          return [
+            ...prev,
+            {
+              ...serverMessage,
+              text: serverMessage.content || serverMessage.text,
+              content: serverMessage.content,
+              isIncoming: !isOurMessage,
+              timestamp: serverMessage.createdAt,
+              dateString: new Date(serverMessage.createdAt).toLocaleDateString(
+                "en-US",
+                {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              ),
+              status: isOurMessage ? "delivered" : "read",
+              productData: serverMessage.productData || null,
+            },
+          ];
+        }
+      });
+    };
+
+    socket.on("new_message", handleNewMessage);
+
+    return () => {
+      socket.off("new_message", handleNewMessage);
+    };
+  }, [socket, currentUser?.id]);
 
   // manually open conversation from location state if not already opened
   const openConversationFromState = useCallback(async () => {
@@ -1388,6 +2022,39 @@ const Messages: React.FC = () => {
       }
     }
   }, []);
+
+  // Update when new incoming messages arrive
+  useEffect(() => {
+    const lastIncomingMessage = messages.filter((msg) => msg.isIncoming).pop();
+
+    if (lastIncomingMessage) {
+      setIsReplyRead(false);
+      setHasIncomingReply(true);
+    }
+  }, [messages]);
+
+  const markConversationAsRead = useCallback(
+    (conversationId: string) => {
+      if (!socket) return;
+
+      // Update local state
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv
+        )
+      );
+
+      // Emit to server
+      socket.emit("mark_as_read", conversationId);
+    },
+    [socket]
+  );
+
+  useEffect(() => {
+    if (activeConversationId) {
+      markConversationAsRead(activeConversationId);
+    }
+  }, [activeConversationId, markConversationAsRead]);
 
   const handleAudioRecord = async () => {
     setIsRecording(true);
@@ -1813,7 +2480,6 @@ const Messages: React.FC = () => {
     };
   }, [socket]);
 
-  // Add this component before your return statement
   const MessageStatus = ({
     status,
     timestamp,
@@ -2066,11 +2732,18 @@ const Messages: React.FC = () => {
                 <div className="flex-1 overflow-y-auto p-1">
                   {conversations
                     .filter((conversation) => {
-                      // Filter by search query
+                      // Get the other participant for search
+                      const otherParticipant = conversation.participants?.find(
+                        (p: any) => p.userId !== currentUser?.id
+                      );
+                      const participantName = otherParticipant
+                        ? `${otherParticipant.firstName || ""} ${
+                            otherParticipant.lastName || ""
+                          }`.trim()
+                        : otherParticipant?.email?.split("@")[0] ||
+                          "Unknown User";
+
                       if (chatSearchQuery) {
-                        const participantName =
-                          conversation.participants?.[0]?.firstName ||
-                          "Fonsah Pageo";
                         const lastMessage =
                           conversation.lastMessage?.content || "";
                         return (
@@ -2087,86 +2760,91 @@ const Messages: React.FC = () => {
                     .filter((conversation) => {
                       // Filter by selected tab
                       if (selectedTab === "Unreads") {
-                        // You might want to add an unread messages count to your conversation model
                         return conversation.unreadCount > 0;
                       }
                       return true;
                     })
-                    .map((conversation) => (
-                      <div
-                        key={conversation.id}
-                        className={`p-2 rounded-lg cursor-pointer transition-colors ${
-                          activeConversationId === conversation.id
-                            ? "bg-gray-100"
-                            : "hover:bg-gray-50"
-                        }`}
-                        onClick={async () => {
-                          setActiveConversationId(conversation.id);
-                          await fetchConversationMessages(conversation.id);
+                    .map((conversation) => {
+                      // Get the other participant (not the current user)
+                      const participant = conversation.participant;
+                      const displayName = participant
+                        ? `${participant.firstName} ${participant.lastName}`
+                        : "Unknown User";
+                      const profileImage = participant?.profileImage;
 
-                          // Mark as read when opening conversation
-                          if (socket) {
-                            socket.emit("mark_as_read", conversation.id);
-                          }
-                        }}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <img
-                            src={
-                              conversation.participants?.[0]?.profileImage ||
-                              eboAvatar
-                            }
-                            alt={
-                              conversation.participants?.[0]?.firstName ||
-                              "Pageo"
-                            }
-                            className="w-10 h-10 rounded-sm object-cover"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <h3 className="font-semibold text-gray-900 truncate">
-                                {conversation.participants?.[0]?.firstName ||
-                                  "Fonsah"}
-                              </h3>
-                              <div className="flex items-center space-x-1">
-                                <span className="text-xs text-gray-500">
-                                  {new Date(
-                                    conversation.updatedAt
-                                  ).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}
-                                </span>
-                                <button
-                                  onClick={(e) =>
-                                    handleActionsMenuClick(conversation.id, e)
-                                  }
-                                  className="p-1 rounded transition-colors"
-                                  style={{
-                                    color:
-                                      actionsMenuOpen === conversation.id
-                                        ? "#64B5F6"
-                                        : "#000000",
-                                  }}
-                                >
-                                  <span className="text-lg">⋯</span>
-                                </button>
+                      // const imageLoadedRef = useRef(false);
+
+                      console.log("🎯 Rendering conversation:", {
+                        displayName,
+                        profileImage,
+                        hasProfileImage: !!profileImage,
+                      });
+
+                      return (
+                        <div
+                          key={conversation.id}
+                          className={`p-2 rounded-lg cursor-pointer hover:bg-gray-50 ${
+                            activeConversationId === conversation.id
+                              ? "bg-gray-100"
+                              : "hover:bg-gray-50"
+                          }`}
+                          onClick={async () => {
+                            await handleConversationClick(conversation.id);
+                          }}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <img
+                              src={profileImage || eboAvatar}
+                              alt={displayName}
+                              className="w-10 h-10 rounded-full object-cover"
+                              crossOrigin="anonymous"
+                              onError={(e) => console.log("❌ Image error")}
+                              onLoad={() => console.log("✅ Image loaded")}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <h3 className="font-semibold text-gray-900 truncate">
+                                  {displayName}
+                                </h3>
+                                <div className="flex items-center space-x-1">
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(
+                                      conversation.updatedAt
+                                    ).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </span>
+                                  <button
+                                    onClick={(e) =>
+                                      handleActionsMenuClick(conversation.id, e)
+                                    }
+                                    className="p-1 rounded transition-colors"
+                                    style={{
+                                      color:
+                                        actionsMenuOpen === conversation.id
+                                          ? "#64B5F6"
+                                          : "#000000",
+                                    }}
+                                  >
+                                    <span className="text-lg">⋯</span>
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex items-center justify-between -mt-1">
-                              <p className="text-sm text-gray-600 truncate">
-                                {conversation.lastMessage?.content ||
-                                  "No messages yet"}
-                              </p>
-                              {/* You can add unread message indicators here */}
-                              {conversation.unreadCount > 0 && (
-                                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                              )}
+                              <div className="flex items-center justify-between -mt-1">
+                                <p className="text-sm text-gray-600 truncate">
+                                  {conversation.lastMessage?.content ||
+                                    "No messages yet"}
+                                </p>
+                                {conversation.unreadCount > 0 && (
+                                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                 </div>
               </div>
             ) : (
@@ -2179,6 +2857,11 @@ const Messages: React.FC = () => {
                     className="w-12 h-12"
                   />
                 </div>
+                <p className="text-center mb-2" style={{ color: "#999999" }}>
+                  {currentUser
+                    ? "No conversations yet"
+                    : "Please log in to see your conversations"}
+                </p>
                 <p className="text-center mb-2" style={{ color: "#999999" }}>
                   Your chats will appear here
                 </p>
@@ -2352,7 +3035,12 @@ const Messages: React.FC = () => {
             <div className="mt-auto bg-white px-4 py-3">
               <div className="border-t border-gray-300 mx-1 mb-3"></div>
               {/* Archived */}
-              <div className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors">
+              <div
+                className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors"
+                onClick={() => {
+                  setSelectedTab("Archived");
+                }}
+              >
                 <div className="flex items-center space-x-3">
                   <img
                     src={archiveIcon}
@@ -2523,7 +3211,7 @@ const Messages: React.FC = () => {
                   {/* Profile Picture */}
                   <div className="w-10 h-10 rounded-full overflow-hidden">
                     <img
-                      src={avatarIcon}
+                      src={user?.profileImage || avatarIcon}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
@@ -2620,7 +3308,8 @@ const Messages: React.FC = () => {
                         {/* Profile Section */}
                         <div className="flex items-center space-x-2 px-3 py-3 border-b border-gray-100">
                           <img
-                            src={avatarIcon}
+                            src={user?.profileImage || avatarIcon}
+                            //
                             alt="User avatar"
                             className="w-12 h-12 rounded-full object-cover"
                             width="48"
@@ -2630,7 +3319,15 @@ const Messages: React.FC = () => {
                             <p className="text-xs text-gray-500">My profile</p>
                             <div className="flex items-center justify-between">
                               <h3 className="text-sm font-bold text-gray-900">
-                                Jean Kameni
+                                {user?.firstName && user?.lastName
+                                  ? `${user.firstName} ${user.lastName}`
+                                  : user?.firstName
+                                  ? user.firstName
+                                  : user?.lastName
+                                  ? user.lastName
+                                  : user?.email
+                                  ? user.email.split("@")[0]
+                                  : "User"}
                               </h3>
                               <div
                                 className="w-6 h-6 rounded flex items-center justify-center"
@@ -2835,7 +3532,10 @@ const Messages: React.FC = () => {
                           {/* Log Out */}
                           <div className="px-3 pt-3 border-t border-gray-100">
                             <button
-                              onClick={() => setIsMenuDropdownOpen(false)}
+                              onClick={() => {
+                                handleLogout();
+                                setIsMenuDropdownOpen(false);
+                              }}
                               className="w-full bg-gray-100 px-3 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                             >
                               <div className="flex items-center space-x-2">
@@ -2944,15 +3644,29 @@ const Messages: React.FC = () => {
                         <div className="text-center">
                           {/* Avatar */}
                           <img
-                            src={eboAvatar}
-                            alt={productData?.seller?.name || "Seller"}
+                            src={
+                              currentConversation?.participant?.profileImage ||
+                              eboAvatar
+                            }
+                            alt={
+                              currentConversation?.participant?.firstName ||
+                              "Seller"
+                            }
                             className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
                           />
 
                           {/* Name and Rating */}
                           <div className="flex items-center justify-center space-x-2 mb-4">
                             <h3 className="text-xl font-semibold text-gray-900">
-                              Joaquin EDIMO
+                              {currentConversation?.participant
+                                ? `${
+                                    currentConversation.participant.firstName ||
+                                    ""
+                                  } ${
+                                    currentConversation.participant.lastName ||
+                                    ""
+                                  }`.trim()
+                                : "Unknown User"}
                             </h3>
                             <div className="flex items-center space-x-2">
                               <svg
@@ -3103,6 +3817,30 @@ const Messages: React.FC = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* When messages are still loading */}
+                  {isLoadingMessages &&
+                    activeConversationId &&
+                    visibleMessages.length === 0 && (
+                      <div className="flex-1 flex flex-col items-center justify-center p-8">
+                        <div className="flex flex-col items-center space-y-3">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+                            <div
+                              className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"
+                              style={{ animationDelay: "0.1s" }}
+                            ></div>
+                            <div
+                              className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"
+                              style={{ animationDelay: "0.2s" }}
+                            ></div>
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            Loading messages...
+                          </span>
+                        </div>
+                      </div>
+                    )}
 
                   {/* Chat Messages Area */}
                   {visibleMessages.length > 0 && (
@@ -3448,19 +4186,27 @@ const Messages: React.FC = () => {
                                     )}
 
                                     {/* Product Card in Message - Only for first message */}
-                                    {message.isProductInquiry &&
-                                      message.productData && (
+                                    {message.productData &&
+                                      isProductInquiry && (
                                         <div className="rounded-lg p-3 mt-3">
                                           <div className="flex space-x-4">
                                             <div className="relative">
                                               <div
                                                 className="absolute -left-3 top-0 w-0.5 h-24"
                                                 style={{
-                                                  backgroundColor: "#FFFFFF",
+                                                  backgroundColor:
+                                                    message.isIncoming
+                                                      ? "#FFFFFF"
+                                                      : "#B8DDFB",
                                                 }}
                                               ></div>
                                               <img
-                                                src={message.productData?.image}
+                                                src={
+                                                  message.productData?.image ||
+                                                  message.productData
+                                                    ?.images?.[0] ||
+                                                  productImage1
+                                                }
                                                 alt={message.productData?.name}
                                                 className="w-24 h-24 object-cover"
                                               />
@@ -3469,13 +4215,21 @@ const Messages: React.FC = () => {
                                               <div className="flex items-center justify-between">
                                                 <div
                                                   className="text-xl font-semibold"
-                                                  style={{ color: "#B8DDFB" }}
+                                                  style={{
+                                                    color: message.isIncoming
+                                                      ? "#FFFFFF"
+                                                      : "#B8DDFB",
+                                                  }}
                                                 >
                                                   ${message.productData?.price}
                                                 </div>
                                                 <div
                                                   className="flex items-center space-x-2 text-[10px]"
-                                                  style={{ color: "#B8DDFB" }}
+                                                  style={{
+                                                    color: message.isIncoming
+                                                      ? "#FFFFFF"
+                                                      : "#B8DDFB",
+                                                  }}
                                                 >
                                                   <img
                                                     src={locIcon}
@@ -3493,13 +4247,21 @@ const Messages: React.FC = () => {
                                               <div className="flex items-center justify-between -mt-0.5">
                                                 <h4
                                                   className="text-xs font-medium"
-                                                  style={{ color: "#B8DDFB" }}
+                                                  style={{
+                                                    color: message.isIncoming
+                                                      ? "#FFFFFF"
+                                                      : "#B8DDFB",
+                                                  }}
                                                 >
                                                   {message.productData?.name}
                                                 </h4>
                                                 <div
                                                   className="text-[10px]"
-                                                  style={{ color: "#B8DDFB" }}
+                                                  style={{
+                                                    color: message.isIncoming
+                                                      ? "#FFFFFF"
+                                                      : "#B8DDFB",
+                                                  }}
                                                 >
                                                   <span>
                                                     Category:{" "}
@@ -3512,19 +4274,25 @@ const Messages: React.FC = () => {
                                               </div>
                                               <p
                                                 className="text-[10px] mt-2 leading-relaxed"
-                                                style={{ color: "#B8DDFB" }}
+                                                style={{
+                                                  color: message.isIncoming
+                                                    ? "#FFFFFF"
+                                                    : "#B8DDFB",
+                                                }}
                                               >
-                                                Premium White Pepper sourced
-                                                from the fertile soils of
-                                                Africa.
-                                                <br />
-                                                Known for its smooth, aromatic
-                                                heat and rich flavor...
+                                                {
+                                                  message.productData
+                                                    ?.description
+                                                }
                                               </p>
                                               <a
                                                 href="#"
                                                 className="text-xs mt-1 block"
-                                                style={{ color: "#182073" }}
+                                                style={{
+                                                  color: message.isIncoming
+                                                    ? "#182073"
+                                                    : "#182073",
+                                                }}
                                               >
                                                 baoafrik.com/product-id-link?
                                               </a>
@@ -4090,7 +4858,7 @@ const Messages: React.FC = () => {
                   )}
 
                   {/* Product Inquiry Card - Only show before sending first message */}
-                  {!isMessageSent && productData && (
+                  {productData && !isMessageSent && (
                     <div className="mb-3">
                       <div className="flex items-start space-x-3">
                         {/* Product Detail Card */}
@@ -4105,6 +4873,10 @@ const Messages: React.FC = () => {
                             <button
                               className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                               style={{ backgroundColor: "#6A6A6A" }}
+                              onClick={() => {
+                                setProductData(null);
+                                setIsProductInquiry(false);
+                              }}
                             >
                               <svg
                                 className="w-2 h-2"
@@ -4129,7 +4901,7 @@ const Messages: React.FC = () => {
                                 style={{ backgroundColor: "#83C4F8" }}
                               ></div>
                               <img
-                                src={productImage1}
+                                src={productData.images?.[0] || productImage1}
                                 alt={productData?.name}
                                 className="w-24 h-24 object-cover"
                               />
@@ -4172,11 +4944,7 @@ const Messages: React.FC = () => {
                                 className="text-[10px] mt-2 leading-relaxed"
                                 style={{ color: "#6A6A6A" }}
                               >
-                                Premium White Pepper sourced from the fertile
-                                soils of Africa.
-                                <br />
-                                Known for its smooth, aromatic heat and rich
-                                flavor...
+                                {productData.description}
                               </p>
                               <a
                                 href="#"
@@ -4940,10 +5708,7 @@ const Messages: React.FC = () => {
               </div>
             ) : (
               // Default Secure Messaging View - Empty State with Fixed Height
-              <div
-                className="flex flex-col items-center justify-center p-8"
-                // style={{ height: "calc(50vh - 4rem)" }}
-              >
+              <div className="flex flex-col items-center justify-center p-8">
                 {/* Secure Messaging Icon */}
                 <div className="flex items-center justify-center mb-6">
                   <img

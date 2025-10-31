@@ -360,7 +360,7 @@ const Header: React.FC<HeaderProps> = ({
                   >
                     <img
                       src={user.profileImage || avatar}
-                      alt="User profile picture"
+                      alt="User Icon"
                       className="w-8 h-8 rounded-full object-cover"
                       width="32"
                       height="32"
@@ -480,7 +480,7 @@ const Header: React.FC<HeaderProps> = ({
                               <div
                                 className="w-6 h-6 rounded flex items-center justify-center"
                                 style={{ backgroundColor: "#E3F2FD" }}
-                                onClick={() => navigate('/profile-setup')}
+                                onClick={() => navigate("/profile-setup")}
                               >
                                 <svg
                                   className="w-4 h-4"
@@ -713,7 +713,7 @@ const Header: React.FC<HeaderProps> = ({
                                 </div>
                               </div>
                               <p className="text-xs text-gray-500 text-left ml-8">
-                                Log out of BAO Afrik
+                                BAO Afrik
                               </p>
                             </button>
                           </div>
@@ -1605,34 +1605,36 @@ const Header: React.FC<HeaderProps> = ({
                     </div>
 
                     {/* Logout Button */}
-                    <div className="pt-6">
-                      <button
-                        onClick={handleLogout}
-                        className="w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <svg
-                              className="w-5 h-5 text-gray-600"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                              />
-                            </svg>
-                            <span>Log Out</span>
+                    <Link to="/login">
+                      <div className="pt-6">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <svg
+                                className="w-5 h-5 text-gray-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                />
+                              </svg>
+                              <span>Log Out</span>
+                            </div>
                           </div>
-                        </div>
-                        <p className="text-xs text-gray-500 text-left ml-8">
-                          Log out of BAO Afrik
-                        </p>
-                      </button>
-                    </div>
+                          <p className="text-xs text-gray-500 text-left ml-8">
+                            Log out of BAO Afrik
+                          </p>
+                        </button>
+                      </div>
+                    </Link>
                   </div>
                 ) : (
                   // Not logged in mobile menu - Visitor

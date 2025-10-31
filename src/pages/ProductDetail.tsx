@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -183,6 +183,7 @@ const ProductDetail: React.FC = () => {
   const [location, setLocation] = useState("");
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [isContactingSeller, setIsContactingSeller] = useState(false);
+  const [realProduct, setRealProduct] = useState<any>(null);
 
   const { addToast } = useToast();
   const { logout } = useAuth();
@@ -215,7 +216,7 @@ const ProductDetail: React.FC = () => {
             type: "error",
             title: "Link Copied",
             message: "Product link copied to clipboard",
-            duration: 3000
+            duration: 3000,
           });
         }
       } catch (error) {
@@ -227,7 +228,7 @@ const ProductDetail: React.FC = () => {
 
   // Mock product data (in real app, this would come from API based on id)
   const product = {
-    id: id || "12890",
+    id: id || "test-product-123",
     name: "White pepper",
     price: 31.7,
     location: "London | United Kingdom",
@@ -276,7 +277,7 @@ const ProductDetail: React.FC = () => {
             type: "error",
             title: "Link Copied",
             message: "Product link copied to clipboard",
-            duration: 3000
+            duration: 3000,
           });
         }
       } catch (error) {
@@ -289,42 +290,58 @@ const ProductDetail: React.FC = () => {
     setShowAdditionalInfo(!showAdditionalInfo);
   };
 
-  const handleContactSeller = async () => {
-    const sellerEmail = "pageo.fonsah@baotechnologiesandtravels.com";
-    const preFilledMessage = "Hello, I am interested in this item, is it still available?";
-    const sellerName = "Fonsah Pageo";
-    const realProductId = "test-product-123"
-    const realProductName = "Test iPhone 15";
-    const realProductPrice = 999;
-    const realProductLocation = 'New York';
-    const realProductCategory = 'Electronics';
-    const realProductDescription = 'Brand new iPhone 15 for testing messaging system';
-    const realProductImage = 'https://www.pexels.com/photo/dark-color-iphones-12-13-14-15-pro-pro-max-luxury-fashion-brand-gentcreate-18403789/';
-
-    if (!user) {
-      // Redirect to login if the user is not authenticated
-      navigate("/login", { state: { returnUrl: `/product/${id}` } });
-      return;
-    }
-
-    try {
-      setIsContactingSeller(true);
-      // create conversation by email
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        addToast({
-          type: "success",
-          title: "Invalid Token",
-          message:
-            "Token expired. Redirecting automatically to login in 3 seeconds...",
-          duration: 3000,
-        });
-
-        setTimeout(() => {
-          logout();
-          navigate("/login");
-        }, 3000);
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/products/test-product-123`
+        );
+        if (response.ok) {
+          const result = await response.json();
+          setRealProduct(result.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
       }
+    };
+
+    fetchProduct();
+  }, []);
+
+  const handleContactSeller = async () => {
+    try {
+      console.log("🔍 Available data:", {
+        product: product,
+        realProduct: realProduct,
+        images: images,
+      });
+      
+      setIsContactingSeller(true);
+
+      const sellerEmail = product.seller.email;
+
+      console.log("🚀 Starting conversation with seller:", sellerEmail);
+
+      const token = localStorage.getItem("accessToken");
+
+      const productDataToSend = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        location: product.location,
+        category: product.category,
+        description: product.description,
+        images: images,
+        seller: {
+          name: product.seller.name,
+          email: product.seller.email,
+          avatar: product.seller.avatar,
+          rating: product.seller.rating,
+          location: product.seller.location,
+        },
+      };
+
+      console.log("📦 Sending product data:", productDataToSend);
 
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/chat/conversations/email`,
@@ -336,8 +353,10 @@ const ProductDetail: React.FC = () => {
           },
           body: JSON.stringify({
             participantEmail: sellerEmail,
-            initialMessage: preFilledMessage,
-            productId: realProductId,
+            productId: "test-product-123",
+            initialMessage:
+              "Hello, I am interested in this item, is it still available?",
+            productData: productDataToSend,
           }),
         }
       );
@@ -348,42 +367,52 @@ const ProductDetail: React.FC = () => {
       }
 
       const result = await response.json();
+      console.log("📨 Contact seller response:", result);
 
       if (result.success) {
-        // Navigate to messages with the conversation data
-        navigate('/messages', {
+        const productData = {
+          id: product.id || "test-product-123",
+          name: product.name || "Test iPhone 15",
+          price: product.price || 569.99,
+          location: product.location || "New York, USA",
+          category: product.category || "Electronics",
+          description:
+            product.description ||
+            "Brand new iPhone 15 for testing messaging system",
+          images: images[selectedImageIndex] || [
+            "https://www.pexels.com/photo/dark-color-iphones-12-13-14-15-pro-pro-max-luxury-fashion-brand-gentcreate-18403789/",
+          ],
+          seller: {
+            name: product.seller.name,
+            email: product.seller.email,
+            avatar: product.seller.avatar,
+            rating: product.seller.rating,
+            location: product.seller.location,
+          },
+        };
+
+        console.log("📦 Navigating with conversation and product data");
+
+        // Navigate to messages
+        navigate("/messages", {
           state: {
             conversation: result.data,
-            product: {
-              id: realProductId,
-              name: realProductName,
-              price: realProductPrice,
-              location: realProductLocation,
-              category: realProductCategory,
-              description: realProductDescription,
-              images: [realProductImage]
-            },
-            seller: {
-              email: sellerEmail,
-              name: sellerName,
-              id: result.data.participant?.id,
-              firstName: sellerName.split(' ')[0],
-              lastName: sellerName.split(' ')[1] || '',
-              profileImage: null,
-              isVerifiedSeller: false
-            },
-            preFilledMessage
-          }
+            conversationId: result.data.id,
+            productData: productDataToSend,
+            preFilledMessage:
+              "Hello, I am interested in this item, is it still available?",
+          },
+          replace: false,
         });
-      } else {
-        throw new Error(result.error || 'Failed to contact seller');
       }
     } catch (error: any) {
       console.error("Error contacting seller:", error);
 
       // Don't show error toast for auth failures
-      if (error.message.includes('Authentication failed') ||
-        error.message.includes('Please log in again')) {
+      if (
+        error.message.includes("Authentication failed") ||
+        error.message.includes("Please log in again")
+      ) {
         return;
       }
 
@@ -392,7 +421,9 @@ const ProductDetail: React.FC = () => {
 
       if (error.message.includes("User not found")) {
         errorMessage = "Seller not found. Please try again later.";
-      } else if (error.message.includes("Cannot create conversation with yourself")) {
+      } else if (
+        error.message.includes("Cannot create conversation with yourself")
+      ) {
         errorMessage = "You cannot contact yourself.";
       } else if (error.message.includes("Email verification required")) {
         errorMessage = "Please verify your email before contacting sellers.";
@@ -401,8 +432,8 @@ const ProductDetail: React.FC = () => {
       addToast({
         type: "error",
         title: "Error starting conversation",
-        message: error.message,
-        duration: 4000,
+        message: errorMessage,
+        duration: 3000,
       });
     } finally {
       setIsContactingSeller(false);
@@ -525,10 +556,11 @@ const ProductDetail: React.FC = () => {
 
               <button
                 onClick={() => setIsSaved(!isSaved)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${isSaved
-                  ? "bg-orange-500 text-white"
-                  : "bg-white bg-opacity-90 text-gray-700"
-                  }`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${
+                  isSaved
+                    ? "bg-orange-500 text-white"
+                    : "bg-white bg-opacity-90 text-gray-700"
+                }`}
               >
                 <svg
                   className="w-5 h-5"
@@ -612,10 +644,11 @@ const ProductDetail: React.FC = () => {
               <button
                 key={index}
                 onClick={() => setSelectedImageIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${selectedImageIndex === index
-                  ? "bg-white"
-                  : "bg-white bg-opacity-50"
-                  }`}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  selectedImageIndex === index
+                    ? "bg-white"
+                    : "bg-white bg-opacity-50"
+                }`}
               />
             ))}
           </div>
@@ -632,10 +665,11 @@ const ProductDetail: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${selectedImageIndex === index
-                      ? "border-orange-500"
-                      : "border-gray-200 hover:border-gray-300"
-                      }`}
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                      selectedImageIndex === index
+                        ? "border-orange-500"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
                   >
                     <img
                       src={image}
@@ -707,10 +741,11 @@ const ProductDetail: React.FC = () => {
                 <div className="flex items-center space-x-3 lg:space-x-4">
                   <button
                     onClick={handleSave}
-                    className={`p-2 lg:p-3 rounded-full transition-colors ${isSaved
-                      ? "text-orange-500 bg-orange-50"
-                      : "text-gray-400 hover:text-orange-500"
-                      }`}
+                    className={`p-2 lg:p-3 rounded-full transition-colors ${
+                      isSaved
+                        ? "text-orange-500 bg-orange-50"
+                        : "text-gray-400 hover:text-orange-500"
+                    }`}
                     title={isSaved ? "Remove from saved" : "Save product"}
                   >
                     <svg
@@ -729,10 +764,11 @@ const ProductDetail: React.FC = () => {
                   </button>
                   <button
                     onClick={handleShare}
-                    className={`p-2 lg:p-3 rounded-full transition-colors ${isShared
-                      ? "text-blue-500 bg-blue-50"
-                      : "text-gray-400 hover:text-blue-500"
-                      }`}
+                    className={`p-2 lg:p-3 rounded-full transition-colors ${
+                      isShared
+                        ? "text-blue-500 bg-blue-50"
+                        : "text-gray-400 hover:text-blue-500"
+                    }`}
                     title={isShared ? "Shared" : "Share product"}
                   >
                     <svg
@@ -768,8 +804,9 @@ const ProductDetail: React.FC = () => {
                 >
                   <span>Additional information</span>
                   <svg
-                    className={`w-4 h-4 transition-transform ${showAdditionalInfo ? "rotate-180" : ""
-                      }`}
+                    className={`w-4 h-4 transition-transform ${
+                      showAdditionalInfo ? "rotate-180" : ""
+                    }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -868,15 +905,15 @@ const ProductDetail: React.FC = () => {
                 onMouseEnter={
                   !isContactingSeller
                     ? (e) =>
-                    ((e.target as HTMLElement).style.backgroundColor =
-                      "#E6941F")
+                        ((e.target as HTMLElement).style.backgroundColor =
+                          "#E6941F")
                     : undefined
                 }
                 onMouseLeave={
                   !isContactingSeller
                     ? (e) =>
-                    ((e.target as HTMLElement).style.backgroundColor =
-                      "#F9A825")
+                        ((e.target as HTMLElement).style.backgroundColor =
+                          "#F9A825")
                     : undefined
                 }
               >
@@ -953,10 +990,11 @@ const ProductDetail: React.FC = () => {
 
             <button
               onClick={() => setIsSaved(!isSaved)}
-              className={`p-2 rounded-lg border transition-colors ${isSaved
-                ? "border-orange-500 text-orange-500 bg-orange-50"
-                : "border-gray-300 text-gray-400 hover:border-gray-400"
-                }`}
+              className={`p-2 rounded-lg border transition-colors ${
+                isSaved
+                  ? "border-orange-500 text-orange-500 bg-orange-50"
+                  : "border-gray-300 text-gray-400 hover:border-gray-400"
+              }`}
             >
               <svg
                 className="w-5 h-5"
@@ -989,8 +1027,9 @@ const ProductDetail: React.FC = () => {
           >
             <span>Additional information</span>
             <svg
-              className={`w-4 h-4 transition-transform ${showAdditionalInfo ? "rotate-180" : ""
-                }`}
+              className={`w-4 h-4 transition-transform ${
+                showAdditionalInfo ? "rotate-180" : ""
+              }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -1235,10 +1274,11 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("textiles-1")
-                      ? "text-orange-500 hover:text-orange-600"
-                      : "text-gray-400 hover:text-gray-600"
-                      }`}
+                    className={`p-2 transition-colors touch-manipulation ${
+                      wishlistProducts.has("textiles-1")
+                        ? "text-orange-500 hover:text-orange-600"
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
                     title={
                       wishlistProducts.has("textiles-1")
                         ? "Remove from saved"
@@ -1344,10 +1384,11 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("tomatoes-1")
-                      ? "text-orange-500 hover:text-orange-600"
-                      : "text-gray-400 hover:text-gray-600"
-                      }`}
+                    className={`p-2 transition-colors touch-manipulation ${
+                      wishlistProducts.has("tomatoes-1")
+                        ? "text-orange-500 hover:text-orange-600"
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
                     title={
                       wishlistProducts.has("tomatoes-1")
                         ? "Remove from saved"
@@ -1453,10 +1494,11 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("shrimp-1")
-                      ? "text-orange-500 hover:text-orange-600"
-                      : "text-gray-400 hover:text-gray-600"
-                      }`}
+                    className={`p-2 transition-colors touch-manipulation ${
+                      wishlistProducts.has("shrimp-1")
+                        ? "text-orange-500 hover:text-orange-600"
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
                     title={
                       wishlistProducts.has("shrimp-1")
                         ? "Remove from saved"
@@ -1562,10 +1604,11 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("ndole-1")
-                      ? "text-orange-500 hover:text-orange-600"
-                      : "text-gray-400 hover:text-gray-600"
-                      }`}
+                    className={`p-2 transition-colors touch-manipulation ${
+                      wishlistProducts.has("ndole-1")
+                        ? "text-orange-500 hover:text-orange-600"
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
                     title={
                       wishlistProducts.has("ndole-1")
                         ? "Remove from saved"
@@ -1721,10 +1764,11 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("basket-1")
-                      ? "text-orange-500 hover:text-orange-600"
-                      : "text-gray-400 hover:text-gray-600"
-                      }`}
+                    className={`p-2 transition-colors touch-manipulation ${
+                      wishlistProducts.has("basket-1")
+                        ? "text-orange-500 hover:text-orange-600"
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
                     title={
                       wishlistProducts.has("basket-1")
                         ? "Remove from saved"
@@ -1830,10 +1874,11 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("combs-1")
-                      ? "text-orange-500 hover:text-orange-600"
-                      : "text-gray-400 hover:text-gray-600"
-                      }`}
+                    className={`p-2 transition-colors touch-manipulation ${
+                      wishlistProducts.has("combs-1")
+                        ? "text-orange-500 hover:text-orange-600"
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
                     title={
                       wishlistProducts.has("combs-1")
                         ? "Remove from saved"
@@ -1939,10 +1984,11 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("beans-1")
-                      ? "text-orange-500 hover:text-orange-600"
-                      : "text-gray-400 hover:text-gray-600"
-                      }`}
+                    className={`p-2 transition-colors touch-manipulation ${
+                      wishlistProducts.has("beans-1")
+                        ? "text-orange-500 hover:text-orange-600"
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
                     title={
                       wishlistProducts.has("beans-1")
                         ? "Remove from saved"
@@ -2048,10 +2094,11 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("cassava-1")
-                      ? "text-orange-500 hover:text-orange-600"
-                      : "text-gray-400 hover:text-gray-600"
-                      }`}
+                    className={`p-2 transition-colors touch-manipulation ${
+                      wishlistProducts.has("cassava-1")
+                        ? "text-orange-500 hover:text-orange-600"
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
                     title={
                       wishlistProducts.has("cassava-1")
                         ? "Remove from saved"

@@ -11,17 +11,11 @@ const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [emailNotFound, setEmailNotFound] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-  };
-
-  const checkEmailExists = (email: string): boolean => {
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    return registeredUsers.some((user: any) => user.email.toLowerCase() === email.toLowerCase());
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,7 +38,6 @@ const ForgotPassword: React.FC = () => {
 
     setIsLoading(true);
     setErrors({});
-    setEmailNotFound(false);
 
     try {
       const response = await authService.forgotPassword(email.toLowerCase());
