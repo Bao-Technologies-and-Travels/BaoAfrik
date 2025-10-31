@@ -22,6 +22,7 @@ import authRoutes from '@/routes/authRoutes';
 import testRoutes from '@/routes/testRoutes';
 import chatRoutes from '@/routes/chatRoutes';
 import s3Routes from '@/routes/s3Routes';
+import productRoutes from './routes/productRoutes';
 
 const app = express();
 const server = createServer(app);
@@ -155,6 +156,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/test', testRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/upload', s3Routes);
+app.use('/api/products', productRoutes);
 
 // 404 handler
 app.use(notFound);

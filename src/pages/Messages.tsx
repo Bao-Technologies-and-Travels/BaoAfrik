@@ -349,11 +349,11 @@ const Messages: React.FC = () => {
       );
     });
 
-    // newSocket.on("conversation_joined", (data) => {});
+    newSocket.on("conversation_joined", (data) => {});
 
-    // newSocket.on("conversation_join_error", (errorData) => {
-    //   console.error("Failed to join conversation:", errorData);
-    // });
+    newSocket.on("conversation_join_error", (errorData) => {
+      console.error("Failed to join conversation:", errorData);
+    });
 
     newSocket.on("message_error", (errorData) => {
       setIsSending(false); // Reset sending state on error
@@ -376,13 +376,13 @@ const Messages: React.FC = () => {
       );
     });
 
-    // newSocket.on("new_message_notification", (data) => {
-    //   // Show notification for new message
-    //   if (data.conversationId !== activeConversationId) {
-    //     // Show browser notification or update badge count
-    //     console.log("New message in other conversation:", data);
-    //   }
-    // });
+    newSocket.on("new_message_notification", (data) => {
+      // Show notification for new message
+      if (data.conversationId !== activeConversationId) {
+        // Show browser notification or update badge count
+        console.log("New message in other conversation:", data);
+      }
+    });
 
     newSocket.on("user_typing", (data) => {
       if (data.conversationId === activeConversationId) {
