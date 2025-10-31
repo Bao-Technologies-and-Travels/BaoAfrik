@@ -1691,8 +1691,8 @@ const Messages: React.FC = () => {
 
       // Clean up any audio URLs in messages
       messages.forEach((message) => {
-        if (message.audioUrl && message.audioUrl.startsWith("blob:")) {
-          URL.revokeObjectURL(message.audioUrl);
+        if (message.fileUrl && message.fileUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(message.fileUrl);
         }
       });
     };
@@ -1830,7 +1830,7 @@ const Messages: React.FC = () => {
 
           // Send voice message
           sendMessageViaSocket(currentConversation.id, {
-            content: textToSend || "Voice message",
+            content: "",
             messageType: "AUDIO",
             fileUrl: fileUrl,
             fileName: voiceFile.name,
@@ -1882,7 +1882,7 @@ const Messages: React.FC = () => {
             // Send message with file reference
             sendMessageViaSocket(currentConversation.id, {
               content: textToSend || `Sent ${file.name}`,
-              messageType: "FILE",
+              messageType: messageType,
               fileUrl: fileUrl,
               fileName: file.name,
               fileSize: file.size,
@@ -4003,7 +4003,7 @@ const Messages: React.FC = () => {
                                     : undefined
                                 }
                               >
-                                {message.type === "voice" ? (
+                                {message.type === "audio" || message.messageType === "AUDIO" ? (
                                   // Voice Message Display
                                   <div className="space-y-2">
                                     {/* Reply Preview for Voice Messages */}
@@ -4056,10 +4056,10 @@ const Messages: React.FC = () => {
                                       <div className="flex items-center space-x-2">
                                         <button
                                           onClick={() => {
-                                            if (message.audioUrl) {
+                                            if (message.fileUrl) {
                                               handleAudioPlayback(
                                                 message.id,
-                                                message.audioUrl,
+                                                message.fileUrl,
                                                 message.duration
                                               );
                                             }
