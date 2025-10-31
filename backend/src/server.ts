@@ -40,6 +40,7 @@ const io = new Server(server, {
     credentials: true,
   },
   transports: ['websocket', 'polling'],
+  allowEIO3: true
 });
 
 new WebSocketService(io);

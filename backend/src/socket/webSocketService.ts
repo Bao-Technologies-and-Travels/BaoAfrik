@@ -116,13 +116,13 @@ export class WebSocketService {
       this.joinUserConversations(authenticatedSocket, userId);
 
       // Message events
-      socket.on('send_message', async (data) => {
+      socket.on('send_message', async (data, callback) => {
         console.log('📤 Send message event received:', {
           conversationId: data.conversationId,
           sender: userEmail,
           tempId: data.tempId
         });
-        await this.handleSendMessage(authenticatedSocket, data);
+        await this.handleSendMessage(authenticatedSocket, data, callback);
       });
 
       socket.on('join_conversation', async (conversationId) => {
@@ -269,7 +269,7 @@ export class WebSocketService {
     }
   }
 
-  private async handleSendMessage(socket: AuthenticatedSocket, data: any) {
+  private async handleSendMessage(socket: AuthenticatedSocket, data: any, callback?: Function) {
     try {
       const { conversationId, content, messageType, fileUrl, fileName, fileSize, replyTo, tempId } = data;
       const senderId = socket.user!.id;
@@ -288,7 +288,6 @@ export class WebSocketService {
         throw new Error('Conversation ID is required');
       }
 
-      // Validate required fields
       if (!content?.trim() && !fileUrl) {
         throw new Error('Message content or file is required');
       }
@@ -330,24 +329,24 @@ export class WebSocketService {
         }
       };
 
+      if (callback) {
+        callback({
+          success: true,
+          data: messageResponse,
+          message: 'Message sent successfully'
+        });
+      }
+
       // Emit to all participants in the conversation
       this.io.to(`conversation:${conversationId}`).emit('new_message', messageResponse);
       console.log(`📨 Message emitted to conversation ${conversationId}, participants:`,
         participants.map(p => p.email));
-
-      // send confirmation to sender with tempId
-      socket.emit('message_sent', {
-        ...messageResponse,
-        tempId
-      });
-      console.log(`✅ Message sent confirmation for tempId: ${tempId}`);
 
       // Send notifications to other participants
       participants.forEach(participant => {
         if (participant.id !== senderId) {
           const participantSocketId = this.userSockets.get(participant.id);
           if (!participantSocketId) {
-            // User is offline, send push notification
             this.sendPushNotification(participant.id, {
               title: `${socket.user!.firstName} ${socket.user!.lastName}`.trim() || socket.user!.email,
               body: content?.substring(0, 100) || 'Sent a file',
@@ -369,6 +368,15 @@ export class WebSocketService {
 
     } catch (error: any) {
       console.error('Send message error:', error);
+
+      if (callback) {
+        callback({
+          success: false,
+          error: error.message || 'Failed to send message',
+          tempId: data.tempId
+        });
+      }
+
       socket.emit('message_error', {
         error: error.message || 'Failed to send message',
         tempId: data.tempId

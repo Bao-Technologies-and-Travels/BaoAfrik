@@ -757,9 +757,9 @@ const Messages: React.FC = () => {
           type: "error",
           title: "Connection Error",
           message: "Unable to send message. Please check your connection.",
-          duration: 4000,
+          duration: 3000,
         });
-        return;
+        return false;
       }
 
       const tempId = Date.now();
@@ -767,7 +767,6 @@ const Messages: React.FC = () => {
       const enhancedProductData = messageData.productData
         ? {
             ...messageData.productData,
-            // Ensure these critical fields are present
             id: messageData.productData.id,
             name: messageData.productData.name,
             price: messageData.productData.price,
@@ -820,13 +819,114 @@ const Messages: React.FC = () => {
         tempId: tempId,
         conversationId,
         timestamp: new Date().toISOString(),
+        senderId: currentUser?.id,
       };
 
-      socket.emit("send_message", messageToSend);
+      console.log("Emiting send_message to server:", messageToSend);
 
-      if (messageData.productData) {
-        setHasSentInitialProductMessage(true);
-      }
+      socket.emit("send_message", messageToSend, (response: any) => {
+        console.log("Server acknowledgement received:", response);
+
+        if (response && response.success) {
+          console.log("✅ Message confirmed by server:", response.data);
+
+          // Update the temp message with the real server data
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.tempId === tempId
+                ? {
+                    ...response.data,
+                    id: response.data.id,
+                    status: "sent",
+                    tempId: undefined,
+                  }
+                : msg
+            )
+          );
+
+          if (messageData.productData) {
+            setHasSentInitialProductMessage(true);
+          }
+        } else {
+          console.error("❌ Server rejected message:", response);
+
+          // Update message status to failed
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.tempId === tempId
+                ? {
+                    ...msg,
+                    status: "failed",
+                    error: response?.error || "Failed to send",
+                  }
+                : msg
+            )
+          );
+
+          addToast({
+            type: "error",
+            title: "Send Failed",
+            message: response?.error || "Failed to send message",
+            duration: 3000,
+          });
+        }
+      });
+
+      const handleMessageSent = (data: any) => {
+        if (data.tempId === tempId) {
+          console.log("📨 Received message_sent event (old pattern):", data);
+          socket.off("message_sent", handleMessageSent);
+          socket.off("message_error", handleMessageError);
+
+          // Update message
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.tempId === tempId
+                ? {
+                    ...data,
+                    id: data.id,
+                    status: "sent",
+                    tempId: undefined,
+                  }
+                : msg
+            )
+          );
+        }
+      };
+
+      const handleMessageError = (errorData: any) => {
+        if (errorData.tempId === tempId) {
+          console.error(
+            "❌ Received message_error event (old pattern):",
+            errorData
+          );
+          socket.off("message_sent", handleMessageSent);
+          socket.off("message_error", handleMessageError);
+
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.tempId === tempId
+                ? {
+                    ...msg,
+                    status: "failed",
+                    error: errorData.error,
+                  }
+                : msg
+            )
+          );
+        }
+      };
+
+      socket.on("message_sent", handleMessageSent);
+      socket.on("message_error", handleMessageError);
+
+      // Cleanup listeners after 10 seconds
+      setTimeout(() => {
+        socket.off("message_sent", handleMessageSent);
+        socket.off("message_error", handleMessageError);
+      }, 10000);
+
+      return true;
     },
     [socket, isSocketConnected, currentUser, addToast]
   );
@@ -1487,8 +1587,8 @@ const Messages: React.FC = () => {
   }, [activeMessageOptionsId]);
 
   // Render message status indicator
-  const renderMessageStatus = (messageId: number) => {
-    const status = messageStatuses[messageId] || "sending";
+  const renderMessageStatus = (message: any) => {
+    const status = message.status || "sending";
 
     switch (status) {
       case "sending":
@@ -1507,6 +1607,7 @@ const Messages: React.FC = () => {
             />
           </svg>
         );
+      case "sent":
       case "delivered":
         return (
           <svg
@@ -1545,6 +1646,18 @@ const Messages: React.FC = () => {
               <path
                 fillRule="evenodd"
                 d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        );
+      case "failed":
+        return (
+          <div className="flex items-center text-red-500" title={message.error}>
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                 clipRule="evenodd"
               />
             </svg>
