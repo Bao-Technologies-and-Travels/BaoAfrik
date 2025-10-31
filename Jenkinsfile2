@@ -122,7 +122,7 @@ pipeline {
                             # Create .env file with actual secrets
                             cat > .env << EOF
 REACT_APP_API_URL=https://${DOMAIN}/api
-REACT_APP_WS_URL=ws://${DOMAIN}/api
+REACT_APP_WS_URL=wss://${DOMAIN}/api
 EOF
 
                             chmod 600 .env
