@@ -54,6 +54,15 @@ export class ChatService {
             },
         });
     }
+
+    private formatTo12HourTime(date: Date): string {
+        return date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
     async createConversationByEmail(data: CreateConversationByEmailData) {
         return await prisma.$transaction(async (tx) => {
             // find participant by email
@@ -93,6 +102,8 @@ export class ChatService {
             if (existingConv) {
                 return existingConv;
             }
+            
+            const now = new Date();
 
             // create new conversation
             const conversation = await tx.conversation.create({
@@ -103,7 +114,9 @@ export class ChatService {
                             { userId: data.creatorId },
                             { userId: participant.id }
                         ]
-                    }
+                    },
+                    createdAt: now,
+                    updatedAt: now
                 },
                 include: {
                     participants: {
@@ -132,51 +145,49 @@ export class ChatService {
 
             let lastMessage = null;
 
-            // add disclaimer as first message
-            const safetyMessage = await tx.message.create({
-                data: {
-                    conversationId: conversation.id,
-                    senderId: data.creatorId,
-                    content: this.getSafetyDisclaimer(),
-                    messageType: MessageType.TEXT,
-                    productData: null
-                }
-            });
-
-            lastMessage = safetyMessage;
-
-            if (data.initialMessage && data.initialMessage.trim() !== this.getSafetyDisclaimer().trim()) {
+            // Add initial message if provided
+            if (data.initialMessage && data.initialMessage.trim()) {
                 const initialMessage = await tx.message.create({
                     data: {
                         conversationId: conversation.id,
                         senderId: data.creatorId,
                         content: data.initialMessage,
                         messageType: MessageType.TEXT,
-                        productData: data.productData ? JSON.stringify(data.productData) : null
+                        productData: data.productData ? JSON.stringify(data.productData) : null,
+                        createdAt: now
                     }
                 });
 
                 lastMessage = initialMessage;
             }
 
-            // updare conversation with last message
-            await tx.conversation.update({
-                where: { id: conversation.id },
-                data: {
-                    lastMessageId: lastMessage.id,
-                    lastMessageAt: new Date()
-                }
-            });
-
-            return {
-            ...conversation,
-            lastMessage: {
-                id: lastMessage.id,
-                content: lastMessage.content,
-                messageType: lastMessage.messageType,
-                createdAt: lastMessage.createdAt,
+            // Update conversation with last message
+            if (lastMessage) {
+                await tx.conversation.update({
+                    where: { id: conversation.id },
+                    data: {
+                        lastMessageId: lastMessage.id,
+                        lastMessageAt: now,
+                        updatedAt: now
+                    }
+                });
             }
-        };
+
+            const response = {
+                ...conversation,
+                lastMessage: lastMessage ? {
+                    id: lastMessage.id,
+                    content: lastMessage.content,
+                    messageType: lastMessage.messageType,
+                    createdAt: lastMessage.createdAt,
+                    formattedTime: this.formatTo12HourTime(lastMessage.createdAt)
+                } : null,
+                productData: data.productData || null,
+                formattedCreatedAt: this.formatTo12HourTime(conversation.createdAt),
+                formattedUpdatedAt: this.formatTo12HourTime(conversation.updatedAt)
+            };
+
+            return response;
         });
     }
 
@@ -252,34 +263,8 @@ export class ChatService {
             }
         });
 
-        // Debug logging
-        console.log('🔍 getUserConversations - Raw data:', {
-            userId,
-            totalConversationsFound: conversations.length,
-            conversationDetails: conversations.map(conv => ({
-                id: conv.id,
-                allParticipantIds: conv.participants.map(p => p.userId),
-                allParticipantEmails: conv.participants.map(p => p.user?.email || 'no-email'),
-                unreadCount: conv.messages.length,
-                currentUserIsParticipant: conv.participants.some(p => p.userId === userId)
-            }))
-        });
-
         const processedConversations = conversations.map(conv => {
-            // find the other participant
             const otherParticipants = conv.participants.filter(p => p.userId !== userId);
-
-            console.log('🔍 Processing conversation:', conv.id, {
-                totalParticipants: conv.participants.length,
-                otherParticipantsCount: otherParticipants.length,
-                otherParticipantEmails: otherParticipants.map(p => p.user?.email || 'no-email'),
-                allParticipants: conv.participants.map(p => ({
-                    userId: p.userId,
-                    email: p.user?.email,
-                    firstName: p.user?.firstName,
-                    lastName: p.user?.lastName
-                }))
-            });
 
             if (otherParticipants.length === 0) {
                 console.warn('Conversation has no other participant. Conversation:', conv.id, 'All Participants:', conv.participants.map(p => p.user?.email));
@@ -299,28 +284,27 @@ export class ChatService {
                 id: conv.id,
                 participant: otherParticipant,
                 product: conv.product,
-                lastMessage: conv.lastMessage,
+                lastMessage: conv.lastMessage ? {
+                    ...conv.lastMessage,
+                    formattedTime: this.formatTo12HourTime(conv.lastMessage.createdAt)
+                } : null,
                 unreadCount: conv.messages.length,
-                lastReadAt: currentUserParticipant?.lastReadAt,
+                lastReadAt: currentUserParticipant?.lastReadAt ? this.formatTo12HourTime(currentUserParticipant.lastReadAt) : null,
                 updatedAt: conv.updatedAt,
+                formattedUpdatedAt: this.formatTo12HourTime(conv.updatedAt),
                 createdAt: conv.createdAt,
+                formattedCreatedAt: this.formatTo12HourTime(conv.createdAt),
                 isEmailBased: !conv.productId
             };
 
-            console.log('✅ Final conversation object:', {
-                id: result.id,
-                participant: result.participant?.email || 'no-email',
-                unreadCount: result.unreadCount
-            });
-
             return result;
         }).filter((conv): conv is NonNullable<typeof conv> => conv !== null);
-
 
         console.log('🎯 Final filtered conversations count:', processedConversations.length);
 
         return processedConversations;
     }
+
     async getConversationMessages(conversationId: string, userId: string) {
         // Verify user has access to this conversation
         const conversation = await prisma.conversation.findFirst({
@@ -370,6 +354,8 @@ export class ChatService {
             orderBy: { createdAt: 'asc' }
         });
 
+        const now = new Date();
+
         // Update last read time for the user
         await prisma.conversationParticipant.updateMany({
             where: {
@@ -377,16 +363,29 @@ export class ChatService {
                 userId
             },
             data: {
-                lastReadAt: new Date()
+                lastReadAt: now
             }
         })
 
-        // Parse productData from JSON string and add safety disclaimer flag
-        const processedMessages = messages.map((message, index) => ({
-            ...message,
-            productData: message.productData ? JSON.parse(message.productData) : null,
-            showSafetyDisclaimer: index === 0 && message.content === this.getSafetyDisclaimer()
-        }));
+        // Parse productData from JSON string 
+        const processedMessages = messages.map((message) => {
+            let parsedProductData = null;
+
+            try {
+                if (message.productData) {
+                    parsedProductData = JSON.parse(message.productData);
+                }
+            } catch (error) {
+                console.error('Error parsing productData for message:', message.id, error);
+                parsedProductData = null;
+            }
+
+            return {
+                ...message,
+                productData: parsedProductData,
+                formattedTime: this.formatTo12HourTime(message.createdAt)
+            };
+        });
 
         return processedMessages;
     }
@@ -414,6 +413,8 @@ export class ChatService {
                 return existingConv;
             }
 
+            const now = new Date();
+
             // Create new conversation
             const conversation = await tx.conversation.create({
                 data: {
@@ -423,7 +424,9 @@ export class ChatService {
                             { userId: data.creatorId },
                             { userId: data.participantId }
                         ]
-                    }
+                    },
+                    createdAt: now,
+                    updatedAt: now
                 },
                 include: {
                     participants: {
@@ -458,19 +461,6 @@ export class ChatService {
 
             let lastMessage = null;
 
-            // Add safety disclaimer as first message
-            const safetyMessage = await tx.message.create({
-                data: {
-                    conversationId: conversation.id,
-                    senderId: data.creatorId,
-                    content: this.getSafetyDisclaimer(),
-                    messageType: MessageType.TEXT,
-                    productId: data.productId || null
-                }
-            });
-
-            lastMessage = safetyMessage;
-
             // Add initial message if provided
             if (data.initialMessage && data.initialMessage.trim()) {
                 const initialMessage = await tx.message.create({
@@ -479,7 +469,8 @@ export class ChatService {
                         senderId: data.creatorId,
                         content: data.initialMessage,
                         messageType: MessageType.TEXT,
-                        productId: data.productId || null
+                        productData: data.productData ? JSON.stringify(data.productData) : null,
+                        createdAt: now
                     }
                 });
 
@@ -487,22 +478,29 @@ export class ChatService {
             }
 
             // Update conversation with last message
-            await tx.conversation.update({
-                where: { id: conversation.id },
-                data: {
-                    lastMessageId: lastMessage.id,
-                    lastMessageAt: new Date()
-                }
-            });
+            if (lastMessage) {
+                await tx.conversation.update({
+                    where: { id: conversation.id },
+                    data: {
+                        lastMessageId: lastMessage.id,
+                        lastMessageAt: now,
+                        updatedAt: now
+                    }
+                });
+            }
 
             return {
                 ...conversation,
-                lastMessage: {
+                lastMessage: lastMessage ? {
                     id: lastMessage.id,
                     content: lastMessage.content,
                     messageType: lastMessage.messageType,
                     createdAt: lastMessage.createdAt,
-                }
+                    formattedTime: this.formatTo12HourTime(lastMessage.createdAt)
+                } : null,
+                productData: data.productData || null,
+                formattedCreatedAt: this.formatTo12HourTime(conversation.createdAt),
+                formattedUpdatedAt: this.formatTo12HourTime(conversation.updatedAt)
             };
         });
     }
@@ -553,24 +551,10 @@ export class ChatService {
                 normalizedMessageType = data.messageType;
             }
 
-            const isDisclaimerMessage = data.content === this.getSafetyDisclaimer();
+            // Create message
+            const shouldIncludeProductData = data.productData;
 
-            // Check if this conversation already has a message with product data
-            const existingProductMessages = await tx.message.count({
-                where: {
-                    conversationId: data.conversationId,
-                    NOT: {
-                        productData: null
-                    }
-                }
-            });
-
-            const hasExistingProductData = existingProductMessages > 0;
-            // Create message - only include productData if:
-            // 1. It's provided in the request
-            // 2. This conversation doesn't already have product data  
-            // 3. It's NOT a disclaimer message
-            const shouldIncludeProductData = data.productData && !hasExistingProductData && !isDisclaimerMessage;
+            const now = new Date();
 
             // Create message
             const message = await tx.message.create({
@@ -586,6 +570,7 @@ export class ChatService {
                     audioUrl: data.audioUrl,
                     replyToId: data.replyToId,
                     productData: shouldIncludeProductData ? JSON.stringify(data.productData) : null,
+                    createdAt: now
                 },
                 include: {
                     sender: {
@@ -605,8 +590,8 @@ export class ChatService {
                 where: { id: data.conversationId },
                 data: {
                     lastMessageId: message.id,
-                    lastMessageAt: new Date(),
-                    updatedAt: new Date()
+                    lastMessageAt: now,
+                    updatedAt: now
                 }
             });
 
@@ -615,14 +600,17 @@ export class ChatService {
                 data: {
                     messageId: message.id,
                     userId: data.senderId,
-                    status: 'sent'
+                    status: 'sent',
+                    createdAt: now,
+                    updatedAt: now
                 }
             });
 
             // Parse productData back to object for response
             const messageWithProductData = {
                 ...message,
-                productData: shouldIncludeProductData ? data.productData : null
+                productData: shouldIncludeProductData ? data.productData : null,
+                formattedTime: this.formatTo12HourTime(message.createdAt)
             };
 
             return messageWithProductData;
@@ -660,7 +648,8 @@ export class ChatService {
         return {
             presignedUrl,
             key,
-            url: `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
+            url: `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
+            generatedAt: this.formatTo12HourTime(new Date())
         };
     }
 
@@ -677,6 +666,8 @@ export class ChatService {
             }
         });
 
+        const now = new Date();
+
         // Update messages as read
         await prisma.message.updateMany({
             where: {
@@ -685,7 +676,8 @@ export class ChatService {
                 isRead: false
             },
             data: {
-                isRead: true
+                isRead: true,
+                updatedAt: now
             }
         });
 
@@ -700,12 +692,14 @@ export class ChatService {
                 },
                 update: {
                     status: 'read',
-                    updatedAt: new Date()
+                    updatedAt: now
                 },
                 create: {
                     messageId: message.id,
                     userId: userId,
-                    status: 'read'
+                    status: 'read',
+                    createdAt: now,
+                    updatedAt: now
                 }
             });
         }
@@ -717,11 +711,14 @@ export class ChatService {
                 userId
             },
             data: {
-                lastReadAt: new Date()
+                lastReadAt: now
             }
         });
 
-        return unreadMessages;
+        return {
+            unreadMessages, 
+            markReadAt: this.formatTo12HourTime(now)
+        };
     }
 
     async getUnreadCounts(userId: string) {
@@ -740,7 +737,8 @@ export class ChatService {
                         isRead: false
                     },
                     select: {
-                        id: true
+                        id: true,
+                        createdAt: true
                     }
                 }
             }
@@ -748,7 +746,8 @@ export class ChatService {
 
         return conversations.map(conv => ({
             conversationId: conv.id,
-            unreadCount: conv.messages.length
+            unreadCount: conv.messages.length,
+            checkedAt: this.formatTo12HourTime(new Date())
         }));
     }
 
@@ -776,11 +775,16 @@ export class ChatService {
             throw new Error('Conversation not found');
         }
 
-        return conversation.participants.map(p => p.user);
+        return {
+            participants: conversation.participants.map(p => p.user),
+            fetchedAt: this.formatTo12HourTime(new Date())
+        };
     }
 
     async updateMessageStatus(messageId: string, userId: string, status: 'sent' | 'delivered' | 'read') {
-        return await prisma.messageStatus.upsert({
+        const now = new Date();
+
+        const messageStatus = await prisma.messageStatus.upsert({
             where: {
                 messageId_userId: {
                     messageId,
@@ -789,17 +793,21 @@ export class ChatService {
             },
             update: {
                 status,
-                updatedAt: new Date()
+                updatedAt: now
             },
             create: {
                 messageId,
                 userId,
-                status
+                status,
+                createdAt: now,
+                updatedAt: now
             }
         });
-    }
 
-    private getSafetyDisclaimer(): string {
-        return `🔒 Secure Messaging: For your safety, keep conversations on BAO'Afrik. Don't share personal info, send money, or share account details. Report suspicious activity. Stay safe!`;
+        return {
+            ...messageStatus,
+            formattedCreatedAt: this.formatTo12HourTime(messageStatus.createdAt),
+            formattedUpdatedAt: this.formatTo12HourTime(messageStatus.updatedAt)
+        };
     }
 }

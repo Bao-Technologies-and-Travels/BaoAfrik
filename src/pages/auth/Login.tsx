@@ -153,7 +153,7 @@ const Login: React.FC = () => {
             ? user.firstName
             : user?.email?.split("@")[0] || "User"
         }!`,
-        duration: 4000,
+        duration: 2500,
       });
 
       navigate("/");

@@ -180,7 +180,7 @@ export class WebSocketService {
       console.log(`👥 User ${userId} has ${conversations.length} conversations to join`);
 
       conversations.forEach(conv => {
-        socket.join(`conversation: ${conv.id}`);
+        socket.join(`conversation:${conv.id}`);
         console.log(`✅ User joined conversation: ${conv.id}`);
       });
 
@@ -199,8 +199,9 @@ export class WebSocketService {
       }
 
       // Verify user has access to this conversation
-      const participants = await this.chatService.getConversationParticipants(conversationId);
-      const userHasAccess = participants.some(p => p.id === socket.user!.id);
+      const participantsResult = await this.chatService.getConversationParticipants(conversationId);
+      const participants = participantsResult.participants; // Extract the participants array
+      const userHasAccess = participants.some((p: any) => p.id === socket.user!.id);
 
       if (userHasAccess) {
         socket.join(`conversation:${conversationId}`);
@@ -208,7 +209,7 @@ export class WebSocketService {
 
         socket.emit('conversation_joined', {
           conversationId,
-          participants: participants.map(p => ({
+          participants: participants.map((p: any) => ({
             id: p.id,
             email: p.email || 'unknown@gmail.com',
             firstName: p.firstName,
@@ -305,7 +306,8 @@ export class WebSocketService {
         fileSize: fileSize || undefined,
         replyToId: replyTo || undefined,
         imageUrl: data.imageUrl || undefined,
-        audioUrl: data.audioUrl || undefined
+        audioUrl: data.audioUrl || undefined,
+        productData: data.productData || undefined
       };
 
       // Save message to database
@@ -313,7 +315,8 @@ export class WebSocketService {
       console.log('💾 Message saved to database:', message.id);
 
       // Get conversation participants
-      const participants = await this.chatService.getConversationParticipants(conversationId);
+      const participantsResult = await this.chatService.getConversationParticipants(conversationId);
+      const participants = participantsResult.participants; // Extract the participants array
 
       // Prepare message response with proper structure
       const messageResponse = {
@@ -340,10 +343,10 @@ export class WebSocketService {
       // Emit to all participants in the conversation
       this.io.to(`conversation:${conversationId}`).emit('new_message', messageResponse);
       console.log(`📨 Message emitted to conversation ${conversationId}, participants:`,
-        participants.map(p => p.email));
+        participants.map((p: any) => p.email));
 
       // Send notifications to other participants
-      participants.forEach(participant => {
+      participants.forEach((participant: any) => {
         if (participant.id !== senderId) {
           const participantSocketId = this.userSockets.get(participant.id);
           if (!participantSocketId) {
@@ -440,13 +443,14 @@ export class WebSocketService {
 
       console.log(`Marking messages as read in conversation ${conversationId} for user ${userId}`);
 
-      const updatedMessages = await this.chatService.markMessagesAsRead(conversationId, userId);
+      const result = await this.chatService.markMessagesAsRead(conversationId, userId);
+      const updatedMessages = result.unreadMessages; // Extract the unreadMessages array
 
       // Notify other participants that messages were read
       socket.to(`conversation:${conversationId}`).emit('messages_read', {
         conversationId,
         readerId: userId,
-        messageIds: updatedMessages.map(m => m.id)
+        messageIds: updatedMessages.map((m: any) => m.id)
       });
 
       console.log(`✅ Marked ${updatedMessages.length} messages as read`);

@@ -148,12 +148,12 @@ const Messages: React.FC = () => {
   const [isSending, setIsSending] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isProductInquiry, setIsProductInquiry] = useState(false);
   const { user, logout } = useAuth();
   const [connectionStatus, setConnectionStatus] = useState<
     "connecting" | "connected" | "disconnected"
   >("connecting");
-  const hasInitialized = useRef(false);
   const socketRef = useRef<Socket | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [lastLoadedConversationId, setLastLoadedConversationId] = useState<
@@ -162,17 +162,30 @@ const Messages: React.FC = () => {
   const [hasSentInitialProductMessage, setHasSentInitialProductMessage] =
     useState(false);
   const [hasSentProductData, setHasSentProductData] = useState(false);
+  const renderCount = useRef(0);
+  const hasProcessedLocationState = useRef(false);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  // Track re-renders for debugging
+  useEffect(() => {
+    renderCount.current += 1;
+    console.log(`🔄 Messages component re-rendered (${renderCount.current})`, {
+      activeConversationId,
+      conversationsCount: conversations.length,
+      messagesCount: messages.length,
+      isLoading,
+      isLoadingMessages,
+    });
+  });
+
   // Get current user on component mount
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {
-      // Decode JWT to get user info (you might need a proper JWT decoding library)
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
         const userData = {
@@ -210,54 +223,35 @@ const Messages: React.FC = () => {
     setSocket(newSocket);
 
     // Connection events
-    newSocket.on("connect", () => {
-      console.log("Websocket connected successfully");
+    const handleConnect = () => {
+      console.log("Websocket connected succesfully");
       setIsSocketConnected(true);
       setConnectionStatus("connected");
 
       newSocket.emit("join_conversations");
       console.log("📨 Joined conversations room");
 
-      // rejoin any active conversation
+      // Rejoin any active conversation
       if (activeConversationId) {
         newSocket.emit("join_conversation", activeConversationId);
         console.log(`🔗 Rejoined conversation: ${activeConversationId}`);
       }
-    });
+    };
 
-    newSocket.on("disconnect", (reason) => {
-      console.log("WebSocket disconnected:", reason);
+    const handleDisconnect = (reason: any) => {
+      console.log("Websocket disconnected", reason);
       setIsSocketConnected(false);
       setConnectionStatus("disconnected");
-    });
+    };
 
-    newSocket.on("connect_error", (error) => {
-      console.error("❌ WebSocket connection error:", error);
+    const handleConnectError = (error: any) => {
+      console.error("Websocket connection error", error);
       setIsSocketConnected(false);
       setConnectionStatus("disconnected");
-    });
-
-    newSocket.on("reconnect", (attemptNumber) => {
-      setIsSocketConnected(true);
-      newSocket.emit("join_conversations");
-
-      if (activeConversationId) {
-        newSocket.emit("join_conversation", activeConversationId);
-      }
-    });
-
-    newSocket.on("reconnect_attempt", (attemptNumber) => {});
-
-    newSocket.on("reconnect_error", (error) => {
-      console.error("Reconnection error:", error);
-    });
-
-    newSocket.on("reconnect_failed", () => {
-      setSocketInitialized(false);
-    });
+    };
 
     // message events
-    newSocket.on("new_message", (serverMessage) => {
+    const handleNewMessage = (serverMessage: any) => {
       console.log("📨 New message received via WebSocket:", serverMessage);
       console.log(
         "📦 Product data in received message:",
@@ -266,8 +260,6 @@ const Messages: React.FC = () => {
 
       setMessages((prev) => {
         const isOurMessage = serverMessage.senderId === currentUser?.id;
-
-        // Check if we already have this message (by ID or tempId)
         const existingMessageIndex = prev.findIndex(
           (msg) =>
             msg.id === serverMessage.id ||
@@ -275,7 +267,6 @@ const Messages: React.FC = () => {
         );
 
         if (existingMessageIndex >= 0) {
-          // Update existing message
           const updatedMessages = [...prev];
           updatedMessages[existingMessageIndex] = {
             ...serverMessage,
@@ -296,7 +287,6 @@ const Messages: React.FC = () => {
           };
           return updatedMessages;
         } else {
-          // Add new message
           return [
             ...prev,
             {
@@ -319,11 +309,16 @@ const Messages: React.FC = () => {
           ];
         }
       });
-    });
+    };
+
+    // Add all event listeners
+    newSocket.on("connect", handleConnect);
+    newSocket.on("disconnect", handleDisconnect);
+    newSocket.on("connect_error", handleConnectError);
+    newSocket.on("new_message", handleNewMessage);
 
     newSocket.on("message_sent", (data) => {
       setIsSending(false);
-
       setMessages((prev) =>
         prev.map((msg) => {
           if (msg.id === `temp-${data.tempId}` || msg.tempId === data.tempId) {
@@ -349,60 +344,21 @@ const Messages: React.FC = () => {
       );
     });
 
-    newSocket.on("conversation_joined", (data) => {});
-
-    newSocket.on("conversation_join_error", (errorData) => {
-      console.error("Failed to join conversation:", errorData);
-    });
-
-    newSocket.on("message_error", (errorData) => {
-      setIsSending(false); // Reset sending state on error
-      addToast({
-        type: "error",
-        title: "Send Failed",
-        message: errorData.error || "Failed to send message",
-        duration: 4000,
-      });
-    });
-
-    newSocket.on("messages_read", (data) => {
-      // Update read status for messages
-      setMessages((prev) =>
-        prev.map((msg) =>
-          data.messageIds && data.messageIds.includes(msg.id)
-            ? { ...msg, isRead: true }
-            : msg
-        )
-      );
-    });
-
-    newSocket.on("new_message_notification", (data) => {
-      // Show notification for new message
-      if (data.conversationId !== activeConversationId) {
-        // Show browser notification or update badge count
-        console.log("New message in other conversation:", data);
-      }
-    });
-
-    newSocket.on("user_typing", (data) => {
-      if (data.conversationId === activeConversationId) {
-        setShowTypingIndicator(true);
-      }
-    });
-
-    newSocket.on("user_stop_typing", (data) => {
-      if (data.conversationId === activeConversationId) {
-        setShowTypingIndicator(false);
-      }
-    });
-
+    // cleanup function
     return () => {
       console.log("Component unmounting - Cleaning up WebSocket connection");
+      newSocket.off("connect", handleConnect);
+      newSocket.off("disconnect", handleDisconnect);
+      newSocket.off("connect_error", handleConnectError);
+      newSocket.off("new_message", handleNewMessage);
+      newSocket.off("message_sent");
+      // Remove other event listeners...
+      newSocket.disconnect();
       setSocket(null);
     };
   }, []);
 
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     if (isLoadingConversations) {
       console.log("Conversations already loading, skipping...");
       return;
@@ -451,95 +407,66 @@ const Messages: React.FC = () => {
           type: "error",
           title: "Connection Error",
           message: "Unable to load messages. Please try again.",
-          duration: 4000,
+          duration: 2500,
         });
       }
     } finally {
       setIsLoadingConversations(false);
     }
-  };
+  }, [isLoadingConversations, currentUser?.id, addToast]);
+
+  useEffect(() => {
+  if (!activeConversationId || isLoadingMessages) {
+    return;
+  }
+
+  console.log('💬 Active conversation changed:', activeConversationId);
+  fetchConversationMessages(activeConversationId);
+}, [activeConversationId]);
 
   // initialization useEffect
   useEffect(() => {
-    // prevent multiple initializations
-    if (isInitialized) {
-      return;
-    }
-
     const loadInitialData = async () => {
-      console.log("🔄 Loading initial data...");
+      console.log("🔄 Loading initial data UseEffect...");
+
+      if (isLoading) {
+        console.log("Already loading, skipping");
+        return;
+      }
+
+      setIsLoading(true);
+      console.log("Starting data loading...");
 
       try {
+        // Load conversations
         await fetchConversations();
 
         const locationState = location.state;
         console.log("Full location state: ", locationState);
 
-        if (locationState && Object.keys(locationState).length > 0) {
-          const locationConversationId =
-            locationState.conversation?.id || locationState.conversationId;
-          console.log(
-            "Loading conversation from location state:",
-            locationConversationId
-          );
+        // handle location once
+        if (locationState && !hasProcessedLocationState.current) {
+          console.log("Processing location state for the first time");
+          hasProcessedLocationState.current = true;
 
-          if (locationConversationId) {
-            // set the active conversation immediately
-            setActiveConversationId(locationConversationId);
-            setLastLoadedConversationId(locationConversationId);
-
-            // load messages for this conversation
-            await fetchConversationMessages(locationConversationId);
-
-            // set product data if available
+          if (locationState.conversationId) {
+            setActiveConversationId(locationState.conversationId);
             if (locationState.productData) {
-              console.log(
-                "Setting product data from locaton state:",
-                locationState.productData
-              );
               setProductData(locationState.productData);
-              setPreFilledMessage(locationState.preFilledMessage || "");
-              setMessageText(locationState.preFilledMessage || "");
               setIsProductInquiry(true);
+              setPreFilledMessage(locationState.preFilledMessage || "");
             }
-
-            // clear location state after loading
-            navigate(location.pathname, { replace: true, state: {} });
-          }
-        } else {
-          console.log(
-            "No conversation in location state, checking localStorage"
-          );
-          // Check localStorage for saved conversation
-          const savedConversationId = localStorage.getItem(
-            "activeConversationId"
-          );
-          if (savedConversationId) {
-            console.log("Loading saved conversation:", savedConversationId);
-            await fetchConversationMessages(savedConversationId);
-          } else {
-            console.log("No conversation to load");
-            setActiveConversationId(null);
-            setCurrentConversation(null);
-            setMessages([]);
           }
         }
-
-        setIsInitialized(true);
       } catch (error) {
         console.error("Error loading initial data:", error);
-        setIsInitialized(true);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadInitialData();
-  }, [
-    location.state?.conversation?.id,
-    location.state?.conversationId,
-    isInitialized,
-    navigate,
-    location.pathname,
-  ]);
+  }, [location.state]);
 
   // persist product inquiry state
   useEffect(() => {
@@ -571,35 +498,6 @@ const Messages: React.FC = () => {
       }
     }
   }, []);
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleConnect = () => {
-      console.log("✅ WebSocket connected");
-      setIsSocketConnected(true);
-    };
-
-    const handleDisconnect = () => {
-      console.log("❌ WebSocket disconnected");
-      setIsSocketConnected(false);
-    };
-
-    const handleConnectError = (error: any) => {
-      console.error("❌ WebSocket connection error:", error);
-      setIsSocketConnected(false);
-    };
-
-    socket.on("connect", handleConnect);
-    socket.on("disconnect", handleDisconnect);
-    socket.on("connect_error", handleConnectError);
-
-    return () => {
-      socket.off("connect", handleConnect);
-      socket.off("disconnect", handleDisconnect);
-      socket.off("connect_error", handleConnectError);
-    };
-  }, [socket]);
 
   // seller typing
   useEffect(() => {
@@ -633,7 +531,7 @@ const Messages: React.FC = () => {
     };
   }, [socket, activeConversationId, currentUser?.id]);
 
-  const fetchConversationMessages = async (conversationId: string) => {
+  const fetchConversationMessages = useCallback(async (conversationId: string) => {
     if (!conversationId) {
       console.log("No conversation ID provided");
       setActiveConversationId(null);
@@ -666,10 +564,9 @@ const Messages: React.FC = () => {
       const getMessageStatus = (message: any, currentUserId: string) => {
         // For sent messages
         if (message.senderId === currentUserId) {
-          return message.status || "sent"; // Simplify this logic
+          return message.status || "sent";
         }
 
-        // For received messages, they're always 'read' if we're viewing them
         return "read";
       };
 
@@ -724,7 +621,7 @@ const Messages: React.FC = () => {
     } finally {
       setIsLoadingMessages(false);
     }
-  };
+  }, [isLoadingMessages, currentUser?.id, addToast, productData, conversations]);
 
   const closeActiveConversation = () => {
     setActiveConversationId(null);
@@ -764,18 +661,29 @@ const Messages: React.FC = () => {
 
       const tempId = Date.now();
 
-      const enhancedProductData = messageData.productData
-        ? {
-            ...messageData.productData,
-            id: messageData.productData.id,
-            name: messageData.productData.name,
-            price: messageData.productData.price,
-            image:
-              messageData.productData.images?.[0] ||
-              messageData.productData.image,
-            seller: messageData.productData.seller,
-          }
-        : null;
+      const isSafetyDisclaimer =
+        messageData.content ===
+        "🔒 Secure Messaging: For your safety, keep conversations on BAO'Afrik. Don't share personal info, send money, or share account details. Report suspicious activity. Stay safe!";
+
+      const enhancedProductData =
+        messageData.productData && !isSafetyDisclaimer
+          ? {
+              ...messageData.productData,
+              id: messageData.productData.id,
+              name: messageData.productData.name,
+              price: messageData.productData.price,
+              image:
+                messageData.productData.images?.[0] ||
+                messageData.productData.image,
+              seller: messageData.productData.seller,
+            }
+          : null;
+
+      console.log("📤 Preparing message:", {
+        content: messageData.content,
+        isSafetyDisclaimer,
+        hasProductData: !!enhancedProductData,
+      });
 
       const tempMessage = {
         id: `temp-${tempId}`,
@@ -1367,8 +1275,13 @@ const Messages: React.FC = () => {
     };
   }, [activeConversationId]);
 
-  const startChatByEmail = async (email: string, message?: string) => {
+  const startChatByEmail = async (
+    sellerEmail: string,
+    initialMessage?: string
+  ) => {
     try {
+      console.log("Starting chat with seller:", sellerEmail);
+
       const token = localStorage.getItem("accessToken");
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/chat/conversations/email`,
@@ -1379,8 +1292,9 @@ const Messages: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            participantEmail: email,
-            initialMessage: message,
+            participantEmail: sellerEmail,
+            initialMessage: "",
+            productData: productData,
             productId: productData?.id,
           }),
         }
@@ -1794,44 +1708,47 @@ const Messages: React.FC = () => {
       userTypedText && userTypedText !== preFilledMessage.trim();
     const textToSend =
       isProductInquiry && !isMessageSent ? preFilledMessage : userTypedText;
-    const hasContent = textToSend && textToSend.trim().length > 0;
+
+    console.log("🔍 Send message analysis:", {
+      userTypedText,
+      preFilledMessage,
+      textToSend,
+      isProductInquiry,
+      isMessageSent,
+      hasUserTyped,
+    });
 
     const isDisclaimerMessage =
-      textToSend.includes("Secure Messaging") ||
-      textToSend.includes("safety") ||
-      textToSend.includes("BAO'Afrik");
+      textToSend ===
+      "🔒 Secure Messaging: For your safety, keep conversations on BAO'Afrik. Don't share personal info, send money, or share account details. Report suspicious activity. Stay safe!";
 
     if (isSending) {
+      console.log("Already sending, skipping");
       return;
     }
 
     // create new conversation if we have product data but no conversation exists
     if (!currentConversation?.id && productData) {
       // start new chat with the seller
+      console.log(
+        "Creating new conversation without sending inquiry message yet"
+      );
       const sellerEmail = productData.seller?.email;
       if (sellerEmail) {
-        const newConversation = await startChatByEmail(
-          sellerEmail,
-          textToSend || preFilledMessage
-        );
+        const newConversation = await startChatByEmail(sellerEmail, "");
 
         if (newConversation) {
           setCurrentConversation(newConversation);
           setActiveConversationId(newConversation.id);
 
           // clear states after sending
-          setMessageText("");
-          setPreFilledMessage("");
-          setSelectedFiles([]);
-          setShowFilePreview(false);
-          setReplyToMessage(null);
+          setMessageText(preFilledMessage);
 
-          // mark as sent
-          setIsMessageSent(true);
-          setIsProductInquiry(false);
-          setHasSentProductData(true);
+          console.log("Conversation created, ready for user to send inquiry");
+
+          setIsSending(false);
+          return;
         }
-        return;
       }
     }
 
@@ -1928,10 +1845,7 @@ const Messages: React.FC = () => {
               fileUrl: uploadData.url,
               fileName: file.name,
               fileSize: file.size,
-              productData:
-                !isMessageSent && !hasSentProductData && !isDisclaimerMessage
-                  ? productData
-                  : null,
+              productData: !isDisclaimerMessage ? productData : null,
             });
 
             messageSent = true;
@@ -1951,23 +1865,17 @@ const Messages: React.FC = () => {
       }
 
       if (textToSend && !messageSent) {
-        console.log("📤 SENDING PRODUCT INQUIRY:", {
+        console.log("📤 User manually sending product inquiry:", {
           content: textToSend,
-          hasProductData: !!productData,
-          isFirstMessage: !isMessageSent,
-          productData: productData,
+          hasProductData: !!productData && !isDisclaimerMessage,
           isDisclaimerMessage,
-          hasSentProductData,
         });
 
         // Send text message
         sendMessageViaSocket(currentConversation.id, {
           content: textToSend,
           messageType: "TEXT",
-          productData:
-            !isMessageSent && !isDisclaimerMessage && !hasSentProductData
-              ? productData
-              : null,
+          productData: !isDisclaimerMessage ? productData : null,
         });
         messageSent = true;
       }

@@ -354,8 +354,6 @@ const ProductDetail: React.FC = () => {
           body: JSON.stringify({
             participantEmail: sellerEmail,
             productId: "test-product-123",
-            initialMessage:
-              "Hello, I am interested in this item, is it still available?",
             productData: productDataToSend,
           }),
         }

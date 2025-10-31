@@ -19,6 +19,7 @@ export class ChatController {
                 data: conversations
             });
         } catch (error) {
+            console.error('Get conversations error:', error);
             return res.status(500).json({
                 success: false,
                 error: 'Failed to get conversations'
@@ -29,7 +30,7 @@ export class ChatController {
     createConversationByEmail = async (req: Request, res: Response) => {
         try {
             const creatorId = req.user!.id;
-            const { participantEmail, initialMessage, productId } = req.body;
+            const { participantEmail, initialMessage, productId, productData } = req.body;
 
             // validate required fields
             if (!participantEmail) {
@@ -53,19 +54,26 @@ export class ChatController {
             });
 
             if (!participant) {
-                return res.status(404).json({ error: 'User not found with this email' });
+                return res.status(404).json({ 
+                    success: false,
+                    error: 'User not found with this email' 
+                });
             }
 
             // prevent self messaging
             if (participant.id === creatorId) {
-                return res.status(400).json({ error: 'You cannot message yourself' });
+                return res.status(400).json({ 
+                    success: false,
+                    error: 'You cannot message yourself' 
+                });
             }
 
             const conversation = await this.chatService.createConversationByEmail({
                 creatorId,
                 participantEmail,
                 productId,
-                initialMessage
+                initialMessage, 
+                productData
             });
 
             return res.status(201).json({
@@ -98,7 +106,7 @@ export class ChatController {
 
     contactSeller = async (req: Request, res: Response) => {
         try {
-            const { productId, initialMessage } = req.body;
+            const { productId } = req.body;
             const buyerId = req.user!.id;
 
             if (!productId) {
@@ -142,12 +150,30 @@ export class ChatController {
 
             console.log('🛍️ Product found, seller:', product.seller.email);
 
+            const productData = {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                location: product.location,
+                category: product.category,
+                description: product.description,
+                images: product.images,
+                seller: {
+                    id: product.seller.id,
+                    email: product.seller.email,
+                    firstName: product.seller.firstName,
+                    lastName: product.seller.lastName,
+                    profileImage: product.seller.profileImage
+                }
+            };
+
             // Create conversation
             const conversation = await this.chatService.createConversationByEmail({
                 creatorId: buyerId,
                 participantEmail: product.seller.email,
                 productId: product.id,
-                initialMessage: initialMessage || `Hello, I am interested in your product: ${product.name}`
+                initialMessage: "",
+                productData: productData
             });
 
             console.log('✅ Conversation created:', conversation.id);
@@ -191,7 +217,7 @@ export class ChatController {
 
             return res.status(500).json({
                 success: false,
-                error: 'Failed to contact seller' + error.message
+                error: 'Failed to contact seller: ' + error.message
             });
         }
     };
@@ -243,7 +269,21 @@ export class ChatController {
                             images: true
                         }
                     },
-                    lastMessage: true
+                    lastMessage: {
+                        select: {
+                            id: true,
+                            content: true,
+                            messageType: true,
+                            createdAt: true,
+                            sender: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
@@ -254,9 +294,20 @@ export class ChatController {
                 });
             }
 
+            // Format the response with proper time formatting
+            const formattedConversation = {
+                ...conversation,
+                lastMessage: conversation.lastMessage ? {
+                    ...conversation.lastMessage,
+                    formattedTime: this.chatService['formatTo12HourTime'](conversation.lastMessage.createdAt)
+                } : null,
+                formattedCreatedAt: this.chatService['formatTo12HourTime'](conversation.createdAt),
+                formattedUpdatedAt: this.chatService['formatTo12HourTime'](conversation.updatedAt)
+            };
+
             return res.json({
                 success: true,
-                data: conversation
+                data: formattedConversation
             });
         } catch (error) {
             console.error('Get conversation details error:', error);
@@ -274,7 +325,10 @@ export class ChatController {
             const userId = req.user!.id;
 
             if (!conversationId) {
-                return res.status(400).json({ error: 'Conversation ID is required' });
+                return res.status(400).json({ 
+                    success: false,
+                    error: 'Conversation ID is required' 
+                });
             }
 
             const messages = await this.chatService.getConversationMessages(
@@ -297,7 +351,7 @@ export class ChatController {
 
             return res.status(500).json({
                 success: false,
-                error: 'Failed to get messsages'
+                error: 'Failed to get messages'
             });
         }
     };
@@ -306,7 +360,7 @@ export class ChatController {
     createConversation = async (req: Request, res: Response) => {
         try {
             const creatorId = req.user!.id;
-            const { participantId, productId, initialMessage } = req.body;
+            const { participantId, productId, initialMessage, productData } = req.body;
 
             if (!participantId) {
                 return res.status(422).json({
@@ -319,18 +373,82 @@ export class ChatController {
                 creatorId,
                 participantId,
                 productId,
-                initialMessage
+                initialMessage,
+                productData
             });
 
             return res.status(201).json({
                 success: true,
                 data: conversation
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Create conversation error:', error);
+            
+            if (error.message.includes('Cannot create conversation with yourself')) {
+                return res.status(422).json({
+                    success: false,
+                    error: 'Cannot create conversation with yourself'
+                });
+            }
+
             return res.status(500).json({
                 success: false,
                 error: 'Failed to create conversation'
+            });
+        }
+    };
+
+    // Send message
+    sendMessage = async (req: Request, res: Response) => {
+        try {
+            const { conversationId, content, messageType, fileUrl, fileName, fileSize, replyToId, imageUrl, audioUrl, productData } = req.body;
+            const senderId = req.user!.id;
+
+            if (!conversationId || !content) {
+                return res.status(422).json({
+                    success: false,
+                    error: 'Conversation ID and content are required'
+                });
+            }
+
+            const message = await this.chatService.sendMessage({
+                conversationId,
+                senderId,
+                content,
+                messageType: messageType || 'TEXT',
+                fileUrl,
+                fileName,
+                fileSize,
+                replyToId,
+                imageUrl,
+                audioUrl,
+                productData
+            });
+
+            return res.status(201).json({
+                success: true,
+                data: message
+            });
+        } catch (error: any) {
+            console.error('Send message error:', error);
+
+            if (error.message.includes('not found') || error.message.includes('access denied')) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Conversation not found or access denied'
+                });
+            }
+
+            if (error.message.includes('No receiver found')) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'No receiver found for this conversation'
+                });
+            }
+
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to send message'
             });
         }
     };
@@ -379,6 +497,7 @@ export class ChatController {
             }
 
             return res.status(500).json({
+                success: false,
                 error: 'Failed to generate upload URL'
             });
         }
@@ -391,14 +510,18 @@ export class ChatController {
             const userId = req.user!.id;
 
             if (!conversationId) {
-                return res.status(400).json({ error: 'Conversation ID is required' });
+                return res.status(400).json({ 
+                    success: false,
+                    error: 'Conversation ID is required' 
+                });
             }
 
-            const updatedMessages = await this.chatService.markMessagesAsRead(conversationId, userId);
+            const result = await this.chatService.markMessagesAsRead(conversationId, userId);
             return res.json({
                 success: true,
                 data: {
-                    updatedCount: updatedMessages.length
+                    updatedCount: result.unreadMessages.length,
+                    markReadAt: result.markReadAt
                 }
             });
         } catch (error) {
@@ -428,4 +551,58 @@ export class ChatController {
             });
         }
     };
-};
+
+    // Get conversation participants
+    getConversationParticipants = async (req: Request, res: Response) => {
+        try {
+            const { conversationId } = req.params;
+            const userId = req.user!.id;
+
+            if (!conversationId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Conversation ID is required'
+                });
+            }
+
+            // Verify user has access to this conversation
+            const hasAccess = await prisma.conversation.findFirst({
+                where: {
+                    id: conversationId,
+                    participants: {
+                        some: {
+                            userId: userId
+                        }
+                    }
+                }
+            });
+
+            if (!hasAccess) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Access denied to this conversation'
+                });
+            }
+
+            const result = await this.chatService.getConversationParticipants(conversationId);
+            return res.json({
+                success: true,
+                data: result
+            });
+        } catch (error: any) {
+            console.error('Get conversation participants error:', error);
+            
+            if (error.message.includes('Conversation not found')) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Conversation not found'
+                });
+            }
+
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to get conversation participants'
+            });
+        }
+    };
+}
