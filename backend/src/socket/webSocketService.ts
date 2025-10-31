@@ -332,6 +332,13 @@ export class WebSocketService {
         }
       };
 
+      console.log('📨 WebSocket broadcasting message:', {
+        id: messageResponse.id,
+        fileUrl: messageResponse.fileUrl,
+        fileName: messageResponse.fileName,
+        fileSize: messageResponse.fileSize
+      });
+
       if (callback) {
         callback({
           success: true,

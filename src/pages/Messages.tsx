@@ -57,6 +57,7 @@ import productImage1 from "../assets/images/pre/1.png";
 import { io, Socket } from "socket.io-client";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
+import { s3Service } from "../services/s3Service";
 
 const Messages: React.FC = () => {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -416,13 +417,13 @@ const Messages: React.FC = () => {
   }, [isLoadingConversations, currentUser?.id, addToast]);
 
   useEffect(() => {
-  if (!activeConversationId || isLoadingMessages) {
-    return;
-  }
+    if (!activeConversationId || isLoadingMessages) {
+      return;
+    }
 
-  console.log('💬 Active conversation changed:', activeConversationId);
-  fetchConversationMessages(activeConversationId);
-}, [activeConversationId]);
+    console.log("💬 Active conversation changed:", activeConversationId);
+    fetchConversationMessages(activeConversationId);
+  }, [activeConversationId]);
 
   // initialization useEffect
   useEffect(() => {
@@ -531,97 +532,100 @@ const Messages: React.FC = () => {
     };
   }, [socket, activeConversationId, currentUser?.id]);
 
-  const fetchConversationMessages = useCallback(async (conversationId: string) => {
-    if (!conversationId) {
-      console.log("No conversation ID provided");
-      setActiveConversationId(null);
-      setCurrentConversation(null);
-      setMessages([]);
-      return;
-    }
-
-    // Only prevent if actively loading, but allow same conversation clicks for refresh
-    if (isLoadingMessages) {
-      console.log("Already loading messages, skipping...");
-      return;
-    }
-
-    try {
-      setIsLoadingMessages(true);
-      console.log(`Loading messages for conversation: ${conversationId}`);
-
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/messages`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  const fetchConversationMessages = useCallback(
+    async (conversationId: string) => {
+      if (!conversationId) {
+        console.log("No conversation ID provided");
+        setActiveConversationId(null);
+        setCurrentConversation(null);
+        setMessages([]);
+        return;
       }
 
-      const data = await response.json();
-      console.log("📨 Messages loaded:", data.data?.length || 0, "messages");
+      // Only prevent if actively loading, but allow same conversation clicks for refresh
+      if (isLoadingMessages) {
+        console.log("Already loading messages, skipping...");
+        return;
+      }
 
-      const getMessageStatus = (message: any, currentUserId: string) => {
-        // For sent messages
-        if (message.senderId === currentUserId) {
-          return message.status || "sent";
+      try {
+        setIsLoadingMessages(true);
+        console.log(`Loading messages for conversation: ${conversationId}`);
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/messages`
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        return "read";
-      };
+        const data = await response.json();
+        console.log("📨 Messages loaded:", data.data?.length || 0, "messages");
 
-      const transformedMessages = (data.data || []).map((message: any) => ({
-        ...message,
-        text: message.content || "",
-        content: message.content || "",
-        isIncoming: message.senderId !== currentUser?.id,
-        timestamp: message.createdAt,
-        dateString: new Date(message.createdAt).toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }),
-        type: message.messageType?.toLowerCase() || "text",
-        status: getMessageStatus(message, currentUser?.id),
-        productData: message.productData || productData,
-        isProductInquiry: !!message.productData && messages.length === 0,
-      }));
+        const getMessageStatus = (message: any, currentUserId: string) => {
+          // For sent messages
+          if (message.senderId === currentUserId) {
+            return message.status || "sent";
+          }
 
-      setMessages(transformedMessages);
-      setActiveConversationId(conversationId);
+          return "read";
+        };
 
-      // Find and set current conversation from conversations list
-      const currentConv = conversations.find((c) => c.id === conversationId);
-      if (currentConv) {
-        setCurrentConversation(currentConv);
-        console.log("✅ Current conversation set:", currentConv.id);
+        const transformedMessages = (data.data || []).map((message: any) => ({
+          ...message,
+          text: message.content || "",
+          content: message.content || "",
+          isIncoming: message.senderId !== currentUser?.id,
+          timestamp: message.createdAt,
+          dateString: new Date(message.createdAt).toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          type: message.messageType?.toLowerCase() || "text",
+          status: getMessageStatus(message, currentUser?.id),
+          productData: message.productData || productData,
+          isProductInquiry: !!message.productData && messages.length === 0,
+        }));
+
+        setMessages(transformedMessages);
+        setActiveConversationId(conversationId);
+
+        // Find and set current conversation from conversations list
+        const currentConv = conversations.find((c) => c.id === conversationId);
+        if (currentConv) {
+          setCurrentConversation(currentConv);
+          console.log("✅ Current conversation set:", currentConv.id);
+        }
+
+        // save to localStorage
+        localStorage.setItem("activeConversationId", conversationId);
+        if (currentConv) {
+          localStorage.setItem(
+            "currentConversation",
+            JSON.stringify(currentConv)
+          );
+        }
+
+        // join socket room
+        if (socketRef.current?.connected) {
+          socketRef.current.emit("join_conversation", conversationId);
+        }
+      } catch (error) {
+        addToast({
+          type: "error",
+          title: "Error",
+          message: "Failed to load messages",
+          duration: 3000,
+        });
+      } finally {
+        setIsLoadingMessages(false);
       }
-
-      // save to localStorage
-      localStorage.setItem("activeConversationId", conversationId);
-      if (currentConv) {
-        localStorage.setItem(
-          "currentConversation",
-          JSON.stringify(currentConv)
-        );
-      }
-
-      // join socket room
-      if (socketRef.current?.connected) {
-        socketRef.current.emit("join_conversation", conversationId);
-      }
-    } catch (error) {
-      addToast({
-        type: "error",
-        title: "Error",
-        message: "Failed to load messages",
-        duration: 3000,
-      });
-    } finally {
-      setIsLoadingMessages(false);
-    }
-  }, [isLoadingMessages, currentUser?.id, addToast, productData, conversations]);
+    },
+    [isLoadingMessages, currentUser?.id, addToast, productData, conversations]
+  );
 
   const closeActiveConversation = () => {
     setActiveConversationId(null);
@@ -661,29 +665,19 @@ const Messages: React.FC = () => {
 
       const tempId = Date.now();
 
-      const isSafetyDisclaimer =
-        messageData.content ===
-        "🔒 Secure Messaging: For your safety, keep conversations on BAO'Afrik. Don't share personal info, send money, or share account details. Report suspicious activity. Stay safe!";
-
       const enhancedProductData =
-        messageData.productData && !isSafetyDisclaimer
+        messageData.productData
           ? {
-              ...messageData.productData,
-              id: messageData.productData.id,
-              name: messageData.productData.name,
-              price: messageData.productData.price,
-              image:
-                messageData.productData.images?.[0] ||
-                messageData.productData.image,
-              seller: messageData.productData.seller,
-            }
+            ...messageData.productData,
+            id: messageData.productData.id,
+            name: messageData.productData.name,
+            price: messageData.productData.price,
+            image:
+              messageData.productData.images?.[0] ||
+              messageData.productData.image,
+            seller: messageData.productData.seller,
+          }
           : null;
-
-      console.log("📤 Preparing message:", {
-        content: messageData.content,
-        isSafetyDisclaimer,
-        hasProductData: !!enhancedProductData,
-      });
 
       const tempMessage = {
         id: `temp-${tempId}`,
@@ -732,6 +726,18 @@ const Messages: React.FC = () => {
 
       console.log("Emiting send_message to server:", messageToSend);
 
+      console.log("📤 Sending via socket - FULL MESSAGE DATA:", {
+        conversationId,
+        messageData: {
+          content: messageData.content,
+          messageType: messageData.messageType,
+          fileUrl: messageData.fileUrl,
+          fileName: messageData.fileName,
+          fileSize: messageData.fileSize,
+          hasFileUrl: !!messageData.fileUrl
+        }
+      });
+
       socket.emit("send_message", messageToSend, (response: any) => {
         console.log("Server acknowledgement received:", response);
 
@@ -743,11 +749,11 @@ const Messages: React.FC = () => {
             prev.map((msg) =>
               msg.tempId === tempId
                 ? {
-                    ...response.data,
-                    id: response.data.id,
-                    status: "sent",
-                    tempId: undefined,
-                  }
+                  ...response.data,
+                  id: response.data.id,
+                  status: "sent",
+                  tempId: undefined,
+                }
                 : msg
             )
           );
@@ -763,10 +769,10 @@ const Messages: React.FC = () => {
             prev.map((msg) =>
               msg.tempId === tempId
                 ? {
-                    ...msg,
-                    status: "failed",
-                    error: response?.error || "Failed to send",
-                  }
+                  ...msg,
+                  status: "failed",
+                  error: response?.error || "Failed to send",
+                }
                 : msg
             )
           );
@@ -791,11 +797,11 @@ const Messages: React.FC = () => {
             prev.map((msg) =>
               msg.tempId === tempId
                 ? {
-                    ...data,
-                    id: data.id,
-                    status: "sent",
-                    tempId: undefined,
-                  }
+                  ...data,
+                  id: data.id,
+                  status: "sent",
+                  tempId: undefined,
+                }
                 : msg
             )
           );
@@ -815,10 +821,10 @@ const Messages: React.FC = () => {
             prev.map((msg) =>
               msg.tempId === tempId
                 ? {
-                    ...msg,
-                    status: "failed",
-                    error: errorData.error,
-                  }
+                  ...msg,
+                  status: "failed",
+                  error: errorData.error,
+                }
                 : msg
             )
           );
@@ -1702,7 +1708,7 @@ const Messages: React.FC = () => {
     }
   }, [isSending]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (voiceBlob?: Blob) => {
     const userTypedText = messageText.trim();
     const hasUserTyped =
       userTypedText && userTypedText !== preFilledMessage.trim();
@@ -1717,10 +1723,6 @@ const Messages: React.FC = () => {
       isMessageSent,
       hasUserTyped,
     });
-
-    const isDisclaimerMessage =
-      textToSend ===
-      "🔒 Secure Messaging: For your safety, keep conversations on BAO'Afrik. Don't share personal info, send money, or share account details. Report suspicious activity. Stay safe!";
 
     if (isSending) {
       console.log("Already sending, skipping");
@@ -1740,8 +1742,6 @@ const Messages: React.FC = () => {
         if (newConversation) {
           setCurrentConversation(newConversation);
           setActiveConversationId(newConversation.id);
-
-          // clear states after sending
           setMessageText(preFilledMessage);
 
           console.log("Conversation created, ready for user to send inquiry");
@@ -1762,7 +1762,7 @@ const Messages: React.FC = () => {
       return;
     }
 
-    if (!textToSend && selectedFiles.length === 0) {
+    if (!textToSend && selectedFiles.length === 0 && !voiceBlob) {
       return; // Don't send empty messages
     }
 
@@ -1780,119 +1780,165 @@ const Messages: React.FC = () => {
 
     try {
       const filesToSend = [...selectedFiles];
+      let messageSent = false;
 
       // Clear input immediately
       setMessageText("");
       setPreFilledMessage("");
-      setSelectedFiles([]);
-      setShowFilePreview(false);
       setReplyToMessage(null);
 
-      let messageSent = false;
+      console.log("handleSendMessage called with voice blob", {
+        hasVoiceBlob: !!voiceBlob,
+        voiceBlobSize: voiceBlob?.size,
+        voiceBlobType: voiceBlob?.type
+      })
 
-      // Handle file attachments first
+      // Handle voice message first (if any)
+      if (voiceBlob) {
+        try {
+          console.log("🎤 Uploading voice message");
+
+          // Convert blob to file
+          const voiceFile = new File(
+            [voiceBlob],
+            `voice-message-${Date.now()}.webm`,
+            {
+              type: "audio/webm",
+            }
+          );
+
+          console.log("🎤 Voice file created:", {
+            name: voiceFile.name,
+            size: voiceFile.size,
+            type: voiceFile.type
+          });
+
+          const { uploadUrl, fileUrl } = await s3Service.getPresignedUrlForChat(
+            voiceFile,
+            user!.id
+          );
+
+          console.log("📤 Uploading to S3:", {
+            uploadUrl: uploadUrl.substring(0, 100) + '...',
+            fileUrl: fileUrl
+          });
+
+          // Upload voice file
+          await s3Service.uploadFile(voiceFile, uploadUrl);
+
+          console.log("✅ Voice message uploaded successfully", fileUrl);
+
+          // Send voice message
+          sendMessageViaSocket(currentConversation.id, {
+            content: textToSend || "Voice message",
+            messageType: "AUDIO",
+            fileUrl: fileUrl,
+            fileName: voiceFile.name,
+            fileSize: voiceFile.size,
+            productData: productData || null,
+          });
+
+          console.log("🎤 Audio message sent with fileUrl:", fileUrl);
+
+          messageSent = true;
+          if (productData) {
+            setHasSentProductData(true);
+          }
+        } catch (error: any) {
+          console.error("❌ Voice message upload failed:", error);
+          addToast({
+            type: "error",
+            title: "Voice message failed",
+            message: "Unable to send voice message. Please try again",
+            duration: 4000,
+          });
+        }
+      }
+
+      // Handle file attachments
       if (filesToSend.length > 0) {
         for (const file of filesToSend) {
           try {
-            // Get presigned URL
-            const presignedResponse = await fetch(
-              `${process.env.REACT_APP_API_URL}/chat/upload-url`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${localStorage.getItem(
-                    "accessToken"
-                  )}`,
-                },
-                body: JSON.stringify({
-                  fileName: file.name,
-                  fileType: file.type,
-                }),
-              }
-            );
-
-            if (!presignedResponse.ok) {
-              throw new Error("Failed to get upload URL");
+            if (!user?.id) {
+              addToast({
+                type: "error",
+                title: "Authentication Error",
+                message: "User not authenticated",
+                duration: 4000,
+              });
+              setIsSending(false);
+              return;
             }
+            const { uploadUrl, fileUrl } =
+              await s3Service.getPresignedUrlForChat(file, user!.id);
 
-            const { data: uploadData } = await presignedResponse.json();
+            await s3Service.uploadFile(file, uploadUrl);
 
-            // Upload file to S3
-            const uploadResponse = await fetch(uploadData.presignedUrl, {
-              method: "PUT",
-              body: file,
-              headers: {
-                "Content-Type": file.type,
-              },
-            });
-
-            if (!uploadResponse.ok) {
-              throw new Error("Upload failed");
-            }
-
-            console.log("📤 Sending message with product data:", {
-              content: textToSend,
-              hasProductData: !!productData,
-              productData: productData,
-              isFirstMessage: !isMessageSent,
-            });
+            let messageType = "FILE";
+            if (file.type.startsWith("image/")) messageType = "IMAGE";
+            if (file.type.startsWith("audio/")) messageType = "AUDIO";
+            if (file.type.startsWith("video/")) messageType = "VIDEO";
 
             // Send message with file reference
             sendMessageViaSocket(currentConversation.id, {
               content: textToSend || `Sent ${file.name}`,
               messageType: "FILE",
-              fileUrl: uploadData.url,
+              fileUrl: fileUrl,
               fileName: file.name,
               fileSize: file.size,
-              productData: !isDisclaimerMessage ? productData : null,
+              productData: productData || null,
             });
 
             messageSent = true;
-            if (productData && !isDisclaimerMessage) {
+            if (productData) {
               setHasSentProductData(true);
             }
-          } catch (error) {
+          } catch (error: any) {
             addToast({
               type: "error",
               title: "File upload failed",
-              message: "Unable to upload attachment. Please try again",
-              duration: 4000,
+              message:
+                error.message ||
+                "Unable to upload attachment. Please try again",
+              duration: 3000,
             });
-            return; // Stop if file upload fails
+            continue;
           }
         }
       }
 
-      if (textToSend && !messageSent) {
-        console.log("📤 User manually sending product inquiry:", {
-          content: textToSend,
-          hasProductData: !!productData && !isDisclaimerMessage,
-          isDisclaimerMessage,
-        });
+      const hasSentFilesOrVoice = filesToSend.length > 0 || voiceBlob;
+      const textIsFileDescription =
+        textToSend === `Sent ${filesToSend[0]?.name}` ||
+        textToSend === "Voice message";
 
+      if (textToSend && (!hasSentFilesOrVoice || !textIsFileDescription)) {
         // Send text message
         sendMessageViaSocket(currentConversation.id, {
           content: textToSend,
           messageType: "TEXT",
-          productData: !isDisclaimerMessage ? productData : null,
+          productData: productData || null,
         });
         messageSent = true;
       }
 
       // Mark as message sent after successful sending
       if (messageSent) {
+        setSelectedFiles([]);
+        setShowFilePreview(false);
+
         setIsMessageSent(true);
 
         // clear product inquiry data after sending
-        if (productData && !isDisclaimerMessage) {
+        if (productData) {
           localStorage.removeItem("productInquiryData");
         }
       }
 
       // Refresh conversations to update last message
       await fetchConversations();
-    } catch (error) {
+    } catch (error: any) {
+      console.error("❌ Send message error:", error);
       addToast({
         type: "error",
         title: "Send Failed",
@@ -2077,7 +2123,12 @@ const Messages: React.FC = () => {
     }
   }, [activeConversationId, markConversationAsRead]);
 
-  const handleAudioRecord = async () => {
+  const handleAudioRecord = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     setIsRecording(true);
     setRecordingTime(0);
     setSoundDetected(false);
@@ -2107,8 +2158,28 @@ const Messages: React.FC = () => {
         }
       };
 
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         setAudioChunks(chunks);
+
+        // autosend the recorded audio
+        if (chunks.length > 0) {
+          try {
+            const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+            console.log("🎤 Auto-sending voice message, size:", audioBlob.size, "bytes");
+
+            // Send the voice message
+            await handleSendMessage(audioBlob);
+
+            // Clear the audio chunks after sending
+            setAudioChunks([]);
+            setRecordingTime(0); // Reset recording time
+          } catch (error) {
+            console.error("❌ Failed to send voice message:", error);
+            // Optionally show error to user
+          }
+        } else {
+          console.warn("No audio chunks recorded");
+        }
       };
 
       recorder.start();
@@ -2165,7 +2236,7 @@ const Messages: React.FC = () => {
         const averageVolume =
           newLevels.reduce((a, b) => a + b, 0) / newLevels.length;
         setSoundDetected(averageVolume > 0.3);
-      }, 50); // Update every 50ms for smooth animation
+      }, 50);
 
       setWaveformTimer(waveformTimer);
     } catch (error) {
@@ -2215,73 +2286,71 @@ const Messages: React.FC = () => {
 
     // Reset waveform to flat line
     setAudioLevels(Array(20).fill(0.1));
-
-    // Keep the recording time for display purposes
   };
 
-  const handleSendVoiceMessage = async () => {
-    if (recordingTime === 0 || audioChunks.length === 0) return;
+  // const handleSendVoiceMessage = async () => {
+  //   if (recordingTime === 0 || audioChunks.length === 0) return;
 
-    try {
-      const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+  //   try {
+  //     const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
 
-      // Upload audio file first
-      const presignedResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/upload-url`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          body: JSON.stringify({
-            fileName: `voice-message-${Date.now()}.webm`,
-            fileType: "audio/webm",
-          }),
-        }
-      );
+  //     // Upload audio file first
+  //     const presignedResponse = await fetch(
+  //       `${process.env.REACT_APP_API_URL}/chat/upload-url`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //         },
+  //         body: JSON.stringify({
+  //           fileName: `voice-message-${Date.now()}.webm`,
+  //           fileType: "audio/webm",
+  //         }),
+  //       }
+  //     );
 
-      if (!presignedResponse.ok) {
-        throw new Error("Failed to get upload URL for audio");
-      }
+  //     if (!presignedResponse.ok) {
+  //       throw new Error("Failed to get upload URL for audio");
+  //     }
 
-      const { data: uploadData } = await presignedResponse.json();
+  //     const { data: uploadData } = await presignedResponse.json();
 
-      // Upload audio to S3
-      const uploadResponse = await fetch(uploadData.presignedUrl, {
-        method: "PUT",
-        body: audioBlob,
-        headers: {
-          "Content-Type": "audio/webm",
-        },
-      });
+  //     // Upload audio to S3
+  //     const uploadResponse = await fetch(uploadData.presignedUrl, {
+  //       method: "PUT",
+  //       body: audioBlob,
+  //       headers: {
+  //         "Content-Type": "audio/webm",
+  //       },
+  //     });
 
-      if (!uploadResponse.ok) {
-        throw new Error("Audio upload failed");
-      }
+  //     if (!uploadResponse.ok) {
+  //       throw new Error("Audio upload failed");
+  //     }
 
-      // Send message with audio reference
-      sendMessageViaSocket(currentConversation.id, {
-        content: "Audio message",
-        messageType: "AUDIO",
-        audioUrl: uploadData.url,
-        duration: recordingTime,
-        fileSize: audioBlob.size,
-      });
+  //     // Send message with audio reference
+  //     sendMessageViaSocket(currentConversation.id, {
+  //       content: "Audio message",
+  //       messageType: "AUDIO",
+  //       audioUrl: uploadData.url,
+  //       duration: recordingTime,
+  //       fileSize: audioBlob.size,
+  //     });
 
-      // Reset recording state
-      setRecordingTime(0);
-      setAudioChunks([]);
-      setMediaRecorder(null);
-    } catch (error) {
-      addToast({
-        type: "error",
-        title: "Audio Send Failed",
-        message: "Failed to send audio message. Please try again.",
-        duration: 4000,
-      });
-    }
-  };
+  //     // Reset recording state
+  //     setRecordingTime(0);
+  //     setAudioChunks([]);
+  //     setMediaRecorder(null);
+  //   } catch (error) {
+  //     addToast({
+  //       type: "error",
+  //       title: "Audio Send Failed",
+  //       message: "Failed to send audio message. Please try again.",
+  //       duration: 4000,
+  //     });
+  //   }
+  // };
 
   // Handle audio preview playback (before sending)
   const handlePreviewPlayback = () => {
@@ -2708,11 +2777,10 @@ const Messages: React.FC = () => {
                     <div className="flex space-x-6 relative">
                       <button
                         onClick={() => setSelectedTab("All")}
-                        className={`text-sm font-medium pb-1 relative ${
-                          selectedTab === "All"
-                            ? "text-gray-900"
-                            : "text-gray-500 hover:text-gray-700"
-                        }`}
+                        className={`text-sm font-medium pb-1 relative ${selectedTab === "All"
+                          ? "text-gray-900"
+                          : "text-gray-500 hover:text-gray-700"
+                          }`}
                         style={{
                           color: selectedTab === "All" ? "#64B5F6" : undefined,
                         }}
@@ -2727,11 +2795,10 @@ const Messages: React.FC = () => {
                       </button>
                       <button
                         onClick={() => setSelectedTab("Unreads")}
-                        className={`text-sm font-medium pb-1 relative ${
-                          selectedTab === "Unreads"
-                            ? "text-gray-900"
-                            : "text-gray-500 hover:text-gray-700"
-                        }`}
+                        className={`text-sm font-medium pb-1 relative ${selectedTab === "Unreads"
+                          ? "text-gray-900"
+                          : "text-gray-500 hover:text-gray-700"
+                          }`}
                         style={{
                           color:
                             selectedTab === "Unreads" ? "#64B5F6" : undefined,
@@ -2758,11 +2825,10 @@ const Messages: React.FC = () => {
                         (p: any) => p.userId !== currentUser?.id
                       );
                       const participantName = otherParticipant
-                        ? `${otherParticipant.firstName || ""} ${
-                            otherParticipant.lastName || ""
+                        ? `${otherParticipant.firstName || ""} ${otherParticipant.lastName || ""
                           }`.trim()
                         : otherParticipant?.email?.split("@")[0] ||
-                          "Unknown User";
+                        "Unknown User";
 
                       if (chatSearchQuery) {
                         const lastMessage =
@@ -2804,11 +2870,10 @@ const Messages: React.FC = () => {
                       return (
                         <div
                           key={conversation.id}
-                          className={`p-2 rounded-lg cursor-pointer hover:bg-gray-50 ${
-                            activeConversationId === conversation.id
-                              ? "bg-gray-100"
-                              : "hover:bg-gray-50"
-                          }`}
+                          className={`p-2 rounded-lg cursor-pointer hover:bg-gray-50 ${activeConversationId === conversation.id
+                            ? "bg-gray-100"
+                            : "hover:bg-gray-50"
+                            }`}
                           onClick={async () => {
                             await handleConversationClick(conversation.id);
                           }}
@@ -3343,12 +3408,12 @@ const Messages: React.FC = () => {
                                 {user?.firstName && user?.lastName
                                   ? `${user.firstName} ${user.lastName}`
                                   : user?.firstName
-                                  ? user.firstName
-                                  : user?.lastName
-                                  ? user.lastName
-                                  : user?.email
-                                  ? user.email.split("@")[0]
-                                  : "User"}
+                                    ? user.firstName
+                                    : user?.lastName
+                                      ? user.lastName
+                                      : user?.email
+                                        ? user.email.split("@")[0]
+                                        : "User"}
                               </h3>
                               <div
                                 className="w-6 h-6 rounded flex items-center justify-center"
@@ -3612,8 +3677,8 @@ const Messages: React.FC = () => {
                 {/* Dimmed Overlay when reaction or message options popup is active */}
                 {(activeReactionMessageId !== null ||
                   activeMessageOptionsId !== null) && (
-                  <div className="absolute inset-0 bg-black bg-opacity-10 z-40 pointer-events-none rounded-2xl"></div>
-                )}
+                    <div className="absolute inset-0 bg-black bg-opacity-10 z-40 pointer-events-none rounded-2xl"></div>
+                  )}
 
                 {/* Scrollable Content Area (Profile + Product + Messages) */}
                 <div
@@ -3680,12 +3745,10 @@ const Messages: React.FC = () => {
                           <div className="flex items-center justify-center space-x-2 mb-4">
                             <h3 className="text-xl font-semibold text-gray-900">
                               {currentConversation?.participant
-                                ? `${
-                                    currentConversation.participant.firstName ||
-                                    ""
-                                  } ${
-                                    currentConversation.participant.lastName ||
-                                    ""
+                                ? `${currentConversation.participant.firstName ||
+                                  ""
+                                  } ${currentConversation.participant.lastName ||
+                                  ""
                                   }`.trim()
                                 : "Unknown User"}
                             </h3>
@@ -3907,11 +3970,10 @@ const Messages: React.FC = () => {
                         return (
                           <div
                             key={message.id}
-                            className={`flex mb-4 ${
-                              message.isIncoming
-                                ? "justify-start"
-                                : "justify-end"
-                            } ${isFadingOut ? "message-fade-out" : ""}`}
+                            className={`flex mb-4 ${message.isIncoming
+                              ? "justify-start"
+                              : "justify-end"
+                              } ${isFadingOut ? "message-fade-out" : ""}`}
                             style={{
                               animation: isFadingOut
                                 ? "fadeOutUp 0.5s ease-in-out forwards"
@@ -3925,11 +3987,10 @@ const Messages: React.FC = () => {
                           >
                             <div className="max-w-xs lg:max-w-md relative">
                               <div
-                                className={`rounded-2xl p-4 ${
-                                  message.isIncoming
-                                    ? "rounded-bl-md cursor-pointer"
-                                    : "rounded-br-md"
-                                }`}
+                                className={`rounded-2xl p-4 ${message.isIncoming
+                                  ? "rounded-bl-md cursor-pointer"
+                                  : "rounded-br-md"
+                                  }`}
                                 style={{
                                   backgroundColor: message.isIncoming
                                     ? "#F0F8FE"
@@ -3938,7 +3999,7 @@ const Messages: React.FC = () => {
                                 onClick={
                                   message.isIncoming
                                     ? () =>
-                                        handleIncomingMessageClick(message.id)
+                                      handleIncomingMessageClick(message.id)
                                     : undefined
                                 }
                               >
@@ -4041,14 +4102,14 @@ const Messages: React.FC = () => {
                                           {(() => {
                                             const time =
                                               audioPlaybackTime[message.id] !==
-                                              undefined
+                                                undefined
                                                 ? audioPlaybackTime[message.id]
                                                 : message.duration;
                                             return `${Math.floor(time / 60)
                                               .toString()
                                               .padStart(2, "0")} : ${(time % 60)
-                                              .toString()
-                                              .padStart(2, "0")}`;
+                                                .toString()
+                                                .padStart(2, "0")}`;
                                           })()}
                                         </span>
                                         <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
@@ -4327,11 +4388,10 @@ const Messages: React.FC = () => {
 
                               {/* Bottom Timestamp */}
                               <div
-                                className={`flex items-center mt-2 ${
-                                  message.isIncoming
-                                    ? "justify-start"
-                                    : "justify-end"
-                                }`}
+                                className={`flex items-center mt-2 ${message.isIncoming
+                                  ? "justify-start"
+                                  : "justify-end"
+                                  }`}
                               >
                                 <span
                                   className="text-xs mr-1"
@@ -4387,7 +4447,7 @@ const Messages: React.FC = () => {
                                   style={{
                                     zIndex:
                                       activeReactionMessageId === message.id ||
-                                      activeMessageOptionsId === message.id
+                                        activeMessageOptionsId === message.id
                                         ? 999
                                         : "auto",
                                   }}
@@ -4817,9 +4877,8 @@ const Messages: React.FC = () => {
 
                 {/* Message Input - Fixed at Bottom */}
                 <div
-                  className={`px-6 pb-6 flex-shrink-0 ${
-                    messages.length > 0 ? "py-2" : "-mt-2"
-                  }`}
+                  className={`px-6 pb-6 flex-shrink-0 ${messages.length > 0 ? "py-2" : "-mt-2"
+                    }`}
                 >
                   {/* Permanent Gray Separator Line */}
                   <div className="mb-3 -mx-6">
@@ -5346,234 +5405,14 @@ const Messages: React.FC = () => {
                         </div>
                       )}
                     </div>
-                  ) : recordingTime > 0 ? (
-                    // Show audio preview bubble and send button after recording
-                    <div className="flex flex-col">
-                      {/* Audio Preview Bubble - Outside message input */}
-                      <div className="mb-3">
-                        <div
-                          className="flex items-center justify-between rounded-md px-4 py-2"
-                          style={{
-                            background:
-                              "linear-gradient(to right, #DBEAFE, #64B5F6)",
-                            borderRadius: "12px",
-                            width: "300px",
-                          }}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <button
-                              onClick={handlePreviewPlayback}
-                              className="hover:opacity-80 transition-opacity"
-                            >
-                              {isPreviewPlaying ? (
-                                // Pause icon
-                                <svg
-                                  className="w-8 h-8 text-white fill-current"
-                                  viewBox="0 0 24 24"
-                                  style={{
-                                    filter:
-                                      "drop-shadow(0 0 2px rgba(255,255,255,0.3))",
-                                  }}
-                                >
-                                  <path
-                                    d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"
-                                    style={{ fillRule: "evenodd" }}
-                                  />
-                                </svg>
-                              ) : (
-                                // Play icon
-                                <svg
-                                  className="w-8 h-8 text-white fill-current"
-                                  viewBox="0 0 24 24"
-                                  style={{
-                                    filter:
-                                      "drop-shadow(0 0 2px rgba(255,255,255,0.3))",
-                                  }}
-                                >
-                                  <path
-                                    d="M8 5v14l11-7z"
-                                    style={{ fillRule: "evenodd" }}
-                                  />
-                                </svg>
-                              )}
-                            </button>
-                            <span className="text-white text-sm">
-                              {(() => {
-                                const time =
-                                  previewPlaybackTime > 0
-                                    ? previewPlaybackTime
-                                    : recordingTime;
-                                return `${Math.floor(time / 60)
-                                  .toString()
-                                  .padStart(2, "0")} : ${(time % 60)
-                                  .toString()
-                                  .padStart(2, "0")}`;
-                              })()}
-                            </span>
-                            <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
-                            <span className="text-white text-sm">Audio</span>
-                            <div className="flex items-center justify-center space-x-0.5">
-                              {[
-                                6, 8, 4, 6, 12, 16, 14, 18, 20, 16, 12, 8, 6,
-                                10, 14, 12, 8, 6, 4, 8,
-                              ].map((h, i) => (
-                                <div
-                                  key={i}
-                                  className="w-0.5 bg-white rounded-full"
-                                  style={{ height: `${h}px` }}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => {
-                              // Stop preview audio if playing
-                              if (previewAudio) {
-                                previewAudio.pause();
-                                setPreviewAudio(null);
-                              }
-                              setIsPreviewPlaying(false);
-                              setPreviewPlaybackTime(0);
-                              setRecordingTime(0);
-                              setAudioChunks([]);
-                            }}
-                            className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
-                            style={{
-                              backgroundColor: "rgba(255, 255, 255, 0.3)",
-                            }}
-                          >
-                            <svg
-                              className="w-3 h-3 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Message Input with Send Button */}
-                      <div
-                        className="flex items-center"
-                        style={{
-                          backgroundColor: "#F5F5F5",
-                          borderRadius: "12px",
-                          padding: "6px",
-                        }}
-                      >
-                        <div className="relative emoji-picker-container">
-                          <button
-                            onClick={handleEmojiClick}
-                            className="p-1.5 hover:text-gray-600"
-                          >
-                            <img
-                              src={faceIcon}
-                              alt="emoji"
-                              className="w-6 h-6"
-                              style={{
-                                filter: showEmojiPicker
-                                  ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                                  : "none",
-                              }}
-                            />
-                          </button>
-
-                          {/* Emoji Picker */}
-                          {showEmojiPicker && (
-                            <div className="absolute bottom-full left-0 mb-2 z-50">
-                              <style>{`
-                                .emoji-picker-react {
-                                  border: none !important;
-                                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-                                }
-                                .emoji-picker-react .emoji-search {
-                                  border: 1px solid #e5e5e5 !important;
-                                  box-shadow: none !important;
-                                  outline: none !important;
-                                  background-color: #f8f8f8 !important;
-                                }
-                                .emoji-picker-react .emoji-search:focus {
-                                  border: 1px solid #e5e5e5 !important;
-                                  box-shadow: none !important;
-                                  outline: none !important;
-                                }
-                                .emoji-picker-react .emoji-group:before {
-                                  color: #666 !important;
-                                  font-weight: bold !important;
-                                  font-size: 12px !important;
-                                }
-                                .emoji-picker-react .emoji-categories button {
-                                  border-radius: 50% !important;
-                                  width: 32px !important;
-                                  height: 32px !important;
-                                  margin: 2px !important;
-                                }
-                                .emoji-picker-react .emoji-categories button.active {
-                                  background-color: #64B5F6 !important;
-                                }
-                                .emoji-picker-react .emoji-categories button svg {
-                                  width: 16px !important;
-                                  height: 16px !important;
-                                }
-                              `}</style>
-                              <EmojiPicker
-                                onEmojiClick={onEmojiClick}
-                                width={350}
-                                height={450}
-                                searchDisabled={false}
-                                skinTonesDisabled={true}
-                                previewConfig={{
-                                  showPreview: false,
-                                }}
-                                searchPlaceHolder="Search Emoji"
-                              />
-                            </div>
-                          )}
-                        </div>
-                        <button
-                          onClick={handleAttachClick}
-                          className="p-1.5 text-gray-400 hover:text-gray-600"
-                        >
-                          <img
-                            src={pinIcon}
-                            alt="attachment"
-                            className="w-6 h-6"
-                            style={{
-                              filter: isAttachActive
-                                ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                                : "none",
-                            }}
-                          />
-                        </button>
-                        <div className="flex-1">
-                          <input
-                            type="text"
-                            placeholder="...Write your message"
-                            className="w-full px-3 py-2 focus:outline-none bg-transparent"
-                            style={{
-                              border: "none",
-                              caretColor: "#64B5F6",
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                handleSendVoiceMessage();
-                              }
-                            }}
-                          />
-                        </div>
-                        <button
-                          onClick={handleSendVoiceMessage}
-                          className="p-2 text-blue-600 hover:text-blue-800"
-                        >
-                          <img src={bluIcon} alt="send" className="w-7 h-7" />
-                        </button>
+                  ) : recordingTime > 0 && audioChunks.length > 0 ? (
+                    // Show sending state after recording
+                    <div className="flex items-center justify-center py-4">
+                      <div className="flex items-center space-x-3 text-blue-600">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                        <span className="text-sm">
+                          Sending voice message...
+                        </span>
                       </div>
                     </div>
                   ) : (
@@ -5706,11 +5545,13 @@ const Messages: React.FC = () => {
                       </div>
 
                       <button
-                        onClick={
-                          messageText.trim() || selectedFiles.length > 0
-                            ? handleSendMessage
-                            : handleAudioRecord
-                        }
+                        onClick={(e) => {
+                          if (messageText.trim() || selectedFiles.length > 0) {
+                            handleSendMessage();
+                          } else {
+                            handleAudioRecord(e);
+                          }
+                        }}
                         className="p-2 text-blue-600 hover:text-blue-800"
                       >
                         {messageText.trim() || selectedFiles.length > 0 ? (

@@ -102,7 +102,7 @@ export class ChatService {
             if (existingConv) {
                 return existingConv;
             }
-            
+
             const now = new Date();
 
             // create new conversation
@@ -383,6 +383,11 @@ export class ChatService {
             return {
                 ...message,
                 productData: parsedProductData,
+                fileUrl: message.fileUrl,
+                fileName: message.fileName,
+                fileSize: message.fileSize,
+                imageUrl: message.imageUrl,
+                audioUrl: message.audioUrl,
                 formattedTime: this.formatTo12HourTime(message.createdAt)
             };
         });
@@ -556,6 +561,14 @@ export class ChatService {
 
             const now = new Date();
 
+            console.log('📨 Backend received message data:', {
+                content: data.content,
+                messageType: data.messageType,
+                fileUrl: data.fileUrl,
+                fileName: data.fileName,
+                fileSize: data.fileSize
+            });
+
             // Create message
             const message = await tx.message.create({
                 data: {
@@ -585,6 +598,13 @@ export class ChatService {
                 }
             });
 
+            console.log('💾 Database message after creation:', {
+                id: message.id,
+                fileUrl: message.fileUrl,
+                fileName: message.fileName,
+                fileSize: message.fileSize
+            });
+
             // Update conversation with last message
             await tx.conversation.update({
                 where: { id: data.conversationId },
@@ -610,8 +630,20 @@ export class ChatService {
             const messageWithProductData = {
                 ...message,
                 productData: shouldIncludeProductData ? data.productData : null,
+                fileUrl: message.fileUrl,
+                fileName: message.fileName,
+                fileSize: message.fileSize,
+                imageUrl: message.imageUrl,
+                audioUrl: message.audioUrl,
                 formattedTime: this.formatTo12HourTime(message.createdAt)
             };
+
+            console.log('📤 Response message with file data:', {
+                id: messageWithProductData.id,
+                fileUrl: messageWithProductData.fileUrl,
+                fileName: messageWithProductData.fileName,
+                fileSize: messageWithProductData.fileSize
+            });
 
             return messageWithProductData;
         });
@@ -716,7 +748,7 @@ export class ChatService {
         });
 
         return {
-            unreadMessages, 
+            unreadMessages,
             markReadAt: this.formatTo12HourTime(now)
         };
     }

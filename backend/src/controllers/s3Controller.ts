@@ -28,7 +28,7 @@ export const getPresignedUrl = async (req: Request, res: Response) => {
     let keyPrefix: string;
     if (uploadType === 'profile') {
       keyPrefix = `${PROFILE_PREFIX}/${userId}`;
-    } else if (uploadType === 'attachment') {
+    } else if (uploadType === 'chat') {
       keyPrefix = `${ATTACHMENTS_PREFIX}/${conversationId}`;
     } else {
       return res.status(400).json({ message: 'Invalid upload type' });
