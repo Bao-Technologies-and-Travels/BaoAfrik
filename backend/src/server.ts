@@ -32,9 +32,12 @@ const io = new Server(server, {
   cors: {
     origin: process.env.CORS_ORIGINS?.split(',') || [
       'http://localhost:3000',
-      'http://localhost:3001'],
+      'http://localhost:3001',
+      'https://staging.baoafrik.com',
+      'https://www.staging.baoafrik.com'
+    ],
     methods: ['GET', 'POST'],
-    credentials: true
+    credentials: true,
   },
   transports: ['websocket', 'polling'],
 });
@@ -96,7 +99,9 @@ app.use(helmet({
 const corsOptions = {
   origin: process.env.CORS_ORIGINS?.split(',') || [
     'http://localhost:3000',
-    'http://localhost:3001'
+    'http://localhost:3001',
+    'https://staging.baoafrik.com',
+    'https://www.staging.baoafrik.com'
   ],
   credentials: true,
   optionsSuccessStatus: 200,
