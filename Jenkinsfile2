@@ -122,9 +122,11 @@ pipeline {
                             # Create .env file with actual secrets
                             cat > .env << EOF
 REACT_APP_API_URL=https://${DOMAIN}/api
-REACT_APP_WS_URL=wss://${DOMAIN}/api
+REACT_APP_WS_URL=wss://${DOMAIN}
 REACT_APP_AWS_REGION="${REACT_APP_AWS_REGION}"
 REACT_APP_S3_BUCKET_NAME="${REACT_APP_S3_BUCKET_NAME}"
+S3_PROFILE_PREFIX=profile-images
+S3_ATTACHMENTS_PREFIX=attachments
 EOF
 
                             chmod 600 .env
@@ -171,6 +173,8 @@ EMAIL_FROM_NAME="BaoAfrik Team"
 
 AWS_REGION="${AWS_REGION}"
 AWS_S3_BUCKET="${AWS_S3_BUCKET}"
+S3_PROFILE_PREFIX=profile-images
+S3_ATTACHMENTS_PREFIX=attachments
 FRONTEND_URL="https://${DOMAIN}"
 CORS_ORIGINS="https://${DOMAIN}"
 BCRYPT_ROUNDS=12

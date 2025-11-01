@@ -33,8 +33,8 @@ const io = new Server(server, {
     origin: process.env.CORS_ORIGINS?.split(',') || [
       'http://localhost:3000',
       'http://localhost:3001',
-      'https://staging.baoafrik.com',
-      'https://www.staging.baoafrik.com'
+      'https://staging.baoafrik.com/*',
+      'https://www.staging.baoafrik.com/*'
     ],
     methods: ['GET', 'POST'],
     credentials: true,
@@ -101,8 +101,8 @@ const corsOptions = {
   origin: process.env.CORS_ORIGINS?.split(',') || [
     'http://localhost:3000',
     'http://localhost:3001',
-    'https://staging.baoafrik.com',
-    'https://www.staging.baoafrik.com'
+    'https://staging.baoafrik.com/*',
+    'https://www.staging.baoafrik.com/*'
   ],
   credentials: true,
   optionsSuccessStatus: 200,

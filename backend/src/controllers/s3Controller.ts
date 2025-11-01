@@ -14,7 +14,7 @@ const s3 = new S3({
 });
 
 const BUCKET = process.env.AWS_S3_BUCKET!;
-const PROFILE_PREFIX = process.env.S3_PROFILE_PREFIX! || 'profiles';
+const PROFILE_PREFIX = process.env.S3_PROFILE_PREFIX! || 'profile-images';
 const ATTACHMENTS_PREFIX = process.env.S3_ATTACHMENTS_PREFIX! || 'attachments';
 
 export const getPresignedUrl = async (req: Request, res: Response) => {
