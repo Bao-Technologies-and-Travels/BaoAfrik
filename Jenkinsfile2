@@ -144,7 +144,7 @@ EOF
                     string(credentialsId: 'jwt_refresh_secret', variable: 'JWT_REFRESH_SECRET'),
                     string(credentialsId: 'resend_api_key', variable: 'RESEND_API_KEY'),
                     string(credentialsId: 'aws_region', variable: 'AWS_REGION'),
-                    string(credentialsId: 'aws_bucket', variable: 'REACT_APP_S3_BUCKET_NAME'),
+                    string(credentialsId: 'aws_bucket', variable: 'AWS_S3_BUCKET'),
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
                         sh """
@@ -170,7 +170,7 @@ EMAIL_FROM_ADDRESS=noreply@baoafrik.com
 EMAIL_FROM_NAME="BaoAfrik Team"
 
 AWS_REGION="${AWS_REGION}"
-REACT_APP_S3_BUCKET_NAME="${REACT_APP_S3_BUCKET_NAME}"
+AWS_S3_BUCKET="${AWS_S3_BUCKET}"
 FRONTEND_URL="https://${DOMAIN}"
 CORS_ORIGINS="https://${DOMAIN}"
 BCRYPT_ROUNDS=12
