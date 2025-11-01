@@ -165,6 +165,9 @@ const Messages: React.FC = () => {
   const [hasSentProductData, setHasSentProductData] = useState(false);
   const renderCount = useRef(0);
   const hasProcessedLocationState = useRef(false);
+  const currentMessageIdRef = useRef<string | null>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleLogout = () => {
     logout();
@@ -1835,6 +1838,7 @@ const Messages: React.FC = () => {
             fileUrl: fileUrl,
             fileName: voiceFile.name,
             fileSize: voiceFile.size,
+            duration: 0,
             productData: productData || null,
           });
 
@@ -2407,61 +2411,88 @@ const Messages: React.FC = () => {
     duration: number
   ) => {
     // If this message is already playing, pause it
-    if (playingMessageId === messageId && currentAudio) {
-      currentAudio.pause();
+    if (playingMessageId === messageId && currentAudioRef.current) {
+      currentAudioRef.current.pause();
       setPlayingMessageId(null);
-      setCurrentAudio(null);
+      currentMessageIdRef.current = null;
+      if (updateTimerRef.current) {
+        clearInterval(updateTimerRef.current);
+        updateTimerRef.current = null;
+      }
       return;
     }
 
     // Stop any currently playing audio
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+      if (updateTimerRef.current) {
+        clearInterval(updateTimerRef.current);
+        updateTimerRef.current = null;
+      }
     }
 
     // Create and play new audio
     const audio = new Audio(audioUrl);
-    setCurrentAudio(audio);
+    currentAudioRef.current = audio;
+    currentMessageIdRef.current = messageId;
     setPlayingMessageId(messageId);
 
-    // Initialize playback time to full duration
+    // Initialize playback time to 0
     setAudioPlaybackTime((prev) => ({
       ...prev,
-      [messageId]: duration,
+      [messageId]: 0,
     }));
 
-    // Update countdown timer
-    const updateTimer = setInterval(() => {
-      setAudioPlaybackTime((prev) => {
-        const remaining = Math.max(0, (prev[messageId] || duration) - 1);
-        if (remaining === 0) {
-          clearInterval(updateTimer);
-        }
-        return {
+    // Update playback time - using refs to avoid closure issues
+    updateTimerRef.current = setInterval(() => {
+      if (currentAudioRef.current && currentMessageIdRef.current) {
+        const currentTime = Math.floor(currentAudioRef.current.currentTime);
+
+        setAudioPlaybackTime((prev) => ({
           ...prev,
-          [messageId]: remaining,
-        };
-      });
-    }, 1000);
+          [currentMessageIdRef.current!]: currentTime,
+        }));
+      }
+    }, 100);
 
     // Handle audio end
     audio.onended = () => {
       setPlayingMessageId(null);
-      setCurrentAudio(null);
-      clearInterval(updateTimer);
+      currentMessageIdRef.current = null;
+      currentAudioRef.current = null;
+      if (updateTimerRef.current) {
+        clearInterval(updateTimerRef.current);
+        updateTimerRef.current = null;
+      }
       setAudioPlaybackTime((prev) => ({
         ...prev,
-        [messageId]: duration,
+        [messageId]: 0,
       }));
     };
 
-    // Handle audio pause
-    audio.onpause = () => {
-      clearInterval(updateTimer);
+    // Handle audio errors
+    audio.onerror = () => {
+      console.error("❌ Audio playback error");
+      setPlayingMessageId(null);
+      currentMessageIdRef.current = null;
+      currentAudioRef.current = null;
+      if (updateTimerRef.current) {
+        clearInterval(updateTimerRef.current);
+        updateTimerRef.current = null;
+      }
     };
 
-    audio.play();
+    audio.play().catch(error => {
+      console.error("❌ Audio play failed:", error);
+      setPlayingMessageId(null);
+      currentMessageIdRef.current = null;
+      currentAudioRef.current = null;
+      if (updateTimerRef.current) {
+        clearInterval(updateTimerRef.current);
+        updateTimerRef.current = null;
+      }
+    });
   };
 
   // Cleanup timers on unmount
@@ -4060,7 +4091,7 @@ const Messages: React.FC = () => {
                                               handleAudioPlayback(
                                                 message.id,
                                                 message.fileUrl,
-                                                message.duration
+                                                message.duration || 0
                                               );
                                             }
                                           }}
@@ -4100,16 +4131,19 @@ const Messages: React.FC = () => {
                                         </button>
                                         <span className="text-white text-sm">
                                           {(() => {
-                                            const time =
-                                              audioPlaybackTime[message.id] !==
-                                                undefined
-                                                ? audioPlaybackTime[message.id]
-                                                : message.duration;
-                                            return `${Math.floor(time / 60)
-                                              .toString()
-                                              .padStart(2, "0")} : ${(time % 60)
-                                                .toString()
-                                                .padStart(2, "0")}`;
+                                            if (playingMessageId === message.id && audioPlaybackTime[message.id] !== undefined) {
+                                              const currentTime = audioPlaybackTime[message.id];
+                                              const minutes = Math.floor(currentTime / 60);
+                                              const seconds = Math.floor(currentTime % 60);
+                                              return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                                            }
+                                            // If not playing, show total duration
+                                            else {
+                                              const totalDuration = message.duration || 0;
+                                              const minutes = Math.floor(totalDuration / 60);
+                                              const seconds = Math.floor(totalDuration % 60);
+                                              return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                                            }
                                           })()}
                                         </span>
                                         <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>

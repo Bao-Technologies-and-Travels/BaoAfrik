@@ -123,6 +123,8 @@ pipeline {
                             cat > .env << EOF
 REACT_APP_API_URL=https://${DOMAIN}/api
 REACT_APP_WS_URL=wss://${DOMAIN}/api
+REACT_APP_AWS_REGION="${REACT_APP_AWS_REGION}"
+REACT_APP_S3_BUCKET_NAME="${REACT_APP_S3_BUCKET_NAME}"
 EOF
 
                             chmod 600 .env
