@@ -3449,6 +3449,7 @@ const Messages: React.FC = () => {
                               <div
                                 className="w-6 h-6 rounded flex items-center justify-center"
                                 style={{ backgroundColor: "#E3F2FD" }}
+                                onClick={() => navigate("/profile-setup")}
                               >
                                 <svg
                                   className="w-4 h-4"
