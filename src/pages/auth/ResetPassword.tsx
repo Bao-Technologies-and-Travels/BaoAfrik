@@ -15,16 +15,24 @@ const ResetPassword: React.FC = () => {
   // State for the entire flow
   const [step, setStep] = useState<'code' | 'password'>('code');
   const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [countdown, setCountdown] = useState(0);
   const [resetToken, setResetToken] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [touched, setTouched] = useState({
+    password: false,
+    confirmPassword: false
+  });
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const [formData, setFormData] = useState({
+    password: '',
+    confirmPassword: ''
+  });
 
   useEffect(() => {
     if (countdown > 0) {
@@ -120,6 +128,12 @@ const ResetPassword: React.FC = () => {
         setErrors({});
         // Clear the code inputs
         setCode(['', '', '', '', '', '']);
+        addToast({
+          type: "success",
+          title: "New code sent",
+          message: "Check your email and spam folder for a new code that has been sent",
+          duration: 3000,
+        });
         inputRefs.current[0]?.focus();
       } else {
         setErrors({
@@ -135,53 +149,63 @@ const ResetPassword: React.FC = () => {
     }
   };
 
-  // Password validation
-  const validatePassword = (password: string) => {
-    if (password.length < 8) {
-      return 'Password must be at least 8 characters long';
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    // show password requirements if password field has content but criteria not met
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else {
+      delete newErrors.password;
+
+      const requirements = [];
+      if (formData.password.length < 8) requirements.push('at least 8 characters');
+      if (!/(?=.*[a-z])/.test(formData.password)) requirements.push('one lowercase letter');
+      if (!/(?=.*[A-Z])/.test(formData.password)) requirements.push('one uppercase letter');
+      if (!/(?=.*\d)/.test(formData.password)) requirements.push('one number');
+      if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(formData.password)) requirements.push('one special character');
+
+      if (requirements.length > 0) {
+        newErrors.passwordHint = `Password must contain: ${requirements.join(', ')}`;
+      } else {
+        delete newErrors.passwordHint;
+      }
     }
-    if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
-      return 'Password must contain both letters and numbers';
+
+    // confirm password validation
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match. Please repeat the password entered above.'
+    } else {
+      delete newErrors.confirmPassword;
     }
-    return '';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   // Password reset
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: { [key: string]: string } = {};
+    setTouched({
+      password: true,
+      confirmPassword: true
+    });
 
-    // Validate password
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      newErrors.password = passwordError;
-    }
+    if (!validateForm()) return;
 
-    // Validate confirm password
-    if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    if (!resetToken) {
-      newErrors.general = 'Reset session expired. Please start over.';
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
 
     setIsLoading(true);
     setErrors({});
+    setSuccessMessage('');
 
     try {
       const response = await authService.resetPassword({
         resetToken: resetToken,
-        newPassword: password,
-        confirmPassword: confirmPassword
+        newPassword: formData.password,
+        confirmPassword: formData.confirmPassword
       });
 
       addToast({
@@ -211,8 +235,45 @@ const ResetPassword: React.FC = () => {
   const handleBackToCode = () => {
     setStep('code');
     setErrors({});
-    setPassword('');
-    setConfirmPassword('');
+
+  };
+
+  const getPasswordRequirements = () => {
+    const password = formData.password;
+    return [
+      { text: 'At least 8 characters', met: password.length >= 8 },
+      { text: 'One lowercase letter (a-z)', met: /(?=.*[a-z])/.test(password) },
+      { text: 'One uppercase letter (A-Z)', met: /(?=.*[A-Z])/.test(password) },
+      { text: 'One number (0-9)', met: /(?=.*\d)/.test(password) },
+      { text: 'One special character', met: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password) }
+    ];
+  };
+
+  const isPasswordValid = () => {
+    const requirements = getPasswordRequirements();
+    return requirements.every(req => req.met);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name } = e.target;
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+  };
+
+  useEffect(() => {
+    if (step === 'password') {
+      validateForm();
+    }
+  }, [formData.password, formData.confirmPassword, step]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   // Render code verification step
@@ -344,16 +405,20 @@ const ResetPassword: React.FC = () => {
           </label>
           <div className="relative">
             <input
-              type={showPassword ? "text" : "password"}
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm bg-white ${errors.password ? 'border-red-500' : 'border-gray-300'
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${touched.password && errors.password ? 'border-red-500' :
+                !touched.password ? 'border-gray-200' :
+                  isPasswordValid() ? 'border-green-500' : 'border-orange-500'
                 }`}
               placeholder="Enter new password"
               required
               disabled={isLoading}
               minLength={8}
+              onBlur={handleBlur}
             />
             <button
               type="button"
@@ -373,12 +438,38 @@ const ResetPassword: React.FC = () => {
               )}
             </button>
           </div>
-          {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+          {/* Password requirements checklist */}
+          {(touched.password || formData.password) && (
+            <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm font-medium text-gray-700 mb-2">Password must contain:</p>
+              <div className="space-y-1">
+                {getPasswordRequirements().map((req, index) => (
+                  <div key={index} className="flex items-center text-sm">
+                    {req.met ? (
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <span className={req.met ? 'text-green-600' : 'text-gray-500'}>
+                      {req.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
-          <p className="mt-1 text-xs text-gray-500">
-            Password must be at least 8 characters and contain both letters and numbers
-          </p>
+          {touched.password && errors.password && !errors.passwordHint && (
+            <p className="mt-2 text-sm text-red-600 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {errors.password}
+            </p>
+          )}
         </div>
 
         <div>
@@ -387,11 +478,15 @@ const ResetPassword: React.FC = () => {
           </label>
           <div className="relative">
             <input
-              type={showConfirmPassword ? "text" : "password"}
               id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm bg-white ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${touched.confirmPassword && errors.confirmPassword ? 'border-red-500' :
+                !touched.confirmPassword ? 'border-gray-200' :
+                  formData.confirmPassword && !errors.confirmPassword ? 'border-green-500' : 'border-gray-200'
                 }`}
               placeholder="Confirm new password"
               required
@@ -415,16 +510,29 @@ const ResetPassword: React.FC = () => {
               )}
             </button>
           </div>
-          {errors.confirmPassword && (
-            <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+          {touched.confirmPassword && errors.confirmPassword && (
+            <p className="mt-1 text-sm text-red-600 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {errors.confirmPassword}
+            </p>
+          )}
+          {touched.confirmPassword && formData.confirmPassword && !errors.confirmPassword && (
+            <p className="mt-1 text-sm text-green-600 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              Passwords match
+            </p>
           )}
         </div>
 
         <div className="pt-4">
           <button
             type="submit"
-            disabled={isLoading || !password.trim() || !confirmPassword.trim()}
-            className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${password.trim() && confirmPassword.trim() && !isLoading
+            disabled={isLoading || !formData.password.trim() || !formData.confirmPassword.trim()}
+            className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${formData.password.trim() && formData.confirmPassword.trim() && !isLoading
               ? 'bg-orange-500 hover:bg-orange-600 text-white'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}

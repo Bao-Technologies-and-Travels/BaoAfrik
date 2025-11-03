@@ -1,37 +1,272 @@
+/* groovylint-disable DuplicateStringLiteral, LineLength */
 pipeline {
     agent any
 
     environment {
         NODE_ENV = 'staging'
-        SSH_HOST = 'ubuntu@34.238.160.159'
+        SSH_KEY_ID = 'baoafrik-key'
+        SSH_HOST = 'ubuntu@54.162.69.251'
         APP_DIR = '~/BaoAfrik'
-        APP_NAME = 'baoafrik'
+        BACKEND_DIR = '~/BaoAfrik/backend'
+        APP_NAME_FRONTEND = 'baoafrik-frontend'
+        APP_NAME_BACKEND = 'baoafrik-backend'
         REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
         BRANCH = 'fonsah-staging'
+        DOMAIN = 'staging.baoafrik.com'
+        EMAIL = 'pageo.fonsah@baotechnologiesandtravels.com'
     }
 
     stages {
-        stage('Deploy to Server') {
+        stage('Setup server dependencies') {
             steps {
-                echo "Deploying backend on server ${SSH_HOST}..."
+                echo 'Setting up server dependencies...'
 
-                sshagent(['baoafrik-key']) {
+                sshagent([env.SSH_KEY_ID]) {
+                    // step 1: system updates
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    set -e
+                        # Update and upgrade server packages
+                        sudo apt update && sudo apt upgrade -y
+                    '
+                    """
+
+                    // step 2: install Nodejs
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        # Install Node.js and npm if not already installed
+                        curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+                        sudo apt-get install -y nodejs
+
+                        # Verify Node.js installation
+                        echo "Node.js version:"
+                        node --version
+                        echo "npm version:"
+                        npm --version
+                    '
+                    """
+
+                    // step 3: install pm2
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        # Install PM2 globally
+                        sudo npm install -g pm2@latest
+                        pm2 --version
+                    '
+                    """
+
+                    // step 4: install other dependencies
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        # Install Nginx if not already installed
+                        if ! command -v nginx &> /dev/null; then
+                            sudo apt install -y nginx
+                        fi
+
+                        # Install certbot for SSL if not present
+                        if ! command -v certbot &> /dev/null; then
+                            sudo apt install -y certbot python3-certbot-nginx
+                        fi
+
+                        # Configure firewall
+                        sudo ufw allow 22 80 443 3000 3001 8080
+                        sudo ufw --force enable
+
+                        # Setup PM2
+                        pm2 startup systemd
+
+                        echo "System dependencies installed successfully."
+                    '
+                    """
+                }
+            }
+        }
+
+        stage('Clone Repository') {
+            steps {
+                echo 'Cloning repository...'
+                sshagent([env.SSH_KEY_ID]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        set -e
                         if [ ! -d ~/BaoAfrik ]; then
                             git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
                         fi
+
                         cd ${APP_DIR}
                         git fetch origin ${BRANCH}
+                        git checkout ${BRANCH}
                         git reset --hard origin/${BRANCH}
+                        echo "Repository cloned/updated successfully."
+                    '
+                    """
+                }
+            }
+        }
 
-                        mv .env.example .env
+        stage('Setup frontend Environment') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'aws_region', variable: 'REACT_APP_AWS_REGION'),
+                    string(credentialsId: 'aws_bucket', variable: 'REACT_APP_S3_BUCKET_NAME'),
+                ]) {
+                    sshagent([env.SSH_KEY_ID]) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                            set -e
+                            cd ${APP_DIR}
+
+                            # Remove existing .env if any
+                            rm -f .env
+
+                            # Create .env file with actual secrets
+                            cat > .env << EOF
+REACT_APP_API_URL=https://${DOMAIN}/api
+REACT_APP_WS_URL=wss://${DOMAIN}
+REACT_APP_AWS_REGION="${REACT_APP_AWS_REGION}"
+REACT_APP_S3_BUCKET_NAME="${REACT_APP_S3_BUCKET_NAME}"
+S3_PROFILE_PREFIX=profile-images
+S3_ATTACHMENTS_PREFIX=attachments
+EOF
+
+                            chmod 600 .env
+                            echo "=== Environment file created securely ==="
+                        '
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Setup Backend Environment') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'db_url', variable: 'DATABASE_URL'),
+                    string(credentialsId: 'jwt_secret', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'jwt_refresh_secret', variable: 'JWT_REFRESH_SECRET'),
+                    string(credentialsId: 'resend_api_key', variable: 'RESEND_API_KEY'),
+                    string(credentialsId: 'aws_region', variable: 'AWS_REGION'),
+                    string(credentialsId: 'aws_bucket', variable: 'AWS_S3_BUCKET'),
+                ]) {
+                    sshagent([env.SSH_KEY_ID]) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                            set -e
+                            cd ${BACKEND_DIR}
+
+                            # Remove existing .env if any
+                            rm -f .env
+
+                            # Create .env file with actual secrets
+                            cat > .env << EOF
+NODE_ENV=staging
+PORT=3001
+DATABASE_URL="${DATABASE_URL}"
+JWT_SECRET="${JWT_SECRET}"
+JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}"
+JWT_EXPIRE_TIME=30m
+JWT_REFRESH_EXPIRE_TIME=7d
+EMAIL_SERVICE=resend
+RESEND_API_KEY="${RESEND_API_KEY}"
+EMAIL_FROM_ADDRESS=noreply@baoafrik.com
+EMAIL_FROM_NAME="BaoAfrik Team"
+
+AWS_REGION="${AWS_REGION}"
+AWS_S3_BUCKET="${AWS_S3_BUCKET}"
+S3_PROFILE_PREFIX=profile-images
+S3_ATTACHMENTS_PREFIX=attachments
+FRONTEND_URL="https://${DOMAIN}"
+CORS_ORIGINS="https://${DOMAIN}"
+BCRYPT_ROUNDS=12
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+EOF
+
+                            chmod 600 .env
+                            echo "=== Environment file created securely ==="
+                        '
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                echo "Deploying frontend and backend on server ${SSH_HOST}..."
+
+                sshagent([env.SSH_KEY_ID]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        echo "Starting backend deployment..."
+
+                        cd ${BACKEND_DIR}
+
+                        if [ ! -f .env ]; then
+                            echo "ERROR: .env file not found!"
+                            exit 1
+                        fi
+
+                        rm -rf node_modules package-lock.json
 
                         npm install
                         npm run build
 
-                        pm2 restart ${APP_NAME} || pm2 start dist/server.js --name ${APP_NAME}
+                        npx prisma db push
+
+                        pm2 delete ${APP_NAME_BACKEND} || true
+                        pm2 start dist/server.js --name ${APP_NAME_BACKEND} -- --port 3001
                         pm2 save
+
+                        echo "Backend deployed successfully."
+                        echo "Starting frontend deployment..."
+
+                        cd ${APP_DIR}
+                        rm -rf node_modules package-lock.json build
+
+                        npm install
+
+                        if ! npm list react-scripts | grep react-scripts > /dev/null 2>&1; then
+                            echo "Installing react-scripts..."
+                            npm install --save-dev react-scripts
+                        fi
+
+                        npm run build
+
+                        pm2 delete ${APP_NAME_FRONTEND} || true
+                        pm2 start serve --name ${APP_NAME_FRONTEND} -- -s build -l 3000
+
+                        pm2 save
+                        pm2 list
+
+                        echo "Frontend deployment completed successfully."
+                    '
+                    """
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                echo 'Verifying deployment...'
+
+                sshagent([env.SSH_KEY_ID]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                        # Wait for services to start
+                        sleep 10
+
+                        echo "=== Deployment Verification ==="
+                        echo "PM2 Processes:"
+                        pm2 list
+
+                        echo "Testing Backend API:"
+                        curl -f http://localhost:3001/api/health > /dev/null && echo "Backend API is accessible" || echo "Backend API failed"
+
+                        echo "Testing Frontend:"
+                        curl -f http://localhost:3000 > /dev/null && echo "Frontend is accessible" || echo "Frontend failed"
+
+                        echo "=== Deployment Complete ==="
                     '
                     """
                 }
@@ -41,11 +276,12 @@ pipeline {
 
     post {
         always {
-            emailext(
-                subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - ${currentBuild.currentResult}!",
-                from: 'ashprincepageo@gmail.com',
-                to: 'pageo.fonsah@baotechnologiesandtravels.com',
-                mimeType: 'text/html',
+            script {
+                emailext(
+                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
+                to: "${env.EMAIL},${baotechnologies_dev_team}",
+                from: 'jenkins.baoafrik.com',
+                replyTo: 'no-reply@baotechnologiesandtravels.com',
                 body: """
                     <html>
                         <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
@@ -53,13 +289,39 @@ pipeline {
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
+                            <p><strong>Changes made:</strong>Forgot password fixed, with inline policy enforced and neutral messages displayed when user inputs an email that does not exist in the database. Profile setup updated with different date of birth picker, also allowing manual date input. Edit profile button functional on mobile versions, users are redirected to the profile-setup page</p>
                             <p>Check the <a href="${env.BUILD_URL}">console output</a> for details.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
                         </body>
                     </html>
-                """
+                """,
+                mimeType: 'text/html'
             )
+            }
         }
+        // success {
+        //     withCredentials([string(credentialsId: 'baotechnologies_dev_team', variable: 'baotechnologies_dev_team')]) {
+        //         emailext(
+        //         subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
+        //         to: "${baotechnologies_dev_team}",
+        //         from: 'jenkins.baoafrik.com',
+        //         replyTo: 'no-reply@baotechnologiesandtravels.com',
+        //         body: """
+        //             <html>
+        //                 <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+        //                     <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
+        //                     <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+        //                     <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
+        //                     <p>Check out recent changes at ${DOMAIN}.</p>
+        //                     <hr>
+        //                     <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
+        //                 </body>
+        //             </html>
+        //         """,
+        //         mimeType: 'text/html'
+        //         )
+        //     }
+        // }
     }
 }

@@ -55,7 +55,9 @@ const isAuthEndpoint = (url: string): boolean => {
     '/forgot-password',
     '/reset-password',
     '/verify-email',
-    '/resend-verification'
+    '/resend-verification',
+    '/verify-reset-code',
+    '/change-password'
   ];
   
   return authEndpoints.some(endpoint => url.includes(endpoint));

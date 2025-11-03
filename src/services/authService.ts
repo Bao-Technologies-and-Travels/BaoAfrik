@@ -140,7 +140,6 @@ export class AuthService {
     try {
 
       const response = await apiClient.post<{ resetToken: string }>('/auth/verify-reset-code', { email, code });
-      // More defensive check
       if (response.success && response.data) {
       } else {
         console.warn('Response indicates failure or missing data');

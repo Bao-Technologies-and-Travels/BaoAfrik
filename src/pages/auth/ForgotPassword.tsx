@@ -114,9 +114,19 @@ const ForgotPassword: React.FC = () => {
           <div className="bg-white border-0 lg:border border-gray-200 rounded-lg shadow-none lg:shadow-lg p-8 mt-0 lg:mt-16">
             <div className="text-left lg:text-center mb-8">
               {/* Profile Mail Icon - Hidden on mobile */}
-              <div className="hidden lg:block mx-auto w-20 h-20 bg-blue-50 rounded-full items-center justify-center mb-6">
-                <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <div className="flex items-center justify-center mx-auto w-20 h-20 bg-blue-50 rounded-full mb-6">
+                <svg
+                  className="w-10 h-10 text-blue-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
               </div>
 
@@ -157,12 +167,8 @@ const ForgotPassword: React.FC = () => {
             {errors.general && !success && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <div className="flex items-center mb-2">
-                  <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                  <p className="text-red-800 font-medium">Unable to Send Reset Code</p>
                 </div>
-                <p className="text-red-700 text-sm">{errors.general}</p>
+                <p className="text-blue-700 text-sm">{errors.general}</p>
 
                 {/* Show helpful actions for specific errors */}
                 {errors.general.includes('verify your email') && (
@@ -207,8 +213,8 @@ const ForgotPassword: React.FC = () => {
                     type="submit"
                     disabled={isLoading || !email.trim()}
                     className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${email.trim() && !isLoading
-                        ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }`}
                   >
                     {isLoading ? (

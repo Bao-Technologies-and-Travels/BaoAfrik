@@ -26,56 +26,6 @@ const Register: React.FC = () => {
     confirmPassword: false
   });
 
-  const validateField = (name: string, value: string) => {
-    const newErrors: { [key: string]: string } = { ...errors };
-
-    switch (name) {
-      case 'email':
-        if (!value.trim()) {
-          newErrors.email = 'Email address is required';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          newErrors.email = 'Please enter a valid email address of format name@example.com';
-        } else {
-          delete newErrors.email;
-        }
-        break;
-
-      case 'password':
-        if (!value) {
-          newErrors.password = 'Password is required';
-        } else {
-          delete newErrors.password;
-
-          // show password requirements as hint
-          const requirements = [];
-          if (value.length < 8) requirements.push('at least 8 characters');
-          if (!/(?=.*[a-z])/.test(value)) requirements.push('one lowercase letter');
-          if (!/(?=.*[A-Z])/.test(value)) requirements.push('one uppercase letter');
-          if (!/(?=.*\d)/.test(value)) requirements.push('one number');
-          if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(value)) requirements.push('one special character');
-
-          if (requirements.length > 0) {
-            newErrors.passwordHint = `Password must contain: ${requirements.join(', ')}`;
-          } else {
-            delete newErrors.passwordHint;
-          }
-        }
-        break;
-
-      case 'confirmPassword':
-        if (!value) {
-          newErrors.confirmPassword = 'Password confirmation is required';
-        } else if (formData.password && value !== formData.password) {
-          newErrors.confirmPassword = 'Passwords do not match. Please repeat the same password entered above';
-        } else {
-          delete newErrors.confirmPassword;
-        }
-        break;
-    }
-
-    setErrors(newErrors);
-  };
-
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -84,12 +34,16 @@ const Register: React.FC = () => {
       newErrors.email = 'Email address is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address of format name@example.com';
+    } else {
+      delete newErrors.email;
     }
 
     // show password requirements if password field has content but criteria not met
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else {
+      delete newErrors.password;
+
       const requirements = [];
       if (formData.password.length < 8) requirements.push('at least 8 characters');
       if (!/(?=.*[a-z])/.test(formData.password)) requirements.push('one lowercase letter');
@@ -99,6 +53,8 @@ const Register: React.FC = () => {
 
       if (requirements.length > 0) {
         newErrors.passwordHint = `Password must contain: ${requirements.join(', ')}`;
+      } else {
+        delete newErrors.passwordHint;
       }
     }
 
@@ -107,6 +63,8 @@ const Register: React.FC = () => {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match. Please repeat the password entered above.'
+    } else {
+      delete newErrors.confirmPassword;
     }
 
     setErrors(newErrors);
@@ -128,11 +86,9 @@ const Register: React.FC = () => {
       [name]: value
     }));
 
-    validateField(name, value);
-
-    if (name === 'password' && formData.confirmPassword) {
-      validateField('confirmPassword', formData.confirmPassword);
-    }
+    setTimeout(() => {
+      validateForm();
+    }, 0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
