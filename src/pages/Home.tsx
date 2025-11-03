@@ -370,9 +370,9 @@ const Home: React.FC = () => {
 
     // Apply country filter if a specific country is selected (using country filter buttons)
     if (selectedCountry) {
-      products = products.filter(product => 
+        products = products.filter(product => 
         getProductCountry(product.id).name === selectedCountry
-      );
+        );
     }
 
     return products;
