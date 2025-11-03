@@ -174,6 +174,11 @@ const Messages: React.FC = () => {
     navigate("/login");
   };
 
+  const handleProfileSetup = () => {
+    navigate("/profile-setup");
+    console.log("profile setup button clicked");
+  };
+
   // Track re-renders for debugging
   useEffect(() => {
     renderCount.current += 1;
@@ -3423,18 +3428,17 @@ const Messages: React.FC = () => {
                         </div>
 
                         {/* Profile Section */}
-                        <div className="flex items-center space-x-2 px-3 py-3 border-b border-gray-100">
-                          <img
-                            src={user?.profileImage || avatarIcon}
-                            //
-                            alt="User avatar"
-                            className="w-12 h-12 rounded-full object-cover"
-                            width="48"
-                            height="48"
-                          />
-                          <div className="flex-1">
-                            <p className="text-xs text-gray-500">My profile</p>
-                            <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-around">
+                          <div className="flex justify-center items-center gap-2">
+                            <img
+                              src={user?.profileImage || avatarIcon}
+                              alt="User avatar"
+                              className="w-12 h-12 rounded-full object-cover"
+                              width="48"
+                              height="48"
+                            />
+                            <div className="flex-col">
+                              <p className="text-xs text-gray-500">My profile</p>
                               <h3 className="text-sm font-bold text-gray-900">
                                 {user?.firstName && user?.lastName
                                   ? `${user.firstName} ${user.lastName}`
@@ -3446,14 +3450,15 @@ const Messages: React.FC = () => {
                                         ? user.email.split("@")[0]
                                         : "User"}
                               </h3>
-                              <Link to="/profile-setup">
-                              <div
-                                className="w-6 h-6 rounded flex items-center justify-center"
-                                style={{ backgroundColor: "#E3F2FD" }}
-                                onClick={() => navigate("/profile-setup")}
-                              >
+                            </div>
+                          </div>
+                          <div style={{ position: 'relative', zIndex: 999 }}>
+                            <Link to="/profile-setup"
+                            >
+                              <div className="w-10 h-10 rounded flex items-center justify-center"
+                                style={{ backgroundColor: "#E3F2FD" }}>
                                 <svg
-                                  className="w-4 h-4"
+                                  className="w-5 h-5 pointer-events-none"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -3467,8 +3472,7 @@ const Messages: React.FC = () => {
                                   />
                                 </svg>
                               </div>
-                              </Link>
-                            </div>
+                            </Link>
                           </div>
                         </div>
 

@@ -69,6 +69,26 @@ const Header: React.FC<HeaderProps> = ({
     }
   }, [location]);
 
+  // debug to check all click events
+  useEffect(() => {
+    const handleAllClicks = (e: Event) => {
+      console.log('=== GLOBAL CLICK DETECTED ===');
+      console.log('Target:', e.target);
+      console.log('Current target:', e.currentTarget);
+      console.log('Event type:', e.type);
+      console.log('--------------------------------');
+    };
+
+    // Capture phase to catch events before they're stopped
+    document.addEventListener('click', handleAllClicks, true);
+    document.addEventListener('touchend', handleAllClicks, true);
+
+    return () => {
+      document.removeEventListener('click', handleAllClicks, true);
+      document.removeEventListener('touchend', handleAllClicks, true);
+    };
+  }, []);
+
   // Handle clicks outside dropdowns to close them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -93,6 +113,10 @@ const Header: React.FC<HeaderProps> = ({
   }, [isLanguageDropdownOpen, isDesktopMenuOpen]);
 
   const isHomePage = location.pathname === "/";
+
+  const handleProfileSetup = () => {
+    navigate("/profile-setup");
+  }
 
   return (
     <>
@@ -454,17 +478,17 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
 
                         {/* Profile Section */}
-                        <div className="flex items-center space-x-2 px-3 py-3 border-b border-gray-100">
-                          <img
-                            src={user?.profileImage || avatar}
-                            alt="User avatar"
-                            className="w-12 h-12 rounded-full object-cover"
-                            width="48"
-                            height="48"
-                          />
-                          <div className="flex-1">
-                            <p className="text-xs text-gray-500">My profile</p>
-                            <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-around">
+                          <div className="flex justify-center items-center gap-2">
+                            <img
+                              src={user?.profileImage || avatar}
+                              alt="User avatar"
+                              className="w-12 h-12 rounded-full object-cover"
+                              width="48"
+                              height="48"
+                            />
+                            <div className="flex-col">
+                              <p className="text-xs text-gray-500">My profile</p>
                               <h3 className="text-sm font-bold text-gray-900">
                                 {user?.firstName && user?.lastName
                                   ? `${user.firstName} ${user.lastName}`
@@ -476,29 +500,29 @@ const Header: React.FC<HeaderProps> = ({
                                         ? user.email.split("@")[0]
                                         : "User"}
                               </h3>
-                              <Link to="/profile-setup">
-                                <div
-                                  className="w-6 h-6 rounded flex items-center justify-center"
-                                  style={{ backgroundColor: "#E3F2FD" }}
-                                  onClick={() => navigate("/profile-setup")}
-                                >
-                                  <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    style={{ color: "#64B5F6" }}
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                    />
-                                  </svg>
-                                </div>
-                              </Link>
                             </div>
+                          </div>
+                          <div style={{ position: 'relative', zIndex: 999 }}>
+                            <button
+                              onClick={() => {
+                                handleProfileSetup();
+                              }}
+                            >
+                              <svg
+                                className="w-5 h-5 pointer-events-none"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                style={{ color: "#64B5F6" }}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                              </svg>
+                            </button>
                           </div>
                         </div>
 
@@ -1345,7 +1369,11 @@ const Header: React.FC<HeaderProps> = ({
                                     ? user.email.split("@")[0]
                                     : "User"}
                           </h3>
-                          <div
+                          <button
+                          onClick={() => {
+                            handleProfileSetup();
+                            setIsMobileMenuOpen(false);
+                          }}
                             className="w-8 h-8 rounded flex items-center justify-center"
                             style={{ backgroundColor: "#E3F2FD" }}
                           >
@@ -1363,7 +1391,7 @@ const Header: React.FC<HeaderProps> = ({
                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                               />
                             </svg>
-                          </div>
+                          </button>
                         </div>
                       </div>
                     </div>
