@@ -67,13 +67,10 @@ function AppContent() {
     );
   }
 
-  // For seller profile pages on mobile, render without header
+  // For seller profile pages, render without header (Header is now in SellerProfile component)
   if (isSellerProfilePage) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
-        <div className="hidden lg:block">
-          <Header showSearchBar={false} isProductDetailPage={false} />
-        </div>
         <main className="flex-1">
           <Routes>
             <Route path="/seller/:sellerId" element={<SellerProfile />} />

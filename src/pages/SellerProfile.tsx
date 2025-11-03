@@ -4,6 +4,10 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import sellerAvatar from '../assets/images/logos/avatar.png';
 import defaultCoverImage from '../assets/images/logos/8.png';
+import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
+import verifyIcon from '../assets/images/pre/verify.svg';
+import basketIcon from '../assets/images/pre/basket.png';
+import logoIcon from '../assets/images/logos/ba-brand-icon-colored.png';
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
 import pre2 from '../assets/images/pre/2.png';
@@ -192,59 +196,150 @@ const SellerProfile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-
-
+    <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <Header />
+      
+      {/* Gray Divider below Header */}
+      <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9' }}></div>
 
       {/* Cover Page Section - Desktop */}
-      <div className="hidden lg:block px-2 py-4 relative">
-        <div className="w-full">
-          <div className="bg-orange-100 h-64 rounded-2xl relative overflow-hidden w-full">
-            {/* Cover Image */}
-            <img
-              src={seller.coverPhoto || defaultCoverImage}
-              alt="Cover Photo"
-              className="w-full h-full object-cover"
+      <div className="hidden lg:block py-4 relative" style={{ backgroundColor: '#FFFFFF' }}>
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center space-x-2 text-xs mb-4">
+            <img 
+              src={arrowLeftIcon} 
+              alt="Back" 
+              className="w-4 h-4 cursor-pointer" 
+              onClick={() => navigate('/')}
             />
-          </div>
-          
-          {/* Profile Avatar - Half in cover, positioned for left alignment */}
-          <div className="absolute left-8 bottom-[-80px]">
-            <div className="w-40 h-40 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
-              <img
-                src={seller.avatar}
-                alt={seller.name}
-                className="w-36 h-36 rounded-xl object-cover"
-              />
-            </div>
-          </div>
-          
-          {/* Chat Button - Positioned at right side of cover */}
-          <div className="absolute right-8 bottom-[-60px]">
-            <div className="flex items-center space-x-3">
-              <button className="bg-orange-400 text-white px-8 xl:px-12 py-3 rounded-lg hover:bg-orange-500 transition-colors font-medium flex items-center space-x-2">
-                <span>Chat with seller</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </button>
-              <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white">
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 010 2z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          
-          {/* Name and Status - Positioned next to avatar */}
-          <div className="absolute left-52 bottom-[-70px]">
-            <h1 className="text-xl text-gray-900 mb-2">{seller.name}</h1>
-            {seller.isVerified && (
-              <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-2 py-1 rounded-md">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                <span className="text-xs font-medium">Verified Seller</span>
+            <span 
+              className="hover:text-gray-700 cursor-pointer" 
+              style={{ color: '#BABABA' }}
+              onClick={() => navigate('/')}
+            >
+              Homepage
+            </span>
+            <span style={{ color: '#BABABA' }}>·</span>
+            <span 
+              className="hover:text-gray-700 cursor-pointer" 
+              style={{ color: '#BABABA' }}
+              onClick={() => navigate(-1)}
+            >
+              Product ID
+            </span>
+            <span style={{ color: '#BABABA' }}>·</span>
+            <span className="font-medium" style={{ color: '#4D4D4D' }}>User Profil ID</span>
+          </nav>
+
+          {/* Cover Image Container */}
+          <div className="relative">
+            <div className="h-64 rounded-2xl relative overflow-hidden" style={{ backgroundColor: '#FEF6E9' }}>
+              {/* Decorative Logo Watermark */}
+              <div className="absolute" style={{ left: '50%', top: '15%', transform: 'translate(-50%, -50%)', width: '150%', height: '170%' }}>
+                <div 
+                  style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    background: `url(${logoIcon}) no-repeat center`,
+                    backgroundSize: 'contain',
+                    opacity: '0.5',
+                    filter: 'brightness(0) invert(1) brightness(2)'
+                  }}
+                />
               </div>
-            )}
+            </div>
+            
+            {/* Profile Avatar - Half in cover, positioned for left alignment */}
+            <div className="absolute left-6 bottom-[-68px]">
+              <div className="w-28 h-28 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+                <img
+                  src={seller.avatar}
+                  alt={seller.name}
+                  className="w-24 h-24 rounded-xl object-cover"
+                />
+              </div>
+            </div>
+            
+            {/* Chat Button - Positioned at right side of cover */}
+            <div className="absolute right-0 bottom-[-62px]">
+              <div className="flex items-center space-x-3">
+                <button 
+                  className="hover:opacity-90 transition-opacity"
+                  style={{
+                    display: 'flex',
+                    height: '40px',
+                    padding: '8px 20px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '10px',
+                    backgroundColor: '#F9A825',
+                    color: 'white',
+                    borderRadius: '12px',
+                    fontWeight: '400',
+                    fontSize: '14px'
+                  }}
+                >
+                  <span>Message the seller</span>
+                  <img src={basketIcon} alt="Cart" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} />
+                </button>
+                <button 
+                  className="hover:bg-gray-50 transition-colors"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: 'white',
+                    border: '1px solid #F9A825',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div className="flex space-x-1">
+                    <div 
+                      style={{
+                        width: '5px',
+                        height: '5px',
+                        backgroundColor: 'white',
+                        border: '1.5px solid #F9A825',
+                        borderRadius: '50%'
+                      }}
+                    ></div>
+                    <div 
+                      style={{
+                        width: '5px',
+                        height: '5px',
+                        backgroundColor: 'white',
+                        border: '1.5px solid #F9A825',
+                        borderRadius: '50%'
+                      }}
+                    ></div>
+                    <div 
+                      style={{
+                        width: '5px',
+                        height: '5px',
+                        backgroundColor: 'white',
+                        border: '1.5px solid #F9A825',
+                        borderRadius: '50%'
+                      }}
+                    ></div>
+                  </div>
+                </button>
+              </div>
+            </div>
+            
+            {/* Name and Status - Positioned next to avatar */}
+            <div className="absolute left-40 bottom-[-65px]">
+              <h1 className="text-base font-semibold text-gray-900 mb-1.5">{seller.name}</h1>
+              {seller.isVerified && (
+                <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
+                  <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
+                  <span className="text-xs font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -273,12 +368,12 @@ const SellerProfile: React.FC = () => {
         {/* Profile Content Overlay */}
         <div className="px-4 md:px-6 pb-6 relative">
           {/* Profile Avatar - Positioned like desktop */}
-          <div className="absolute left-4 md:left-6 -top-10">
-            <div className="w-20 h-20 md:w-24 md:h-24 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+          <div className="absolute left-4 md:left-6 -top-8">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
               <img
                 src={seller.avatar}
                 alt={seller.name}
-                className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover"
+                className="w-14 h-14 md:w-16 md:h-16 rounded-xl object-cover"
               />
             </div>
           </div>
@@ -286,16 +381,16 @@ const SellerProfile: React.FC = () => {
           {/* Verified Badge - Moved Down */}
           <div className="absolute right-4 md:right-6 top-2">
             {seller.isVerified && (
-              <div className="inline-flex items-center space-x-1 bg-green-100 text-green-700 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg text-xs md:text-sm whitespace-nowrap">
-                <div className="w-1 h-1 md:w-1.5 md:h-1.5 bg-green-500 rounded-full"></div>
-                <span className="font-medium">Verified Seller</span>
+              <div className="inline-flex items-center space-x-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg text-xs md:text-sm whitespace-nowrap" style={{ backgroundColor: '#EDFBF0' }}>
+                <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                <span className="font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
               </div>
             )}
           </div>
           
           {/* Name and Info - Below Avatar */}
-          <div className="pt-12 md:pt-14">
-            <h1 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">{seller.name}</h1>
+          <div className="pt-10 md:pt-12">
+            <h1 className="text-base md:text-lg font-semibold text-gray-900 mb-2">{seller.name}</h1>
             
             {/* Location, Member Info, and Rating */}
             <div className="flex items-start justify-between mb-3">
