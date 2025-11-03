@@ -68,7 +68,7 @@ export const register = asyncHandler(async (req: Request<{}, {}, RegisterRequest
 
   // Generate email verification code
   const verificationCode = generateVerificationCode();
-  const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const verificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
   // Create user
   const user = await prisma.user.create({
@@ -364,7 +364,7 @@ export const resendVerificationCode = asyncHandler(async (req: Request<{}, {}, R
 
   // Generate new verification code
   const verificationCode = generateVerificationCode();
-  const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const verificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
   // Update user with new verification code
   await prisma.user.update({

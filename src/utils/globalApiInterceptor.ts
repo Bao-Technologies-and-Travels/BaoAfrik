@@ -49,11 +49,13 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
 
 const isAuthEndpoint = (url: string): boolean => {
   const authEndpoints = [
-    '/auth/login',
-    '/auth/register',
-    '/auth/refresh',
-    '/auth/forgot-password',
-    '/auth/reset-password'
+    '/login',
+    '/register',
+    '/refresh',
+    '/forgot-password',
+    '/reset-password',
+    '/verify-email',
+    '/resend-verification'
   ];
   
   return authEndpoints.some(endpoint => url.includes(endpoint));

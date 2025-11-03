@@ -34,12 +34,6 @@ export const validateRegister = [
     .withMessage('Please provide a valid email address in the format name@domain.com')
     .normalizeEmail(),
 
-  // body('phoneNumber')
-  //   .optional()
-  //   .trim()
-  //   .isMobilePhone('any')
-  //   .withMessage('Please provide a valid phone number'),
-
   body('password')
     .notEmpty()
     .withMessage('Password is required')
@@ -348,16 +342,6 @@ export const validateUpdateProfile = [
     .withMessage('Last name must be between 1 and 50 characters')
     .matches(/^[a-zA-Z\s]+$/)
     .withMessage('Last name can only contain letters and spaces'),
-
-  // body('profileImage')
-  //   .optional()
-  //   .custom((value) => {
-  //     if (typeof value !== 'string') return false;
-  //     const isDataUrl = value.startsWith('data:image/');
-  //     const isHttpUrl = /^https?:\/\//i.test(value);
-  //     return isDataUrl || isHttpUrl;
-  //   })
-  //   .withMessage('Profile image must be an http(s) URL or a data URL'),
 
   handleValidationErrors,
 ];

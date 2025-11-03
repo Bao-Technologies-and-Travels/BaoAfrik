@@ -92,7 +92,7 @@ const EmailVerification: React.FC = () => {
         if (fromRegistration) {
           navigate('/email-verification-success');
         } else {
-          navigate('/profile');
+          navigate('/login');
         }
       } else {
         setError(response.message || 'Invalid verification code.');

@@ -105,9 +105,8 @@ const Header: React.FC<HeaderProps> = ({
       )}
 
       <header
-        className={`shadow-sm relative ${
-          isProductDetailPage ? "lg:block hidden" : ""
-        } ${!user ? "border-b border-orange-100" : ""}`}
+        className={`shadow-sm relative ${isProductDetailPage ? "lg:block hidden" : ""
+          } ${!user ? "border-b border-orange-100" : ""}`}
         style={{
           backgroundColor: user ? "#FFFFFF" : "#FFFBF5",
           fontFamily: "Poppins, sans-serif",
@@ -199,12 +198,12 @@ const Header: React.FC<HeaderProps> = ({
                     className="text-white px-4 py-2 rounded-full font-medium text-sm transition-colors duration-200"
                     style={{ backgroundColor: "#F9A825" }}
                     onMouseEnter={(e) =>
-                      ((e.target as HTMLElement).style.backgroundColor =
-                        "#E6941F")
+                    ((e.target as HTMLElement).style.backgroundColor =
+                      "#E6941F")
                     }
                     onMouseLeave={(e) =>
-                      ((e.target as HTMLElement).style.backgroundColor =
-                        "#F9A825")
+                    ((e.target as HTMLElement).style.backgroundColor =
+                      "#F9A825")
                     }
                   >
                     <svg
@@ -470,33 +469,35 @@ const Header: React.FC<HeaderProps> = ({
                                 {user?.firstName && user?.lastName
                                   ? `${user.firstName} ${user.lastName}`
                                   : user?.firstName
-                                  ? user.firstName
-                                  : user?.lastName
-                                  ? user.lastName
-                                  : user?.email
-                                  ? user.email.split("@")[0]
-                                  : "User"}
+                                    ? user.firstName
+                                    : user?.lastName
+                                      ? user.lastName
+                                      : user?.email
+                                        ? user.email.split("@")[0]
+                                        : "User"}
                               </h3>
-                              <div
-                                className="w-6 h-6 rounded flex items-center justify-center"
-                                style={{ backgroundColor: "#E3F2FD" }}
-                                onClick={() => navigate("/profile-setup")}
-                              >
-                                <svg
-                                  className="w-4 h-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  style={{ color: "#64B5F6" }}
+                              <Link to="/profile-setup">
+                                <div
+                                  className="w-6 h-6 rounded flex items-center justify-center"
+                                  style={{ backgroundColor: "#E3F2FD" }}
+                                  onClick={() => navigate("/profile-setup")}
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                  />
-                                </svg>
-                              </div>
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    style={{ color: "#64B5F6" }}
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    />
+                                  </svg>
+                                </div>
+                              </Link>
                             </div>
                           </div>
                         </div>
@@ -537,9 +538,8 @@ const Header: React.FC<HeaderProps> = ({
                           {/* Chats */}
                           <Link
                             to="/messages"
-                            className={`flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg ${
-                              highlightChats ? "bg-gray-50" : ""
-                            }`}
+                            className={`flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg ${highlightChats ? "bg-gray-50" : ""
+                              }`}
                             onClick={() => setIsDesktopMenuOpen(false)}
                           >
                             <div className="flex items-center space-x-2">
@@ -812,12 +812,12 @@ const Header: React.FC<HeaderProps> = ({
                     className="inline-flex items-center px-8 py-2 text-white rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
                     style={{ backgroundColor: "#F9A822" }}
                     onMouseEnter={(e) =>
-                      ((e.target as HTMLElement).style.backgroundColor =
-                        "#E6941F")
+                    ((e.target as HTMLElement).style.backgroundColor =
+                      "#E6941F")
                     }
                     onMouseLeave={(e) =>
-                      ((e.target as HTMLElement).style.backgroundColor =
-                        "#F9A822")
+                    ((e.target as HTMLElement).style.backgroundColor =
+                      "#F9A822")
                     }
                   >
                     Sign In
@@ -1046,11 +1046,10 @@ const Header: React.FC<HeaderProps> = ({
                         <div className="py-2">
                           <button
                             onClick={() => handleLanguageChange("EN")}
-                            className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                              selectedLanguage === "EN"
-                                ? "bg-blue-50 text-blue-600"
-                                : "text-gray-700 hover:bg-gray-50"
-                            }`}
+                            className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${selectedLanguage === "EN"
+                              ? "bg-blue-50 text-blue-600"
+                              : "text-gray-700 hover:bg-gray-50"
+                              }`}
                           >
                             <img
                               src="https://flagcdn.com/w20/gb.png"
@@ -1063,11 +1062,10 @@ const Header: React.FC<HeaderProps> = ({
                           </button>
                           <button
                             onClick={() => handleLanguageChange("FR")}
-                            className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                              selectedLanguage === "FR"
-                                ? "bg-blue-50 text-blue-600"
-                                : "text-gray-700 hover:bg-gray-50"
-                            }`}
+                            className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${selectedLanguage === "FR"
+                              ? "bg-blue-50 text-blue-600"
+                              : "text-gray-700 hover:bg-gray-50"
+                              }`}
                           >
                             French
                           </button>
@@ -1340,12 +1338,12 @@ const Header: React.FC<HeaderProps> = ({
                             {user?.firstName && user?.lastName
                               ? `${user.firstName} ${user.lastName}`
                               : user?.firstName
-                              ? user.firstName
-                              : user?.lastName
-                              ? user.lastName
-                              : user?.email
-                              ? user.email.split("@")[0]
-                              : "User"}
+                                ? user.firstName
+                                : user?.lastName
+                                  ? user.lastName
+                                  : user?.email
+                                    ? user.email.split("@")[0]
+                                    : "User"}
                           </h3>
                           <div
                             className="w-8 h-8 rounded flex items-center justify-center"
@@ -1669,12 +1667,12 @@ const Header: React.FC<HeaderProps> = ({
                         className="block w-full text-center px-8 py-4 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors font-medium text-lg"
                         style={{ backgroundColor: "#F9A822" }}
                         onMouseEnter={(e) =>
-                          ((e.target as HTMLElement).style.backgroundColor =
-                            "#E6941F")
+                        ((e.target as HTMLElement).style.backgroundColor =
+                          "#E6941F")
                         }
                         onMouseLeave={(e) =>
-                          ((e.target as HTMLElement).style.backgroundColor =
-                            "#F9A822")
+                        ((e.target as HTMLElement).style.backgroundColor =
+                          "#F9A822")
                         }
                         onClick={() => setIsMobileMenuOpen(false)}
                       >

@@ -114,7 +114,7 @@ const ForgotPassword: React.FC = () => {
           <div className="bg-white border-0 lg:border border-gray-200 rounded-lg shadow-none lg:shadow-lg p-8 mt-0 lg:mt-16">
             <div className="text-left lg:text-center mb-8">
               {/* Profile Mail Icon - Hidden on mobile */}
-              <div className="hidden lg:block mx-auto w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+              <div className="hidden lg:block mx-auto w-20 h-20 bg-blue-50 rounded-full items-center justify-center mb-6">
                 <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>

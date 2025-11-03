@@ -120,7 +120,6 @@ export const authenticateToken = asyncHandler(
   }
 );
 
-// Optional authentication - doesn't throw error if no token
 export const optionalAuth = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;

@@ -1,135 +1,218 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import logoSmall from "../../assets/images/logos/ba-brand-icon-colored.png";
-import logoFull from "../../assets/images/logos/ba-Primary-brand-logo-colored.png";
-import LoadingSpinner from "../../components/ui/LoadingSpinner";
-import lilLogo from "../../assets/images/pre/lil.png";
+import { useToast } from "../../contexts/ToastContext";
 import { UpdateProfileData, apiClient } from "../../services/api";
 import { s3Service } from "../../services/s3Service";
-import { useToast } from "../../contexts/ToastContext";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import logoSmall from "../../assets/images/logos/ba-brand-icon-colored.png";
+import logoFull from "../../assets/images/logos/ba-Primary-brand-logo-colored.png";
+import lilLogo from "../../assets/images/pre/lil.png";
+
+// Types for better type safety
+interface FormData {
+  firstName: string;
+  lastName: string;
+  gender: string;
+  birthDate: string;
+}
+
+interface FormErrors {
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  birthDate?: string;
+  general?: string;
+}
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { addToast } = useToast();
-
-  const [formData, setFormData] = useState({
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // State management
+  const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
     gender: "",
     birthDate: "",
   });
+  
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageRemoved, setImageRemoved] = useState(false);
-
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isUploadingImage, setIsUpLoadingImage] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [initialData, setInitialData] = useState<FormData & { profileImage: string }>({
+    firstName: "",
+    lastName: "",
+    gender: "",
+    birthDate: "",
+    profileImage: "",
+  });
 
-  // Form validation state
-  const isFormValid =
-    formData.firstName.trim() &&
-    formData.lastName.trim() &&
-    formData.gender &&
-    formData.birthDate;
+  // Memoized validation
+  const isFormValid = useCallback((): boolean => {
+    return Boolean(
+      formData.firstName.trim() &&
+      formData.lastName.trim() &&
+      formData.gender &&
+      formData.birthDate
+    );
+  }, [formData]);
 
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        gender: user.gender || "",
-        birthDate: user.birthDate ? formatDateForInput(user.birthDate) : "",
-      });
+  const hasChanges = useCallback((): boolean => {
+    return (
+      formData.firstName !== initialData.firstName ||
+      formData.lastName !== initialData.lastName ||
+      formData.gender !== initialData.gender ||
+      formData.birthDate !== initialData.birthDate ||
+      profileImage !== initialData.profileImage
+    );
+  }, [formData, initialData, profileImage]);
 
-      if (user.profileImage) {
-        setProfileImage(user.profileImage);
-        setExistingImageUrl(user.profileImage);
-      }
-    }
-  }, [user]);
-
-  const formatDateForInput = (dateString: string): string => {
+  // Date formatting utility
+  const formatDateForInput = useCallback((dateString: string): string => {
     if (!dateString) return "";
 
     try {
       const date = new Date(dateString);
-      if (isNaN(date.getTime())) {
-        console.warn("Invalid date string:", dateString);
-        return "";
-      }
+      if (isNaN(date.getTime())) return "";
 
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-
-      return `${year}-${month}-${day}`;
+      return date.toISOString().split('T')[0];
     } catch (error) {
+      console.error("Date formatting error:", error);
       return "";
     }
-  };
+  }, []);
 
+  // Fetch user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await apiClient.getCurrentUser();
+        if (response.success && response.data) {
+          const userData = response.data;
+          const birthDateStr = formatDateForInput(userData.birthDate || "");
+
+          const newFormData: FormData = {
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            gender: userData.gender || "",
+            birthDate: birthDateStr,
+          };
+
+          setFormData(newFormData);
+          setInitialData({
+            ...newFormData,
+            profileImage: userData.profileImage || "",
+          });
+
+          if (userData.profileImage) {
+            setProfileImage(userData.profileImage);
+            setExistingImageUrl(userData.profileImage);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+        addToast({
+          type: "error",
+          title: "Data Loading Error",
+          message: "Failed to load your profile data. Please refresh the page.",
+          duration: 5000,
+        });
+      }
+    };
+
+    fetchUserData();
+  }, [addToast, formatDateForInput]);
+
+  // Input handlers
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
 
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
+    // Clear specific error when user starts typing
+    if (errors[name as keyof FormErrors]) {
+      setErrors(prev => ({
         ...prev,
         [name]: "",
       }));
     }
   };
 
+  const handleDateChange = (date: Date | null) => {
+    const dateString = date ? date.toISOString().split('T')[0] : "";
+    setFormData(prev => ({
+      ...prev,
+      birthDate: dateString,
+    }));
+
+    if (errors.birthDate) {
+      setErrors(prev => ({
+        ...prev,
+        birthDate: "",
+      }));
+    }
+  };
+
+  // Image handling
+  const validateImageFile = (file: File): string | null => {
+    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!validTypes.includes(file.type)) {
+      return "Please select a valid image (JPEG, PNG, GIF)";
+    }
+
+    if (file.size > maxSize) {
+      return "Image size must be less than 5MB";
+    }
+
+    return null;
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
-      const maxSize = 5 * 1024 * 1024; // 5mb
+    if (!file) return;
 
-      if (!validTypes.includes(file.type)) {
-        setErrors((prev) => ({
-          ...prev,
-          general: "Please select a valid image (JPEG, PNG GIF)",
-        }));
-        return;
-      }
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      setErrors(prev => ({ ...prev, general: validationError }));
+      return;
+    }
 
-      if (file.size > maxSize) {
-        setErrors((prev) => ({
-          ...prev,
-          general: "Image size must be less than 5MB",
-        }));
-        return;
-      }
+    setSelectedFile(file);
+    setImageRemoved(false);
 
-      setSelectedFile(file);
-      setImageRemoved(false);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setProfileImage(event.target?.result as string);
+    };
+    reader.onerror = () => {
+      setErrors(prev => ({
+        ...prev,
+        general: "Failed to read image file",
+      }));
+    };
+    reader.readAsDataURL(file);
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setProfileImage(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      if (errors.general) {
-        setErrors((prev) => ({
-          ...prev,
-          general: "",
-        }));
-      }
+    // Clear general error
+    if (errors.general) {
+      setErrors(prev => ({ ...prev, general: "" }));
     }
   };
 
@@ -141,28 +224,32 @@ const ProfileSetup: React.FC = () => {
     try {
       setProfileImage(null);
       setSelectedFile(null);
-      setExistingImageUrl(null);
       setImageRemoved(true);
 
+      // Only delete from S3 if we have an existing URL
       if (existingImageUrl && existingImageUrl.includes("amazonaws.com")) {
         await s3Service.deleteFile(existingImageUrl);
       }
 
+      setExistingImageUrl(null);
+
       if (errors.general) {
-        setErrors((prev) => ({ ...prev, general: "" }));
+        setErrors(prev => ({ ...prev, general: "" }));
       }
     } catch (error) {
-      setErrors((prev) => ({
+      console.error("Failed to remove image:", error);
+      setErrors(prev => ({
         ...prev,
         general: "Failed to remove image from storage",
       }));
     }
   };
 
+  // Image upload to S3
   const uploadImageToS3 = async (): Promise<string | null> => {
     if (!selectedFile || !user) return null;
 
-    setIsUpLoadingImage(true);
+    setIsUploadingImage(true);
     try {
       const { uploadUrl, fileUrl } = await s3Service.getPresignedUrlForProfile(
         selectedFile,
@@ -170,18 +257,20 @@ const ProfileSetup: React.FC = () => {
       );
 
       await s3Service.uploadFile(selectedFile, uploadUrl);
-
       return fileUrl;
     } catch (error) {
-      throw new Error("Failed to upload image to S3");
+      console.error("S3 upload error:", error);
+      throw new Error("Failed to upload image to storage");
     } finally {
-      setIsUpLoadingImage(false);
+      setIsUploadingImage(false);
     }
   };
 
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
+  // Form validation
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
 
+    // First name validation
     if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required";
     } else if (formData.firstName.trim().length < 2) {
@@ -190,6 +279,7 @@ const ProfileSetup: React.FC = () => {
       newErrors.firstName = "First name can only contain letters";
     }
 
+    // Last name validation
     if (!formData.lastName.trim()) {
       newErrors.lastName = "Last name is required";
     } else if (formData.lastName.trim().length < 2) {
@@ -198,10 +288,12 @@ const ProfileSetup: React.FC = () => {
       newErrors.lastName = "Last name can only contain letters";
     }
 
+    // Gender validation
     if (!formData.gender) {
       newErrors.gender = "Gender is required";
     }
 
+    // Birth date validation
     if (!formData.birthDate) {
       newErrors.birthDate = "Birth date is required";
     } else {
@@ -210,18 +302,14 @@ const ProfileSetup: React.FC = () => {
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
 
-      if (
-        monthDiff < 0 ||
-        (monthDiff === 0 && today.getDate() < birthDate.getDate())
-      ) {
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
 
       if (birthDate > today) {
-        newErrors.birthDate = "Birth date cannot be after today's date";
+        newErrors.birthDate = "Birth date cannot be in the future";
       } else if (age < 13) {
-        newErrors.birthDate =
-          "You must be at least 13 years old to access the platform";
+        newErrors.birthDate = "You must be at least 13 years old to use this platform";
       } else if (age > 120) {
         newErrors.birthDate = "Please enter a valid birth date";
       }
@@ -231,38 +319,60 @@ const ProfileSetup: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // If no changes, navigate away
+    if (!hasChanges()) {
+      addToast({
+        type: "info",
+        title: "Profile unchanged",
+        message: "No changes were made to your profile.",
+        duration: 3000
+      });
+      navigate("/");
+      return;
+    }
+
+    // Validate form
     if (!validateForm()) {
+      addToast({
+        type: "error",
+        title: "Validation Error",
+        message: "Please fix the errors in the form before submitting.",
+        duration: 5000,
+      });
       return;
     }
 
     setIsLoading(true);
     setErrors({});
-    setSuccessMessage("");
 
     try {
       let imageUrl: string | null = null;
 
+      // Handle image upload/removal
       if (selectedFile) {
-        // Upload new image to S3
-        const uploadedUrl = await uploadImageToS3();
-        imageUrl = uploadedUrl;
-
-        // delete old image if it exists and is different from new one
-        if (existingImageUrl && existingImageUrl !== uploadedUrl) {
+        // Upload new image
+        imageUrl = await uploadImageToS3();
+        
+        // Delete old image if it exists and is different from new one
+        if (existingImageUrl && existingImageUrl !== imageUrl) {
           await s3Service.deleteFile(existingImageUrl);
         }
       } else if (imageRemoved) {
+        // Image was removed
         imageUrl = null;
         if (existingImageUrl) {
           await s3Service.deleteFile(existingImageUrl);
         }
       } else {
+        // Keep existing image
         imageUrl = existingImageUrl;
       }
 
+      // Prepare profile data
       const profileData: UpdateProfileData = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
@@ -271,18 +381,18 @@ const ProfileSetup: React.FC = () => {
         profileImage: imageUrl,
       };
 
+      // API call
       const response = await apiClient.updateProfile(profileData);
 
       if (!response.success) {
+        // Handle API validation errors
         if (response.errors) {
-          const apiErrors: { [key: string]: string } = {};
+          const apiErrors: FormErrors = {};
           Object.entries(response.errors).forEach(([key, value]) => {
             if (Array.isArray(value)) {
-              apiErrors[key] = value.join(", ");
+              apiErrors[key as keyof FormErrors] = value.join(", ");
             } else if (typeof value === "string") {
-              apiErrors[key] = value;
-            } else {
-              apiErrors[key] = "Invalid field value";
+              apiErrors[key as keyof FormErrors] = value;
             }
           });
           setErrors(apiErrors);
@@ -292,88 +402,78 @@ const ProfileSetup: React.FC = () => {
         }
       }
 
+      // Success
       addToast({
         type: "success",
-        title: "Profile modified",
-        message:
-          "Profile updated successfully. Redirecting automatically in 3 seeconds...",
+        title: "Profile Updated",
+        message: "Your profile has been updated successfully. Redirecting to login...",
         duration: 3000,
       });
 
+      // Logout and redirect after delay
       setTimeout(() => {
         logout();
         navigate("/login");
       }, 3000);
+
     } catch (error: any) {
+      console.error("Profile update error:", error);
+      
+      let toastMessage = "Failed to update profile. Please try again.";
+      let toastTitle = "Update Failed";
+
       if (error.message.includes("S3") || error.message.includes("storage")) {
-        addToast({
-          type: "error",
-          title: "Image Error",
-          message: "Failed to process image. Please try again.",
-          duration: 5000,
-        });
+        toastTitle = "Image Error";
+        toastMessage = "Failed to process image. Please try again.";
       } else if (error.message.includes("validation")) {
-        addToast({
-          type: "error",
-          title: "Validation Error",
-          message: "Please fix the form errors and try again.",
-          duration: 5000,
-        });
-      } else {
-        addToast({
-          type: "error",
-          title: "Update Failed",
-          message:
-            error.message ||
-            "Failed to save profile information. Please try again.",
-          duration: 5000,
-        });
+        toastTitle = "Validation Error";
+        toastMessage = "Please check the form for errors and try again.";
       }
+
+      addToast({
+        type: "error",
+        title: toastTitle,
+        message: toastMessage,
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const hasExistingData =
-    user?.firstName ||
-    user?.lastName ||
-    user?.gender ||
-    user?.birthDate ||
-    user?.profileImage;
+  const hasExistingData = Boolean(
+    user?.firstName || user?.lastName || user?.gender || user?.birthDate || user?.profileImage
+  );
+
+  const currentBirthDate = formData.birthDate ? new Date(formData.birthDate) : null;
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Desktop Header - Top Left with Background */}
+      {/* Desktop Header */}
       <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8 border-b-2 border-orange-200">
         <div className="flex items-center justify-between">
-          <Link to="/">
+          <Link to="/" aria-label="Go to homepage">
             <img
               src={logoFull}
               alt="BaoAfrik Logo"
               className="h-8 object-contain"
             />
           </Link>
-          <button className="p-2 rounded-lg hover:bg-orange-100 transition-colors">
-            <svg
-              className="w-6 h-6 text-orange-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+          <button 
+            className="p-2 rounded-lg hover:bg-orange-100 transition-colors"
+            aria-label="Menu"
+          >
+            <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-8 lg:pt-16">
         <div className="w-full max-w-2xl">
-          {/* Mobile Logo - Centered with Background */}
+          {/* Mobile Logo */}
           <div className="lg:hidden bg-white -mx-4 px-4 py-6 mb-8">
             <div className="text-center">
               <div className="mx-auto w-16 h-16 mb-6">
@@ -396,33 +496,30 @@ const ProfileSetup: React.FC = () => {
             </div>
           </div>
 
-          {/* Display success message if any */}
-          {successMessage && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-600 text-sm">{successMessage}</p>
-              {!user?.firstName && (
-                <p className="text-green-600 text-sm mt-1">
-                  You will be redirected to login in 3 seconds...
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Display general error if any */}
+          {/* Error Display */}
           {errors.general && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert">
               <p className="text-red-600 text-sm">{errors.general}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             <div className="flex flex-col lg:flex-row gap-16">
-              {/* Left side - Profile Image */}
+              {/* Profile Image Section */}
               <div className="w-full lg:w-2/5 flex items-center justify-center">
-                <div className="bg-blue-50 rounded-2xl p-16 flex flex-col items-center justify-center w-80 h-80">
+                <div className="bg-blue-50 rounded-2xl p-8 flex flex-col items-center justify-center w-80 h-80">
                   <div
                     className="w-40 h-40 bg-blue-100 rounded-2xl flex items-center justify-center mb-8 cursor-pointer hover:bg-blue-200 transition-colors relative overflow-hidden"
                     onClick={handleImageClick}
+                    role="button"
+                    aria-label={profileImage ? "Change profile photo" : "Add profile photo"}
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleImageClick();
+                      }
+                    }}
                   >
                     {profileImage ? (
                       <>
@@ -474,20 +571,16 @@ const ProfileSetup: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap justify-center">
                     <p className="text-base text-gray-500 text-center whitespace-nowrap">
-                      {profileImage
-                        ? "Change profile photo"
-                        : "Add a profile photo"}
+                      {profileImage ? "Change profile photo" : "Add a profile photo"}
                     </p>
                     {profileImage && (
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveImage();
-                        }}
-                        className="ml-2 text-red-500 hover:text-red-700 text-sm underline"
+                        onClick={handleRemoveImage}
+                        className="text-red-500 hover:text-red-700 text-sm underline"
+                        disabled={isUploadingImage}
                       >
                         Remove
                       </button>
@@ -496,15 +589,17 @@ const ProfileSetup: React.FC = () => {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/jpg,image/png,image/gif"
                     onChange={handleImageUpload}
                     className="hidden"
+                    aria-label="Profile image upload"
                   />
                 </div>
               </div>
 
-              {/* Right side - Form Fields */}
-              <div className="w-full space-y-6">
+              {/* Form Fields */}
+              <div className="w-full lg:w-3/5 space-y-6">
+                {/* First Name */}
                 <div>
                   <label
                     htmlFor="firstName"
@@ -517,20 +612,23 @@ const ProfileSetup: React.FC = () => {
                     id="firstName"
                     name="firstName"
                     value={formData.firstName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, firstName: e.target.value })
-                    }
-                    className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50"
+                    onChange={handleInputChange}
+                    className={`w-full px-5 py-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 ${
+                      errors.firstName ? 'border-red-300' : 'border-gray-300'
+                    }`}
                     placeholder="Enter your first name"
                     required
+                    aria-invalid={!!errors.firstName}
+                    aria-describedby={errors.firstName ? "firstName-error" : undefined}
                   />
                   {errors.firstName && (
-                    <p className="mt-1 text-sm text-red-600">
+                    <p id="firstName-error" className="mt-1 text-sm text-red-600">
                       {errors.firstName}
                     </p>
                   )}
                 </div>
 
+                {/* Last Name */}
                 <div>
                   <label
                     htmlFor="lastName"
@@ -543,20 +641,23 @@ const ProfileSetup: React.FC = () => {
                     id="lastName"
                     name="lastName"
                     value={formData.lastName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lastName: e.target.value })
-                    }
-                    className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50"
+                    onChange={handleInputChange}
+                    className={`w-full px-5 py-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 ${
+                      errors.lastName ? 'border-red-300' : 'border-gray-300'
+                    }`}
                     placeholder="Enter your last name"
                     required
+                    aria-invalid={!!errors.lastName}
+                    aria-describedby={errors.lastName ? "lastName-error" : undefined}
                   />
                   {errors.lastName && (
-                    <p className="mt-1 text-sm text-red-600">
+                    <p id="lastName-error" className="mt-1 text-sm text-red-600">
                       {errors.lastName}
                     </p>
                   )}
                 </div>
 
+                {/* Gender */}
                 <div>
                   <label
                     htmlFor="gender"
@@ -570,38 +671,33 @@ const ProfileSetup: React.FC = () => {
                       name="gender"
                       value={formData.gender}
                       onChange={handleInputChange}
-                      className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 appearance-none cursor-pointer"
+                      className={`w-full px-5 py-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 appearance-none cursor-pointer ${
+                        errors.gender ? 'border-red-300' : 'border-gray-300'
+                      }`}
                       required
+                      aria-invalid={!!errors.gender}
+                      aria-describedby={errors.gender ? "gender-error" : undefined}
                     >
                       <option value="">Select your gender</option>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>
-                      <option value="prefer-not-to-say">
-                        Prefer not to say
-                      </option>
+                      <option value="prefer-not-to-say">Prefer not to say</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </div>
                   </div>
                   {errors.gender && (
-                    <p className="mt-1 text-sm text-red-600">{errors.gender}</p>
+                    <p id="gender-error" className="mt-1 text-sm text-red-600">
+                      {errors.gender}
+                    </p>
                   )}
                 </div>
 
+                {/* Date of Birth */}
                 <div>
                   <label
                     htmlFor="birthDate"
@@ -609,17 +705,43 @@ const ProfileSetup: React.FC = () => {
                   >
                     Date of Birth
                   </label>
-                  <input
-                    type="date"
-                    id="birthDate"
-                    name="birthDate"
-                    value={formData.birthDate}
-                    onChange={handleInputChange}
-                    className="w-full px-6 py-5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base bg-gray-50 cursor-pointer min-h-[60px]"
-                    required
-                  />
+                  <div className={`flex items-center justify-between border rounded-2xl px-4 min-h-[60px] focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent ${
+                    errors.birthDate ? 'border-red-300' : 'border-gray-300'
+                  }`}>
+                    <DatePicker
+                      id="birthDate"
+                      selected={currentBirthDate}
+                      onChange={handleDateChange}
+                      dateFormat="dd-MM-yyyy"
+                      placeholderText="01-01-2000"
+                      showMonthDropdown
+                      showYearDropdown
+                      dropdownMode="select"
+                      scrollableYearDropdown
+                      maxDate={new Date()}
+                      shouldCloseOnSelect
+                      showPopperArrow={false}
+                      autoComplete="bday"
+                      className="flex-1 bg-transparent text-base outline-none placeholder:text-gray-400 cursor-text w-full"
+                      aria-invalid={!!errors.birthDate}
+                      aria-describedby={errors.birthDate ? "birthDate-error" : undefined}
+                      calendarStartDay={1}
+                    />
+
+                    {/* Calendar Icon */}
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById("birthDate")?.focus()}
+                      className="ml-3 text-gray-400 hover:text-blue-500 transition-colors duration-150 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Open calendar"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
                   {errors.birthDate && (
-                    <p className="mt-1 text-sm text-red-600">
+                    <p id="birthDate-error" className="mt-1 text-sm text-red-600">
                       {errors.birthDate}
                     </p>
                   )}
@@ -627,28 +749,22 @@ const ProfileSetup: React.FC = () => {
               </div>
             </div>
 
+            {/* Submit Button */}
             <div className="pt-8 pb-8 md:pb-0">
               <button
                 type="submit"
-                disabled={isLoading || !isFormValid || isUploadingImage}
-                className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer ${
-                  isFormValid && !isLoading && !isUploadingImage
-                    ? "text-white"
+                disabled={isLoading || !isFormValid() || isUploadingImage}
+                className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer text-white ${
+                  isFormValid() && !isLoading && !isUploadingImage
+                    ? "text-white bg-yellow-500 hover:bg-yellow-700 cursor-pointer"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
-                style={
-                  isFormValid && !isLoading && !isUploadingImage
-                    ? { backgroundColor: "#F9A825" }
-                    : {}
-                }
               >
                 {isLoading || isUploadingImage ? (
                   <div className="flex items-center justify-center">
                     <LoadingSpinner size="sm" color="white" className="mr-2" />
                     <span>
-                      {isUploadingImage
-                        ? "Uploading image...."
-                        : "Saving information"}
+                      {isUploadingImage ? "Uploading image..." : "Saving information..."}
                     </span>
                   </div>
                 ) : hasExistingData ? (
@@ -662,7 +778,7 @@ const ProfileSetup: React.FC = () => {
         </div>
       </div>
 
-      {/* Footer - Hidden on mobile */}
+      {/* Footer */}
       <div className="hidden lg:block py-6 px-4">
         <div className="border-t border-gray-200 pt-4">
           <div className="flex items-center justify-between text-xs text-gray-400">

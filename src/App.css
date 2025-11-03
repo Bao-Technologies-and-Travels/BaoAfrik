@@ -18,3 +18,207 @@
 .promoted-tag {
   @apply bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
 }
+
+/* Styles for the React Date picker */
+
+.react-datepicker {
+  @apply border border-gray-200 rounded-2xl shadow-xl p-4 bg-white font-sans;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+}
+
+.react-datepicker__header {
+  @apply bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200 rounded-t-2xl pt-2 pb-2 px-2;
+}
+
+/* Navigation arrows */
+.react-datepicker__navigation {
+  @apply top-4 border-gray-400 hover:border-gray-600 transition-colors duration-200;
+}
+
+.react-datepicker__navigation--previous {
+  @apply left-4;
+}
+
+.react-datepicker__navigation--next {
+  @apply right-4;
+}
+
+.react-datepicker__navigation-icon::before {
+  @apply border-gray-500 hover:border-gray-700 transition-colors duration-200;
+}
+
+/* Current month */
+.react-datepicker__current-month {
+  @apply text-gray-900 font-semibold text-lg mb-2 text-center;
+}
+
+/* Month + Year dropdowns */
+.react-datepicker__month-dropdown-container,
+.react-datepicker__year-dropdown-container {
+  @apply mx-1 mb-3;
+}
+
+.react-datepicker__month-dropdown-container select,
+.react-datepicker__year-dropdown-container select {
+  @apply bg-white border border-gray-300 text-gray-700 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:border-gray-400;
+  min-width: 100px;
+}
+
+/* Week days header */
+.react-datepicker__day-names {
+  @apply flex flex-row justify-between bg-white pt-2 pb-1; 
+}
+
+.react-datepicker__day-name {
+  @apply text-gray-500 font-medium text-xs uppercase tracking-wider w-8 h-8 flex items-center justify-center flex-shrink-0;
+}
+
+/* Days grid */
+.react-datepicker__month {
+  @apply my-1 mx-0;
+}
+
+.react-datepicker__week {
+  @apply flex flex-row justify-between;
+}
+
+/* Consolidated day styles */
+.react-datepicker__day,
+.react-datepicker__month-text,
+.react-datepicker__quarter-text,
+.react-datepicker__year-text {
+  @apply text-gray-700 hover:bg-blue-50 rounded-full transition-all duration-200 w-8 h-8 flex items-center justify-center text-sm font-medium flex-shrink-0;
+  border: 2px solid transparent;
+  margin: 2px;
+}
+
+.react-datepicker__day:hover,
+.react-datepicker__month-text:hover,
+.react-datepicker__quarter-text:hover,
+.react-datepicker__year-text:hover {
+  @apply bg-blue-100 border-blue-200 transform scale-105;
+}
+
+/* Selected day */
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  @apply bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full shadow-md hover:from-blue-600 hover:to-blue-700 border-blue-500 transform scale-105;
+}
+
+.react-datepicker__day--selected:hover,
+.react-datepicker__day--keyboard-selected:hover {
+  @apply shadow-lg transform scale-110;
+}
+
+/* Today */
+.react-datepicker__day--today {
+  @apply font-semibold text-blue-600 bg-blue-50 border-blue-200;
+}
+
+.react-datepicker__day--today:hover {
+  @apply bg-blue-100 border-blue-300;
+}
+
+/* Outside month days */
+.react-datepicker__day--outside-month {
+  @apply text-gray-400 opacity-60;
+}
+
+.react-datepicker__day--disabled {
+  @apply text-gray-300 cursor-not-allowed hover:bg-transparent;
+}
+
+.react-datepicker__day--disabled:hover {
+  @apply transform-none border-transparent;
+}
+
+/* Weekend days */
+/* .react-datepicker__day--weekend {
+  @apply text-gray-600;
+} */
+
+.react-datepicker__day--weekend.react-datepicker__day--selected {
+  @apply text-white;
+}
+
+/* Triangle pointer */
+.react-datepicker__triangle {
+  @apply hidden;
+}
+
+/* Time picker if used */
+.react-datepicker__time-container {
+  @apply border-l border-gray-200;
+}
+
+.react-datepicker__time-box {
+  @apply rounded-r-2xl;
+}
+
+.react-datepicker__time-list-item {
+  @apply text-gray-700 hover:bg-blue-50 transition-colors duration-200;
+}
+
+.react-datepicker__time-list-item--selected {
+  @apply bg-blue-500 text-white hover:bg-blue-600;
+}
+
+/* Month year dropdown container */
+.react-datepicker__month-year-dropdown-container {
+  @apply flex justify-center gap-2 mb-3;
+}
+
+/* Focus states for accessibility */
+.react-datepicker__day:focus,
+.react-datepicker__month-text:focus,
+.react-datepicker__quarter-text:focus,
+.react-datepicker__year-text:focus {
+  @apply outline-none ring-2 ring-blue-300 ring-opacity-50;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .react-datepicker {
+    @apply p-2;
+    min-width: 280px;
+  }
+  
+  .react-datepicker__day,
+  .react-datepicker__month-text,
+  .react-datepicker__quarter-text,
+  .react-datepicker__year-text {
+    @apply w-7 h-7 text-xs mx-0.5 my-0.5;
+  }
+  
+  .react-datepicker__day-name {
+    @apply w-7 h-7 text-xs mx-0.5;
+  }
+}
+
+/* Animation for smooth transitions */
+.react-datepicker__day,
+.react-datepicker__month-text,
+.react-datepicker__quarter-text,
+.react-datepicker__year-text,
+.react-datepicker__navigation {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom scrollbar for time picker */
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list::-webkit-scrollbar-track {
+  @apply bg-gray-50 rounded;
+}
+
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded hover:bg-gray-400;
+}

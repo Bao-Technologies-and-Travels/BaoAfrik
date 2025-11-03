@@ -1,4 +1,3 @@
-// ResetPassword.tsx - Combined component
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';

@@ -2751,7 +2751,7 @@ const Messages: React.FC = () => {
           style={{ display: "none" }}
         />
         {/* Left Sidebar - Full Height */}
-        <div className="w-1/4 bg-white border-r-2 border-gray-300 flex flex-col h-screen sticky top-0 relative">
+        <div className="w-1/4 bg-white border-r-2 border-gray-300 flex flex-col h-screen sticky top-0">
           {/* Header */}
           <header className="bg-white">
             <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
@@ -3446,6 +3446,7 @@ const Messages: React.FC = () => {
                                         ? user.email.split("@")[0]
                                         : "User"}
                               </h3>
+                              <Link to="/profile-setup">
                               <div
                                 className="w-6 h-6 rounded flex items-center justify-center"
                                 style={{ backgroundColor: "#E3F2FD" }}
@@ -3466,6 +3467,7 @@ const Messages: React.FC = () => {
                                   />
                                 </svg>
                               </div>
+                              </Link>
                             </div>
                           </div>
                         </div>
