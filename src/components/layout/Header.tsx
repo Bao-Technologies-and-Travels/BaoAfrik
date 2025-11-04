@@ -366,7 +366,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                               <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
                             )}
                           </button>
-                        </div>
+                    </div>
                 </div>
                 
                       {/* Notification List */}
@@ -453,8 +453,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                             </div>
                           );
                         })}
-                      </div>
-
+                </div>
+                
                       {/* Footer */}
                       <div className="px-6 pt-5 pb-3 flex items-center justify-between">
                         <button onClick={markAllAsRead} className="text-xs hover:opacity-70 transition-opacity" style={{ color: '#939393' }}>
@@ -464,14 +464,14 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                           onClick={() => {
                             navigate('/notifications');
                             setIsNotificationOpen(false);
-                          }}
+                  }}
                           className="text-xs flex items-center space-x-1 hover:opacity-70 transition-opacity" 
                           style={{ color: '#64B5F6' }}
-                        >
+                >
                           <span>See all notifications</span>
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                  </svg>
                         </button>
                       </div>
                     </div>
