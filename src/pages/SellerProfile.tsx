@@ -519,7 +519,7 @@ const SellerProfile: React.FC = () => {
             <div className="flex">
               <button 
                 onClick={() => setActiveTab('reviews')}
-                className="px-4 py-3 text-sm font-medium border-b-2 transition-colors"
+                className="px-4 py-1 text-sm font-medium border-b-2 transition-colors"
                 style={{
                   color: activeTab === 'reviews' ? '#64B5F6' : '#BABABA',
                   borderColor: activeTab === 'reviews' ? '#64B5F6' : 'transparent'
@@ -529,7 +529,7 @@ const SellerProfile: React.FC = () => {
               </button>
               <button 
                 onClick={() => setActiveTab('items')}
-                className="px-4 py-3 text-sm font-medium ml-8 border-b-2 transition-colors"
+                className="px-4 py-1 text-sm font-medium ml-8 border-b-2 transition-colors"
                 style={{
                   color: activeTab === 'items' ? '#64B5F6' : '#BABABA',
                   borderColor: activeTab === 'items' ? '#64B5F6' : 'transparent'
@@ -595,7 +595,7 @@ const SellerProfile: React.FC = () => {
                 </div>
 
                 {/* Review Cards */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {/* Review 1 - Samine Herald */}
                   <div className="pb-6">
                     <div className="flex items-start space-x-3 mb-3">
@@ -810,20 +810,22 @@ const SellerProfile: React.FC = () => {
                 </div>
 
                 {/* Pagination */}
-                <div className="flex items-center justify-between mt-6">
-                  <span className="text-sm" style={{ color: '#BABABA' }}>1 - 4 out of 23</span>
-                  <div className="flex items-center space-x-1">
-                    <button 
-                      disabled
-                      className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
-                    >
-                      <img src={grayArrowIcon} alt="Previous" style={{ width: '20px', height: '20px' }} />
-                    </button>
-                    <button 
-                      className="transition-opacity hover:opacity-80"
-                    >
-                      <img src={blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
-                    </button>
+                <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm" style={{ color: '#BABABA' }}>1 - 4 out of 23</span>
+                    <div className="flex items-center space-x-1">
+                      <button 
+                        disabled
+                        className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
+                      >
+                        <img src={grayArrowIcon} alt="Previous" style={{ width: '20px', height: '20px' }} />
+                      </button>
+                      <button 
+                        className="transition-opacity hover:opacity-80"
+                      >
+                        <img src={blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -831,42 +833,42 @@ const SellerProfile: React.FC = () => {
               {/* RIGHT COLUMN - Rating Summary & Give Your Opinion */}
               <div className="lg:col-span-1">
                 {/* Overall Rating Summary */}
-                <div className="mb-8">
-                  <div className="flex items-start space-x-4 mb-4">
-                    <div className="text-4xl font-bold text-gray-900">4.3</div>
-                    <svg className="w-8 h-8 text-yellow-400 fill-current mt-1" viewBox="0 0 24 24">
+                <div className="mb-8 text-center">
+                  <div className="flex items-center justify-center space-x-2 mb-3">
+                    <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
+                    <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                     </svg>
                   </div>
-                  <div className="text-sm text-gray-600 mb-4">Review & Rates (456)</div>
+                  <div className="text-sm mb-8" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
                   
                   {/* Rating Bars */}
                   <div className="space-y-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '70%'}}></div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '70%'}}></div>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '60%'}}></div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '60%'}}></div>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '40%'}}></div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '40%'}}></div>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '20%'}}></div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '20%'}}></div>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '10%'}}></div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '10%'}}></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Give Your Opinion Section */}
-                <div className="border-t pt-6" style={{ borderColor: '#E5E5E5' }}>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Give your opinion</h3>
-                  <p className="text-sm text-gray-600 mb-4">Share your opinion about this user and help others learn a bit more about them.</p>
+                <div className="pt-24 text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Give your opinion</h3>
+                  <p className="text-xs mb-6" style={{ color: '#B0B0B0' }}>Share your opinion about this user and help others learn a bit more about them.</p>
                   
                   {/* Star Rating Input */}
-                  <div className="flex items-center space-x-1 mb-4">
+                  <div className="flex items-center justify-center space-x-1 mb-6">
                     {[1,2,3,4,5].map((star) => (
                       <button
                         key={star}
@@ -874,41 +876,61 @@ const SellerProfile: React.FC = () => {
                         className="focus:outline-none hover:scale-110 transition-transform"
                       >
                         <svg 
-                          className={`w-8 h-8 ${userRating >= star ? 'text-yellow-400 fill-current' : 'text-gray-300'} stroke-current`} 
+                          className="w-7 h-7" 
                           viewBox="0 0 24 24"
-                          style={{ strokeWidth: '1.5' }}
+                          fill={userRating >= star ? '#FBBC05' : 'none'}
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         >
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          <path 
+                            d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
+                            stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
+                          />
                         </svg>
                       </button>
                     ))}
                   </div>
                   
                   {/* Review Text Input */}
-                  <div className="flex items-start space-x-3 mb-4">
-                    <img
-                      src={sellerAvatar}
-                      alt="Your avatar"
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
+                  <div className="flex items-start space-x-3 mb-4 pl-4">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <style dangerouslySetInnerHTML={{__html: `
+                      .custom-placeholder::placeholder {
+                        color: #D9D9D9;
+                        opacity: 1;
+                      }
+                    `}} />
                     <textarea
                       value={userReviewText}
                       onChange={(e) => setUserReviewText(e.target.value)}
-                      placeholder="Que pensez vous de cet article?"
-                      className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                      style={{ borderColor: '#E5E5E5', minHeight: '80px' }}
+                      placeholder="What do you think of this article?"
+                      className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none resize-none custom-placeholder"
+                      style={{ 
+                        border: 'none',
+                        minHeight: '80px',
+                        color: '#6A6A6A',
+                        backgroundColor: 'transparent'
+                      }}
                     />
                   </div>
                   
                   {/* Post Review Button */}
-                  <button 
-                    className="w-full py-2.5 rounded-lg font-medium text-white transition-colors"
-                    style={{ backgroundColor: '#F9A825' }}
-                    onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-                    onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-                  >
-                    Post the review
-                  </button>
+                  <div className="pl-4">
+                    <button 
+                      className="w-full py-2.5 rounded-lg font-medium transition-all mt-6"
+                      style={{ 
+                        backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
+                        color: userRating > 0 ? 'white' : '#6A6A6A'
+                      }}
+                    >
+                      Post the review
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
