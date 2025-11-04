@@ -8,6 +8,11 @@ import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
 import verifyIcon from '../assets/images/pre/verify.svg';
 import basketIcon from '../assets/images/pre/basket.png';
 import logoIcon from '../assets/images/logos/ba-brand-icon-colored.png';
+import whatsappIcon from '../assets/images/pre/zap.svg';
+import instagramIcon from '../assets/images/pre/ig.svg';
+import facebookIcon from '../assets/images/pre/fb.svg';
+import locationIcon from '../assets/images/pre/PL.svg';
+import profileIcon from '../assets/images/pre/profile.svg';
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
 import pre2 from '../assets/images/pre/2.png';
@@ -336,7 +341,7 @@ const SellerProfile: React.FC = () => {
               {seller.isVerified && (
                 <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
                   <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
-                  <span className="text-xs font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
+                  <span className="text-xs" style={{ color: '#45C55B', fontWeight: '300' }}>Verified Seller</span>
                 </div>
               )}
             </div>
@@ -438,33 +443,52 @@ const SellerProfile: React.FC = () => {
           {/* Bio and Info Sections - Responsive grid layout */}
           <div className="mb-4 grid grid-cols-1 xl:grid-cols-3 gap-8 xl:gap-16">
             {/* Bio Section */}
-            <div className="xl:col-span-2">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Bio</h3>
-              <p className="text-gray-600 leading-relaxed text-base">
+            <div className="xl:col-span-2 pl-8">
+              <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#6A6A6A' }}>Bio</h3>
+              <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
                 {seller.bio}
               </p>
+              
+              {/* Social Media Icons */}
+              <div className="flex items-center space-x-8 mt-6">
+                <a href="#" className="hover:opacity-80 transition-opacity">
+                  <img src={whatsappIcon} alt="WhatsApp" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
+                </a>
+                <a href="#" className="hover:opacity-80 transition-opacity">
+                  <img src={instagramIcon} alt="Instagram" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
+                </a>
+                <a href="#" className="hover:opacity-80 transition-opacity">
+                  <img src={facebookIcon} alt="Facebook" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
+                </a>
+              </div>
             </div>
 
             {/* Info Section - Location and Membership */}
-            <div className="space-y-8">
+            <div className="space-y-4 pl-32">
+              {/* Location */}
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Reviews & Ratings</h2>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span>London, United Kingdom</span>
+                <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Location</h4>
+                <div className="flex items-center space-x-2">
+                  <img src={locationIcon} alt="Location" className="w-4 h-4" />
+                  <span className="text-sm" style={{ color: '#64B5F6' }}>London, United Kingdom</span>
                 </div>
               </div>
 
+              {/* Useful link */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Member</h4>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Since 2025</span>
+                <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Useful link</h4>
+                <div className="flex items-center space-x-2">
+                  <img src={locationIcon} alt="Link" className="w-4 h-4" />
+                  <span className="text-sm" style={{ color: '#64B5F6' }}>user-randomlink.com</span>
+                </div>
+              </div>
+
+              {/* Member Since */}
+              <div>
+                <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Member Since</h4>
+                <div className="flex items-center space-x-2">
+                  <img src={profileIcon} alt="Profile" className="w-4 h-4" />
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>May 2025</span>
                 </div>
               </div>
             </div>
