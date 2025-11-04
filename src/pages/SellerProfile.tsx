@@ -394,7 +394,7 @@ const SellerProfile: React.FC = () => {
                       >
                         <img src={warningIcon} alt="Report" className="w-4 h-4" />
                         <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Report the profile</span>
-                      </button>
+              </button>
                     </div>
                   )}
                 </div>
@@ -1926,7 +1926,7 @@ const SellerProfile: React.FC = () => {
                     >
                       2
                     </button>
-                  </div>
+            </div>
                   
                   <button
                     className="font-normal transition-colors"

@@ -19,6 +19,7 @@ import PasswordResetSuccess from './pages/auth/PasswordResetSuccess';
 import Profile from './pages/Profile';
 import ProductDetail from './pages/ProductDetail';
 import SellerProfile from './pages/SellerProfile';
+import UserAccount from './pages/UserAccount';
 import Messages from './pages/Messages';
 import Listings from './pages/Listings';
 import CreateListing from './pages/CreateListing';
@@ -28,6 +29,7 @@ function AppContent() {
   const location = useLocation();
   const isProductDetailPage = location.pathname.startsWith('/product/');
   const isSellerProfilePage = location.pathname.startsWith('/seller/');
+  const isUserAccountPage = location.pathname === '/account';
   const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success'];
   const customLayoutPages = ['/messages', '/create-listing'];
   const isAuthPage = authPages.includes(location.pathname);
@@ -74,6 +76,20 @@ function AppContent() {
         <main className="flex-1">
           <Routes>
             <Route path="/seller/:sellerId" element={<SellerProfile />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // For user account page, render without header (Header is now in UserAccount component)
+  if (isUserAccountPage) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <main className="flex-1">
+          <Routes>
+            <Route path="/account" element={<UserAccount />} />
           </Routes>
         </main>
         <Footer />

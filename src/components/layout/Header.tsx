@@ -269,7 +269,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 </Link>
                 
                 <Link 
-                  to="/profile" 
+                  to="/account" 
                   className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full hover:ring-1 hover:ring-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
                   title="Profile"
                   aria-label="Go to profile page"
