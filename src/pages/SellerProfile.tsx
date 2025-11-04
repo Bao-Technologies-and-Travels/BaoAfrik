@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import sellerAvatar from '../assets/images/logos/avatar.png';
@@ -17,6 +17,7 @@ import likeIcon from '../assets/images/pre/like.svg';
 import dislikeIcon from '../assets/images/pre/dislike.svg';
 import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
+import bookmarkIcon from '../assets/images/pre/bm.svg';
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
 import pre2 from '../assets/images/pre/2.png';
@@ -893,7 +894,7 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Review Text Input */}
-                  <div className="flex items-start space-x-3 mb-4 pl-4">
+                  <div className="flex items-start space-x-3 mb-4 pl-8">
                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
@@ -920,7 +921,7 @@ const SellerProfile: React.FC = () => {
                   </div>
                   
                   {/* Post Review Button */}
-                  <div className="pl-4">
+                  <div className="pl-8">
                     <button 
                       className="w-full py-2.5 rounded-lg font-medium transition-all mt-6"
                       style={{ 
@@ -938,50 +939,94 @@ const SellerProfile: React.FC = () => {
 
           {/* Seller Items Content */}
           {activeTab === 'items' && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+            <>
+              {/* Title */}
+              <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{seller.name} items</h2>
+              
+              {/* Product Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
               {/* Product 1 - African Textiles */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre1} alt="African Textiles" className="w-full h-full object-cover" />
+              <Link to={`/product/1`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre1} 
+                    alt="African Textiles"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(1).flag} 
                       alt={getProductCountry(1).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(1).abbreviation}
                     </span>
+                  </div>
                 </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$13.9</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $13.9
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Textiles</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>African Textiles</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('textiles-1')) {
                             newSet.delete('textiles-1');
@@ -990,72 +1035,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('textiles-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('textiles-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('textiles-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                          {!wishlistProducts.has('textiles-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('textiles-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 2 - Fresh Tomatoes */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre2} alt="Fresh Tomatoes" className="w-full h-full object-cover" />
+              <Link to={`/product/2`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre2} 
+                    alt="Fresh Tomatoes"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(2).flag} 
                       alt={getProductCountry(2).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(2).abbreviation}
                     </span>
+                  </div>
                 </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$45</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $45
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Fresh Tomatoes</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Fresh Tomatoes</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('tomatoes-1')) {
                             newSet.delete('tomatoes-1');
@@ -1064,72 +1146,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('tomatoes-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('tomatoes-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                          {!wishlistProducts.has('tomatoes-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('tomatoes-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 3 - Dried Shrimp */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre3} alt="Dried Shrimp" className="w-full h-full object-cover" />
+              <Link to={`/product/3`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre3} 
+                    alt="Dried Shrimp"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(3).flag} 
                       alt={getProductCountry(3).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(3).abbreviation}
                     </span>
+                  </div>
                 </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$8.09</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $8.09
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Dried Shrimp</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Dried Shrimp</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('shrimp-1')) {
                             newSet.delete('shrimp-1');
@@ -1138,72 +1257,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('shrimp-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('shrimp-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                          {!wishlistProducts.has('shrimp-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('shrimp-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 4 - Ndolé Leaves */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre4} alt="Ndolé Leaves" className="w-full h-full object-cover" />
+              <Link to={`/product/4`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre4} 
+                    alt="Ndolé Leaves"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(4).flag} 
                       alt={getProductCountry(4).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(4).abbreviation}
                     </span>
+                  </div>
                 </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$11.5</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $11.5
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Ndolé Leaves</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Ndolé Leaves</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('ndole-1')) {
                             newSet.delete('ndole-1');
@@ -1212,72 +1368,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('ndole-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('ndole-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                          {!wishlistProducts.has('ndole-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('ndole-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 5 - Plantain Chips */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre5} alt="Plantain Chips" className="w-full h-full object-cover" />
+              <Link to={`/product/5`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre5} 
+                    alt="Plantain Chips"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(5).flag} 
                       alt={getProductCountry(5).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(5).abbreviation}
                     </span>
+                  </div>
                 </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$6.50</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $6.50
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Plantain Chips</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Plantain Chips</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('plantain-1')) {
                             newSet.delete('plantain-1');
@@ -1286,72 +1479,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('plantain-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('plantain-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('plantain-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                          {!wishlistProducts.has('plantain-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('plantain-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 6 - Yam Flour */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre6} alt="Yam Flour" className="w-full h-full object-cover" />
+              <Link to={`/product/6`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre6} 
+                    alt="Yam Flour"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(6).flag} 
                       alt={getProductCountry(6).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(6).abbreviation}
                     </span>
+                  </div>
                 </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$9.75</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $9.75
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Yam Flour</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Yam Flour</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('yam-1')) {
                             newSet.delete('yam-1');
@@ -1360,72 +1590,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('yam-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('yam-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('yam-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                          {!wishlistProducts.has('yam-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('yam-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 7 - Palm Oil */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre7} alt="Palm Oil" className="w-full h-full object-cover" />
+              <Link to={`/product/7`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre7} 
+                    alt="Palm Oil"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(7).flag} 
                       alt={getProductCountry(7).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(7).abbreviation}
                     </span>
+                  </div>
                 </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$15.20</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $15.20
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Palm Oil</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Palm Oil</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('palm-1')) {
                             newSet.delete('palm-1');
@@ -1434,72 +1701,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('palm-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('palm-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('palm-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                          {!wishlistProducts.has('palm-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('palm-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 8 - African Spices */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre8} alt="African Spices" className="w-full h-full object-cover" />
+              <Link to={`/product/8`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre8} 
+                    alt="African Spices"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(8).flag} 
                       alt={getProductCountry(8).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(8).abbreviation}
                     </span>
+                  </div>
                 </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$22.00</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $22.00
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                      <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Spices</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>African Spices</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('spices-1')) {
                             newSet.delete('spices-1');
@@ -1508,29 +1812,76 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('spices-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('spices-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('spices-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                          {!wishlistProducts.has('spices-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('spices-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
+              
+              {/* Pagination */}
+              <div className="flex items-center justify-center space-x-6 mt-8">
+                <button
+                  disabled={true}
+                  className="font-normal transition-colors disabled:cursor-not-allowed"
+                  style={{ fontSize: '16px', color: '#BABABA' }}
+                >
+                  Previous
+                </button>
+                
+                <div className="flex items-center space-x-2">
+                  <button
+                    className="font-bold transition-colors relative pb-1"
+                    style={{ fontSize: '16px', color: '#212121' }}
+                  >
+                    <span>1</span>
+                    <div 
+                      className="absolute bottom-0 left-0 right-0"
+                      style={{
+                        width: '100%',
+                        height: '2px',
+                        backgroundColor: '#212121'
+                      }}
+                    />
+                  </button>
+                  <button
+                    className="font-normal transition-colors hover:text-gray-900"
+                    style={{ fontSize: '16px', color: '#BABABA' }}
+                  >
+                    2
+                  </button>
+                </div>
+                
+                <button
+                  className="font-bold transition-colors"
+                  style={{ fontSize: '16px', color: '#212121' }}
+                >
+                  Next
+                </button>
+                
+                <div className="flex items-center space-x-1">
+                  <div className="px-2 py-0.5 rounded" style={{ backgroundColor: '#F5F5F5' }}>
+                    <span className="font-bold" style={{ fontSize: '16px', color: '#212121' }}>1</span>
+                  </div>
+                  <span className="font-normal" style={{ fontSize: '16px', color: '#BABABA' }}>/ 2</span>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -1572,3 +1923,4 @@ const SellerProfile: React.FC = () => {
 };
 
 export default SellerProfile;
+
