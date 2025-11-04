@@ -570,13 +570,117 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
               <>
                 {/* Language Toggle for mobile */}
                 <div className="relative mr-1">
-                  <button
+                   <button
                     onClick={toggleLanguageDropdown}
                     className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
                     style={{ borderColor: '#E4E4E4', color: '#BABABA' }}
                   >
                     {selectedLanguage}
                     <img src={arrowDownIcon} alt="Arrow" className="ml-1 w-4 h-4" />
+                   </button>
+                  
+                  {/* Language Dropdown for mobile */}
+                  {isLanguageDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
+                      {/* Header */}
+                      <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
+                        <h3 className="text-sm font-medium text-gray-700">Language :</h3>
+                        <button
+                          onClick={() => setIsLanguageDropdownOpen(false)}
+                          className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                           </svg>
+                        </button>
+                       </div>
+
+                      {/* Language Options */}
+                      <div className="py-2">
+                        <button
+                          onClick={() => handleLanguageChange('EN')}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'EN' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'EN' ? '#64B5F6' : '#374151'
+                          }}
+                        >
+                          English
+                        </button>
+                        <button
+                          onClick={() => handleLanguageChange('FR')}
+                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
+                          style={{
+                            backgroundColor: selectedLanguage === 'FR' ? '#F0F8FE' : 'transparent',
+                            color: selectedLanguage === 'FR' ? '#64B5F6' : '#374151'
+                          }}
+                >
+                          French
+                        </button>
+                       </div>
+                             </div>
+                  )}
+                             </div>
+                
+                {/* Become a seller button - only for logged in users */}
+                         <Link 
+              to="/register" 
+                   className="flex items-center space-x-1.5 px-2.5 py-2 rounded-lg transition-colors mr-1"
+                   style={{backgroundColor: '#FEF6E9'}}
+                         >
+                  <img src={basketIcon} alt="Basket" className="w-5 h-5" style={{filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)'}} />
+                  <span className="text-sm font-normal" style={{color: '#F9A825'}}>Start selling</span>
+                         </Link>
+
+            {/* Notification Icon */}
+                         <Link 
+              to="/notifications"
+              className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
+              title="Notifications"
+              aria-label="View notifications"
+            >
+              <img 
+                src={notificationIcon} 
+                alt="Notifications" 
+                className="w-5 h-5"
+                style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
+              />
+                         </Link>
+
+            {/* Burger Menu Button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="p-1.5 rounded-md focus:outline-none transition-all duration-200"
+              style={{ color: '#171717' }}
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                )}
+                             </svg>
+                </button>
+              </>
+            ) : (
+               // Logged out user mobile navigation
+              <>
+                {/* Language Toggle for mobile */}
+                 <div className="relative" style={{ marginRight: window.innerWidth < 640 ? '8px' : '4px' }}>
+                  <button
+                    onClick={toggleLanguageDropdown}
+                     className="flex items-center border rounded-lg bg-white font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                     style={{ 
+                       borderColor: '#E4E4E4', 
+                       color: '#BABABA',
+                       padding: window.innerWidth < 640 ? '4px 8px' : '6px 10px',
+                       fontSize: window.innerWidth < 640 ? '11px' : '14px'
+                     }}
+                  >
+                    {selectedLanguage}
+                     <img src={arrowDownIcon} alt="Arrow" className="ml-1" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
                   </button>
                   
                   {/* Language Dropdown for mobile */}
@@ -599,116 +703,12 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       <div className="py-2">
                         <button
                           onClick={() => handleLanguageChange('EN')}
-                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
-                          style={{
-                            backgroundColor: selectedLanguage === 'EN' ? '#F0F8FE' : 'transparent',
-                            color: selectedLanguage === 'EN' ? '#64B5F6' : '#374151'
-                          }}
+                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
+                            selectedLanguage === 'EN' 
+                              ? 'bg-blue-50 text-blue-600' 
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
                         >
-                          English
-                        </button>
-                        <button
-                          onClick={() => handleLanguageChange('FR')}
-                          className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
-                          style={{
-                            backgroundColor: selectedLanguage === 'FR' ? '#F0F8FE' : 'transparent',
-                            color: selectedLanguage === 'FR' ? '#64B5F6' : '#374151'
-                          }}
-                        >
-                          French
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Become a seller button - only for logged in users */}
-            <Link 
-              to="/register" 
-                   className="flex items-center space-x-1.5 px-2.5 py-2 rounded-lg transition-colors mr-1"
-                   style={{backgroundColor: '#FEF6E9'}}
-                >
-                  <img src={basketIcon} alt="Basket" className="w-5 h-5" style={{filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)'}} />
-                  <span className="text-sm font-normal" style={{color: '#F9A825'}}>Start selling</span>
-            </Link>
-            
-            {/* Notification Icon */}
-            <Link
-              to="/notifications"
-              className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
-              title="Notifications"
-              aria-label="View notifications"
-            >
-              <img 
-                src={notificationIcon} 
-                alt="Notifications" 
-                className="w-5 h-5"
-                style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
-              />
-            </Link>
-            
-            {/* Burger Menu Button */}
-            <button
-              onClick={toggleMobileMenu}
-              className="p-1.5 rounded-md focus:outline-none transition-all duration-200"
-              style={{ color: '#171717' }}
-              aria-label="Toggle navigation menu"
-              aria-expanded={isMobileMenuOpen}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                {isMobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                )}
-                  </svg>
-                </button>
-              </>
-            ) : (
-               // Logged out user mobile navigation
-               <>
-                 {/* Language Toggle for mobile */}
-                 <div className="relative" style={{ marginRight: window.innerWidth < 640 ? '8px' : '4px' }}>
-                   <button
-                     onClick={toggleLanguageDropdown}
-                     className="flex items-center border rounded-lg bg-white font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
-                     style={{ 
-                       borderColor: '#E4E4E4', 
-                       color: '#BABABA',
-                       padding: window.innerWidth < 640 ? '4px 8px' : '6px 10px',
-                       fontSize: window.innerWidth < 640 ? '11px' : '14px'
-                     }}
-                   >
-                     {selectedLanguage}
-                     <img src={arrowDownIcon} alt="Arrow" className="ml-1" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
-                   </button>
-                   
-                   {/* Language Dropdown for mobile */}
-                   {isLanguageDropdownOpen && (
-                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
-                       {/* Header */}
-                       <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
-                         <h3 className="text-sm font-medium text-gray-700">Language :</h3>
-                         <button
-                           onClick={() => setIsLanguageDropdownOpen(false)}
-                           className="text-gray-400 hover:text-gray-600 focus:outline-none"
-                         >
-                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-             </svg>
-           </button>
-                       </div>
-                       
-                       {/* Language Options */}
-                       <div className="py-2">
-                         <button
-                           onClick={() => handleLanguageChange('EN')}
-                           className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                             selectedLanguage === 'EN' 
-                               ? 'bg-blue-50 text-blue-600' 
-                               : 'text-gray-700 hover:bg-gray-50'
-                           }`}
-                         >
                           <img 
                             src="https://flagcdn.com/w20/gb.png" 
                             alt="UK flag" 
@@ -716,26 +716,26 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                             width="20"
                             height="16"
                           />
-                           English
-                         </button>
-                         <button
-                           onClick={() => handleLanguageChange('FR')}
-                           className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
-                             selectedLanguage === 'FR' 
-                               ? 'bg-blue-50 text-blue-600' 
-                               : 'text-gray-700 hover:bg-gray-50'
-                           }`}
-                         >
+                          English
+                        </button>
+                        <button
+                          onClick={() => handleLanguageChange('FR')}
+                          className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
+                            selectedLanguage === 'FR' 
+                              ? 'bg-blue-50 text-blue-600' 
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
                           French
-                         </button>
-                         <button
-                           onClick={() => handleLanguageChange('DE')}
+                        </button>
+                        <button
+                          onClick={() => handleLanguageChange('DE')}
                           className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
                           style={{
                             backgroundColor: selectedLanguage === 'DE' ? '#F0F8FE' : 'transparent',
                             color: selectedLanguage === 'DE' ? '#64B5F6' : '#374151'
                           }}
-                         >
+                        >
                           <img 
                             src="https://flagcdn.com/w20/de.png" 
                             alt="Germany flag" 
@@ -743,16 +743,16 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                             width="20"
                             height="16"
                           />
-                           Germany
-                         </button>
-                         <button
-                           onClick={() => handleLanguageChange('ES')}
+                          Germany
+                        </button>
+                        <button
+                          onClick={() => handleLanguageChange('ES')}
                           className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
                           style={{
                             backgroundColor: selectedLanguage === 'ES' ? '#F0F8FE' : 'transparent',
                             color: selectedLanguage === 'ES' ? '#64B5F6' : '#374151'
                           }}
-                         >
+                        >
                           <img 
                             src="https://flagcdn.com/w20/es.png" 
                             alt="Spain flag" 
@@ -761,12 +761,12 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                             height="16"
                           />
                           Spanish
-                         </button>
-                       </div>
-                     </div>
-                   )}
-                 </div>
-                 
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
                  {/* Sign In Button - Mobile */}
                  <Link 
                    to="/login" 
@@ -784,8 +784,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                  </Link>
                  
                  {/* Sign Up Button - Mobile */}
-                <Link 
-                  to="/register" 
+            <Link 
+              to="/register" 
                     className="inline-flex items-center rounded-lg font-medium transition-colors duration-200 focus:outline-none border"
                     style={{
                       borderColor: '#F9A822', 
@@ -793,15 +793,15 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       padding: window.innerWidth < 640 ? '4px 12px' : '8px 32px',
                       fontSize: window.innerWidth < 640 ? '11px' : '14px'
                     }}
-                    onMouseEnter={(e) => {
+                   onMouseEnter={(e) => {
                       (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
-                    }}
-                    onMouseLeave={(e) => {
+                   }}
+                   onMouseLeave={(e) => {
                       (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                    }}
-                 >
+                   }}
+                >
                    Sign Up
-                </Link>
+            </Link>
               </>
             )}
           </div>
@@ -824,8 +824,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
               {/* Translation Toggle and Close Button */}
               <div className="flex items-center space-x-2">
                 {/* Translation Toggle */}
-                <div className="relative">
-                  <button
+                 <div className="relative">
+                   <button
                     onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                     className="flex items-center border rounded-lg bg-white font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
                     style={{ 
@@ -835,30 +835,30 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       fontSize: '11px'
                     }}
                     aria-label="Select language"
-                  >
-                    {selectedLanguage}
+                   >
+                     {selectedLanguage}
                     <img src={arrowDownIcon} alt="Arrow" className="ml-1" style={{ width: '12px', height: '12px' }} />
-                  </button>
-                  
+                   </button>
+                   
                   {/* Language Dropdown */}
-                  {isLanguageDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
-                      {/* Header */}
-                      <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
-                        <h3 className="text-sm font-medium text-gray-700">Language :</h3>
-                        <button
-                          onClick={() => setIsLanguageDropdownOpen(false)}
-                          className="text-gray-400 hover:text-gray-600 focus:outline-none"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                      
-                      {/* Language Options */}
-                      <div className="py-2">
-                        <button
+                   {isLanguageDropdownOpen && (
+                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
+                       {/* Header */}
+                       <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
+                         <h3 className="text-sm font-medium text-gray-700">Language :</h3>
+                         <button
+                           onClick={() => setIsLanguageDropdownOpen(false)}
+                           className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                         >
+                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+                       </div>
+                       
+                       {/* Language Options */}
+                       <div className="py-2">
+                         <button
                           onClick={() => {
                             setSelectedLanguage('EN');
                             setIsLanguageDropdownOpen(false);
@@ -866,9 +866,9 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                           className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center"
                         >
                           <img src="https://flagcdn.com/w20/gb.png" alt="UK flag" className="w-5 h-4 object-cover rounded-sm mr-3" />
-                          English
-                        </button>
-                        <button
+                           English
+                         </button>
+                         <button
                           onClick={() => {
                             setSelectedLanguage('FR');
                             setIsLanguageDropdownOpen(false);
@@ -877,8 +877,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                         >
                           <img src="https://flagcdn.com/w20/fr.png" alt="France flag" className="w-5 h-4 object-cover rounded-sm mr-3" />
                           France
-                        </button>
-                        <button
+                         </button>
+                         <button
                           onClick={() => {
                             setSelectedLanguage('DE');
                             setIsLanguageDropdownOpen(false);
@@ -886,9 +886,9 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                           className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center"
                         >
                           <img src="https://flagcdn.com/w20/de.png" alt="Germany flag" className="w-5 h-4 object-cover rounded-sm mr-3" />
-                          Germany
-                        </button>
-                        <button
+                           Germany
+                         </button>
+                         <button
                           onClick={() => {
                             setSelectedLanguage('ES');
                             setIsLanguageDropdownOpen(false);
@@ -897,15 +897,15 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                         >
                           <img src="https://flagcdn.com/w20/es.png" alt="Spain flag" className="w-5 h-4 object-cover rounded-sm mr-3" />
                           Spanish
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
+                         </button>
+                       </div>
+                     </div>
+                   )}
+                 </div>
+                 
                 {/* Close Button */}
-              <button
-                onClick={toggleMobileMenu}
+                 <button
+                   onClick={toggleMobileMenu}
                   className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none transition-all duration-200"
                 aria-label="Close navigation menu"
               >
@@ -923,24 +923,24 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 <div className="space-y-4">
                   {/* Start selling button */}
                   <div className="pb-2">
-                    <Link 
-                      to="/register" 
+                  <Link 
+                    to="/register" 
                       className="inline-flex items-center px-3 py-2 rounded-lg font-normal text-sm transition-colors duration-200 focus:outline-none" 
                       style={{backgroundColor: '#FFF8F0', color: '#F9A822'}}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                       <svg className="w-4 h-4 mr-1.5 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#F9A822'}}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                      </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
+                    </svg>
                       Start selling
-                    </Link>
+                  </Link>
                   </div>
 
                   {/* Profile Section */}
                   <div className="flex items-center space-x-3 py-3 border-b border-gray-100">
-                    <img 
+                      <img 
                       src={user?.profileImage || avatar} 
-                      alt="User avatar" 
+                        alt="User avatar" 
                       className="w-12 h-12 rounded-full object-cover"
                       width="48"
                       height="48"
@@ -951,8 +951,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                         <h3 className="text-sm font-bold text-gray-900">{user?.name || 'Jean Kameni'}</h3>
                         <div className="w-6 h-6 rounded flex items-center justify-center" style={{backgroundColor: '#E3F2FD'}}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#64B5F6'}}>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
                         </div>
                       </div>
                     </div>
@@ -960,19 +960,19 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
 
                   {/* Create a new listing button */}
                   <div className="py-3">
-                    <Link 
-                      to="/create-listing" 
+                  <Link 
+                    to="/create-listing" 
                       className="block w-full px-3 py-2 rounded-lg font-medium text-sm transition-colors duration-200 focus:outline-none" 
                       style={{backgroundColor: '#E3F2FD', color: '#64B5F6'}}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                       <div className="flex items-center justify-center space-x-1.5">
-                        <span>Create a new listing</span>
+                      <span>Create a new listing</span>
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#64B5F6'}}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                      </div>
-                    </Link>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                  </Link>
                   </div>
 
                   {/* Navigation Menu Items */}
@@ -985,66 +985,66 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     >
                       <div className="flex items-center space-x-2">
                         <img src={messageIcon} alt="Message" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                        <div>
+                      <div>
                           <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Chats</div>
-                        </div>
                       </div>
-                    </Link>
+                           </div>
+                  </Link>
 
                     {/* My listings */}
-                    <Link 
+                  <Link 
                       to="/my-listings" 
                       className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                       <div className="flex items-center space-x-2">
                         <img src={boxIcon} alt="Box" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                        <div>
+                      <div>
                           <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>My listings</div>
                         </div>
-                      </div>
-                    </Link>
+                    </div>
+                  </Link>
 
                     {/* My requests */}
-                    <Link 
+                  <Link 
                       to="/my-requests" 
                       className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                       <div className="flex items-center space-x-2">
                         <img src={groupIcon} alt="Group" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                        <div>
+                      <div>
                           <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>My requests</div>
                         </div>
-                      </div>
-                    </Link>
+                    </div>
+                  </Link>
 
-                    {/* Bookmarks */}
-                    <Link 
-                      to="/bookmarks" 
+                  {/* Bookmarks */}
+                  <Link 
+                    to="/bookmarks" 
                       className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                       <div className="flex items-center space-x-2">
                         <img src={frameIcon} alt="Frame" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                        <div>
+                      <div>
                           <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Bookmarks</div>
                         </div>
-                      </div>
-                    </Link>
+                    </div>
+                  </Link>
 
                     {/* Help Center */}
                     <Link 
                       to="/help" 
                       className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                       onClick={() => setIsMobileMenuOpen(false)}
-                    >
+                  >
                       <div className="flex items-center space-x-2">
                         <img src={podsIcon} alt="Pods" className="w-5 h-5" style={{color: '#64B5F6'}} />
-                        <div>
+                      <div>
                           <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Help Center</div>
                         </div>
-                      </div>
+                           </div>
                     </Link>
 
                     {/* Settings */}
@@ -1059,7 +1059,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                           <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Settings</div>
                           <div className="text-xs text-gray-500">Set your account preferences</div>
                         </div>
-                      </div>
+                           </div>
                     </Link>
                   </div>
 
@@ -1074,14 +1074,14 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                     >
                       <div className="flex items-center space-x-2">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{color: '#6A6A6A'}}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
                         <div className="text-left">
                           <div className="font-medium text-xs" style={{color: '#6A6A6A'}}>Log Out</div>
                           <div className="text-xs" style={{color: '#6A6A6A'}}>Log out of BAO Afrik</div>
-                        </div>
                       </div>
-                    </button>
+                    </div>
+                  </button>
                   </div>
                 </div>
               ) : (
