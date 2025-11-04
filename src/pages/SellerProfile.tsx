@@ -211,7 +211,7 @@ const SellerProfile: React.FC = () => {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       <Header />
-      
+
       {/* Gray Divider below Header */}
       <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9' }}></div>
 
@@ -262,22 +262,22 @@ const SellerProfile: React.FC = () => {
                   }}
                 />
               </div>
-            </div>
-            
-            {/* Profile Avatar - Half in cover, positioned for left alignment */}
+          </div>
+          
+          {/* Profile Avatar - Half in cover, positioned for left alignment */}
             <div className="absolute left-6 bottom-[-68px]">
               <div className="w-28 h-28 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
-                <img
-                  src={seller.avatar}
-                  alt={seller.name}
+              <img
+                src={seller.avatar}
+                alt={seller.name}
                   className="w-24 h-24 rounded-xl object-cover"
-                />
-              </div>
+              />
             </div>
-            
-            {/* Chat Button - Positioned at right side of cover */}
+          </div>
+          
+          {/* Chat Button - Positioned at right side of cover */}
             <div className="absolute right-0 bottom-[-62px]">
-              <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3">
                 <button 
                   className="hover:opacity-90 transition-opacity"
                   style={{
@@ -296,7 +296,7 @@ const SellerProfile: React.FC = () => {
                 >
                   <span>Message the seller</span>
                   <img src={basketIcon} alt="Cart" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} />
-                </button>
+              </button>
                 <button 
                   className="hover:bg-gray-50 transition-colors"
                   style={{
@@ -339,19 +339,19 @@ const SellerProfile: React.FC = () => {
                       }}
                     ></div>
                   </div>
-                </button>
-              </div>
+              </button>
             </div>
-            
-            {/* Name and Status - Positioned next to avatar */}
+          </div>
+          
+          {/* Name and Status - Positioned next to avatar */}
             <div className="absolute left-40 bottom-[-65px]">
               <h1 className="text-base font-semibold text-gray-900 mb-1.5">{seller.name}</h1>
-              {seller.isVerified && (
+            {seller.isVerified && (
                 <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
                   <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
                   <span className="text-xs" style={{ color: '#45C55B', fontWeight: '300' }}>Verified Seller</span>
-                </div>
-              )}
+              </div>
+            )}
             </div>
           </div>
         </div>
@@ -514,7 +514,7 @@ const SellerProfile: React.FC = () => {
 
       {/* Reviews and Ratings Section */}
       <div className="bg-white">
-        {/* Tab Navigation */}
+          {/* Tab Navigation */}
         <div className="border-b" style={{ borderColor: '#E5E5E5' }}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex">
@@ -539,8 +539,8 @@ const SellerProfile: React.FC = () => {
                 Seller Items
               </button>
             </div>
+            </div>
           </div>
-        </div>
         
         <div className="max-w-7xl mx-auto px-6 py-4 mt-8">
 
@@ -549,10 +549,10 @@ const SellerProfile: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* LEFT COLUMN - Reviews List */}
               <div className="lg:col-span-2">
-                {/* Filter Dropdown */}
+          {/* Filter Dropdown */}
                 <div className="relative mb-6 pb-3" ref={filterDropdownRef}>
-                  <button 
-                    onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+            <button 
+              onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
                     className="flex items-center hover:opacity-80 transition-opacity"
                     style={{ color: '#939393' }}
                   >
@@ -571,31 +571,31 @@ const SellerProfile: React.FC = () => {
                       {/* Bottom line with circle */}
                       <line x1="3" y1="14" x2="17" y2="14" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
                       <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
-                    </svg>
+              </svg>
                     <span className="text-sm">{selectedFilter}</span>
+            </button>
+            
+            {/* Dropdown Menu */}
+            {filterDropdownOpen && (
+              <div className="absolute top-8 left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-48">
+                {filterOptions.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => handleFilterSelect(option)}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                      selectedFilter === option ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+                    } ${option === filterOptions[0] ? 'rounded-t-lg' : ''} ${
+                      option === filterOptions[filterOptions.length - 1] ? 'rounded-b-lg' : ''
+                    }`}
+                  >
+                    {option}
                   </button>
-                  
-                  {/* Dropdown Menu */}
-                  {filterDropdownOpen && (
-                    <div className="absolute top-8 left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-48">
-                      {filterOptions.map((option) => (
-                        <button
-                          key={option}
-                          onClick={() => handleFilterSelect(option)}
-                          className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                            selectedFilter === option ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
-                          } ${option === filterOptions[0] ? 'rounded-t-lg' : ''} ${
-                            option === filterOptions[filterOptions.length - 1] ? 'rounded-b-lg' : ''
-                          }`}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-                {/* Review Cards */}
+          {/* Review Cards */}
                 <div className="space-y-4">
                   {/* Review 1 - Samine Herald */}
                   <div className="pb-6">
@@ -605,33 +605,33 @@ const SellerProfile: React.FC = () => {
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <div className="flex-1">
+                <div className="flex-1">
                         <h4 className="font-semibold text-gray-900 mb-2">Samine Herald</h4>
-                        <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
+                      <div className="flex items-center">
                               {[1,2,3,4,5].map((star) => (
                                 <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
-                          </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
-                        </div>
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
                       </div>
+                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
                     </div>
+                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
+                  </div>
+                </div>
+              </div>
                     <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
                       Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages.
-                    </p>
+              </p>
                     
                     {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
                         <div className="flex items-center space-x-2">
-                          <button
+                    <button 
                             onClick={() => setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'yes' ? null : 'yes' }))}
                             className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
                             style={{ 
@@ -639,11 +639,11 @@ const SellerProfile: React.FC = () => {
                               color: '#6A6A6A',
                               backgroundColor: reviewHelpfulness.review1 === 'yes' ? '#F0F0F0' : 'white'
                             }}
-                          >
+                    >
                             <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
                             <span className="text-xs">Yes</span>
-                          </button>
-                          <button
+                    </button>
+                    <button 
                             onClick={() => setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'no' ? null : 'no' }))}
                             className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
                             style={{ 
@@ -654,17 +654,17 @@ const SellerProfile: React.FC = () => {
                           >
                             <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
                             <span className="text-xs">No</span>
-                          </button>
-                        </div>
-                      </div>
+                    </button>
+                  </div>
+                          </div>
                       <button 
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
                       >
                         View the discussion (1)
                       </button>
-                    </div>
-                  </div>
+                        </div>
+            </div>
 
                   {/* Review 2 - Kael Otto */}
                   <div className="pb-6">
@@ -674,33 +674,33 @@ const SellerProfile: React.FC = () => {
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <div className="flex-1">
+                <div className="flex-1">
                         <h4 className="font-semibold text-gray-900 mb-2">Kael Otto</h4>
-                        <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
+                      <div className="flex items-center">
                               {[1,2,3,4,5].map((star) => (
                                 <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
-                          </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 12 Dec 2024</span>
-                        </div>
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
                       </div>
+                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
                     </div>
+                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 12 Dec 2024</span>
+                  </div>
+                </div>
+              </div>
                     <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
                       Amazing seller! The product quality exceeded my expectations. Fast shipping and excellent communication throughout the process. The item was exactly as described and arrived in perfect condition.
-                    </p>
+              </p>
                     
                     {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
                         <div className="flex items-center space-x-2">
-                          <button
+                    <button 
                             onClick={() => setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'yes' ? null : 'yes' }))}
                             className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
                             style={{ 
@@ -708,11 +708,11 @@ const SellerProfile: React.FC = () => {
                               color: '#6A6A6A',
                               backgroundColor: reviewHelpfulness.review2 === 'yes' ? '#F0F0F0' : 'white'
                             }}
-                          >
+                    >
                             <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
                             <span className="text-xs">Yes</span>
-                          </button>
-                          <button
+                    </button>
+                    <button 
                             onClick={() => setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'no' ? null : 'no' }))}
                             className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
                             style={{ 
@@ -723,17 +723,17 @@ const SellerProfile: React.FC = () => {
                           >
                             <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
                             <span className="text-xs">No</span>
-                          </button>
-                        </div>
-                      </div>
+                    </button>
+                  </div>
+                          </div>
                       <button 
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
                       >
                         View the discussion (3)
                       </button>
-                    </div>
-                  </div>
+                        </div>
+            </div>
 
                   {/* Review 3 - Alex Johnson */}
                   <div className="pb-6">
@@ -743,11 +743,11 @@ const SellerProfile: React.FC = () => {
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <div className="flex-1">
+                <div className="flex-1">
                         <h4 className="font-semibold text-gray-900 mb-2">Alex Johnson</h4>
-                        <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
+                      <div className="flex items-center">
                               {[1,2].map((star) => (
                                 <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -755,26 +755,26 @@ const SellerProfile: React.FC = () => {
                               ))}
                               {[1,2,3].map((star) => (
                                 <svg key={`empty-${star}`} className="w-3.5 h-3.5 text-gray-300 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>2.1</span>
-                          </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 8 Nov 2024</span>
-                        </div>
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
                       </div>
+                            <span className="text-sm font-medium" style={{ color: '#939393' }}>2.1</span>
                     </div>
+                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 8 Nov 2024</span>
+                  </div>
+                </div>
+              </div>
                     <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
                       The product was okay, but not exactly what I expected. Shipping took longer than anticipated. Communication could have been better.
-                    </p>
+              </p>
                     
                     {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
                         <div className="flex items-center space-x-2">
-                          <button
+                    <button 
                             onClick={() => setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'yes' ? null : 'yes' }))}
                             className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
                             style={{ 
@@ -782,11 +782,11 @@ const SellerProfile: React.FC = () => {
                               color: '#6A6A6A',
                               backgroundColor: reviewHelpfulness.review3 === 'yes' ? '#F0F0F0' : 'white'
                             }}
-                          >
+                    >
                             <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
                             <span className="text-xs">Yes</span>
-                          </button>
-                          <button
+                    </button>
+                    <button 
                             onClick={() => setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'no' ? null : 'no' }))}
                             className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
                             style={{ 
@@ -797,18 +797,18 @@ const SellerProfile: React.FC = () => {
                           >
                             <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
                             <span className="text-xs">No</span>
-                          </button>
-                        </div>
-                      </div>
+                    </button>
+                  </div>
+                          </div>
                       <button 
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
                       >
                         View the discussion (2)
                       </button>
-                    </div>
-                  </div>
-                </div>
+                        </div>
+                      </div>
+                          </div>
 
                 {/* Pagination */}
                 <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
@@ -826,10 +826,10 @@ const SellerProfile: React.FC = () => {
                       >
                         <img src={blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
                       </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
+            </div>
 
               {/* RIGHT COLUMN - Rating Summary & Give Your Opinion */}
               <div className="lg:col-span-1">
@@ -840,7 +840,7 @@ const SellerProfile: React.FC = () => {
                     <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                     </svg>
-                  </div>
+          </div>
                   <div className="text-sm mb-8" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
                   
                   {/* Rating Bars */}
@@ -871,7 +871,7 @@ const SellerProfile: React.FC = () => {
                   {/* Star Rating Input */}
                   <div className="flex items-center justify-center space-x-1 mb-6">
                     {[1,2,3,4,5].map((star) => (
-                      <button
+            <button 
                         key={star}
                         onClick={() => setUserRating(star)}
                         className="focus:outline-none hover:scale-110 transition-transform"
@@ -889,9 +889,9 @@ const SellerProfile: React.FC = () => {
                             stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
                           />
                         </svg>
-                      </button>
+            </button>
                     ))}
-                  </div>
+          </div>
                   
                   {/* Review Text Input */}
                   <div className="flex items-start space-x-3 mb-4 pl-8">
@@ -978,9 +978,9 @@ const SellerProfile: React.FC = () => {
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(1).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
                 
                 {/* Product Content */}
                 <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
@@ -1089,9 +1089,9 @@ const SellerProfile: React.FC = () => {
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(2).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
                 
                 {/* Product Content */}
                 <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
@@ -1200,9 +1200,9 @@ const SellerProfile: React.FC = () => {
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(3).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
                 
                 {/* Product Content */}
                 <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
@@ -1311,9 +1311,9 @@ const SellerProfile: React.FC = () => {
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(4).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
                 
                 {/* Product Content */}
                 <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
@@ -1422,9 +1422,9 @@ const SellerProfile: React.FC = () => {
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(5).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
                 
                 {/* Product Content */}
                 <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
@@ -1533,9 +1533,9 @@ const SellerProfile: React.FC = () => {
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(6).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
                 
                 {/* Product Content */}
                 <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
@@ -1644,9 +1644,9 @@ const SellerProfile: React.FC = () => {
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(7).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
                 
                 {/* Product Content */}
                 <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
@@ -1755,9 +1755,9 @@ const SellerProfile: React.FC = () => {
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(8).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
                 
                 {/* Product Content */}
                 <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
@@ -1832,53 +1832,59 @@ const SellerProfile: React.FC = () => {
                   </div>
                 </div>
               </Link>
-            </div>
+              </div>
               
               {/* Pagination */}
-              <div className="flex items-center justify-center space-x-6 mt-8">
-                <button
-                  disabled={true}
-                  className="font-normal transition-colors disabled:cursor-not-allowed"
-                  style={{ fontSize: '16px', color: '#BABABA' }}
-                >
-                  Previous
-                </button>
+              <div className="flex items-center justify-between mt-8">
+                <div className="flex-1"></div>
                 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-12">
                   <button
-                    className="font-bold transition-colors relative pb-1"
-                    style={{ fontSize: '16px', color: '#212121' }}
-                  >
-                    <span>1</span>
-                    <div 
-                      className="absolute bottom-0 left-0 right-0"
-                      style={{
-                        width: '100%',
-                        height: '2px',
-                        backgroundColor: '#212121'
-                      }}
-                    />
-                  </button>
-                  <button
-                    className="font-normal transition-colors hover:text-gray-900"
+                    disabled={true}
+                    className="font-normal transition-colors disabled:cursor-not-allowed"
                     style={{ fontSize: '16px', color: '#BABABA' }}
                   >
-                    2
+                    Previous
+                  </button>
+                  
+                  <div className="flex items-baseline space-x-6">
+                    <button
+                      className="font-normal transition-colors relative pb-1"
+                      style={{ fontSize: '16px', color: '#212121' }}
+                    >
+                      <span>1</span>
+                      <div 
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2"
+                        style={{
+                          width: '200%',
+                          height: '2px',
+                          backgroundColor: '#212121'
+                        }}
+                      />
+                    </button>
+                    <button
+                      className="font-normal transition-colors hover:text-gray-900"
+                      style={{ fontSize: '16px', color: '#BABABA' }}
+                    >
+                      2
+                    </button>
+                  </div>
+                  
+                  <button
+                    className="font-normal transition-colors"
+                    style={{ fontSize: '16px', color: '#212121' }}
+                  >
+                    Next
                   </button>
                 </div>
                 
-                <button
-                  className="font-bold transition-colors"
-                  style={{ fontSize: '16px', color: '#212121' }}
-                >
-                  Next
-                </button>
-                
-                <div className="flex items-center space-x-1">
-                  <div className="px-2 py-0.5 rounded" style={{ backgroundColor: '#F5F5F5' }}>
-                    <span className="font-bold" style={{ fontSize: '16px', color: '#212121' }}>1</span>
+                <div className="flex-1 flex justify-end">
+                  <div className="flex items-center space-x-1">
+                    <div className="px-3 py-1 rounded border" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9' }}>
+                      <span className="font-normal" style={{ fontSize: '16px', color: '#212121' }}>1</span>
+                    </div>
+                    <span className="font-normal" style={{ fontSize: '16px', color: '#BABABA' }}>/ 2</span>
                   </div>
-                  <span className="font-normal" style={{ fontSize: '16px', color: '#BABABA' }}>/ 2</span>
                 </div>
               </div>
             </>
