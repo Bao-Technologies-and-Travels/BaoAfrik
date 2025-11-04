@@ -18,6 +18,13 @@ import dislikeIcon from '../assets/images/pre/dislike.svg';
 import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
 import bookmarkIcon from '../assets/images/pre/bm.svg';
+import shareIcon from '../assets/images/pre/Share.svg';
+import warningIcon from '../assets/images/pre/warning.svg';
+import fbIcon from '../assets/images/pre/FB1.svg';
+import igIcon from '../assets/images/pre/IG1.svg';
+import xIcon from '../assets/images/pre/x.svg';
+import tgIcon from '../assets/images/pre/tg.svg';
+import zapIcon from '../assets/images/pre/zap1.svg';
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
 import pre2 from '../assets/images/pre/2.png';
@@ -76,6 +83,9 @@ const SellerProfile: React.FC = () => {
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
         setFilterDropdownOpen(false);
       }
+      if (optionsModalRef.current && !optionsModalRef.current.contains(event.target as Node)) {
+        setShowOptionsModal(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -117,7 +127,10 @@ const SellerProfile: React.FC = () => {
   const [userRating, setUserRating] = useState(0);
   const [userReviewText, setUserReviewText] = useState('');
   const [reviewHelpfulness, setReviewHelpfulness] = useState<{[key: string]: 'yes' | 'no' | null}>({});
+  const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const optionsModalRef = useRef<HTMLDivElement>(null);
   const { sellerId } = useParams<{ sellerId: string }>();
 
   // Filter options
@@ -297,49 +310,94 @@ const SellerProfile: React.FC = () => {
                   <span>Message the seller</span>
                   <img src={basketIcon} alt="Cart" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} />
               </button>
-                <button 
-                  className="hover:bg-gray-50 transition-colors"
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    backgroundColor: 'white',
-                    border: '1px solid #F9A825',
-                    borderRadius: '12px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                >
-                  <div className="flex space-x-1">
+                <div className="relative" ref={optionsModalRef}>
+                  <button 
+                    onClick={() => setShowOptionsModal(!showOptionsModal)}
+                    className="hover:bg-gray-50 transition-colors"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: 'white',
+                      border: '1px solid #F9A825',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div className="flex space-x-1">
+                      <div 
+                        style={{
+                          width: '5px',
+                          height: '5px',
+                          backgroundColor: 'white',
+                          border: '1.5px solid #F9A825',
+                          borderRadius: '50%'
+                        }}
+                      ></div>
+                      <div 
+                        style={{
+                          width: '5px',
+                          height: '5px',
+                          backgroundColor: 'white',
+                          border: '1.5px solid #F9A825',
+                          borderRadius: '50%'
+                        }}
+                      ></div>
+                      <div 
+                        style={{
+                          width: '5px',
+                          height: '5px',
+                          backgroundColor: 'white',
+                          border: '1.5px solid #F9A825',
+                          borderRadius: '50%'
+                        }}
+                      ></div>
+                    </div>
+                  </button>
+                  
+                  {/* Options Modal */}
+                  {showOptionsModal && (
                     <div 
+                      className="absolute z-10"
                       style={{
-                        width: '5px',
-                        height: '5px',
-                        backgroundColor: 'white',
-                        border: '1.5px solid #F9A825',
-                        borderRadius: '50%'
+                        display: 'inline-flex',
+                        padding: '8px 6px',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        gap: '6px',
+                        borderRadius: '12px',
+                        background: '#FFF',
+                        boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                        top: '48px',
+                        right: '0',
+                        minWidth: '200px'
                       }}
-                    ></div>
-                    <div 
-                      style={{
-                        width: '5px',
-                        height: '5px',
-                        backgroundColor: 'white',
-                        border: '1.5px solid #F9A825',
-                        borderRadius: '50%'
-                      }}
-                    ></div>
-                    <div 
-                      style={{
-                        width: '5px',
-                        height: '5px',
-                        backgroundColor: 'white',
-                        border: '1.5px solid #F9A825',
-                        borderRadius: '50%'
-                      }}
-                    ></div>
-                  </div>
-              </button>
+                    >
+                      <button 
+                        className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
+                        onClick={() => {
+                          setShowOptionsModal(false);
+                          setShowShareModal(true);
+                        }}
+                      >
+                        <img src={shareIcon} alt="Share" className="w-4 h-4" />
+                        <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Share the profile</span>
+                      </button>
+                      <button 
+                        className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
+                        onClick={() => {
+                          // Handle report action
+                          setShowOptionsModal(false);
+                        }}
+                      >
+                        <img src={warningIcon} alt="Report" className="w-4 h-4" />
+                        <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Report the profile</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
             </div>
           </div>
           
@@ -1924,6 +1982,107 @@ const SellerProfile: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Share Profile Modal */}
+      {showShareModal && (
+        <>
+          {/* Focused Overlay */}
+          <div 
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={() => setShowShareModal(false)}
+          />
+          
+          {/* Share Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div 
+              className="bg-white rounded-2xl shadow-xl relative max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+              style={{ padding: '32px 24px', marginTop: '40px' }}
+            >
+              {/* Profile Picture - Half Outside Modal */}
+              <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '-40px' }}>
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                  <img
+                    src={seller.avatar}
+                    alt={seller.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Heading */}
+              <h3 className="text-xl font-semibold text-center mb-3 mt-8" style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Share this profile with your network
+              </h3>
+
+              {/* Description */}
+              <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0' }}>
+                Increase visibility by showcasing this profile to connect with more buyers or potential clients.
+              </p>
+
+              {/* Link Field with Copy Button */}
+              <div className="flex items-center space-x-2 mb-6">
+                <input
+                  type="text"
+                  value={`baoafrik.com/user-profile-id?`}
+                  readOnly
+                  className="flex-1 px-3 py-2.5 rounded-lg text-sm"
+                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', border: 'none' }}
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                  }}
+                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90"
+                  style={{ backgroundColor: '#000000' }}
+                >
+                  Copy link
+                </button>
+              </div>
+
+              {/* Share To Section */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 mb-4">Share to</h4>
+                <div className="flex items-center justify-center space-x-6">
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={fbIcon} alt="Facebook" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Facebook</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={igIcon} alt="Instagram" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Instagram</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={xIcon} alt="X" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>X</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0088cc' }}>
+                      <img src={tgIcon} alt="Telegram" className="w-6 h-6" />
+                    </div>
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Telegram</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={zapIcon} alt="WhatsApp" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Whatsapp</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
