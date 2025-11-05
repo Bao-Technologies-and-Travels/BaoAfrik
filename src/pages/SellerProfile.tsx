@@ -1,9 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import sellerAvatar from '../assets/images/logos/avatar.png';
 import defaultCoverImage from '../assets/images/logos/8.png';
+import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
+import verifyIcon from '../assets/images/pre/verify.svg';
+import basketIcon from '../assets/images/pre/basket.png';
+import logoIcon from '../assets/images/logos/ba-brand-icon-colored.png';
+import whatsappIcon from '../assets/images/pre/zap.svg';
+import instagramIcon from '../assets/images/pre/ig.svg';
+import facebookIcon from '../assets/images/pre/fb.svg';
+import locationIcon from '../assets/images/pre/PL.svg';
+import profileIcon from '../assets/images/pre/profile.svg';
+import likeIcon from '../assets/images/pre/like.svg';
+import dislikeIcon from '../assets/images/pre/dislike.svg';
+import grayArrowIcon from '../assets/images/pre/gray.svg';
+import blackArrowIcon from '../assets/images/pre/black.svg';
+import bookmarkIcon from '../assets/images/pre/bm.svg';
+import shareIcon from '../assets/images/pre/Share.svg';
+import warningIcon from '../assets/images/pre/warning.svg';
+import fbIcon from '../assets/images/pre/FB1.svg';
+import igIcon from '../assets/images/pre/IG1.svg';
+import xIcon from '../assets/images/pre/x.svg';
+import tgIcon from '../assets/images/pre/tg.svg';
+import zapIcon from '../assets/images/pre/zap1.svg';
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
 import pre2 from '../assets/images/pre/2.png';
@@ -62,6 +83,9 @@ const SellerProfile: React.FC = () => {
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
         setFilterDropdownOpen(false);
       }
+      if (optionsModalRef.current && !optionsModalRef.current.contains(event.target as Node)) {
+        setShowOptionsModal(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -99,17 +123,23 @@ const SellerProfile: React.FC = () => {
   const [likedReviews, setLikedReviews] = useState<string[]>([]);
   const [expandedDiscussions, setExpandedDiscussions] = useState<string[]>([]);
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState('Most Relevant');
+  const [selectedFilter, setSelectedFilter] = useState('The most relevant');
+  const [userRating, setUserRating] = useState(0);
+  const [userReviewText, setUserReviewText] = useState('');
+  const [reviewHelpfulness, setReviewHelpfulness] = useState<{[key: string]: 'yes' | 'no' | null}>({});
+  const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const optionsModalRef = useRef<HTMLDivElement>(null);
   const { sellerId } = useParams<{ sellerId: string }>();
 
   // Filter options
   const filterOptions = [
-    'Most Relevant',
-    'Newest First',
-    'Oldest First',
-    'Highest Rating',
-    'Lowest Rating'
+    'The most relevant',
+    'Newest first',
+    'Oldest first',
+    'Highest rating',
+    'Lowest rating'
   ];
 
   // Function to handle filter selection
@@ -192,59 +222,195 @@ const SellerProfile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <Header />
 
-
+      {/* Gray Divider below Header */}
+      <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9' }}></div>
 
       {/* Cover Page Section - Desktop */}
-      <div className="hidden lg:block px-2 py-4 relative">
-        <div className="w-full">
-          <div className="bg-orange-100 h-64 rounded-2xl relative overflow-hidden w-full">
-            {/* Cover Image */}
-            <img
-              src={seller.coverPhoto || defaultCoverImage}
-              alt="Cover Photo"
-              className="w-full h-full object-cover"
+      <div className="hidden lg:block py-4 relative" style={{ backgroundColor: '#FFFFFF' }}>
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center space-x-2 text-xs mb-4">
+            <img 
+              src={arrowLeftIcon} 
+              alt="Back" 
+              className="w-4 h-4 cursor-pointer" 
+              onClick={() => navigate('/')}
             />
+            <span 
+              className="hover:text-gray-700 cursor-pointer" 
+              style={{ color: '#BABABA' }}
+              onClick={() => navigate('/')}
+            >
+              Homepage
+            </span>
+            <span style={{ color: '#BABABA' }}>·</span>
+            <span 
+              className="hover:text-gray-700 cursor-pointer" 
+              style={{ color: '#BABABA' }}
+              onClick={() => navigate(-1)}
+            >
+              Product ID
+            </span>
+            <span style={{ color: '#BABABA' }}>·</span>
+            <span className="font-medium" style={{ color: '#4D4D4D' }}>User Profil ID</span>
+          </nav>
+
+          {/* Cover Image Container */}
+          <div className="relative">
+            <div className="h-64 rounded-2xl relative overflow-hidden" style={{ backgroundColor: '#FEF6E9' }}>
+              {/* Decorative Logo Watermark */}
+              <div className="absolute" style={{ left: '50%', top: '15%', transform: 'translate(-50%, -50%)', width: '150%', height: '170%' }}>
+                <div 
+                  style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    background: `url(${logoIcon}) no-repeat center`,
+                    backgroundSize: 'contain',
+                    opacity: '0.5',
+                    filter: 'brightness(0) invert(1) brightness(2)'
+                  }}
+                />
+              </div>
           </div>
           
           {/* Profile Avatar - Half in cover, positioned for left alignment */}
-          <div className="absolute left-8 bottom-[-80px]">
-            <div className="w-40 h-40 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+            <div className="absolute left-6 bottom-[-68px]">
+              <div className="w-28 h-28 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
               <img
                 src={seller.avatar}
                 alt={seller.name}
-                className="w-36 h-36 rounded-xl object-cover"
+                  className="w-24 h-24 rounded-xl object-cover"
               />
             </div>
           </div>
           
           {/* Chat Button - Positioned at right side of cover */}
-          <div className="absolute right-8 bottom-[-60px]">
+            <div className="absolute right-0 bottom-[-62px]">
             <div className="flex items-center space-x-3">
-              <button className="bg-orange-400 text-white px-8 xl:px-12 py-3 rounded-lg hover:bg-orange-500 transition-colors font-medium flex items-center space-x-2">
-                <span>Chat with seller</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                <button 
+                  className="hover:opacity-90 transition-opacity"
+                  style={{
+                    display: 'flex',
+                    height: '40px',
+                    padding: '8px 20px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '10px',
+                    backgroundColor: '#F9A825',
+                    color: 'white',
+                    borderRadius: '12px',
+                    fontWeight: '400',
+                    fontSize: '14px'
+                  }}
+                >
+                  <span>Message the seller</span>
+                  <img src={basketIcon} alt="Cart" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} />
               </button>
-              <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white">
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 010 2z" />
-                </svg>
+                <div className="relative" ref={optionsModalRef}>
+                  <button 
+                    onClick={() => setShowOptionsModal(!showOptionsModal)}
+                    className="hover:bg-gray-50 transition-colors"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: 'white',
+                      border: '1px solid #F9A825',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div className="flex space-x-1">
+                      <div 
+                        style={{
+                          width: '5px',
+                          height: '5px',
+                          backgroundColor: 'white',
+                          border: '1.5px solid #F9A825',
+                          borderRadius: '50%'
+                        }}
+                      ></div>
+                      <div 
+                        style={{
+                          width: '5px',
+                          height: '5px',
+                          backgroundColor: 'white',
+                          border: '1.5px solid #F9A825',
+                          borderRadius: '50%'
+                        }}
+                      ></div>
+                      <div 
+                        style={{
+                          width: '5px',
+                          height: '5px',
+                          backgroundColor: 'white',
+                          border: '1.5px solid #F9A825',
+                          borderRadius: '50%'
+                        }}
+                      ></div>
+                    </div>
+                  </button>
+                  
+                  {/* Options Modal */}
+                  {showOptionsModal && (
+                    <div 
+                      className="absolute z-10"
+                      style={{
+                        display: 'inline-flex',
+                        padding: '8px 6px',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        gap: '6px',
+                        borderRadius: '12px',
+                        background: '#FFF',
+                        boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                        top: '48px',
+                        right: '0',
+                        minWidth: '200px'
+                      }}
+                    >
+                      <button 
+                        className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
+                        onClick={() => {
+                          setShowOptionsModal(false);
+                          setShowShareModal(true);
+                        }}
+                      >
+                        <img src={shareIcon} alt="Share" className="w-4 h-4" />
+                        <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Share the profile</span>
+                      </button>
+                      <button 
+                        className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
+                        onClick={() => {
+                          // Handle report action
+                          setShowOptionsModal(false);
+                        }}
+                      >
+                        <img src={warningIcon} alt="Report" className="w-4 h-4" />
+                        <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Report the profile</span>
               </button>
+                    </div>
+                  )}
+                </div>
             </div>
           </div>
           
           {/* Name and Status - Positioned next to avatar */}
-          <div className="absolute left-52 bottom-[-70px]">
-            <h1 className="text-xl text-gray-900 mb-2">{seller.name}</h1>
+            <div className="absolute left-40 bottom-[-65px]">
+              <h1 className="text-base font-semibold text-gray-900 mb-1.5">{seller.name}</h1>
             {seller.isVerified && (
-              <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-2 py-1 rounded-md">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                <span className="text-xs font-medium">Verified Seller</span>
+                <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
+                  <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
+                  <span className="text-xs" style={{ color: '#45C55B', fontWeight: '300' }}>Verified Seller</span>
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>
@@ -273,12 +439,12 @@ const SellerProfile: React.FC = () => {
         {/* Profile Content Overlay */}
         <div className="px-4 md:px-6 pb-6 relative">
           {/* Profile Avatar - Positioned like desktop */}
-          <div className="absolute left-4 md:left-6 -top-10">
-            <div className="w-20 h-20 md:w-24 md:h-24 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+          <div className="absolute left-4 md:left-6 -top-8">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
               <img
                 src={seller.avatar}
                 alt={seller.name}
-                className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover"
+                className="w-14 h-14 md:w-16 md:h-16 rounded-xl object-cover"
               />
             </div>
           </div>
@@ -286,16 +452,16 @@ const SellerProfile: React.FC = () => {
           {/* Verified Badge - Moved Down */}
           <div className="absolute right-4 md:right-6 top-2">
             {seller.isVerified && (
-              <div className="inline-flex items-center space-x-1 bg-green-100 text-green-700 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg text-xs md:text-sm whitespace-nowrap">
-                <div className="w-1 h-1 md:w-1.5 md:h-1.5 bg-green-500 rounded-full"></div>
-                <span className="font-medium">Verified Seller</span>
+              <div className="inline-flex items-center space-x-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg text-xs md:text-sm whitespace-nowrap" style={{ backgroundColor: '#EDFBF0' }}>
+                <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                <span className="font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
               </div>
             )}
           </div>
           
           {/* Name and Info - Below Avatar */}
-          <div className="pt-12 md:pt-14">
-            <h1 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">{seller.name}</h1>
+          <div className="pt-10 md:pt-12">
+            <h1 className="text-base md:text-lg font-semibold text-gray-900 mb-2">{seller.name}</h1>
             
             {/* Location, Member Info, and Rating */}
             <div className="flex items-start justify-between mb-3">
@@ -343,33 +509,52 @@ const SellerProfile: React.FC = () => {
           {/* Bio and Info Sections - Responsive grid layout */}
           <div className="mb-4 grid grid-cols-1 xl:grid-cols-3 gap-8 xl:gap-16">
             {/* Bio Section */}
-            <div className="xl:col-span-2">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Bio</h3>
-              <p className="text-gray-600 leading-relaxed text-base">
+            <div className="xl:col-span-2 pl-8">
+              <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#6A6A6A' }}>Bio</h3>
+              <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
                 {seller.bio}
               </p>
+              
+              {/* Social Media Icons */}
+              <div className="flex items-center space-x-8 mt-6">
+                <a href="#" className="hover:opacity-80 transition-opacity">
+                  <img src={whatsappIcon} alt="WhatsApp" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
+                </a>
+                <a href="#" className="hover:opacity-80 transition-opacity">
+                  <img src={instagramIcon} alt="Instagram" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
+                </a>
+                <a href="#" className="hover:opacity-80 transition-opacity">
+                  <img src={facebookIcon} alt="Facebook" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
+                </a>
+              </div>
             </div>
 
             {/* Info Section - Location and Membership */}
-            <div className="space-y-8">
+            <div className="space-y-4 pl-32">
+              {/* Location */}
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Reviews & Ratings</h2>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span>London, United Kingdom</span>
+                <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Location</h4>
+                <div className="flex items-center space-x-2">
+                  <img src={locationIcon} alt="Location" className="w-4 h-4" />
+                  <span className="text-sm" style={{ color: '#64B5F6' }}>London, United Kingdom</span>
                 </div>
               </div>
 
+              {/* Useful link */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Member</h4>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Since 2025</span>
+                <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Useful link</h4>
+                <div className="flex items-center space-x-2">
+                  <img src={locationIcon} alt="Link" className="w-4 h-4" />
+                  <span className="text-sm" style={{ color: '#64B5F6' }}>user-randomlink.com</span>
+                </div>
+              </div>
+
+              {/* Member Since */}
+              <div>
+                <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Member Since</h4>
+                <div className="flex items-center space-x-2">
+                  <img src={profileIcon} alt="Profile" className="w-4 h-4" />
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>May 2025</span>
                 </div>
               </div>
             </div>
@@ -387,97 +572,65 @@ const SellerProfile: React.FC = () => {
 
       {/* Reviews and Ratings Section */}
       <div className="bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-4">
           {/* Tab Navigation */}
-          <div className="border-b border-gray-200 mb-8">
+        <div className="border-b" style={{ borderColor: '#E5E5E5' }}>
+          <div className="max-w-7xl mx-auto px-6">
             <div className="flex">
               <button 
                 onClick={() => setActiveTab('reviews')}
-                className={`px-4 py-2 text-sm lg:text-base font-medium border-b-2 ${
-                  activeTab === 'reviews' 
-                    ? 'text-gray-900 border-gray-900' 
-                    : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
+                className="px-4 py-1 text-sm font-medium border-b-2 transition-colors"
+                style={{
+                  color: activeTab === 'reviews' ? '#64B5F6' : '#BABABA',
+                  borderColor: activeTab === 'reviews' ? '#64B5F6' : 'transparent'
+                }}
               >
                 Reviews and Ratings
               </button>
               <button 
                 onClick={() => setActiveTab('items')}
-                className={`px-4 py-2 text-sm lg:text-base font-medium ml-8 border-b-2 ${
-                  activeTab === 'items' 
-                    ? 'text-gray-900 border-gray-900' 
-                    : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
+                className="px-4 py-1 text-sm font-medium ml-8 border-b-2 transition-colors"
+                style={{
+                  color: activeTab === 'items' ? '#64B5F6' : '#BABABA',
+                  borderColor: activeTab === 'items' ? '#64B5F6' : 'transparent'
+                }}
               >
                 Seller Items
               </button>
             </div>
+            </div>
           </div>
+        
+        <div className="max-w-7xl mx-auto px-6 py-4 mt-8">
 
           {/* Reviews Content */}
           {activeTab === 'reviews' && (
-            <>
-          {/* Rating Summary */}
-          <div className="border border-gray-200 rounded-lg p-6 mb-8">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="text-4xl font-bold text-gray-900">4.3</div>
-                <div className="flex items-center">
-                  <svg className="w-6 h-6 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                </div>
-              </div>
-              <div className="flex-1 ml-8">
-                {/* Rating Bars */}
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '70%'}}></div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '60%'}}></div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '40%'}}></div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '20%'}}></div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-yellow-400 h-2 rounded-full" style={{width: '10%'}}></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="-mt-4 text-sm text-gray-600">Reviews (456)</div>
-          </div>
-
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* LEFT COLUMN - Reviews List */}
+              <div className="lg:col-span-2">
           {/* Filter Dropdown */}
-          <div className="relative mb-6" ref={filterDropdownRef}>
+                <div className="relative mb-6 pb-3" ref={filterDropdownRef}>
             <button 
               onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
-              className="flex items-center text-gray-600 text-sm hover:text-gray-800 transition-colors"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                <circle cx="8" cy="6" r="2" fill="currentColor" />
-                <circle cx="16" cy="10" r="2" fill="currentColor" />
-                <circle cx="12" cy="14" r="2" fill="currentColor" />
+                    className="flex items-center hover:opacity-80 transition-opacity"
+                    style={{ color: '#939393' }}
+                  >
+                    {/* Filter Icon - Same as mobile search bar */}
+                    <svg 
+                      width="20" 
+                      height="20" 
+                      viewBox="0 0 20 20" 
+                      fill="none"
+                      className="mr-2"
+                    >
+                      {/* Top line with circle */}
+                      <line x1="3" y1="6" x2="17" y2="6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
+                      <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
+                      
+                      {/* Bottom line with circle */}
+                      <line x1="3" y1="14" x2="17" y2="14" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
+                      <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
               </svg>
-              <span>{selectedFilter}</span>
-              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+                    <span className="text-sm">{selectedFilter}</span>
             </button>
             
             {/* Dropdown Menu */}
@@ -501,363 +654,437 @@ const SellerProfile: React.FC = () => {
           </div>
 
           {/* Review Cards */}
-          <div className="space-y-6">
-            {/* Review 1 */}
-            <div className="border-b border-gray-100 pb-6">
-              <div className="flex items-start space-x-4">
-                <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face"
-                  alt="Miles Kennedy"
-                  className="w-12 h-12 rounded-lg object-cover"
-                />
+                <div className="space-y-4">
+                  {/* Review 1 - Samine Herald */}
+                  <div className="pb-6">
+                    <div className="flex items-start space-x-3 mb-3">
+                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </div>
                 <div className="flex-1">
-                  <div className="mb-2">
-                    <h4 className="font-medium text-gray-900 mb-1">Miles Kennedy</h4>
+                        <h4 className="font-semibold text-gray-900 mb-2">Samine Herald</h4>
                     <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
                       <div className="flex items-center">
-                        {[1,2,3,4].map((star) => (
-                          <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                              {[1,2,3,4,5].map((star) => (
+                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                           </svg>
                         ))}
                       </div>
-                      <span className="text-xs text-gray-500 lg:text-sm">
-                        <span className="lg:hidden">15/07/2025</span>
-                        <span className="hidden lg:inline">Published on 15, Jul 2025</span>
-                      </span>
+                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
                     </div>
+                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
                   </div>
                 </div>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed mb-3 mt-2">
-                Amazing seller! The product quality exceeded my expectations. Fast shipping and excellent communication throughout the process. The item was exactly as described and arrived in perfect condition. Highly recommend this seller to anyone looking for quality products and reliable service.
+                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                      Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages.
               </p>
+                    
+                    {/* Helpfulness Section */}
               <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
+                        <div className="flex items-center space-x-2">
                     <button 
-                      onClick={() => {
-                        const isLiked = likedReviews.includes('review1');
-                        if (isLiked) {
-                          setLikes(prev => ({ ...prev, review1: prev.review1 - 1 }));
-                          setLikedReviews(prev => prev.filter(id => id !== 'review1'));
-                        } else {
-                          setLikes(prev => ({ ...prev, review1: prev.review1 + 1 }));
-                          setLikedReviews(prev => [...prev, 'review1']);
-                        }
-                      }}
-                      className={`flex items-center space-x-2 transition-colors px-3 py-1 rounded-lg ${
-                        likedReviews.includes('review1') ? 'text-red-500 bg-red-50' : 'text-gray-500 hover:text-red-500 bg-blue-50 hover:bg-blue-100'
-                      }`}
+                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'yes' ? null : 'yes' }))}
+                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                            style={{ 
+                              border: '1px solid #E1E1E1',
+                              color: '#6A6A6A',
+                              backgroundColor: reviewHelpfulness.review1 === 'yes' ? '#F0F0F0' : 'white'
+                            }}
                     >
-                      <svg className="w-4 h-4" fill={likedReviews.includes('review1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      <span className="text-sm">{likes.review1}</span>
+                            <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
+                            <span className="text-xs">Yes</span>
                     </button>
                     <button 
-                      onClick={() => {
-                        const isExpanded = expandedDiscussions.includes('review1');
-                        if (isExpanded) {
-                          setExpandedDiscussions(prev => prev.filter(id => id !== 'review1'));
-                        } else {
-                          setExpandedDiscussions(prev => [...prev, 'review1']);
-                        }
-                      }}
-                      className="text-blue-500 text-sm hover:underline"
-                    >
-                      {expandedDiscussions.includes('review1') ? 'Hide discussion (2)' : 'View discussion (2)'}
+                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'no' ? null : 'no' }))}
+                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                            style={{ 
+                              border: '1px solid #E1E1E1',
+                              color: '#6A6A6A',
+                              backgroundColor: reviewHelpfulness.review1 === 'no' ? '#F0F0F0' : 'white'
+                            }}
+                          >
+                            <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
+                            <span className="text-xs">No</span>
                     </button>
                   </div>
-                  {expandedDiscussions.includes('review1') && (
-                    <div className="mt-4 pl-4 border-l-2 border-gray-200 space-y-3">
-                      <div className="flex items-start space-x-3">
-                        <img
-                          src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face"
-                          alt="Sarah Wilson"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-900">Sarah Wilson</span>
-                            <span className="text-xs text-gray-500">2 days ago</span>
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">I completely agree! This seller is amazing. Had a similar experience with my order.</p>
+                      <button 
+                        className="text-xs hover:underline"
+                        style={{ color: '#64B5F6' }}
+                      >
+                        View the discussion (1)
+                      </button>
                         </div>
-                      </div>
-                      <div className="flex items-start space-x-3">
-                        <img
-                          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face"
-                          alt="Miles Kennedy"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-900">Miles Kennedy</span>
-                            <span className="text-xs text-gray-500">1 day ago</span>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">@Sarah Wilson Thanks! Really appreciate the positive feedback. This seller deserves all the praise!</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
             </div>
 
-            {/* Review 2 */}
-            <div className="border-b border-gray-100 pb-6">
-              <div className="flex items-start space-x-4">
-                <img
-                  src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=40&h=40&fit=crop&crop=face"
-                  alt="Samine Herald"
-                  className="w-12 h-12 rounded-lg object-cover"
-                />
+                  {/* Review 2 - Kael Otto */}
+                  <div className="pb-6">
+                    <div className="flex items-start space-x-3 mb-3">
+                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </div>
                 <div className="flex-1">
-                  <div className="mb-2">
-                    <h4 className="font-medium text-gray-900 mb-1">Samine Herald</h4>
+                        <h4 className="font-semibold text-gray-900 mb-2">Kael Otto</h4>
                     <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
                       <div className="flex items-center">
-                        {[1,2,3,4].map((star) => (
-                          <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                              {[1,2,3,4,5].map((star) => (
+                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                           </svg>
                         ))}
                       </div>
-                      <span className="text-xs text-gray-500 lg:text-sm">
-                        <span className="lg:hidden">22/06/2025</span>
-                        <span className="hidden lg:inline">Published on 22, Jun 2025</span>
-                      </span>
+                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
                     </div>
+                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 12 Dec 2024</span>
                   </div>
                 </div>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed mb-3 mt-2">
-                Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages. Will definitely purchase from this seller again!
+                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                      Amazing seller! The product quality exceeded my expectations. Fast shipping and excellent communication throughout the process. The item was exactly as described and arrived in perfect condition.
               </p>
+                    
+                    {/* Helpfulness Section */}
               <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
+                        <div className="flex items-center space-x-2">
                     <button 
-                      onClick={() => {
-                        const isLiked = likedReviews.includes('review2');
-                        if (isLiked) {
-                          setLikes(prev => ({ ...prev, review2: prev.review2 - 1 }));
-                          setLikedReviews(prev => prev.filter(id => id !== 'review2'));
-                        } else {
-                          setLikes(prev => ({ ...prev, review2: prev.review2 + 1 }));
-                          setLikedReviews(prev => [...prev, 'review2']);
-                        }
-                      }}
-                      className={`flex items-center space-x-2 transition-colors px-3 py-1 rounded-lg ${
-                        likedReviews.includes('review2') ? 'text-red-500 bg-red-50' : 'text-gray-500 hover:text-red-500 bg-blue-50 hover:bg-blue-100'
-                      }`}
+                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'yes' ? null : 'yes' }))}
+                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                            style={{ 
+                              border: '1px solid #E1E1E1',
+                              color: '#6A6A6A',
+                              backgroundColor: reviewHelpfulness.review2 === 'yes' ? '#F0F0F0' : 'white'
+                            }}
                     >
-                      <svg className="w-4 h-4" fill={likedReviews.includes('review2') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      <span className="text-sm">{likes.review2}</span>
+                            <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
+                            <span className="text-xs">Yes</span>
                     </button>
                     <button 
-                      onClick={() => {
-                        const isExpanded = expandedDiscussions.includes('review2');
-                        if (isExpanded) {
-                          setExpandedDiscussions(prev => prev.filter(id => id !== 'review2'));
-                        } else {
-                          setExpandedDiscussions(prev => [...prev, 'review2']);
-                        }
-                      }}
-                      className="text-blue-500 text-sm hover:underline"
-                    >
-                      {expandedDiscussions.includes('review2') ? 'Hide discussion (2)' : 'View discussion (2)'}
+                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'no' ? null : 'no' }))}
+                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                            style={{ 
+                              border: '1px solid #E1E1E1',
+                              color: '#6A6A6A',
+                              backgroundColor: reviewHelpfulness.review2 === 'no' ? '#F0F0F0' : 'white'
+                            }}
+                          >
+                            <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
+                            <span className="text-xs">No</span>
                     </button>
                   </div>
-                  {expandedDiscussions.includes('review2') && (
-                    <div className="mt-4 pl-4 border-l-2 border-gray-200 space-y-3">
-                      <div className="flex items-start space-x-3">
-                        <img
-                          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face"
-                          alt="Alex Thompson"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-900">Alex Thompson</span>
-                            <span className="text-xs text-gray-500">3 days ago</span>
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">How was the packaging? I'm considering ordering from this seller too.</p>
+                      <button 
+                        className="text-xs hover:underline"
+                        style={{ color: '#64B5F6' }}
+                      >
+                        View the discussion (3)
+                      </button>
                         </div>
-                      </div>
-                      <div className="flex items-start space-x-3">
-                        <img
-                          src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=32&h=32&fit=crop&crop=face"
-                          alt="Samine Herald"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-900">Samine Herald</span>
-                            <span className="text-xs text-gray-500">2 days ago</span>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">@Alex Thompson The packaging was excellent! Very professional and secure. Definitely recommend!</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
             </div>
 
-            {/* Review 3 */}
-            <div className="border-b border-gray-100 pb-6">
-              <div className="flex items-start space-x-4">
-                <img
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
-                  alt="David Johnson"
-                  className="w-12 h-12 rounded-lg object-cover"
-                />
+                  {/* Review 3 - Alex Johnson */}
+                  <div className="pb-6">
+                    <div className="flex items-start space-x-3 mb-3">
+                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </div>
                 <div className="flex-1">
-                  <div className="mb-2">
-                    <h4 className="font-medium text-gray-900 mb-1">David Johnson</h4>
+                        <h4 className="font-semibold text-gray-900 mb-2">Alex Johnson</h4>
                     <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
                       <div className="flex items-center">
-                        {[1,2,3,4].map((star) => (
-                          <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                              {[1,2].map((star) => (
+                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                              ))}
+                              {[1,2,3].map((star) => (
+                                <svg key={`empty-${star}`} className="w-3.5 h-3.5 text-gray-300 fill-current" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                           </svg>
                         ))}
                       </div>
-                      <span className="text-xs text-gray-500 lg:text-sm">
-                        <span className="lg:hidden">10/05/2025</span>
-                        <span className="hidden lg:inline">Published on 10, May 2025</span>
-                      </span>
+                            <span className="text-sm font-medium" style={{ color: '#939393' }}>2.1</span>
                     </div>
+                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 8 Nov 2024</span>
                   </div>
                 </div>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed mb-3 mt-2">
-                Fantastic seller with top-notch products! The quality is exceptional and the price was very reasonable. Quick delivery and the item was exactly what I was looking for. Professional packaging and great customer service. This seller truly cares about their customers' experience.
+                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                      The product was okay, but not exactly what I expected. Shipping took longer than anticipated. Communication could have been better.
               </p>
+                    
+                    {/* Helpfulness Section */}
               <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
+                        <div className="flex items-center space-x-2">
                     <button 
-                      onClick={() => {
-                        const isLiked = likedReviews.includes('review3');
-                        if (isLiked) {
-                          setLikes(prev => ({ ...prev, review3: prev.review3 - 1 }));
-                          setLikedReviews(prev => prev.filter(id => id !== 'review3'));
-                        } else {
-                          setLikes(prev => ({ ...prev, review3: prev.review3 + 1 }));
-                          setLikedReviews(prev => [...prev, 'review3']);
-                        }
-                      }}
-                      className={`flex items-center space-x-2 transition-colors px-3 py-1 rounded-lg ${
-                        likedReviews.includes('review3') ? 'text-red-500 bg-red-50' : 'text-gray-500 hover:text-red-500 bg-blue-50 hover:bg-blue-100'
-                      }`}
+                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'yes' ? null : 'yes' }))}
+                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                            style={{ 
+                              border: '1px solid #E1E1E1',
+                              color: '#6A6A6A',
+                              backgroundColor: reviewHelpfulness.review3 === 'yes' ? '#F0F0F0' : 'white'
+                            }}
                     >
-                      <svg className="w-4 h-4" fill={likedReviews.includes('review3') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      <span className="text-sm">{likes.review3}</span>
+                            <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
+                            <span className="text-xs">Yes</span>
                     </button>
                     <button 
-                      onClick={() => {
-                        const isExpanded = expandedDiscussions.includes('review3');
-                        if (isExpanded) {
-                          setExpandedDiscussions(prev => prev.filter(id => id !== 'review3'));
-                        } else {
-                          setExpandedDiscussions(prev => [...prev, 'review3']);
-                        }
-                      }}
-                      className="text-blue-500 text-sm hover:underline"
-                    >
-                      {expandedDiscussions.includes('review3') ? 'Hide discussion (2)' : 'View discussion (2)'}
+                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'no' ? null : 'no' }))}
+                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                            style={{ 
+                              border: '1px solid #E1E1E1',
+                              color: '#6A6A6A',
+                              backgroundColor: reviewHelpfulness.review3 === 'no' ? '#F0F0F0' : 'white'
+                            }}
+                          >
+                            <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
+                            <span className="text-xs">No</span>
                     </button>
                   </div>
-                  {expandedDiscussions.includes('review3') && (
-                    <div className="mt-4 pl-4 border-l-2 border-gray-200 space-y-3">
-                      <div className="flex items-start space-x-3">
-                        <img
-                          src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face"
-                          alt="Emma Davis"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-900">Emma Davis</span>
-                            <span className="text-xs text-gray-500">1 day ago</span>
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">What was the delivery time? I need something urgently.</p>
+                      <button 
+                        className="text-xs hover:underline"
+                        style={{ color: '#64B5F6' }}
+                      >
+                        View the discussion (2)
+                      </button>
                         </div>
                       </div>
-                      <div className="flex items-start space-x-3">
-                        <img
-                          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face"
-                          alt="David Johnson"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-900">David Johnson</span>
-                            <span className="text-xs text-gray-500">1 day ago</span>
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">@Emma Davis It arrived 2 days earlier than expected! Very fast shipping.</p>
+
+                {/* Pagination */}
+                <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm" style={{ color: '#BABABA' }}>1 - 4 out of 23</span>
+                    <div className="flex items-center space-x-1">
+                      <button 
+                        disabled
+                        className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
+                      >
+                        <img src={grayArrowIcon} alt="Previous" style={{ width: '20px', height: '20px' }} />
+                      </button>
+                      <button 
+                        className="transition-opacity hover:opacity-80"
+                      >
+                        <img src={blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
+                      </button>
                         </div>
                       </div>
                     </div>
-                  )}
             </div>
+
+              {/* RIGHT COLUMN - Rating Summary & Give Your Opinion */}
+              <div className="lg:col-span-1">
+                {/* Overall Rating Summary */}
+                <div className="mb-8 text-center">
+                  <div className="flex items-center justify-center space-x-2 mb-3">
+                    <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
+                    <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
           </div>
+                  <div className="text-sm mb-8" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
+                  
+                  {/* Rating Bars */}
+                  <div className="space-y-2">
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '70%'}}></div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '60%'}}></div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '40%'}}></div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '20%'}}></div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1">
+                      <div className="bg-yellow-400 h-1 rounded-full" style={{width: '10%'}}></div>
+                    </div>
+                  </div>
+                </div>
 
-          {/* View More Reviews Button */}
-          <div className="text-center mt-8">
+                {/* Give Your Opinion Section */}
+                <div className="pt-24 text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Give your opinion</h3>
+                  <p className="text-xs mb-6" style={{ color: '#B0B0B0' }}>Share your opinion about this user and help others learn a bit more about them.</p>
+                  
+                  {/* Star Rating Input */}
+                  <div className="flex items-center justify-center space-x-1 mb-6">
+                    {[1,2,3,4,5].map((star) => (
             <button 
-              onClick={() => navigate('/reviews')}
-              className="text-blue-500 hover:underline transition-colors bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100"
-            >
-              View more reviews (453)
+                        key={star}
+                        onClick={() => setUserRating(star)}
+                        className="focus:outline-none hover:scale-110 transition-transform"
+                      >
+                        <svg 
+                          className="w-7 h-7" 
+                          viewBox="0 0 24 24"
+                          fill={userRating >= star ? '#FBBC05' : 'none'}
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path 
+                            d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
+                            stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
+                          />
+                        </svg>
             </button>
+                    ))}
           </div>
-            </>
+                  
+                  {/* Review Text Input */}
+                  <div className="flex items-start space-x-3 mb-4 pl-8">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <style dangerouslySetInnerHTML={{__html: `
+                      .custom-placeholder::placeholder {
+                        color: #D9D9D9;
+                        opacity: 1;
+                      }
+                    `}} />
+                    <textarea
+                      value={userReviewText}
+                      onChange={(e) => setUserReviewText(e.target.value)}
+                      placeholder="What do you think of this article?"
+                      className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none resize-none custom-placeholder"
+                      style={{ 
+                        border: 'none',
+                        minHeight: '80px',
+                        color: '#6A6A6A',
+                        backgroundColor: 'transparent'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Post Review Button */}
+                  <div className="pl-8">
+                    <button 
+                      className="w-full py-2.5 rounded-lg font-medium transition-all mt-6"
+                      style={{ 
+                        backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
+                        color: userRating > 0 ? 'white' : '#6A6A6A'
+                      }}
+                    >
+                      Post the review
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Seller Items Content */}
           {activeTab === 'items' && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+            <>
+              {/* Title */}
+              <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{seller.name} items</h2>
+              
+              {/* Product Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
               {/* Product 1 - African Textiles */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre1} alt="African Textiles" className="w-full h-full object-cover" />
+              <Link to={`/product/1`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre1} 
+                    alt="African Textiles"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(1).flag} 
                       alt={getProductCountry(1).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(1).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$13.9</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $13.9
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Textiles</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>African Textiles</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('textiles-1')) {
                             newSet.delete('textiles-1');
@@ -866,72 +1093,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('textiles-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('textiles-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('textiles-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                          {!wishlistProducts.has('textiles-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('textiles-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 2 - Fresh Tomatoes */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre2} alt="Fresh Tomatoes" className="w-full h-full object-cover" />
+              <Link to={`/product/2`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre2} 
+                    alt="Fresh Tomatoes"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(2).flag} 
                       alt={getProductCountry(2).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(2).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$45</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $45
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Fresh Tomatoes</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Fresh Tomatoes</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('tomatoes-1')) {
                             newSet.delete('tomatoes-1');
@@ -940,72 +1204,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('tomatoes-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('tomatoes-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('tomatoes-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                          {!wishlistProducts.has('tomatoes-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('tomatoes-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 3 - Dried Shrimp */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre3} alt="Dried Shrimp" className="w-full h-full object-cover" />
+              <Link to={`/product/3`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre3} 
+                    alt="Dried Shrimp"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(3).flag} 
                       alt={getProductCountry(3).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(3).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$8.09</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $8.09
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Dried Shrimp</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Dried Shrimp</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('shrimp-1')) {
                             newSet.delete('shrimp-1');
@@ -1014,72 +1315,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('shrimp-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('shrimp-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('shrimp-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                          {!wishlistProducts.has('shrimp-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('shrimp-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 4 - Ndolé Leaves */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre4} alt="Ndolé Leaves" className="w-full h-full object-cover" />
+              <Link to={`/product/4`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre4} 
+                    alt="Ndolé Leaves"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(4).flag} 
                       alt={getProductCountry(4).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(4).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$11.5</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $11.5
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Ndolé Leaves</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Ndolé Leaves</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('ndole-1')) {
                             newSet.delete('ndole-1');
@@ -1088,72 +1426,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('ndole-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('ndole-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('ndole-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                          {!wishlistProducts.has('ndole-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('ndole-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 5 - Plantain Chips */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre5} alt="Plantain Chips" className="w-full h-full object-cover" />
+              <Link to={`/product/5`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre5} 
+                    alt="Plantain Chips"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(5).flag} 
                       alt={getProductCountry(5).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(5).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$6.50</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $6.50
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Plantain Chips</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Plantain Chips</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('plantain-1')) {
                             newSet.delete('plantain-1');
@@ -1162,72 +1537,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('plantain-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('plantain-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('plantain-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                          {!wishlistProducts.has('plantain-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('plantain-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 6 - Yam Flour */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre6} alt="Yam Flour" className="w-full h-full object-cover" />
+              <Link to={`/product/6`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre6} 
+                    alt="Yam Flour"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(6).flag} 
                       alt={getProductCountry(6).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(6).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$9.75</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $9.75
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Yam Flour</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Yam Flour</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('yam-1')) {
                             newSet.delete('yam-1');
@@ -1236,72 +1648,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('yam-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('yam-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('yam-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                          {!wishlistProducts.has('yam-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('yam-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 7 - Palm Oil */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre7} alt="Palm Oil" className="w-full h-full object-cover" />
+              <Link to={`/product/7`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre7} 
+                    alt="Palm Oil"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(7).flag} 
                       alt={getProductCountry(7).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(7).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$15.20</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $15.20
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">Palm Oil</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>Palm Oil</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('palm-1')) {
                             newSet.delete('palm-1');
@@ -1310,72 +1759,109 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('palm-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('palm-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('palm-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                          {!wishlistProducts.has('palm-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('palm-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Product 8 - African Spices */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="aspect-square bg-gray-100 relative">
-                  <img src={pre8} alt="African Spices" className="w-full h-full object-cover" />
+              <Link to={`/product/8`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                {/* Product Image - Top */}
+                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                  <img 
+                    src={pre8} 
+                    alt="African Spices"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    style={{ borderRadius: '12px' }}
+                  />
                   
                   {/* Country Badge */}
-                  <div className="absolute top-2 left-2 bg-white rounded-md px-2 py-1 flex items-center space-x-1 shadow-sm">
+                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                    display: 'flex', 
+                    padding: '2px 6px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    top: '8px',
+                    left: '8px'
+                  }}>
                     <img 
                       src={getProductCountry(8).flag} 
                       alt={getProductCountry(8).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      style={{ 
+                        width: '12px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '2px'
+                      }}
                     />
-                    <span className="text-xs font-medium text-gray-800">
+                    <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                       {getProductCountry(8).abbreviation}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 pb-2">
+                
+                {/* Product Content */}
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-base font-semibold text-gray-900">$22.00</span>
-                    <div className="flex items-center text-xs text-green-600 px-0.5 sm:px-1 py-0.5 bg-green-50 rounded whitespace-nowrap">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full mr-0.5 sm:mr-1 flex-shrink-0"></div>
-                      <span className="text-xs sm:text-xs">Verified Seller</span>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      $22.00
+                    </div>
+                    <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                      display: 'flex', 
+                      padding: '1px 4px', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '1px', 
+                      fontSize: '9px' 
+                    }}>
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="font-medium text-gray-900 text-sm mb-1 truncate">African Spices</h3>
+                  <h3 className="line-clamp-2 font-medium" style={{ 
+                    fontSize: '13px', 
+                    color: '#212121',
+                    marginBottom: '4px'
+                  }}>African Spices</h3>
                   
-                  {/* Location and Bookmark Row */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 flex items-center text-xs text-gray-500">
-                      <svg className="w-2.5 h-2.5 mr-1 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="truncate font-normal max-w-[60px] sm:max-w-none">London | United Kingdom</span>
+                  {/* Location and Bookmark Row - Below Product Name */}
+                  <div className="flex items-center justify-between">
+                    {/* Location */}
+                    <div className="flex items-center text-gray-500 flex-1">
+                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
+                      }} />
+                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div className="ml-4">
+                    <div style={{ marginLeft: '8px' }}>
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           const newSet = new Set(wishlistProducts);
                           if (newSet.has('spices-1')) {
                             newSet.delete('spices-1');
@@ -1384,29 +1870,82 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className={`p-2 transition-colors touch-manipulation ${
-                          wishlistProducts.has('spices-1') 
-                            ? 'text-orange-500 hover:text-orange-600' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                        className="transition-colors touch-manipulation"
                         title={wishlistProducts.has('spices-1') ? 'Remove from saved' : 'Save product'}
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
                       >
-                        <div className="relative">
-                          <svg className="w-6 h-6" fill={wishlistProducts.has('spices-1') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                          {!wishlistProducts.has('spices-1') && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-xs font-bold">+</span>
-                            </div>
-                          )}
-                        </div>
+                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                          width: '20px',
+                          height: '20px',
+                          filter: wishlistProducts.has('spices-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        }} />
                       </button>
                     </div>
                   </div>
                 </div>
+              </Link>
               </div>
+              
+              {/* Pagination */}
+              <div className="flex items-center justify-between mt-8">
+                <div className="flex-1"></div>
+                
+                <div className="flex items-center space-x-12">
+                  <button
+                    disabled={true}
+                    className="font-normal transition-colors disabled:cursor-not-allowed"
+                    style={{ fontSize: '16px', color: '#BABABA' }}
+                  >
+                    Previous
+                  </button>
+                  
+                  <div className="flex items-baseline space-x-6">
+                    <button
+                      className="font-normal transition-colors relative pb-1"
+                      style={{ fontSize: '16px', color: '#212121' }}
+                    >
+                      <span>1</span>
+                      <div 
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2"
+                        style={{
+                          width: '200%',
+                          height: '2px',
+                          backgroundColor: '#212121'
+                        }}
+                      />
+                    </button>
+                    <button
+                      className="font-normal transition-colors hover:text-gray-900"
+                      style={{ fontSize: '16px', color: '#BABABA' }}
+                    >
+                      2
+                    </button>
             </div>
+                  
+                  <button
+                    className="font-normal transition-colors"
+                    style={{ fontSize: '16px', color: '#212121' }}
+                  >
+                    Next
+                  </button>
+                </div>
+                
+                <div className="flex-1 flex justify-end">
+                  <div className="flex items-center space-x-1">
+                    <div className="px-3 py-1 rounded border" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9' }}>
+                      <span className="font-normal" style={{ fontSize: '16px', color: '#212121' }}>1</span>
+                    </div>
+                    <span className="font-normal" style={{ fontSize: '16px', color: '#BABABA' }}>/ 2</span>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -1443,8 +1982,110 @@ const SellerProfile: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Share Profile Modal */}
+      {showShareModal && (
+        <>
+          {/* Focused Overlay */}
+          <div 
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={() => setShowShareModal(false)}
+          />
+          
+          {/* Share Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div 
+              className="bg-white rounded-2xl shadow-xl relative max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+              style={{ padding: '32px 24px', marginTop: '40px' }}
+            >
+              {/* Profile Picture - Half Outside Modal */}
+              <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '-40px' }}>
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                  <img
+                    src={seller.avatar}
+                    alt={seller.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Heading */}
+              <h3 className="text-xl font-semibold text-center mb-3 mt-8" style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Share this profile with your network
+              </h3>
+
+              {/* Description */}
+              <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0' }}>
+                Increase visibility by showcasing this profile to connect with more buyers or potential clients.
+              </p>
+
+              {/* Link Field with Copy Button */}
+              <div className="flex items-center space-x-2 mb-6">
+                <input
+                  type="text"
+                  value={`baoafrik.com/user-profile-id?`}
+                  readOnly
+                  className="flex-1 px-3 py-2.5 rounded-lg text-sm"
+                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', border: 'none' }}
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                  }}
+                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90"
+                  style={{ backgroundColor: '#000000' }}
+                >
+                  Copy link
+                </button>
+              </div>
+
+              {/* Share To Section */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 mb-4">Share to</h4>
+                <div className="flex items-center justify-center space-x-6">
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={fbIcon} alt="Facebook" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Facebook</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={igIcon} alt="Instagram" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Instagram</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={xIcon} alt="X" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>X</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0088cc' }}>
+                      <img src={tgIcon} alt="Telegram" className="w-6 h-6" />
+                    </div>
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Telegram</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={zapIcon} alt="WhatsApp" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Whatsapp</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 export default SellerProfile;
+
