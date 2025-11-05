@@ -223,7 +223,17 @@ const Notifications: React.FC = () => {
                                   </p>
                                 )}
                                 {notif.subText && (
-                                  <p className="mt-1.5" style={{ color: notif.id === 1 && !notif.isRead ? '#64B5F6' : '#9E9E9E', fontSize: notif.id === 1 ? '14px' : '13px' }}>{notif.subText}</p>
+                                  notif.id === 1 ? (
+                                    <p 
+                                      className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity" 
+                                      style={{ color: !notif.isRead ? '#64B5F6' : '#9E9E9E', fontSize: '14px' }}
+                                      onClick={() => navigate('/notification-detail')}
+                                    >
+                                      {notif.subText}
+                                    </p>
+                                  ) : (
+                                    <p className="mt-1.5" style={{ color: '#9E9E9E', fontSize: '13px' }}>{notif.subText}</p>
+                                  )
                                 )}
                               </div>
                               <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
