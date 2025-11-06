@@ -1,145 +1,146 @@
-export const s3Service = {
+class S3Service {
+  private baseUrl = process.env.REACT_APP_API_URL;
 
-    async getViewUrl(fileUrl: string) {
-        const token = localStorage.getItem('accessToken');
-        if (!token) throw new Error('User not authenticated');
+  private async request(endpoint: string, body: any) {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('User not authenticated');
 
-        // Extract key from the fileUrl
-        const url = new URL(fileUrl);
-        const key = url.pathname.substring(1);
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
 
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/upload/view-url`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ key }),
-        });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Upload service error: ${response.status} ${response.statusText} - ${errorText}`);
+    }
 
-        if (!res.ok) throw new Error('Failed to get view URL');
-        const data = await res.json();
-        return data.viewUrl;
-    },
+    return response.json();
+  }
 
-    async getPresignedUrlForProfile(file: File, userId: string) {
-        const token = localStorage.getItem('accessToken');
-        if (!token) throw new Error('User not authenticated');
+  // For profile images
+  async getPresignedUrlForProfile(file: File, userId: string) {
+    console.log('📸 Getting presigned URL for profile image:', {
+      fileName: file.name,
+      fileType: file.type,
+      userId
+    });
 
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/upload/upload-url`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                fileName: file.name,
-                fileType: file.type,
-                uploadType: 'profile',
-                userId,
-            }),
-        });
+    const response = await this.request('/upload/upload-url/profile', {
+      fileName: file.name,
+      fileType: file.type,
+      userId,
+    });
 
-        if (!res.ok) throw new Error('Failed to get presigned URL');
-        return res.json();
-    },
+    console.log('✅ Profile upload URL response:', response);
+    return response;
+  }
 
-    async getPresignedUrlForChat(file: File, userId: string) {
-        const token = localStorage.getItem('accessToken');
-        if (!token) throw new Error('User not authenticated');
+  // For chat files 
+  async getPresignedUrlForChat(file: File, userId: string) {
+    console.log('💬 Getting presigned URL for chat file:', {
+      fileName: file.name,
+      fileType: file.type,
+      userId
+    });
 
-        const requestBody = {
-            fileName: file.name,
-            fileType: file.type,
-            uploadType: 'chat',
-            userId: userId,
-        };
+    const response = await this.request('/upload/upload-url/chat', {
+      fileName: file.name,
+      fileType: file.type,
+      userId,
+    });
 
-        console.log('🔍 [DEBUG] S3 Upload Request Details:', {
-            url: `${process.env.REACT_APP_API_URL}/upload/upload-url`,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token.substring(0, 20)}...`, // Log partial token for security
-            },
-            body: requestBody,
-            fileInfo: {
-                name: file.name,
-                type: file.type,
-                size: file.size
-            }
-        });
+    console.log('✅ Chat upload URL response:', response);
+    return response;
+  }
 
-        try {
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/upload/upload-url`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify(requestBody),
-            });
+  // For product images
+  async getPresignedUrlForProduct(file: File, userId: string) {
+    console.log('🛍️ Getting presigned URL for product image:', {
+      fileName: file.name,
+      fileType: file.type,
+      userId
+    });
 
-            console.log('📨 [DEBUG] S3 Upload Response Status:', {
-                status: res.status,
-                statusText: res.statusText,
-                ok: res.ok,
-                headers: Object.fromEntries(res.headers.entries())
-            });
+    const response = await this.request('/upload/upload-url/product', {
+      fileName: file.name,
+      fileType: file.type,
+      userId,
+    });
 
-            if (!res.ok) {
-                // Try to get the error response body
-                let errorText = 'No error message';
-                try {
-                    errorText = await res.text();
-                } catch (e) {
-                    errorText = 'Could not read error response';
-                }
+    return response;
+  }
 
-                console.error('❌ [DEBUG] S3 Upload Error Details:', {
-                    status: res.status,
-                    statusText: res.statusText,
-                    errorBody: errorText
-                });
+  // Upload file to S3 using presigned URL
+  async uploadFile(file: File, uploadUrl: string): Promise<boolean> {
+    console.log('📤 Uploading file to S3:', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      uploadUrl: uploadUrl.substring(0, 100) + '...'
+    });
 
-                throw new Error(`Upload URL request failed: ${res.status} ${res.statusText} - ${errorText}`);
-            }
+    const response = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
 
-            const responseData = await res.json();
-            console.log('✅ [DEBUG] S3 Upload Success Response:', responseData);
-            return responseData;
-        } catch (error) {
-            console.error('❌ [DEBUG] S3 Upload Network Error:', error);
-            throw error;
-        }
-    },
+    if (!response.ok) {
+      console.error('❌ S3 upload failed:', {
+        status: response.status,
+        statusText: response.statusText
+      });
+      throw new Error('Upload failed');
+    }
 
-    uploadFile: async (file: File, uploadUrl: string) => {
-        const res = await fetch(uploadUrl, {
-            method: 'PUT',
-            headers: { 'Content-Type': file.type },
-            body: file,
-        });
+    console.log('✅ File uploaded successfully to S3');
+    return true;
+  }
 
-        if (!res.ok) throw new Error('Upload failed');
-        return true;
-    },
+  // Get view URL for private files
+  async getViewUrl(fileUrl: string): Promise<string> {
+    // Extract key from the fileUrl
+    const url = new URL(fileUrl);
+    const key = url.pathname.substring(1);
 
-    deleteFile: async (fileUrl: string) => {
-        const token = localStorage.getItem('accessToken');
-        if (!token) throw new Error('User not authenticated');
+    const response = await this.request('/upload/view-url', { key });
+    return response.viewUrl;
+  }
 
-        const key = decodeURIComponent(new URL(fileUrl).pathname.substring(1));
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/upload/delete-image`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ key }),
-        });
+  // Delete file from S3
+  async deleteFile(fileUrl: string): Promise<boolean> {
+    // Extract key from the fileUrl
+    const url = new URL(fileUrl);
+    const key = decodeURIComponent(url.pathname.substring(1));
 
-        if (!res.ok) throw new Error('Failed to delete file');
-        return true;
-    },
-};
+    console.log('🗑️ Deleting file from S3:', { key });
+
+    await this.request('/upload/delete-file', { key });
+    return true;
+  }
+
+  // Batch upload for multiple files
+  async getBatchPresignedUrls(files: File[], uploadType: 'profile' | 'chat' | 'product', userId: string) {
+    const fileData = files.map(file => ({
+      fileName: file.name,
+      fileType: file.type,
+    }));
+
+    const response = await this.request('/upload/batch-upload-urls', {
+      files: fileData,
+      uploadType,
+      userId,
+    });
+
+    return response.data;
+  }
+}
+
+export const s3Service = new S3Service();

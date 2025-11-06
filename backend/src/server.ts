@@ -21,8 +21,10 @@ import { connectRedis } from '@/config/redis';
 import authRoutes from '@/routes/authRoutes';
 import testRoutes from '@/routes/testRoutes';
 import chatRoutes from '@/routes/chatRoutes';
-import s3Routes from '@/routes/s3Routes';
 import productRoutes from './routes/productRoutes';
+import uploadRoutes from './routes/uploadRoutes';
+import countryRoutes from './routes/countryRoutes';
+import categoriesRoutes from './routes/categoriesRoutes';
 
 const app = express();
 const server = createServer(app);
@@ -145,7 +147,7 @@ app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'BaoAfrik API is running',
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toUTCString(),
     version: '1.0.0',
   });
 });
@@ -161,8 +163,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
 app.use('/api/auth', authRoutes);
 app.use('/api/test', testRoutes);
 app.use('/api/chat', chatRoutes);
-app.use('/api/upload', s3Routes);
+app.use('/api/upload', uploadRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/locations', countryRoutes);
 
 // 404 handler
 app.use(notFound);

@@ -705,7 +705,11 @@ const Messages: React.FC = () => {
           isVerifiedSeller: false,
         },
         isIncoming: false,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toLocaleTimeString('en-US', {
+          hour12: true,
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
         dateString: "Just now",
         type: messageData.messageType?.toLowerCase() || "text",
         status: "sending",
@@ -728,7 +732,11 @@ const Messages: React.FC = () => {
         productData: enhancedProductData,
         tempId: tempId,
         conversationId,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toLocaleTimeString('en-US', {
+          hour12: true,
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
         senderId: currentUser?.id,
       };
 

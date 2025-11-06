@@ -156,7 +156,7 @@ export const validateRefreshToken = [
 
 // Product validation rules
 export const validateCreateProduct = [
-  body('name')
+  body('title')
     .trim()
     .notEmpty()
     .withMessage('Product name is required')
@@ -182,14 +182,8 @@ export const validateCreateProduct = [
     .trim()
     .notEmpty()
     .withMessage('Category is required')
-    .isIn(['Food & Spices', 'Fashion & Textiles', 'Beauty & Wellness', 'Home & Decor', 'Books & Media'])
+    .isIn(['beauty', 'books', 'fashion', 'food', 'home'])
     .withMessage('Invalid category'),
-
-  body('subcategory')
-    .optional()
-    .trim()
-    .isLength({ max: 100 })
-    .withMessage('Subcategory must not exceed 100 characters'),
 
   body('location')
     .trim()
@@ -198,28 +192,17 @@ export const validateCreateProduct = [
     .isLength({ max: 255 })
     .withMessage('Location must not exceed 255 characters'),
 
-  body('country')
+  body('origin')
     .trim()
     .notEmpty()
     .withMessage('Country is required')
     .isLength({ max: 100 })
     .withMessage('Country must not exceed 100 characters'),
 
-  body('stock')
+  body('quantity')
     .optional()
     .isInt({ min: 0 })
     .withMessage('Stock must be a non-negative integer'),
-
-  body('tags')
-    .optional()
-    .isArray()
-    .withMessage('Tags must be an array'),
-
-  body('tags.*')
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 50 })
-    .withMessage('Each tag must be between 1 and 50 characters'),
 
   handleValidationErrors,
 ];
@@ -376,3 +359,4 @@ export const validateUUIDParam = (paramName: string = 'id') => [
 
   handleValidationErrors,
 ];
+

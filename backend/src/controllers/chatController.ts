@@ -152,7 +152,7 @@ export class ChatController {
 
             const productData = {
                 id: product.id,
-                name: product.name,
+                name: product.title,
                 price: product.price,
                 location: product.location,
                 category: product.category,
@@ -185,7 +185,7 @@ export class ChatController {
                     seller: product.seller,
                     product: {
                         id: product.id,
-                        name: product.name,
+                        name: product.title,
                         price: product.price,
                         images: product.images
                     }
@@ -261,7 +261,7 @@ export class ChatController {
                     product: {
                         select: {
                             id: true,
-                            name: true,
+                            title: true,
                             price: true,
                             location: true,
                             category: true,

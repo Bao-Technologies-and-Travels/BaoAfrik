@@ -135,7 +135,7 @@ export class ChatService {
                     product: {
                         select: {
                             id: true,
-                            name: true,
+                            title: true,
                             price: true,
                             images: true
                         }
@@ -220,7 +220,7 @@ export class ChatService {
                 product: {
                     select: {
                         id: true,
-                        name: true,
+                        title: true,
                         price: true,
                         images: true,
                         seller: {
@@ -449,7 +449,7 @@ export class ChatService {
                     product: {
                         select: {
                             id: true,
-                            name: true,
+                            title: true,
                             price: true,
                             images: true,
                             seller: {

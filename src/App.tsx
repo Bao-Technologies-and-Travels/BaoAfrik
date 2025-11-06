@@ -21,6 +21,7 @@ import ProductDetail from './pages/ProductDetail';
 import SellerProfile from './pages/SellerProfile';
 import Messages from './pages/Messages';
 import Listings from './pages/Listings';
+import MyListings from './pages/MyListings';
 import CreateListing from './pages/CreateListing';
 import './App.css';
 import { ToastProvider } from './contexts/ToastContext';
@@ -51,6 +52,7 @@ function AppContent() {
           <Route path="/reset-password-sent" element={<ResetPasswordSent />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/password-reset-success" element={<PasswordResetSuccess />} />
+          <Route path="/create-listing" element={<CreateListing />} />
         </Routes>
       </div>
     );
@@ -95,6 +97,8 @@ function AppContent() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/my-listings" element={<MyListings />} />
+          <Route path="/edit-listing/:id" element={<CreateListing />} />
         </Routes>
       </main>
       <Footer />

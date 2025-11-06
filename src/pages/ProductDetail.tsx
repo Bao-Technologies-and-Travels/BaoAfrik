@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 // Import product images
-import mainImage from "../assets/images/logos/0.png"; // New main white pepper image
+import mainImage from "../assets/images/logos/0.png"; 
 import africanTextileImage from "../assets/images/logos/Fashion.png";
 import basketImage from "../assets/images/logos/culture.png";
 import woodenCombImage from "../assets/images/logos/decor.png";

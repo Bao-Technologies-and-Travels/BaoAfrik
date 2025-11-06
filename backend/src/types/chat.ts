@@ -1,4 +1,3 @@
-// types/chat.ts
 export interface Message {
   id: string;
   senderId: string;

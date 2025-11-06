@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,42 +8,42 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(uuid())
-  email             String    @unique
-  firstName         String?   @map("first_name")
-  lastName          String?   @map("last_name")
-  phoneNumber       String?   @map("phone_number")
-  passwordHash      String?   @map("password_hash")
-  profileImage      String?   @map("profile_image")
-  gender            String?
-  birthDate         DateTime? @map("birth_date")
-  emailVerified     Boolean   @default(false) @map("email_verified")
-  emailVerificationCode String? @map("email_verification_code")
+  id                       String    @id @default(uuid())
+  email                    String    @unique
+  firstName                String?   @map("first_name")
+  lastName                 String?   @map("last_name")
+  phoneNumber              String?   @map("phone_number")
+  passwordHash             String?   @map("password_hash")
+  profileImage             String?   @map("profile_image")
+  gender                   String?
+  birthDate                DateTime? @map("birth_date")
+  emailVerified            Boolean   @default(false) @map("email_verified")
+  emailVerificationCode    String?   @map("email_verification_code")
   emailVerificationExpires DateTime? @map("email_verification_expires")
-  
-  passwordResetToken String? @map("password_reset_token")
-  passwordResetTokenExpires DateTime? @map("password_reset_token_expires")
-  passwordResetCode String? @map("password_reset_code")
-  passwordResetExpires DateTime?  @map("password_reset_expires")
 
-  provider          String?   // 'local', 'google', 'facebook', 'github'
-  providerId        String?   @map("provider_id")
-  isActive          Boolean   @default(true) @map("is_active")
-  isVerifiedSeller  Boolean   @default(false) @map("is_verified_seller")
-  rating            Float?    @default(0.0)
-  totalSales        Int       @default(0) @map("total_sales")
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-  lastLoginAt       DateTime? @map("last_login_at")
+  passwordResetToken        String?   @map("password_reset_token")
+  passwordResetTokenExpires DateTime? @map("password_reset_token_expires")
+  passwordResetCode         String?   @map("password_reset_code")
+  passwordResetExpires      DateTime? @map("password_reset_expires")
+
+  provider         String? // 'local', 'google', 'facebook', 'github'
+  providerId       String?   @map("provider_id")
+  isActive         Boolean   @default(true) @map("is_active")
+  isVerifiedSeller Boolean   @default(false) @map("is_verified_seller")
+  rating           Float?    @default(0.0)
+  totalSales       Int       @default(0) @map("total_sales")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  lastLoginAt      DateTime? @map("last_login_at")
 
   // Relations
-  products          Product[]
-  productLikes      ProductLike[]
-  productSaves      ProductSave[]
-  sentMessages      Message[]
-  refreshTokens     RefreshToken[]
+  products                 Product[]
+  productLikes             ProductLike[]
+  productSaves             ProductSave[]
+  sentMessages             Message[]
+  refreshTokens            RefreshToken[]
   conversationParticipants ConversationParticipant[]
-  sentMessageStatuses MessageStatus[]
+  sentMessageStatuses      MessageStatus[]
 
   @@map("users")
 }
@@ -62,31 +61,30 @@ model RefreshToken {
 }
 
 model Product {
-  id            String    @id @default(uuid())
-  sellerId      String    @map("seller_id")
-  name          String
-  description   String?
-  price         Decimal   @db.Decimal(10, 2)
-  currency      String    @default("USD")
-  category      String
-  subcategory   String?
-  location      String
-  country       String
-  images        Json?     // Array of image URLs
-  specifications Json?    // Product specifications object
-  availability  Boolean   @default(true)
-  stock         Int       @default(0)
-  tags          Json?     // Array of tags
-  viewCount     Int       @default(0) @map("view_count")
-  likeCount     Int       @default(0) @map("like_count")
-  saveCount     Int       @default(0) @map("save_count")
-  isActive      Boolean   @default(true) @map("is_active")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-  publishedAt   DateTime? @map("published_at")
+  id                String        @id @default(uuid())
+  sellerId          String        @map("seller_id")
+  title             String
+  description       String?
+  price             Decimal       @db.Decimal(10, 2)
+  currency          String        @default("USD")
+  category          String
+  origin            String
+  location          String
+  saleType          SaleType      @default(DEFAULT) @map("sale_type")
+  deliveryAvailable Boolean       @default(false) @map("delivery_available")
+  quantity          Int           @default(1)
+  images            Json? // Array of image objects with url, isPrimary, etc.
+  status            ProductStatus @default(DRAFT)
+  viewCount         Int           @default(0) @map("view_count")
+  likeCount         Int           @default(0) @map("like_count")
+  saveCount         Int           @default(0) @map("save_count")
+  isActive          Boolean       @default(true) @map("is_active")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  publishedAt       DateTime?     @map("published_at")
 
   // Relations
-  seller        User @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  seller        User           @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   likes         ProductLike[]
   saves         ProductSave[]
   messages      Message[]
@@ -122,33 +120,33 @@ model ProductSave {
 }
 
 model Message {
-  id         String      @id @default(uuid())
-  senderId   String      @map("sender_id")
-  productId  String?     @map("product_id")
-  conversationId String? @map("conversation_id")
-  imageUrl   String?     @map("image_url")
-  audioUrl   String?     @map("audio_url")
-  fileUrl    String?     @map("file_url")
-  fileName   String?     @map("file_name")
-  fileSize   Int?        @map("file_size")
-  replyToId  String?     @map("reply_to_id")
-  productData String?
-  productSnapshot Json?  @map("product_snapshot")
-  subject    String?
-  content    String
-  isRead     Boolean     @default(false) @map("is_read")
-  messageType MessageType @default(INQUIRY) @map("message_type")
-  createdAt  DateTime    @default(now()) @map("created_at")
-  updatedAt  DateTime    @updatedAt @map("updated_at")
+  id              String      @id @default(uuid())
+  senderId        String      @map("sender_id")
+  productId       String?     @map("product_id")
+  conversationId  String?     @map("conversation_id")
+  imageUrl        String?     @map("image_url")
+  audioUrl        String?     @map("audio_url")
+  fileUrl         String?     @map("file_url")
+  fileName        String?     @map("file_name")
+  fileSize        Int?        @map("file_size")
+  replyToId       String?     @map("reply_to_id")
+  productData     String?
+  productSnapshot Json?       @map("product_snapshot")
+  subject         String?
+  content         String
+  isRead          Boolean     @default(false) @map("is_read")
+  messageType     MessageType @default(INQUIRY) @map("message_type")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
 
   // Relations
-  sender   User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  product  Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  conversation Conversation? @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
-  replyTo  Message? @relation("MessageReplies", fields: [replyToId], references: [id])
-  replies  Message[] @relation("MessageReplies")
-  statuses MessageStatus[]
-  conversationAsLastMessage Conversation[] @relation("ConversationLastMessage")
+  sender                    User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  product                   Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  conversation              Conversation?   @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
+  replyTo                   Message?        @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies                   Message[]       @relation("MessageReplies")
+  statuses                  MessageStatus[]
+  conversationAsLastMessage Conversation[]  @relation("ConversationLastMessage")
 
   @@map("messages")
 }
@@ -186,7 +184,7 @@ model Country {
   id        String   @id @default(uuid())
   name      String   @unique
   code      String   @unique // ISO country code
-  flag      String?  // Flag image URL
+  flag      String? // Flag image URL
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -195,29 +193,29 @@ model Country {
 }
 
 model Conversation {
-  id          String  @id @default(uuid())
-  productId   String?  @map("product_id")
-  lastMessageId String? @map("last_message_id")
+  id            String    @id @default(uuid())
+  productId     String?   @map("product_id")
+  lastMessageId String?   @map("last_message_id")
   lastMessageAt DateTime? @map("last_message_at")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  lastMessage Message? @relation("ConversationLastMessage", fields: [lastMessageId], references: [id], onDelete: SetNull)
+  product      Product?                  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  lastMessage  Message?                  @relation("ConversationLastMessage", fields: [lastMessageId], references: [id], onDelete: SetNull)
   participants ConversationParticipant[]
-  messages Message[] @relation("ConversationMessages")
+  messages     Message[]                 @relation("ConversationMessages")
 
   @@map("conversations")
 }
 
 model ConversationParticipant {
-  id  String  @id @default(uuid())
-  conversationId  String  @map("conversation_id")
-  userId  String @map("user_id")
-  joinedAt  DateTime @default(now()) @map("joined_at")
-  lastReadAt  DateTime @default(now())  @map("last_read_at")
-  createdAt DateTime @default(now())
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  userId         String   @map("user_id")
+  joinedAt       DateTime @default(now()) @map("joined_at")
+  lastReadAt     DateTime @default(now()) @map("last_read_at")
+  createdAt      DateTime @default(now())
 
   // Relations
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
@@ -243,4 +241,17 @@ enum MessageStatusType {
   SENT
   DELIVERED
   READ
+}
+
+enum SaleType {
+  DEFAULT
+  URGENT
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  SOLD
+  EXPIRED
+  DELETED
 }

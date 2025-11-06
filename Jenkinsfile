@@ -290,7 +290,7 @@ EOF
                                     <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                                     <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
                                     <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                                    <p><strong>Changes made:</strong>Forgot password fixed, with inline policy enforced and neutral messages displayed when user inputs an email that does not exist in the database. Profile setup updated with different date of birth picker, also allowing manual date input. Edit profile button functional on mobile versions, users are redirected to the profile-setup page</p>
+                                    <p><strong>Changes made:</strong> Built API endpoints to create a draft listing or publish a listing, view listings, delete listing, search for products that were recently created. Global file uploads for chats, profile updates, product listings</p>
                                     <p>Check the <a href="${env.BUILD_URL}">console output</a> for details.</p>
                                     <hr>
                                     <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

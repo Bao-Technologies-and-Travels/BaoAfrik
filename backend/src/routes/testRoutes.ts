@@ -234,7 +234,11 @@ router.post('/send-test-email', async (req: Request, res: Response) => {
     return res.json({
       success: true,
       message: `Test email sent successfully to ${email}`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toLocaleTimeString('en-US', {
+          hour12: true,
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
     });
     
   } catch (error) {
