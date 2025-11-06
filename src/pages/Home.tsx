@@ -1761,55 +1761,63 @@ const Home: React.FC = () => {
               {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                     className={`absolute top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 shadow-sm animate-in slide-in-from-right duration-300 w-80 sm:w-96 ${
-                      notification.type === 'success' 
-                        ? 'bg-blue-50 border border-blue-200' 
-                        : 'bg-orange-50 border border-orange-200'
-                    }`}
+                     className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center rounded-xl px-4 py-3 shadow-lg animate-in slide-in-from-right duration-300"
+                     style={{ 
+                       backgroundColor: notification.type === 'success' ? '#F5FBFF' : '#FFFCF7',
+                       border: notification.type === 'success' ? '1px solid #CFE8FC' : '1px solid #FCD79B',
+                       width: '350px'
+                     }}
                   >
                     {/* Product Image */}
                     <div className="relative mr-3">
                       <img
                         src={notification.product.image}
                         alt={notification.product.name}
-                         className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg"
+                         className="w-10 h-10 object-cover rounded-lg"
                       />
-                      {/* Bookmark Icon Overlay */}
-                      <div className={`absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex items-center justify-center ${
-                        notification.type === 'success' 
-                          ? 'bg-blue-500' 
-                          : 'bg-white border border-orange-300'
-                      }`}>
-                        {notification.type === 'success' ? (
-                           <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-                        ) : (
-                          <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5l14 14M5 19L19 5" />
-              </svg>
-                        )}
-                      </div>
+                      {/* Bookmark Icon Badge */}
+                      {notification.type === 'success' ? (
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+                          <div className="w-3 h-3 rounded flex items-center justify-center" style={{ backgroundColor: '#64B5F6' }}>
+                            <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="#F9A825" viewBox="0 0 24 24" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 5v14l7-5 7 5V5a2 2 0 00-2-2H7a2 2 0 00-2 2z" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                     
                     {/* Notification Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-800">
+                      <div className="text-sm">
                         {notification.type === 'success' ? (
-                          <>Added to <Link to="/bookmarks" className="text-blue-600 hover:text-blue-700 underline">Bookmarks</Link></>
+                          <>
+                            <span style={{ color: '#939393' }}>Added to </span>
+                            <Link to="/bookmarks" className="underline hover:opacity-70" style={{ color: '#64B5F6' }}>Bookmarks</Link>
+                          </>
                         ) : (
-                          <>Failed to add to <span className="text-orange-600">Bookmarks</span></>
+                          <>
+                            <span style={{ color: '#939393' }}>Failed to add to </span>
+                            <span style={{ color: '#F9A825' }}>Bookmarks</span>
+                          </>
                         )}
                       </div>
-                      <div className="text-xs text-gray-600 truncate">
-                        {notification.product.name} - ${notification.product.price}
+                      <div className="text-xs truncate" style={{ color: '#939393' }}>
+                        {notification.product.name} · ${notification.product.price}
                       </div>
                     </div>
                     
                     {/* Close Button */}
                   <button
                       onClick={() => removeNotification(notification.id)}
-                      className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="ml-2 hover:opacity-70 transition-opacity"
+                      style={{ color: '#6A6A6A' }}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -2014,25 +2022,32 @@ const Home: React.FC = () => {
                                     e.preventDefault();
                                     handleSave(product.id);
                                   }}
-                                  className="transition-colors touch-manipulation"
+                                  className="transition-colors touch-manipulation rounded"
                                   style={{ 
                                     width: window.innerWidth < 640 ? '16px' : '20px', 
                                     height: window.innerWidth < 640 ? '16px' : '20px', 
                                     display: 'flex', 
                                     alignItems: 'center', 
                                     justifyContent: 'center',
-                                    marginLeft: window.innerWidth < 640 ? '4px' : '8px'
+                                    marginLeft: window.innerWidth < 640 ? '4px' : '8px',
+                                    backgroundColor: savedProducts.has(product.id) ? '#64B5F6' : 'transparent'
                                   }}
                   >
-                    <img 
+                    {savedProducts.has(product.id) ? (
+                      <svg className="text-white" style={{ width: window.innerWidth < 640 ? '10px' : '12px', height: window.innerWidth < 640 ? '10px' : '12px' }} fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <img 
                                     src={bookmarkIcon} 
                                     alt="Bookmark" 
                                     style={{
                                       width: window.innerWidth < 640 ? '16px' : '20px',
                                       height: window.innerWidth < 640 ? '16px' : '20px',
-                                      filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                                      filter: 'grayscale(100%) opacity(0.5)'
                                     }}
                     />
+                    )}
                   </button>
                               </div>
                             </div>

@@ -54,6 +54,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
     return true;
   });
 
+  const unreadCount = notifications.filter(notif => !notif.isRead).length;
+
   const handleLogout = () => {
     logout();
     setIsMobileMenuOpen(false);
@@ -297,6 +299,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       className="w-6 h-6"
                       style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
                     />
+                    {unreadCount > 0 && (
+                      <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FF0000' }}>
+                        <span className="text-white text-xs font-medium">{unreadCount}</span>
+                      </div>
+                    )}
                         </button>
 
                   {/* Notification Dropdown */}
@@ -855,6 +862,11 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                 className="w-5 h-5"
                 style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
               />
+              {unreadCount > 0 && (
+                <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FF0000' }}>
+                  <span className="text-white font-medium" style={{ fontSize: '9px' }}>{unreadCount}</span>
+                </div>
+              )}
                          </button>
 
             {/* Burger Menu Button */}
