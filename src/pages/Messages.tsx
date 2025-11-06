@@ -1053,13 +1053,13 @@ const Messages: React.FC = () => {
         style={{ display: 'none' }}
       />
       {/* Left Sidebar - Full Height */}
-      <div className="w-1/4 bg-white border-r-2 border-gray-300 flex flex-col h-screen sticky top-0 relative">
+      <div className="w-full md:w-1/4 bg-white md:border-r-2 border-gray-300 flex flex-col h-screen sticky top-0 relative">
         {/* Header */}
         <header className="bg-white">
           <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
             <div className="flex items-center justify-between h-16">
-              {/* Left side - Logo and sidebar button */}
-              <div className="flex items-center space-x-36 pr-0">
+              {/* Desktop - Logo and sidebar button */}
+              <div className="hidden md:flex items-center space-x-36 pr-0">
                 <img 
                   src={logo} 
                   alt="bao'Afrik" 
@@ -1072,16 +1072,36 @@ const Messages: React.FC = () => {
                     className="w-5 h-5"
                   />
                 </button>
-        </div>
-      </div>
-    </div>
+              </div>
+              
+              {/* Mobile - Chats header with icons */}
+              <div className="flex md:hidden items-center justify-between w-full">
+                <h1 className="text-xl font-normal text-black">Chats</h1>
+                <div className="flex items-center space-x-3">
+                  <button className="p-2 hover:bg-gray-100 rounded">
+                    <img 
+                      src={filterIcon} 
+                      alt="Filter" 
+                      className="w-5 h-5"
+                    />
+                  </button>
+                  <button className="p-2 hover:bg-gray-100 rounded">
+                    <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </header>
 
         {/* Chats List */}
         <div className="flex-1 flex flex-col">
           {/* Chats Header */}
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="pt-1 px-6 pb-4 md:p-6">
+            {/* Desktop - Chats title and filter */}
+            <div className="hidden md:flex items-center justify-between mb-4">
               <h1 className="text-xl text-black">Chats</h1>
               <button className="p-2 hover:bg-gray-200 rounded">
                 <img 
@@ -1092,7 +1112,7 @@ const Messages: React.FC = () => {
               </button>
             </div>
             
-            {/* Search Bar */}
+            {/* Search Bar - visible on all screens */}
             <div className="relative">
               <input
                 type="text"
@@ -1378,7 +1398,7 @@ const Messages: React.FC = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="hidden md:flex flex-1 flex-col h-screen overflow-hidden">
         {/* Header */}
         <header className="bg-gray-50">
           <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
