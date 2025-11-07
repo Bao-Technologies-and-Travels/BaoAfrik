@@ -17,10 +17,35 @@ const ArchivedChats: React.FC = () => {
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
   const [actionsMenuOpen, setActionsMenuOpen] = useState<number | null>(null);
   const [pinnedChats, setPinnedChats] = useState<Set<number>>(new Set());
+  const [archivedChatIds, setArchivedChatIds] = useState<Set<number>>(new Set([1, 2, 3, 4]));
+  const chatListRef = React.useRef<HTMLDivElement>(null);
+  const [actionsMenuCoords, setActionsMenuCoords] = useState<{ top: number; right: number } | null>(null);
 
   const handleActionsMenuClick = (chatId: number, event: React.MouseEvent) => {
     event.stopPropagation();
-    setActionsMenuOpen(actionsMenuOpen === chatId ? null : chatId);
+    const isOpening = actionsMenuOpen !== chatId;
+
+    if (isOpening) {
+      setActionsMenuOpen(chatId);
+      
+      // Calculate dropdown position
+      if (chatListRef.current) {
+        const buttonElement = event.currentTarget as HTMLElement;
+        const cardElement = buttonElement.closest('.chat-card') as HTMLElement;
+        const buttonRect = buttonElement.getBoundingClientRect();
+        const cardRect = cardElement.getBoundingClientRect();
+        const containerRect = chatListRef.current.getBoundingClientRect();
+        const scrollTop = chatListRef.current.scrollTop;
+        
+        const top = cardRect.bottom - containerRect.top + scrollTop + 8;
+        const right = 16; // 16px from right edge
+        
+        setActionsMenuCoords({ top, right });
+      }
+    } else {
+      setActionsMenuOpen(null);
+      setActionsMenuCoords(null);
+    }
   };
 
   const handleActionSelect = (action: string, chatId: number) => {
@@ -34,9 +59,21 @@ const ArchivedChats: React.FC = () => {
         newSet.delete(chatId);
         return newSet;
       });
+    } else if (action === 'Unarchive the chat') {
+      // Remove from archived list
+      setArchivedChatIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(chatId);
+        return newSet;
+      });
+      // Navigate back to messages after a brief moment
+      setTimeout(() => {
+        navigate('/messages');
+      }, 300);
     }
     
     setActionsMenuOpen(null);
+    setActionsMenuCoords(null);
   };
 
   const handleChatClick = (chatId: number) => {
@@ -116,11 +153,11 @@ const ArchivedChats: React.FC = () => {
       </div>
 
       {/* Archived Chats List with Overlay */}
-      <div className="flex-1 overflow-y-auto relative">
-        {archivedChats.map((chat) => (
+      <div className="flex-1 overflow-y-auto relative" ref={chatListRef}>
+        {archivedChats.filter(chat => archivedChatIds.has(chat.id)).map((chat) => (
           <div
             key={chat.id}
-            className="p-4 cursor-pointer transition-colors relative"
+            className={`chat-card p-4 cursor-pointer transition-colors relative ${actionsMenuOpen === chat.id ? 'mx-2 rounded-lg' : ''}`}
             style={{
               backgroundColor: actionsMenuOpen === chat.id ? '#FFFFFF' : 'transparent',
               boxShadow: actionsMenuOpen === chat.id ? '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)' : 'none',
@@ -200,15 +237,35 @@ const ArchivedChats: React.FC = () => {
             {/* Semi-transparent overlay - covers entire page */}
             <div
               className="fixed inset-0 bg-black bg-opacity-20 z-40"
-              onClick={() => setActionsMenuOpen(null)}
+              onClick={() => {
+                setActionsMenuOpen(null);
+                setActionsMenuCoords(null);
+              }}
             ></div>
 
             {/* Actions Menu */}
-            <div className="actions-menu absolute right-4 top-[10rem] bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48" style={{ borderRadius: '24px' }}>
+            <div 
+              className="actions-menu absolute bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48" 
+              style={actionsMenuCoords
+                ? {
+                    borderRadius: '24px',
+                    top: `${actionsMenuCoords.top}px`,
+                    right: `${actionsMenuCoords.right}px`
+                  }
+                : {
+                    borderRadius: '24px',
+                    top: '10rem',
+                    right: '16px'
+                  }
+              }
+            >
               <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="text-sm font-thin" style={{ color: '#BABABA' }}>Actions</h3>
                 <button
-                  onClick={() => setActionsMenuOpen(null)}
+                  onClick={() => {
+                    setActionsMenuOpen(null);
+                    setActionsMenuCoords(null);
+                  }}
                   className="transition-colors"
                   style={{ color: '#374151' }}
                 >
@@ -253,11 +310,11 @@ const ArchivedChats: React.FC = () => {
                 </button>
 
                 <button
-                  onClick={() => handleActionSelect('Archive the chat', actionsMenuOpen)}
+                  onClick={() => handleActionSelect('Unarchive the chat', actionsMenuOpen)}
                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
                 >
-                  <img src={actionIcon05} alt="Archive the chat" className="w-4 h-4" />
-                  <span className="font-light" style={{ color: '#374151' }}>Archive the chat</span>
+                  <img src={actionIcon05} alt="Unarchive the chat" className="w-4 h-4" />
+                  <span className="font-light" style={{ color: '#374151' }}>Unarchive the chat</span>
                 </button>
 
                 <button

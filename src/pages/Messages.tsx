@@ -115,6 +115,9 @@ const Messages: React.FC = () => {
   const [showReactionEmojiPicker, setShowReactionEmojiPicker] = useState(false);
   const [replyToMessage, setReplyToMessage] = useState<any>(null);
   const [showMobileConversation, setShowMobileConversation] = useState(false);
+  const [mobileMessageOptionsId, setMobileMessageOptionsId] = useState<number | null>(null);
+  const [showMobileReactionPicker, setShowMobileReactionPicker] = useState(false);
+  const [mobileMessageCoords, setMobileMessageCoords] = useState<{ top: number; left: number } | null>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const chatListRef = React.useRef<HTMLDivElement>(null);
@@ -259,6 +262,39 @@ const Messages: React.FC = () => {
       }
     };
 
+    const handleMobileIncomingMessageClick = (messageId: number, event?: React.MouseEvent) => {
+      const isOpening = mobileMessageOptionsId !== messageId;
+      
+      if (isOpening) {
+        setMobileMessageOptionsId(messageId);
+        
+        // Calculate position relative to clicked message
+        if (event && messagesContainerRef.current) {
+          const messageElement = (event.currentTarget as HTMLElement).closest('.mobile-message-wrapper') as HTMLElement;
+          if (messageElement) {
+            const messageRect = messageElement.getBoundingClientRect();
+            const containerRect = messagesContainerRef.current.getBoundingClientRect();
+            const scrollTop = messagesContainerRef.current.scrollTop;
+            
+            const top = messageRect.top - containerRect.top + scrollTop;
+            const left = 16;
+            
+            setMobileMessageCoords({ top, left });
+          }
+        }
+      } else {
+        setMobileMessageOptionsId(null);
+        setMobileMessageCoords(null);
+        setShowMobileReactionPicker(false);
+      }
+      
+      // Mark reply as read when user clicks on incoming message
+      const message = messages.find(m => m.id === messageId);
+      if (message && message.isIncoming) {
+        setIsReplyRead(true);
+      }
+    };
+
   const handleActionsMenuClick = (chatId: number, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent chat selection
     const isOpening = actionsMenuOpen !== chatId;
@@ -372,17 +408,23 @@ const Messages: React.FC = () => {
 
   // Handle reaction selection
   const handleReactionSelect = (reaction: string) => {
-    if (activeReactionMessageId !== null) {
+    const messageId = activeReactionMessageId !== null ? activeReactionMessageId : mobileMessageOptionsId;
+    
+    if (messageId !== null) {
       setMessages(prevMessages => 
         prevMessages.map(msg => 
-          msg.id === activeReactionMessageId 
+          msg.id === messageId 
             ? { ...msg, reaction } 
             : msg
         )
       );
     }
+    
     setActiveReactionMessageId(null);
+    setMobileMessageOptionsId(null);
+    setShowMobileReactionPicker(false);
     setShowReactionEmojiPicker(false);
+    setMobileMessageCoords(null);
   };
 
   // Handle reaction removal
@@ -418,8 +460,11 @@ const Messages: React.FC = () => {
       }
     }
     
-    // Close the options menu
+    // Close the options menu (both desktop and mobile)
     setActiveMessageOptionsId(null);
+    setMobileMessageOptionsId(null);
+    setShowMobileReactionPicker(false);
+    setMobileMessageCoords(null);
   };
 
   // Close message options popup on click outside or Escape key
@@ -1286,7 +1331,7 @@ const Messages: React.FC = () => {
                   return (
                     <div 
                       key={message.id} 
-                      className={`flex mb-3 ${message.isIncoming ? 'justify-start' : 'justify-end'} ${isFadingOut ? 'message-fade-out' : ''}`}
+                      className={`mobile-message-wrapper flex mb-3 ${message.isIncoming ? 'justify-start' : 'justify-end'} ${isFadingOut ? 'message-fade-out' : ''}`}
                       style={{
                         animation: isFadingOut ? 'fadeOutUp 0.5s ease-in-out forwards' : 'fadeIn 0.5s ease-in-out',
                         opacity: isFadingOut ? 0 : 1,
@@ -1296,10 +1341,11 @@ const Messages: React.FC = () => {
                     >
                       <div className="max-w-[75%] relative">
                         <div 
-                          className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md' : 'rounded-br-md'}`} 
+                          className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`} 
                           style={{ 
                             backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
                           }}
+                          onClick={message.isIncoming ? (e) => handleMobileIncomingMessageClick(message.id, e) : undefined}
                         >
                           {/* Message Text */}
                           <p 
@@ -1372,9 +1418,9 @@ const Messages: React.FC = () => {
                               )}
                             </div>
                           )}
-                        </div>
-                      </div>
-                    </div>
+        </div>
+      </div>
+    </div>
                   );
                 })}
                 
@@ -1432,6 +1478,174 @@ const Messages: React.FC = () => {
                 
                 <div ref={messagesEndRef}></div>
               </div>
+            )}
+
+            {/* Mobile Message Options and Reactions - Positioned above clicked message */}
+            {mobileMessageOptionsId !== null && (
+              <>
+                {/* Semi-transparent overlay */}
+                <div
+                  className="absolute inset-0 bg-black bg-opacity-20 z-50"
+                  onClick={() => {
+                    setMobileMessageOptionsId(null);
+                    setShowMobileReactionPicker(false);
+                    setMobileMessageCoords(null);
+                  }}
+                ></div>
+
+                {/* Actions Menu - Positioned above message */}
+                <div
+                  className="absolute bg-white rounded-xl shadow-xl border border-gray-200 z-50"
+                  style={mobileMessageCoords
+                    ? { 
+                        minWidth: '160px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        top: `${mobileMessageCoords.top - 260}px`
+                      }
+                    : {
+                        minWidth: '160px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        top: '100px'
+                      }
+                  }
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Header */}
+                  <div className="px-3 py-2 border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium" style={{ color: '#9CA3AF', fontSize: '10px' }}>Actions</span>
+                      <button
+                        onClick={() => {
+                          setMobileMessageOptionsId(null);
+                          setShowMobileReactionPicker(false);
+                          setMobileMessageCoords(null);
+                        }}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                          <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="py-1">
+                    <button
+                      onClick={() => handleMessageOptionSelect('reply', mobileMessageOptionsId)}
+                      className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                    >
+                      <img src={replyIcon} alt="Reply" className="w-3.5 h-3.5 mr-2" />
+                      <span className="text-xs" style={{ color: '#6B7280' }}>Reply the message</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleMessageOptionSelect('important', mobileMessageOptionsId)}
+                      className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                    >
+                      <img src={starIcon} alt="Star" className="w-3.5 h-3.5 mr-2" />
+                      <span className="text-xs" style={{ color: '#6B7280' }}>Mark as important</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleMessageOptionSelect('copy', mobileMessageOptionsId)}
+                      className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                    >
+                      <img src={copyIcon} alt="Copy" className="w-3.5 h-3.5 mr-2" />
+                      <span className="text-xs" style={{ color: '#6B7280' }}>Copy the message</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleMessageOptionSelect('select', mobileMessageOptionsId)}
+                      className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                    >
+                      <img src={tickIcon} alt="Select" className="w-3.5 h-3.5 mr-2" />
+                      <span className="text-xs" style={{ color: '#6B7280' }}>Select the message</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleMessageOptionSelect('pin', mobileMessageOptionsId)}
+                      className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                    >
+                      <img src={pinMenuIcon} alt="Pin" className="w-3.5 h-3.5 mr-2" />
+                      <span className="text-xs" style={{ color: '#6B7280' }}>Pin the message</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleMessageOptionSelect('delete', mobileMessageOptionsId)}
+                      className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                    >
+                      <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5 mr-2" />
+                      <span className="text-xs" style={{ color: '#6B7280' }}>Delete for me</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Reactions Bar - Positioned below Actions menu */}
+                <div
+                  className="absolute bg-white rounded-full shadow-xl border border-gray-200 z-50"
+                  style={mobileMessageCoords
+                    ? { 
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        top: `${mobileMessageCoords.top - 40}px`
+                      }
+                    : {
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        top: '300px'
+                      }
+                  }
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="px-2 py-1.5 flex items-center space-x-1.5">
+                    <button onClick={() => handleReactionSelect('👍')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '24px', height: '24px' }}>
+                      <Emoji unified="1f44d" size={16} />
+                    </button>
+                    <button onClick={() => handleReactionSelect('❤️')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '24px', height: '24px' }}>
+                      <Emoji unified="2764-fe0f" size={16} />
+                    </button>
+                    <button onClick={() => handleReactionSelect('✅')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '24px', height: '24px' }}>
+                      <Emoji unified="2705" size={16} />
+                    </button>
+                    <button onClick={() => handleReactionSelect('😂')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '24px', height: '24px' }}>
+                      <Emoji unified="1f602" size={16} />
+                    </button>
+                    <button onClick={() => handleReactionSelect('😊')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '24px', height: '24px' }}>
+                      <Emoji unified="1f60a" size={16} />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMobileReactionPicker(!showMobileReactionPicker);
+                      }}
+                      className="hover:scale-110 transition-transform flex items-center justify-center"
+                      style={{ width: '24px', height: '24px' }}
+                    >
+                      <img src={emoji6} alt="More reactions" style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
+                    </button>
+                  </div>
+
+                  {/* Mobile Reaction Emoji Picker */}
+                  {showMobileReactionPicker && (
+                    <div 
+                      className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50" 
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <EmojiPicker
+                        onEmojiClick={(emojiObject) => {
+                          handleReactionSelect(emojiObject.emoji);
+                          setShowMobileReactionPicker(false);
+                        }}
+                        width={280}
+                        height={350}
+                      />
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
 
