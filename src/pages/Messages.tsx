@@ -1208,8 +1208,8 @@ const Messages: React.FC = () => {
             {visibleMessages.length > 0 && (
               <div 
                 ref={messagesContainerRef}
-                className="px-4 py-2 overflow-y-auto scroll-smooth"
-                style={{ scrollBehavior: 'smooth', maxHeight: showCondensedHeader ? 'calc(100vh - 240px)' : 'calc(100vh - 450px)' }}
+                className="px-4 py-2 overflow-y-auto scroll-smooth flex-1"
+                style={{ scrollBehavior: 'smooth' }}
               >
                 {/* View Older Messages Button */}
                 {messages.length > 10 && !showAllMessages && (
@@ -1614,44 +1614,69 @@ const Messages: React.FC = () => {
                   {/* Gray baseline */}
                   <div className="absolute bottom-0 left-4 right-4 h-px bg-gray-200"></div>
                   
-                  <div className="flex space-x-6 relative">
+                  <div className="flex items-center justify-between">
+                    <div className="flex space-x-6 relative">
+                      <button 
+                        onClick={() => setSelectedTab('All')}
+                        className={`text-sm font-medium pb-1 relative ${
+                          selectedTab === 'All' 
+                            ? 'text-gray-900' 
+                            : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                        style={{ 
+                          color: selectedTab === 'All' ? '#64B5F6' : undefined
+                        }}
+                      >
+                        All
+                        {selectedTab === 'All' && (
+                          <div 
+                            className="absolute bottom-0 left-0 right-0 h-0.5"
+                            style={{ backgroundColor: '#64B5F6' }}
+                          ></div>
+                        )}
+                      </button>
+                      <button 
+                        onClick={() => setSelectedTab('Unreads')}
+                        className={`text-sm font-medium pb-1 relative flex items-center space-x-1 ${
+                          selectedTab === 'Unreads' 
+                            ? 'text-gray-900' 
+                            : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                        style={{ 
+                          color: selectedTab === 'Unreads' ? '#64B5F6' : undefined
+                        }}
+                      >
+                        <span>Unreads</span>
+                        <span 
+                          className="md:hidden w-5 h-5 rounded-full flex items-center justify-center text-xs"
+                          style={{ 
+                            backgroundColor: '#E3F2FD',
+                            color: '#64B5F6',
+                            border: '1px solid white'
+                          }}
+                        >
+                          3
+                        </span>
+                        {selectedTab === 'Unreads' && (
+                          <div 
+                            className="absolute bottom-0 left-0 right-0 h-0.5"
+                            style={{ backgroundColor: '#64B5F6' }}
+                          ></div>
+                        )}
+                      </button>
+                    </div>
+                    
+                    {/* Hamburger Menu - Mobile Only */}
                     <button 
-                      onClick={() => setSelectedTab('All')}
-                      className={`text-sm font-medium pb-1 relative ${
-                        selectedTab === 'All' 
-                          ? 'text-gray-900' 
-                          : 'text-gray-500 hover:text-gray-700'
-                      }`}
-                      style={{ 
-                        color: selectedTab === 'All' ? '#64B5F6' : undefined
+                      className="md:hidden pb-1"
+                      onClick={() => {
+                        // Navigate to archived messages view
+                        console.log('View archived messages');
                       }}
                     >
-                      All
-                      {selectedTab === 'All' && (
-                        <div 
-                          className="absolute bottom-0 left-0 right-0 h-0.5"
-                          style={{ backgroundColor: '#64B5F6' }}
-                        ></div>
-                      )}
-                    </button>
-                    <button 
-                      onClick={() => setSelectedTab('Unreads')}
-                      className={`text-sm font-medium pb-1 relative ${
-                        selectedTab === 'Unreads' 
-                          ? 'text-gray-900' 
-                          : 'text-gray-500 hover:text-gray-700'
-                      }`}
-                      style={{ 
-                        color: selectedTab === 'Unreads' ? '#64B5F6' : undefined
-                      }}
-                    >
-                      Unreads
-                      {selectedTab === 'Unreads' && (
-                        <div 
-                          className="absolute bottom-0 left-0 right-0 h-0.5"
-                          style={{ backgroundColor: '#64B5F6' }}
-                        ></div>
-                      )}
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#6A6A6A' }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -1660,20 +1685,28 @@ const Messages: React.FC = () => {
               {/* Chat Entry */}
               <div className="flex-1 overflow-y-auto p-1">
                 <div 
-                  className={`p-2 rounded-lg cursor-pointer transition-colors ${activeChatId === chatEntry.id ? 'hover:bg-gray-100' : 'hover:bg-gray-50'}`} 
+                  className={`p-2 rounded-lg cursor-pointer transition-colors md:hover:bg-gray-50`} 
                   style={{ 
-                    backgroundColor: actionsMenuOpen === chatEntry.id 
-                      ? '#FFFFFF' 
-                      : activeChatId === chatEntry.id 
-                        ? '#F5F5F5' 
-                        : '#FFFFFF',
+                    backgroundColor: window.innerWidth >= 768 
+                      ? (actionsMenuOpen === chatEntry.id 
+                          ? '#FFFFFF' 
+                          : activeChatId === chatEntry.id 
+                            ? '#F5F5F5' 
+                            : '#FFFFFF')
+                      : '#FFFFFF',
                     boxShadow: actionsMenuOpen === chatEntry.id 
                       ? '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)' 
                       : 'none',
                     zIndex: actionsMenuOpen === chatEntry.id ? 45 : 'auto',
                     position: actionsMenuOpen === chatEntry.id ? 'relative' : 'static'
                   }}
-                  onClick={() => setActiveChatId(chatEntry.id)}
+                  onClick={() => {
+                    setActiveChatId(chatEntry.id);
+                    // Mobile: Open conversation view
+                    if (window.innerWidth < 768) {
+                      setShowMobileConversation(true);
+                    }
+                  }}
                 >
                     <div className="flex items-center space-x-2">
                       <img 
@@ -1850,9 +1883,9 @@ const Messages: React.FC = () => {
           </>
         )}
         
-        {/* Archive and Important Section - At Bottom of Sidebar - Only show when there are conversations */}
+        {/* Archive and Important Section - At Bottom of Sidebar - Only show when there are conversations - Hidden on mobile */}
         {chatEntry && (
-          <div className="mt-auto bg-white px-4 py-3">
+          <div className="hidden md:block mt-auto bg-white px-4 py-3">
             <div className="border-t border-gray-300 mx-1 mb-3"></div>
             {/* Archived */}
             <div className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors">
