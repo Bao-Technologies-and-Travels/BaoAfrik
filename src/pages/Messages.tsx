@@ -1590,12 +1590,12 @@ const Messages: React.FC = () => {
                     ? { 
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        top: `${mobileMessageCoords.top - 50}px`
+                        top: `${mobileMessageCoords.top - 35}px`
                       }
                     : {
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        top: '290px'
+                        top: '305px'
                       }
                   }
                   onClick={(e) => e.stopPropagation()}
