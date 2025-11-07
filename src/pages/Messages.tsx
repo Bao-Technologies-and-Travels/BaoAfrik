@@ -108,11 +108,30 @@ const Messages: React.FC = () => {
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [activeMessageOptionsId, setActiveMessageOptionsId] = useState<number | null>(null);
   const [showMobileArchiveModal, setShowMobileArchiveModal] = useState(false);
+  const [actionsMenuCoords, setActionsMenuCoords] = useState<{ top: number; right: number } | null>(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [showReactionEmojiPicker, setShowReactionEmojiPicker] = useState(false);
   const [replyToMessage, setReplyToMessage] = useState<any>(null);
   const [showMobileConversation, setShowMobileConversation] = useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
+  const chatListRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      if (typeof window !== 'undefined') {
+        setIsMobileViewport(window.innerWidth < 768);
+      }
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+
+    return () => {
+      window.removeEventListener('resize', updateViewport);
+    };
+  }, []);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -238,14 +257,34 @@ const Messages: React.FC = () => {
       }
     };
 
-    const handleActionsMenuClick = (chatId: number, event: React.MouseEvent) => {
-      event.stopPropagation(); // Prevent chat selection
-      setActionsMenuOpen(actionsMenuOpen === chatId ? null : chatId);
-    };
+  const handleActionsMenuClick = (chatId: number, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent chat selection
+    const isOpening = actionsMenuOpen !== chatId;
+
+    if (isOpening) {
+      setActionsMenuOpen(chatId);
+
+      if (isMobileViewport && chatListRef.current) {
+        const buttonElement = event.currentTarget as HTMLElement;
+        const buttonRect = buttonElement.getBoundingClientRect();
+        const containerRect = chatListRef.current.getBoundingClientRect();
+        const scrollTop = chatListRef.current.scrollTop;
+        const top = buttonRect.bottom - containerRect.top + scrollTop + 24;
+
+        setActionsMenuCoords({ top, right: 16 });
+      } else {
+        setActionsMenuCoords(null);
+      }
+    } else {
+      setActionsMenuOpen(null);
+      setActionsMenuCoords(null);
+    }
+  };
 
     const handleActionSelect = (action: string, chatId: number) => {
       console.log(`Action: ${action} for chat: ${chatId}`);
       setActionsMenuOpen(null);
+    setActionsMenuCoords(null);
       // Here you would implement the actual action logic
     };
 
@@ -1536,7 +1575,10 @@ const Messages: React.FC = () => {
       )}
 
       {/* Left Sidebar - Full Height */}
-      <div className={`${showMobileConversation && productData ? 'hidden md:flex' : 'flex'} w-full md:w-1/4 bg-white md:border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative`}>
+      <div
+        ref={chatListRef}
+        className={`${showMobileConversation && productData ? 'hidden md:flex' : 'flex'} w-full md:w-1/4 bg-white md:border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative`}
+      >
         {/* Header */}
         <header className="bg-white">
           <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
@@ -1810,11 +1852,28 @@ const Messages: React.FC = () => {
             {/* Semi-transparent overlay for sidebar only */}
             <div 
               className="absolute inset-0 bg-black bg-opacity-20 z-40"
-              onClick={() => setActionsMenuOpen(null)}
+              onClick={() => {
+                setActionsMenuOpen(null);
+                setActionsMenuCoords(null);
+              }}
             ></div>
             
             {/* Actions Menu */}
-             <div className="actions-menu absolute right-4 top-[21rem] bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48" style={{ borderRadius: '24px' }}>
+             <div
+              className="actions-menu absolute bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48"
+              style={isMobileViewport && actionsMenuCoords
+                ? {
+                    borderRadius: '24px',
+                    top: `${actionsMenuCoords.top}px`,
+                    right: `${actionsMenuCoords.right}px`
+                  }
+                : {
+                    borderRadius: '24px',
+                    top: '21rem',
+                    right: '1rem'
+                  }
+              }
+            >
               <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="text-sm font-thin" style={{ color: '#BABABA' }}>Actions</h3>
                 <button
