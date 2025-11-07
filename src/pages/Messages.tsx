@@ -107,6 +107,7 @@ const Messages: React.FC = () => {
   const [activeReactionMessageId, setActiveReactionMessageId] = useState<number | null>(null);
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [activeMessageOptionsId, setActiveMessageOptionsId] = useState<number | null>(null);
+  const [showMobileArchiveModal, setShowMobileArchiveModal] = useState(false);
   const [showReactionEmojiPicker, setShowReactionEmojiPicker] = useState(false);
   const [replyToMessage, setReplyToMessage] = useState<any>(null);
   const [showMobileConversation, setShowMobileConversation] = useState(false);
@@ -1672,10 +1673,7 @@ const Messages: React.FC = () => {
                     {/* Archive Button - Mobile Only */}
                     <button 
                       className="md:hidden pb-1 flex items-center"
-                      onClick={() => {
-                        // Navigate to archived messages view
-                        console.log('View archived messages');
-                      }}
+                      onClick={() => setShowMobileArchiveModal(true)}
                     >
                       <img src={amIcon} alt="Archived Messages" className="w-5 h-5" />
                     </button>
@@ -1906,6 +1904,55 @@ const Messages: React.FC = () => {
               <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>+9</span>
             </div>
           </div>
+        )}
+        
+        {/* Mobile Archive Modal - Only show on mobile */}
+        {showMobileArchiveModal && (
+          <>
+            {/* Overlay */}
+            <div 
+              className="md:hidden fixed inset-0 z-50"
+              style={{ backgroundColor: '#0000001A' }}
+              onClick={() => setShowMobileArchiveModal(false)}
+            ></div>
+            
+            {/* Modal */}
+            <div 
+              className="md:hidden fixed bg-white p-3 shadow-lg"
+              style={{ borderRadius: '14px', minWidth: '220px', top: '140px', right: '16px', zIndex: 51 }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm" style={{ color: '#BABABA' }}>Actions</h3>
+                <button
+                  onClick={() => setShowMobileArchiveModal(false)}
+                  className="transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#171717' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              {/* Archived */}
+              <div className="flex items-center justify-between py-2 cursor-pointer">
+                <div className="flex items-center space-x-3">
+                  <img src={archiveIcon} alt="Archived" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>Archived</span>
+                </div>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>4</span>
+              </div>
+              
+              {/* Mark as important */}
+              <div className="flex items-center justify-between py-2 cursor-pointer">
+                <div className="flex items-center space-x-3">
+                  <img src={starIcon} alt="Mark as important" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>Mark as important</span>
+                </div>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>+9</span>
+              </div>
+            </div>
+          </>
         )}
         
       </div>
