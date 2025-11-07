@@ -2025,7 +2025,7 @@ const Messages: React.FC = () => {
               </div>
               
               {/* Mark as important */}
-              <div className="flex items-center justify-between py-2 cursor-pointer">
+              <div className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors">
                 <div className="flex items-center space-x-3">
                   <img src={starIcon} alt="Mark as important" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
                   <span className="text-sm" style={{ color: '#6A6A6A' }}>Mark as important</span>
