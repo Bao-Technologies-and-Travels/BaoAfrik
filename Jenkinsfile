@@ -174,7 +174,8 @@ EMAIL_FROM_NAME="BaoAfrik Team"
 AWS_REGION="${AWS_REGION}"
 AWS_S3_BUCKET="${AWS_S3_BUCKET}"
 S3_PROFILE_PREFIX=profile-images
-S3_ATTACHMENTS_PREFIX=attachments
+S3_ATTACHMENTS_PREFIX=chat-attachments
+S3_PRODUCT_PREFIX=product-images
 FRONTEND_URL="https://${DOMAIN}"
 CORS_ORIGINS="https://${DOMAIN}"
 BCRYPT_ROUNDS=12
@@ -280,7 +281,7 @@ EOF
                 withCredentials([string(credentialsId: 'baotechnologies_dev_team', variable: 'baotechnologies-dev_team')]) {
                     emailext(
                         subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
-                        to: "${env.EMAIL},${env.baotechnologies_dev_team}",
+                        to: "${env.EMAIL},${baotechnologies_dev_team}",
                         from: 'jenkins.baoafrik.com',
                         replyTo: 'no-reply@baotechnologiesandtravels.com',
                         body: """
