@@ -108,6 +108,7 @@ const Messages: React.FC = () => {
   const [activeMessageOptionsId, setActiveMessageOptionsId] = useState<number | null>(null);
   const [showReactionEmojiPicker, setShowReactionEmojiPicker] = useState(false);
   const [replyToMessage, setReplyToMessage] = useState<any>(null);
+  const [showMobileConversation, setShowMobileConversation] = useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -446,6 +447,8 @@ const Messages: React.FC = () => {
         if (!isMessageSent) {
           setMessageText(preFilledMessage || '');
         }
+        // Show mobile conversation view when coming from product detail
+        setShowMobileConversation(true);
       }
     }
   }, [location.state, isMessageSent]);
@@ -478,6 +481,7 @@ const Messages: React.FC = () => {
         id: Date.now(),
         text: messageToSend,
         timestamp: timeString,
+        timeString: timeString,
         dateString: `Today, ${timeString}`,
         productData: isMessageSent ? null : productData, // Only attach product data for first message
         isProductInquiry: !isMessageSent && !!productData,
@@ -540,14 +544,15 @@ const Messages: React.FC = () => {
                    hour12: false
                  });
                  
-                 const sellerReply = {
-                   id: Date.now() + 1,
-                   text: "Hello my dear, Yes this item is still available, how much do you want for ?",
-                   timestamp: replyTimeString,
-                   dateString: `Today, ${replyTimeString}`,
-                   isIncoming: true,
-                   sentAt: replyTime
-                 };
+                const sellerReply = {
+                  id: Date.now() + 1,
+                  text: "Hello my dear, Yes this item is still available, how much do you want for ?",
+                  timestamp: replyTimeString,
+                  timeString: replyTimeString,
+                  dateString: `Today, ${replyTimeString}`,
+                  isIncoming: true,
+                  sentAt: replyTime
+                };
                  
                 setMessages(prev => [...prev, sellerReply]);
                 setShowTypingIndicator(false);
@@ -1052,8 +1057,482 @@ const Messages: React.FC = () => {
         onChange={handleFileSelect}
         style={{ display: 'none' }}
       />
+      {/* Mobile Conversation View - Full Screen on Mobile */}
+      {showMobileConversation && productData && (
+        <div className="md:hidden w-full bg-white flex flex-col h-screen overflow-hidden">
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Seller Profile Section or Condensed Header */}
+            {!showCondensedHeader ? (
+              <>
+                {/* Header with Back Arrow - Only shows with full profile */}
+                <div className="p-4 flex items-center justify-between">
+                  <button onClick={() => setShowMobileConversation(false)} className="p-2">
+                    <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  {/* Top Right Icons */}
+                  <div className="flex space-x-2">
+                    <button 
+                      className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      style={{ border: '0.727px solid #F3F3F3' }}
+                    >
+                      <img src={fiIcon} alt="Refresh" className="w-4 h-4" />
+                    </button>
+                    <button 
+                      className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      style={{ border: '0.727px solid #F3F3F3' }}
+                    >
+                      <img src={faIcon} alt="Report" className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Full Profile Header */}
+                <div className="px-6 pb-4 pt-0">
+                {/* Avatar - overlapping into header */}
+                <div className="flex justify-center -mt-8 mb-2">
+                  <img 
+                    src={eboAvatar} 
+                    alt="Joaquin EDIMO"
+                    className="w-16 h-16 rounded-full object-cover border-4 border-white"
+                  />
+                </div>
+                
+                {/* Name and Rating */}
+                <div className="flex items-center justify-center space-x-1.5 mb-2">
+                  <h3 className="text-base font-medium text-gray-900">Joaquin EDIMO</h3>
+                  <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                  <span className="text-sm" style={{ color: '#BABABA' }}>4.3</span>
+                </div>
+
+                {/* Website and Location - Side by Side */}
+                <div className="flex items-center justify-center space-x-3 mb-2">
+                  {/* Website */}
+                  <div className="flex items-center space-x-0.5">
+                    <img src={earthIcon} alt="Website" className="w-3 h-3" />
+                    <span style={{ fontSize: '10px', color: '#64B5F6' }}>user-randomlink.com</span>
+                  </div>
+
+                  {/* Location */}
+                  <div className="flex items-center space-x-0.5">
+                    <img src={locIcon} alt="Location" className="w-3 h-3" />
+                    <span style={{ fontSize: '10px', color: '#64B5F6' }}>London, United Kingdom</span>
+                  </div>
+                </div>
+
+                {/* Join Date */}
+                <div className="flex items-center justify-center space-x-1 mb-2">
+                  <img src={profileIcon} alt="Profile" className="w-3 h-3" style={{ filter: 'brightness(0) saturate(100%) invert(44%) sepia(0%) saturate(0%) hue-rotate(208deg) brightness(94%) contrast(86%)' }} />
+                  <span style={{ fontSize: '10px', color: '#6A6A6A' }}>Joined BAO' Afrik in June 2018</span>
+                </div>
+
+                {/* Bio - Shortened */}
+                <p className="text-xs text-center mb-3" style={{ color: '#BABABA' }}>
+                  Passionate about discovering unique products and always on the lookout for great deals.
+                </p>
+
+                {/* See User Profile Button */}
+                <div className="flex justify-center">
+                  <button 
+                    className="px-5 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                    style={{ 
+                      backgroundColor: '#F0F8FE', 
+                      color: '#64B5F6' 
+                    }}
+                  >
+                    See user profile
+                  </button>
+                </div>
+                </div>
+              </>
+            ) : (
+              // Condensed Header Bar - Single Row
+              <div style={{ borderBottom: '1px solid #F1F1F1' }}>
+                <div className="flex items-center justify-between px-4 py-3">
+                  {/* Left: Back Arrow */}
+                  <button onClick={() => setShowMobileConversation(false)} className="p-1">
+                    <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  
+                  {/* Center: Avatar + Name + Rating */}
+                  <div className="flex items-center space-x-2 flex-1 justify-center">
+                    <img 
+                      src={eboAvatar} 
+                      alt="Joaquin EDIMO"
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div className="flex items-center space-x-1.5">
+                      <h3 className="text-sm font-medium text-gray-900">Joaquin EDIMO</h3>
+                      <svg className="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                      <span className="text-xs" style={{ color: '#BABABA' }}>4.3</span>
+                    </div>
+                  </div>
+
+                  {/* Right: Action Icons */}
+                  <div className="flex space-x-2">
+                    <button
+                      className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      style={{ border: '0.727px solid #F3F3F3' }}
+                    >
+                      <img src={fiIcon} alt="Refresh" className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      style={{ border: '0.727px solid #F3F3F3' }}
+                    >
+                      <img src={faIcon} alt="Report" className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Date Separator */}
+            {visibleMessages.length > 0 && !showCondensedHeader && (
+              <div className="flex items-center justify-center my-3 px-6">
+                <div className="w-12 h-px bg-gray-300"></div>
+                <span className="px-2 text-xs text-gray-500">{visibleMessages[0]?.dateString}</span>
+                <div className="w-12 h-px bg-gray-300"></div>
+              </div>
+            )}
+
+            {/* Chat Messages Area */}
+            {visibleMessages.length > 0 && (
+              <div 
+                ref={messagesContainerRef}
+                className="px-4 py-2 overflow-y-auto scroll-smooth"
+                style={{ scrollBehavior: 'smooth', maxHeight: showCondensedHeader ? 'calc(100vh - 240px)' : 'calc(100vh - 450px)' }}
+              >
+                {/* View Older Messages Button */}
+                {messages.length > 10 && !showAllMessages && (
+                  <div className="flex justify-center mb-3">
+                    <button
+                      onClick={() => setShowAllMessages(true)}
+                      className="px-3 py-1 rounded-full text-xs font-medium transition-colors hover:opacity-80"
+                      style={{
+                        backgroundColor: '#E3F2FD',
+                        color: '#64B5F6'
+                      }}
+                    >
+                      View older messages
+                    </button>
+                  </div>
+                )}
+
+                {/* Messages */}
+                {visibleMessages.map((message, index) => {
+                  const isFadingOut = fadingOutMessageIds.includes(message.id);
+                  const isReactionActive = activeReactionMessageId === message.id;
+                  return (
+                    <div 
+                      key={message.id} 
+                      className={`flex mb-3 ${message.isIncoming ? 'justify-start' : 'justify-end'} ${isFadingOut ? 'message-fade-out' : ''}`}
+                      style={{
+                        animation: isFadingOut ? 'fadeOutUp 0.5s ease-in-out forwards' : 'fadeIn 0.5s ease-in-out',
+                        opacity: isFadingOut ? 0 : 1,
+                        position: isReactionActive ? 'relative' : 'static',
+                        zIndex: isReactionActive ? 50 : 'auto'
+                      }}
+                    >
+                      <div className="max-w-[75%] relative">
+                        <div 
+                          className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md' : 'rounded-br-md'}`} 
+                          style={{ 
+                            backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
+                          }}
+                        >
+                          {/* Message Text */}
+                          <p 
+                            style={{ fontSize: '12px', marginBottom: 0, color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                          >
+                            {message.text}
+                          </p>
+                          
+                          {/* Product Card in Message - Only for first message */}
+                          {message.isProductInquiry && message.productData && (
+                            <div className="rounded-lg p-1.5 mt-2">
+                              <div className="flex space-x-2">
+                                <div className="relative">
+                                  <div className="absolute -left-1.5 top-0 w-0.5 h-12" style={{ backgroundColor: '#FFFFFF' }}></div>
+                                  <img 
+                                    src={message.productData.image} 
+                                    alt={message.productData.name}
+                                    className="w-12 h-12 object-cover rounded"
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <div style={{ fontSize: '9px', fontWeight: 600, color: '#B8DDFB' }}>USD {message.productData.price}</div>
+                                    <div className="flex items-center space-x-0.5" style={{ fontSize: '5.5px', color: '#B8DDFB' }}>
+                                      <img src={locIcon} alt="Location" className="w-1.5 h-1.5" />
+                                      <span>{message.productData.location}</span>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <h4 style={{ fontSize: '7px', fontWeight: 500, color: '#B8DDFB' }}>{message.productData.name}</h4>
+                                    <div style={{ fontSize: '5.5px', color: '#B8DDFB' }}>
+                                      <span>Category: {message.productData.category || 'Spices'}</span>
+                                    </div>
+                                  </div>
+                                  <p style={{ fontSize: '5.5px', marginTop: '2px', lineHeight: '1.3', color: '#B8DDFB' }}>
+                                    Premium White Pepper sourced from the fertile soils of Africa. Known for its smooth, aromatic heat and rich flavor...
+                                  </p>
+                                  <a href="#" style={{ fontSize: '6px', marginTop: '2px', display: 'block', color: '#1976D2' }}>
+                                    baoafrik.com/product-id-link?
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div className={`flex items-center mt-1 space-x-1 text-xs ${message.isIncoming ? 'justify-start' : 'justify-end'}`} style={{ color: '#6A6A6A' }}>
+                          <span>{message.timeString}</span>
+                          {!message.isIncoming && messageStatuses[message.id] && (
+                            <div className="flex items-center">
+                              {messageStatuses[message.id] === 'sending' && (
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#9E9E9E' }}>
+                                  <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2"/>
+                                </svg>
+                              )}
+                              {messageStatuses[message.id] === 'delivered' && (
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#9E9E9E' }}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
+                                </svg>
+                              )}
+                              {messageStatuses[message.id] === 'read' && (
+                                <div className="flex items-center" style={{ position: 'relative' }}>
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
+                                  </svg>
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6', marginLeft: '-6px' }}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
+                                  </svg>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                
+                {/* Typing Indicator */}
+                {showTypingIndicator && (
+                  <div className="flex justify-start mb-3">
+                    <div className="max-w-20">
+                      <div 
+                        className="rounded-2xl rounded-bl-md px-3 py-2 flex items-center" 
+                        style={{ backgroundColor: '#F0F8FE' }}
+                      >
+                        <div className="flex space-x-1">
+                          <div 
+                            className="w-1.5 h-1.5 rounded-full animate-bounce" 
+                            style={{ 
+                              backgroundColor: '#64B5F6',
+                              animationDelay: '0ms'
+                            }}
+                          ></div>
+                          <div 
+                            className="w-1.5 h-1.5 rounded-full animate-bounce" 
+                            style={{ 
+                              backgroundColor: '#64B5F6',
+                              animationDelay: '150ms'
+                            }}
+                          ></div>
+                          <div 
+                            className="w-1.5 h-1.5 rounded-full animate-bounce" 
+                            style={{ 
+                              backgroundColor: '#64B5F6',
+                              animationDelay: '300ms'
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* View Latest Messages Button */}
+                {showAllMessages && messages.length > 10 && (
+                  <div className="flex justify-center mt-3 mb-3">
+                    <button
+                      onClick={() => setShowAllMessages(false)}
+                      className="px-3 py-1 rounded-full text-xs font-medium transition-colors hover:opacity-80"
+                      style={{
+                        backgroundColor: '#E3F2FD',
+                        color: '#64B5F6'
+                      }}
+                    >
+                      View latest messages
+                    </button>
+                  </div>
+                )}
+                
+                <div ref={messagesEndRef}></div>
+              </div>
+            )}
+          </div>
+
+          {/* Fixed Input Bar at Bottom */}
+          <div className="border-t border-gray-200 px-4 py-3 bg-white">
+            {/* Product Card - Only show before message is sent */}
+            {productData && !isMessageSent && (
+              <div className="mb-3 rounded-lg p-2" style={{ backgroundColor: '#F5F5F5' }}>
+              <div className="flex items-start justify-between mb-1">
+                <span style={{ fontSize: '10px', fontWeight: 500, color: '#83C4F8' }}>From Bao'Afrik</span>
+                <button className="w-3.5 h-3.5 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" style={{ backgroundColor: '#6A6A6A' }}>
+                  <svg className="w-1.5 h-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#000000' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+              <div className="flex space-x-2.5">
+                <div className="relative">
+                  <div className="absolute -left-1.5 top-0 w-0.5 h-20" style={{ backgroundColor: '#83C4F8' }}></div>
+                  <img 
+                    src={productData.image} 
+                    alt={productData.name}
+                    className="w-20 h-20 object-cover"
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#6A6A6A' }}>USD {productData.price}</div>
+                    <div className="flex items-center space-x-0.5" style={{ fontSize: '8px', color: '#BABABA' }}>
+                      <img src={locIcon} alt="Location" className="w-2.5 h-2.5" />
+                      <span>{productData.location}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <h4 style={{ fontSize: '10px', fontWeight: 500, color: '#6A6A6A' }}>{productData.name}</h4>
+                    <div style={{ fontSize: '8px', color: '#BABABA' }}>
+                      <span>Category: {productData.category || 'Spices'}</span>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: '8px', marginTop: '4px', lineHeight: '1.4', color: '#6A6A6A' }}>
+                    Premium White Pepper sourced from the fertile soils of Africa.<br/>
+                    Known for its smooth, aromatic heat and rich flavor...
+                  </p>
+                  <a href="#" style={{ fontSize: '9px', marginTop: '4px', display: 'block', color: '#83C4F8' }}>
+                    baoafrik.com/product-id-link?
+                  </a>
+                </div>
+              </div>
+            </div>
+            )}
+            
+            <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
+              {/* Emoji Icon */}
+              <div className="relative emoji-picker-container">
+                <button 
+                  onClick={handleEmojiClick}
+                  className="p-1 hover:text-gray-600"
+                >
+                  <img 
+                    src={faceIcon} 
+                    alt="emoji" 
+                    className="w-5 h-5" 
+                    style={{ 
+                      filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                    }}
+                  />
+                </button>
+                
+                {/* Emoji Picker */}
+                {showEmojiPicker && (
+                  <div className="absolute bottom-full left-0 mb-2 z-50">
+                    <EmojiPicker
+                      onEmojiClick={onEmojiClick}
+                      width={280}
+                      height={350}
+                      searchDisabled={false}
+                      skinTonesDisabled={true}
+                      previewConfig={{
+                        showPreview: false
+                      }}
+                      searchPlaceHolder="Search Emoji"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Attachment Icon */}
+              <button 
+                onClick={handleAttachClick}
+                className="p-1 text-gray-400 hover:text-gray-600"
+              >
+                <img 
+                  src={pinIcon} 
+                  alt="attachment" 
+                  className="w-5 h-5" 
+                  style={{ 
+                    filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                  }}
+                />
+              </button>
+
+              {/* Text Input */}
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={messageText}
+                  onChange={(e) => {
+                    setMessageText(e.target.value);
+                    handleTypingDetection();
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSendMessage();
+                    }
+                  }}
+                  placeholder="...Write your message"
+                  className="w-full px-2 py-1.5 focus:outline-none bg-transparent"
+                  style={{ 
+                    border: 'none',
+                    caretColor: '#64B5F6',
+                    fontSize: '11px'
+                  }}
+                />
+              </div>
+
+              {/* Voice/Send Button */}
+              <button 
+                onClick={messageText.trim() || selectedFiles.length > 0 ? handleSendMessage : handleAudioRecord}
+                className="p-1.5 text-blue-600 hover:text-blue-800"
+              >
+                {messageText.trim() || selectedFiles.length > 0 ? (
+                  <img src={bluIcon} alt="send" className="w-6 h-6" />
+                ) : (
+                  <img src={audioIcon} alt="audio" className="w-6 h-6" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Hidden file input for mobile */}
+          <input
+            id="mobile-file-input"
+            type="file"
+            multiple
+            accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+        </div>
+      )}
+
       {/* Left Sidebar - Full Height */}
-      <div className="w-full md:w-1/4 bg-white md:border-r-2 border-gray-300 flex flex-col h-screen sticky top-0 relative">
+      <div className={`${showMobileConversation && productData ? 'hidden md:flex' : 'flex'} w-full md:w-1/4 bg-white md:border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative`}>
         {/* Header */}
         <header className="bg-white">
           <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
