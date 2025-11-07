@@ -1498,13 +1498,13 @@ const Messages: React.FC = () => {
                   className="absolute bg-white rounded-xl shadow-xl border border-gray-200 z-50"
                   style={mobileMessageCoords
                     ? { 
-                        minWidth: '160px',
+                        minWidth: '180px',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        top: `${mobileMessageCoords.top - 260}px`
+                        top: `${mobileMessageCoords.top - 250}px`
                       }
                     : {
-                        minWidth: '160px',
+                        minWidth: '180px',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         top: '100px'
@@ -1590,12 +1590,12 @@ const Messages: React.FC = () => {
                     ? { 
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        top: `${mobileMessageCoords.top - 40}px`
+                        top: `${mobileMessageCoords.top - 50}px`
                       }
                     : {
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        top: '300px'
+                        top: '290px'
                       }
                   }
                   onClick={(e) => e.stopPropagation()}
