@@ -351,6 +351,22 @@ export const validateChangePassword = [
   handleValidationErrors,
 ];
 
+export const validateFileUpload = [
+  body('fileName')
+  .notEmpty()
+  .withMessage('File name is required'),
+
+  body('fileType')
+  .notEmpty()
+  .withMessage('File type is required'),
+
+  body('userId')
+  .notEmpty()
+  .withMessage('User ID is required'),
+
+  handleValidationErrors,
+];
+
 // UUID parameter validation
 export const validateUUIDParam = (paramName: string = 'id') => [
   param(paramName)

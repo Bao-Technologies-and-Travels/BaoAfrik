@@ -124,7 +124,6 @@ export class ProductController {
     try {
       const { id } = req.params;
       
-      // Validate ID exists
       if (!id) {
         return res.status(400).json({
           success: false,
@@ -160,7 +159,6 @@ export class ProductController {
       const updateData = req.body;
       const userId = (req as any).user?.id;
 
-      // Validate required parameters
       if (!id) {
         return res.status(400).json({
           success: false,
@@ -201,13 +199,11 @@ export class ProductController {
     }
   }
 
-  // Delete product
   async deleteProduct(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
 
-      // Validate required parameters
       if (!id) {
         return res.status(400).json({
           success: false,
@@ -516,7 +512,6 @@ export class ProductController {
     try {
       const { userId } = req.params;
       
-      // Validate userId exists
       if (!userId) {
         return res.status(400).json({
           success: false,

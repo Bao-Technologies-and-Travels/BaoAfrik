@@ -32,7 +32,6 @@ export class ChatController {
             const creatorId = req.user!.id;
             const { participantEmail, initialMessage, productId, productData } = req.body;
 
-            // validate required fields
             if (!participantEmail) {
                 return res.status(422).json({
                     success: false,
@@ -466,7 +465,6 @@ export class ChatController {
                 });
             }
 
-            // Validate file size from content-length
             const contentLength = parseInt(req.headers['content-length'] || '0');
             const maxSize = 50 * 1024 * 1024; // 50MB
 

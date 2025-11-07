@@ -535,21 +535,17 @@ export class ChatService {
                 throw new Error('Conversation not found or access denied');
             }
 
-            // get the receiver
             const receiver = conversation?.participants[0];
             if (!receiver) {
                 throw new Error('No receiver found for this conversation');
             }
 
-            // Validate and normalize messageType
             let normalizedMessageType: MessageType;
             if (typeof data.messageType === 'string') {
-                // Convert string to MessageType enum
                 const upperCaseType = data.messageType.toUpperCase();
                 if (upperCaseType in MessageType) {
                     normalizedMessageType = MessageType[upperCaseType as keyof typeof MessageType];
                 } else {
-                    // Default to TEXT if invalid
                     normalizedMessageType = MessageType.TEXT;
                 }
             } else {

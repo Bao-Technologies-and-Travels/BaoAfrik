@@ -4,10 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION!,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
-  }
 });
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET!;
@@ -26,7 +22,6 @@ export interface PresignedUrlResponse {
 }
 
 export class S3Service {
-  // Validate file type and size
   private validateFile(fileType: string, fileSize?: number): void {
     const allowedTypes = [
       'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
@@ -39,7 +34,6 @@ export class S3Service {
       throw new Error(`Invalid file type: ${fileType}. Allowed types: images, audio, video, PDF, Word documents.`);
     }
 
-    // Optional: Add file size validation
     const maxSize = 50 * 1024 * 1024; // 50MB
     if (fileSize && fileSize > maxSize) {
       throw new Error(`File too large: ${(fileSize / 1024 / 1024).toFixed(2)}MB. Maximum size is 50MB.`);
@@ -57,7 +51,6 @@ export class S3Service {
     try {
        console.log('🔍 Starting presigned URL generation...');
 
-      // Validate file
       this.validateFile(fileType, fileSize);
 
       const fileExtension = fileName.split('.').pop()?.toLowerCase() || 'bin';

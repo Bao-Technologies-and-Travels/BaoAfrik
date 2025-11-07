@@ -14,6 +14,7 @@ pipeline {
         BRANCH = 'fonsah-staging'
         DOMAIN = 'staging.baoafrik.com'
         EMAIL = 'pageo.fonsah@baotechnologiesandtravels.com'
+        BAOTECHNOLOGIES_DEV_TEAM = 'wendy.tembong@baotechnologiesandtravels.com,esther.eyere@baotechnologiesandtravels.com,toni.ebong@baotechnologiesandtravels.com,glory.tama@baotechnologiesandtravels.com,lionel.ngansop@baotechnologiesandtravels.com,arrey.johnson@baotechnologiesandtravels.com'
     }
 
     stages {
@@ -278,10 +279,9 @@ EOF
     post {
         always {
             script {
-                withCredentials([string(credentialsId: 'baotechnologies_dev_team', variable: 'baotechnologies-dev_team')]) {
-                    emailext(
+                emailext(
                         subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
-                        to: "${env.EMAIL},${baotechnologies_dev_team}",
+                        to: "${env.EMAIL}",
                         from: 'jenkins.baoafrik.com',
                         replyTo: 'no-reply@baotechnologiesandtravels.com',
                         body: """
@@ -300,14 +300,13 @@ EOF
                         """,
                         mimeType: 'text/html'
                     )
-                }
             }
         }
         // success {
-        //     withCredentials([string(credentialsId: 'baotechnologies_dev_team', variable: 'baotechnologies_dev_team')]) {
+        //     script {
         //         emailext(
         //         subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
-        //         to: "${baotechnologies_dev_team}",
+        //         to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
         //         from: 'jenkins.baoafrik.com',
         //         replyTo: 'no-reply@baotechnologiesandtravels.com',
         //         body: """

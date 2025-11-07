@@ -5,7 +5,7 @@ import { authenticateToken } from '../middleware/authMiddleware';
 const router = Router();
 const chatController = new ChatController();
 
-// router.use(authenticateToken);
+router.use(authenticateToken);
 
 router.get('/conversations', chatController.getConversations);
 router.get('/conversations/:conversationId', chatController.getConversationDetails);
