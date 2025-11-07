@@ -359,7 +359,7 @@ const CreateListing: React.FC = () => {
           throw new Error('Failed to upload image to S3');
         }
 
-        console.log('✅ Successfully uploaded to S3');
+        console.log(' Successfully uploaded to S3');
 
         // Step 3: Add image to product
         const addImageResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}/images`, {

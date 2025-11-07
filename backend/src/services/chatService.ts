@@ -192,8 +192,6 @@ export class ChatService {
     }
 
     async getUserConversations(userId: string) {
-        console.log('getUserConversation called for user:', userId);
-
         const conversations = await prisma.conversation.findMany({
             where: {
                 participants: {
@@ -300,7 +298,7 @@ export class ChatService {
             return result;
         }).filter((conv): conv is NonNullable<typeof conv> => conv !== null);
 
-        console.log('🎯 Final filtered conversations count:', processedConversations.length);
+        console.log(' Final filtered conversations count:', processedConversations.length);
 
         return processedConversations;
     }
@@ -634,7 +632,7 @@ export class ChatService {
                 formattedTime: this.formatTo12HourTime(message.createdAt)
             };
 
-            console.log('📤 Response message with file data:', {
+            console.log(' Response message with file data:', {
                 id: messageWithProductData.id,
                 fileUrl: messageWithProductData.fileUrl,
                 fileName: messageWithProductData.fileName,

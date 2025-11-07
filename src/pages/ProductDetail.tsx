@@ -310,7 +310,7 @@ const ProductDetail: React.FC = () => {
 
   const handleContactSeller = async () => {
     try {
-      console.log("🔍 Available data:", {
+      console.log(" Available data:", {
         product: product,
         realProduct: realProduct,
         images: images,

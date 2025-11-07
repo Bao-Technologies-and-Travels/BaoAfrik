@@ -214,7 +214,7 @@ router.post('/send-test-email', async (req: Request, res: Response) => {
           <p>Hello from BaoAfrik!</p>
           <p>This is a test email to confirm that your email service is working correctly.</p>
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #333; margin-top: 0;">✅ Email Configuration Status:</h3>
+            <h3 style="color: #333; margin-top: 0;"> Email Configuration Status:</h3>
             <ul style="color: #666;">
               <li>SMTP Connection: Active</li>
               <li>Gmail App Password: Working</li>

@@ -107,8 +107,6 @@ interface Notification {
 }
 
 const Home: React.FC = () => {
-  console.log('🏠 Home component is rendering');
-
   const { user, isVisitor } = useAuth();
   const navigationLocation = useLocation();
   const productGridRef = React.useRef<HTMLDivElement>(null);
@@ -148,19 +146,6 @@ const Home: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<FrontendProduct[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-
-  // debug useEffect
-  useEffect(() => {
-    console.log('🎯 Component mounted - testing basic logging.');
-
-    // Test if console is working
-    console.log('✅ Basic console log test');
-    console.warn('⚠️ Console warn test');
-    console.error('❌ Console error test');
-
-    // Test fetch
-    fetchProducts();
-  }, []);
 
   // UseEffect for fetching products
   useEffect(() => {
@@ -219,7 +204,7 @@ const Home: React.FC = () => {
       // Extract products from the correct structure
       if (result.success && result.data && result.data.products) {
         const productsArray = result.data.products;
-        console.log(`✅ Found ${productsArray.length} products in data.products`);
+        console.log(` Found ${productsArray.length} products in data.products`);
 
         if (productsArray.length > 0) {
           setProducts(productsArray);
@@ -232,10 +217,10 @@ const Home: React.FC = () => {
       }
 
     } catch (error) {
-      console.error('❌ Fetch error:', error);
+      console.error(' Fetch error:', error);
       setError(`API connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
-      console.log('✅ fetchProducts completed');
+      console.log(' fetchProducts completed');
       setIsLoading(false);
     }
   };
@@ -687,7 +672,7 @@ const Home: React.FC = () => {
       console.log(`Country filter ${selectedCountry}: ${beforeCount} -> ${displayProducts.length}`);
     }
 
-    console.log(`🎯 Displaying ${displayProducts.length} products for category: ${activeCategory}`);
+    console.log(` Displaying ${displayProducts.length} products for category: ${activeCategory}`);
     return displayProducts;
   }, [isSearchActive, searchResults, activeCategory, allProductsComputed, selectedCountry]);
 

@@ -11,7 +11,7 @@ const AWS_REGION = process.env.AWS_REGION!;
 
 const S3_PREFIXES = {
   profile: process.env.S3_PROFILE_PREFIX || 'profile-images',
-  chat: process.env.S3_ATTACHMENTS_PREFIX || 'attachments',
+  chat: process.env.S3_ATTACHMENTS_PREFIX || 'chat-uploads',
   product: process.env.S3_PRODUCT_PREFIX || 'product-images'
 };
 
@@ -49,7 +49,6 @@ export class S3Service {
     fileSize?: number
   ): Promise<PresignedUrlResponse> {
     try {
-       console.log('🔍 Starting presigned URL generation...');
 
       this.validateFile(fileType, fileSize);
 
@@ -57,12 +56,6 @@ export class S3Service {
 
       const prefix = S3_PREFIXES[uploadType];
       const key = `${prefix}/${userId}/${uuidv4()}.${fileExtension}`;
-
-      console.log('🔍 Creating PutObjectCommand with:', {
-      Bucket: BUCKET_NAME,
-      Key: key,
-      Region: AWS_REGION
-    });
 
       const command = new PutObjectCommand({
         Bucket: BUCKET_NAME,
@@ -79,21 +72,13 @@ export class S3Service {
       const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
       const viewUrl = `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 
-      console.log(`✅ Generated presigned URL for ${uploadType}:`, {
-        userId,
-        fileName,
-        fileType,
-        key,
-        viewUrl
-      });
-
       return {
         uploadUrl,
         key,
         viewUrl
       };
     } catch (error: any) {
-      console.error('❌ Error generating presigned URL:', error);
+      console.error(' Error generating presigned URL:', error);
       throw new Error(`Error generating upload URL: ${error.message}`);
     }
   }
@@ -111,7 +96,7 @@ export class S3Service {
 
       return await Promise.all(promises);
     } catch (error: any) {
-      console.error('❌ Error generating batch presigned URLs:', error);
+      console.error(' Error generating batch presigned URLs:', error);
       throw new Error(`Error generating batch upload URLs: ${error.message}`);
     }
   }
@@ -127,7 +112,7 @@ export class S3Service {
       const viewUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
       return viewUrl;
     } catch (error: any) {
-      console.error('❌ Error generating view URL:', error);
+      console.error(' Error generating view URL:', error);
       throw new Error(`Error generating view URL: ${error.message}`);
     }
   }
@@ -141,9 +126,8 @@ export class S3Service {
       });
 
       await s3Client.send(command);
-      console.log(`✅ Deleted file from S3: ${key}`);
     } catch (error: any) {
-      console.error('❌ Error deleting file from S3:', error);
+      console.error(' Error deleting file from S3:', error);
       throw new Error(`Error deleting file: ${error.message}`);
     }
   }

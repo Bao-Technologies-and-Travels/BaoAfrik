@@ -115,7 +115,7 @@ export class ChatController {
                 });
             }
 
-            console.log('📞 Contact seller request:', { productId, buyerId });
+            console.log(' Contact seller request:', { productId, buyerId });
 
             // Get product and seller information
             const product = await prisma.product.findUnique({
@@ -175,7 +175,7 @@ export class ChatController {
                 productData: productData
             });
 
-            console.log('✅ Conversation created:', conversation.id);
+            console.log(' Conversation created:', conversation.id);
 
             return res.json({
                 success: true,

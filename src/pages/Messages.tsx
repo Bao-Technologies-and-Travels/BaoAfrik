@@ -217,7 +217,7 @@ const Messages: React.FC = () => {
 
     // Prevent multiple connections
     if (socketRef.current?.connected) {
-      console.log("✅ WebSocket already connected");
+      console.log(" WebSocket already connected");
       return;
     }
 
@@ -605,7 +605,7 @@ const Messages: React.FC = () => {
         const currentConv = conversations.find((c) => c.id === conversationId);
         if (currentConv) {
           setCurrentConversation(currentConv);
-          console.log("✅ Current conversation set:", currentConv.id);
+          console.log(" Current conversation set:", currentConv.id);
         }
 
         // save to localStorage
@@ -742,7 +742,7 @@ const Messages: React.FC = () => {
 
       console.log("Emiting send_message to server:", messageToSend);
 
-      console.log("📤 Sending via socket - FULL MESSAGE DATA:", {
+      console.log(" Sending via socket - FULL MESSAGE DATA:", {
         conversationId,
         messageData: {
           content: messageData.content,
@@ -758,7 +758,7 @@ const Messages: React.FC = () => {
         console.log("Server acknowledgement received:", response);
 
         if (response && response.success) {
-          console.log("✅ Message confirmed by server:", response.data);
+          console.log(" Message confirmed by server:", response.data);
 
           // Update the temp message with the real server data
           setMessages((prev) =>
@@ -778,7 +778,7 @@ const Messages: React.FC = () => {
             setHasSentInitialProductMessage(true);
           }
         } else {
-          console.error("❌ Server rejected message:", response);
+          console.error(" Server rejected message:", response);
 
           // Update message status to failed
           setMessages((prev) =>
@@ -827,7 +827,7 @@ const Messages: React.FC = () => {
       const handleMessageError = (errorData: any) => {
         if (errorData.tempId === tempId) {
           console.error(
-            "❌ Received message_error event (old pattern):",
+            " Received message_error event (old pattern):",
             errorData
           );
           socket.off("message_sent", handleMessageSent);
@@ -1324,7 +1324,7 @@ const Messages: React.FC = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("❌ Create conversation error:", errorText);
+        console.error(" Create conversation error:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -1667,7 +1667,7 @@ const Messages: React.FC = () => {
 
   // Add debug logging to track conversation state
   useEffect(() => {
-    console.log("🔍 Current conversation state:", {
+    console.log(" Current conversation state:", {
       activeConversationId,
       currentConversation,
       productData: !!productData,
@@ -1731,7 +1731,7 @@ const Messages: React.FC = () => {
     const textToSend =
       isProductInquiry && !isMessageSent ? preFilledMessage : userTypedText;
 
-    console.log("🔍 Send message analysis:", {
+    console.log(" Send message analysis:", {
       userTypedText,
       preFilledMessage,
       textToSend,
@@ -1834,7 +1834,7 @@ const Messages: React.FC = () => {
             user!.id
           );
 
-          console.log("📤 Uploading to S3:", {
+          console.log(" Uploading to S3:", {
             uploadUrl: uploadUrl.substring(0, 100) + '...',
             fileUrl: fileUrl
           });
@@ -1842,7 +1842,7 @@ const Messages: React.FC = () => {
           // Upload voice file
           await s3Service.uploadFile(voiceFile, uploadUrl);
 
-          console.log("✅ Voice message uploaded successfully", fileUrl);
+          console.log(" Voice message uploaded successfully", fileUrl);
 
           // Send voice message
           sendMessageViaSocket(currentConversation.id, {
@@ -1862,7 +1862,7 @@ const Messages: React.FC = () => {
             setHasSentProductData(true);
           }
         } catch (error: any) {
-          console.error("❌ Voice message upload failed:", error);
+          console.error(" Voice message upload failed:", error);
           addToast({
             type: "error",
             title: "Voice message failed",
@@ -1955,7 +1955,7 @@ const Messages: React.FC = () => {
       // Refresh conversations to update last message
       await fetchConversations();
     } catch (error: any) {
-      console.error("❌ Send message error:", error);
+      console.error(" Send message error:", error);
       addToast({
         type: "error",
         title: "Send Failed",
@@ -2191,7 +2191,7 @@ const Messages: React.FC = () => {
             setAudioChunks([]);
             setRecordingTime(0); // Reset recording time
           } catch (error) {
-            console.error("❌ Failed to send voice message:", error);
+            console.error(" Failed to send voice message:", error);
             // Optionally show error to user
           }
         } else {
@@ -2486,7 +2486,7 @@ const Messages: React.FC = () => {
 
     // Handle audio errors
     audio.onerror = () => {
-      console.error("❌ Audio playback error");
+      console.error(" Audio playback error");
       setPlayingMessageId(null);
       currentMessageIdRef.current = null;
       currentAudioRef.current = null;
@@ -2497,7 +2497,7 @@ const Messages: React.FC = () => {
     };
 
     audio.play().catch(error => {
-      console.error("❌ Audio play failed:", error);
+      console.error(" Audio play failed:", error);
       setPlayingMessageId(null);
       currentMessageIdRef.current = null;
       currentAudioRef.current = null;
@@ -2905,7 +2905,7 @@ const Messages: React.FC = () => {
 
                       // const imageLoadedRef = useRef(false);
 
-                      console.log("🎯 Rendering conversation:", {
+                      console.log(" Rendering conversation:", {
                         displayName,
                         profileImage,
                         hasProfileImage: !!profileImage,
@@ -2928,8 +2928,8 @@ const Messages: React.FC = () => {
                               alt={displayName}
                               className="w-10 h-10 rounded-full object-cover"
                               crossOrigin="anonymous"
-                              onError={(e) => console.log("❌ Image error")}
-                              onLoad={() => console.log("✅ Image loaded")}
+                              onError={(e) => console.log(" Image error")}
+                              onLoad={() => console.log(" Image loaded")}
                             />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
@@ -4585,7 +4585,7 @@ const Messages: React.FC = () => {
                                         </button>
                                         <button
                                           onClick={() =>
-                                            handleReactionSelect("✅")
+                                            handleReactionSelect("")
                                           }
                                           className="hover:scale-110 transition-transform flex items-center justify-center"
                                           style={{

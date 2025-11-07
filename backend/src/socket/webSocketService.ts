@@ -117,7 +117,7 @@ export class WebSocketService {
 
       // Message events
       socket.on('send_message', async (data, callback) => {
-        console.log('📤 Send message event received:', {
+        console.log(' Send message event received:', {
           conversationId: data.conversationId,
           sender: userEmail,
           tempId: data.tempId
@@ -151,7 +151,7 @@ export class WebSocketService {
       });
 
       socket.on('contact_seller', async (data) => {
-        console.log('📞 Contact seller:', { sellerId: data.sellerId, user: userEmail });
+        console.log(' Contact seller:', { sellerId: data.sellerId, user: userEmail });
         await this.handleContactSeller(authenticatedSocket, data);
       });
 
@@ -181,11 +181,11 @@ export class WebSocketService {
 
       conversations.forEach(conv => {
         socket.join(`conversation:${conv.id}`);
-        console.log(`✅ User joined conversation: ${conv.id}`);
+        console.log(` User joined conversation: ${conv.id}`);
       });
 
       socket.join(userId);
-      console.log(`✅ User ${userId} joined their personal room`);
+      console.log(` User ${userId} joined their personal room`);
     } catch (error) {
       console.error('Error joining conversations:', error);
     }
@@ -205,7 +205,7 @@ export class WebSocketService {
 
       if (userHasAccess) {
         socket.join(`conversation:${conversationId}`);
-        console.log(`✅ User ${socket.user!.email} joined conversation: ${conversationId}`);
+        console.log(` User ${socket.user!.email} joined conversation: ${conversationId}`);
 
         socket.emit('conversation_joined', {
           conversationId,
@@ -217,11 +217,11 @@ export class WebSocketService {
           }))
         });
       } else {
-        console.log(`❌ Access denied for user ${socket.user!.email} to conversation ${conversationId}`);
+        console.log(` Access denied for user ${socket.user!.email} to conversation ${conversationId}`);
         socket.emit('conversation_join_error', { error: 'Access denied' });
       }
     } catch (error) {
-      console.error('❌ Error joining conversation:', error);
+      console.error(' Error joining conversation:', error);
       socket.emit('conversation_join_error', { error: 'Failed to join conversation' });
     }
   }
@@ -235,7 +235,7 @@ export class WebSocketService {
         throw new Error('Seller ID and Product ID are required');
       }
 
-      console.log(`📞 Contacting seller ${sellerId} for product ${productId} from buyer ${buyerId}`);
+      console.log(` Contacting seller ${sellerId} for product ${productId} from buyer ${buyerId}`);
 
       // Create conversation
       const conversation = await this.chatService.createConversation({
@@ -262,10 +262,10 @@ export class WebSocketService {
       }
 
       socket.emit('conversation_created', { conversation });
-      console.log(`✅ Conversation created: ${conversation.id}`);
+      console.log(` Conversation created: ${conversation.id}`);
 
     } catch (error: any) {
-      console.error('❌ Contact seller error:', error);
+      console.error(' Contact seller error:', error);
       socket.emit('contact_seller_error', { error: error.message || 'Failed to contact seller' });
     }
   }
@@ -276,7 +276,7 @@ export class WebSocketService {
       const senderId = socket.user!.id;
       const senderEmail = socket.user!.email;
 
-      console.log('📤 Processing message send:', {
+      console.log(' Processing message send:', {
         conversationId,
         sender: senderEmail,
         contentLength: content?.length,
@@ -460,10 +460,10 @@ export class WebSocketService {
         messageIds: updatedMessages.map((m: any) => m.id)
       });
 
-      console.log(`✅ Marked ${updatedMessages.length} messages as read`);
+      console.log(` Marked ${updatedMessages.length} messages as read`);
 
     } catch (error) {
-      console.error('❌ Mark as read error:', error);
+      console.error(' Mark as read error:', error);
       socket.emit('read_error', { error: 'Failed to mark messages as read' });
     }
   }
