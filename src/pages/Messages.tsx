@@ -55,6 +55,7 @@ import trashIcon from '../assets/images/pre/trash.svg';
 import replyCloseIcon from '../assets/images/pre/re.svg';
 import productImage1 from '../assets/images/pre/1.png';
 import amIcon from '../assets/images/pre/AM.svg';
+import pinBadgeIcon from '../assets/images/pre/pn.svg';
 
 const Messages: React.FC = () => {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -110,6 +111,7 @@ const Messages: React.FC = () => {
   const [showMobileArchiveModal, setShowMobileArchiveModal] = useState(false);
   const [actionsMenuCoords, setActionsMenuCoords] = useState<{ top: number; right: number } | null>(null);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [isChatPinned, setIsChatPinned] = useState(false);
   const [showReactionEmojiPicker, setShowReactionEmojiPicker] = useState(false);
   const [replyToMessage, setReplyToMessage] = useState<any>(null);
   const [showMobileConversation, setShowMobileConversation] = useState(false);
@@ -283,8 +285,15 @@ const Messages: React.FC = () => {
 
     const handleActionSelect = (action: string, chatId: number) => {
       console.log(`Action: ${action} for chat: ${chatId}`);
+      
+      if (action === 'Pin the chat') {
+        setIsChatPinned(true);
+      } else if (action === 'Unpin the chat') {
+        setIsChatPinned(false);
+      }
+      
       setActionsMenuOpen(null);
-    setActionsMenuCoords(null);
+      setActionsMenuCoords(null);
       // Here you would implement the actual action logic
     };
 
@@ -1750,11 +1759,18 @@ const Messages: React.FC = () => {
                   }}
                 >
                     <div className="flex items-center space-x-2">
-                      <img 
-                        src={chatEntry.avatar} 
-                        alt={chatEntry.name}
-                        className="w-10 h-10 rounded-sm object-cover"
-                      />
+                      <div className="relative">
+                        <img 
+                          src={chatEntry.avatar} 
+                          alt={chatEntry.name}
+                          className="w-10 h-10 rounded-sm object-cover"
+                        />
+                        {isChatPinned && (
+                          <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+                            <img src={pinBadgeIcon} alt="Pinned" className="w-3 h-3" />
+                          </div>
+                        )}
+                      </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <h3 className="text-sm md:text-base font-medium md:font-semibold text-gray-900 truncate">{chatEntry.name}</h3>
@@ -1914,11 +1930,11 @@ const Messages: React.FC = () => {
                 </button>
                 
                 <button
-                  onClick={() => handleActionSelect('Pin the chat', actionsMenuOpen)}
+                  onClick={() => handleActionSelect(isChatPinned ? 'Unpin the chat' : 'Pin the chat', actionsMenuOpen)}
                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
                 >
-                  <img src={actionIcon04} alt="Pin the chat" className="w-4 h-4" />
-                  <span className="font-light" style={{ color: '#374151' }}>Pin the chat</span>
+                  <img src={actionIcon04} alt={isChatPinned ? 'Unpin the chat' : 'Pin the chat'} className="w-4 h-4" />
+                  <span className="font-light" style={{ color: '#374151' }}>{isChatPinned ? 'Unpin the chat' : 'Pin the chat'}</span>
                 </button>
                 
                 <button
@@ -1994,7 +2010,13 @@ const Messages: React.FC = () => {
               </div>
               
               {/* Archived */}
-              <div className="flex items-center justify-between py-2 cursor-pointer">
+              <div 
+                className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors"
+                onClick={() => {
+                  setShowMobileArchiveModal(false);
+                  navigate('/archived-chats');
+                }}
+              >
                 <div className="flex items-center space-x-3">
                   <img src={archiveIcon} alt="Archived" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
                   <span className="text-sm" style={{ color: '#6A6A6A' }}>Archived</span>
