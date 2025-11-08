@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { UploadController } from '../controllers/uploadController';
-import { body } from 'express-validator';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { validateFileUpload } from '@/middleware/validationMiddleware';
 

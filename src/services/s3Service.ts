@@ -22,7 +22,6 @@ class S3Service {
     }
 
     const data = await response.json();
-    console.log(' Profile upload URL response:', data);
     return data;
   }
 
@@ -50,7 +49,6 @@ class S3Service {
     }
 
     const data = await response.json();
-    console.log(' Chat upload URL response:', data);
     return data;
   }
 
@@ -91,14 +89,9 @@ class S3Service {
     });
 
     if (!response.ok) {
-      console.error(' S3 upload failed:', {
-        status: response.status,
-        statusText: response.statusText
-      });
       throw new Error('Upload failed');
     }
 
-    console.log(' File uploaded successfully to S3');
     return true;
   }
 
@@ -137,8 +130,6 @@ class S3Service {
     // Extract key from the fileUrl
     const url = new URL(fileUrl);
     const key = decodeURIComponent(url.pathname.substring(1));
-
-    console.log(' Deleting file from S3:', { key });
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/upload/delete-file`, {
       method: 'POST',

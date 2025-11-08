@@ -50,7 +50,6 @@ export const getPresignedUrl = async (req: Request, res: Response) => {
       key,
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ message: 'Failed to generate pre-signed URL' });
   }
 };
@@ -72,7 +71,6 @@ export const getViewPresignedUrl = async (req: Request, res: Response) => {
 
     return res.json({ viewUrl });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ message: 'Failed to generate view URL' });
   }
 };
@@ -87,7 +85,6 @@ export const deleteImage = async (req: Request, res: Response) => {
 
     return res.json({ success: true });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ message: 'Failed to delete image' });
   }
 };

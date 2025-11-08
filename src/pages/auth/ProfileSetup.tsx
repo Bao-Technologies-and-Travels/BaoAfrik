@@ -87,9 +87,8 @@ const ProfileSetup: React.FC = () => {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return "";
 
-      return date.toISOString().split('T')[0];
+      return date.toUTCString().split('T')[0];
     } catch (error) {
-      console.error("Date formatting error:", error);
       return "";
     }
   }, []);
@@ -122,7 +121,6 @@ const ProfileSetup: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error("Failed to fetch user data:", error);
         addToast({
           type: "error",
           title: "Data Loading Error",
@@ -237,7 +235,6 @@ const ProfileSetup: React.FC = () => {
         setErrors(prev => ({ ...prev, general: "" }));
       }
     } catch (error) {
-      console.error("Failed to remove image:", error);
       setErrors(prev => ({
         ...prev,
         general: "Failed to remove image from storage",
@@ -259,7 +256,6 @@ const ProfileSetup: React.FC = () => {
       await s3Service.uploadFile(selectedFile, uploadUrl);
       return fileUrl;
     } catch (error) {
-      console.error("S3 upload error:", error);
       throw new Error("Failed to upload image to storage");
     } finally {
       setIsUploadingImage(false);
@@ -417,7 +413,6 @@ const ProfileSetup: React.FC = () => {
       }, 3000);
 
     } catch (error: any) {
-      console.error("Profile update error:", error);
       
       let toastMessage = "Failed to update profile. Please try again.";
       let toastTitle = "Update Failed";

@@ -314,7 +314,7 @@ EOF
                             <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>Updated frontend s3Service to fetch the correct backend API endpoints for profile uploads, product uploads, chat uploads.</p>
+                            <p><strong>Changes made:</strong>Fetch and auto-fill product details on edit-listing page, cleared debugging logs</p>
                             <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

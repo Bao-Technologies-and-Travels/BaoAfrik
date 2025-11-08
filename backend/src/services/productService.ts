@@ -76,7 +76,6 @@ function parseProductImages(images: Prisma.JsonValue | null): ProductImage[] {
 
         return [];
     } catch (error) {
-        console.error('Error parsing product images:', error);
         return [];
     }
 }

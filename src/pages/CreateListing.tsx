@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import logo from '../assets/images/pre/logo.png';
 import shippxIcon from '../assets/images/pre/shippx.svg';
 import locIcon from '../assets/images/pre/Loc.svg';
@@ -22,6 +22,8 @@ import pathIcon from '../assets/images/pre/Path.svg';
 import path2Icon from '../assets/images/pre/path2.svg';
 import loadIcon from '../assets/images/pre/load.svg';
 import { useAuth } from "../contexts/AuthContext";
+import { useToast } from '../contexts/ToastContext';
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const CreateListing: React.FC = () => {
   const navigate = useNavigate();
@@ -51,6 +53,12 @@ const CreateListing: React.FC = () => {
   const [draggedImagesTotal, setDraggedImagesTotal] = useState(0);
   const [currentDraggedImageIndex, setCurrentDraggedImageIndex] = useState(0);
   const { user, logout } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { id } = useParams<{ id: string }>();
+  const isEditMode = Boolean(id);
+  const [productData, setProductData] = useState<any>(null);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
+  const { addToast } = useToast();
 
   const handleLogout = () => {
     logout();
@@ -64,7 +72,67 @@ const CreateListing: React.FC = () => {
     quantity > 0 &&
     category !== '' &&
     origin !== '' &&
-    imageUrls.length > 0;
+    (isEditMode || imageUrls.length > 0);
+
+  useEffect(() => {
+    if (isEditMode && id) {
+      fetchProductData(id);
+    }
+  }, [isEditMode, id]);
+
+  const fetchProductData = async (productId: string) => {
+    setIsLoadingProduct(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch product data');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        const product = result.data;
+        setProductData(product);
+
+        setTitle(product.title || '');
+        setDescription(product.description || '');
+        setPrice(product.price?.toString() || '');
+        setCurrency(product.currency || 'USD');
+        setQuantity(product.quantity || 1);
+        setCategory(product.category || '');
+        setOrigin(product.origin || '');
+        setSaleType(product.saleType || 'Default');
+        setDeliveryAvailable(product.deliveryAvailable || false);
+        setLocation(product.location || 'London, United Kingdom');
+
+        if (product.images && product.images.length > 0) {
+          const existingImageUrls = product.images.map((img: any) => img.url);
+          setImageUrls(existingImageUrls);
+
+          const primaryIndex = product.images.findIndex((img: any) => img.isPrimary);
+          setPrimaryImageIndex(primaryIndex >= 0 ? primaryIndex : 0);
+        }
+      }
+    } catch (error) {
+      addToast({
+        type: "error",
+        title: "Failed to load",
+        message: "Unable to retrieve product data. Please check your internet connection.",
+        duration: 3000
+      });
+      navigate('/my-listings');
+    } finally {
+      setIsLoadingProduct(false);
+    }
+  };
 
   const categories = [
     { value: 'beauty', label: 'Beauty & Wellness' },
@@ -183,7 +251,12 @@ const CreateListing: React.FC = () => {
           reader.readAsDataURL(file);
         });
       } else {
-        alert('You can only upload up to 10 images');
+        addToast({
+          type: "error",
+          title: "Upload limit",
+          message: "You can only upload up to 10 images at a time",
+          duration: 3000
+        });
       }
     }
   };
@@ -279,7 +352,12 @@ const CreateListing: React.FC = () => {
         reader.readAsDataURL(file);
       });
     } else {
-      alert('You can only upload up to 10 images');
+      addToast({
+        type: "error",
+        title: "Upload limit",
+        message: "You can only upload up to 10 images at a time",
+        duration: 3000
+      });
     }
   };
 
@@ -305,11 +383,12 @@ const CreateListing: React.FC = () => {
   };
 
   const uploadProductImages = async (productId: string, imageFiles: File[]) => {
+    setIsLoading(true);
+
     try {
       const token = localStorage.getItem('accessToken');
 
       for (const file of imageFiles) {
-        // Step 1: Get presigned URL
         const presignedResponse = await fetch(`${process.env.REACT_APP_API_URL}/upload/product`, {
           method: 'POST',
           headers: {
@@ -325,28 +404,21 @@ const CreateListing: React.FC = () => {
 
         if (!presignedResponse.ok) {
           const errorText = await presignedResponse.text();
-          console.error('Failed to get upload URL:', errorText);
-
           throw new Error('Failed to get upload URL');
         }
 
         const presignedResult = await presignedResponse.json();
-        console.log('Upload URL response:', presignedResult);
 
-        // Check if the response has the expected structure
         if (!presignedResult.success) {
           throw new Error(presignedResult.message || 'Failed to get upload URL');
         }
 
         if (!presignedResult.data || !presignedResult.data.uploadUrl) {
-          console.error('Invalid response structure:', presignedResult);
           throw new Error('Invalid response from upload service');
         }
 
         const presignedData = presignedResult.data;
 
-        // Step 2: Upload to S3
-        console.log('Uploading to S3...', presignedData.uploadUrl);
         const uploadResponse = await fetch(presignedData.uploadUrl, {
           method: 'PUT',
           headers: {
@@ -359,9 +431,6 @@ const CreateListing: React.FC = () => {
           throw new Error('Failed to upload image to S3');
         }
 
-        console.log(' Successfully uploaded to S3');
-
-        // Step 3: Add image to product
         const addImageResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}/images`, {
           method: 'POST',
           headers: {
@@ -380,13 +449,13 @@ const CreateListing: React.FC = () => {
 
         if (!addImageResponse.ok) {
           const errorText = await addImageResponse.text();
-          console.error('Failed to add image to product:', errorText);
           throw new Error('Failed to add image to product');
         }
       }
     } catch (error) {
-      console.error('Error uploading product images:', error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -394,57 +463,78 @@ const CreateListing: React.FC = () => {
     try {
       const token = localStorage.getItem('accessToken');
 
-      // Prepare product data matching frontend state
       const productData = {
         title,
         description,
-        price: price, // Keep as string, backend will parse
+        price: price,
         currency,
         quantity,
         category,
         origin,
         location,
-        saleType, // 'Default' or 'Urgent'
+        saleType,
         deliveryAvailable
       };
 
-      console.log('Saving draft with data:', productData);
-
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(productData)
-      });
+      let response;
+      if (isEditMode && id) {
+        // Update existing product
+        response = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(productData)
+        });
+      } else {
+        // Create new product
+        response = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(productData)
+        });
+      }
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to save draft');
+        throw new Error(result.message || `Failed to ${isEditMode ? 'update' : 'save'} draft`);
       }
 
       if (result.success) {
-        console.log('Draft saved successfully:', result.data);
+        const productId = result.data.id || id;
 
-        // Upload images if any
-        if (images.length > 0 && result.data.id) {
-          await uploadProductImages(result.data.id, images);
+        // Upload new images if any
+        if (images.length > 0 && productId) {
+          await uploadProductImages(productId, images);
         }
 
         // Show success message
-        alert('Draft saved successfully!');
-        // Optionally navigate to drafts page
-        // navigate('/my-listings?tab=drafts');
+        addToast({
+          type: "success",
+          title: "Action completed",
+          message: `${isEditMode ? 'Draft updated' : 'Draft saved'} successfully!`,
+          duration: 3000
+        });
+        navigate('/my-listings?tab=drafts');
       }
     } catch (error: any) {
-      console.error('Failed to save draft:', error);
-      alert(`Failed to save draft: ${error.message}`);
+      addToast({
+        type: "error",
+        title: "Action failed",
+        message: `Failed to ${isEditMode ? 'update' : 'save'} draft: ${error.message}`,
+        duration: 3000
+      });
     }
   };
 
   const handlePostListing = async () => {
+    setIsLoading(true);
+
     try {
       const token = localStorage.getItem('accessToken');
 
@@ -462,26 +552,37 @@ const CreateListing: React.FC = () => {
         deliveryAvailable
       };
 
-      console.log('Creating product with data:', productData);
-
-      const createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(productData)
-      });
+      let createResponse;
+      if (isEditMode && id) {
+        // Update existing product
+        createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(productData)
+        });
+      } else {
+        // Create new product
+        createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(productData)
+        });
+      }
 
       const createResult = await createResponse.json();
 
       if (!createResponse.ok) {
-        throw new Error(createResult.message || 'Failed to create product');
+        throw new Error(createResult.message || `Failed to ${isEditMode ? 'update' : 'create'} product`);
       }
 
       if (createResult.success) {
         const productId = createResult.data.id;
-        console.log('Product created with ID:', productId);
 
         // Upload images
         if (images.length > 0) {
@@ -505,15 +606,24 @@ const CreateListing: React.FC = () => {
         }
 
         if (publishResult.success) {
-          console.log('Listing posted successfully');
-          alert('Listing posted successfully!');
-          // Navigate to the product page or listings page
-          // navigate(`/product/${productId}`);
+          addToast({
+            type: "success",
+            title: "Action completed",
+            message: `Listing ${isEditMode ? 'updated' : 'posted'} successfully!`,
+            duration: 3000
+          });
+          navigate('/my-listings?tab=all');
         }
       }
     } catch (error: any) {
-      console.error('Failed to post listing:', error);
-      alert(`Failed to post listing: ${error.message}`);
+      addToast({
+        type: "error",
+        title: "Action failed",
+        message: "Failed to post listing. Please try again.",
+        duration: 3000
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -558,6 +668,20 @@ const CreateListing: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isLanguageDropdownOpen, isMenuDropdownOpen, isCategoryDropdownOpen, isOriginDropdownOpen, isSaleTypeDropdownOpen, isCurrencyDropdownOpen]);
+
+  const pageTitle = isEditMode ? 'Edit listing' : 'Create a new listing';
+  const postButtonText = isEditMode ? 'Update listing' : 'Post listing';
+
+  if (isLoadingProduct) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading product data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen overflow-hidden bg-gray-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -986,9 +1110,11 @@ const CreateListing: React.FC = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl font-medium text-gray-900">
-                    Create a new listing
+                    {pageTitle}
                   </h1>
-                  <p className="mt-1 text-xs" style={{ color: '#BABABA' }}>Add a new product</p>
+                  <p className="mt-1 text-xs" style={{ color: '#BABABA' }}>
+                    {isEditMode ? 'Edit your product' : 'Add a new product'}
+                  </p>
                 </div>
               </div>
 
@@ -1510,7 +1636,6 @@ const CreateListing: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => {
-                              console.log('Currency button clicked, current state:', isCurrencyDropdownOpen);
                               setIsCurrencyDropdownOpen(!isCurrencyDropdownOpen);
                             }}
                             className="pl-4 pr-1 py-3 border-none focus:outline-none bg-white flex items-center"
@@ -2029,14 +2154,18 @@ const CreateListing: React.FC = () => {
                   </button>
                   <button
                     onClick={handlePostListing}
-                    className="flex items-center space-x-2 px-16 py-2.5 rounded-xl font-medium transition-colors text-sm"
+                    disabled={isLoading || !isFormComplete || isImageLoading}
+                    className={`flex items-center space-x-2 px-16 py-2.5 rounded-xl font-medium transition-colors text-sm ${isFormComplete && !isLoading && !isImageLoading
+                      ? "text-white bg-yellow-500 hover:bg-yellow-700 cursor-pointer"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      }`}
                     style={{
                       backgroundColor: isFormComplete ? '#F9A825' : '#E9E9E9',
                       color: isFormComplete ? '#FFFFFF' : '#6A6A6A',
                       cursor: isFormComplete ? 'pointer' : 'not-allowed'
                     }}
                   >
-                    <span>Post listing</span>
+                    <span>{postButtonText}</span>
                     <img
                       src={flyIcon}
                       alt="Post"

@@ -19,7 +19,6 @@ export class ChatController {
                 data: conversations
             });
         } catch (error) {
-            console.error('Get conversations error:', error);
             return res.status(500).json({
                 success: false,
                 error: 'Failed to get conversations'
@@ -80,7 +79,6 @@ export class ChatController {
                 data: conversation
             });
         } catch (error: any) {
-            console.error('Create conversation by email error:', error);
 
             if (error.message.includes('User not found')) {
                 return res.status(404).json({
@@ -115,8 +113,6 @@ export class ChatController {
                 });
             }
 
-            console.log(' Contact seller request:', { productId, buyerId });
-
             // Get product and seller information
             const product = await prisma.product.findUnique({
                 where: { id: productId },
@@ -147,8 +143,6 @@ export class ChatController {
                 });
             }
 
-            console.log('🛍️ Product found, seller:', product.seller.email);
-
             const productData = {
                 id: product.id,
                 name: product.title,
@@ -175,8 +169,6 @@ export class ChatController {
                 productData: productData
             });
 
-            console.log(' Conversation created:', conversation.id);
-
             return res.json({
                 success: true,
                 data: {
@@ -191,7 +183,6 @@ export class ChatController {
                 }
             });
         } catch (error: any) {
-            console.error('Contact seller error:', error);
 
             if (error.message.includes('Product not found')) {
                 return res.status(404).json({
@@ -309,7 +300,6 @@ export class ChatController {
                 data: formattedConversation
             });
         } catch (error) {
-            console.error('Get conversation details error:', error);
             return res.status(500).json({
                 success: false,
                 error: 'Failed to get conversation details'
@@ -339,7 +329,6 @@ export class ChatController {
                 data: messages
             });
         } catch (error: any) {
-            console.error('Get messages error:', error);
 
             if (error.message.includes('not found') || error.message.includes('access denied')) {
                 return res.status(404).json({
@@ -381,7 +370,6 @@ export class ChatController {
                 data: conversation
             });
         } catch (error: any) {
-            console.error('Create conversation error:', error);
             
             if (error.message.includes('Cannot create conversation with yourself')) {
                 return res.status(422).json({
@@ -429,7 +417,6 @@ export class ChatController {
                 data: message
             });
         } catch (error: any) {
-            console.error('Send message error:', error);
 
             if (error.message.includes('not found') || error.message.includes('access denied')) {
                 return res.status(404).json({
@@ -485,7 +472,6 @@ export class ChatController {
                 data: presignedUrl
             });
         } catch (error: any) {
-            console.error('Generate presigned URL error:', error);
 
             if (error.message.includes('File type not allowed')) {
                 return res.status(422).json({
@@ -523,7 +509,6 @@ export class ChatController {
                 }
             });
         } catch (error) {
-            console.error('Mark as read error:', error);
             return res.status(500).json({
                 success: false,
                 error: 'Failed to mark messages as read'
@@ -542,7 +527,6 @@ export class ChatController {
                 data: unreadCounts
             });
         } catch (error) {
-            console.error('Get unread counts error:', error);
             return res.status(500).json({
                 success: false,
                 error: 'Failed to get unread counts'
@@ -588,7 +572,6 @@ export class ChatController {
                 data: result
             });
         } catch (error: any) {
-            console.error('Get conversation participants error:', error);
             
             if (error.message.includes('Conversation not found')) {
                 return res.status(404).json({

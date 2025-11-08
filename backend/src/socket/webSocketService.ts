@@ -99,8 +99,6 @@ export class WebSocketService {
       const userId = authenticatedSocket.user.id;
       const userEmail = authenticatedSocket.user.email;
 
-      console.log(`WebSocket connection established for user: ${userEmail} (${userId})`);
-
       // store user connection
       this.userSockets.set(userId, socket.id);
       this.connectedUsers.set(userId, authenticatedSocket);
@@ -117,46 +115,34 @@ export class WebSocketService {
 
       // Message events
       socket.on('send_message', async (data, callback) => {
-        console.log(' Send message event received:', {
-          conversationId: data.conversationId,
-          sender: userEmail,
-          tempId: data.tempId
-        });
         await this.handleSendMessage(authenticatedSocket, data, callback);
       });
 
       socket.on('join_conversation', async (conversationId) => {
-        console.log('🔗 Join conversation event:', { conversationId, user: userEmail });
         await this.handleJoinConversation(authenticatedSocket, conversationId);
       });
 
       socket.on('typing_start', (data) => {
-        console.log('⌨️ Typing start:', { conversationId: data.conversationId, user: userEmail });
         this.handleTypingStart(authenticatedSocket, data);
       });
 
       socket.on('typing_stop', (data) => {
-        console.log('⏹️ Typing stop:', { conversationId: data.conversationId, user: userEmail });
         this.handleTypingStop(authenticatedSocket, data);
       });
 
       socket.on('mark_as_read', async (data) => {
-        console.log('📖 Mark as read:', { conversationId: data, user: userEmail });
         await this.handleMarkAsRead(authenticatedSocket, data);
       });
 
       socket.on('join_conversations', () => {
-        console.log('🔄 Join conversations request:', userEmail);
         this.joinUserConversations(authenticatedSocket, userId);
       });
 
       socket.on('contact_seller', async (data) => {
-        console.log(' Contact seller:', { sellerId: data.sellerId, user: userEmail });
         await this.handleContactSeller(authenticatedSocket, data);
       });
 
       socket.on('disconnect', (reason) => {
-        console.log(`🔌 WebSocket disconnected for user ${userEmail}:`, reason);
         this.userSockets.delete(userId);
         this.connectedUsers.delete(userId);
       });
@@ -177,15 +163,12 @@ export class WebSocketService {
   private async joinUserConversations(socket: AuthenticatedSocket, userId: string) {
     try {
       const conversations = await this.chatService.getUserConversations(userId);
-      console.log(`👥 User ${userId} has ${conversations.length} conversations to join`);
 
       conversations.forEach(conv => {
         socket.join(`conversation:${conv.id}`);
-        console.log(` User joined conversation: ${conv.id}`);
       });
 
       socket.join(userId);
-      console.log(` User ${userId} joined their personal room`);
     } catch (error) {
       console.error('Error joining conversations:', error);
     }
@@ -205,7 +188,6 @@ export class WebSocketService {
 
       if (userHasAccess) {
         socket.join(`conversation:${conversationId}`);
-        console.log(` User ${socket.user!.email} joined conversation: ${conversationId}`);
 
         socket.emit('conversation_joined', {
           conversationId,
@@ -217,11 +199,9 @@ export class WebSocketService {
           }))
         });
       } else {
-        console.log(` Access denied for user ${socket.user!.email} to conversation ${conversationId}`);
         socket.emit('conversation_join_error', { error: 'Access denied' });
       }
     } catch (error) {
-      console.error(' Error joining conversation:', error);
       socket.emit('conversation_join_error', { error: 'Failed to join conversation' });
     }
   }
@@ -234,8 +214,6 @@ export class WebSocketService {
       if (!sellerId || !productId) {
         throw new Error('Seller ID and Product ID are required');
       }
-
-      console.log(` Contacting seller ${sellerId} for product ${productId} from buyer ${buyerId}`);
 
       // Create conversation
       const conversation = await this.chatService.createConversation({
@@ -258,11 +236,9 @@ export class WebSocketService {
           },
           product: data.product
         });
-        console.log(`📨 Notified seller ${sellerId} about new conversation`);
       }
 
       socket.emit('conversation_created', { conversation });
-      console.log(` Conversation created: ${conversation.id}`);
 
     } catch (error: any) {
       console.error(' Contact seller error:', error);
@@ -275,14 +251,6 @@ export class WebSocketService {
       const { conversationId, content, messageType, fileUrl, fileName, fileSize, replyTo, tempId } = data;
       const senderId = socket.user!.id;
       const senderEmail = socket.user!.email;
-
-      console.log(' Processing message send:', {
-        conversationId,
-        sender: senderEmail,
-        contentLength: content?.length,
-        messageType,
-        tempId
-      });
 
       // Validate required fields
       if (!conversationId) {
@@ -312,7 +280,6 @@ export class WebSocketService {
 
       // Save message to database
       const message = await this.chatService.sendMessage(messageData);
-      console.log('💾 Message saved to database:', message.id);
 
       // Get conversation participants
       const participantsResult = await this.chatService.getConversationParticipants(conversationId);
@@ -332,13 +299,6 @@ export class WebSocketService {
         }
       };
 
-      console.log('📨 WebSocket broadcasting message:', {
-        id: messageResponse.id,
-        fileUrl: messageResponse.fileUrl,
-        fileName: messageResponse.fileName,
-        fileSize: messageResponse.fileSize
-      });
-
       if (callback) {
         callback({
           success: true,
@@ -349,8 +309,6 @@ export class WebSocketService {
 
       // Emit to all participants in the conversation
       this.io.to(`conversation:${conversationId}`).emit('new_message', messageResponse);
-      console.log(`📨 Message emitted to conversation ${conversationId}, participants:`,
-        participants.map((p: any) => p.email));
 
       // Send notifications to other participants
       participants.forEach((participant: any) => {
@@ -377,7 +335,6 @@ export class WebSocketService {
       });
 
     } catch (error: any) {
-      console.error('Send message error:', error);
 
       if (callback) {
         callback({
@@ -448,8 +405,6 @@ export class WebSocketService {
         throw new Error('Conversation ID is required');
       }
 
-      console.log(`Marking messages as read in conversation ${conversationId} for user ${userId}`);
-
       const result = await this.chatService.markMessagesAsRead(conversationId, userId);
       const updatedMessages = result.unreadMessages; // Extract the unreadMessages array
 
@@ -459,8 +414,6 @@ export class WebSocketService {
         readerId: userId,
         messageIds: updatedMessages.map((m: any) => m.id)
       });
-
-      console.log(` Marked ${updatedMessages.length} messages as read`);
 
     } catch (error) {
       console.error(' Mark as read error:', error);

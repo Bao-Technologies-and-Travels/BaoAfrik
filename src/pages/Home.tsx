@@ -160,7 +160,6 @@ const Home: React.FC = () => {
       } catch (err: any) {
         if (err.name === 'AbortError') {
           setError('Request timeout - using local data');
-          console.log('Request timed out, using fallback data');
         }
       } finally {
         clearTimeout(timeoutId);
@@ -177,14 +176,11 @@ const Home: React.FC = () => {
 
   // fetch products from API
   const fetchProducts = async () => {
-    console.log('🔄 fetchProducts called');
 
     setIsLoading(true);
     setError(null);
 
     try {
-      console.log('Fetching products from:', `${process.env.REACT_APP_API_URL}/products`);
-
       const response = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
         method: 'GET',
         headers: {
@@ -192,23 +188,18 @@ const Home: React.FC = () => {
         },
       });
 
-      console.log('Response status:', response.status);
-
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${await response.text()}`);
       }
 
       const result = await response.json();
-      console.log('📊 API response success:', result.success);
 
       // Extract products from the correct structure
       if (result.success && result.data && result.data.products) {
         const productsArray = result.data.products;
-        console.log(` Found ${productsArray.length} products in data.products`);
 
         if (productsArray.length > 0) {
           setProducts(productsArray);
-          console.log(`🎉 Successfully loaded ${productsArray.length} products from API`);
         } else {
           console.log('No products in array, using fallback');
         }
@@ -217,10 +208,8 @@ const Home: React.FC = () => {
       }
 
     } catch (error) {
-      console.error(' Fetch error:', error);
       setError(`API connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
-      console.log(' fetchProducts completed');
       setIsLoading(false);
     }
   };
@@ -233,9 +222,6 @@ const Home: React.FC = () => {
 
     return apiProducts.map((product: any, index: number) => {
       try {
-        console.log('Transforming product:', product);
-
-        // Extract data from your actual API structure
         const productId = product.id;
         const productName = product.title || 'Unknown Product';
         const productPrice = product.price || '0';
@@ -243,22 +229,15 @@ const Home: React.FC = () => {
         const productLocation = product.location || 'Unknown Location';
         const isVerified = product.seller?.isVerifiedSeller || false;
 
-        // Handle images - your API has images as array of objects
         let productImage;
         if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-          // Use the URL from the first image object
           productImage = product.images[0]?.url;
-          console.log('Using image URL:', productImage);
         }
 
-        // If no image from API, use default
         if (!productImage) {
           productImage = getDefaultProductImage(productCategory);
-          console.log('Using default image for category:', productCategory);
         }
 
-        // Convert string ID to number for frontend compatibility
-        // Create a simple numeric ID from the UUID
         const numericId = productId ? parseInt(productId.replace(/[^0-9]/g, '').slice(0, 8)) || index + 1000 : index + 1000;
 
         const transformedProduct = {
@@ -271,11 +250,9 @@ const Home: React.FC = () => {
           category: productCategory
         };
 
-        console.log('Transformed product:', transformedProduct);
         return transformedProduct;
 
       } catch (error) {
-        console.error('Error transforming product:', product, error);
         return {
           id: index + 1000,
           name: 'Invalid Product',
@@ -555,11 +532,9 @@ const Home: React.FC = () => {
   const getAllProducts = (): FrontendProduct[] => {
     if (products.length > 0) {
       const transformed = transformToFrontendProducts(products);
-      console.log(`🔄 Using ${transformed.length} transformed API products`);
       return transformed;
     } else {
       const fallback = Object.values(allProducts).flat();
-      console.log(`🔄 Using ${fallback.length} fallback products`);
       return fallback;
     }
   };
@@ -576,25 +551,8 @@ const Home: React.FC = () => {
       return acc;
     }, {} as CategoryProducts);
 
-    console.log('📦 Categorized products:', Object.keys(categorized));
     return categorized;
   };
-
-  // useEffect to log when products are loaded
-  useEffect(() => {
-    if (products.length > 0) {
-      console.log(`📊 Products state updated with ${products.length} items`);
-      console.log('Sample product:', products[0]);
-    }
-  }, [products]);
-
-  // log when computed products are ready
-  useEffect(() => {
-    const computed = getAllProductsByCategory();
-    const totalProducts = Object.values(computed).flat().length;
-    console.log(`🛍️ Total products available: ${totalProducts}`);
-    console.log('Categories:', Object.keys(computed));
-  }, [products]);
 
   const allProductsComputed = React.useMemo(() => {
     return getAllProductsByCategory();
@@ -657,10 +615,8 @@ const Home: React.FC = () => {
     let displayProducts: FrontendProduct[] = [];
     if (activeCategory === 'All') {
       displayProducts = Object.values(allProductsComputed).flat();
-      console.log(`Using all categories: ${displayProducts.length} products`);
     } else {
       displayProducts = allProductsComputed[activeCategory] || [];
-      console.log(`Using all categories: ${displayProducts.length} products`);
     }
 
     // Apply country filter if selected
@@ -669,10 +625,8 @@ const Home: React.FC = () => {
       displayProducts = displayProducts.filter((product: FrontendProduct) =>
         getProductCountry(product.id).name === selectedCountry
       );
-      console.log(`Country filter ${selectedCountry}: ${beforeCount} -> ${displayProducts.length}`);
     }
 
-    console.log(` Displaying ${displayProducts.length} products for category: ${activeCategory}`);
     return displayProducts;
   }, [isSearchActive, searchResults, activeCategory, allProductsComputed, selectedCountry]);
 
@@ -703,7 +657,6 @@ const Home: React.FC = () => {
   useEffect(() => {
     if (searchQuery.trim() || selectedCategoryText || selectedPlaceOfOriginText || location.trim()) {
       // Only auto-search if we have active search criteria
-      console.log('🔄 Auto-searching due to filter change');
       handleSearch();
     }
   }, [selectedCountry]);
@@ -779,16 +732,8 @@ const Home: React.FC = () => {
 
   // Handle search functionality
   const handleSearch = () => {
-    console.log('=== SEARCH TRIGGERED ===');
-    console.log('Search Query (Product):', searchQuery);
-    console.log('Selected Category:', selectedCategoryText);
-    console.log('Place of Origin (Country Badge):', selectedPlaceOfOriginText);
-    console.log('Seller Location:', location);
-    console.log('Selected Country Filter:', selectedCountry);
-
     // Get all products
     let productsToSearch: FrontendProduct[] = getAllProducts();
-    console.log('Total products before filtering:', productsToSearch.length);
 
     // Apply search query filter (Product input)
     if (searchQuery.trim()) {
@@ -797,7 +742,6 @@ const Home: React.FC = () => {
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.location.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      console.log('After product name/location filter:', productsToSearch.length, '(was', beforeCount, ')');
     }
 
     // Apply category filter (Categories dropdown)
@@ -806,7 +750,6 @@ const Home: React.FC = () => {
       productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
         product.category === selectedCategoryText
       );
-      console.log(`After category filter (${selectedCategoryText}):`, productsToSearch.length, '(was', beforeCount, ')');
     }
 
     // Apply place of origin filter (Place of Origin dropdown - filters by country badge at top)
@@ -814,10 +757,8 @@ const Home: React.FC = () => {
       const beforeCount = productsToSearch.length;
       productsToSearch = productsToSearch.filter((product: FrontendProduct) => {
         const country = getProductCountry(product.id).name;
-        console.log(`Product ${product.id} country:`, country, 'matches', selectedPlaceOfOriginText, '?', country === selectedPlaceOfOriginText);
         return country === selectedPlaceOfOriginText;
       });
-      console.log(`After place of origin filter (${selectedPlaceOfOriginText}):`, productsToSearch.length, '(was', beforeCount, ')');
     }
 
     // Apply country filter from filter buttons (applies to both category view and search)
@@ -826,7 +767,6 @@ const Home: React.FC = () => {
       productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
         getProductCountry(product.id).name === selectedCountry
       );
-      console.log(`After country filter (${selectedCountry}):`, productsToSearch.length, '(was', beforeCount, ')');
     }
 
     // Apply seller location filter (Seller Location input - filters by location at bottom)
@@ -835,11 +775,7 @@ const Home: React.FC = () => {
       productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
         product.location.toLowerCase().includes(location.toLowerCase())
       );
-      console.log(`After seller location filter (${location}):`, productsToSearch.length, '(was', beforeCount, ')');
     }
-
-    console.log('Final filtered products:', productsToSearch.length);
-    console.log('======================');
 
     setSearchResults(productsToSearch);
     setIsSearchActive(true);
@@ -906,12 +842,6 @@ const Home: React.FC = () => {
 
       setImageFormData(formData);
 
-      console.log('Image selected:', {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        formDataReady: true
-      });
     }
   };
 
@@ -959,7 +889,6 @@ const Home: React.FC = () => {
         newSaved.delete(productId);
         // Remove notification if product is unbookmarked
         setNotifications(prev => prev.filter(notif => notif.product.id !== productId));
-        console.log(`Unsaved product ${productId}`);
       } else {
         // Simulate bookmarking attempt with potential failure
         const product = productsToDisplay.find((p: FrontendProduct) => p.id === productId);
@@ -994,7 +923,6 @@ const Home: React.FC = () => {
 
               return [...prev, errorNotification];
             });
-            console.log(`Failed to save product ${productId}`);
           } else {
             // Success - add to bookmarks
             newSaved.add(productId);
@@ -1023,7 +951,6 @@ const Home: React.FC = () => {
 
               return [...prev, newNotification];
             });
-            console.log(`Saved product ${productId}`);
           }
         }
       }
@@ -1710,38 +1637,6 @@ const Home: React.FC = () => {
           )}
         </div>
       </div>
-
-      {loading && (
-        <div className="flex flex-col items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-          <p className="text-gray-600">Loading products from API...</p>
-        </div>
-      )}
-
-      {!loading && products.length > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3 mx-4 mb-6">
-          <div className="flex items-center text-green-800">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <span className="text-sm">Loaded {products.length} products from API</span>
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mx-4 mb-6">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-yellow-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-            <div>
-              <span className="text-yellow-700 text-sm">{error}</span>
-              <p className="text-yellow-600 text-xs mt-1">Using local product data instead</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Hero Banner - Auto Sliding */}
       <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-4 sm:mx-20 md:mx-24 lg:mx-40 rounded-2xl mb-6 sm:mb-0" style={{ background: 'linear-gradient(to right, #F9A822, #E55325)', height: window.innerWidth < 640 ? '100px' : 'auto' }}>

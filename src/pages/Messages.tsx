@@ -176,19 +176,11 @@ const Messages: React.FC = () => {
 
   const handleProfileSetup = () => {
     navigate("/profile-setup");
-    console.log("profile setup button clicked");
   };
 
   // Track re-renders for debugging
   useEffect(() => {
     renderCount.current += 1;
-    console.log(`🔄 Messages component re-rendered (${renderCount.current})`, {
-      activeConversationId,
-      conversationsCount: conversations.length,
-      messagesCount: messages.length,
-      isLoading,
-      isLoadingMessages,
-    });
   });
 
   // Get current user on component mount
@@ -203,7 +195,6 @@ const Messages: React.FC = () => {
           firstName: payload.firstName,
           lastName: payload.lastName,
         };
-        console.log("Current user from token:", userData);
         setCurrentUser(userData);
       } catch (error) {
         console.error("Failed to decode user from token:", error);
@@ -217,11 +208,8 @@ const Messages: React.FC = () => {
 
     // Prevent multiple connections
     if (socketRef.current?.connected) {
-      console.log(" WebSocket already connected");
       return;
     }
-
-    console.log("Establishing WebSocket Connection...");
 
     const newSocket = io(process.env.REACT_APP_WS_URL!, {
       auth: { token },
@@ -233,40 +221,29 @@ const Messages: React.FC = () => {
 
     // Connection events
     const handleConnect = () => {
-      console.log("Websocket connected succesfully");
       setIsSocketConnected(true);
       setConnectionStatus("connected");
 
       newSocket.emit("join_conversations");
-      console.log("📨 Joined conversations room");
 
       // Rejoin any active conversation
       if (activeConversationId) {
         newSocket.emit("join_conversation", activeConversationId);
-        console.log(`🔗 Rejoined conversation: ${activeConversationId}`);
       }
     };
 
     const handleDisconnect = (reason: any) => {
-      console.log("Websocket disconnected", reason);
       setIsSocketConnected(false);
       setConnectionStatus("disconnected");
     };
 
     const handleConnectError = (error: any) => {
-      console.error("Websocket connection error", error);
       setIsSocketConnected(false);
       setConnectionStatus("disconnected");
     };
 
     // message events
     const handleNewMessage = (serverMessage: any) => {
-      console.log("📨 New message received via WebSocket:", serverMessage);
-      console.log(
-        "📦 Product data in received message:",
-        serverMessage.productData
-      );
-
       setMessages((prev) => {
         const isOurMessage = serverMessage.senderId === currentUser?.id;
         const existingMessageIndex = prev.findIndex(
@@ -320,7 +297,6 @@ const Messages: React.FC = () => {
       });
     };
 
-    // Add all event listeners
     newSocket.on("connect", handleConnect);
     newSocket.on("disconnect", handleDisconnect);
     newSocket.on("connect_error", handleConnectError);
@@ -355,13 +331,11 @@ const Messages: React.FC = () => {
 
     // cleanup function
     return () => {
-      console.log("Component unmounting - Cleaning up WebSocket connection");
       newSocket.off("connect", handleConnect);
       newSocket.off("disconnect", handleDisconnect);
       newSocket.off("connect_error", handleConnectError);
       newSocket.off("new_message", handleNewMessage);
       newSocket.off("message_sent");
-      // Remove other event listeners...
       newSocket.disconnect();
       setSocket(null);
     };
@@ -369,7 +343,6 @@ const Messages: React.FC = () => {
 
   const fetchConversations = useCallback(async () => {
     if (isLoadingConversations) {
-      console.log("Conversations already loading, skipping...");
       return;
     }
 
@@ -379,33 +352,21 @@ const Messages: React.FC = () => {
         `${process.env.REACT_APP_API_URL}/chat/conversations`
       );
 
-      console.log("📡 API Response Status:", response.status);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log("Raw API response", data);
 
       // Debug each conversation
       if (data.data && data.data.length > 0) {
         data.data.forEach((conv: any, index: number) => {
-          console.log(`💬 Conversation ${index + 1} structure:`, {
-            id: conv.id,
-            hasParticipants: !!conv.participants,
-            participantsCount: conv.participants?.length,
-            participants: conv.participants,
-            hasParticipant: !!conv.participant,
-            participant: conv.participant,
-            currentUserId: currentUser?.id,
-          });
         });
       }
 
       setConversations(data.data || []);
     } catch (error) {
-      console.log("Fetch Conversations error:", error);
       if (
         error instanceof Error &&
         !error.message.includes("Authentication") &&
@@ -429,33 +390,27 @@ const Messages: React.FC = () => {
       return;
     }
 
-    console.log("💬 Active conversation changed:", activeConversationId);
     fetchConversationMessages(activeConversationId);
   }, [activeConversationId]);
 
   // initialization useEffect
   useEffect(() => {
     const loadInitialData = async () => {
-      console.log("🔄 Loading initial data UseEffect...");
 
       if (isLoading) {
-        console.log("Already loading, skipping");
         return;
       }
 
       setIsLoading(true);
-      console.log("Starting data loading...");
 
       try {
         // Load conversations
         await fetchConversations();
 
         const locationState = location.state;
-        console.log("Full location state: ", locationState);
 
         // handle location once
         if (locationState && !hasProcessedLocationState.current) {
-          console.log("Processing location state for the first time");
           hasProcessedLocationState.current = true;
 
           if (locationState.conversationId) {
@@ -513,7 +468,6 @@ const Messages: React.FC = () => {
     if (!socket) return;
 
     socket.on("user_typing", (data) => {
-      console.log("⌨️ User typing received:", data);
       if (
         data.conversationId === activeConversationId &&
         data.userId !== currentUser?.id
@@ -524,7 +478,6 @@ const Messages: React.FC = () => {
     });
 
     socket.on("user_stop_typing", (data) => {
-      console.log("⏹️ User stopped typing:", data);
       if (
         data.conversationId === activeConversationId &&
         data.userId !== currentUser?.id
@@ -543,7 +496,6 @@ const Messages: React.FC = () => {
   const fetchConversationMessages = useCallback(
     async (conversationId: string) => {
       if (!conversationId) {
-        console.log("No conversation ID provided");
         setActiveConversationId(null);
         setCurrentConversation(null);
         setMessages([]);
@@ -552,13 +504,11 @@ const Messages: React.FC = () => {
 
       // Only prevent if actively loading, but allow same conversation clicks for refresh
       if (isLoadingMessages) {
-        console.log("Already loading messages, skipping...");
         return;
       }
 
       try {
         setIsLoadingMessages(true);
-        console.log(`Loading messages for conversation: ${conversationId}`);
 
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/messages`
@@ -569,7 +519,6 @@ const Messages: React.FC = () => {
         }
 
         const data = await response.json();
-        console.log("📨 Messages loaded:", data.data?.length || 0, "messages");
 
         const getMessageStatus = (message: any, currentUserId: string) => {
           // For sent messages
@@ -605,7 +554,6 @@ const Messages: React.FC = () => {
         const currentConv = conversations.find((c) => c.id === conversationId);
         if (currentConv) {
           setCurrentConversation(currentConv);
-          console.log(" Current conversation set:", currentConv.id);
         }
 
         // save to localStorage
@@ -740,25 +688,9 @@ const Messages: React.FC = () => {
         senderId: currentUser?.id,
       };
 
-      console.log("Emiting send_message to server:", messageToSend);
-
-      console.log(" Sending via socket - FULL MESSAGE DATA:", {
-        conversationId,
-        messageData: {
-          content: messageData.content,
-          messageType: messageData.messageType,
-          fileUrl: messageData.fileUrl,
-          fileName: messageData.fileName,
-          fileSize: messageData.fileSize,
-          hasFileUrl: !!messageData.fileUrl
-        }
-      });
-
       socket.emit("send_message", messageToSend, (response: any) => {
-        console.log("Server acknowledgement received:", response);
 
         if (response && response.success) {
-          console.log(" Message confirmed by server:", response.data);
 
           // Update the temp message with the real server data
           setMessages((prev) =>
@@ -778,7 +710,6 @@ const Messages: React.FC = () => {
             setHasSentInitialProductMessage(true);
           }
         } else {
-          console.error(" Server rejected message:", response);
 
           // Update message status to failed
           setMessages((prev) =>
@@ -804,7 +735,6 @@ const Messages: React.FC = () => {
 
       const handleMessageSent = (data: any) => {
         if (data.tempId === tempId) {
-          console.log("📨 Received message_sent event (old pattern):", data);
           socket.off("message_sent", handleMessageSent);
           socket.off("message_error", handleMessageError);
 
@@ -826,10 +756,6 @@ const Messages: React.FC = () => {
 
       const handleMessageError = (errorData: any) => {
         if (errorData.tempId === tempId) {
-          console.error(
-            " Received message_error event (old pattern):",
-            errorData
-          );
           socket.off("message_sent", handleMessageSent);
           socket.off("message_error", handleMessageError);
 
@@ -900,7 +826,6 @@ const Messages: React.FC = () => {
   const handleConversationClick = async (conversationId: string) => {
     // Prevent rapid consecutive clicks on same conversation
     if (isLoadingMessages) {
-      console.log("Currently loading messages, skipping...");
       return;
     }
 
@@ -1302,8 +1227,6 @@ const Messages: React.FC = () => {
     initialMessage?: string
   ) => {
     try {
-      console.log("Starting chat with seller:", sellerEmail);
-
       const token = localStorage.getItem("accessToken");
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/chat/conversations/email`,
@@ -1324,12 +1247,10 @@ const Messages: React.FC = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(" Create conversation error:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      console.log("Conversation created:", result.data);
       const conversation = result.data;
 
       setConversations((prev) => [conversation, ...prev]);
@@ -1339,7 +1260,6 @@ const Messages: React.FC = () => {
       await fetchConversations();
       return conversation;
     } catch (error) {
-      console.error("Error starting chat:", error);
 
       let errorMessage = "Failed to start conversation. Please try again.";
       if (error instanceof Error) {
@@ -1612,7 +1532,6 @@ const Messages: React.FC = () => {
   // Handle incoming product data from Product Detail page
   useEffect(() => {
     if (location.state && Object.keys(location.state).length > 0) {
-      console.log("📍 Location state received:", location.state);
 
       const {
         productData: stateProductData,
@@ -1622,10 +1541,7 @@ const Messages: React.FC = () => {
       } = location.state;
 
       if (stateProductData) {
-        console.log(
-          "📦 Product data received from location:",
-          stateProductData
-        );
+
         setProductData(stateProductData);
         setPreFilledMessage(statePreFilledMessage || "");
         // only set messageText if no messages have been sent yet
@@ -1641,11 +1557,6 @@ const Messages: React.FC = () => {
         targetConversationId &&
         targetConversationId !== activeConversationId
       ) {
-        console.log(
-          "💬 Loading conversation from location state:",
-          targetConversationId
-        );
-
         // force load the conversation immediately
         setActiveConversationId(targetConversationId);
         setLastLoadedConversationId(targetConversationId);
@@ -1665,23 +1576,6 @@ const Messages: React.FC = () => {
     activeConversationId,
   ]);
 
-  // Add debug logging to track conversation state
-  useEffect(() => {
-    console.log(" Current conversation state:", {
-      activeConversationId,
-      currentConversation,
-      productData: !!productData,
-      isProductInquiry,
-      locationState: location.state,
-    });
-  }, [
-    activeConversationId,
-    currentConversation,
-    productData,
-    isProductInquiry,
-    location.state,
-  ]);
-
   // Auto-scroll when new messages arrive
   useEffect(() => {
     if (messagesEndRef.current && messages.length > 0) {
@@ -1690,7 +1584,7 @@ const Messages: React.FC = () => {
         block: "end",
       });
     }
-  }, [messages.length, activeConversationId]); // Scroll when messages or conversation changes
+  }, [messages.length, activeConversationId]); 
 
   // Cleanup for audio URLs
   useEffect(() => {
@@ -1730,27 +1624,12 @@ const Messages: React.FC = () => {
       userTypedText && userTypedText !== preFilledMessage.trim();
     const textToSend =
       isProductInquiry && !isMessageSent ? preFilledMessage : userTypedText;
-
-    console.log(" Send message analysis:", {
-      userTypedText,
-      preFilledMessage,
-      textToSend,
-      isProductInquiry,
-      isMessageSent,
-      hasUserTyped,
-    });
-
     if (isSending) {
-      console.log("Already sending, skipping");
       return;
     }
 
     // create new conversation if we have product data but no conversation exists
     if (!currentConversation?.id && productData) {
-      // start new chat with the seller
-      console.log(
-        "Creating new conversation without sending inquiry message yet"
-      );
       const sellerEmail = productData.seller?.email;
       if (sellerEmail) {
         const newConversation = await startChatByEmail(sellerEmail, "");
@@ -1759,8 +1638,6 @@ const Messages: React.FC = () => {
           setCurrentConversation(newConversation);
           setActiveConversationId(newConversation.id);
           setMessageText(preFilledMessage);
-
-          console.log("Conversation created, ready for user to send inquiry");
 
           setIsSending(false);
           return;
@@ -1803,17 +1680,9 @@ const Messages: React.FC = () => {
       setPreFilledMessage("");
       setReplyToMessage(null);
 
-      console.log("handleSendMessage called with voice blob", {
-        hasVoiceBlob: !!voiceBlob,
-        voiceBlobSize: voiceBlob?.size,
-        voiceBlobType: voiceBlob?.type
-      })
-
       // Handle voice message first (if any)
       if (voiceBlob) {
         try {
-          console.log("🎤 Uploading voice message");
-
           // Convert blob to file
           const voiceFile = new File(
             [voiceBlob],
@@ -1823,26 +1692,13 @@ const Messages: React.FC = () => {
             }
           );
 
-          console.log("🎤 Voice file created:", {
-            name: voiceFile.name,
-            size: voiceFile.size,
-            type: voiceFile.type
-          });
-
           const { uploadUrl, fileUrl } = await s3Service.getPresignedUrlForChat(
             voiceFile,
             user!.id
           );
 
-          console.log(" Uploading to S3:", {
-            uploadUrl: uploadUrl.substring(0, 100) + '...',
-            fileUrl: fileUrl
-          });
-
           // Upload voice file
           await s3Service.uploadFile(voiceFile, uploadUrl);
-
-          console.log(" Voice message uploaded successfully", fileUrl);
 
           // Send voice message
           sendMessageViaSocket(currentConversation.id, {
@@ -1855,14 +1711,11 @@ const Messages: React.FC = () => {
             productData: productData || null,
           });
 
-          console.log("🎤 Audio message sent with fileUrl:", fileUrl);
-
           messageSent = true;
           if (productData) {
             setHasSentProductData(true);
           }
         } catch (error: any) {
-          console.error(" Voice message upload failed:", error);
           addToast({
             type: "error",
             title: "Voice message failed",
@@ -1955,7 +1808,6 @@ const Messages: React.FC = () => {
       // Refresh conversations to update last message
       await fetchConversations();
     } catch (error: any) {
-      console.error(" Send message error:", error);
       addToast({
         type: "error",
         title: "Send Failed",
@@ -1990,8 +1842,6 @@ const Messages: React.FC = () => {
     if (!socket) return;
 
     const handleNewMessage = (serverMessage: any) => {
-      console.log("📨 New message received via WebSocket:", serverMessage);
-
       setMessages((prev) => {
         const isOurMessage = serverMessage.senderId === currentUser?.id;
 
@@ -2182,7 +2032,6 @@ const Messages: React.FC = () => {
         if (chunks.length > 0) {
           try {
             const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-            console.log("🎤 Auto-sending voice message, size:", audioBlob.size, "bytes");
 
             // Send the voice message
             await handleSendMessage(audioBlob);
@@ -2486,7 +2335,6 @@ const Messages: React.FC = () => {
 
     // Handle audio errors
     audio.onerror = () => {
-      console.error(" Audio playback error");
       setPlayingMessageId(null);
       currentMessageIdRef.current = null;
       currentAudioRef.current = null;
@@ -2497,7 +2345,6 @@ const Messages: React.FC = () => {
     };
 
     audio.play().catch(error => {
-      console.error(" Audio play failed:", error);
       setPlayingMessageId(null);
       currentMessageIdRef.current = null;
       currentAudioRef.current = null;
@@ -2896,20 +2743,12 @@ const Messages: React.FC = () => {
                       return true;
                     })
                     .map((conversation) => {
-                      // Get the other participant (not the current user)
+                      // Get the other participant 
                       const participant = conversation.participant;
                       const displayName = participant
                         ? `${participant.firstName} ${participant.lastName}`
                         : "Unknown User";
                       const profileImage = participant?.profileImage;
-
-                      // const imageLoadedRef = useRef(false);
-
-                      console.log(" Rendering conversation:", {
-                        displayName,
-                        profileImage,
-                        hasProfileImage: !!profileImage,
-                      });
 
                       return (
                         <div

@@ -78,7 +78,6 @@ export class S3Service {
         viewUrl
       };
     } catch (error: any) {
-      console.error(' Error generating presigned URL:', error);
       throw new Error(`Error generating upload URL: ${error.message}`);
     }
   }
@@ -96,7 +95,6 @@ export class S3Service {
 
       return await Promise.all(promises);
     } catch (error: any) {
-      console.error(' Error generating batch presigned URLs:', error);
       throw new Error(`Error generating batch upload URLs: ${error.message}`);
     }
   }
@@ -112,7 +110,6 @@ export class S3Service {
       const viewUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
       return viewUrl;
     } catch (error: any) {
-      console.error(' Error generating view URL:', error);
       throw new Error(`Error generating view URL: ${error.message}`);
     }
   }
@@ -127,7 +124,6 @@ export class S3Service {
 
       await s3Client.send(command);
     } catch (error: any) {
-      console.error(' Error deleting file from S3:', error);
       throw new Error(`Error deleting file: ${error.message}`);
     }
   }

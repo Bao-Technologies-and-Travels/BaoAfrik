@@ -65,7 +65,6 @@ export class ProductController {
         data: product
       });
     } catch (error: any) {
-      console.error('Create product error:', error);
       return res.status(500).json({
         success: false,
         message: error.message

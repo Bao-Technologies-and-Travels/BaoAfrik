@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 
 interface Product {
     id: string;
@@ -18,6 +19,8 @@ interface Product {
     createdAt: string;
     publishedAt?: string;
 }
+
+const {addToast} = useToast();
 
 const ConfirmationDialog: React.FC<{
     isOpen: boolean;
@@ -242,15 +245,22 @@ const MyListings: React.FC = () => {
                 setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
 
                 // Show success message
-                // You can use a toast notification here instead of alert
-                console.log('Listing deleted successfully');
+                addToast({
+                    type: "success",
+                    title: "Action completed",
+                    message: "Listing deleted successfully",
+                    duration: 3000
+                });
             } else {
                 throw new Error('Failed to delete listing');
             }
         } catch (error) {
-            console.error('Error deleting listing:', error);
-            // Show error message
-            console.error('Failed to delete listing');
+           addToast({
+                    type: "error",
+                    title: "Action failed",
+                    message: "Failed to delete listing. Please try again",
+                    duration: 3000
+                });
         }
     };
 
@@ -271,13 +281,22 @@ const MyListings: React.FC = () => {
                 setProducts(prev => prev.map(p =>
                     p.id === productId ? { ...p, status: 'PUBLISHED' } : p
                 ));
-                console.log('Listing published successfully');
+                addToast({
+                    type: "success",
+                    title: "Action completed",
+                    message: "Listing published successfully",
+                    duration: 3000
+                });
             } else {
                 throw new Error('Failed to publish listing');
             }
         } catch (error) {
-            console.error('Error publishing listing:', error);
-            console.error('Failed to publish listing');
+            addToast({
+                    type: "error",
+                    title: "Action failed",
+                    message: "Failed to publish listing",
+                    duration: 3000
+                });
         }
     };
 
@@ -397,14 +416,14 @@ const MyListings: React.FC = () => {
                                         key={tab.key}
                                         onClick={() => setActiveTab(tab.key as any)}
                                         className={`flex items-center px-6 py-3 border-b-2 font-medium text-sm ${activeTab === tab.key
-                                                ? 'border-orange-500 text-orange-600'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                            ? 'border-orange-500 text-orange-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                             }`}
                                     >
                                         {tab.label}
                                         <span className={`ml-2 py-0.5 px-2 rounded-full text-xs ${activeTab === tab.key
-                                                ? 'bg-orange-100 text-orange-600'
-                                                : 'bg-gray-100 text-gray-600'
+                                            ? 'bg-orange-100 text-orange-600'
+                                            : 'bg-gray-100 text-gray-600'
                                             }`}>
                                             {tab.count}
                                         </span>

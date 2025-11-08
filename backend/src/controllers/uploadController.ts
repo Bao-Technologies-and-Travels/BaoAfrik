@@ -31,7 +31,6 @@ export class UploadController {
         key: presignedData.key
       });
     } catch (error: any) {
-      console.error('Profile upload URL error:', error);
       return res.status(500).json({
         success: false,
         message: error.message
@@ -67,7 +66,6 @@ export class UploadController {
         key: presignedData.key
       });
     } catch (error: any) {
-      console.error('Chat upload URL error:', error);
       return res.status(500).json({
         success: false,
         message: error.message
@@ -107,7 +105,6 @@ export class UploadController {
         data: presignedData
       });
     } catch (error: any) {
-      console.error('Product upload URL error:', error);
       return res.status(500).json({
         success: false,
         message: error.message
@@ -134,7 +131,6 @@ export class UploadController {
         viewUrl
       });
     } catch (error: any) {
-      console.error('View URL error:', error);
       return res.status(500).json({
         success: false,
         message: error.message
@@ -162,7 +158,6 @@ export class UploadController {
         message: 'File deleted successfully'
       });
     } catch (error: any) {
-      console.error('Delete file error:', error);
       return res.status(500).json({
         success: false,
         message: error.message
@@ -212,7 +207,6 @@ export class UploadController {
         data: responseData
       });
     } catch (error: any) {
-      console.error('Batch upload URL error:', error);
       return res.status(500).json({
         success: false,
         message: error.message

@@ -220,7 +220,6 @@ const ProductDetail: React.FC = () => {
           });
         }
       } catch (error) {
-        console.error("Error sharing:", error);
       }
     }
     setSharedProducts(newSet);
@@ -309,18 +308,10 @@ const ProductDetail: React.FC = () => {
   }, []);
 
   const handleContactSeller = async () => {
-    try {
-      console.log(" Available data:", {
-        product: product,
-        realProduct: realProduct,
-        images: images,
-      });
-      
+    try {      
       setIsContactingSeller(true);
 
       const sellerEmail = product.seller.email;
-
-      console.log("🚀 Starting conversation with seller:", sellerEmail);
 
       const token = localStorage.getItem("accessToken");
 
@@ -340,8 +331,6 @@ const ProductDetail: React.FC = () => {
           location: product.seller.location,
         },
       };
-
-      console.log("📦 Sending product data:", productDataToSend);
 
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/chat/conversations/email`,
@@ -365,7 +354,6 @@ const ProductDetail: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log("📨 Contact seller response:", result);
 
       if (result.success) {
         const productData = {
@@ -389,8 +377,6 @@ const ProductDetail: React.FC = () => {
           },
         };
 
-        console.log("📦 Navigating with conversation and product data");
-
         // Navigate to messages
         navigate("/messages", {
           state: {
@@ -404,7 +390,6 @@ const ProductDetail: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error("Error contacting seller:", error);
 
       // Don't show error toast for auth failures
       if (

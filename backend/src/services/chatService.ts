@@ -272,7 +272,6 @@ export class ChatService {
             const otherParticipant = otherParticipants[0]?.user;
 
             if (!otherParticipant) {
-                console.error('Other participant user data is undefined! Conversation:', conv.id);
                 return null;
             }
 
@@ -297,8 +296,6 @@ export class ChatService {
 
             return result;
         }).filter((conv): conv is NonNullable<typeof conv> => conv !== null);
-
-        console.log(' Final filtered conversations count:', processedConversations.length);
 
         return processedConversations;
     }
@@ -374,7 +371,6 @@ export class ChatService {
                     parsedProductData = JSON.parse(message.productData);
                 }
             } catch (error) {
-                console.error('Error parsing productData for message:', message.id, error);
                 parsedProductData = null;
             }
 
@@ -555,14 +551,6 @@ export class ChatService {
 
             const now = new Date();
 
-            console.log('📨 Backend received message data:', {
-                content: data.content,
-                messageType: data.messageType,
-                fileUrl: data.fileUrl,
-                fileName: data.fileName,
-                fileSize: data.fileSize
-            });
-
             // Create message
             const message = await tx.message.create({
                 data: {
@@ -590,13 +578,6 @@ export class ChatService {
                         }
                     },
                 }
-            });
-
-            console.log('💾 Database message after creation:', {
-                id: message.id,
-                fileUrl: message.fileUrl,
-                fileName: message.fileName,
-                fileSize: message.fileSize
             });
 
             // Update conversation with last message
@@ -631,13 +612,6 @@ export class ChatService {
                 audioUrl: message.audioUrl,
                 formattedTime: this.formatTo12HourTime(message.createdAt)
             };
-
-            console.log(' Response message with file data:', {
-                id: messageWithProductData.id,
-                fileUrl: messageWithProductData.fileUrl,
-                fileName: messageWithProductData.fileName,
-                fileSize: messageWithProductData.fileSize
-            });
 
             return messageWithProductData;
         });
