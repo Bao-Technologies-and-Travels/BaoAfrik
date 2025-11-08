@@ -20,8 +20,6 @@ interface Product {
     publishedAt?: string;
 }
 
-const {addToast} = useToast();
-
 const ConfirmationDialog: React.FC<{
     isOpen: boolean;
     title: string;
@@ -162,6 +160,7 @@ const MyListings: React.FC = () => {
         onConfirm: () => { },
         confirmText: 'Delete'
     });
+    const {addToast} = useToast();
 
     useEffect(() => {
         fetchMyListings();
