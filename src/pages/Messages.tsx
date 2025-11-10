@@ -203,6 +203,17 @@ const Messages: React.FC = () => {
     }
   }, [messages, showAllMessages]);
 
+  // Auto-scroll for mobile conversation view when it opens
+  useEffect(() => {
+    if (showMobileConversation && messagesEndRef.current) {
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+      }, 300);
+    }
+  }, [showMobileConversation]);
+
   // File attachment handlers
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -1245,8 +1256,8 @@ const Messages: React.FC = () => {
                 </div>
               </>
             ) : (
-              // Condensed Header Bar - Single Row
-              <div style={{ borderBottom: '1px solid #F1F1F1' }}>
+              // Condensed Header Bar - Single Row - Sticky
+              <div className="sticky top-0 z-30 bg-white" style={{ borderBottom: '1px solid #F1F1F1' }}>
                 <div className="flex items-center justify-between px-4 py-3">
                   {/* Left: Back Arrow */}
                   <button onClick={() => setShowMobileConversation(false)} className="p-1">
@@ -2658,8 +2669,8 @@ const Messages: React.FC = () => {
                 </div>
               </div>
               ) : (
-                // Condensed Header Bar
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 transition-all duration-500 ease-in-out">
+                // Condensed Header Bar - Sticky
+                <div className="sticky top-0 z-30 bg-white flex items-center justify-between px-6 py-4 border-b border-gray-200 transition-all duration-500 ease-in-out rounded-t-2xl">
                   <div className="flex items-center space-x-3">
                     {/* Profile Picture */}
                     <img 
