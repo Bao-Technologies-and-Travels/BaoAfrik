@@ -118,6 +118,7 @@ const Messages: React.FC = () => {
   const [mobileMessageOptionsId, setMobileMessageOptionsId] = useState<number | null>(null);
   const [showMobileReactionPicker, setShowMobileReactionPicker] = useState(false);
   const [mobileMessageCoords, setMobileMessageCoords] = useState<{ top: number; left: number } | null>(null);
+  const [pinnedMessage, setPinnedMessage] = useState<any>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const chatListRef = React.useRef<HTMLDivElement>(null);
@@ -279,15 +280,14 @@ const Messages: React.FC = () => {
       if (isOpening) {
         setMobileMessageOptionsId(messageId);
         
-        // Calculate position relative to clicked message
-        if (event && messagesContainerRef.current) {
+        // Calculate position relative to clicked message (fixed positioning)
+        if (event) {
           const messageElement = (event.currentTarget as HTMLElement).closest('.mobile-message-wrapper') as HTMLElement;
           if (messageElement) {
             const messageRect = messageElement.getBoundingClientRect();
-            const containerRect = messagesContainerRef.current.getBoundingClientRect();
-            const scrollTop = messagesContainerRef.current.scrollTop;
             
-            const top = messageRect.top - containerRect.top + scrollTop;
+            // Position relative to viewport (using fixed positioning)
+            const top = messageRect.top;
             const left = 16;
             
             setMobileMessageCoords({ top, left });
@@ -471,11 +471,94 @@ const Messages: React.FC = () => {
       }
     }
     
+    if (action === 'important' && messageId) {
+      // Toggle important status for the message
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
+          msg.id === messageId
+            ? { ...msg, isImportant: !msg.isImportant }
+            : msg
+        )
+      );
+    }
+    
+    if (action === 'pin' && messageId) {
+      // Find the message
+      const message = messages.find(m => m.id === messageId);
+      if (message) {
+        if (message.isPinned) {
+          // Unpin the message
+          setMessages(prevMessages =>
+            prevMessages.map(msg =>
+              msg.id === messageId
+                ? { ...msg, isPinned: false }
+                : msg
+            )
+          );
+          // Clear pinned message preview if this was the pinned message
+          if (pinnedMessage && pinnedMessage.id === messageId) {
+            setPinnedMessage(null);
+          }
+        } else {
+          // Pin the message
+          setPinnedMessage(message);
+          // Also mark message as pinned
+          setMessages(prevMessages =>
+            prevMessages.map(msg =>
+              msg.id === messageId
+                ? { ...msg, isPinned: true }
+                : msg
+            )
+          );
+        }
+      }
+    }
+    
     // Close the options menu (both desktop and mobile)
     setActiveMessageOptionsId(null);
     setMobileMessageOptionsId(null);
     setShowMobileReactionPicker(false);
     setMobileMessageCoords(null);
+  };
+
+  // Handle important badge removal
+  const handleRemoveImportant = (messageId: number) => {
+    setMessages(prevMessages =>
+      prevMessages.map(msg =>
+        msg.id === messageId
+          ? { ...msg, isImportant: false }
+          : msg
+      )
+    );
+  };
+
+  // Handle pin badge removal
+  const handleRemovePin = (messageId: number) => {
+    setMessages(prevMessages =>
+      prevMessages.map(msg =>
+        msg.id === messageId
+          ? { ...msg, isPinned: false }
+          : msg
+      )
+    );
+    // Clear pinned message preview if this was the pinned message
+    if (pinnedMessage && pinnedMessage.id === messageId) {
+      setPinnedMessage(null);
+    }
+  };
+
+  // Handle unpinning from preview
+  const handleUnpinMessage = () => {
+    if (pinnedMessage) {
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
+          msg.id === pinnedMessage.id
+            ? { ...msg, isPinned: false }
+            : msg
+        )
+      );
+      setPinnedMessage(null);
+    }
   };
 
   // Close message options popup on click outside or Escape key
@@ -1303,6 +1386,26 @@ const Messages: React.FC = () => {
               </div>
             )}
 
+            {/* Pinned Message Preview - Shows when message is pinned and condensed header is shown */}
+            {pinnedMessage && showCondensedHeader && (
+              <div className="sticky top-14 z-20 px-4 py-2" style={{ backgroundColor: '#F1F1F1' }}>
+                <div className="flex items-center space-x-2">
+                  <img 
+                    src={pinBadgeIcon} 
+                    alt="Pin" 
+                    className="w-5 h-5 flex-shrink-0 cursor-pointer hover:opacity-70 transition-opacity" 
+                    style={{ filter: 'brightness(0) saturate(100%) invert(71%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(92%) contrast(86%)' }}
+                    onClick={handleUnpinMessage}
+                  />
+                  <div className="flex-1 min-w-0 px-2 py-1.5" style={{ backgroundColor: '#FFFFFF', borderRadius: '6px' }}>
+                    <p className="text-xs truncate" style={{ color: '#6A6A6A' }}>
+                      {pinnedMessage.text}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Date Separator */}
             {visibleMessages.length > 0 && !showCondensedHeader && (
               <div className="flex items-center justify-center my-3 px-6">
@@ -1316,7 +1419,7 @@ const Messages: React.FC = () => {
             {visibleMessages.length > 0 && (
               <div 
                 ref={messagesContainerRef}
-                className="px-4 py-2 overflow-y-auto scroll-smooth flex-1"
+                className="px-4 py-2 overflow-y-auto scroll-smooth flex-1 relative"
                 style={{ scrollBehavior: 'smooth' }}
               >
                 {/* View Older Messages Button */}
@@ -1429,6 +1532,88 @@ const Messages: React.FC = () => {
                               )}
                             </div>
                           )}
+                          
+                          {/* Reaction Display - inline after timestamp */}
+                          {message.reaction && (
+                            <div 
+                              className="ml-3 cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => handleRemoveReaction(message.id)}
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                border: '1px solid #F1F1F1',
+                                borderRadius: '20px',
+                                padding: '2px 10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                minWidth: '50px',
+                                height: '22px',
+                                marginTop: '-2px',
+                                gap: '6px'
+                              }}
+                            >
+                              <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                              <span style={{ fontSize: '12px', lineHeight: 1 }}>
+                                {message.reaction}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* Important Badge - inline after timestamp/reaction */}
+                          {message.isImportant && (
+                            <div 
+                              className="ml-3 cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => handleRemoveImportant(message.id)}
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                border: '1px solid #F1F1F1',
+                                borderRadius: '20px',
+                                padding: '2px 10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                minWidth: '50px',
+                                height: '22px',
+                                marginTop: '-2px',
+                                gap: '6px'
+                              }}
+                            >
+                              <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                              <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                              </svg>
+                            </div>
+                          )}
+                          
+                          {/* Pin Badge - inline after timestamp/reaction/important */}
+                          {message.isPinned && (
+                            <div 
+                              className="ml-3 cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => handleRemovePin(message.id)}
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                border: '1px solid #F1F1F1',
+                                borderRadius: '20px',
+                                padding: '2px 10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                minWidth: '50px',
+                                height: '22px',
+                                marginTop: '-2px',
+                                gap: '6px'
+                              }}
+                            >
+                              <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                              <img src={pinBadgeIcon} alt="Pin" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' }} />
+                            </div>
+                          )}
         </div>
       </div>
     </div>
@@ -1488,15 +1673,13 @@ const Messages: React.FC = () => {
                 )}
                 
                 <div ref={messagesEndRef}></div>
-              </div>
-            )}
 
-            {/* Mobile Message Options and Reactions - Positioned above clicked message */}
-            {mobileMessageOptionsId !== null && (
+                {/* Mobile Message Options and Reactions - Positioned above clicked message */}
+                {mobileMessageOptionsId !== null && (
               <>
-                {/* Semi-transparent overlay */}
+                {/* Semi-transparent overlay - covers entire page */}
                 <div
-                  className="absolute inset-0 bg-black bg-opacity-20 z-50"
+                  className="fixed inset-0 bg-black bg-opacity-20 z-50"
                   onClick={() => {
                     setMobileMessageOptionsId(null);
                     setShowMobileReactionPicker(false);
@@ -1506,7 +1689,7 @@ const Messages: React.FC = () => {
 
                 {/* Actions Menu - Positioned above message */}
                 <div
-                  className="absolute bg-white rounded-xl shadow-xl border border-gray-200 z-50"
+                  className="fixed bg-white rounded-xl shadow-xl border border-gray-200 z-50"
                   style={mobileMessageCoords
                     ? { 
                         minWidth: '180px',
@@ -1581,7 +1764,9 @@ const Messages: React.FC = () => {
                       className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                     >
                       <img src={pinMenuIcon} alt="Pin" className="w-3.5 h-3.5 mr-2" />
-                      <span className="text-xs" style={{ color: '#6B7280' }}>Pin the message</span>
+                      <span className="text-xs" style={{ color: '#6B7280' }}>
+                        {messages.find(m => m.id === mobileMessageOptionsId)?.isPinned ? 'Unpin the message' : 'Pin the message'}
+                      </span>
                     </button>
 
                     <button
@@ -1596,7 +1781,7 @@ const Messages: React.FC = () => {
 
                 {/* Reactions Bar - Positioned below Actions menu */}
                 <div
-                  className="absolute bg-white rounded-full shadow-xl border border-gray-200 z-50"
+                  className="fixed bg-white rounded-full shadow-xl border border-gray-200 z-50"
                   style={mobileMessageCoords
                     ? { 
                         left: '50%',
@@ -1657,6 +1842,8 @@ const Messages: React.FC = () => {
                   )}
                 </div>
               </>
+            )}
+              </div>
             )}
           </div>
 
@@ -2709,6 +2896,26 @@ const Messages: React.FC = () => {
                 </div>
               )}
 
+              {/* Pinned Message Preview - Shows when message is pinned and condensed header is shown */}
+              {pinnedMessage && showCondensedHeader && (
+                <div className="sticky top-20 z-20 px-6 py-3" style={{ backgroundColor: '#F1F1F1' }}>
+                  <div className="flex items-center space-x-3">
+                    <img 
+                      src={pinBadgeIcon} 
+                      alt="Pin" 
+                      className="w-6 h-6 flex-shrink-0 cursor-pointer hover:opacity-70 transition-opacity" 
+                      style={{ filter: 'brightness(0) saturate(100%) invert(71%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(92%) contrast(86%)' }}
+                      onClick={handleUnpinMessage}
+                    />
+                    <div className="px-3 py-2" style={{ backgroundColor: '#FFFFFF', borderRadius: '6px', maxWidth: '70%' }}>
+                      <p className="text-sm truncate" style={{ color: '#6A6A6A' }}>
+                        {pinnedMessage.text}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Chat Messages Area */}
               {visibleMessages.length > 0 && (
                 <div 
@@ -2978,21 +3185,79 @@ const Messages: React.FC = () => {
                               className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
                               onClick={() => handleRemoveReaction(message.id)}
                               style={{
-                                backgroundColor: '#F0F8FE',
-                                border: '1px solid #CFE8FC',
-                                borderRadius: '12px',
-                                padding: '4px 10px',
+                                backgroundColor: '#FFFFFF',
+                                border: '1px solid #F1F1F1',
+                                borderRadius: '20px',
+                                padding: '2px 12px',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center',
-                                minWidth: '40px',
-                                height: '24px',
-                                marginTop: '-2px'
+                                justifyContent: 'space-between',
+                                minWidth: '60px',
+                                height: '22px',
+                                marginTop: '-2px',
+                                gap: '8px'
                               }}
                             >
+                              <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
                               <span style={{ fontSize: '14px', lineHeight: 1 }}>
                                 {message.reaction}
                               </span>
+                            </div>
+                          )}
+                          
+                          {/* Important Badge - inline after timestamp/reaction */}
+                          {message.isImportant && (
+                            <div 
+                              className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => handleRemoveImportant(message.id)}
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                border: '1px solid #F1F1F1',
+                                borderRadius: '20px',
+                                padding: '2px 12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                minWidth: '60px',
+                                height: '22px',
+                                marginTop: '-2px',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                              <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                              </svg>
+                            </div>
+                          )}
+                          
+                          {/* Pin Badge - inline after timestamp/reaction/important */}
+                          {message.isPinned && (
+                            <div 
+                              className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => handleRemovePin(message.id)}
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                border: '1px solid #F1F1F1',
+                                borderRadius: '20px',
+                                padding: '2px 12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                minWidth: '60px',
+                                height: '22px',
+                                marginTop: '-2px',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                              <img src={pinBadgeIcon} alt="Pin" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' }} />
                             </div>
                           )}
                         </div>
@@ -3133,7 +3398,7 @@ const Messages: React.FC = () => {
                                   </button>
                                   
                                   <button 
-                                    onClick={() => handleMessageOptionSelect('important')}
+                                    onClick={() => handleMessageOptionSelect('important', activeMessageOptionsId || undefined)}
                                     className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                   >
                                     <img src={starIcon} alt="Star" className="w-4 h-4 mr-2" />
@@ -3141,7 +3406,7 @@ const Messages: React.FC = () => {
                                   </button>
                                   
                                   <button 
-                                    onClick={() => handleMessageOptionSelect('copy')}
+                                    onClick={() => handleMessageOptionSelect('copy', activeMessageOptionsId || undefined)}
                                     className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                   >
                                     <img src={copyIcon} alt="Copy" className="w-4 h-4 mr-2" />
@@ -3149,7 +3414,7 @@ const Messages: React.FC = () => {
                                   </button>
                                   
                                   <button 
-                                    onClick={() => handleMessageOptionSelect('select')}
+                                    onClick={() => handleMessageOptionSelect('select', activeMessageOptionsId || undefined)}
                                     className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                   >
                                     <img src={tickIcon} alt="Select" className="w-4 h-4 mr-2" />
@@ -3157,15 +3422,17 @@ const Messages: React.FC = () => {
                                   </button>
                                   
                                   <button 
-                                    onClick={() => handleMessageOptionSelect('pin')}
+                                    onClick={() => handleMessageOptionSelect('pin', activeMessageOptionsId || undefined)}
                                     className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                   >
                                     <img src={pinMenuIcon} alt="Pin" className="w-4 h-4 mr-2" />
-                                    <span className="text-xs" style={{ color: '#6B7280' }}>Pin the message</span>
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>
+                                      {messages.find(m => m.id === activeMessageOptionsId)?.isPinned ? 'Unpin the message' : 'Pin the message'}
+                                    </span>
                                   </button>
                                   
                                   <button 
-                                    onClick={() => handleMessageOptionSelect('delete')}
+                                    onClick={() => handleMessageOptionSelect('delete', activeMessageOptionsId || undefined)}
                                     className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                   >
                                     <img src={trashIcon} alt="Delete" className="w-4 h-4 mr-2" />
