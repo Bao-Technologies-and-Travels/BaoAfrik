@@ -870,8 +870,8 @@ const Messages: React.FC = () => {
     setRecordingTime(0);
     setSoundDetected(false);
     
-    // Initialize waveform with 20 bars
-    setAudioLevels(Array(20).fill(0.1));
+    // Start with empty waveform - bars will be added progressively
+    setAudioLevels([]);
     
     // Start recording timer
     const timer = setInterval(() => {
@@ -908,7 +908,7 @@ const Messages: React.FC = () => {
       const source = audioCtx.createMediaStreamSource(stream);
       
       analyserNode.fftSize = 256;
-      analyserNode.smoothingTimeConstant = 0.8;
+      analyserNode.smoothingTimeConstant = 0.3; // Lower for more responsive waveforms
       source.connect(analyserNode);
       
       setAudioContext(audioCtx);
@@ -918,36 +918,34 @@ const Messages: React.FC = () => {
       const bufferLength = analyserNode.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       
-      // Start waveform animation timer using real audio data
+      // Progressive waveform building - Instagram style
       const waveformTimer = setInterval(() => {
-        analyserNode.getByteFrequencyData(dataArray);
+        analyserNode.getByteTimeDomainData(dataArray);
         
-        // Calculate average volume and create waveform
-        const newLevels = Array(20).fill(0).map((_, index) => {
-          // Sample different frequency ranges for each bar
-          const startIndex = Math.floor((index / 20) * bufferLength);
-          const endIndex = Math.floor(((index + 1) / 20) * bufferLength);
-          
-          // Get average amplitude for this frequency range
-          let sum = 0;
-          for (let i = startIndex; i < endIndex; i++) {
-            sum += dataArray[i];
-          }
-          const average = sum / (endIndex - startIndex);
-          
-          // Normalize to 0.1-1.0 range (0-255 -> 0.1-1.0)
-          const normalized = Math.max(0.1, Math.min(1.0, (average / 255) * 1.2 + 0.1));
-          
-          return normalized;
+        // Calculate current audio level (amplitude)
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const value = dataArray[i] - 128; // Convert to signed
+          sum += Math.abs(value);
+        }
+        const averageLevel = sum / bufferLength;
+        
+        // Normalize to get bar height (0.2-1.0 range)
+        // Short bars when quiet, tall bars when loud
+        const barHeight = Math.max(0.15, Math.min(1.0, (averageLevel / 128) * 3));
+        
+        // Detect if voice/sound is present (threshold ~0.3)
+        const hasVoice = barHeight > 0.3;
+        setSoundDetected(hasVoice);
+        
+        // Add new bar to the waveform array (Instagram style - left to right)
+        setAudioLevels(prev => {
+          const newLevels = [...prev, barHeight];
+          // Limit to 50 bars max (will scroll effect naturally)
+          return newLevels.slice(-50);
         });
         
-        setAudioLevels(newLevels);
-        
-        // Update sound detection based on overall volume
-        const averageVolume = newLevels.reduce((a, b) => a + b, 0) / newLevels.length;
-        setSoundDetected(averageVolume > 0.3);
-        
-      }, 50); // Update every 50ms for smooth animation
+      }, 100); // Add new bar every 100ms
       
       setWaveformTimer(waveformTimer);
       
@@ -1698,28 +1696,56 @@ const Messages: React.FC = () => {
                                       {message.text}
                                     </p>
                                     
-                                    {/* White/Blue line and quoted message */}
-                                    <div className="flex items-stretch">
-                                      {/* Vertical line */}
-                                      <div 
-                                        className="rounded-full mr-1.5"
-                                        style={{ 
-                                          width: '2px',
-                                          backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
-                                          flexShrink: 0
-                                        }}
-                                      ></div>
-                                      
-                                      {/* Quoted message info */}
-                                      <div className="flex-1">
-                                        <p style={{ fontSize: '10px', fontWeight: 500, marginBottom: '2px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
+                                    {message.replyTo.type === 'voice' ? (
+                                      /* Voice Note Reply */
+                                      <div className="flex items-center space-x-1.5">
+                                        <span style={{ fontSize: '10px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)', fontWeight: 500 }}>
                                           {message.replyTo.sender}
-                                        </p>
-                                        <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
-                                          {message.replyTo.text}
-                                        </p>
+                                        </span>
+                                        <span style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                          {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
+                                        </span>
+                                        <div className="flex items-center space-x-0.5">
+                                          {[2,3,2,4,6,7,8,7,6,4].map((h, i) => (
+                                            <div
+                                              key={i}
+                                              style={{ 
+                                                width: '2px',
+                                                height: `${h}px`,
+                                                backgroundColor: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)',
+                                                borderRadius: '1px'
+                                              }}
+                                            />
+                                          ))}
+                                        </div>
+                                        <svg style={{ width: '12px', height: '12px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }} fill="currentColor" viewBox="0 0 24 24">
+                                          <path d="M8 5v14l11-7z" />
+                                        </svg>
                                       </div>
-                                    </div>
+                                    ) : (
+                                      /* Text Reply */
+                                      <div className="flex items-stretch">
+                                        {/* Vertical line */}
+                                        <div 
+                                          className="rounded-full mr-1.5"
+                                          style={{ 
+                                            width: '2px',
+                                            backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                            flexShrink: 0
+                                          }}
+                                        ></div>
+                                        
+                                        {/* Quoted message info */}
+                                        <div className="flex-1">
+                                          <p style={{ fontSize: '10px', fontWeight: 500, marginBottom: '2px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
+                                            {message.replyTo.sender}
+                                          </p>
+                                          <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                            {message.replyTo.text}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                                 
@@ -2194,40 +2220,82 @@ const Messages: React.FC = () => {
             {/* Reply Preview - Mobile */}
             {replyToMessage && (
               <div className="mb-2 relative">
-                <div 
-                  className="rounded-lg p-2 pl-4 pr-8 relative flex"
-                  style={{ 
-                    backgroundColor: '#FAFAFA'
-                  }}
-                >
-                  {/* Blue line inside */}
+                {replyToMessage.type === 'voice' ? (
+                  /* Voice Note Reply Preview */
                   <div 
-                    className="rounded-full mr-3"
+                    className="rounded-lg p-2 pr-8 relative flex items-center space-x-2"
                     style={{ 
-                      width: '2px',
-                      backgroundColor: '#64B5F6',
-                      flexShrink: 0
+                      backgroundColor: '#64B5F6'
                     }}
-                  ></div>
-                  
-                  {/* Content */}
-                  <div className="flex-1">
-                    <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                      {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
-                    </div>
-                    <div className="text-xs" style={{ color: '#6A6A6A' }}>
-                      {replyToMessage.text}
-                    </div>
-                  </div>
-                  
-                  {/* Close button */}
-                  <button
-                    onClick={() => setReplyToMessage(null)}
-                    className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
                   >
-                    <img src={replyCloseIcon} alt="Close" className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                    {/* Play icon */}
+                    <svg className="w-4 h-4 text-white fill-current flex-shrink-0" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                    </svg>
+                    
+                    {/* Duration text */}
+                    <span className="text-white text-xs whitespace-nowrap">
+                      {Math.floor((replyToMessage.duration || 0) / 60).toString().padStart(2, '0')} : {((replyToMessage.duration || 0) % 60).toString().padStart(2, '0')} - Audio
+                    </span>
+                    
+                    {/* Waveform */}
+                    <div className="flex items-center justify-center space-x-0.5 flex-1">
+                      {[3,5,3,6,9,11,13,11,9,6,5,3].map((h, i) => (
+                        <div
+                          key={i}
+                          className="w-0.5 bg-white rounded-full"
+                          style={{ height: `${h}px` }}
+                        />
+                      ))}
+                    </div>
+                    
+                    {/* Close button */}
+                    <button
+                      onClick={() => setReplyToMessage(null)}
+                      className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
+                    >
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  /* Text Reply Preview */
+                  <div 
+                    className="rounded-lg p-2 pl-4 pr-8 relative flex"
+                    style={{ 
+                      backgroundColor: '#FAFAFA'
+                    }}
+                  >
+                    {/* Blue line inside */}
+                    <div 
+                      className="rounded-full mr-3"
+                      style={{ 
+                        width: '2px',
+                        backgroundColor: '#64B5F6',
+                        flexShrink: 0
+                      }}
+                    ></div>
+                    
+                    {/* Content */}
+                    <div className="flex-1">
+                      <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
+                        {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
+                      </div>
+                      <div className="text-xs" style={{ color: '#6A6A6A' }}>
+                        {replyToMessage.text}
+                      </div>
+                    </div>
+                    
+                    {/* Close button */}
+                    <button
+                      onClick={() => setReplyToMessage(null)}
+                      className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
+                    >
+                      <img src={replyCloseIcon} alt="Close" className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             
@@ -3941,28 +4009,56 @@ const Messages: React.FC = () => {
                                     {message.text}
                                   </p>
                                   
-                                  {/* White line and quoted message */}
-                                  <div className="flex items-stretch">
-                                    {/* Vertical white line */}
-                                    <div 
-                                      className="rounded-full mr-2"
-                                      style={{ 
-                                        width: '2px',
-                                        backgroundColor: '#FFFFFF',
-                                        flexShrink: 0
-                                      }}
-                                    ></div>
-                                    
-                                    {/* Quoted message info */}
-                                    <div className="flex-1">
-                                      <p className="text-xs font-medium mb-0.5" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                                  {message.replyTo.type === 'voice' ? (
+                                    /* Voice Note Reply */
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-xs font-medium" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
                                         {message.replyTo.sender}
-                                      </p>
-                                      <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                                        {message.replyTo.text}
-                                      </p>
+                                      </span>
+                                      <span className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                        {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
+                                      </span>
+                                      <div className="flex items-center space-x-0.5">
+                                        {[3,4,3,5,8,10,12,10,8,5,4,3].map((h, i) => (
+                                          <div
+                                            key={i}
+                                            style={{ 
+                                              width: '2px',
+                                              height: `${h}px`,
+                                              backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                                              borderRadius: '1px'
+                                            }}
+                                          />
+                                        ))}
+                                      </div>
+                                      <svg className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.6)' }} fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                      </svg>
                                     </div>
-                                  </div>
+                                  ) : (
+                                    /* Text Reply */
+                                    <div className="flex items-stretch">
+                                      {/* Vertical white line */}
+                                      <div 
+                                        className="rounded-full mr-2"
+                                        style={{ 
+                                          width: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          flexShrink: 0
+                                        }}
+                                      ></div>
+                                      
+                                      {/* Quoted message info */}
+                                      <div className="flex-1">
+                                        <p className="text-xs font-medium mb-0.5" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                                          {message.replyTo.sender}
+                                        </p>
+                                        <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                          {message.replyTo.text}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               
@@ -4483,43 +4579,85 @@ const Messages: React.FC = () => {
                     <div className="w-full bg-gray-200 rounded-full" style={{ height: '0.5px' }}></div>
                   </div>
                   
-                  {/* Reply Preview */}
+                  {/* Reply Preview - Desktop */}
                   {replyToMessage && (
                     <div className="mb-2 relative">
-                      <div 
-                        className="rounded-lg p-2 pl-4 pr-8 relative flex"
-                        style={{ 
-                          backgroundColor: '#FAFAFA'
-                        }}
-                      >
-                        {/* Blue line inside */}
+                      {replyToMessage.type === 'voice' ? (
+                        /* Voice Note Reply Preview */
                         <div 
-                          className="rounded-full mr-3"
+                          className="rounded-lg p-3 pr-10 relative flex items-center space-x-3"
                           style={{ 
-                            width: '2px',
-                            backgroundColor: '#64B5F6',
-                            flexShrink: 0
+                            backgroundColor: '#64B5F6'
                           }}
-                        ></div>
-                        
-                        {/* Content */}
-                        <div className="flex-1">
-                          <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                            {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
-                          </div>
-                          <div className="text-xs" style={{ color: '#6A6A6A' }}>
-                            {replyToMessage.text}
-                          </div>
-                        </div>
-                        
-                        {/* Close button */}
-                        <button
-                          onClick={() => setReplyToMessage(null)}
-                          className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
                         >
-                          <img src={replyCloseIcon} alt="Close" className="w-4 h-4" />
-                        </button>
-                      </div>
+                          {/* Play icon */}
+                          <svg className="w-5 h-5 text-white fill-current flex-shrink-0" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                          </svg>
+                          
+                          {/* Duration text */}
+                          <span className="text-white text-sm whitespace-nowrap">
+                            {Math.floor((replyToMessage.duration || 0) / 60).toString().padStart(2, '0')} : {((replyToMessage.duration || 0) % 60).toString().padStart(2, '0')} - Audio
+                          </span>
+                          
+                          {/* Waveform */}
+                          <div className="flex items-center justify-center space-x-0.5 flex-1">
+                            {[4,6,4,8,12,14,16,14,12,8,6,4,8,10,12,10,8,6,4,6].map((h, i) => (
+                              <div
+                                key={i}
+                                className="w-0.5 bg-white rounded-full"
+                                style={{ height: `${h}px` }}
+                              />
+                            ))}
+                          </div>
+                          
+                          {/* Close button */}
+                          <button
+                            onClick={() => setReplyToMessage(null)}
+                            className="absolute top-2 right-2 hover:opacity-70 transition-opacity"
+                          >
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ) : (
+                        /* Text Reply Preview */
+                        <div 
+                          className="rounded-lg p-2 pl-4 pr-8 relative flex"
+                          style={{ 
+                            backgroundColor: '#FAFAFA'
+                          }}
+                        >
+                          {/* Blue line inside */}
+                          <div 
+                            className="rounded-full mr-3"
+                            style={{ 
+                              width: '2px',
+                              backgroundColor: '#64B5F6',
+                              flexShrink: 0
+                            }}
+                          ></div>
+                          
+                          {/* Content */}
+                          <div className="flex-1">
+                            <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
+                              {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
+                            </div>
+                            <div className="text-xs" style={{ color: '#6A6A6A' }}>
+                              {replyToMessage.text}
+                            </div>
+                          </div>
+                          
+                          {/* Close button */}
+                          <button
+                            onClick={() => setReplyToMessage(null)}
+                            className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
+                          >
+                            <img src={replyCloseIcon} alt="Close" className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                   
