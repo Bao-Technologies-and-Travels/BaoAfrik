@@ -1025,6 +1025,7 @@ const Messages: React.FC = () => {
         type: 'voice',
         duration: recordingTime,
         timestamp: timeString,
+        timeString: timeString,
         dateString: `Today, ${timeString}`,
         sentAt: currentTime,
         audioUrl: audioUrl,
@@ -1057,18 +1058,55 @@ const Messages: React.FC = () => {
           ...prev,
           [newMessage.id]: 'read'
         }));
-      }, 5000);
+        
+        // Show typing indicator after voice message is read
+        setIsSellerTyping(true);
+        setHasIncomingReply(false);
+        
+        setTimeout(() => {
+          setIsSellerTyping(false);
+          setHasIncomingReply(true);
+          setIsReplyRead(false);
+          
+          // Add incoming reply message
+          const replyTime = new Date();
+          const replyTimeString = replyTime.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false 
+          });
+          
+          setMessages(prev => [...prev, {
+            id: Date.now(),
+            text: "Thank you for your message!",
+            timestamp: replyTimeString,
+            timeString: replyTimeString,
+            dateString: `Today, ${replyTimeString}`,
+            isIncoming: true,
+            sentAt: replyTime
+          }]);
+          
+          // Auto-transition to read state after 3 seconds since chat is open
+          setTimeout(() => {
+            setIsReplyRead(true);
+          }, 3000);
+         }, 2000); // 2 seconds of typing indicator
+      }, 5000); // 5 seconds for read
 
       // Update chat entry with latest message
       const chatId = chatEntry?.id || Date.now();
+      const voiceDuration = `${Math.floor(recordingTime / 60).toString().padStart(2, '0')} : ${(recordingTime % 60).toString().padStart(2, '0')} - Audio`;
       setChatEntry({
         id: chatId,
         name: 'Joaquin EDIMO',
         avatar: eboAvatar,
-        lastMessage: '🎤 You: Audio message',
+        lastMessage: voiceDuration,
         timestamp: `Today, ${timeString}`,
         isRead: false,
         isActive: true,
+        sentByUser: true,
+        hasVoiceNote: true,
+        voiceDuration: recordingTime,
         messageId: newMessage.id
       });
       setActiveChatId(chatId); // Set as active chat
@@ -1580,8 +1618,8 @@ const Messages: React.FC = () => {
                             {/* Voice Message Display */}
                             {message.type === 'voice' ? (
                               <div className="flex items-center space-x-2">
-                                <div className="relative">
-                                  <img src={avatarIcon} alt="Avatar" className="w-8 h-8 rounded-full" />
+                                <div className="relative flex-shrink-0">
+                                  <img src={avatarIcon} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
                                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-white rounded-full flex items-center justify-center" style={{ transform: 'translate(15%, 15%)' }}>
                                     <svg className="w-2 h-2" viewBox="0 0 12 12" fill="none">
                                       <rect x="1" y="4" width="2" height="4" fill="#64B5F6"/>
@@ -1590,7 +1628,7 @@ const Messages: React.FC = () => {
                                     </svg>
                                   </div>
                                 </div>
-                                <div className="flex items-center space-x-1.5">
+                                <div className="flex items-center space-x-1.5 flex-shrink-0">
                                   <button
                                     onClick={() => {
                                       if (message.audioUrl) {
@@ -1616,7 +1654,7 @@ const Messages: React.FC = () => {
                                     })()}
                                   </span>
                                 </div>
-                                <div className="flex items-center justify-center space-x-0.5">
+                                <div className="flex items-center justify-center space-x-0.5 flex-shrink-0">
                                   {[3,5,3,6,9,11,13,11,9,6,5,3,6,8,9,8,6,5,3,5].map((h, i) => (
                                     <div
                                       key={i}
@@ -2311,14 +2349,14 @@ const Messages: React.FC = () => {
                     style={{ 
                       backgroundColor: 'rgba(255, 255, 255, 0.3)',
                       borderRadius: '50%',
-                      width: '20px',
-                      height: '20px',
+                      width: '18px',
+                      height: '18px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}
                   >
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -2747,7 +2785,14 @@ const Messages: React.FC = () => {
                                {chatEntry.hasDocument && (chatEntry.documentType === 'jpg' || chatEntry.documentType === 'png') && (
                                  <img src={svgIcon} alt="File" className="w-3.5 h-3.5 inline mr-1" style={{ filter: 'brightness(0) saturate(100%) invert(31%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(96%) contrast(91%)' }} />
                                )}
-                               <span style={{ color: '#4D4D4D' }}>{chatEntry.lastMessage}</span>
+                               {chatEntry.hasVoiceNote && (
+                                 <svg className="w-3.5 h-3.5 inline mr-1" viewBox="0 0 12 12" fill="none">
+                                   <rect x="1" y="4" width="2" height="4" fill="#6A6A6A"/>
+                                   <rect x="5" y="2" width="2" height="8" fill="#6A6A6A"/>
+                                   <rect x="9" y="0" width="2" height="12" fill="#6A6A6A"/>
+                                 </svg>
+                               )}
+                               <span style={{ color: chatEntry.hasVoiceNote ? '#6A6A6A' : '#4D4D4D' }}>{chatEntry.lastMessage}</span>
                              </>
                            )}
                           </p>
