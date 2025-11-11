@@ -56,6 +56,8 @@ import replyCloseIcon from '../assets/images/pre/re.svg';
 import productImage1 from '../assets/images/pre/1.png';
 import amIcon from '../assets/images/pre/AM.svg';
 import pinBadgeIcon from '../assets/images/pre/pn.svg';
+import documentIcon from '../assets/images/pre/do.svg';
+import photoIcon from '../assets/images/pre/ph.svg';
 
 const Messages: React.FC = () => {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -92,6 +94,8 @@ const Messages: React.FC = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<string>('');
   const [isAttachActive, setIsAttachActive] = useState(false);
+  const [showAttachmentBadges, setShowAttachmentBadges] = useState(false);
+  const [selectedDocuments, setSelectedDocuments] = useState<File[]>([]);
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
   const [isUserTyping, setIsUserTyping] = useState(false);
   const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout | null>(null);
@@ -218,8 +222,6 @@ const Messages: React.FC = () => {
   // File attachment handlers
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    // Reset attach button state when file dialog closes (whether files selected or cancelled)
-    setIsAttachActive(false);
     
     if (files && files.length > 0) {
       const newFiles = Array.from(files);
@@ -229,8 +231,19 @@ const Messages: React.FC = () => {
   };
 
   const handleAttachClick = () => {
-    setIsAttachActive(true);
-    const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+    setShowAttachmentBadges(!showAttachmentBadges);
+    setIsAttachActive(!isAttachActive);
+  };
+
+  const handleAddPhotosClick = () => {
+    const fileInput = document.getElementById('photo-file-input') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  const handleAddDocumentsClick = () => {
+    const fileInput = document.getElementById('document-file-input') as HTMLInputElement;
     if (fileInput) {
       fileInput.click();
     }
@@ -666,6 +679,9 @@ const Messages: React.FC = () => {
         day: 'numeric'
       });
 
+      const imageFiles = selectedFiles.filter(f => f.type.startsWith('image/'));
+      const documentFiles = selectedFiles.filter(f => !f.type.startsWith('image/'));
+
       const newMessage = {
         id: Date.now(),
         text: messageToSend,
@@ -675,6 +691,8 @@ const Messages: React.FC = () => {
         productData: isMessageSent ? null : productData, // Only attach product data for first message
         isProductInquiry: !isMessageSent && !!productData,
         sentAt: currentTime,
+        images: imageFiles.length > 0 ? imageFiles : [],
+        documents: documentFiles.length > 0 ? documentFiles : [],
         attachments: selectedFiles.length > 0 ? selectedFiles.map(file => ({
           name: file.name,
         size: file.size,
@@ -767,8 +785,12 @@ const Messages: React.FC = () => {
 
       // Create or update chat entry for sidebar
       const chatId = chatEntry?.id || Date.now();
-      const displayMessage = selectedFiles.length > 0 && !messageToSend 
-        ? `📎 ${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''}` 
+      const hasImages = imageFiles.length > 0;
+      const hasDocuments = documentFiles.length > 0;
+      const displayMessage = hasImages && !messageToSend 
+        ? 'Image' 
+        : hasDocuments && !messageToSend
+        ? 'Document'
         : messageToSend.length > 30 ? messageToSend.substring(0, 30) + '...' : messageToSend;
       
       setChatEntry({
@@ -779,6 +801,9 @@ const Messages: React.FC = () => {
         timestamp: `Today, ${timeString}`,
         isRead: false,
         isActive: true,
+        sentByUser: true,
+        hasImage: hasImages,
+        hasDocument: hasDocuments,
         messageId: newMessage.id // Link to the latest message for status sync
       });
       
@@ -1246,6 +1271,24 @@ const Messages: React.FC = () => {
         onChange={handleFileSelect}
         style={{ display: 'none' }}
       />
+      {/* Hidden file input for photos only */}
+      <input
+        id="photo-file-input"
+        type="file"
+        multiple
+        accept="image/*"
+        onChange={handleFileSelect}
+        style={{ display: 'none' }}
+      />
+      {/* Hidden file input for documents only */}
+      <input
+        id="document-file-input"
+        type="file"
+        multiple
+        accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx"
+        onChange={handleFileSelect}
+        style={{ display: 'none' }}
+      />
       {/* Mobile Conversation View - Full Screen on Mobile */}
       {showMobileConversation && productData && (
         <div className="md:hidden w-full bg-white flex flex-col h-screen overflow-hidden">
@@ -1454,23 +1497,46 @@ const Messages: React.FC = () => {
                       }}
                     >
                       <div className="max-w-[75%] relative">
-                        <div 
-                          className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`} 
-                          style={{ 
-                            backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
-                          }}
-                          onClick={message.isIncoming ? (e) => handleMobileIncomingMessageClick(message.id, e) : undefined}
-                        >
-                          {/* Message Text */}
-                          <p 
-                            style={{ fontSize: '12px', marginBottom: 0, color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                        {/* Images (if present) - NO bubble */}
+                        {message.images && message.images.length > 0 && (
+                          <div className={`flex flex-wrap gap-1 mb-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
+                            {message.images.map((image: File, imgIndex: number) => (
+                              <img
+                                key={imgIndex}
+                                src={URL.createObjectURL(image)}
+                                alt={image.name}
+                                className="object-cover"
+                                style={{ 
+                                  borderRadius: '12px',
+                                  maxWidth: '160px',
+                                  maxHeight: '160px'
+                                }}
+                              />
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Message bubble with text and/or product card and/or documents */}
+                        {(message.text || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0)) && (
+                          <div 
+                            className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`} 
+                            style={{ 
+                              backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
+                            }}
+                            onClick={message.isIncoming ? (e) => handleMobileIncomingMessageClick(message.id, e) : undefined}
                           >
-                            {message.text}
-                          </p>
-                          
-                          {/* Product Card in Message - Only for first message */}
-                          {message.isProductInquiry && message.productData && (
-                            <div className="rounded-lg p-1.5 mt-2">
+                            {/* Message Text */}
+                            {message.text && (
+                              <p 
+                                style={{ fontSize: '12px', marginBottom: 0, color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                              >
+                                {message.text}
+                              </p>
+                            )}
+                            
+                            {/* Product Card in Message - Only for first message */}
+                            {message.isProductInquiry && message.productData && (
+                              <div className="rounded-lg p-1.5 mt-2">
                               <div className="flex space-x-2">
                                 <div className="relative">
                                   <div className="absolute -left-1.5 top-0 w-0.5 h-12" style={{ backgroundColor: '#FFFFFF' }}></div>
@@ -1504,7 +1570,35 @@ const Messages: React.FC = () => {
                               </div>
                             </div>
                           )}
-                        </div>
+
+                            {/* Document Display in Message */}
+                            {message.documents && message.documents.length > 0 && (
+                              <div className={message.text ? 'mt-2' : ''}>
+                                {message.documents.map((doc: File, docIndex: number) => {
+                                  const fileName = doc.name.split('.');
+                                  const extension = fileName.pop() || '';
+                                  const nameWithoutExt = fileName.join('.');
+                                  return (
+                                    <div key={docIndex} className="flex items-center space-x-2 p-2" style={{ backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '8px' }}>
+                                      <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#E74C3C' }}>
+                                        <span className="text-white text-xs font-bold">{extension.toUpperCase()}</span>
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-xs truncate" style={{ color: '#FFFFFF' }}>
+                                          {nameWithoutExt} · {extension}
+                                        </p>
+                                        <p className="text-xs" style={{ color: '#B8DDFB' }}>
+                                          {Math.ceil(doc.size / (1024 * 1024))} MB
+                                        </p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         <div className={`flex items-center mt-1 space-x-1 text-xs ${message.isIncoming ? 'justify-start' : 'justify-end'}`} style={{ color: '#6A6A6A' }}>
                           <span>{message.timeString}</span>
                           {!message.isIncoming && messageStatuses[message.id] && (
@@ -1895,6 +1989,99 @@ const Messages: React.FC = () => {
             </div>
             )}
             
+            {/* Attachment Badges - Above Message Input Bar (Only show when no files selected) */}
+            {showAttachmentBadges && selectedFiles.length === 0 && (
+              <div className="pl-1 pr-2 pb-2 flex items-center space-x-2">
+                <button onClick={handleAddDocumentsClick} className="flex items-center space-x-1.5 px-3 py-1.5" style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}>
+                  <img src={documentIcon} alt="Document" className="w-3 h-3" />
+                  <span className="text-xs font-medium" style={{ color: '#64B5F6' }}>Add documents</span>
+                </button>
+                <button onClick={handleAddPhotosClick} className="flex items-center space-x-1.5 px-3 py-1.5" style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}>
+                  <img src={photoIcon} alt="Photo" className="w-3 h-3" />
+                  <span className="text-xs font-medium" style={{ color: '#64B5F6' }}>Add photos</span>
+                </button>
+              </div>
+            )}
+
+            {/* Files Display */}
+            {selectedFiles.length > 0 && (
+              <div className="pt-2 px-1 pb-2">
+                {selectedFiles.map((file, index) => {
+                  const isImage = file.type.startsWith('image/');
+                  if (isImage) {
+                    return (
+                      <div key={index} className="inline-block relative mr-2 mb-2">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={file.name}
+                          className="w-20 h-20 object-cover"
+                          style={{ borderRadius: '12px' }}
+                        />
+                        <button
+                          onClick={() => removeFile(index)}
+                          className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: '#4D4D4D', border: '2px solid #FFFFFF' }}
+                        >
+                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    );
+                  } else {
+                    // Document preview
+                    const fileName = file.name.split('.');
+                    const extension = fileName.pop() || '';
+                    const nameWithoutExt = fileName.join('.');
+                    return (
+                      <div key={index} className="relative mb-2 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px' }}>
+                        <div className="w-10 h-10 rounded flex items-center justify-center" style={{ backgroundColor: '#E74C3C' }}>
+                          <span className="text-white text-xs font-bold">{extension.toUpperCase()}</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs" style={{ color: '#6A6A6A' }}>
+                            {nameWithoutExt} · {extension}
+                          </p>
+                          <p className="text-xs" style={{ color: '#B0B0B0' }}>
+                            {Math.ceil(file.size / (1024 * 1024))} MB
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => removeFile(index)}
+                          className="w-5 h-5 rounded-full flex items-center justify-center hover:opacity-70"
+                          style={{ backgroundColor: '#4D4D4D', border: '2px solid #FFFFFF' }}
+                        >
+                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    );
+                  }
+                })}
+                {/* Add More Button - Only show for images */}
+                {selectedFiles.some(f => f.type.startsWith('image/')) && (
+                  <button
+                    onClick={handleAddPhotosClick}
+                    className="inline-block w-20 h-20 flex-shrink-0"
+                    style={{
+                      backgroundColor: '#F0F8FE',
+                      border: '2px dashed #64B5F6',
+                      borderRadius: '12px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      verticalAlign: 'top'
+                    }}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            )}
+
             <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
               {/* Emoji Icon */}
               <div className="relative emoji-picker-container">
@@ -1933,13 +2120,14 @@ const Messages: React.FC = () => {
               {/* Attachment Icon */}
               <button 
                 onClick={handleAttachClick}
-                className="p-1 text-gray-400 hover:text-gray-600"
+                className="p-1.5 transition-colors focus:outline-none"
+                style={{ outline: 'none' }}
               >
                 <img 
                   src={pinIcon} 
                   alt="attachment" 
-                  className="w-5 h-5" 
-                  style={{ 
+                  className="w-5 h-5"
+                  style={{
                     filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
                   }}
                 />
@@ -2220,7 +2408,13 @@ const Messages: React.FC = () => {
                                >
                                  You
                                </span>
-                               <span className="text-gray-600">{chatEntry.lastMessage}</span>
+                               {chatEntry.hasImage && (
+                                 <img src={photoIcon} alt="Image" className="w-3.5 h-3.5 inline mr-1" style={{ filter: 'brightness(0) saturate(100%) invert(31%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(96%) contrast(91%)' }} />
+                               )}
+                               {chatEntry.hasDocument && (
+                                 <img src={documentIcon} alt="Document" className="w-3.5 h-3.5 inline mr-1" style={{ filter: 'brightness(0) saturate(100%) invert(31%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(96%) contrast(91%)' }} />
+                               )}
+                               <span style={{ color: '#4D4D4D' }}>{chatEntry.lastMessage}</span>
                              </>
                            )}
                           </p>
@@ -2964,14 +3158,35 @@ const Messages: React.FC = () => {
                         }}
                       >
                        <div className="max-w-xs lg:max-w-md relative">
-                         <div 
-                           className={`rounded-2xl p-4 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`} 
-                           style={{ 
-                             backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
-                           }}
-                           onClick={message.isIncoming ? () => handleIncomingMessageClick(message.id) : undefined}
-                         >
-                          {message.type === 'voice' ? (
+                         {/* Images (if present) - NO bubble */}
+                         {message.images && message.images.length > 0 && (
+                           <div className={`flex flex-wrap gap-2 mb-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
+                             {message.images.map((image: File, imgIndex: number) => (
+                               <img
+                                 key={imgIndex}
+                                 src={URL.createObjectURL(image)}
+                                 alt={image.name}
+                                 className="object-cover"
+                                 style={{ 
+                                   borderRadius: '12px',
+                                   maxWidth: '300px',
+                                   maxHeight: '300px'
+                                 }}
+                               />
+                             ))}
+                           </div>
+                         )}
+
+                         {/* Message bubble (only if there's text or voice or documents) */}
+                         {((!message.images || message.images.length === 0) && (message.text || message.type === 'voice' || (message.documents && message.documents.length > 0))) && (
+                           <div 
+                             className={`rounded-2xl p-4 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`} 
+                             style={{ 
+                               backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
+                             }}
+                             onClick={message.isIncoming ? () => handleIncomingMessageClick(message.id) : undefined}
+                           >
+                            {message.type === 'voice' ? (
                             // Voice Message Display
                             <div className="space-y-2">
                               {/* Reply Preview for Voice Messages */}
@@ -3046,42 +3261,6 @@ const Messages: React.FC = () => {
                                 </div>
                               </div>
                             </div>
-                            ) : message.attachments && message.attachments.length > 0 ? (
-                              // File Attachment Message Display
-                              <div className="space-y-2">
-                                {message.text && (
-                                  <p 
-                                    className="text-sm" 
-                                    style={{ color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
-                                  >
-                                    {message.text}
-                                  </p>
-                                )}
-                                <div className="space-y-2">
-                                  {message.attachments.map((file: any, index: number) => (
-                                    <div 
-                                      key={index} 
-                                      onClick={() => handleFileClick(file)}
-                                      className="flex items-center space-x-3 p-3 bg-white/20 rounded-lg cursor-pointer hover:bg-white/30 transition-colors"
-                                    >
-                                      <div className="w-10 h-10 bg-white/30 rounded-lg flex items-center justify-center">
-                                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                        </svg>
-                                      </div>
-                                      <div className="flex-1">
-                                        <p className="text-white text-sm font-medium">{file.name}</p>
-                                        <p className="text-white/80 text-xs">{formatFileSize(file.size)}</p>
-                                      </div>
-                                      <div className="w-6 h-6 bg-white/30 rounded flex items-center justify-center">
-                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                        </svg>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
                             ) : (
                               // Text Message Display
                             <>
@@ -3165,9 +3344,36 @@ const Messages: React.FC = () => {
                                   </div>
                                 </div>
                               )}
+
+                              {/* Document Display */}
+                              {message.documents && message.documents.length > 0 && (
+                                <div className={message.text || message.replyTo ? 'mt-3' : ''}>
+                                  {message.documents.map((doc: File, docIndex: number) => {
+                                    const fileName = doc.name.split('.');
+                                    const extension = fileName.pop() || '';
+                                    const nameWithoutExt = fileName.join('.');
+                                    return (
+                                      <div key={docIndex} className="flex items-center space-x-3 p-3" style={{ backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '10px' }}>
+                                        <div className="w-10 h-10 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#E74C3C' }}>
+                                          <span className="text-white text-xs font-bold">{extension.toUpperCase()}</span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-sm truncate" style={{ color: '#FFFFFF' }}>
+                                            {nameWithoutExt} · {extension}
+                                          </p>
+                                          <p className="text-sm" style={{ color: '#B8DDFB' }}>
+                                            {Math.ceil(doc.size / (1024 * 1024))} MB
+                                          </p>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </>
                           )}
-                        </div>
+                           </div>
+                         )}
                         
                         {/* Bottom Timestamp */}
                         <div className={`flex items-center mt-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
@@ -3601,83 +3807,10 @@ const Messages: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                        
-                        {/* File Attachment Indicator - Inline with Product Card */}
-                        {selectedFiles.length > 0 && (
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center space-x-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#F0F8FE' }}>
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                              </svg>
-                              <div className="flex flex-col">
-                                <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>
-                                  {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} attached
-                                </span>
-                                <div className="text-xs" style={{ color: '#64B5F6' }}>
-                                  {selectedFiles.map((file, index) => (
-                                    <span key={index}>
-                                      {file.name} ({formatFileSize(file.size)})
-                                      {index < selectedFiles.length - 1 ? ', ' : ''}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setSelectedFiles([]);
-                                  setShowFilePreview(false);
-                                }}
-                                className="ml-2 hover:opacity-70"
-                                style={{ color: '#64B5F6' }}
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}
                   
-                  {/* File Attachment Indicator - Only show when no product detail popup */}
-                  {selectedFiles.length > 0 && isMessageSent && (
-                    <div className="mb-3">
-                      <div className="flex items-center space-x-2">
-                        <div className="flex items-center space-x-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#F0F8FE' }}>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                          </svg>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>
-                              {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} attached
-                            </span>
-                            <div className="text-xs" style={{ color: '#64B5F6' }}>
-                              {selectedFiles.map((file, index) => (
-                                <span key={index}>
-                                  {file.name} ({formatFileSize(file.size)})
-                                  {index < selectedFiles.length - 1 ? ', ' : ''}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setSelectedFiles([]);
-                              setShowFilePreview(false);
-                            }}
-                            className="ml-2 hover:opacity-70"
-                            style={{ color: '#64B5F6' }}
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {isRecording ? (
                     // Recording Interface with inline file attachment
@@ -3753,13 +3886,14 @@ const Messages: React.FC = () => {
                         </div>
                         <button 
                           onClick={handleAttachClick}
-                          className="p-1.5 text-gray-400 hover:text-gray-600"
+                          className="p-2 transition-colors focus:outline-none"
+                          style={{ outline: 'none' }}
                         >
                           <img 
                             src={pinIcon} 
                             alt="attachment" 
-                            className="w-6 h-6" 
-                            style={{ 
+                            className="w-6 h-6"
+                            style={{
                               filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
                             }}
                           />
@@ -3810,41 +3944,6 @@ const Messages: React.FC = () => {
                         </button>
                       </div>
                       
-                      {/* File Attachment Indicator - Inline with Recording */}
-                      {selectedFiles.length > 0 && (
-                        <div className="flex items-center space-x-2">
-                          <div className="flex items-center space-x-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#F0F8FE' }}>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                            </svg>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>
-                                {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} attached
-                              </span>
-                              <div className="text-xs" style={{ color: '#64B5F6' }}>
-                                {selectedFiles.map((file, index) => (
-                                  <span key={index}>
-                                    {file.name} ({formatFileSize(file.size)})
-                                    {index < selectedFiles.length - 1 ? ', ' : ''}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => {
-                                setSelectedFiles([]);
-                                setShowFilePreview(false);
-                              }}
-                              className="ml-2 hover:opacity-70"
-                              style={{ color: '#64B5F6' }}
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   ) : recordingTime > 0 ? (
                     // Show audio preview bubble and send button after recording
@@ -3988,13 +4087,14 @@ const Messages: React.FC = () => {
                         </div>
                         <button 
                           onClick={handleAttachClick}
-                          className="p-1.5 text-gray-400 hover:text-gray-600"
+                          className="p-2 transition-colors focus:outline-none"
+                          style={{ outline: 'none' }}
                         >
                           <img 
                             src={pinIcon} 
                             alt="attachment" 
-                            className="w-6 h-6" 
-                            style={{ 
+                            className="w-6 h-6"
+                            style={{
                               filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
                             }}
                           />
@@ -4024,13 +4124,107 @@ const Messages: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    // Normal Message Input
-                    <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '6px' }}>
-                      <div className="relative emoji-picker-container">
-                        <button 
-                          onClick={handleEmojiClick}
-                          className="p-1.5 hover:text-gray-600"
-                        >
+                    <>
+                      {/* Attachment Badges - Above Message Input Bar (Only show when no files selected) */}
+                      {showAttachmentBadges && selectedFiles.length === 0 && (
+                        <div className="pl-2 pr-4 pb-3 flex items-center space-x-3">
+                          <button onClick={handleAddDocumentsClick} className="flex items-center space-x-2 px-4 py-2" style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}>
+                            <img src={documentIcon} alt="Document" className="w-4 h-4" />
+                            <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>Add documents</span>
+                          </button>
+                          <button onClick={handleAddPhotosClick} className="flex items-center space-x-2 px-4 py-2" style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}>
+                            <img src={photoIcon} alt="Photo" className="w-4 h-4" />
+                            <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>Add photos</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Files Display */}
+                      {selectedFiles.length > 0 && (
+                        <div className="pt-3 pl-2 pr-6 pb-3">
+                          {selectedFiles.map((file, index) => {
+                            const isImage = file.type.startsWith('image/');
+                            if (isImage) {
+                              return (
+                                <div key={index} className="inline-block relative mr-3 mb-3">
+                                  <img
+                                    src={URL.createObjectURL(file)}
+                                    alt={file.name}
+                                    className="w-24 h-24 object-cover"
+                                    style={{ borderRadius: '12px' }}
+                                  />
+                                  <button
+                                    onClick={() => removeFile(index)}
+                                    className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center"
+                                    style={{ backgroundColor: '#4D4D4D', border: '2px solid #FFFFFF' }}
+                                  >
+                                    <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              );
+                            } else {
+                              // Document preview
+                              const fileName = file.name.split('.');
+                              const extension = fileName.pop() || '';
+                              const nameWithoutExt = fileName.join('.');
+                              return (
+                                <div key={index} className="relative mb-3 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px' }}>
+                                  <div className="w-12 h-12 rounded flex items-center justify-center" style={{ backgroundColor: '#E74C3C' }}>
+                                    <span className="text-white text-sm font-bold">{extension.toUpperCase()}</span>
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="text-sm" style={{ color: '#6A6A6A' }}>
+                                      {nameWithoutExt} · {extension}
+                                    </p>
+                                    <p className="text-sm" style={{ color: '#B0B0B0' }}>
+                                      {Math.ceil(file.size / (1024 * 1024))} MB
+                                    </p>
+                                  </div>
+                                  <button
+                                    onClick={() => removeFile(index)}
+                                    className="w-6 h-6 rounded-full flex items-center justify-center hover:opacity-70"
+                                    style={{ backgroundColor: '#4D4D4D', border: '2px solid #FFFFFF' }}
+                                  >
+                                    <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              );
+                            }
+                          })}
+                          {/* Add More Button - Only show for images */}
+                          {selectedFiles.some(f => f.type.startsWith('image/')) && (
+                            <button
+                              onClick={handleAddPhotosClick}
+                              className="inline-block w-24 h-24 flex-shrink-0"
+                              style={{
+                                backgroundColor: '#F0F8FE',
+                                border: '2px dashed #64B5F6',
+                                borderRadius: '12px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                verticalAlign: 'top'
+                              }}
+                            >
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Normal Message Input */}
+                      <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '6px' }}>
+                        <div className="relative emoji-picker-container">
+                          <button 
+                            onClick={handleEmojiClick}
+                            className="p-1.5 hover:text-gray-600"
+                          >
                           <img 
                             src={faceIcon} 
                             alt="emoji" 
@@ -4108,13 +4302,14 @@ const Messages: React.FC = () => {
                         </div>
                         <button 
                           onClick={handleAttachClick}
-                          className="p-1.5 text-gray-400 hover:text-gray-600"
+                          className="p-2 transition-colors focus:outline-none"
+                          style={{ outline: 'none' }}
                         >
                           <img 
                             src={pinIcon} 
                             alt="attachment" 
-                            className="w-6 h-6" 
-                            style={{ 
+                            className="w-6 h-6"
+                            style={{
                               filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
                             }}
                           />
@@ -4151,7 +4346,8 @@ const Messages: React.FC = () => {
                           <img src={audioIcon} alt="audio" className="w-7 h-7" />
                         )}
                       </button>
-                    </div>
+                      </div>
+                    </>
                   )}
                 </div>
             </div>
