@@ -1003,6 +1003,11 @@ const Messages: React.FC = () => {
 
   const handleSendVoiceMessage = () => {
     if (recordingTime > 0) {
+      // Clear any incoming reply state when sending a new message
+      setHasIncomingReply(false);
+      setIsReplyRead(false);
+      setIsSellerTyping(false);
+      
       const currentTime = new Date();
       const timeString = currentTime.toLocaleTimeString('en-US', { 
         hour: '2-digit', 
@@ -1078,7 +1083,7 @@ const Messages: React.FC = () => {
           
           setMessages(prev => [...prev, {
             id: Date.now(),
-            text: "Thank you for your message!",
+            text: "Thanks for the voice note! I'll review it and get back to you shortly.",
             timestamp: replyTimeString,
             timeString: replyTimeString,
             dateString: `Today, ${replyTimeString}`,
@@ -1609,28 +1614,45 @@ const Messages: React.FC = () => {
                         {/* Message bubble with text and/or product card and/or documents and/or voice */}
                         {(message.text || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0) || message.type === 'voice') && (
                           <div 
-                            className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`} 
+                            className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md' : 'rounded-br-md'} cursor-pointer`} 
                             style={{ 
                               backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
                             }}
-                            onClick={message.isIncoming ? (e) => handleMobileIncomingMessageClick(message.id, e) : undefined}
+                            onClick={(e) => handleMobileIncomingMessageClick(message.id, e)}
                           >
                             {/* Voice Message Display */}
                             {message.type === 'voice' ? (
                               <div className="flex items-center space-x-2">
-                                <div className="relative flex-shrink-0">
-                                  <img src={avatarIcon} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
-                                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-white rounded-full flex items-center justify-center" style={{ transform: 'translate(15%, 15%)' }}>
-                                    <svg className="w-2 h-2" viewBox="0 0 12 12" fill="none">
-                                      <rect x="1" y="4" width="2" height="4" fill="#64B5F6"/>
-                                      <rect x="5" y="2" width="2" height="8" fill="#64B5F6"/>
-                                      <rect x="9" y="0" width="2" height="12" fill="#64B5F6"/>
-                                    </svg>
+                                {/* Avatar or Speed Button - Mobile */}
+                                {playingMessageId === message.id ? (
+                                  <div 
+                                    className="flex items-center justify-center flex-shrink-0"
+                                    style={{ 
+                                      backgroundColor: '#4781AF',
+                                      borderRadius: '12px',
+                                      width: '36px',
+                                      height: '28px',
+                                      padding: '0 8px'
+                                    }}
+                                  >
+                                    <span className="text-white text-xs font-medium">1x</span>
                                   </div>
-                                </div>
+                                ) : (
+                                  <div className="relative flex-shrink-0">
+                                    <img src={avatarIcon} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
+                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-white rounded-full flex items-center justify-center" style={{ transform: 'translate(15%, 15%)' }}>
+                                      <svg className="w-2 h-2" viewBox="0 0 12 12" fill="none">
+                                        <rect x="1" y="4" width="2" height="4" fill="#64B5F6"/>
+                                        <rect x="5" y="2" width="2" height="8" fill="#64B5F6"/>
+                                        <rect x="9" y="0" width="2" height="12" fill="#64B5F6"/>
+                                      </svg>
+                                    </div>
+                                  </div>
+                                )}
                                 <div className="flex items-center space-x-1.5 flex-shrink-0">
                                   <button
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       if (message.audioUrl) {
                                         handleAudioPlayback(message.id, message.audioUrl, message.duration);
                                       }
@@ -1638,11 +1660,11 @@ const Messages: React.FC = () => {
                                     className="hover:opacity-80 transition-opacity"
                                   >
                                     {playingMessageId === message.id ? (
-                                      <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                      <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
                                         <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" style={{ fillRule: 'evenodd' }}/>
                                       </svg>
                                     ) : (
-                                      <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                      <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
                                         <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
                                       </svg>
                                     )}
@@ -1668,8 +1690,41 @@ const Messages: React.FC = () => {
                               </div>
                             ) : (
                               <>
-                                {/* Message Text */}
-                                {message.text && (
+                                {/* Reply Section - Mobile */}
+                                {message.replyTo && (
+                                  <div className="mb-2">
+                                    {/* User's reply text at top */}
+                                    <p style={{ fontSize: '12px', marginBottom: '6px', color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}>
+                                      {message.text}
+                                    </p>
+                                    
+                                    {/* White/Blue line and quoted message */}
+                                    <div className="flex items-stretch">
+                                      {/* Vertical line */}
+                                      <div 
+                                        className="rounded-full mr-1.5"
+                                        style={{ 
+                                          width: '2px',
+                                          backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                          flexShrink: 0
+                                        }}
+                                      ></div>
+                                      
+                                      {/* Quoted message info */}
+                                      <div className="flex-1">
+                                        <p style={{ fontSize: '10px', fontWeight: 500, marginBottom: '2px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
+                                          {message.replyTo.sender}
+                                        </p>
+                                        <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                          {message.replyTo.text}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {/* Message Text (only show if no reply) */}
+                                {!message.replyTo && message.text && (
                                   <p 
                                     style={{ fontSize: '12px', marginBottom: 0, color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
                                   >
@@ -1862,7 +1917,7 @@ const Messages: React.FC = () => {
                 })}
                 
                 {/* Typing Indicator */}
-                {showTypingIndicator && (
+                {isSellerTyping && (
                   <div className="flex justify-start mb-3">
                     <div className="max-w-20">
                       <div 
@@ -2134,6 +2189,46 @@ const Messages: React.FC = () => {
                 </div>
               </div>
             </div>
+            )}
+            
+            {/* Reply Preview - Mobile */}
+            {replyToMessage && (
+              <div className="mb-2 relative">
+                <div 
+                  className="rounded-lg p-2 pl-4 pr-8 relative flex"
+                  style={{ 
+                    backgroundColor: '#FAFAFA'
+                  }}
+                >
+                  {/* Blue line inside */}
+                  <div 
+                    className="rounded-full mr-3"
+                    style={{ 
+                      width: '2px',
+                      backgroundColor: '#64B5F6',
+                      flexShrink: 0
+                    }}
+                  ></div>
+                  
+                  {/* Content */}
+                  <div className="flex-1">
+                    <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
+                      {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
+                    </div>
+                    <div className="text-xs" style={{ color: '#6A6A6A' }}>
+                      {replyToMessage.text}
+                    </div>
+                  </div>
+                  
+                  {/* Close button */}
+                  <button
+                    onClick={() => setReplyToMessage(null)}
+                    className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
+                  >
+                    <img src={replyCloseIcon} alt="Close" className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
             )}
             
             {/* Attachment Badges - Above Message Input Bar (Only show when no files selected) */}
@@ -2785,13 +2880,15 @@ const Messages: React.FC = () => {
                                {chatEntry.hasDocument && (chatEntry.documentType === 'jpg' || chatEntry.documentType === 'png') && (
                                  <img src={svgIcon} alt="File" className="w-3.5 h-3.5 inline mr-1" style={{ filter: 'brightness(0) saturate(100%) invert(31%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(96%) contrast(91%)' }} />
                                )}
-                               {chatEntry.hasVoiceNote && (
-                                 <svg className="w-3.5 h-3.5 inline mr-1" viewBox="0 0 12 12" fill="none">
-                                   <rect x="1" y="4" width="2" height="4" fill="#6A6A6A"/>
-                                   <rect x="5" y="2" width="2" height="8" fill="#6A6A6A"/>
-                                   <rect x="9" y="0" width="2" height="12" fill="#6A6A6A"/>
-                                 </svg>
-                               )}
+                              {chatEntry.hasVoiceNote && (
+                                <svg className="w-3.5 h-3.5 inline mr-1" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <rect x="1" y="6" width="1.5" height="2" rx="0.75" fill="#4D4D4D"/>
+                                  <rect x="4" y="4" width="1.5" height="6" rx="0.75" fill="#4D4D4D"/>
+                                  <rect x="7" y="2" width="1.5" height="10" rx="0.75" fill="#4D4D4D"/>
+                                  <rect x="10" y="4" width="1.5" height="6" rx="0.75" fill="#4D4D4D"/>
+                                  <rect x="13" y="5" width="1.5" height="4" rx="0.75" fill="#4D4D4D"/>
+                                </svg>
+                              )}
                                <span style={{ color: chatEntry.hasVoiceNote ? '#6A6A6A' : '#4D4D4D' }}>{chatEntry.lastMessage}</span>
                              </>
                            )}
@@ -3535,6 +3632,183 @@ const Messages: React.FC = () => {
                           zIndex: isReactionActive ? 50 : 'auto'
                         }}
                       >
+                       {/* Reaction and Option Icons - LEFT side for outgoing messages */}
+                       {!message.isIncoming && clickedMessageId === message.id && (
+                        <div className="flex items-center mr-1 self-center reaction-container relative" style={{ zIndex: (activeReactionMessageId === message.id || activeMessageOptionsId === message.id) ? 999 : 'auto' }}>
+                          <button 
+                            className="p-1 hover:opacity-70 transition-opacity"
+                            onClick={(e) => handleReactionClick(message.id, e)}
+                          >
+                            <img 
+                              src={reactionIcon} 
+                              alt="Reaction" 
+                              className="w-6 h-6" 
+                              style={{
+                                filter: activeReactionMessageId === message.id 
+                                  ? 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' 
+                                  : 'none'
+                              }}
+                            />
+                          </button>
+                          <button 
+                            className="p-1 hover:opacity-70 transition-opacity"
+                            onClick={(e) => handleMessageOptionsClick(message.id, e)}
+                          >
+                            <img 
+                              src={optionIcon} 
+                              alt="Options" 
+                              className="w-6 h-6" 
+                              style={{
+                                filter: activeMessageOptionsId === message.id 
+                                  ? 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' 
+                                  : 'none'
+                              }}
+                            />
+                          </button>
+                          
+                          {/* Reaction Popup - For outgoing messages */}
+                          {activeReactionMessageId === message.id && (
+                            <div className="absolute bottom-full mb-2" style={{ left: '-24px', right: '-24px', zIndex: 999 }}>
+                              <div className="relative bg-white shadow-lg px-4 py-2.5 flex items-center justify-center space-x-1.5 border border-gray-200" style={{ borderRadius: '20px', minWidth: '280px' }}>
+                                <button onClick={() => handleReactionSelect('👍')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="1f44d" size={24} />
+                                </button>
+                                <button onClick={() => handleReactionSelect('❤️')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="2764-fe0f" size={24} />
+                                </button>
+                                <button onClick={() => handleReactionSelect('✅')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="2705" size={24} />
+                                </button>
+                                <button onClick={() => handleReactionSelect('😂')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="1f602" size={24} />
+                                </button>
+                                <button onClick={() => handleReactionSelect('😊')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                  <Emoji unified="1f60a" size={24} />
+                                </button>
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowReactionEmojiPicker(!showReactionEmojiPicker);
+                                  }} 
+                                  className="hover:scale-110 transition-transform flex items-center justify-center" 
+                                  style={{ width: '32px', height: '32px' }}
+                                >
+                                  <img src={emoji6} alt="More reactions" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+                                </button>
+                                <div 
+                                  style={{
+                                    position: 'absolute',
+                                    left: 'calc(16px + 4px + 16px)',
+                                    bottom: '-6px',
+                                    width: 0,
+                                    height: 0,
+                                    borderLeft: '6px solid transparent',
+                                    borderRight: '6px solid transparent',
+                                    borderTop: '6px solid white',
+                                  }}
+                                ></div>
+                              </div>
+                              
+                              {showReactionEmojiPicker && (
+                                <div 
+                                  className="absolute top-full mt-2 z-50"
+                                  style={{ left: '50%', transform: 'translateX(-50%)' }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <EmojiPicker
+                                    onEmojiClick={(emojiObject) => {
+                                      handleReactionSelect(emojiObject.emoji);
+                                      setShowReactionEmojiPicker(false);
+                                    }}
+                                    width={300}
+                                    height={400}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Message Options Popup - For outgoing messages */}
+                          {activeMessageOptionsId === message.id && (
+                            <div 
+                              className="absolute -left-12" 
+                              style={{ 
+                                zIndex: 999,
+                                top: index <= 1 ? '-200px' : 'auto',
+                                bottom: index > 1 ? '100%' : 'auto',
+                                marginBottom: index > 1 ? '8px' : '0'
+                              }}
+                            >
+                              <div className="relative bg-white rounded-2xl shadow-xl py-2 px-1 border border-gray-200" style={{ minWidth: '180px' }}>
+                                <div className="flex items-center justify-between px-3 mb-1">
+                                  <span className="font-medium" style={{ color: '#9CA3AF', fontSize: '10px' }}>Actions</span>
+                                  <button 
+                                    onClick={() => setActiveMessageOptionsId(null)}
+                                    className="text-gray-500 hover:text-gray-700"
+                                  >
+                                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                      <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                    </svg>
+                                  </button>
+                                </div>
+                                
+                                <div className="space-y-0.5">
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('reply', message.id)}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={replyIcon} alt="Reply" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Reply the message</span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('important', activeMessageOptionsId || undefined)}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={starIcon} alt="Star" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Mark as important</span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('copy', activeMessageOptionsId || undefined)}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={copyIcon} alt="Copy" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Copy the message</span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('select', activeMessageOptionsId || undefined)}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={tickIcon} alt="Select" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Select the message</span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('pin', activeMessageOptionsId || undefined)}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={pinMenuIcon} alt="Pin" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>
+                                      {messages.find(m => m.id === activeMessageOptionsId)?.isPinned ? 'Unpin the message' : 'Pin the message'}
+                                    </span>
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => handleMessageOptionSelect('delete', activeMessageOptionsId || undefined)}
+                                    className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <img src={trashIcon} alt="Delete" className="w-4 h-4 mr-2" />
+                                    <span className="text-xs" style={{ color: '#6B7280' }}>Delete for me</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                       )}
+                       
                        <div className="max-w-xs lg:max-w-md relative">
                          {/* Images (if present) - NO bubble */}
                          {message.images && message.images.length > 0 && (
@@ -3562,14 +3836,14 @@ const Messages: React.FC = () => {
                              style={{ 
                                backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
                              }}
-                             onClick={message.isIncoming ? () => handleIncomingMessageClick(message.id) : undefined}
+                             onClick={() => handleIncomingMessageClick(message.id)}
                            >
                             {message.type === 'voice' ? (
                             // Voice Message Display
                             <div className="space-y-2">
                               {/* Reply Preview for Voice Messages */}
                               {message.replyTo && (
-                                <div className="flex items-stretch">
+                                <div className="flex items-stretch" style={{ maxWidth: '55%' }}>
                                   <div 
                                     className="rounded-full mr-2" 
                                     style={{ 
@@ -3590,15 +3864,32 @@ const Messages: React.FC = () => {
                               
                               {/* Voice Message Content */}
                               <div className="flex items-center space-x-3">
-                                <div className="relative">
-                                  <img src={avatarIcon} alt="Your Avatar" className="w-10 h-10 rounded-full" />
-                                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                                    <img src={swiIcon} alt="Waveform" className="w-3.5 h-3.5" />
+                                {/* Avatar or Speed Button - Desktop */}
+                                {playingMessageId === message.id ? (
+                                  <div 
+                                    className="flex items-center justify-center flex-shrink-0"
+                                    style={{ 
+                                      backgroundColor: '#4781AF',
+                                      borderRadius: '16px',
+                                      width: '48px',
+                                      height: '36px',
+                                      padding: '0 12px'
+                                    }}
+                                  >
+                                    <span className="text-white text-sm font-medium">1x</span>
                                   </div>
-                                </div>
+                                ) : (
+                                  <div className="relative flex-shrink-0">
+                                    <img src={avatarIcon} alt="Your Avatar" className="w-10 h-10 rounded-full" />
+                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                                      <img src={swiIcon} alt="Waveform" className="w-3.5 h-3.5" />
+                                    </div>
+                                  </div>
+                                )}
                                 <div className="flex items-center space-x-2">
                                   <button
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       if (message.audioUrl) {
                                         handleAudioPlayback(message.id, message.audioUrl, message.duration);
                                       }
@@ -3644,7 +3935,7 @@ const Messages: React.FC = () => {
                             <>
                               {/* Reply Section */}
                               {message.replyTo && (
-                                <div className="mb-3">
+                                <div className="mb-3" style={{ maxWidth: '55%' }}>
                                   {/* User's reply text at top */}
                                   <p className="text-sm mb-2" style={{ color: '#FFFFFF' }}>
                                     {message.text}
@@ -3757,6 +4048,93 @@ const Messages: React.FC = () => {
                         
                         {/* Bottom Timestamp */}
                         <div className={`flex items-center mt-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
+                          {/* For outgoing messages: Badges BEFORE timestamp */}
+                          {!message.isIncoming && (
+                            <>
+                              {/* Reaction Display - LEFT of timestamp */}
+                              {message.reaction && (
+                                <div 
+                                  className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                  onClick={() => handleRemoveReaction(message.id)}
+                                  style={{
+                                    backgroundColor: '#FFFFFF',
+                                    border: '1px solid #F1F1F1',
+                                    borderRadius: '20px',
+                                    padding: '2px 12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    minWidth: '60px',
+                                    height: '22px',
+                                    marginTop: '-2px',
+                                    gap: '8px'
+                                  }}
+                                >
+                                  <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <span style={{ fontSize: '14px', lineHeight: 1 }}>
+                                    {message.reaction}
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {/* Important Badge - LEFT of timestamp */}
+                              {message.isImportant && (
+                                <div 
+                                  className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                  onClick={() => handleRemoveImportant(message.id)}
+                                  style={{
+                                    backgroundColor: '#FFFFFF',
+                                    border: '1px solid #F1F1F1',
+                                    borderRadius: '20px',
+                                    padding: '2px 12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    minWidth: '60px',
+                                    height: '22px',
+                                    marginTop: '-2px',
+                                    gap: '8px'
+                                  }}
+                                >
+                                  <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                  </svg>
+                                </div>
+                              )}
+                              
+                              {/* Pin Badge - LEFT of timestamp */}
+                              {message.isPinned && (
+                                <div 
+                                  className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                  onClick={() => handleRemovePin(message.id)}
+                                  style={{
+                                    backgroundColor: '#FFFFFF',
+                                    border: '1px solid #F1F1F1',
+                                    borderRadius: '20px',
+                                    padding: '2px 12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    minWidth: '60px',
+                                    height: '22px',
+                                    marginTop: '-2px',
+                                    gap: '8px'
+                                  }}
+                                >
+                                  <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <img src={pinBadgeIcon} alt="Pin" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' }} />
+                                </div>
+                              )}
+                            </>
+                          )}
+                          
                           <span 
                             className="text-xs mr-1" 
                             style={{ color: '#6A6A6A' }}
@@ -3765,91 +4143,96 @@ const Messages: React.FC = () => {
                           </span>
                           {!message.isIncoming && renderMessageStatus(message.id)}
                           
-                          {/* Reaction Display - inline after timestamp */}
-                          {message.reaction && (
-                            <div 
-                              className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
-                              onClick={() => handleRemoveReaction(message.id)}
-                              style={{
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #F1F1F1',
-                                borderRadius: '20px',
-                                padding: '2px 12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                minWidth: '60px',
-                                height: '22px',
-                                marginTop: '-2px',
-                                gap: '8px'
-                              }}
-                            >
-                              <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                              <span style={{ fontSize: '14px', lineHeight: 1 }}>
-                                {message.reaction}
-                              </span>
-                            </div>
-                          )}
-                          
-                          {/* Important Badge - inline after timestamp/reaction */}
-                          {message.isImportant && (
-                            <div 
-                              className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
-                              onClick={() => handleRemoveImportant(message.id)}
-                              style={{
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #F1F1F1',
-                                borderRadius: '20px',
-                                padding: '2px 12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                minWidth: '60px',
-                                height: '22px',
-                                marginTop: '-2px',
-                                gap: '8px'
-                              }}
-                            >
-                              <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                              <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                              </svg>
-                            </div>
-                          )}
-                          
-                          {/* Pin Badge - inline after timestamp/reaction/important */}
-                          {message.isPinned && (
-                            <div 
-                              className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
-                              onClick={() => handleRemovePin(message.id)}
-                              style={{
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #F1F1F1',
-                                borderRadius: '20px',
-                                padding: '2px 12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                minWidth: '60px',
-                                height: '22px',
-                                marginTop: '-2px',
-                                gap: '8px'
-                              }}
-                            >
-                              <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                              <img src={pinBadgeIcon} alt="Pin" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' }} />
-                            </div>
+                          {/* For incoming messages: Badges AFTER timestamp */}
+                          {message.isIncoming && (
+                            <>
+                              {/* Reaction Display - RIGHT of timestamp */}
+                              {message.reaction && (
+                                <div 
+                                  className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                  onClick={() => handleRemoveReaction(message.id)}
+                                  style={{
+                                    backgroundColor: '#FFFFFF',
+                                    border: '1px solid #F1F1F1',
+                                    borderRadius: '20px',
+                                    padding: '2px 12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    minWidth: '60px',
+                                    height: '22px',
+                                    marginTop: '-2px',
+                                    gap: '8px'
+                                  }}
+                                >
+                                  <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <span style={{ fontSize: '14px', lineHeight: 1 }}>
+                                    {message.reaction}
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {/* Important Badge - RIGHT of timestamp */}
+                              {message.isImportant && (
+                                <div 
+                                  className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                  onClick={() => handleRemoveImportant(message.id)}
+                                  style={{
+                                    backgroundColor: '#FFFFFF',
+                                    border: '1px solid #F1F1F1',
+                                    borderRadius: '20px',
+                                    padding: '2px 12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    minWidth: '60px',
+                                    height: '22px',
+                                    marginTop: '-2px',
+                                    gap: '8px'
+                                  }}
+                                >
+                                  <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                  </svg>
+                                </div>
+                              )}
+                              
+                              {/* Pin Badge - RIGHT of timestamp */}
+                              {message.isPinned && (
+                                <div 
+                                  className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                  onClick={() => handleRemovePin(message.id)}
+                                  style={{
+                                    backgroundColor: '#FFFFFF',
+                                    border: '1px solid #F1F1F1',
+                                    borderRadius: '20px',
+                                    padding: '2px 12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    minWidth: '60px',
+                                    height: '22px',
+                                    marginTop: '-2px',
+                                    gap: '8px'
+                                  }}
+                                >
+                                  <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <img src={pinBadgeIcon} alt="Pin" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' }} />
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
                       
-                      {/* Reaction and Option Icons for Incoming Messages - Outside the message bubble */}
+                      {/* Reaction and Option Icons - RIGHT side for incoming messages only */}
                       {message.isIncoming && clickedMessageId === message.id && (
                         <div className="flex items-center ml-1 self-center reaction-container relative" style={{ zIndex: (activeReactionMessageId === message.id || activeMessageOptionsId === message.id) ? 999 : 'auto' }}>
                           <button 
@@ -4035,7 +4418,7 @@ const Messages: React.FC = () => {
                     })}
                   
                   {/* Typing Indicator */}
-                  {showTypingIndicator && (
+                  {isSellerTyping && (
                     <div className="flex justify-start mb-4">
                       <div className="max-w-20">
                         <div 

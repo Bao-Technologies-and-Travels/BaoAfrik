@@ -855,7 +855,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
               className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
               title="Notifications"
               aria-label="View notifications"
-            >
+                         >
               <img 
                 src={notificationIcon} 
                 alt="Notifications" 
@@ -865,7 +865,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
               {unreadCount > 0 && (
                 <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FF0000' }}>
                   <span className="text-white font-medium" style={{ fontSize: '9px' }}>{unreadCount}</span>
-                </div>
+                             </div>
               )}
                          </button>
 
