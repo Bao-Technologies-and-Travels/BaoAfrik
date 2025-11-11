@@ -28,6 +28,7 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -35,7 +36,6 @@ const Header: React.FC<HeaderProps> = ({
   const [highlightChats, setHighlightChats] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
-  const navigate = useNavigate();
 
   // Mock notification data with read/unread status
   const [notifications, setNotifications] = useState([
@@ -56,6 +56,8 @@ const Header: React.FC<HeaderProps> = ({
     if (notificationTab === 'messages') return notif.type === 'message';
     return true;
   });
+
+  const unreadCount = notifications.filter(notif => !notif.isRead).length;
 
   const handleLogout = () => {
     logout();
@@ -374,6 +376,11 @@ const Header: React.FC<HeaderProps> = ({
                         className="w-6 h-6"
                         style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
                       />
+                      {unreadCount > 0 && (
+                        <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FF0000' }}>
+                          <span className="text-white text-xs font-medium">{unreadCount}</span>
+                        </div>
+                      )}
                     </button>
 
                     {/* Notification Dropdown */}
@@ -1171,8 +1178,8 @@ const Header: React.FC<HeaderProps> = ({
                           <button
                             onClick={() => handleLanguageChange('EN')}
                             className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${selectedLanguage === 'EN'
-                                ? 'bg-blue-50 text-blue-600'
-                                : 'text-gray-700 hover:bg-gray-50'
+                              ? 'bg-blue-50 text-blue-600'
+                              : 'text-gray-700 hover:bg-gray-50'
                               }`}
                           >
                             <img
@@ -1187,8 +1194,8 @@ const Header: React.FC<HeaderProps> = ({
                           <button
                             onClick={() => handleLanguageChange('FR')}
                             className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${selectedLanguage === 'FR'
-                                ? 'bg-blue-50 text-blue-600'
-                                : 'text-gray-700 hover:bg-gray-50'
+                              ? 'bg-blue-50 text-blue-600'
+                              : 'text-gray-700 hover:bg-gray-50'
                               }`}
                           >
                             French
@@ -1414,14 +1421,14 @@ const Header: React.FC<HeaderProps> = ({
                         <p className="text-xs text-gray-500">My profile</p>
                         <div className="flex items-center justify-between">
                           <h3 className="text-sm font-bold text-gray-900">{user?.firstName && user?.lastName
-                                  ? `${user.firstName} ${user.lastName}`
-                                  : user?.firstName
-                                    ? user.firstName
-                                    : user?.lastName
-                                      ? user.lastName
-                                      : user?.email
-                                        ? user.email.split("@")[0]
-                                        : "User"}</h3>
+                            ? `${user.firstName} ${user.lastName}`
+                            : user?.firstName
+                              ? user.firstName
+                              : user?.lastName
+                                ? user.lastName
+                                : user?.email
+                                  ? user.email.split("@")[0]
+                                  : "User"}</h3>
                           <div className="w-6 h-6 rounded flex items-center justify-center" style={{ backgroundColor: '#E3F2FD' }}>
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

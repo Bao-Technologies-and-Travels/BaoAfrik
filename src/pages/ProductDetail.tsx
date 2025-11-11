@@ -226,6 +226,7 @@ const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<any[]>([]);
 
   const { addToast } = useToast();
   const { logout } = useAuth();
@@ -420,22 +421,22 @@ const ProductDetail: React.FC = () => {
     try {
       setIsContactingSeller(true);
 
+      const existingConversation = conversations.find(conv =>
+        conv.participant?.id === product.seller.id
+      );
+
+      if (existingConversation) {
+        console.log('Using existing conversation with seller:', existingConversation.id);
+        await handleConversationClick(existingConversation.id);
+        return;
+      }
+
       console.log('Starting contact seller process for product:', product.id);
       console.log('Seller data:', product.seller);
 
       const token = localStorage.getItem("accessToken");
-      if (!token) {
-        addToast({
-          type: "error",
-          title: "Authentication Required",
-          message: "Please log in to contact the seller",
-          duration: 3000,
-        });
-        navigate("/login");
-        return;
-      }
 
-       const productDataToSend = {
+      const productDataToSend = {
         id: product.id,
         name: product.title,
         price: product.price,
@@ -462,6 +463,7 @@ const ProductDetail: React.FC = () => {
           },
           body: JSON.stringify({
             productId: product.id,
+            sellerId: product.seller.id
           }),
         }
       );
@@ -477,17 +479,9 @@ const ProductDetail: React.FC = () => {
       console.log('Chat API success:', result);
 
       if (result.success) {
-        navigate("/messages", {
-          state: {
-            conversation: result.data.conversation,
-            conversationId: result.data.conversation.id,
-            productData: productDataToSend,
-            preFilledMessage: "Hello, I am interested in this item, is it still available?",
-          },
-          replace: false,
-        });
+        await handleConversationClick(result.data.conversation.id);
       } else {
-        throw new Error(result.message || "Failed to start conversation");
+        throw new Error(result.error || 'Failed to contact seller');
       }
     } catch (error: any) {
       console.error('Error in handleContactSeller:', error);
@@ -520,6 +514,45 @@ const ProductDetail: React.FC = () => {
       setIsContactingSeller(false);
     }
   };
+
+  const handleConversationClick = async (conversationId: string) => {
+    navigate("/messages", {
+      state: {
+        conversationId: conversationId
+      }
+    });
+  };
+
+  const fetchConversations = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/chat/conversations`,
+        {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setConversations(data.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch conversations:', error);
+    }
+  };
+
+  // call fetch conversations when component mounts or user changes
+  useEffect(() => {
+    if (user?.id) {
+      fetchConversations();
+    }
+  }, [user?.id]);
 
   const handleWishlist = (productId: string) => {
     setWishlistProducts((prev) => {

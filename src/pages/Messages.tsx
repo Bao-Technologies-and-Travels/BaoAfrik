@@ -168,6 +168,8 @@ const Messages: React.FC = () => {
   const currentMessageIdRef = useRef<string | null>(null);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [lastTypingTime, setLastTypingTime] = useState<number>(0);
 
   const handleLogout = () => {
     logout();
@@ -372,22 +374,31 @@ const Messages: React.FC = () => {
     const handleUserTyping = (data: any) => {
       console.log('User typing:', data);
       if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
+        console.log('Showing typing indicator for user:', data.userId);
         setShowTypingIndicator(true);
         setIsSellerTyping(true);
 
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
           console.log('Auto-hiding typing indicator');
           setShowTypingIndicator(false);
           setIsSellerTyping(false);
         }, 3000);
+
+        setTypingTimeout(timeout);
       }
     };
 
     const handleUserStopTyping = (data: any) => {
       console.log('User stopped typing:', data);
       if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
+        console.log('Hiding typing indicator for user:', data.userId);
         setShowTypingIndicator(false);
         setIsSellerTyping(false);
+
+        if (typingTimer) {
+          clearTimeout(typingTimer);
+          setTypingTimer(null);
+        }
       }
     };
 
@@ -1212,11 +1223,18 @@ const Messages: React.FC = () => {
 
   // Typing detection logic
   const handleTypingDetection = useCallback(() => {
-    if (!currentConversation?.id || !socket || !isSocketConnected) return;
+    if (!currentConversation?.id || !socket || !isSocketConnected) {
+      console.log('Cannot send typing: no conversation or socket');
+      return;
+    };
+
+    const now = Date.now();
+
+    if (now - lastTypingTime < 500) {
+      return;
+    }
 
     console.log('⌨️ Starting typing detection for conversation:', currentConversation.id);
-
-    setIsUserTyping(true);
 
     // Send typing start event
     socket.emit("typing_start", {
@@ -1224,36 +1242,45 @@ const Messages: React.FC = () => {
       userId: currentUser?.id,
     });
 
+    setLastTypingTime(now);
+
     // clear existing timer
-    if (typingTimer) {
-      clearTimeout(typingTimer);
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
     }
 
-    // set new timer to stop typing indicator
+    // set new timer to stop typing indicator after 2 seconds of inactivity
     const timer = setTimeout(() => {
-      console.log('Stopping typing detection');
-      setIsUserTyping(false);
-
+      console.log('Stopping typing detection for conversation:', currentConversation.id);
       socket.emit("typing_stop", {
         conversationId: currentConversation.id,
         userId: currentUser?.id,
       });
     }, 2000);
 
-    setTypingTimer(timer);
+    setTypingTimeout(timer);
   }, [
     currentConversation?.id,
     socket,
     isSocketConnected,
-    typingTimer,
+    typingTimeout,
+    lastTypingTime,
     currentUser?.id,
   ]);
 
   const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessageText(e.target.value);
+    const value = e.target.value;
+    setMessageText(value);
 
-    if (e.target.value.trim().length > 0) {
+    if (value.trim().length > 0 && currentConversation?.id) {
       handleTypingDetection();
+    } else if (value.trim().length === 0 && currentConversation?.id) {
+      if (socket && isSocketConnected) {
+        socket.emit("typing_stop", {
+          conversationId: currentConversation.id,
+          userId: currentUser?.id
+        });
+      }
     }
   };
 
@@ -1677,7 +1704,7 @@ const Messages: React.FC = () => {
 
   const handleSendMessage = async (voiceBlob?: Blob) => {
     if (!checkConnection()) return;
-    
+
     const userTypedText = messageText.trim();
     const hasUserTyped =
       userTypedText && userTypedText !== preFilledMessage.trim();
@@ -2442,11 +2469,18 @@ const Messages: React.FC = () => {
   // Cleanup typing timer on unmount
   useEffect(() => {
     return () => {
-      if (typingTimer) {
-        clearTimeout(typingTimer);
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+
+      if (socket && isSocketConnected && currentConversation?.id) {
+        socket.emit("typing_stop", {
+          conversationId: currentConversation.id,
+          userId: currentUser?.id
+        });
       }
     };
-  }, [typingTimer]);
+  }, [typingTimeout, socket, isSocketConnected, currentConversation?.id, currentUser?.id]);
 
   useEffect(() => {
     return () => {
@@ -3886,18 +3920,39 @@ const Messages: React.FC = () => {
 
                       {/* Messages */}
                       {visibleMessages.map((message, index) => {
-                        const isFadingOut = fadingOutMessageIds.includes(
-                          message.id
-                        );
+                        const isFadingOut = fadingOutMessageIds.includes(message.id);
                         const isReactionActive =
                           activeReactionMessageId === message.id;
+                        const isSystemMessage = message.messageType === 'SYSTEM' || message.isSystemMessage;
+
+                        // Handle system messages (safety disclaimer)
+                        if (isSystemMessage) {
+                          return (
+                            <div key={message.id} className="flex justify-center mb-4">
+                              <div className="max-w-md w-full">
+                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+                                  <div className="flex items-center justify-center mb-2">
+                                    <svg className="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="text-sm font-medium text-yellow-800">Safety Notice</span>
+                                  </div>
+                                  <p className="text-sm text-yellow-700 leading-relaxed">
+                                    {message.content}
+                                  </p>
+                                  <div className="mt-2 pt-2 border-t border-yellow-200">
+                                    <span className="text-xs text-yellow-600">
+                                      {formatMessageTime(message.timestamp)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+
                         return (
-                          <div
-                            key={message.id}
-                            className={`flex mb-4 ${message.isIncoming
-                              ? "justify-start"
-                              : "justify-end"
-                              } ${isFadingOut ? "message-fade-out" : ""}`}
+                          <div key={message.id} className={`flex mb-4 ${message.isIncoming ? "justify-start" : "justify-end"} ${isFadingOut ? "message-fade-out" : ""}`}
                             style={{
                               animation: isFadingOut
                                 ? "fadeOutUp 0.5s ease-in-out forwards"
@@ -3965,7 +4020,7 @@ const Messages: React.FC = () => {
                                     <div className="flex items-center space-x-3">
                                       <div className="relative">
                                         <img
-                                          src={avatarIcon}
+                                          src={user?.profileImage || avatarIcon}
                                           alt="Your Avatar"
                                           className="w-10 h-10 rounded-full"
                                         />
