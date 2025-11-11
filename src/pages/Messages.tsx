@@ -150,6 +150,7 @@ const Messages: React.FC = () => {
   const [showReactionEmojiPicker, setShowReactionEmojiPicker] = useState(false);
   const [replyToMessage, setReplyToMessage] = useState<any>(null);
   const [showMobileConversation, setShowMobileConversation] = useState(false);
+  const [recordedWaveforms, setRecordedWaveforms] = useState<number[]>([]);
   const [mobileMessageOptionsId, setMobileMessageOptionsId] = useState<number | null>(null);
   const [showMobileReactionPicker, setShowMobileReactionPicker] = useState(false);
   const [mobileMessageCoords, setMobileMessageCoords] = useState<{ top: number; left: number } | null>(null);
@@ -960,6 +961,9 @@ const Messages: React.FC = () => {
     setIsRecording(false);
     setSoundDetected(false);
     
+    // Save the recorded waveforms before clearing
+    setRecordedWaveforms([...audioLevels]);
+    
     if (recordingTimer) {
       clearInterval(recordingTimer);
       setRecordingTimer(null);
@@ -993,9 +997,7 @@ const Messages: React.FC = () => {
     
     setAnalyser(null);
     
-    // Reset waveform to flat line
-    setAudioLevels(Array(20).fill(0.1));
-    
+    // Keep the recorded waveforms for preview (don't reset)
     // Keep the recording time for display purposes
   };
 
@@ -1032,9 +1034,13 @@ const Messages: React.FC = () => {
         dateString: `Today, ${timeString}`,
         sentAt: currentTime,
         audioUrl: audioUrl,
+        waveformData: [...recordedWaveforms],
         replyTo: replyToMessage ? {
           text: replyToMessage.text,
-          sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'
+          sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You',
+          type: replyToMessage.type,
+          duration: replyToMessage.duration,
+          waveformData: replyToMessage.waveformData
         } : null
       };
       
@@ -1118,6 +1124,8 @@ const Messages: React.FC = () => {
       setReplyToMessage(null);
       setAudioChunks([]);
       setMediaRecorder(null);
+      setRecordedWaveforms([]);
+      setAudioLevels([]);
       
       // Clean up preview audio if playing
       if (previewAudio) {
@@ -1675,15 +1683,27 @@ const Messages: React.FC = () => {
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-center space-x-0.5 flex-shrink-0">
-                                  {[3,5,3,6,9,11,13,11,9,6,5,3,6,8,9,8,6,5,3,5].map((h, i) => (
-                                    <div
-                                      key={i}
-                                      className="w-0.5 bg-white rounded-full"
-                                      style={{
-                                        height: `${h}px`,
-                                      }}
-                                    />
-                                  ))}
+                                  {(message.waveformData && message.waveformData.length > 0 ? 
+                                    message.waveformData.slice(-20).map((level: number, i: number) => (
+                                      <div
+                                        key={i}
+                                        className="w-0.5 bg-white rounded-full"
+                                        style={{
+                                          height: `${Math.max(3, level * 15)}px`,
+                                        }}
+                                      />
+                                    ))
+                                  : 
+                                    [3,5,3,6,9,11,13,11,9,6,5,3,6,8,9,8,6,5,3,5].map((h, i) => (
+                                      <div
+                                        key={i}
+                                        className="w-0.5 bg-white rounded-full"
+                                        style={{
+                                          height: `${h}px`,
+                                        }}
+                                      />
+                                    ))
+                                  )}
                                 </div>
                               </div>
                             ) : (
@@ -1697,30 +1717,63 @@ const Messages: React.FC = () => {
                                     </p>
                                     
                                     {message.replyTo.type === 'voice' ? (
-                                      /* Voice Note Reply */
-                                      <div className="flex items-center space-x-1.5">
-                                        <span style={{ fontSize: '10px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)', fontWeight: 500 }}>
-                                          {message.replyTo.sender}
-                                        </span>
-                                        <span style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
-                                          {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
-                                        </span>
-                                        <div className="flex items-center space-x-0.5">
-                                          {[2,3,2,4,6,7,8,7,6,4].map((h, i) => (
-                                            <div
-                                              key={i}
-                                              style={{ 
-                                                width: '2px',
-                                                height: `${h}px`,
-                                                backgroundColor: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)',
-                                                borderRadius: '1px'
-                                              }}
-                                            />
-                                          ))}
+                                      /* Voice Note Reply - Screenshot Structure */
+                                      <div className="flex items-start">
+                                        {/* White vertical line on LEFT */}
+                                        <div 
+                                          className="rounded-full mr-1.5"
+                                          style={{ 
+                                            width: '2px',
+                                            backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                            height: '30px',
+                                            flexShrink: 0,
+                                            marginTop: '2px'
+                                          }}
+                                        ></div>
+                                        
+                                        <div className="flex-1">
+                                          {/* "You" text in light blue */}
+                                          <div style={{ fontSize: '10px', color: message.isIncoming ? '#64B5F6' : '#CFE8FC', fontWeight: 500, marginBottom: '4px' }}>
+                                            {message.replyTo.sender}
+                                          </div>
+                                          
+                                          {/* Audio preview inline */}
+                                          <div className="flex items-center space-x-1">
+                                            <span style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                              {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
+                                            </span>
+                                            <div className="flex items-center space-x-0.5">
+                                              {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ? 
+                                                message.replyTo.waveformData.slice(-10).map((level: number, i: number) => (
+                                                  <div
+                                                    key={i}
+                                                    style={{ 
+                                                      width: '1.5px',
+                                                      height: `${Math.max(2, level * 8)}px`,
+                                                      backgroundColor: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)',
+                                                      borderRadius: '1px'
+                                                    }}
+                                                  />
+                                                ))
+                                              : 
+                                                [2,3,2,4,6,7,8,7,6,4].map((h, i) => (
+                                                  <div
+                                                    key={i}
+                                                    style={{ 
+                                                      width: '1.5px',
+                                                      height: `${h}px`,
+                                                      backgroundColor: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)',
+                                                      borderRadius: '1px'
+                                                    }}
+                                                  />
+                                                ))
+                                              )}
+                                            </div>
+                                            <svg style={{ width: '12px', height: '12px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }} fill="currentColor" viewBox="0 0 24 24">
+                                              <path d="M8 5v14l11-7z" />
+                                            </svg>
+                                          </div>
                                         </div>
-                                        <svg style={{ width: '12px', height: '12px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }} fill="currentColor" viewBox="0 0 24 24">
-                                          <path d="M8 5v14l11-7z" />
-                                        </svg>
                                       </div>
                                     ) : (
                                       /* Text Reply */
@@ -2221,41 +2274,64 @@ const Messages: React.FC = () => {
             {replyToMessage && (
               <div className="mb-2 relative">
                 {replyToMessage.type === 'voice' ? (
-                  /* Voice Note Reply Preview */
+                  /* Voice Note Reply Preview - Matches Audio Preview Style */
                   <div 
-                    className="rounded-lg p-2 pr-8 relative flex items-center space-x-2"
+                    className="p-2 relative flex items-center space-x-2"
                     style={{ 
-                      backgroundColor: '#64B5F6'
+                      backgroundColor: '#64B5F6',
+                      borderRadius: '12px',
+                      maxWidth: '85%'
                     }}
                   >
                     {/* Play icon */}
-                    <svg className="w-4 h-4 text-white fill-current flex-shrink-0" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
-                    </svg>
+                    <button className="hover:opacity-80 transition-opacity flex-shrink-0">
+                      <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                      </svg>
+                    </button>
                     
                     {/* Duration text */}
-                    <span className="text-white text-xs whitespace-nowrap">
+                    <span className="text-white text-xs mx-2 flex-shrink-0">
                       {Math.floor((replyToMessage.duration || 0) / 60).toString().padStart(2, '0')} : {((replyToMessage.duration || 0) % 60).toString().padStart(2, '0')} - Audio
                     </span>
                     
                     {/* Waveform */}
-                    <div className="flex items-center justify-center space-x-0.5 flex-1">
-                      {[3,5,3,6,9,11,13,11,9,6,5,3].map((h, i) => (
-                        <div
-                          key={i}
-                          className="w-0.5 bg-white rounded-full"
-                          style={{ height: `${h}px` }}
-                        />
-                      ))}
+                    <div className="flex space-x-0.5 items-end flex-1 mx-2">
+                      {(replyToMessage.waveformData && replyToMessage.waveformData.length > 0 ? 
+                        replyToMessage.waveformData.slice(-20).map((level: number, i: number) => (
+                          <div
+                            key={i}
+                            className="w-0.5 bg-white rounded-full"
+                            style={{ height: `${Math.max(2, level * 15)}px`, minHeight: '2px' }}
+                          />
+                        ))
+                      : 
+                        [3,5,3,6,9,11,13,11,9,6,5,3].map((h, i) => (
+                          <div
+                            key={i}
+                            className="w-0.5 bg-white rounded-full"
+                            style={{ height: `${h}px`, minHeight: '2px' }}
+                          />
+                        ))
+                      )}
                     </div>
                     
                     {/* Close button */}
                     <button
                       onClick={() => setReplyToMessage(null)}
-                      className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
+                      className="hover:opacity-80 transition-opacity flex-shrink-0"
+                      style={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                        borderRadius: '50%',
+                        width: '18px',
+                        height: '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
                     >
-                      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
                   </div>
@@ -2488,19 +2564,30 @@ const Messages: React.FC = () => {
                     {Math.floor((isPreviewPlaying ? previewPlaybackTime : recordingTime) / 60).toString().padStart(2, '0')} : {((isPreviewPlaying ? previewPlaybackTime : recordingTime) % 60).toString().padStart(2, '0')} - Audio
                   </span>
                   <div className="flex space-x-0.5 items-end flex-1 mx-2">
-                    {[3,5,3,6,9,11,13,11,9,6,5,3,6,8,9,8,6,5,3,5].map((h, i) => (
-                      <div
-                        key={i}
-                        className="w-0.5 bg-white rounded-full"
-                        style={{ height: `${h}px`, minHeight: '2px' }}
-                      />
-                    ))}
+                    {recordedWaveforms.length > 0 ? (
+                      recordedWaveforms.slice(-20).map((level, i) => (
+                        <div
+                          key={i}
+                          className="w-0.5 bg-white rounded-full"
+                          style={{ height: `${Math.max(2, level * 15)}px`, minHeight: '2px' }}
+                        />
+                      ))
+                    ) : (
+                      [3,5,3,6,9,11,13,11,9,6,5,3,6,8,9,8,6,5,3,5].map((h, i) => (
+                        <div
+                          key={i}
+                          className="w-0.5 bg-white rounded-full"
+                          style={{ height: `${h}px`, minHeight: '2px' }}
+                        />
+                      ))
+                    )}
                   </div>
                   <button
                     onClick={() => {
                       setRecordingTime(0);
                       setAudioChunks([]);
-                      setAudioLevels(Array(20).fill(0.1));
+                      setAudioLevels([]);
+                      setRecordedWaveforms([]);
                       setIsPreviewPlaying(false);
                       setPreviewPlaybackTime(0);
                       if (previewAudio) {
@@ -3986,15 +4073,27 @@ const Messages: React.FC = () => {
                                   <span className="text-white text-sm">Audio</span>
                                 </div>
                                 <div className="flex items-center justify-center space-x-0.5">
-                                  {[4,6,4,8,12,14,16,14,12,8,6,4,8,10,12,10,8,6,4,6].map((h, i) => (
-                                    <div
-                                      key={i}
-                                      className="w-0.5 bg-white rounded-full"
-                                      style={{
-                                        height: `${h}px`,
-                                      }}
-                                    />
-                                  ))}
+                                  {(message.waveformData && message.waveformData.length > 0 ? 
+                                    message.waveformData.slice(-20).map((level: number, i: number) => (
+                                      <div
+                                        key={i}
+                                        className="w-0.5 bg-white rounded-full"
+                                        style={{
+                                          height: `${Math.max(4, level * 18)}px`,
+                                        }}
+                                      />
+                                    ))
+                                  : 
+                                    [4,6,4,8,12,14,16,14,12,8,6,4,8,10,12,10,8,6,4,6].map((h, i) => (
+                                      <div
+                                        key={i}
+                                        className="w-0.5 bg-white rounded-full"
+                                        style={{
+                                          height: `${h}px`,
+                                        }}
+                                      />
+                                    ))
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -4010,30 +4109,63 @@ const Messages: React.FC = () => {
                                   </p>
                                   
                                   {message.replyTo.type === 'voice' ? (
-                                    /* Voice Note Reply */
-                                    <div className="flex items-center space-x-2">
-                                      <span className="text-xs font-medium" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                                        {message.replyTo.sender}
-                                      </span>
-                                      <span className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                                        {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
-                                      </span>
-                                      <div className="flex items-center space-x-0.5">
-                                        {[3,4,3,5,8,10,12,10,8,5,4,3].map((h, i) => (
-                                          <div
-                                            key={i}
-                                            style={{ 
-                                              width: '2px',
-                                              height: `${h}px`,
-                                              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                                              borderRadius: '1px'
-                                            }}
-                                          />
-                                        ))}
+                                    /* Voice Note Reply - Screenshot Structure */
+                                    <div className="flex items-start">
+                                      {/* White vertical line on LEFT */}
+                                      <div 
+                                        className="rounded-full mr-2"
+                                        style={{ 
+                                          width: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          height: '36px',
+                                          flexShrink: 0,
+                                          marginTop: '2px'
+                                        }}
+                                      ></div>
+                                      
+                                      <div className="flex-1">
+                                        {/* "You" text in light blue */}
+                                        <div className="text-xs font-medium mb-1" style={{ color: '#CFE8FC' }}>
+                                          {message.replyTo.sender}
+                                        </div>
+                                        
+                                        {/* Audio preview inline */}
+                                        <div className="flex items-center space-x-1.5">
+                                          <span className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                            {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
+                                          </span>
+                                          <div className="flex items-center space-x-0.5">
+                                            {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ? 
+                                              message.replyTo.waveformData.slice(-12).map((level: number, i: number) => (
+                                                <div
+                                                  key={i}
+                                                  style={{ 
+                                                    width: '2px',
+                                                    height: `${Math.max(3, level * 10)}px`,
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                                                    borderRadius: '1px'
+                                                  }}
+                                                />
+                                              ))
+                                            : 
+                                              [3,4,3,5,8,10,12,10,8,5,4,3].map((h, i) => (
+                                                <div
+                                                  key={i}
+                                                  style={{ 
+                                                    width: '2px',
+                                                    height: `${h}px`,
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                                                    borderRadius: '1px'
+                                                  }}
+                                                />
+                                              ))
+                                            )}
+                                          </div>
+                                          <svg className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.6)' }} fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z" />
+                                          </svg>
+                                        </div>
                                       </div>
-                                      <svg className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.6)' }} fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M8 5v14l11-7z" />
-                                      </svg>
                                     </div>
                                   ) : (
                                     /* Text Reply */
@@ -4583,41 +4715,57 @@ const Messages: React.FC = () => {
                   {replyToMessage && (
                     <div className="mb-2 relative">
                       {replyToMessage.type === 'voice' ? (
-                        /* Voice Note Reply Preview */
+                        /* Voice Note Reply Preview - Matches Audio Preview Style */
                         <div 
-                          className="rounded-lg p-3 pr-10 relative flex items-center space-x-3"
+                          className="p-3 relative flex items-center"
                           style={{ 
-                            backgroundColor: '#64B5F6'
+                            backgroundColor: '#64B5F6',
+                            borderRadius: '12px'
                           }}
                         >
                           {/* Play icon */}
-                          <svg className="w-5 h-5 text-white fill-current flex-shrink-0" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
-                          </svg>
+                          <button className="hover:opacity-80 transition-opacity flex-shrink-0">
+                            <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                            </svg>
+                          </button>
                           
-                          {/* Duration text */}
-                          <span className="text-white text-sm whitespace-nowrap">
-                            {Math.floor((replyToMessage.duration || 0) / 60).toString().padStart(2, '0')} : {((replyToMessage.duration || 0) % 60).toString().padStart(2, '0')} - Audio
+                          {/* Duration and Audio label */}
+                          <span className="text-white text-sm">
+                            {Math.floor((replyToMessage.duration || 0) / 60).toString().padStart(2, '0')} : {((replyToMessage.duration || 0) % 60).toString().padStart(2, '0')}
                           </span>
+                          <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
+                          <span className="text-white text-sm">Audio</span>
                           
                           {/* Waveform */}
-                          <div className="flex items-center justify-center space-x-0.5 flex-1">
-                            {[4,6,4,8,12,14,16,14,12,8,6,4,8,10,12,10,8,6,4,6].map((h, i) => (
-                              <div
-                                key={i}
-                                className="w-0.5 bg-white rounded-full"
-                                style={{ height: `${h}px` }}
-                              />
-                            ))}
+                          <div className="flex items-center justify-center space-x-0.5 ml-2">
+                            {(replyToMessage.waveformData && replyToMessage.waveformData.length > 0 ? 
+                              replyToMessage.waveformData.slice(-20).map((level: number, i: number) => (
+                                <div
+                                  key={i}
+                                  className="w-0.5 bg-white rounded-full"
+                                  style={{ height: `${Math.max(4, level * 18)}px` }}
+                                />
+                              ))
+                            : 
+                              [6,8,4,6,12,16,14,18,20,16,12,8,6,10,14,12,8,6,4,8].map((h, i) => (
+                                <div
+                                  key={i}
+                                  className="w-0.5 bg-white rounded-full"
+                                  style={{ height: `${h}px` }}
+                                />
+                              ))
+                            )}
                           </div>
                           
                           {/* Close button */}
                           <button
                             onClick={() => setReplyToMessage(null)}
-                            className="absolute top-2 right-2 hover:opacity-70 transition-opacity"
+                            className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity ml-2"
+                            style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
                           >
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                           </button>
                         </div>
@@ -4886,13 +5034,23 @@ const Messages: React.FC = () => {
                             <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
                             <span className="text-white text-sm">Audio</span>
                             <div className="flex items-center justify-center space-x-0.5">
-                              {[6,8,4,6,12,16,14,18,20,16,12,8,6,10,14,12,8,6,4,8].map((h, i) => (
-                                <div
-                                  key={i}
-                                  className="w-0.5 bg-white rounded-full"
-                                  style={{ height: `${h}px` }}
-                                />
-                              ))}
+                              {recordedWaveforms.length > 0 ? (
+                                recordedWaveforms.slice(-20).map((level, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-0.5 bg-white rounded-full"
+                                    style={{ height: `${Math.max(4, level * 18)}px` }}
+                                  />
+                                ))
+                              ) : (
+                                [6,8,4,6,12,16,14,18,20,16,12,8,6,10,14,12,8,6,4,8].map((h, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-0.5 bg-white rounded-full"
+                                    style={{ height: `${h}px` }}
+                                  />
+                                ))
+                              )}
                             </div>
                           </div>
                           <button 
@@ -4906,6 +5064,8 @@ const Messages: React.FC = () => {
                               setPreviewPlaybackTime(0);
                               setRecordingTime(0);
                               setAudioChunks([]);
+                              setRecordedWaveforms([]);
+                              setAudioLevels([]);
                             }}
                             className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                             style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
