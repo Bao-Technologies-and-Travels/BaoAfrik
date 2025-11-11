@@ -58,6 +58,16 @@ import amIcon from '../assets/images/pre/AM.svg';
 import pinBadgeIcon from '../assets/images/pre/pn.svg';
 import documentIcon from '../assets/images/pre/do.svg';
 import photoIcon from '../assets/images/pre/ph.svg';
+import closeIcon from '../assets/images/pre/cc.svg';
+
+// PDF Icon Component
+const PDFIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
+  <svg width={size} height={size} viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M32 0H4C1.79086 0 0 1.79086 0 4V52C0 54.2091 1.79086 56 4 56H44C46.2091 56 48 54.2091 48 52V16L32 0Z" fill="#FF1607"/>
+    <path d="M32 0L48 16H38C34.6863 16 32 13.3137 32 10V0Z" fill="#FFFFFF80"/>
+    <text x="24" y="38" fontSize="14" fontWeight="bold" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif">PDF</text>
+  </svg>
+);
 
 const Messages: React.FC = () => {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -1578,17 +1588,17 @@ const Messages: React.FC = () => {
                                   const fileName = doc.name.split('.');
                                   const extension = fileName.pop() || '';
                                   const nameWithoutExt = fileName.join('.');
+                                  const fileSizeMB = doc.size / (1024 * 1024);
+                                  const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
                                   return (
-                                    <div key={docIndex} className="flex items-center space-x-2 p-2" style={{ backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '8px' }}>
-                                      <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#E74C3C' }}>
-                                        <span className="text-white text-xs font-bold">{extension.toUpperCase()}</span>
-                                      </div>
+                                    <div key={docIndex} className="flex items-center space-x-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                                      <PDFIcon size={32} />
                                       <div className="flex-1 min-w-0">
-                                        <p className="text-xs truncate" style={{ color: '#FFFFFF' }}>
+                                        <p className="text-xs truncate" style={{ color: '#FFFFFF', fontWeight: '400' }}>
                                           {nameWithoutExt} · {extension}
                                         </p>
-                                        <p className="text-xs" style={{ color: '#B8DDFB' }}>
-                                          {Math.ceil(doc.size / (1024 * 1024))} MB
+                                        <p style={{ fontSize: '10px', color: '#B8DDFB' }}>
+                                          {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
                                         </p>
                                       </div>
                                     </div>
@@ -2033,27 +2043,24 @@ const Messages: React.FC = () => {
                     const fileName = file.name.split('.');
                     const extension = fileName.pop() || '';
                     const nameWithoutExt = fileName.join('.');
+                    const fileSizeMB = file.size / (1024 * 1024);
+                    const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1)); // Rough estimate: ~100KB per page
                     return (
-                      <div key={index} className="relative mb-2 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px' }}>
-                        <div className="w-10 h-10 rounded flex items-center justify-center" style={{ backgroundColor: '#E74C3C' }}>
-                          <span className="text-white text-xs font-bold">{extension.toUpperCase()}</span>
-                        </div>
+                      <div key={index} className="relative mb-2 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                        <PDFIcon size={40} />
                         <div className="flex-1">
-                          <p className="text-xs" style={{ color: '#6A6A6A' }}>
+                          <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
                             {nameWithoutExt} · {extension}
                           </p>
-                          <p className="text-xs" style={{ color: '#B0B0B0' }}>
-                            {Math.ceil(file.size / (1024 * 1024))} MB
+                          <p style={{ fontSize: '10px', color: '#B0B0B0' }}>
+                            {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
                           </p>
                         </div>
                         <button
                           onClick={() => removeFile(index)}
-                          className="w-5 h-5 rounded-full flex items-center justify-center hover:opacity-70"
-                          style={{ backgroundColor: '#4D4D4D', border: '2px solid #FFFFFF' }}
+                          className="absolute top-2 right-2 w-4 h-4 flex items-center justify-center hover:opacity-70"
                         >
-                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                          <img src={closeIcon} alt="Close" className="w-4 h-4" />
                         </button>
                       </div>
                     );
@@ -3352,17 +3359,17 @@ const Messages: React.FC = () => {
                                     const fileName = doc.name.split('.');
                                     const extension = fileName.pop() || '';
                                     const nameWithoutExt = fileName.join('.');
+                                    const fileSizeMB = doc.size / (1024 * 1024);
+                                    const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
                                     return (
-                                      <div key={docIndex} className="flex items-center space-x-3 p-3" style={{ backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '10px' }}>
-                                        <div className="w-10 h-10 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#E74C3C' }}>
-                                          <span className="text-white text-xs font-bold">{extension.toUpperCase()}</span>
-                                        </div>
+                                      <div key={docIndex} className="flex items-center space-x-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                                        <PDFIcon size={40} />
                                         <div className="flex-1 min-w-0">
-                                          <p className="text-sm truncate" style={{ color: '#FFFFFF' }}>
+                                          <p className="text-sm truncate" style={{ color: '#FFFFFF', fontWeight: '400' }}>
                                             {nameWithoutExt} · {extension}
                                           </p>
-                                          <p className="text-sm" style={{ color: '#B8DDFB' }}>
-                                            {Math.ceil(doc.size / (1024 * 1024))} MB
+                                          <p className="text-xs" style={{ color: '#B8DDFB' }}>
+                                            {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
                                           </p>
                                         </div>
                                       </div>
@@ -4169,27 +4176,24 @@ const Messages: React.FC = () => {
                               const fileName = file.name.split('.');
                               const extension = fileName.pop() || '';
                               const nameWithoutExt = fileName.join('.');
+                              const fileSizeMB = file.size / (1024 * 1024);
+                              const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
                               return (
-                                <div key={index} className="relative mb-3 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px' }}>
-                                  <div className="w-12 h-12 rounded flex items-center justify-center" style={{ backgroundColor: '#E74C3C' }}>
-                                    <span className="text-white text-sm font-bold">{extension.toUpperCase()}</span>
-                                  </div>
+                                <div key={index} className="relative mb-3 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', fontFamily: 'Poppins, sans-serif', maxWidth: '400px' }}>
+                                  <PDFIcon size={48} />
                                   <div className="flex-1">
-                                    <p className="text-sm" style={{ color: '#6A6A6A' }}>
+                                    <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>
                                       {nameWithoutExt} · {extension}
                                     </p>
-                                    <p className="text-sm" style={{ color: '#B0B0B0' }}>
-                                      {Math.ceil(file.size / (1024 * 1024))} MB
+                                    <p className="text-xs" style={{ color: '#B0B0B0' }}>
+                                      {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
                                     </p>
                                   </div>
                                   <button
                                     onClick={() => removeFile(index)}
-                                    className="w-6 h-6 rounded-full flex items-center justify-center hover:opacity-70"
-                                    style={{ backgroundColor: '#4D4D4D', border: '2px solid #FFFFFF' }}
+                                    className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center hover:opacity-70"
                                   >
-                                    <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <img src={closeIcon} alt="Close" className="w-5 h-5" />
                                   </button>
                                 </div>
                               );
