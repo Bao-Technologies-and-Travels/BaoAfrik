@@ -214,6 +214,9 @@ const Messages: React.FC = () => {
     const newSocket = io(process.env.REACT_APP_WS_URL!, {
       auth: { token },
       transports: ["websocket", "polling"],
+      timeout: 10000,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
     });
 
     socketRef.current = newSocket;
@@ -269,7 +272,7 @@ const Messages: React.FC = () => {
                 day: "numeric",
               }
             ),
-            status: isOurMessage ? "delivered" : "read",
+            status: isOurMessage ? "sent" : "read",
           };
           return updatedMessages;
         } else {
@@ -290,24 +293,29 @@ const Messages: React.FC = () => {
                   day: "numeric",
                 }
               ),
-              status: isOurMessage ? "delivered" : "read",
+              status: isOurMessage ? "sent" : "read",
             },
           ];
         }
       });
     };
 
-    newSocket.on("connect", handleConnect);
-    newSocket.on("disconnect", handleDisconnect);
-    newSocket.on("connect_error", handleConnectError);
-    newSocket.on("new_message", handleNewMessage);
+    const handleMessageStatusUpdate = (data: any) => {
+      console.log('Message status update:', data);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === data.messageId ? { ...msg, status: 'delivered' } : msg
+        )
+      );
+    };
 
-    newSocket.on("message_sent", (data) => {
+    const handleMessageSent = (data: any) => {
+      console.log('Message sent confirmation:', data);
       setIsSending(false);
       setMessages((prev) =>
         prev.map((msg) => {
           if (msg.id === `temp-${data.tempId}` || msg.tempId === data.tempId) {
-            return {
+            const updatedMessage = {
               ...data,
               text: data.content || data.text,
               content: data.content,
@@ -320,13 +328,88 @@ const Messages: React.FC = () => {
                 month: "long",
                 day: "numeric",
               }),
-              status: "delivered",
+              status: "sent",
               tempId: undefined,
             };
+
+            setTimeout(() => {
+              setMessages(prev => prev.map(m =>
+                m.id === data.id ? { ...m, status: 'delivered' } : m
+              ));
+            }, 1000);
+
+            setTimeout(() => {
+              setMessages(prev => prev.map(m =>
+                m.d === data.id ? { ...m, status: 'read' } : m
+              ));
+            }, 3000);
+            return updatedMessage;
           }
           return msg;
         })
       );
+    };
+
+    const handleMessageDelivered = (data: any) => {
+      console.log('Message delivered:', data);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === data.messageId ? { ...msg, status: 'delivered' } : msg
+        )
+      )
+    };
+
+    const handleMessageRead = (data: any) => {
+      console.log('Message read:', data);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === data.messageId ? { ...msg, status: 'read' } : msg
+        )
+      )
+    };
+
+    // typing events
+    const handleUserTyping = (data: any) => {
+      console.log('User typing:', data);
+      if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
+        setShowTypingIndicator(true);
+        setIsSellerTyping(true);
+
+        setTimeout(() => {
+          console.log('Auto-hiding typing indicator');
+          setShowTypingIndicator(false);
+          setIsSellerTyping(false);
+        }, 3000);
+      }
+    };
+
+    const handleUserStopTyping = (data: any) => {
+      console.log('User stopped typing:', data);
+      if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
+        setShowTypingIndicator(false);
+        setIsSellerTyping(false);
+      }
+    };
+
+    newSocket.on("connect", handleConnect);
+    newSocket.on("disconnect", handleDisconnect);
+    newSocket.on("connect_error", handleConnectError);
+
+    newSocket.on("new_message", handleNewMessage);
+    newSocket.on("message_status_update", handleMessageStatusUpdate);
+    newSocket.on("message_sent", handleMessageSent);
+    newSocket.on("message_delivered", handleMessageDelivered);
+    newSocket.on("message_read", handleMessageRead);
+
+    newSocket.on("user_typing", handleUserTyping);
+    newSocket.on("user_stop_typing", handleUserStopTyping);
+
+    newSocket.on("connected", (data) => {
+      console.log('🔌 WebSocket server confirmed connection:', data);
+    });
+
+    newSocket.on("conversation_joined", (data) => {
+      console.log('✅ Joined conversation:', data.conversationId);
     });
 
     // cleanup function
@@ -335,11 +418,21 @@ const Messages: React.FC = () => {
       newSocket.off("disconnect", handleDisconnect);
       newSocket.off("connect_error", handleConnectError);
       newSocket.off("new_message", handleNewMessage);
+      newSocket.off("user_typing", handleUserTyping);
+      newSocket.off("user_stop_typing", handleUserStopTyping);
+      newSocket.off("connected");
+      newSocket.off("conversation_joined");
       newSocket.off("message_sent");
-      newSocket.disconnect();
+      newSocket.off("message_status_update", handleMessageStatusUpdate);
+      newSocket.off("message_delivered", handleMessageDelivered);
+      newSocket.off("message_read", handleMessageRead);
+
+      if (newSocket.connected) {
+        newSocket.disconnect();
+      }
       setSocket(null);
     };
-  }, []);
+  }, [activeConversationId, currentUser?.id, typingTimer]);
 
   const fetchConversations = useCallback(async () => {
     if (isLoadingConversations) {
@@ -348,12 +441,22 @@ const Messages: React.FC = () => {
 
     try {
       setIsLoadingConversations(true);
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/chat/conversations`
       );
 
 
       if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem("accessToken");
+          throw new Error("Authentication failed. Please log in again.");
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -361,7 +464,13 @@ const Messages: React.FC = () => {
 
       // Debug each conversation
       if (data.data && data.data.length > 0) {
+        console.log('📨 Loaded conversations:', data.data.length);
         data.data.forEach((conv: any, index: number) => {
+          console.log(`Conversation ${index + 1}:`, {
+            id: conv.id,
+            participants: conv.participants?.length || 0,
+            lastMessage: conv.lastMessage?.content?.substring(0, 50)
+          });
         });
       }
 
@@ -383,7 +492,7 @@ const Messages: React.FC = () => {
     } finally {
       setIsLoadingConversations(false);
     }
-  }, [isLoadingConversations, currentUser?.id, addToast]);
+  }, [isLoadingConversations, addToast]);
 
   useEffect(() => {
     if (!activeConversationId || isLoadingMessages) {
@@ -534,7 +643,11 @@ const Messages: React.FC = () => {
           text: message.content || "",
           content: message.content || "",
           isIncoming: message.senderId !== currentUser?.id,
-          timestamp: message.createdAt,
+          timestamp: new Date(message.createdAt).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          }),
           dateString: new Date(message.createdAt).toLocaleDateString("en-US", {
             weekday: "long",
             year: "numeric",
@@ -610,6 +723,7 @@ const Messages: React.FC = () => {
   const sendMessageViaSocket = useCallback(
     (conversationId: string, messageData: any) => {
       if (!socket || !isSocketConnected) {
+        console.error('WebSocket not connected, cannot send message');
         addToast({
           type: "error",
           title: "Connection Error",
@@ -619,21 +733,7 @@ const Messages: React.FC = () => {
         return false;
       }
 
-      const tempId = Date.now();
-
-      const enhancedProductData =
-        messageData.productData
-          ? {
-            ...messageData.productData,
-            id: messageData.productData.id,
-            name: messageData.productData.name,
-            price: messageData.productData.price,
-            image:
-              messageData.productData.images?.[0] ||
-              messageData.productData.image,
-            seller: messageData.productData.seller,
-          }
-          : null;
+      const tempId = Date.now().toString();
 
       const tempMessage = {
         id: `temp-${tempId}`,
@@ -653,21 +753,20 @@ const Messages: React.FC = () => {
           isVerifiedSeller: false,
         },
         isIncoming: false,
-        timestamp: new Date().toLocaleTimeString('en-US', {
-          hour12: true,
+        timestamp: new Date().toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit',
+          hour12: true
         }),
         dateString: "Just now",
         type: messageData.messageType?.toLowerCase() || "text",
         status: "sending",
         text: messageData.content,
-        productData: enhancedProductData,
+        productData: messageData.productData,
       };
 
       // Add message immediately to UI
       setMessages((prev) => {
-        // Check if we already have this temp message (prevent duplicates)
         const existingIndex = prev.findIndex((msg) => msg.tempId === tempId);
         if (existingIndex >= 0) {
           return prev;
@@ -675,112 +774,53 @@ const Messages: React.FC = () => {
         return [...prev, tempMessage];
       });
 
-      const messageToSend = {
+      const timeout = setTimeout(() => {
+        console.error('Message send timeout');
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.tempId === tempId
+              ? {
+                ...msg,
+                status: "Failed",
+                error: "send timeout",
+              }
+              : msg
+          )
+        );
+      }, 10000);
+
+      socket.emit("send_message", {
         ...messageData,
-        productData: enhancedProductData,
         tempId: tempId,
         conversationId,
-        timestamp: new Date().toLocaleTimeString('en-US', {
-          hour12: true,
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-        senderId: currentUser?.id,
-      };
+      },
+        (response: any) => {
+          clearTimeout(timeout);
 
-      socket.emit("send_message", messageToSend, (response: any) => {
+          if (response && response.success) {
+            console.log('Message send acknowledged:', response.data.id);
+          } else {
+            console.error('Message send failed:', response?.error);
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.tempId === tempId
+                  ? {
+                    ...msg,
+                    status: "failed",
+                    error: response?.error || "Failed to send",
+                  }
+                  : msg
+              )
+            );
 
-        if (response && response.success) {
-
-          // Update the temp message with the real server data
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.tempId === tempId
-                ? {
-                  ...response.data,
-                  id: response.data.id,
-                  status: "sent",
-                  tempId: undefined,
-                }
-                : msg
-            )
-          );
-
-          if (messageData.productData) {
-            setHasSentInitialProductMessage(true);
+            addToast({
+              type: "error",
+              title: "Send Failed",
+              message: response?.error || "Failed to send message",
+              duration: 3000,
+            });
           }
-        } else {
-
-          // Update message status to failed
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.tempId === tempId
-                ? {
-                  ...msg,
-                  status: "failed",
-                  error: response?.error || "Failed to send",
-                }
-                : msg
-            )
-          );
-
-          addToast({
-            type: "error",
-            title: "Send Failed",
-            message: response?.error || "Failed to send message",
-            duration: 3000,
-          });
-        }
-      });
-
-      const handleMessageSent = (data: any) => {
-        if (data.tempId === tempId) {
-          socket.off("message_sent", handleMessageSent);
-          socket.off("message_error", handleMessageError);
-
-          // Update message
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.tempId === tempId
-                ? {
-                  ...data,
-                  id: data.id,
-                  status: "sent",
-                  tempId: undefined,
-                }
-                : msg
-            )
-          );
-        }
-      };
-
-      const handleMessageError = (errorData: any) => {
-        if (errorData.tempId === tempId) {
-          socket.off("message_sent", handleMessageSent);
-          socket.off("message_error", handleMessageError);
-
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.tempId === tempId
-                ? {
-                  ...msg,
-                  status: "failed",
-                  error: errorData.error,
-                }
-                : msg
-            )
-          );
-        }
-      };
-
-      socket.on("message_sent", handleMessageSent);
-      socket.on("message_error", handleMessageError);
-
-      // Cleanup listeners after 10 seconds
-      setTimeout(() => {
-        socket.off("message_sent", handleMessageSent);
-        socket.off("message_error", handleMessageError);
-      }, 10000);
+        });
 
       return true;
     },
@@ -1174,8 +1214,9 @@ const Messages: React.FC = () => {
   const handleTypingDetection = useCallback(() => {
     if (!currentConversation?.id || !socket || !isSocketConnected) return;
 
+    console.log('⌨️ Starting typing detection for conversation:', currentConversation.id);
+
     setIsUserTyping(true);
-    startTyping(currentConversation.id);
 
     // Send typing start event
     socket.emit("typing_start", {
@@ -1190,14 +1231,14 @@ const Messages: React.FC = () => {
 
     // set new timer to stop typing indicator
     const timer = setTimeout(() => {
+      console.log('Stopping typing detection');
       setIsUserTyping(false);
-      // Send typing stop event
 
       socket.emit("typing_stop", {
         conversationId: currentConversation.id,
         userId: currentUser?.id,
       });
-    }, 1000);
+    }, 2000);
 
     setTypingTimer(timer);
   }, [
@@ -1210,7 +1251,10 @@ const Messages: React.FC = () => {
 
   const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageText(e.target.value);
-    handleTypingDetection();
+
+    if (e.target.value.trim().length > 0) {
+      handleTypingDetection();
+    }
   };
 
   // Cleanup when conversation changes
@@ -1584,7 +1628,7 @@ const Messages: React.FC = () => {
         block: "end",
       });
     }
-  }, [messages.length, activeConversationId]); 
+  }, [messages.length, activeConversationId]);
 
   // Cleanup for audio URLs
   useEffect(() => {
@@ -1618,7 +1662,22 @@ const Messages: React.FC = () => {
     }
   }, [isSending]);
 
+  const checkConnection = () => {
+    if (!socket || !isSocketConnected) {
+      addToast({
+        type: "error",
+        title: "Connection Lost",
+        message: "Please check your internet connection and try again.",
+        duration: 3000,
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleSendMessage = async (voiceBlob?: Blob) => {
+    if (!checkConnection()) return;
+    
     const userTypedText = messageText.trim();
     const hasUserTyped =
       userTypedText && userTypedText !== preFilledMessage.trim();
@@ -1853,31 +1912,27 @@ const Messages: React.FC = () => {
         );
 
         if (existingMessageIndex >= 0) {
-          // Update existing message - only update if necessary
-          const existingMessage = prev[existingMessageIndex];
-          if (existingMessage.status === "sending" && serverMessage.id) {
-            const updatedMessages = [...prev];
-            updatedMessages[existingMessageIndex] = {
-              ...serverMessage,
-              text: serverMessage.content || serverMessage.text,
-              content: serverMessage.content,
-              isIncoming: !isOurMessage,
-              timestamp: serverMessage.createdAt,
-              dateString: new Date(serverMessage.createdAt).toLocaleDateString(
-                "en-US",
-                {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                }
-              ),
-              status: isOurMessage ? "delivered" : "read",
-              productData: serverMessage.productData || null,
-            };
-            return updatedMessages;
-          }
-          return prev; // No changes needed
+          // Update existing message
+          const updatedMessages = [...prev];
+          updatedMessages[existingMessageIndex] = {
+            ...serverMessage,
+            text: serverMessage.content || serverMessage.text,
+            content: serverMessage.content,
+            isIncoming: !isOurMessage,
+            timestamp: new Date(serverMessage.createdAt).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true
+            }),
+            dateString: new Date(serverMessage.createdAt).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric"
+            }),
+            status: isOurMessage ? "delivered" : "read",
+          };
+          return updatedMessages;
         } else {
           // Add new message
           return [
@@ -1887,7 +1942,11 @@ const Messages: React.FC = () => {
               text: serverMessage.content || serverMessage.text,
               content: serverMessage.content,
               isIncoming: !isOurMessage,
-              timestamp: serverMessage.createdAt,
+              timestamp: new Date(serverMessage.createdAt).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+              }),
               dateString: new Date(serverMessage.createdAt).toLocaleDateString(
                 "en-US",
                 {
@@ -2154,70 +2213,6 @@ const Messages: React.FC = () => {
     setAudioLevels(Array(20).fill(0.1));
   };
 
-  // const handleSendVoiceMessage = async () => {
-  //   if (recordingTime === 0 || audioChunks.length === 0) return;
-
-  //   try {
-  //     const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-
-  //     // Upload audio file first
-  //     const presignedResponse = await fetch(
-  //       `${process.env.REACT_APP_API_URL}/chat/upload-url`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //         },
-  //         body: JSON.stringify({
-  //           fileName: `voice-message-${Date.now()}.webm`,
-  //           fileType: "audio/webm",
-  //         }),
-  //       }
-  //     );
-
-  //     if (!presignedResponse.ok) {
-  //       throw new Error("Failed to get upload URL for audio");
-  //     }
-
-  //     const { data: uploadData } = await presignedResponse.json();
-
-  //     // Upload audio to S3
-  //     const uploadResponse = await fetch(uploadData.presignedUrl, {
-  //       method: "PUT",
-  //       body: audioBlob,
-  //       headers: {
-  //         "Content-Type": "audio/webm",
-  //       },
-  //     });
-
-  //     if (!uploadResponse.ok) {
-  //       throw new Error("Audio upload failed");
-  //     }
-
-  //     // Send message with audio reference
-  //     sendMessageViaSocket(currentConversation.id, {
-  //       content: "Audio message",
-  //       messageType: "AUDIO",
-  //       audioUrl: uploadData.url,
-  //       duration: recordingTime,
-  //       fileSize: audioBlob.size,
-  //     });
-
-  //     // Reset recording state
-  //     setRecordingTime(0);
-  //     setAudioChunks([]);
-  //     setMediaRecorder(null);
-  //   } catch (error) {
-  //     addToast({
-  //       type: "error",
-  //       title: "Audio Send Failed",
-  //       message: "Failed to send audio message. Please try again.",
-  //       duration: 4000,
-  //     });
-  //   }
-  // };
-
   // Handle audio preview playback (before sending)
   const handlePreviewPlayback = () => {
     // If already playing, pause it
@@ -2461,19 +2456,67 @@ const Messages: React.FC = () => {
     };
   }, [socket]);
 
+  const formatMessageTime = (timestamp: any): string => {
+    if (!timestamp) return '--:--';
+
+    try {
+      let date: Date;
+
+      if (timestamp instanceof Date) {
+        date = timestamp;
+      } else if (typeof timestamp === 'string') {
+        // Handle ISO strings, timestamps, and your custom formats
+        if (timestamp.includes('T')) {
+          date = new Date(timestamp);
+        } else if (timestamp === 'Just now') {
+          return 'Just now';
+        } else {
+          // Try to parse as date, if fails return original
+          date = new Date(timestamp);
+          if (isNaN(date.getTime())) {
+            return timestamp; // Return original if can't parse
+          }
+        }
+      } else if (typeof timestamp === 'number') {
+        date = new Date(timestamp);
+      } else {
+        return '--:--';
+      }
+
+      if (isNaN(date.getTime())) {
+        return '--:--';
+      }
+
+      return date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    } catch (error) {
+      console.error('Error formatting time:', error, timestamp);
+      return '--:--';
+    }
+  };
+
   const MessageStatus = ({
     status,
     timestamp,
+    isIncoming = false
   }: {
     status: string;
     timestamp: string;
+    isIncoming?: boolean
   }) => {
     const getStatusIcon = () => {
+      if (isIncoming) return null;
+
+      console.log('Rendering status icon for:', status);
+
       switch (status) {
         case "sending":
           return (
             <svg
-              className="w-4 h-4 text-gray-400"
+              className="w-4 h-4 text-gray-400 animate-pulse"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -2549,12 +2592,9 @@ const Messages: React.FC = () => {
     };
 
     return (
-      <div className="flex items-center space-x-1">
-        <span className="text-xs text-gray-500">
-          {new Date(timestamp).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+      <div className="flex items-center space-x-1 mt-2">
+        <span className="text-xs mr-1 text-gray-500">
+          {formatMessageTime(timestamp)}
         </span>
         {getStatusIcon()}
       </div>
@@ -2777,11 +2817,10 @@ const Messages: React.FC = () => {
                                 </h3>
                                 <div className="flex items-center space-x-1">
                                   <span className="text-xs text-gray-500">
-                                    {new Date(
-                                      conversation.updatedAt
-                                    ).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
+                                    {new Date(conversation.updatedAt).toLocaleTimeString([], {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                      hour12: true
                                     })}
                                   </span>
                                   <button
@@ -4281,13 +4320,11 @@ const Messages: React.FC = () => {
                                   : "justify-end"
                                   }`}
                               >
-                                <span
-                                  className="text-xs mr-1"
-                                  style={{ color: "#6A6A6A" }}
-                                >
-                                  {message.timestamp}
-                                </span>
-                                {!message.isIncoming && (
+                                {message.isIncoming ? (
+                                  <span className="text-xs mr-1" style={{ color: "#6A6A6A" }}>
+                                    {formatMessageTime(message.timestamp)}
+                                  </span>
+                                ) : (
                                   <MessageStatus
                                     status={message.status}
                                     timestamp={message.timestamp}

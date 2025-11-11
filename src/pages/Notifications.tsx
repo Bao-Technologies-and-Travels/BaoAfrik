@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
+import { useNotificationToast } from '../contexts/NotificationToastContext';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
 import lilLogo from '../assets/images/pre/lil.png';
 import avatar from '../assets/images/logos/avatar.png';
@@ -10,6 +11,7 @@ import appNotificationIcon from '../assets/images/pre/nof.svg';
 
 const Notifications: React.FC = () => {
   const navigate = useNavigate();
+  const { showNotification } = useNotificationToast();
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -98,7 +100,22 @@ const Notifications: React.FC = () => {
             {/* Header */}
             <div className="px-8 pt-6 pb-4">
               <div className="flex items-center justify-between mb-6">
-                <h1 className="text-xl font-semibold" style={{ color: '#212121' }}>Notifications</h1>
+                <div className="flex items-center space-x-4">
+                  <h1 className="text-xl font-semibold" style={{ color: '#212121' }}>Notifications</h1>
+                  
+                  {/* Test Toast Button */}
+                  <button
+                    onClick={() => showNotification({
+                      type: 'app',
+                      mainText: 'Your profile has been updated,',
+                      subText: 'you ...',
+                      subText2: 'Invoice 6 August 2025 Sequence: 2-7 ...'
+                    })}
+                    className="text-xs px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
+                  >
+                    Test Toast
+                  </button>
+                </div>
                 
                 {/* Pagination */}
                 <div className="flex items-center">

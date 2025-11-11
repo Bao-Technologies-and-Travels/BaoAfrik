@@ -387,9 +387,8 @@ const CreateListing: React.FC = () => {
 
     try {
       const token = localStorage.getItem('accessToken');
-
-      for (const file of imageFiles) {
-        const presignedResponse = await fetch(`${process.env.REACT_APP_API_URL}/upload/product`, {
+      const uploadPromises = imageFiles.map(async (file) => {
+        const presignedResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}/images/upload-url`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -398,27 +397,20 @@ const CreateListing: React.FC = () => {
           body: JSON.stringify({
             fileName: file.name,
             fileType: file.type,
-            userId: user?.id,
           }),
         });
 
         if (!presignedResponse.ok) {
-          const errorText = await presignedResponse.text();
           throw new Error('Failed to get upload URL');
         }
 
         const presignedResult = await presignedResponse.json();
 
-        if (!presignedResult.success) {
-          throw new Error(presignedResult.message || 'Failed to get upload URL');
-        }
-
-        if (!presignedResult.data || !presignedResult.data.uploadUrl) {
+        if (!presignedResult.success || !presignedResult.data?.uploadUrl) {
           throw new Error('Invalid response from upload service');
         }
 
         const presignedData = presignedResult.data;
-
         const uploadResponse = await fetch(presignedData.uploadUrl, {
           method: 'PUT',
           headers: {
@@ -448,11 +440,16 @@ const CreateListing: React.FC = () => {
         });
 
         if (!addImageResponse.ok) {
-          const errorText = await addImageResponse.text();
           throw new Error('Failed to add image to product');
         }
-      }
+
+        return addImageResponse.json();
+      });
+
+      await Promise.all(uploadPromises);
+
     } catch (error) {
+      console.error('Error uploading product images:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -552,10 +549,14 @@ const CreateListing: React.FC = () => {
         deliveryAvailable
       };
 
+      console.log('Product data to send (createListing page):', productData);
+
       let createResponse;
+      let productId;
+
       if (isEditMode && id) {
         // Update existing product
-        createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
+        createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -563,8 +564,10 @@ const CreateListing: React.FC = () => {
           },
           body: JSON.stringify(productData)
         });
+        productId = id;
       } else {
         // Create new product
+        console.log('Create mode - creating new product');
         createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
           method: 'POST',
           headers: {
@@ -575,7 +578,10 @@ const CreateListing: React.FC = () => {
         });
       }
 
+      console.log('API Response status:', createResponse.status);
+
       const createResult = await createResponse.json();
+      console.log('Create product response (createListing page):', createResult);
 
       if (!createResponse.ok) {
         throw new Error(createResult.message || `Failed to ${isEditMode ? 'update' : 'create'} product`);
@@ -583,6 +589,7 @@ const CreateListing: React.FC = () => {
 
       if (createResult.success) {
         const productId = createResult.data.id;
+        console.log('Product ID from response (create listing page):', productId);
 
         // Upload images
         if (images.length > 0) {
@@ -600,6 +607,7 @@ const CreateListing: React.FC = () => {
         });
 
         const publishResult = await publishResponse.json();
+        console.log('Publish response:', publishResult);
 
         if (!publishResponse.ok) {
           throw new Error(publishResult.message || 'Failed to publish product');

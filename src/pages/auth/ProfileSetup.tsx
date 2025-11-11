@@ -87,7 +87,7 @@ const ProfileSetup: React.FC = () => {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return "";
 
-      return date.toUTCString().split('T')[0];
+      return date.toISOString().split('T')[0];
     } catch (error) {
       return "";
     }

@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 // Import product images
-import mainImage from "../assets/images/logos/0.png"; 
+import mainImage from "../assets/images/logos/0.png";
 import africanTextileImage from "../assets/images/logos/Fashion.png";
 import basketImage from "../assets/images/logos/culture.png";
 import woodenCombImage from "../assets/images/logos/decor.png";
@@ -164,6 +164,46 @@ const getProductCountry = (productId: number) => {
   );
 };
 
+interface Seller {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profileImage?: string;
+  rating?: number;
+  reviewCount?: number;
+  verified?: boolean;
+  location?: string;
+  joinDate?: string;
+  description?: string;
+  website?: string;
+}
+
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  quantity: number;
+  category: string;
+  origin: string;
+  location: string;
+  saleType: string;
+  deliveryAvailable: boolean;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  images: Array<{
+    id: string;
+    url: string;
+    isPrimary: boolean;
+    key: string;
+    order: number;
+  }>;
+  seller: Seller;
+}
+
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -183,13 +223,109 @@ const ProductDetail: React.FC = () => {
   const [location, setLocation] = useState("");
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [isContactingSeller, setIsContactingSeller] = useState(false);
-  const [realProduct, setRealProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const { addToast } = useToast();
   const { logout } = useAuth();
 
   // Product images array - main image first, then thumbnail images
-  const images = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
+  const defaultImages = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
+
+  // Fetch product data from API
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) {
+        setError("Product ID is required");
+        setIsLoading(false);
+        return
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const token = localStorage.getItem("accessToken");
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
+          headers: token ? {
+            'Authorization': `Bearer ${token}`
+          } : {}
+        });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error("Product not found");
+          }
+          throw new Error(`Failed to fetch product: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          setProduct(result.data);
+        } else {
+          throw new Error("Invalid product data received");
+        }
+      } catch (error: any) {
+        console.error("Failed to fetch product", error);
+        setError(error.message || "Failed to load product");
+        addToast({
+          type: 'error',
+          title: 'Error',
+          message: error.message || "Failed to load product details",
+          duration: 3000
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id, addToast]);
+
+  const images = product?.images && product.images.length > 0
+    ? product.images.map(img => img.url)
+    : defaultImages;
+
+  // format published data
+  const getPublishedDate = (createdAt: string) => {
+    const date = new Date(createdAt);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) return "Published 1 day ago";
+    if (diffDays <= 7) return `Published ${diffDays}days ago`;
+    if (diffDays <= 30) return `Published ${Math.ceil(diffDays / 7)} weeks ago`;
+    return `Published ${Math.ceil(diffDays / 30)} months ago`;
+  };
+
+  // Safe seller access functions
+  const getSellerName = (seller: Seller | undefined): string => {
+    if (!seller) return "Unknown Seller";
+    return `${seller.firstName || ''} ${seller.lastName || ''}`.trim() || "Unknown Seller";
+  };
+
+  const getSellerEmail = (seller: Seller | undefined): string => {
+    return seller?.email || "";
+  };
+
+  const getSellerProfileImage = (seller: Seller | undefined): string => {
+    return seller?.profileImage || sellerAvatar;
+  };
+
+  const getSellerRating = (seller: Seller | undefined): number => {
+    return seller?.rating || 4.8;
+  };
+
+  const getSellerLocation = (seller: Seller | undefined): string => {
+    return seller?.location || "Unknown location";
+  };
+
+  const isSellerVerified = (seller: Seller | undefined): boolean => {
+    return seller?.verified || false;
+  };
 
   // Share product handler
   const handleShareProduct = async (productId: string) => {
@@ -201,8 +337,8 @@ const ProductDetail: React.FC = () => {
 
       // Share functionality
       const shareData = {
-        title: "Check out this product on BaoAfrik",
-        text: "I found this amazing product on BaoAfrik marketplace",
+        title: product ? `Check out ${product.title} on BaoAfrik` : 'Check out this product on BaoAfrik',
+        text: product ? product.description : "I found this amazing product on BaoAfrik marketplace",
         url: window.location.href,
       };
 
@@ -213,46 +349,27 @@ const ProductDetail: React.FC = () => {
           // Fallback: copy to clipboard
           await navigator.clipboard.writeText(window.location.href);
           addToast({
-            type: "error",
+            type: "success",
             title: "Link Copied",
             message: "Product link copied to clipboard",
             duration: 3000,
           });
         }
       } catch (error) {
+        addToast({
+          type: "error",
+          title: "Share failed",
+          message: "Failed to share product",
+          duration: 3000
+        });
       }
     }
     setSharedProducts(newSet);
   };
 
-  // Mock product data (in real app, this would come from API based on id)
-  const product = {
-    id: id || "test-product-123",
-    name: "White pepper",
-    price: 31.7,
-    location: "London | United Kingdom",
-    category: "Spices",
-    publishedDate: "Published 2 days ago",
-    description:
-      "White pepper is a spice produced from the dried seed of the pepper plant. It consists of the seed only, with the darker-colored skin removed through a retting process.",
-    seller: {
-      name: "Fonsah Pageo",
-      email: "pageo.fonsah@baotechnologiesandtravels.com",
-      avatar: sellerAvatar,
-      rating: 4.8,
-      reviewCount: 124,
-      verified: true,
-      location: "London, United Kingdom",
-      joinDate: "June 2018",
-      description:
-        "Passionate about discovering unique products and always on the lookout for great deals. I enjoy exploring new brands, trying out innovative items, and supporting businesses that deliver quality and creativity.",
-      website: "user-randomlink.com",
-    },
-  };
-
   const handleSave = () => {
     setIsSaved(!isSaved);
-    // In a real app, this would save to user's saved items
+    // TODO: Implement actual save to user's saved items via API
   };
 
   const handleShare = async () => {
@@ -261,8 +378,8 @@ const ProductDetail: React.FC = () => {
     if (!isShared) {
       // Share functionality
       const shareData = {
-        title: "Check out this product on BaoAfrik",
-        text: "I found this amazing product on BaoAfrik marketplace",
+        title: product ? `Check out ${product.title} on BaoAfrik` : "Check out this product on BaoAfrik",
+        text: product ? `product.description` : "I found this amazing product on BaoAfrik marketplace",
         url: window.location.href,
       };
 
@@ -273,7 +390,7 @@ const ProductDetail: React.FC = () => {
           // Fallback: copy to clipboard
           await navigator.clipboard.writeText(window.location.href);
           addToast({
-            type: "error",
+            type: "success",
             title: "Link Copied",
             message: "Product link copied to clipboard",
             duration: 3000,
@@ -289,51 +406,54 @@ const ProductDetail: React.FC = () => {
     setShowAdditionalInfo(!showAdditionalInfo);
   };
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/products/test-product-123`
-        );
-        if (response.ok) {
-          const result = await response.json();
-          setRealProduct(result.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch product:", error);
-      }
-    };
-
-    fetchProduct();
-  }, []);
-
   const handleContactSeller = async () => {
-    try {      
+    if (!product || !product.seller) {
+      addToast({
+        type: "error",
+        title: "Error",
+        message: "Seller information not available",
+        duration: 3000
+      });
+      return;
+    }
+
+    try {
       setIsContactingSeller(true);
 
-      const sellerEmail = product.seller.email;
+      console.log('Starting contact seller process for product:', product.id);
+      console.log('Seller data:', product.seller);
 
       const token = localStorage.getItem("accessToken");
+      if (!token) {
+        addToast({
+          type: "error",
+          title: "Authentication Required",
+          message: "Please log in to contact the seller",
+          duration: 3000,
+        });
+        navigate("/login");
+        return;
+      }
 
-      const productDataToSend = {
+       const productDataToSend = {
         id: product.id,
-        name: product.name,
+        name: product.title,
         price: product.price,
         location: product.location,
         category: product.category,
         description: product.description,
         images: images,
         seller: {
-          name: product.seller.name,
-          email: product.seller.email,
-          avatar: product.seller.avatar,
-          rating: product.seller.rating,
-          location: product.seller.location,
+          name: getSellerName(product.seller),
+          avatar: getSellerProfileImage(product.seller),
+          rating: getSellerRating(product.seller),
+          location: getSellerLocation(product.seller),
         },
       };
 
+      console.log('Sending request to chat API...');
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations/email`,
+        `${process.env.REACT_APP_API_URL}/chat/contact-seller`,
         {
           method: "POST",
           headers: {
@@ -341,57 +461,36 @@ const ProductDetail: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            participantEmail: sellerEmail,
-            productId: "test-product-123",
-            productData: productDataToSend,
+            productId: product.id,
           }),
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to start conversation");
-      }
+      console.log('Chat API response status:', response.status);
 
       const result = await response.json();
 
-      if (result.success) {
-        const productData = {
-          id: product.id || "test-product-123",
-          name: product.name || "Test iPhone 15",
-          price: product.price || 569.99,
-          location: product.location || "New York, USA",
-          category: product.category || "Electronics",
-          description:
-            product.description ||
-            "Brand new iPhone 15 for testing messaging system",
-          images: images[selectedImageIndex] || [
-            "https://www.pexels.com/photo/dark-color-iphones-12-13-14-15-pro-pro-max-luxury-fashion-brand-gentcreate-18403789/",
-          ],
-          seller: {
-            name: product.seller.name,
-            email: product.seller.email,
-            avatar: product.seller.avatar,
-            rating: product.seller.rating,
-            location: product.seller.location,
-          },
-        };
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to contact seller');
+      }
 
-        // Navigate to messages
+      console.log('Chat API success:', result);
+
+      if (result.success) {
         navigate("/messages", {
           state: {
-            conversation: result.data,
-            conversationId: result.data.id,
+            conversation: result.data.conversation,
+            conversationId: result.data.conversation.id,
             productData: productDataToSend,
-            preFilledMessage:
-              "Hello, I am interested in this item, is it still available?",
+            preFilledMessage: "Hello, I am interested in this item, is it still available?",
           },
           replace: false,
         });
+      } else {
+        throw new Error(result.message || "Failed to start conversation");
       }
     } catch (error: any) {
-
-      // Don't show error toast for auth failures
+      console.error('Error in handleContactSeller:', error);
       if (
         error.message.includes("Authentication failed") ||
         error.message.includes("Please log in again")
@@ -399,7 +498,6 @@ const ProductDetail: React.FC = () => {
         return;
       }
 
-      // Show user-friendly error message
       let errorMessage = "Failed to contact seller. Please try again.";
 
       if (error.message.includes("User not found")) {
@@ -466,6 +564,38 @@ const ProductDetail: React.FC = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <LoadingSpinner size="lg" color="orange" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            {error || "Product not found"}
+          </h2>
+          <button
+            onClick={() => navigate("/")}
+            className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const sellerName = product.seller
+    ? `${product.seller.firstName} ${product.seller.lastName}`
+    : "Unknown Seller";
+
+
   return (
     <div className="min-h-screen bg-white">
       {/* Desktop Breadcrumb - Hidden on Mobile */}
@@ -481,7 +611,7 @@ const ProductDetail: React.FC = () => {
             </Link>
             <span className="text-gray-300">/</span>
             <span className="text-gray-900 font-semibold">
-              Product-{product.id}
+              {product.title}
             </span>
           </nav>
         </div>
@@ -492,7 +622,7 @@ const ProductDetail: React.FC = () => {
         <div className="relative h-80 bg-gray-100">
           <img
             src={images[selectedImageIndex]}
-            alt={product.name}
+            alt={product.title}
             className="w-full h-full object-cover"
             loading="eager"
           />
@@ -521,7 +651,7 @@ const ProductDetail: React.FC = () => {
 
             {/* Action Buttons - Top Right */}
             <div className="absolute top-4 right-4 flex space-x-2">
-              <button className="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-lg">
+              <button onClick={handleShare} className="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-lg">
                 <svg
                   className="w-5 h-5 text-gray-700"
                   fill="none"
@@ -538,12 +668,11 @@ const ProductDetail: React.FC = () => {
               </button>
 
               <button
-                onClick={() => setIsSaved(!isSaved)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${
-                  isSaved
-                    ? "bg-orange-500 text-white"
-                    : "bg-white bg-opacity-90 text-gray-700"
-                }`}
+                onClick={handleSave}
+                className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${isSaved
+                  ? "bg-orange-500 text-white"
+                  : "bg-white bg-opacity-90 text-gray-700"
+                  }`}
               >
                 <svg
                   className="w-5 h-5"
@@ -627,11 +756,10 @@ const ProductDetail: React.FC = () => {
               <button
                 key={index}
                 onClick={() => setSelectedImageIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  selectedImageIndex === index
-                    ? "bg-white"
-                    : "bg-white bg-opacity-50"
-                }`}
+                className={`w-2 h-2 rounded-full transition-all ${selectedImageIndex === index
+                  ? "bg-white"
+                  : "bg-white bg-opacity-50"
+                  }`}
               />
             ))}
           </div>
@@ -648,15 +776,14 @@ const ProductDetail: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImageIndex === index
-                        ? "border-orange-500"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${selectedImageIndex === index
+                      ? "border-orange-500"
+                      : "border-gray-200 hover:border-gray-300"
+                      }`}
                   >
                     <img
                       src={image}
-                      alt={`${product.name} ${index + 1}`}
+                      alt={`${product.title} ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -666,7 +793,7 @@ const ProductDetail: React.FC = () => {
               <div className="w-[500px] h-[500px] rounded-lg overflow-hidden bg-gray-100">
                 <img
                   src={images[selectedImageIndex]}
-                  alt={product.name}
+                  alt={product.title}
                   className="w-full h-full object-cover"
                   loading="eager"
                 />
@@ -676,17 +803,17 @@ const ProductDetail: React.FC = () => {
             {/* Desktop Right Column - Product Info */}
             <div className="flex-1 max-w-lg">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {product.name}
+                {product.title}
               </h1>
 
               {/* Price with Published Date and Category */}
               <div className="flex items-center justify-between mb-6">
                 <div className="text-3xl font-bold text-gray-900">
-                  ${product.price}
+                  ${product.currency} ${product.price}
                 </div>
                 <div className="flex flex-col items-end space-y-1">
                   <span className="text-sm text-gray-500">
-                    {product.publishedDate}
+                    {getPublishedDate(product.createdAt)}
                   </span>
                   <span
                     className="text-sm font-medium"
@@ -724,11 +851,10 @@ const ProductDetail: React.FC = () => {
                 <div className="flex items-center space-x-3 lg:space-x-4">
                   <button
                     onClick={handleSave}
-                    className={`p-2 lg:p-3 rounded-full transition-colors ${
-                      isSaved
-                        ? "text-orange-500 bg-orange-50"
-                        : "text-gray-400 hover:text-orange-500"
-                    }`}
+                    className={`p-2 lg:p-3 rounded-full transition-colors ${isSaved
+                      ? "text-orange-500 bg-orange-50"
+                      : "text-gray-400 hover:text-orange-500"
+                      }`}
                     title={isSaved ? "Remove from saved" : "Save product"}
                   >
                     <svg
@@ -747,11 +873,10 @@ const ProductDetail: React.FC = () => {
                   </button>
                   <button
                     onClick={handleShare}
-                    className={`p-2 lg:p-3 rounded-full transition-colors ${
-                      isShared
-                        ? "text-blue-500 bg-blue-50"
-                        : "text-gray-400 hover:text-blue-500"
-                    }`}
+                    className={`p-2 lg:p-3 rounded-full transition-colors ${isShared
+                      ? "text-blue-500 bg-blue-50"
+                      : "text-gray-400 hover:text-blue-500"
+                      }`}
                     title={isShared ? "Shared" : "Share product"}
                   >
                     <svg
@@ -777,9 +902,7 @@ const ProductDetail: React.FC = () => {
                   Description
                 </h3>
                 <p className="text-gray-600 leading-relaxed mb-3">
-                  White pepper is a spice produced from the dried seed of the
-                  pepper plant. It consists of the seed only, with the
-                  darker-colored skin removed through a retting process.
+                  {product.description}
                 </p>
                 <button
                   onClick={toggleAdditionalInfo}
@@ -787,9 +910,8 @@ const ProductDetail: React.FC = () => {
                 >
                   <span>Additional information</span>
                   <svg
-                    className={`w-4 h-4 transition-transform ${
-                      showAdditionalInfo ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform ${showAdditionalInfo ? "rotate-180" : ""
+                      }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -812,7 +934,7 @@ const ProductDetail: React.FC = () => {
                     <div className="space-y-2 text-sm text-gray-600">
                       <div className="flex justify-between">
                         <span className="font-medium">Origin:</span>
-                        <span>Kerala, India (Malabar Coast)</span>
+                        <span>{product.origin}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium">Processing Method:</span>
@@ -840,63 +962,69 @@ const ProductDetail: React.FC = () => {
               </div>
 
               {/* Seller Info */}
-              <div
-                className="bg-white rounded-lg border border-gray-200 p-4 mb-6 cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={() =>
-                  navigate(
-                    `/seller/${product.seller.name
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`
-                  )
-                }
-              >
-                <div className="text-sm font-medium text-gray-500 mb-3">
-                  Seller profile
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={product.seller.avatar}
-                      alt={product.seller.name}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        {product.seller.name}
+              {product.seller && (
+                <div
+                  className="bg-white rounded-lg border border-gray-200 p-4 mb-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() =>
+                    navigate(
+                      `/seller/${sellerName
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}`
+                    )
+                  }
+                >
+                  <div className="text-sm font-medium text-gray-500 mb-3">
+                    Seller profile
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={product.seller.profileImage || sellerAvatar}
+                        alt={sellerName}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {sellerName}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {product.seller.location || "Unknown location"}
+                        </div>
                       </div>
                     </div>
+                    {product.seller.verified && (
+                      <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-2 py-1 rounded-md">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                        <span className="text-xs font-medium">
+                          Verified Seller
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  {product.seller.verified && (
-                    <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-2 py-1 rounded-md">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                      <span className="text-xs font-medium">
-                        Verified Seller
-                      </span>
-                    </div>
-                  )}
                 </div>
-              </div>
+              )}
 
               {/* Contact Seller Button - Below Seller Profile */}
               <button
                 onClick={handleContactSeller}
+                disabled={isContactingSeller || !product?.seller}
                 className="w-full flex items-center justify-center space-x-2 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
                 style={{
                   backgroundColor: isContactingSeller ? "#ccc" : "#F9A825",
                 }}
-                disabled={!user || isContactingSeller}
+                // disabled={!user || isContactingSeller}
                 onMouseEnter={
                   !isContactingSeller
                     ? (e) =>
-                        ((e.target as HTMLElement).style.backgroundColor =
-                          "#E6941F")
+                    ((e.target as HTMLElement).style.backgroundColor =
+                      "#E6941F")
                     : undefined
                 }
                 onMouseLeave={
                   !isContactingSeller
                     ? (e) =>
-                        ((e.target as HTMLElement).style.backgroundColor =
-                          "#F9A825")
+                    ((e.target as HTMLElement).style.backgroundColor =
+                      "#F9A825")
                     : undefined
                 }
               >
@@ -937,23 +1065,23 @@ const ProductDetail: React.FC = () => {
             {/* Left side - Price, Product Name */}
             <div className="flex-1">
               <div className="text-2xl font-bold text-gray-900 mb-2">
-                ${product.price}
+                ${product.currency} ${product.price}
               </div>
               <h1 className="text-lg font-bold text-gray-900 mb-0">
-                {product.name}
+                {product.title}
               </h1>
             </div>
 
             {/* Right side - Date, Category */}
             <div className="flex flex-col items-end text-right">
               <div className="text-xs text-black mb-1">
-                Published 2 days ago
+                {getPublishedDate(product.createdAt)}
               </div>
               <div
                 className="text-xs font-medium mb-4"
                 style={{ color: "#F9A825" }}
               >
-                Category: Spices
+                Category: {product.category}
               </div>
             </div>
           </div>
@@ -972,12 +1100,11 @@ const ProductDetail: React.FC = () => {
             </div>
 
             <button
-              onClick={() => setIsSaved(!isSaved)}
-              className={`p-2 rounded-lg border transition-colors ${
-                isSaved
-                  ? "border-orange-500 text-orange-500 bg-orange-50"
-                  : "border-gray-300 text-gray-400 hover:border-gray-400"
-              }`}
+              onClick={handleSave}
+              className={`p-2 rounded-lg border transition-colors ${isSaved
+                ? "border-orange-500 text-orange-500 bg-orange-50"
+                : "border-gray-300 text-gray-400 hover:border-gray-400"
+                }`}
             >
               <svg
                 className="w-5 h-5"
@@ -1010,9 +1137,8 @@ const ProductDetail: React.FC = () => {
           >
             <span>Additional information</span>
             <svg
-              className={`w-4 h-4 transition-transform ${
-                showAdditionalInfo ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 transition-transform ${showAdditionalInfo ? "rotate-180" : ""
+                }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -1028,6 +1154,33 @@ const ProductDetail: React.FC = () => {
 
           {/* Additional Information Section - Mobile */}
           {showAdditionalInfo && (
+            // <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            //   <h4 className="font-semibold text-gray-900 mb-3">
+            //     Additional Product Information
+            //   </h4>
+            //   <div className="space-y-2 text-sm text-gray-600">
+            //     <div className="flex justify-between">
+            //       <span className="font-medium">Origin:</span>
+            //       <span>{product.origin}</span>
+            //     </div>
+            //     <div className="flex justify-between">
+            //       <span className="font-medium">Quantity Available:</span>
+            //       <span>{product.quantity}</span>
+            //     </div>
+            //     <div className="flex justify-between">
+            //       <span className="font-medium">Sale Type:</span>
+            //       <span>{product.saleType}</span>
+            //     </div>
+            //     <div className="flex justify-between">
+            //       <span className="font-medium">Delivery Available:</span>
+            //       <span>{product.deliveryAvailable ? "Yes" : "No"}</span>
+            //     </div>
+            //     <div className="flex justify-between">
+            //       <span className="font-medium">Status:</span>
+            //       <span className="capitalize">{product.status.toLowerCase()}</span>
+            //     </div>
+            //   </div>
+            // </div>
             <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <h4 className="font-semibold text-gray-900 mb-3">
                 Additional Product Information
@@ -1067,7 +1220,7 @@ const ProductDetail: React.FC = () => {
           className="mb-4 cursor-pointer hover:bg-gray-50 transition-colors rounded-lg p-3 -mx-3"
           onClick={() =>
             navigate(
-              `/seller/${product.seller.name
+              `/seller/${sellerName
                 .toLowerCase()
                 .replace(/\s+/g, "-")}`
             )
@@ -1075,13 +1228,13 @@ const ProductDetail: React.FC = () => {
         >
           <div className="flex items-center space-x-3 mb-2">
             <img
-              src={product.seller.avatar}
-              alt={product.seller.name}
+              src={product.seller.profileImage || sellerAvatar}
+              alt={sellerName}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>
               <div className="font-medium text-gray-900">
-                {product.seller.name}
+                {sellerName}
               </div>
               {product.seller.verified && (
                 <div className="flex items-center text-xs text-green-600 mt-1">
@@ -1135,7 +1288,7 @@ const ProductDetail: React.FC = () => {
             <button
               onClick={() =>
                 navigate(
-                  `/seller/${product.seller.name
+                  `/seller/${sellerName
                     .toLowerCase()
                     .replace(/\s+/g, "-")}?tab=reviews`
                 )
@@ -1257,11 +1410,10 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${
-                      wishlistProducts.has("textiles-1")
-                        ? "text-orange-500 hover:text-orange-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
+                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("textiles-1")
+                      ? "text-orange-500 hover:text-orange-600"
+                      : "text-gray-400 hover:text-gray-600"
+                      }`}
                     title={
                       wishlistProducts.has("textiles-1")
                         ? "Remove from saved"
@@ -1367,11 +1519,10 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${
-                      wishlistProducts.has("tomatoes-1")
-                        ? "text-orange-500 hover:text-orange-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
+                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("tomatoes-1")
+                      ? "text-orange-500 hover:text-orange-600"
+                      : "text-gray-400 hover:text-gray-600"
+                      }`}
                     title={
                       wishlistProducts.has("tomatoes-1")
                         ? "Remove from saved"
@@ -1477,11 +1628,10 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${
-                      wishlistProducts.has("shrimp-1")
-                        ? "text-orange-500 hover:text-orange-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
+                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("shrimp-1")
+                      ? "text-orange-500 hover:text-orange-600"
+                      : "text-gray-400 hover:text-gray-600"
+                      }`}
                     title={
                       wishlistProducts.has("shrimp-1")
                         ? "Remove from saved"
@@ -1587,11 +1737,10 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${
-                      wishlistProducts.has("ndole-1")
-                        ? "text-orange-500 hover:text-orange-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
+                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("ndole-1")
+                      ? "text-orange-500 hover:text-orange-600"
+                      : "text-gray-400 hover:text-gray-600"
+                      }`}
                     title={
                       wishlistProducts.has("ndole-1")
                         ? "Remove from saved"
@@ -1747,11 +1896,10 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${
-                      wishlistProducts.has("basket-1")
-                        ? "text-orange-500 hover:text-orange-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
+                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("basket-1")
+                      ? "text-orange-500 hover:text-orange-600"
+                      : "text-gray-400 hover:text-gray-600"
+                      }`}
                     title={
                       wishlistProducts.has("basket-1")
                         ? "Remove from saved"
@@ -1857,11 +2005,10 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${
-                      wishlistProducts.has("combs-1")
-                        ? "text-orange-500 hover:text-orange-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
+                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("combs-1")
+                      ? "text-orange-500 hover:text-orange-600"
+                      : "text-gray-400 hover:text-gray-600"
+                      }`}
                     title={
                       wishlistProducts.has("combs-1")
                         ? "Remove from saved"
@@ -1967,11 +2114,10 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${
-                      wishlistProducts.has("beans-1")
-                        ? "text-orange-500 hover:text-orange-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
+                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("beans-1")
+                      ? "text-orange-500 hover:text-orange-600"
+                      : "text-gray-400 hover:text-gray-600"
+                      }`}
                     title={
                       wishlistProducts.has("beans-1")
                         ? "Remove from saved"
@@ -2077,11 +2223,10 @@ const ProductDetail: React.FC = () => {
                       }
                       setWishlistProducts(newSet);
                     }}
-                    className={`p-2 transition-colors touch-manipulation ${
-                      wishlistProducts.has("cassava-1")
-                        ? "text-orange-500 hover:text-orange-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
+                    className={`p-2 transition-colors touch-manipulation ${wishlistProducts.has("cassava-1")
+                      ? "text-orange-500 hover:text-orange-600"
+                      : "text-gray-400 hover:text-gray-600"
+                      }`}
                     title={
                       wishlistProducts.has("cassava-1")
                         ? "Remove from saved"

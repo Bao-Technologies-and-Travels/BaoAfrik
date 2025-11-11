@@ -238,10 +238,8 @@ const Home: React.FC = () => {
           productImage = getDefaultProductImage(productCategory);
         }
 
-        const numericId = productId ? parseInt(productId.replace(/[^0-9]/g, '').slice(0, 8)) || index + 1000 : index + 1000;
-
         const transformedProduct = {
-          id: numericId,
+          id: productId,
           name: productName,
           price: productPrice.toString(),
           image: productImage,
@@ -2312,7 +2310,7 @@ const Home: React.FC = () => {
                         <div className={filteredProducts.length <= 6 ? '' : 'overflow-x-auto scrollbar-hide'}>
                           <div className={filteredProducts.length <= 6 ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6' : 'flex gap-5 sm:gap-6'}>
                             {filteredProducts.slice(0, 12).map((product) => (
-                              <Link key={product.id} to={`/product/${product.id}`} className={`bg-white rounded-lg overflow-hidden transition-all duration-200 block group ${filteredProducts.length > 6 ? 'flex-shrink-0' : ''}`} style={filteredProducts.length > 6 ? { width: '200px' } : {}}>
+                              <Link key={product.id} to={`/products/${product.id}`} className={`bg-white rounded-lg overflow-hidden transition-all duration-200 block group ${filteredProducts.length > 6 ? 'flex-shrink-0' : ''}`} style={filteredProducts.length > 6 ? { width: '200px' } : {}}>
                                 {/* Product Image - Top */}
                                 <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
                                   <img
@@ -2681,7 +2679,7 @@ const Home: React.FC = () => {
                   className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6 overflow-x-auto scrollbar-hide"
                 >
                   {productsToDisplay.map((product: FrontendProduct) => (
-                    <Link key={product.id} to={`${process.env.REACT_APP_API_URL}/product/${product.id}`} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 block group">
+                    <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 block group">
                       {/* Product Image - Top */}
                       <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
                         <img

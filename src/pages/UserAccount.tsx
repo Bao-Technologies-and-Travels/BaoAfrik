@@ -298,24 +298,24 @@ const UserAccount: React.FC = () => {
                 >
                   <img src={shareIcon} alt="Share" className="w-8 h-8" />
               </button>
-                <button 
+                  <button 
                   className="hover:opacity-90 transition-opacity"
-                  style={{
-                    display: 'flex',
+                    style={{
+                      display: 'flex',
                     height: '40px',
                     padding: '8px 20px',
-                    justifyContent: 'center',
+                      justifyContent: 'center',
                     alignItems: 'center',
                     gap: '10px',
                     backgroundColor: '#F0F8FE',
                     color: '#64B5F6',
-                    borderRadius: '12px',
+                        borderRadius: '12px',
                     fontWeight: '400',
                     fontSize: '14px'
                   }}
                 >
                   <span>Edit your profile</span>
-              </button>
+                      </button>
             </div>
           </div>
           
@@ -815,9 +815,9 @@ const UserAccount: React.FC = () => {
                   </div>
                 </div>
 
-              </div>
-            </div>
           </div>
+                    </div>
+                  </div>
         </div>
       </div>
       
