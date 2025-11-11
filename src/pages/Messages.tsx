@@ -59,6 +59,7 @@ import pinBadgeIcon from '../assets/images/pre/pn.svg';
 import documentIcon from '../assets/images/pre/do.svg';
 import photoIcon from '../assets/images/pre/ph.svg';
 import closeIcon from '../assets/images/pre/cc.svg';
+import svgIcon from '../assets/images/pre/svg.svg';
 
 // PDF Icon Component
 const PDFIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
@@ -66,6 +67,26 @@ const PDFIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
     <path d="M32 0H4C1.79086 0 0 1.79086 0 4V52C0 54.2091 1.79086 56 4 56H44C46.2091 56 48 54.2091 48 52V16L32 0Z" fill="#FF1607"/>
     <path d="M32 0L48 16H38C34.6863 16 32 13.3137 32 10V0Z" fill="#FFFFFF80"/>
     <text x="24" y="38" fontSize="14" fontWeight="bold" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif">PDF</text>
+  </svg>
+);
+
+// JPG Icon Component
+const JPGIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
+  <svg width={size} height={size} viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M32 0H4C1.79086 0 0 1.79086 0 4V52C0 54.2091 1.79086 56 4 56H44C46.2091 56 48 54.2091 48 52V16L32 0Z" fill="#E0E0E0"/>
+    <path d="M32 0L48 16H38C34.6863 16 32 13.3137 32 10V0Z" fill="#BDBDBD"/>
+    <rect x="2" y="40" width="20" height="14" rx="2" fill="#2196F3"/>
+    <text x="12" y="51" fontSize="10" fontWeight="bold" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif">JPG</text>
+  </svg>
+);
+
+// PNG Icon Component
+const PNGIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
+  <svg width={size} height={size} viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M32 0H4C1.79086 0 0 1.79086 0 4V52C0 54.2091 1.79086 56 4 56H44C46.2091 56 48 54.2091 48 52V16L32 0Z" fill="#E0E0E0"/>
+    <path d="M32 0L48 16H38C34.6863 16 32 13.3137 32 10V0Z" fill="#BDBDBD"/>
+    <rect x="2" y="40" width="20" height="14" rx="2" fill="#2196F3"/>
+    <text x="12" y="51" fontSize="9" fontWeight="bold" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif">PNG</text>
   </svg>
 );
 
@@ -797,8 +818,28 @@ const Messages: React.FC = () => {
       const chatId = chatEntry?.id || Date.now();
       const hasImages = imageFiles.length > 0;
       const hasDocuments = documentFiles.length > 0;
+      
+      // Detect specific document types
+      let documentType = '';
+      if (hasDocuments && documentFiles.length > 0) {
+        const firstDocExt = documentFiles[0].name.split('.').pop()?.toLowerCase();
+        if (firstDocExt === 'pdf') {
+          documentType = 'pdf';
+        } else if (firstDocExt === 'jpg' || firstDocExt === 'jpeg') {
+          documentType = 'jpg';
+        } else if (firstDocExt === 'png') {
+          documentType = 'png';
+        }
+      }
+      
       const displayMessage = hasImages && !messageToSend 
         ? 'Image' 
+        : hasDocuments && !messageToSend && documentType === 'pdf'
+        ? 'Document'
+        : hasDocuments && !messageToSend && documentType === 'jpg'
+        ? 'JPG File'
+        : hasDocuments && !messageToSend && documentType === 'png'
+        ? 'PNG File'
         : hasDocuments && !messageToSend
         ? 'Document'
         : messageToSend.length > 30 ? messageToSend.substring(0, 30) + '...' : messageToSend;
@@ -814,6 +855,7 @@ const Messages: React.FC = () => {
         sentByUser: true,
         hasImage: hasImages,
         hasDocument: hasDocuments,
+        documentType: documentType,
         messageId: newMessage.id // Link to the latest message for status sync
       });
       
@@ -1295,7 +1337,7 @@ const Messages: React.FC = () => {
         id="document-file-input"
         type="file"
         multiple
-        accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx"
+        accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
         onChange={handleFileSelect}
         style={{ display: 'none' }}
       />
@@ -1526,8 +1568,8 @@ const Messages: React.FC = () => {
                           </div>
                         )}
 
-                        {/* Message bubble with text and/or product card and/or documents */}
-                        {(message.text || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0)) && (
+                        {/* Message bubble with text and/or product card and/or documents and/or voice */}
+                        {(message.text || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0) || message.type === 'voice') && (
                           <div 
                             className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`} 
                             style={{ 
@@ -1535,14 +1577,67 @@ const Messages: React.FC = () => {
                             }}
                             onClick={message.isIncoming ? (e) => handleMobileIncomingMessageClick(message.id, e) : undefined}
                           >
-                            {/* Message Text */}
-                            {message.text && (
-                              <p 
-                                style={{ fontSize: '12px', marginBottom: 0, color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
-                              >
-                                {message.text}
-                              </p>
-                            )}
+                            {/* Voice Message Display */}
+                            {message.type === 'voice' ? (
+                              <div className="flex items-center space-x-2">
+                                <div className="relative">
+                                  <img src={avatarIcon} alt="Avatar" className="w-8 h-8 rounded-full" />
+                                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-white rounded-full flex items-center justify-center" style={{ transform: 'translate(15%, 15%)' }}>
+                                    <svg className="w-2 h-2" viewBox="0 0 12 12" fill="none">
+                                      <rect x="1" y="4" width="2" height="4" fill="#64B5F6"/>
+                                      <rect x="5" y="2" width="2" height="8" fill="#64B5F6"/>
+                                      <rect x="9" y="0" width="2" height="12" fill="#64B5F6"/>
+                                    </svg>
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-1.5">
+                                  <button
+                                    onClick={() => {
+                                      if (message.audioUrl) {
+                                        handleAudioPlayback(message.id, message.audioUrl, message.duration);
+                                      }
+                                    }}
+                                    className="hover:opacity-80 transition-opacity"
+                                  >
+                                    {playingMessageId === message.id ? (
+                                      <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" style={{ fillRule: 'evenodd' }}/>
+                                      </svg>
+                                    ) : (
+                                      <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                        <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                                      </svg>
+                                    )}
+                                  </button>
+                                  <span className="text-white text-xs whitespace-nowrap">
+                                    {(() => {
+                                      const time = audioPlaybackTime[message.id] !== undefined ? audioPlaybackTime[message.id] : message.duration;
+                                      return `${Math.floor(time / 60).toString().padStart(2, '0')} : ${(time % 60).toString().padStart(2, '0')} - Audio`;
+                                    })()}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-center space-x-0.5">
+                                  {[3,5,3,6,9,11,13,11,9,6,5,3,6,8,9,8,6,5,3,5].map((h, i) => (
+                                    <div
+                                      key={i}
+                                      className="w-0.5 bg-white rounded-full"
+                                      style={{
+                                        height: `${h}px`,
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                {/* Message Text */}
+                                {message.text && (
+                                  <p 
+                                    style={{ fontSize: '12px', marginBottom: 0, color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                                  >
+                                    {message.text}
+                                  </p>
+                                )}
                             
                             {/* Product Card in Message - Only for first message */}
                             {message.isProductInquiry && message.productData && (
@@ -1590,9 +1685,11 @@ const Messages: React.FC = () => {
                                   const nameWithoutExt = fileName.join('.');
                                   const fileSizeMB = doc.size / (1024 * 1024);
                                   const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
+                                  const extensionLower = extension.toLowerCase();
+                                  const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
                                   return (
                                     <div key={docIndex} className="flex items-center space-x-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                                      <PDFIcon size={32} />
+                                      <DocumentIcon size={32} />
                                       <div className="flex-1 min-w-0">
                                         <p className="text-xs truncate" style={{ color: '#FFFFFF', fontWeight: '400' }}>
                                           {nameWithoutExt} · {extension}
@@ -1605,6 +1702,8 @@ const Messages: React.FC = () => {
                                   );
                                 })}
                               </div>
+                            )}
+                              </>
                             )}
                           </div>
                         )}
@@ -2045,9 +2144,11 @@ const Messages: React.FC = () => {
                     const nameWithoutExt = fileName.join('.');
                     const fileSizeMB = file.size / (1024 * 1024);
                     const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1)); // Rough estimate: ~100KB per page
+                    const extensionLower = extension.toLowerCase();
+                    const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
                     return (
                       <div key={index} className="relative mb-2 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                        <PDFIcon size={40} />
+                        <DocumentIcon size={40} />
                         <div className="flex-1">
                           <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
                             {nameWithoutExt} · {extension}
@@ -2089,93 +2190,315 @@ const Messages: React.FC = () => {
               </div>
             )}
 
-            <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
-              {/* Emoji Icon */}
-              <div className="relative emoji-picker-container">
+            {isRecording ? (
+              // Recording Interface for Mobile
+              <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
+                <div 
+                  className="rounded-full px-4 py-1 flex items-center flex-1 mr-1"
+                  style={{ 
+                    background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
+                    maxWidth: 'calc(100% - 32px)'
+                  }}
+                >
+                  <div className="flex items-center space-x-2 flex-shrink-0">
+                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" style={{ boxShadow: '0 0 6px rgba(239, 68, 68, 0.6)' }}></div>
+                    <span className="text-white text-xs">
+                      {Math.floor(recordingTime / 60).toString().padStart(2, '0')}:
+                      {(recordingTime % 60).toString().padStart(2, '0')} - Audio recording
+                    </span>
+                  </div>
+                  <div className="flex space-x-0.5 ml-3 items-end flex-1 justify-end">
+                    {audioLevels.map((level, i) => {
+                      const height = `${level * 16}px`;
+                      const minHeight = '2px';
+                      return (
+                        <div
+                          key={i}
+                          className="w-0.5 bg-white rounded-full transition-all duration-150 ease-out"
+                          style={{
+                            height: Math.max(parseFloat(height), parseFloat(minHeight)) + 'px',
+                            minHeight: minHeight
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+                
                 <button 
-                  onClick={handleEmojiClick}
-                  className="p-1 hover:text-gray-600"
+                  onClick={handleStopRecording}
+                  className="w-7 h-7 border-2 border-red-500 rounded-full flex items-center justify-center hover:bg-red-50 transition-colors flex-shrink-0"
+                  style={{ backgroundColor: '#F5F5F5' }}
+                >
+                  <div className="w-2.5 h-2.5 bg-red-500 rounded-sm"></div>
+                </button>
+              </div>
+            ) : recordingTime > 0 ? (
+              // Audio Preview for Mobile - After Recording
+              <div className="space-y-2">
+                {/* Audio Preview Bubble */}
+                <div 
+                  className="flex items-center px-3 py-2"
+                  style={{ 
+                    background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
+                    borderRadius: '12px',
+                    maxWidth: '85%'
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      if (isPreviewPlaying) {
+                        if (previewAudio) {
+                          previewAudio.pause();
+                          setIsPreviewPlaying(false);
+                        }
+                      } else {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        const audio = new Audio(audioUrl);
+                        
+                        audio.addEventListener('timeupdate', () => {
+                          setPreviewPlaybackTime(Math.floor(audio.currentTime));
+                        });
+                        
+                        audio.addEventListener('ended', () => {
+                          setIsPreviewPlaying(false);
+                          setPreviewPlaybackTime(0);
+                        });
+                        
+                        audio.play();
+                        setPreviewAudio(audio);
+                        setIsPreviewPlaying(true);
+                      }
+                    }}
+                    className="hover:opacity-80 transition-opacity flex-shrink-0"
+                  >
+                    {isPreviewPlaying ? (
+                      <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
+                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" style={{ fillRule: 'evenodd' }}/>
+                      </svg>
+                    ) : (
+                      <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                      </svg>
+                    )}
+                  </button>
+                  <span className="text-white text-xs mx-2 flex-shrink-0">
+                    {Math.floor((isPreviewPlaying ? previewPlaybackTime : recordingTime) / 60).toString().padStart(2, '0')} : {((isPreviewPlaying ? previewPlaybackTime : recordingTime) % 60).toString().padStart(2, '0')} - Audio
+                  </span>
+                  <div className="flex space-x-0.5 items-end flex-1 mx-2">
+                    {[3,5,3,6,9,11,13,11,9,6,5,3,6,8,9,8,6,5,3,5].map((h, i) => (
+                      <div
+                        key={i}
+                        className="w-0.5 bg-white rounded-full"
+                        style={{ height: `${h}px`, minHeight: '2px' }}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setRecordingTime(0);
+                      setAudioChunks([]);
+                      setAudioLevels(Array(20).fill(0.1));
+                      setIsPreviewPlaying(false);
+                      setPreviewPlaybackTime(0);
+                      if (previewAudio) {
+                        previewAudio.pause();
+                        setPreviewAudio(null);
+                      }
+                    }}
+                    className="hover:opacity-80 transition-opacity flex-shrink-0"
+                    style={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                      borderRadius: '50%',
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Message Input Bar */}
+                <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
+                  {/* Emoji Icon */}
+                  <div className="relative emoji-picker-container">
+                    <button 
+                      onClick={handleEmojiClick}
+                      className="p-1 hover:text-gray-600"
+                    >
+                      <img 
+                        src={faceIcon} 
+                        alt="emoji" 
+                        className="w-5 h-5" 
+                        style={{ 
+                          filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
+                        }}
+                      />
+                    </button>
+                    
+                    {/* Emoji Picker */}
+                    {showEmojiPicker && (
+                      <div className="absolute bottom-full left-0 mb-2 z-50">
+                        <EmojiPicker
+                          onEmojiClick={onEmojiClick}
+                          width={280}
+                          height={350}
+                          searchDisabled={false}
+                          skinTonesDisabled={true}
+                          previewConfig={{
+                            showPreview: false
+                          }}
+                          searchPlaceHolder="Search Emoji"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Attachment Icon */}
+                  <button 
+                    onClick={handleAttachClick}
+                    className="p-1.5 transition-colors focus:outline-none"
+                    style={{ outline: 'none' }}
+                  >
+                    <img 
+                      src={pinIcon} 
+                      alt="attachment" 
+                      className="w-5 h-5"
+                      style={{
+                        filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
+                      }}
+                    />
+                  </button>
+
+                  {/* Text Input */}
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={messageText}
+                      onChange={(e) => {
+                        setMessageText(e.target.value);
+                        handleTypingDetection();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSendMessage();
+                        }
+                      }}
+                      placeholder="...Write a message"
+                      className="w-full px-2 py-1.5 focus:outline-none bg-transparent"
+                      style={{ 
+                        border: 'none',
+                        caretColor: '#64B5F6',
+                        fontSize: '11px'
+                      }}
+                    />
+                  </div>
+
+                  {/* Send Button */}
+                  <button 
+                    onClick={handleSendVoiceMessage}
+                    className="p-1.5 text-blue-600 hover:text-blue-800"
+                  >
+                    <img src={bluIcon} alt="send" className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // Normal Message Input for Mobile
+              <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
+                {/* Emoji Icon */}
+                <div className="relative emoji-picker-container">
+                  <button 
+                    onClick={handleEmojiClick}
+                    className="p-1 hover:text-gray-600"
+                  >
+                    <img 
+                      src={faceIcon} 
+                      alt="emoji" 
+                      className="w-5 h-5" 
+                      style={{ 
+                        filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
+                      }}
+                    />
+                  </button>
+                  
+                  {/* Emoji Picker */}
+                  {showEmojiPicker && (
+                    <div className="absolute bottom-full left-0 mb-2 z-50">
+                      <EmojiPicker
+                        onEmojiClick={onEmojiClick}
+                        width={280}
+                        height={350}
+                        searchDisabled={false}
+                        skinTonesDisabled={true}
+                        previewConfig={{
+                          showPreview: false
+                        }}
+                        searchPlaceHolder="Search Emoji"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Attachment Icon */}
+                <button 
+                  onClick={handleAttachClick}
+                  className="p-1.5 transition-colors focus:outline-none"
+                  style={{ outline: 'none' }}
                 >
                   <img 
-                    src={faceIcon} 
-                    alt="emoji" 
-                    className="w-5 h-5" 
-                    style={{ 
-                      filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                    src={pinIcon} 
+                    alt="attachment" 
+                    className="w-5 h-5"
+                    style={{
+                      filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
                     }}
                   />
                 </button>
-                
-                {/* Emoji Picker */}
-                {showEmojiPicker && (
-                  <div className="absolute bottom-full left-0 mb-2 z-50">
-                    <EmojiPicker
-                      onEmojiClick={onEmojiClick}
-                      width={280}
-                      height={350}
-                      searchDisabled={false}
-                      skinTonesDisabled={true}
-                      previewConfig={{
-                        showPreview: false
-                      }}
-                      searchPlaceHolder="Search Emoji"
-                    />
-                  </div>
-                )}
+
+                {/* Text Input */}
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={messageText}
+                    onChange={(e) => {
+                      setMessageText(e.target.value);
+                      handleTypingDetection();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSendMessage();
+                      }
+                    }}
+                    placeholder="...Write your message"
+                    className="w-full px-2 py-1.5 focus:outline-none bg-transparent"
+                    style={{ 
+                      border: 'none',
+                      caretColor: '#64B5F6',
+                      fontSize: '11px'
+                    }}
+                  />
+                </div>
+
+                {/* Voice/Send Button */}
+                <button 
+                  onClick={messageText.trim() || selectedFiles.length > 0 ? handleSendMessage : handleAudioRecord}
+                  className="p-1.5 text-blue-600 hover:text-blue-800"
+                >
+                  {messageText.trim() || selectedFiles.length > 0 ? (
+                    <img src={bluIcon} alt="send" className="w-6 h-6" />
+                  ) : (
+                    <img src={audioIcon} alt="audio" className="w-6 h-6" />
+                  )}
+                </button>
               </div>
-
-              {/* Attachment Icon */}
-              <button 
-                onClick={handleAttachClick}
-                className="p-1.5 transition-colors focus:outline-none"
-                style={{ outline: 'none' }}
-              >
-                <img 
-                  src={pinIcon} 
-                  alt="attachment" 
-                  className="w-5 h-5"
-                  style={{
-                    filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
-                  }}
-                />
-              </button>
-
-              {/* Text Input */}
-              <div className="flex-1">
-                <input
-                  type="text"
-                  value={messageText}
-                  onChange={(e) => {
-                    setMessageText(e.target.value);
-                    handleTypingDetection();
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSendMessage();
-                    }
-                  }}
-                  placeholder="...Write your message"
-                  className="w-full px-2 py-1.5 focus:outline-none bg-transparent"
-                  style={{ 
-                    border: 'none',
-                    caretColor: '#64B5F6',
-                    fontSize: '11px'
-                  }}
-                />
-              </div>
-
-              {/* Voice/Send Button */}
-              <button 
-                onClick={messageText.trim() || selectedFiles.length > 0 ? handleSendMessage : handleAudioRecord}
-                className="p-1.5 text-blue-600 hover:text-blue-800"
-              >
-                {messageText.trim() || selectedFiles.length > 0 ? (
-                  <img src={bluIcon} alt="send" className="w-6 h-6" />
-                ) : (
-                  <img src={audioIcon} alt="audio" className="w-6 h-6" />
-                )}
-              </button>
-            </div>
+            )}
           </div>
 
           {/* Hidden file input for mobile */}
@@ -2418,8 +2741,11 @@ const Messages: React.FC = () => {
                                {chatEntry.hasImage && (
                                  <img src={photoIcon} alt="Image" className="w-3.5 h-3.5 inline mr-1" style={{ filter: 'brightness(0) saturate(100%) invert(31%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(96%) contrast(91%)' }} />
                                )}
-                               {chatEntry.hasDocument && (
+                               {chatEntry.hasDocument && chatEntry.documentType === 'pdf' && (
                                  <img src={documentIcon} alt="Document" className="w-3.5 h-3.5 inline mr-1" style={{ filter: 'brightness(0) saturate(100%) invert(31%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(96%) contrast(91%)' }} />
+                               )}
+                               {chatEntry.hasDocument && (chatEntry.documentType === 'jpg' || chatEntry.documentType === 'png') && (
+                                 <img src={svgIcon} alt="File" className="w-3.5 h-3.5 inline mr-1" style={{ filter: 'brightness(0) saturate(100%) invert(31%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(96%) contrast(91%)' }} />
                                )}
                                <span style={{ color: '#4D4D4D' }}>{chatEntry.lastMessage}</span>
                              </>
@@ -3361,9 +3687,11 @@ const Messages: React.FC = () => {
                                     const nameWithoutExt = fileName.join('.');
                                     const fileSizeMB = doc.size / (1024 * 1024);
                                     const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
+                                    const extensionLower = extension.toLowerCase();
+                                    const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
                                     return (
                                       <div key={docIndex} className="flex items-center space-x-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                                        <PDFIcon size={40} />
+                                        <DocumentIcon size={40} />
                                         <div className="flex-1 min-w-0">
                                           <p className="text-sm truncate" style={{ color: '#FFFFFF', fontWeight: '400' }}>
                                             {nameWithoutExt} · {extension}
@@ -4178,9 +4506,11 @@ const Messages: React.FC = () => {
                               const nameWithoutExt = fileName.join('.');
                               const fileSizeMB = file.size / (1024 * 1024);
                               const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
+                              const extensionLower = extension.toLowerCase();
+                              const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
                               return (
                                 <div key={index} className="relative mb-3 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', fontFamily: 'Poppins, sans-serif', maxWidth: '400px' }}>
-                                  <PDFIcon size={48} />
+                                  <DocumentIcon size={48} />
                                   <div className="flex-1">
                                     <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>
                                       {nameWithoutExt} · {extension}
@@ -4234,7 +4564,7 @@ const Messages: React.FC = () => {
                             alt="emoji" 
                             className="w-6 h-6" 
                             style={{ 
-                              filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                              filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
                             }}
                           />
                         </button>
@@ -4314,7 +4644,7 @@ const Messages: React.FC = () => {
                             alt="attachment" 
                             className="w-6 h-6"
                             style={{
-                              filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                              filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
                             }}
                           />
                         </button>
