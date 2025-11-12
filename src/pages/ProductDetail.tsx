@@ -21,6 +21,21 @@ import pre4 from '../assets/images/pre/4.png';
 import pre5 from '../assets/images/pre/5.png';
 import pre6 from '../assets/images/pre/6.png';
 
+// Import share icon and arrow icon
+import shareIcon from '../assets/images/pre/Share.svg';
+import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
+// Import social media icons for share modal
+import fbIcon from '../assets/images/pre/FB1.svg';
+import igIcon from '../assets/images/pre/IG1.svg';
+import xIcon from '../assets/images/pre/x.svg';
+import tgIcon from '../assets/images/pre/tg.svg';
+import zapIcon from '../assets/images/pre/zap1.svg';
+// Import icons for product detail
+import bagIcon from '../assets/images/pre/bag.svg';
+import locIcon from '../assets/images/pre/Loc.svg';
+import verifyIcon from '../assets/images/pre/verify.svg';
+import unverifyIcon from '../assets/images/pre/unverify.svg';
+
 // Country mapping for products
 const getProductCountry = (productId: number) => {
   const countryMap: { [key: number]: { name: string; code: string; flag: string; abbreviation: string } } = {
@@ -65,6 +80,7 @@ const ProductDetail: React.FC = () => {
   const [location, setLocation] = useState('');
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [isContactingSeller, setIsContactingSeller] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Product images array - main image first, then thumbnail images
   const images = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
@@ -235,17 +251,45 @@ const ProductDetail: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
 
       {/* Desktop Breadcrumb - Hidden on Mobile */}
-      <div className="hidden lg:block bg-white py-8">
+      <div className="hidden lg:block bg-white py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center justify-center space-x-3 text-base text-gray-400">
-            <Link to="/" className="hover:text-gray-600 font-medium">Home</Link>
-            <span className="text-gray-300">/</span>
-            <Link to="/" className="hover:text-gray-600 font-medium">Spices</Link>
-            <span className="text-gray-300">/</span>
-            <span className="text-gray-900 font-semibold">Product-{product.id}</span>
+          <nav className="flex items-center justify-between -ml-4">
+            {/* Left side - Breadcrumb */}
+            <div className="flex items-center space-x-2" style={{ fontSize: '13px' }}>
+              {/* Back Arrow Icon */}
+              <img 
+                src={arrowLeftIcon} 
+                alt="Back" 
+                className="cursor-pointer hover:opacity-80 transition-opacity" 
+                style={{ width: '14px', height: '14px' }}
+                onClick={() => navigate('/')}
+              />
+              
+              {/* Homepage text */}
+              <Link to="/" className="hover:opacity-80 transition-opacity" style={{ color: '#BABABA' }}>
+                Homepage
+              </Link>
+              
+              {/* Dot separator */}
+              <span style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+              
+              {/* Product ID text */}
+              <span className="font-medium" style={{ color: '#212121' }}>
+                Product ID
+              </span>
+            </div>
+            
+            {/* Right side - Share Button */}
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+              style={{ backgroundColor: '#F4F4F4' }}
+            >
+              <img src={shareIcon} alt="Share" className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%)' }} />
+            </button>
           </nav>
         </div>
       </div>
@@ -341,184 +385,207 @@ const ProductDetail: React.FC = () => {
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="flex gap-12">
-            <div className="flex gap-6">
-              <div className="flex flex-col space-y-4">
-                {images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImageIndex(index)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImageIndex === index ? 'border-orange-500' : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-
-              <div className="w-[500px] h-[500px] rounded-lg overflow-hidden bg-gray-100">
+            {/* Left Side - Image Gallery */}
+            <div className="flex-shrink-0">
+              {/* Main Image */}
+              <div className="relative w-[500px] h-[500px] rounded-[40px] overflow-hidden bg-gray-100 mb-4">
                 <img
                   src={images[selectedImageIndex]}
                   alt={product.name}
                   className="w-full h-full object-cover"
                   loading="eager"
                 />
+                
+                {/* Image Slider Indicator */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1.5">
+                  {images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className="w-1.5 h-1.5 rounded-full transition-all"
+                      style={{
+                        backgroundColor: selectedImageIndex === index ? '#FFFFFF' : '#21212199'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Thumbnail Images */}
+              <div className="flex gap-3">
+                {images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImageIndex(index)}
+                    className="relative w-[56px] h-[56px] rounded-lg overflow-hidden"
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.name} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    {selectedImageIndex === index && (
+                      <>
+                        {/* White overlay */}
+                        <div className="absolute inset-0" style={{ backgroundColor: '#FFFFFF99' }}></div>
+                        {/* Check icon */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#F9A825' }}>
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Desktop Right Column - Product Info */}
-            <div className="flex-1 max-w-lg">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-              
-              {/* Price with Published Date and Category */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="text-3xl font-bold text-gray-900">${product.price}</div>
-                <div className="flex flex-col items-end space-y-1">
-                  <span className="text-sm text-gray-500">{product.publishedDate}</span>
-                  <span className="text-sm font-medium" style={{color: '#F9A825'}}>Category: {product.category}</span>
-                </div>
-              </div>
-              
-              {/* Location with Save and Like Buttons */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span className="text-gray-600">{product.location}</span>
-                </div>
-                <div className="flex items-center space-x-3 lg:space-x-4">
-                  <button 
-                    onClick={handleSave}
-                    className={`p-2 lg:p-3 rounded-full transition-colors ${
-                      isSaved 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-400 hover:text-orange-500'
-                    }`}
-                    title={isSaved ? 'Remove from saved' : 'Save product'}
-                  >
-                    <svg className="w-5 h-5 lg:w-6 lg:h-6" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                  </button>
-                  <button 
-                    onClick={handleShare}
-                    className={`p-2 lg:p-3 rounded-full transition-colors ${
-                      isShared 
-                        ? 'text-blue-500 bg-blue-50' 
-                        : 'text-gray-400 hover:text-blue-500'
-                    }`}
-                    title={isShared ? 'Shared' : 'Share product'}
-                  >
-                    <svg className="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                    </svg>
-                  </button>
-                </div>
+            {/* Right Side - Product Info */}
+            <div className="flex-1 max-w-xl">
+              {/* Product Name and Posted Date */}
+              <div className="flex items-start justify-between mb-1.5">
+                <h1 className="font-normal" style={{ fontSize: '18px', color: '#939393' }}>
+                  Ginger Essential Oil
+                </h1>
+                <span className="font-light" style={{ fontSize: '11px', color: '#6A6A6A' }}>
+                  Posted 2 days ago
+                </span>
               </div>
 
-              {/* Description - Reduced */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-                <p className="text-gray-600 leading-relaxed mb-3">White pepper is a spice produced from the dried seed of the pepper plant. It consists of the seed only, with the darker-colored skin removed through a retting process.</p>
-                <button 
-                  onClick={toggleAdditionalInfo}
-                  className="text-blue-500 hover:text-blue-600 text-sm font-medium flex items-center space-x-1"
+              {/* Price */}
+              <div className="mb-4" style={{ fontSize: '32px', color: '#212121' }}>
+                USD 31.7
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2.5 mb-4">
+                {/* Contact Seller Button */}
+                <button
+                  onClick={handleContactSeller}
+                  className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-light text-white transition-colors hover:opacity-90 text-sm"
+                  style={{ backgroundColor: '#F9A825' }}
+                  disabled={isContactingSeller}
                 >
-                  <span>Additional information</span>
-                  <svg className={`w-4 h-4 transition-transform ${showAdditionalInfo ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <img src={bagIcon} alt="Cart" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
+                  <span>{isContactingSeller ? 'Connecting...' : 'Contact Seller'}</span>
                 </button>
-                
-                {/* Additional Information Section */}
-                {showAdditionalInfo && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-3">Additional Product Information</h4>
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <div className="flex justify-between">
-                        <span className="font-medium">Origin:</span>
-                        <span>Kerala, India (Malabar Coast)</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Processing Method:</span>
-                        <span>Retting process</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Shelf Life:</span>
-                        <span>2-3 years when stored properly</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Storage:</span>
-                        <span>Cool, dry place away from sunlight</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Package Weight:</span>
-                        <span>100g</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Organic:</span>
-                        <span>Yes, certified organic</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+
+                {/* Save for Later Button */}
+                <button
+                  onClick={handleSave}
+                  className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-light transition-colors hover:opacity-80 text-sm"
+                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A' }}
+                >
+                  <svg className="w-4 h-4" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                  <span>Save for later</span>
+                </button>
               </div>
 
-              {/* Seller Info */}
-              <div 
-                className="bg-white rounded-lg border border-gray-200 p-4 mb-6 cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={() => navigate(`/seller/${product.seller.name.toLowerCase().replace(/\s+/g, '-')}`)}
+              {/* Location */}
+              <div className="flex items-center gap-1.5 mb-4 text-sm">
+                <img src={locIcon} alt="Location" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)' }} />
+                <span className="font-light" style={{ color: '#939393' }}>
+                  {product.location}
+                </span>
+              </div>
+
+              {/* Badges */}
+              <div className="flex gap-2.5 mb-4">
+                {/* Country Badge */}
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border text-sm" style={{ borderColor: '#E1E1E1' }}>
+                  <span className="text-sm">🇨🇲</span>
+                  <span className="font-light" style={{ color: '#939393' }}>Cameroun</span>
+                </div>
+
+                {/* Category Badge */}
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border text-sm" style={{ borderColor: '#E1E1E1' }}>
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" style={{ color: '#939393' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C12 2 8 6 8 12c0 2.21 1.79 4 4 4s4-1.79 4-4c0-6-4-10-4-10z" />
+                  </svg>
+                  <span className="font-light" style={{ color: '#939393' }}>Spices</span>
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="font-light leading-relaxed mb-1.5 text-sm" style={{ color: '#B0B0B0' }}>
+                Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste of tradition.
+              </p>
+
+              {/* Read More Link */}
+              <button 
+                onClick={toggleAdditionalInfo}
+                className="font-light mb-5 hover:underline text-sm"
+                style={{ color: '#64B5F6', textDecoration: 'none' }}
               >
-                <div className="text-sm font-medium text-gray-500 mb-3">Seller profile</div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+                Read more
+              </button>
+
+              {/* Seller Profile Section */}
+              <div className="flex items-center justify-between p-3 rounded-xl border" style={{ borderColor: '#E1E1E1' }}>
+                <div className="flex items-center gap-2.5">
+                  {/* Avatar */}
+                  <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-200 overflow-hidden">
                     <img
                       src={product.seller.avatar}
                       alt={product.seller.name}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-full h-full object-cover"
                     />
-                    <div>
-                      <div className="font-medium text-gray-900">{product.seller.name}</div>
-                    </div>
                   </div>
-                  {product.seller.verified && (
-                    <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-2 py-1 rounded-md">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                      <span className="text-xs font-medium">Verified Seller</span>
-                    </div>
-                  )}
-                </div>
-              </div>
 
-              {/* Contact Seller Button - Below Seller Profile */}
-              <button 
-                onClick={handleContactSeller}
-                className="w-full flex items-center justify-center space-x-2 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-                style={{backgroundColor: isContactingSeller ? '#ccc' : '#F9A825'}}
-                disabled={!user || isContactingSeller}
-                onMouseEnter={!isContactingSeller ? (e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F' : undefined}
-                onMouseLeave={!isContactingSeller ? (e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825' : undefined}
-              >
-                {isContactingSeller ? (
-                  <div className="flex items-center justify-center">
-                    <LoadingSpinner size="md" color="white" className="mr-2" />
-                    <span>Connecting...</span>
+                  {/* Seller Info */}
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="font-medium text-sm" style={{ color: '#212121' }}>
+                        {product.seller.name}
+                      </span>
+                      {product.seller.verified ? (
+                        <img src={verifyIcon} alt="Verified" className="w-3.5 h-3.5" />
+                      ) : (
+                        <img src={unverifyIcon} alt="Unverified" className="w-3.5 h-3.5" />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-0.5">
+                      {/* Rating Stars */}
+                      {[...Array(5)].map((_, i) => (
+                        <svg
+                          key={i}
+                          className="w-3.5 h-3.5"
+                          fill={i < Math.floor(product.seller.rating) ? '#F9A825' : 'none'}
+                          stroke="#F9A825"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                          />
+                        </svg>
+                      ))}
+                      <span className="ml-1 text-xs font-light" style={{ color: '#939393' }}>
+                        {product.seller.rating}
+                      </span>
+                    </div>
                   </div>
-                ) : (
-                  <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                </svg>
-                <span>Contact Seller</span>
-                  </>
-                )}
-              </button>
+                </div>
+
+                {/* See Seller Profile Button */}
+                <button
+                  onClick={() => navigate(`/seller/${product.seller.name.toLowerCase().replace(/\s+/g, '-')}`)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors hover:opacity-80 text-sm"
+                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A' }}
+                >
+                  <span className="font-light">See seller profile</span>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1316,6 +1383,107 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <>
+          {/* Focused Overlay */}
+          <div 
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={() => setShowShareModal(false)}
+          />
+          
+          {/* Share Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div 
+              className="bg-white rounded-2xl shadow-xl relative max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+              style={{ padding: '32px 24px', marginTop: '40px' }}
+            >
+              {/* Product Image - Half Outside Modal */}
+              <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '-40px' }}>
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                  <img
+                    src={images[selectedImageIndex]}
+                    alt={product.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Heading */}
+              <h3 className="text-xl font-semibold text-center mb-3 mt-8" style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Share this product with your loved ones
+              </h3>
+
+              {/* Description */}
+              <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0' }}>
+                Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!
+              </p>
+
+              {/* Link Field with Copy Button */}
+              <div className="flex items-center space-x-2 mb-6">
+                <input
+                  type="text"
+                  value={`baoafrik.com/product-id?`}
+                  readOnly
+                  className="flex-1 px-3 py-2.5 rounded-lg text-sm"
+                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', border: 'none' }}
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                  }}
+                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90"
+                  style={{ backgroundColor: '#000000' }}
+                >
+                  Copy link
+                </button>
+              </div>
+
+              {/* Share To Section */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 mb-4">Share to</h4>
+                <div className="flex items-center justify-center space-x-6">
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={fbIcon} alt="Facebook" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Facebook</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={igIcon} alt="Instagram" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Instagram</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={xIcon} alt="X" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>X</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0088cc' }}>
+                      <img src={tgIcon} alt="Telegram" className="w-6 h-6" />
+                    </div>
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Telegram</span>
+                  </button>
+                  <button className="flex flex-col items-center space-y-2">
+                    <img src={zapIcon} alt="WhatsApp" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Whatsapp</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Add spacing before footer */}
       <div className="pb-32"></div>

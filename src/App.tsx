@@ -31,7 +31,6 @@ import './App.css';
 
 function AppContent() {
   const location = useLocation();
-  const isProductDetailPage = location.pathname.startsWith('/product/');
   const isSellerProfilePage = location.pathname.startsWith('/seller/');
   const isUserAccountPage = location.pathname === '/account';
   const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success'];
@@ -107,7 +106,7 @@ function AppContent() {
   // For all other pages, render with header/footer
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header showSearchBar={isProductDetailPage} isProductDetailPage={isProductDetailPage} />
+      <Header />
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
