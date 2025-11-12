@@ -31,10 +31,13 @@ import xIcon from '../assets/images/pre/x.svg';
 import tgIcon from '../assets/images/pre/tg.svg';
 import zapIcon from '../assets/images/pre/zap1.svg';
 // Import icons for product detail
-import bagIcon from '../assets/images/pre/bag.svg';
+import basketIcon from '../assets/images/pre/basket.png';
 import locIcon from '../assets/images/pre/Loc.svg';
 import verifyIcon from '../assets/images/pre/verify.svg';
 import unverifyIcon from '../assets/images/pre/unverify.svg';
+import pepperIcon from '../assets/images/pre/pepper.svg';
+import bookmarkIcon from '../assets/images/pre/bm.svg';
+import spIcon from '../assets/images/pre/sp.svg';
 
 // Country mapping for products
 const getProductCountry = (productId: number) => {
@@ -285,7 +288,7 @@ const ProductDetail: React.FC = () => {
             {/* Right side - Share Button */}
             <button
               onClick={() => setShowShareModal(true)}
-              className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity -ml-6"
               style={{ backgroundColor: '#F4F4F4' }}
             >
               <img src={shareIcon} alt="Share" className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%)' }} />
@@ -383,12 +386,12 @@ const ProductDetail: React.FC = () => {
       
       {/* Desktop Layout */}
       <div className="hidden lg:block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex gap-12">
             {/* Left Side - Image Gallery */}
             <div className="flex-shrink-0">
               {/* Main Image */}
-              <div className="relative w-[500px] h-[500px] rounded-[40px] overflow-hidden bg-gray-100 mb-4">
+              <div className="relative w-[450px] h-[450px] rounded-[40px] overflow-hidden bg-gray-100 mb-4">
                 <img
                   src={images[selectedImageIndex]}
                   alt={product.name}
@@ -397,14 +400,16 @@ const ProductDetail: React.FC = () => {
                 />
                 
                 {/* Image Slider Indicator */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1.5">
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ backgroundColor: '#21212199' }}>
                   {images.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className="w-1.5 h-1.5 rounded-full transition-all"
+                      className="transition-all rounded-full"
                       style={{
-                        backgroundColor: selectedImageIndex === index ? '#FFFFFF' : '#21212199'
+                        width: selectedImageIndex === index ? '16px' : '6px',
+                        height: '6px',
+                        backgroundColor: selectedImageIndex === index ? '#FFFFFF' : '#B0B0B0'
                       }}
                     />
                   ))}
@@ -412,12 +417,15 @@ const ProductDetail: React.FC = () => {
               </div>
 
               {/* Thumbnail Images */}
-              <div className="flex gap-3">
+              <div className="flex gap-3 ml-2">
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className="relative w-[56px] h-[56px] rounded-lg overflow-hidden"
+                    className={`relative w-[56px] h-[56px] rounded-lg overflow-hidden ${
+                      selectedImageIndex === index ? 'border-2' : ''
+                    }`}
+                    style={selectedImageIndex === index ? { borderColor: '#9E9E9E' } : {}}
                   >
                     <img
                       src={image}
@@ -430,7 +438,7 @@ const ProductDetail: React.FC = () => {
                         <div className="absolute inset-0" style={{ backgroundColor: '#FFFFFF99' }}></div>
                         {/* Check icon */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#F9A825' }}>
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center border-2 border-white" style={{ backgroundColor: '#F9A825' }}>
                             <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                             </svg>
@@ -446,49 +454,52 @@ const ProductDetail: React.FC = () => {
             {/* Right Side - Product Info */}
             <div className="flex-1 max-w-xl">
               {/* Product Name and Posted Date */}
-              <div className="flex items-start justify-between mb-1.5">
-                <h1 className="font-normal" style={{ fontSize: '18px', color: '#939393' }}>
+              <div className="flex items-center justify-between mb-1.5">
+                <h1 className="font-normal flex-1" style={{ fontSize: '18px', color: '#939393' }}>
                   Ginger Essential Oil
                 </h1>
-                <span className="font-light" style={{ fontSize: '11px', color: '#6A6A6A' }}>
+                <span className="font-light ml-4" style={{ fontSize: '11px', color: '#6A6A6A' }}>
                   Posted 2 days ago
                 </span>
               </div>
 
               {/* Price */}
-              <div className="mb-4" style={{ fontSize: '32px', color: '#212121' }}>
+              <div className="mb-8" style={{ fontSize: '28px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 USD 31.7
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2.5 mb-4">
+              <div className="flex gap-2.5 mb-8">
                 {/* Contact Seller Button */}
                 <button
                   onClick={handleContactSeller}
-                  className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-light text-white transition-colors hover:opacity-90 text-sm"
-                  style={{ backgroundColor: '#F9A825' }}
+                  className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-white transition-colors hover:opacity-90"
+                  style={{ backgroundColor: '#F9A825', fontSize: '13px', fontWeight: 500, width: 'fit-content' }}
                   disabled={isContactingSeller}
                 >
-                  <img src={bagIcon} alt="Cart" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
+                  <img src={basketIcon} alt="Cart" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
                   <span>{isContactingSeller ? 'Connecting...' : 'Contact Seller'}</span>
                 </button>
 
                 {/* Save for Later Button */}
                 <button
                   onClick={handleSave}
-                  className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-light transition-colors hover:opacity-80 text-sm"
-                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A' }}
+                  className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl transition-colors hover:opacity-80"
+                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', fontSize: '13px', fontWeight: 500, width: 'fit-content' }}
                 >
-                  <svg className="w-4 h-4" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
+                  <img 
+                    src={bookmarkIcon} 
+                    alt="Bookmark" 
+                    className="w-4 h-4"
+                    style={{ filter: isSaved ? 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)' }}
+                  />
                   <span>Save for later</span>
                 </button>
               </div>
 
               {/* Location */}
-              <div className="flex items-center gap-1.5 mb-4 text-sm">
-                <img src={locIcon} alt="Location" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)' }} />
+              <div className="flex items-center gap-1.5 mb-6 text-xs">
+                <img src={locIcon} alt="Location" className="w-3 h-3" style={{ filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)' }} />
                 <span className="font-light" style={{ color: '#939393' }}>
                   {product.location}
                 </span>
@@ -497,39 +508,41 @@ const ProductDetail: React.FC = () => {
               {/* Badges */}
               <div className="flex gap-2.5 mb-4">
                 {/* Country Badge */}
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border text-sm" style={{ borderColor: '#E1E1E1' }}>
-                  <span className="text-sm">🇨🇲</span>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
+                  <img 
+                    src="https://flagcdn.com/w20/cm.png" 
+                    alt="Cameroon flag" 
+                    className="w-3.5 h-3.5 rounded-full object-cover"
+                  />
                   <span className="font-light" style={{ color: '#939393' }}>Cameroun</span>
                 </div>
 
                 {/* Category Badge */}
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border text-sm" style={{ borderColor: '#E1E1E1' }}>
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" style={{ color: '#939393' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C12 2 8 6 8 12c0 2.21 1.79 4 4 4s4-1.79 4-4c0-6-4-10-4-10z" />
-                  </svg>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
+                  <img src={pepperIcon} alt="Pepper" className="w-3 h-3" />
                   <span className="font-light" style={{ color: '#939393' }}>Spices</span>
                 </div>
               </div>
 
               {/* Description */}
-              <p className="font-light leading-relaxed mb-1.5 text-sm" style={{ color: '#B0B0B0' }}>
+              <p className="font-light leading-relaxed mb-0.5 text-sm" style={{ color: '#B0B0B0' }}>
                 Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste of tradition.
               </p>
 
               {/* Read More Link */}
               <button 
                 onClick={toggleAdditionalInfo}
-                className="font-light mb-5 hover:underline text-sm"
+                className="font-medium mb-6 hover:underline text-sm"
                 style={{ color: '#64B5F6', textDecoration: 'none' }}
               >
                 Read more
               </button>
 
               {/* Seller Profile Section */}
-              <div className="flex items-center justify-between p-3 rounded-xl border" style={{ borderColor: '#E1E1E1' }}>
-                <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-between p-4 rounded-xl -ml-2">
+                <div className="flex items-center gap-3">
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-200 overflow-hidden">
+                  <div className="w-14 h-14 rounded-full bg-gray-100 border-2 border-gray-200 overflow-hidden">
                     <img
                       src={product.seller.avatar}
                       alt={product.seller.name}
@@ -554,9 +567,9 @@ const ProductDetail: React.FC = () => {
                       {[...Array(5)].map((_, i) => (
                         <svg
                           key={i}
-                          className="w-3.5 h-3.5"
-                          fill={i < Math.floor(product.seller.rating) ? '#F9A825' : 'none'}
-                          stroke="#F9A825"
+                          className="w-4 h-4"
+                          fill={i < Math.floor(product.seller.rating) ? '#F9A825' : '#E9E9E9'}
+                          stroke="none"
                           viewBox="0 0 24 24"
                         >
                           <path
@@ -577,13 +590,11 @@ const ProductDetail: React.FC = () => {
                 {/* See Seller Profile Button */}
                 <button
                   onClick={() => navigate(`/seller/${product.seller.name.toLowerCase().replace(/\s+/g, '-')}`)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors hover:opacity-80 text-sm"
-                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A' }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors hover:opacity-80"
+                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', fontSize: '12px', fontWeight: 500 }}
                 >
-                  <span className="font-light">See seller profile</span>
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <span>See seller profile</span>
+                  <img src={spIcon} alt="Arrow" className="w-3 h-3" />
                 </button>
               </div>
             </div>
