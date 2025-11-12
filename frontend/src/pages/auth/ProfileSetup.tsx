@@ -32,9 +32,9 @@ const ProfileSetup: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { addToast } = useToast();
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // State management
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
@@ -42,12 +42,12 @@ const ProfileSetup: React.FC = () => {
     gender: "",
     birthDate: "",
   });
-  
+
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageRemoved, setImageRemoved] = useState(false);
-  
+
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -84,14 +84,31 @@ const ProfileSetup: React.FC = () => {
     if (!dateString) return "";
 
     try {
+      // If it's already in YYYY-MM-DD format, return as is
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        return dateString;
+      }
+
+      // Otherwise parse the date and format properly
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return "";
 
-      return date.toISOString().split('T')[0];
+      // Use local date components to avoid timezone issues
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+
+      return `${year}-${month}-${day}`;
     } catch (error) {
       return "";
     }
   }, []);
+
+  const token = localStorage.getItem("accessToken");
+  if (!token) {
+    logout();
+    // navigate("/login");
+  }
 
   // Fetch user data
   useEffect(() => {
@@ -153,11 +170,22 @@ const ProfileSetup: React.FC = () => {
   };
 
   const handleDateChange = (date: Date | null) => {
-    const dateString = date ? date.toISOString().split('T')[0] : "";
-    setFormData(prev => ({
-      ...prev,
-      birthDate: dateString,
-    }));
+    if (date) {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+
+      setFormData(prev => ({
+        ...prev,
+        birthDate: dateString,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        birthDate: "",
+      }));
+    }
 
     if (errors.birthDate) {
       setErrors(prev => ({
@@ -352,7 +380,7 @@ const ProfileSetup: React.FC = () => {
       if (selectedFile) {
         // Upload new image
         imageUrl = await uploadImageToS3();
-        
+
         // Delete old image if it exists and is different from new one
         if (existingImageUrl && existingImageUrl !== imageUrl) {
           await s3Service.deleteFile(existingImageUrl);
@@ -413,7 +441,7 @@ const ProfileSetup: React.FC = () => {
       }, 3000);
 
     } catch (error: any) {
-      
+
       let toastMessage = "Failed to update profile. Please try again.";
       let toastTitle = "Update Failed";
 
@@ -440,7 +468,12 @@ const ProfileSetup: React.FC = () => {
     user?.firstName || user?.lastName || user?.gender || user?.birthDate || user?.profileImage
   );
 
-  const currentBirthDate = formData.birthDate ? new Date(formData.birthDate) : null;
+  const currentBirthDate = formData.birthDate ?
+    (() => {
+      const [year, month, day] = formData.birthDate.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    })() :
+    null;
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -454,7 +487,7 @@ const ProfileSetup: React.FC = () => {
               className="h-8 object-contain"
             />
           </Link>
-          <button 
+          <button
             className="p-2 rounded-lg hover:bg-orange-100 transition-colors"
             aria-label="Menu"
           >
@@ -608,9 +641,8 @@ const ProfileSetup: React.FC = () => {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    className={`w-full px-5 py-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 ${
-                      errors.firstName ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-5 py-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 ${errors.firstName ? 'border-red-300' : 'border-gray-300'
+                      }`}
                     placeholder="Enter your first name"
                     required
                     aria-invalid={!!errors.firstName}
@@ -637,9 +669,8 @@ const ProfileSetup: React.FC = () => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    className={`w-full px-5 py-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 ${
-                      errors.lastName ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-5 py-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 ${errors.lastName ? 'border-red-300' : 'border-gray-300'
+                      }`}
                     placeholder="Enter your last name"
                     required
                     aria-invalid={!!errors.lastName}
@@ -666,9 +697,8 @@ const ProfileSetup: React.FC = () => {
                       name="gender"
                       value={formData.gender}
                       onChange={handleInputChange}
-                      className={`w-full px-5 py-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 appearance-none cursor-pointer ${
-                        errors.gender ? 'border-red-300' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-5 py-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50 appearance-none cursor-pointer ${errors.gender ? 'border-red-300' : 'border-gray-300'
+                        }`}
                       required
                       aria-invalid={!!errors.gender}
                       aria-describedby={errors.gender ? "gender-error" : undefined}
@@ -700,15 +730,14 @@ const ProfileSetup: React.FC = () => {
                   >
                     Date of Birth
                   </label>
-                  <div className={`flex items-center justify-between border rounded-2xl px-4 min-h-[60px] focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent ${
-                    errors.birthDate ? 'border-red-300' : 'border-gray-300'
-                  }`}>
+                  <div className={`flex items-center justify-between border rounded-2xl px-4 min-h-[60px] focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent ${errors.birthDate ? 'border-red-300' : 'border-gray-300'
+                    }`}>
                     <DatePicker
                       id="birthDate"
                       selected={currentBirthDate}
                       onChange={handleDateChange}
                       dateFormat="dd-MM-yyyy"
-                      placeholderText="01-01-2000"
+                      placeholderText="DD-MM-YYYY"
                       showMonthDropdown
                       showYearDropdown
                       dropdownMode="select"
@@ -721,6 +750,127 @@ const ProfileSetup: React.FC = () => {
                       aria-invalid={!!errors.birthDate}
                       aria-describedby={errors.birthDate ? "birthDate-error" : undefined}
                       calendarStartDay={1}
+                      onChangeRaw={(e) => {
+                        if (!e || typeof e !== 'object' || !e.target) return;
+
+                        const input = e.target as HTMLInputElement;
+                        const originalValue = input.value;
+
+                        if (originalValue && /^[0-9-]*$/.test(originalValue)) {
+                          let value = originalValue.replace(/\D/g, ""); // Remove all non-digits
+
+                          // Auto-format with hyphens: DD-MM-YYYY
+                          if (value.length > 4) {
+                            value = `${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 8)}`;
+                          } else if (value.length >= 2) {
+                            value = `${value.slice(0, 2)}-${value.slice(2)}`;
+                          }
+
+                          if (value !== originalValue) {
+                            input.value = value;
+                          }
+
+                          // Parse the formatted date when complete
+                          if (value.length === 10) {
+                            const [day, month, year] = value.split('-').map(Number);
+                            if (day && month && year) {
+                              const dateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                              setFormData(prev => ({ ...prev, birthDate: dateString }));
+
+                              // Clear error if any
+                              if (errors.birthDate) {
+                                setErrors(prev => ({ ...prev, birthDate: "" }));
+                              }
+                              return;
+                            }
+                          }
+
+                          setFormData(prev => ({ ...prev, birthDate: "" }));
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        const input = e.target as HTMLInputElement;
+                        const cursorPosition = input.selectionStart;
+                        const value = input.value;
+
+                        // Allow navigation and deletion keys
+                        const allowedKeys = [
+                          "Backspace", "Delete", "ArrowLeft", "ArrowRight",
+                          "Tab", "Home", "End", "Enter"
+                        ];
+
+                        if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+                          e.preventDefault();
+                          return;
+                        }
+
+                        // allow delete of hyphens
+                        if (e.key === "Backspace") {
+                          if (cursorPosition === 3 || cursorPosition === 6) {
+                            const newValue = value.slice(0, cursorPosition - 2) + value.slice(cursorPosition);
+                            input.value = newValue;
+                            setFormData(prev => ({ ...prev, birthDate: "" }));
+                            input.setSelectionRange(cursorPosition - 2, cursorPosition - 2);
+                            e.preventDefault();
+                          }
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const input = e.target as HTMLInputElement;
+                        const value = input.value;
+
+                        if (value.length > 0) {
+                          if (value.length === 10) {
+                            const [inputDay, inputMonth, inputYear] = value.split('-').map(Number);
+
+                            if (inputDay && inputMonth && inputYear &&
+                              inputDay >= 1 && inputDay <= 31 &&
+                              inputMonth >= 1 && inputMonth <= 12 &&
+                              inputYear >= 1900) {
+
+                              const date = new Date(inputYear, inputMonth - 1, inputDay);
+                              const today = new Date();
+
+                              if (isNaN(date.getTime()) || date.getDate() !== inputDay) {
+                                setErrors(prev => ({
+                                  ...prev,
+                                  birthDate: "Please enter a valid date"
+                                }));
+                              } else if (date > today) {
+                                setErrors(prev => ({
+                                  ...prev,
+                                  birthDate: "Birth date cannot be in the future"
+                                }));
+                              } else {
+                                const dateString = `${inputYear}-${inputMonth.toString().padStart(2, '0')}-${inputDay.toString().padStart(2, '0')}`;
+                                setFormData(prev => ({ ...prev, birthDate: dateString }));
+
+                                if (errors.birthDate) {
+                                  setErrors(prev => ({ ...prev, birthDate: "" }));
+                                }
+                              }
+                            } else {
+                              setErrors(prev => ({
+                                ...prev,
+                                birthDate: "Please enter a valid date in DD-MM-YYYY format"
+                              }));
+                            }
+                          } else {
+                            setFormData(prev => ({ ...prev, birthDate: "" }));
+                            setErrors(prev => ({
+                              ...prev,
+                              birthDate: "Please enter a complete date in DD-MM-YYYY format"
+                            }));
+                          }
+                        } else {
+                          if (errors.birthDate) {
+                            setErrors(prev => ({ ...prev, birthDate: "" }));
+                          }
+                        }
+                      }}
+                      adjustDateOnChange={false}
+                      useWeekdaysShort={false}
+                      strictParsing
                     />
 
                     {/* Calendar Icon */}
@@ -749,11 +899,10 @@ const ProfileSetup: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading || !isFormValid() || isUploadingImage}
-                className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer text-white ${
-                  isFormValid() && !isLoading && !isUploadingImage
-                    ? "text-white bg-yellow-500 hover:bg-yellow-700 cursor-pointer"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
+                className={`w-full py-3 rounded-lg font-medium transition-colors text-sm cursor-pointer text-white ${isFormValid() && !isLoading && !isUploadingImage
+                  ? "text-white bg-yellow-500 hover:bg-yellow-700 cursor-pointer"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
               >
                 {isLoading || isUploadingImage ? (
                   <div className="flex items-center justify-center">

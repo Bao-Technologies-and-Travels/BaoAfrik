@@ -49,6 +49,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
 
 const isAuthEndpoint = (url: string): boolean => {
   const authEndpoints = [
+    // '/',
     '/login',
     '/register',
     '/refresh',
