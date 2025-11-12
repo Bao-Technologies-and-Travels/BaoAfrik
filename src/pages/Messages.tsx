@@ -117,6 +117,7 @@ const Messages: React.FC = () => {
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const [audioPlaybackTime, setAudioPlaybackTime] = useState<{[key: number]: number}>({});
   const [audioPlaybackProgress, setAudioPlaybackProgress] = useState<{[key: number]: number}>({});
+  const [audioPlaybackSpeed, setAudioPlaybackSpeed] = useState<{[key: number]: number}>({});
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
   const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
   const [previewPlaybackTime, setPreviewPlaybackTime] = useState(0);
@@ -1279,8 +1280,37 @@ const Messages: React.FC = () => {
     audio.onpause = () => {
       clearInterval(updateTimer);
     };
+    
+    // Apply playback speed if set
+    const currentSpeed = audioPlaybackSpeed[messageId] || 1;
+    audio.playbackRate = currentSpeed;
 
     audio.play();
+  };
+  
+  // Handle playback speed change
+  const handleSpeedChange = (messageId: number) => {
+    const currentSpeed = audioPlaybackSpeed[messageId] || 1;
+    let newSpeed = 1;
+    
+    // Cycle through speeds: 1x → 1.5x → 2x → 1x
+    if (currentSpeed === 1) {
+      newSpeed = 1.5;
+    } else if (currentSpeed === 1.5) {
+      newSpeed = 2;
+    } else {
+      newSpeed = 1;
+    }
+    
+    setAudioPlaybackSpeed(prev => ({
+      ...prev,
+      [messageId]: newSpeed
+    }));
+    
+    // Apply to currently playing audio if this message is playing
+    if (currentAudio && playingMessageId === messageId) {
+      currentAudio.playbackRate = newSpeed;
+    }
   };
 
   // Cleanup timers on unmount
@@ -1667,8 +1697,12 @@ const Messages: React.FC = () => {
                               <div className="flex items-center space-x-2">
                                 {/* Avatar or Speed Button - Mobile */}
                                 {playingMessageId === message.id ? (
-                                  <div 
-                                    className="flex items-center justify-center flex-shrink-0"
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleSpeedChange(message.id);
+                                    }}
+                                    className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
                                     style={{ 
                                       backgroundColor: '#4781AF',
                                       borderRadius: '12px',
@@ -1677,8 +1711,10 @@ const Messages: React.FC = () => {
                                       padding: '0 8px'
                                     }}
                                   >
-                                    <span className="text-white text-xs font-medium">1x</span>
-                                  </div>
+                                    <span className="text-white text-xs font-medium">
+                                      {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
+                                    </span>
+                                  </button>
                                 ) : (
                                   <div className="relative flex-shrink-0">
                                     <img src={avatarIcon} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
@@ -1786,8 +1822,12 @@ const Messages: React.FC = () => {
                                           <div className="flex items-center">
                                             {/* Speed button - appears when playing */}
                                             {playingMessageId === message.id && (
-                                              <div 
-                                                className="flex items-center justify-center flex-shrink-0"
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleSpeedChange(message.id);
+                                                }}
+                                                className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
                                                 style={{ 
                                                   backgroundColor: '#4781AF',
                                                   borderRadius: '8px',
@@ -1797,8 +1837,10 @@ const Messages: React.FC = () => {
                                                   marginRight: '6px'
                                                 }}
                                               >
-                                                <span className="text-white" style={{ fontSize: '9px', fontWeight: 500 }}>1x</span>
-                                              </div>
+                                                <span className="text-white" style={{ fontSize: '9px', fontWeight: 500 }}>
+                                                  {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
+                                                </span>
+                                              </button>
                                             )}
                                             
                                             {/* Duration */}
@@ -4118,8 +4160,12 @@ const Messages: React.FC = () => {
                               <div className="flex items-center space-x-3">
                                 {/* Avatar or Speed Button - Desktop */}
                                 {playingMessageId === message.id ? (
-                                  <div 
-                                    className="flex items-center justify-center flex-shrink-0"
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleSpeedChange(message.id);
+                                    }}
+                                    className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
                                     style={{ 
                                       backgroundColor: '#4781AF',
                                       borderRadius: '16px',
@@ -4128,8 +4174,10 @@ const Messages: React.FC = () => {
                                       padding: '0 12px'
                                     }}
                                   >
-                                    <span className="text-white text-sm font-medium">1x</span>
-                                  </div>
+                                    <span className="text-white text-sm font-medium">
+                                      {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
+                                    </span>
+                                  </button>
                                 ) : (
                                   <div className="relative flex-shrink-0">
                                     <img src={avatarIcon} alt="Your Avatar" className="w-10 h-10 rounded-full" />
@@ -4239,8 +4287,12 @@ const Messages: React.FC = () => {
                                         <div className="flex items-center">
                                           {/* Speed button - appears when playing */}
                                           {playingMessageId === message.id && (
-                                            <div 
-                                              className="flex items-center justify-center flex-shrink-0"
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleSpeedChange(message.id);
+                                              }}
+                                              className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
                                               style={{ 
                                                 backgroundColor: '#4781AF',
                                                 borderRadius: '10px',
@@ -4250,8 +4302,10 @@ const Messages: React.FC = () => {
                                                 marginRight: '8px'
                                               }}
                                             >
-                                              <span className="text-white" style={{ fontSize: '10px', fontWeight: 500 }}>1x</span>
-                                            </div>
+                                              <span className="text-white" style={{ fontSize: '10px', fontWeight: 500 }}>
+                                                {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
+                                              </span>
+                                            </button>
                                           )}
                                           
                                           {/* Duration */}
