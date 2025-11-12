@@ -116,6 +116,7 @@ const Messages: React.FC = () => {
   const [playingMessageId, setPlayingMessageId] = useState<number | null>(null);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const [audioPlaybackTime, setAudioPlaybackTime] = useState<{[key: number]: number}>({});
+  const [audioPlaybackProgress, setAudioPlaybackProgress] = useState<{[key: number]: number}>({});
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
   const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
   const [previewPlaybackTime, setPreviewPlaybackTime] = useState(0);
@@ -512,6 +513,12 @@ const Messages: React.FC = () => {
       // Find the message to reply to
       const message = messages.find(m => m.id === messageId);
       if (message) {
+        console.log('Setting reply to message:', {
+          type: message.type,
+          duration: message.duration,
+          waveformDataLength: message.waveformData?.length || 0,
+          hasAudioUrl: !!message.audioUrl
+        });
         setReplyToMessage(message);
       }
     }
@@ -732,9 +739,17 @@ const Messages: React.FC = () => {
       })) : null,
       replyTo: replyToMessage ? {
         text: replyToMessage.text,
-        sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'
+        sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You',
+        type: replyToMessage.type,
+        duration: replyToMessage.duration,
+        waveformData: replyToMessage.waveformData,
+        audioUrl: replyToMessage.audioUrl
       } : null
     };
+    
+    if (replyToMessage) {
+      console.log('Replying to message with waveformData:', replyToMessage.waveformData?.length || 0, 'bars');
+    }
 
     setMessages(prev => [...prev, newMessage]);
            setIsMessageSent(true);
@@ -1040,9 +1055,12 @@ const Messages: React.FC = () => {
           sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You',
           type: replyToMessage.type,
           duration: replyToMessage.duration,
-          waveformData: replyToMessage.waveformData
+          waveformData: replyToMessage.waveformData,
+          audioUrl: replyToMessage.audioUrl
         } : null
       };
+      
+      console.log('Sending voice note with waveformData:', recordedWaveforms.length, 'bars');
       
       setMessages(prev => [...prev, newMessage]);
       setRecordingTime(0);
@@ -1213,9 +1231,23 @@ const Messages: React.FC = () => {
       ...prev,
       [messageId]: duration
     }));
+    
+    // Initialize progress to 0
+    setAudioPlaybackProgress(prev => ({
+      ...prev,
+      [messageId]: 0
+    }));
 
-    // Update countdown timer
+    // Update countdown timer and progress
     const updateTimer = setInterval(() => {
+      if (audio.currentTime && duration > 0) {
+        const progress = (audio.currentTime / duration) * 100;
+        setAudioPlaybackProgress(prev => ({
+          ...prev,
+          [messageId]: progress
+        }));
+      }
+      
       setAudioPlaybackTime(prev => {
         const remaining = Math.max(0, (prev[messageId] || duration) - 1);
         if (remaining === 0) {
@@ -1236,6 +1268,10 @@ const Messages: React.FC = () => {
       setAudioPlaybackTime(prev => ({
         ...prev,
         [messageId]: duration
+      }));
+      setAudioPlaybackProgress(prev => ({
+        ...prev,
+        [messageId]: 0
       }));
     };
 
@@ -1684,25 +1720,35 @@ const Messages: React.FC = () => {
                                 </div>
                                 <div className="flex items-center justify-center space-x-0.5 flex-shrink-0">
                                   {(message.waveformData && message.waveformData.length > 0 ? 
-                                    message.waveformData.slice(-20).map((level: number, i: number) => (
-                                      <div
-                                        key={i}
-                                        className="w-0.5 bg-white rounded-full"
-                                        style={{
-                                          height: `${Math.max(3, level * 15)}px`,
-                                        }}
-                                      />
-                                    ))
+                                    message.waveformData.slice(-20).map((level: number, i: number) => {
+                                      const progress = audioPlaybackProgress[message.id] || 0;
+                                      const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
+                                      return (
+                                        <div
+                                          key={i}
+                                          className="w-0.5 rounded-full"
+                                          style={{
+                                            height: `${Math.max(3, level * 15)}px`,
+                                            backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC'
+                                          }}
+                                        />
+                                      );
+                                    })
                                   : 
-                                    [3,5,3,6,9,11,13,11,9,6,5,3,6,8,9,8,6,5,3,5].map((h, i) => (
-                                      <div
-                                        key={i}
-                                        className="w-0.5 bg-white rounded-full"
-                                        style={{
-                                          height: `${h}px`,
-                                        }}
-                                      />
-                                    ))
+                                    [3,5,3,6,9,11,13,11,9,6,5,3,6,8,9,8,6,5,3,5].map((h, i) => {
+                                      const progress = audioPlaybackProgress[message.id] || 0;
+                                      const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
+                                      return (
+                                        <div
+                                          key={i}
+                                          className="w-0.5 rounded-full"
+                                          style={{
+                                            height: `${h}px`,
+                                            backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC'
+                                          }}
+                                        />
+                                      );
+                                    })
                                   )}
                                 </div>
                               </div>
@@ -1717,7 +1763,7 @@ const Messages: React.FC = () => {
                                     </p>
                                     
                                     {message.replyTo.type === 'voice' ? (
-                                      /* Voice Note Reply - Screenshot Structure */
+                                      /* Voice Note Reply - Screenshot Structure - TWO LINES */
                                       <div className="flex items-start">
                                         {/* White vertical line on LEFT */}
                                         <div 
@@ -1725,53 +1771,104 @@ const Messages: React.FC = () => {
                                           style={{ 
                                             width: '2px',
                                             backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
-                                            height: '30px',
-                                            flexShrink: 0,
-                                            marginTop: '2px'
+                                            height: '32px',
+                                            flexShrink: 0
                                           }}
                                         ></div>
                                         
                                         <div className="flex-1">
-                                          {/* "You" text in light blue */}
+                                          {/* "You" text in light blue - ABOVE */}
                                           <div style={{ fontSize: '10px', color: message.isIncoming ? '#64B5F6' : '#CFE8FC', fontWeight: 500, marginBottom: '4px' }}>
                                             {message.replyTo.sender}
                                           </div>
                                           
-                                          {/* Audio preview inline */}
-                                          <div className="flex items-center space-x-1">
-                                            <span style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                          {/* Audio preview - BELOW "You" */}
+                                          <div className="flex items-center">
+                                            {/* Speed button - appears when playing */}
+                                            {playingMessageId === message.id && (
+                                              <div 
+                                                className="flex items-center justify-center flex-shrink-0"
+                                                style={{ 
+                                                  backgroundColor: '#4781AF',
+                                                  borderRadius: '8px',
+                                                  width: '28px',
+                                                  height: '20px',
+                                                  padding: '0 6px',
+                                                  marginRight: '6px'
+                                                }}
+                                              >
+                                                <span className="text-white" style={{ fontSize: '9px', fontWeight: 500 }}>1x</span>
+                                              </div>
+                                            )}
+                                            
+                                            {/* Duration */}
+                                            <span style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)', marginRight: '6px' }}>
                                               {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
                                             </span>
-                                            <div className="flex items-center space-x-0.5">
+                                            
+                                            {/* Waveform */}
+                                            <div className="flex items-center space-x-0.5 flex-1">
                                               {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ? 
-                                                message.replyTo.waveformData.slice(-10).map((level: number, i: number) => (
-                                                  <div
-                                                    key={i}
-                                                    style={{ 
-                                                      width: '1.5px',
-                                                      height: `${Math.max(2, level * 8)}px`,
-                                                      backgroundColor: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)',
-                                                      borderRadius: '1px'
-                                                    }}
-                                                  />
-                                                ))
+                                                message.replyTo.waveformData.slice(-20).map((level: number, i: number) => {
+                                                  const progress = audioPlaybackProgress[message.id] || 0;
+                                                  const totalBars = Math.min(20, message.replyTo.waveformData.length);
+                                                  const isPlayed = playingMessageId === message.id && (i / totalBars) * 100 <= progress;
+                                                  return (
+                                                    <div
+                                                      key={i}
+                                                      style={{ 
+                                                        width: '1.5px',
+                                                        height: `${Math.max(2, level * 8)}px`,
+                                                        backgroundColor: isPlayed ? '#FFFFFF' : (message.isIncoming ? '#6A6A6A' : '#CFE8FC'),
+                                                        borderRadius: '1px'
+                                                      }}
+                                                    />
+                                                  );
+                                                })
                                               : 
-                                                [2,3,2,4,6,7,8,7,6,4].map((h, i) => (
-                                                  <div
-                                                    key={i}
-                                                    style={{ 
-                                                      width: '1.5px',
-                                                      height: `${h}px`,
-                                                      backgroundColor: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)',
-                                                      borderRadius: '1px'
-                                                    }}
-                                                  />
-                                                ))
+                                                [2,3,2,4,6,7,8,7,6,4,6,5,3,6,8,9,8,6,5,3].map((h, i) => {
+                                                  const progress = audioPlaybackProgress[message.id] || 0;
+                                                  const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
+                                                  return (
+                                                    <div
+                                                      key={i}
+                                                      style={{ 
+                                                        width: '1.5px',
+                                                        height: `${h}px`,
+                                                        backgroundColor: isPlayed ? '#FFFFFF' : (message.isIncoming ? '#6A6A6A' : '#CFE8FC'),
+                                                        borderRadius: '1px'
+                                                      }}
+                                                    />
+                                                  );
+                                                })
                                               )}
                                             </div>
-                                            <svg style={{ width: '12px', height: '12px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }} fill="currentColor" viewBox="0 0 24 24">
-                                              <path d="M8 5v14l11-7z" />
-                                            </svg>
+                                            
+                                            {/* Play/Pause button - far right */}
+                                            <button 
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (message.replyTo.audioUrl) {
+                                                  handleAudioPlayback(message.id, message.replyTo.audioUrl, message.replyTo.duration);
+                                                }
+                                              }}
+                                              className="ml-3 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity"
+                                              style={{ 
+                                                width: '18px',
+                                                height: '18px',
+                                                backgroundColor: '#FFFFFF'
+                                              }}
+                                            >
+                                              {playingMessageId === message.id ? (
+                                                <svg style={{ width: '12px', height: '12px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                                                </svg>
+                                              ) : (
+                                                <svg style={{ width: '12px', height: '12px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                  <path d="M8 5v14l11-7z" />
+                                                </svg>
+                                              )}
+                                            </button>
                                           </div>
                                         </div>
                                       </div>
@@ -2276,9 +2373,9 @@ const Messages: React.FC = () => {
                 {replyToMessage.type === 'voice' ? (
                   /* Voice Note Reply Preview - Matches Audio Preview Style */
                   <div 
-                    className="p-2 relative flex items-center space-x-2"
+                    className="flex items-center rounded-md p-2"
                     style={{ 
-                      backgroundColor: '#64B5F6',
+                      background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
                       borderRadius: '12px',
                       maxWidth: '85%'
                     }}
@@ -3998,7 +4095,7 @@ const Messages: React.FC = () => {
                             <div className="space-y-2">
                               {/* Reply Preview for Voice Messages */}
                               {message.replyTo && (
-                                <div className="flex items-stretch" style={{ maxWidth: '55%' }}>
+                                <div className="flex items-stretch">
                                   <div 
                                     className="rounded-full mr-2" 
                                     style={{ 
@@ -4074,25 +4171,35 @@ const Messages: React.FC = () => {
                                 </div>
                                 <div className="flex items-center justify-center space-x-0.5">
                                   {(message.waveformData && message.waveformData.length > 0 ? 
-                                    message.waveformData.slice(-20).map((level: number, i: number) => (
-                                      <div
-                                        key={i}
-                                        className="w-0.5 bg-white rounded-full"
-                                        style={{
-                                          height: `${Math.max(4, level * 18)}px`,
-                                        }}
-                                      />
-                                    ))
+                                    message.waveformData.slice(-20).map((level: number, i: number) => {
+                                      const progress = audioPlaybackProgress[message.id] || 0;
+                                      const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
+                                      return (
+                                        <div
+                                          key={i}
+                                          className="w-0.5 rounded-full"
+                                          style={{
+                                            height: `${Math.max(4, level * 18)}px`,
+                                            backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC'
+                                          }}
+                                        />
+                                      );
+                                    })
                                   : 
-                                    [4,6,4,8,12,14,16,14,12,8,6,4,8,10,12,10,8,6,4,6].map((h, i) => (
-                                      <div
-                                        key={i}
-                                        className="w-0.5 bg-white rounded-full"
-                                        style={{
-                                          height: `${h}px`,
-                                        }}
-                                      />
-                                    ))
+                                    [4,6,4,8,12,14,16,14,12,8,6,4,8,10,12,10,8,6,4,6].map((h, i) => {
+                                      const progress = audioPlaybackProgress[message.id] || 0;
+                                      const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
+                                      return (
+                                        <div
+                                          key={i}
+                                          className="w-0.5 rounded-full"
+                                          style={{
+                                            height: `${h}px`,
+                                            backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC'
+                                          }}
+                                        />
+                                      );
+                                    })
                                   )}
                                 </div>
                               </div>
@@ -4102,14 +4209,14 @@ const Messages: React.FC = () => {
                             <>
                               {/* Reply Section */}
                               {message.replyTo && (
-                                <div className="mb-3" style={{ maxWidth: '55%' }}>
+                                <div className="mb-3">
                                   {/* User's reply text at top */}
                                   <p className="text-sm mb-2" style={{ color: '#FFFFFF' }}>
                                     {message.text}
                                   </p>
                                   
                                   {message.replyTo.type === 'voice' ? (
-                                    /* Voice Note Reply - Screenshot Structure */
+                                    /* Voice Note Reply - Screenshot Structure - TWO LINES */
                                     <div className="flex items-start">
                                       {/* White vertical line on LEFT */}
                                       <div 
@@ -4117,53 +4224,104 @@ const Messages: React.FC = () => {
                                         style={{ 
                                           width: '2px',
                                           backgroundColor: '#FFFFFF',
-                                          height: '36px',
-                                          flexShrink: 0,
-                                          marginTop: '2px'
+                                          height: '38px',
+                                          flexShrink: 0
                                         }}
                                       ></div>
                                       
                                       <div className="flex-1">
-                                        {/* "You" text in light blue */}
+                                        {/* "You" text in light blue - ABOVE */}
                                         <div className="text-xs font-medium mb-1" style={{ color: '#CFE8FC' }}>
                                           {message.replyTo.sender}
                                         </div>
                                         
-                                        {/* Audio preview inline */}
-                                        <div className="flex items-center space-x-1.5">
-                                          <span className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                        {/* Audio preview - BELOW "You" */}
+                                        <div className="flex items-center">
+                                          {/* Speed button - appears when playing */}
+                                          {playingMessageId === message.id && (
+                                            <div 
+                                              className="flex items-center justify-center flex-shrink-0"
+                                              style={{ 
+                                                backgroundColor: '#4781AF',
+                                                borderRadius: '10px',
+                                                width: '32px',
+                                                height: '22px',
+                                                padding: '0 8px',
+                                                marginRight: '8px'
+                                              }}
+                                            >
+                                              <span className="text-white" style={{ fontSize: '10px', fontWeight: 500 }}>1x</span>
+                                            </div>
+                                          )}
+                                          
+                                          {/* Duration */}
+                                          <span className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)', marginRight: '8px' }}>
                                             {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
                                           </span>
-                                          <div className="flex items-center space-x-0.5">
+                                          
+                                          {/* Waveform */}
+                                          <div className="flex items-center space-x-0.5 flex-1">
                                             {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ? 
-                                              message.replyTo.waveformData.slice(-12).map((level: number, i: number) => (
-                                                <div
-                                                  key={i}
-                                                  style={{ 
-                                                    width: '2px',
-                                                    height: `${Math.max(3, level * 10)}px`,
-                                                    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                                                    borderRadius: '1px'
-                                                  }}
-                                                />
-                                              ))
+                                              message.replyTo.waveformData.slice(-20).map((level: number, i: number) => {
+                                                const progress = audioPlaybackProgress[message.id] || 0;
+                                                const totalBars = Math.min(20, message.replyTo.waveformData.length);
+                                                const isPlayed = playingMessageId === message.id && (i / totalBars) * 100 <= progress;
+                                                return (
+                                                  <div
+                                                    key={i}
+                                                    style={{ 
+                                                      width: '2px',
+                                                      height: `${Math.max(3, level * 10)}px`,
+                                                      backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC',
+                                                      borderRadius: '1px'
+                                                    }}
+                                                  />
+                                                );
+                                              })
                                             : 
-                                              [3,4,3,5,8,10,12,10,8,5,4,3].map((h, i) => (
-                                                <div
-                                                  key={i}
-                                                  style={{ 
-                                                    width: '2px',
-                                                    height: `${h}px`,
-                                                    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                                                    borderRadius: '1px'
-                                                  }}
-                                                />
-                                              ))
+                                              [3,4,3,5,8,10,12,10,8,5,4,3,6,8,9,8,6,5,3,5].map((h, i) => {
+                                                const progress = audioPlaybackProgress[message.id] || 0;
+                                                const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
+                                                return (
+                                                  <div
+                                                    key={i}
+                                                    style={{ 
+                                                      width: '2px',
+                                                      height: `${h}px`,
+                                                      backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC',
+                                                      borderRadius: '1px'
+                                                    }}
+                                                  />
+                                                );
+                                              })
                                             )}
                                           </div>
-                                          <svg className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.6)' }} fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z" />
-                                          </svg>
+                                          
+                                          {/* Play/Pause button - far right */}
+                                          <button 
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (message.replyTo.audioUrl) {
+                                                handleAudioPlayback(message.id, message.replyTo.audioUrl, message.replyTo.duration);
+                                              }
+                                            }}
+                                            className="ml-4 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity"
+                                            style={{ 
+                                              width: '22px',
+                                              height: '22px',
+                                              backgroundColor: '#FFFFFF'
+                                            }}
+                                          >
+                                            {playingMessageId === message.id ? (
+                                              <svg style={{ width: '14px', height: '14px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                                              </svg>
+                                            ) : (
+                                              <svg style={{ width: '14px', height: '14px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z" />
+                                              </svg>
+                                            )}
+                                          </button>
                                         </div>
                                       </div>
                                     </div>
@@ -4717,51 +4875,47 @@ const Messages: React.FC = () => {
                       {replyToMessage.type === 'voice' ? (
                         /* Voice Note Reply Preview - Matches Audio Preview Style */
                         <div 
-                          className="p-3 relative flex items-center"
+                          className="flex items-center justify-between rounded-md px-4 py-2"
                           style={{ 
-                            backgroundColor: '#64B5F6',
-                            borderRadius: '12px'
+                            background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
+                            borderRadius: '12px',
+                            width: '300px'
                           }}
                         >
-                          {/* Play icon */}
-                          <button className="hover:opacity-80 transition-opacity flex-shrink-0">
-                            <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
-                            </svg>
-                          </button>
-                          
-                          {/* Duration and Audio label */}
-                          <span className="text-white text-sm">
-                            {Math.floor((replyToMessage.duration || 0) / 60).toString().padStart(2, '0')} : {((replyToMessage.duration || 0) % 60).toString().padStart(2, '0')}
-                          </span>
-                          <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
-                          <span className="text-white text-sm">Audio</span>
-                          
-                          {/* Waveform */}
-                          <div className="flex items-center justify-center space-x-0.5 ml-2">
-                            {(replyToMessage.waveformData && replyToMessage.waveformData.length > 0 ? 
-                              replyToMessage.waveformData.slice(-20).map((level: number, i: number) => (
-                                <div
-                                  key={i}
-                                  className="w-0.5 bg-white rounded-full"
-                                  style={{ height: `${Math.max(4, level * 18)}px` }}
-                                />
-                              ))
-                            : 
-                              [6,8,4,6,12,16,14,18,20,16,12,8,6,10,14,12,8,6,4,8].map((h, i) => (
-                                <div
-                                  key={i}
-                                  className="w-0.5 bg-white rounded-full"
-                                  style={{ height: `${h}px` }}
-                                />
-                              ))
-                            )}
+                          <div className="flex items-center space-x-3">
+                            <button className="hover:opacity-80 transition-opacity">
+                              <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }}/>
+                              </svg>
+                            </button>
+                            <span className="text-white text-sm">
+                              {Math.floor((replyToMessage.duration || 0) / 60).toString().padStart(2, '0')} : {((replyToMessage.duration || 0) % 60).toString().padStart(2, '0')}
+                            </span>
+                            <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
+                            <span className="text-white text-sm">Audio</span>
+                            <div className="flex items-center justify-center space-x-0.5">
+                              {(replyToMessage.waveformData && replyToMessage.waveformData.length > 0 ? 
+                                replyToMessage.waveformData.slice(-20).map((level: number, i: number) => (
+                                  <div
+                                    key={i}
+                                    className="w-0.5 bg-white rounded-full"
+                                    style={{ height: `${Math.max(4, level * 18)}px` }}
+                                  />
+                                ))
+                              : 
+                                [6,8,4,6,12,16,14,18,20,16,12,8,6,10,14,12,8,6,4,8].map((h, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-0.5 bg-white rounded-full"
+                                    style={{ height: `${h}px` }}
+                                  />
+                                ))
+                              )}
+                            </div>
                           </div>
-                          
-                          {/* Close button */}
                           <button
                             onClick={() => setReplyToMessage(null)}
-                            className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity ml-2"
+                            className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                             style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
                           >
                             <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
