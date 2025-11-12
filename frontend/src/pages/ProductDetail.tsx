@@ -845,14 +845,14 @@ const ProductDetail: React.FC = () => {
 
             {/* Desktop Right Column - Product Info */}
             <div className="flex-1 max-w-lg">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              <h1 className="text-2xl text-gray-900 mb-4">
                 {product.title}
               </h1>
 
               {/* Price with Published Date and Category */}
               <div className="flex items-center justify-between mb-6">
                 <div className="text-3xl font-bold text-gray-900">
-                  ${product.currency} ${product.price}
+                  {product.currency} {product.price}
                 </div>
                 <div className="flex flex-col items-end space-y-1">
                   <span className="text-sm text-gray-500">
@@ -1031,7 +1031,7 @@ const ProductDetail: React.FC = () => {
                           {sellerName}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {product.seller.location || "Unknown location"}
+                          {product.seller.location || product.origin.charAt(0).toUpperCase() + product.origin.slice(1) || "Unknown location"}
                         </div>
                       </div>
                     </div>

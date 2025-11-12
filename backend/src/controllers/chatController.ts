@@ -26,81 +26,6 @@ export class ChatController {
         }
     };
 
-    createConversationByEmail = async (req: Request, res: Response) => {
-        try {
-            const creatorId = req.user!.id;
-            const { participantEmail, initialMessage, productId, productData } = req.body;
-
-            if (!participantEmail) {
-                return res.status(422).json({
-                    success: false,
-                    error: 'Participant email is required'
-                });
-            }
-
-            const participant = await prisma.user.findUnique({
-                where: {
-                    email: participantEmail,
-                },
-                select: {
-                    id: true,
-                    email: true,
-                    firstName: true,
-                    lastName: true,
-                    profileImage: true,
-                }
-            });
-
-            if (!participant) {
-                return res.status(404).json({ 
-                    success: false,
-                    error: 'User not found with this email' 
-                });
-            }
-
-            // prevent self messaging
-            if (participant.id === creatorId) {
-                return res.status(400).json({ 
-                    success: false,
-                    error: 'You cannot message yourself' 
-                });
-            }
-
-            const conversation = await this.chatService.createConversationByEmail({
-                creatorId,
-                participantEmail,
-                productId,
-                initialMessage, 
-                productData
-            });
-
-            return res.status(201).json({
-                success: true,
-                data: conversation
-            });
-        } catch (error: any) {
-
-            if (error.message.includes('User not found')) {
-                return res.status(404).json({
-                    success: false,
-                    error: 'User not found with this email'
-                });
-            }
-
-            if (error.message.includes('Cannot create conversation with yourself')) {
-                return res.status(422).json({
-                    success: false,
-                    error: 'Cannot create conversation with yourself'
-                });
-            }
-
-            return res.status(500).json({
-                success: false,
-                error: 'Failed to create conversation'
-            });
-        }
-    };
-
     contactSeller = async (req: Request, res: Response) => {
         try {
             const { productId } = req.body;
@@ -161,9 +86,9 @@ export class ChatController {
             };
 
             // Create conversation
-            const conversation = await this.chatService.createConversationByEmail({
+            const conversation = await this.chatService.createConversation({
                 creatorId: buyerId,
-                participantEmail: product.seller.email,
+                participantId: product.seller.id,
                 productId: product.id,
                 initialMessage: "",
                 productData: productData
