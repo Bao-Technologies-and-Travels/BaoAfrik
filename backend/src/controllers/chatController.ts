@@ -139,7 +139,7 @@ export class ChatController {
             if (product.seller.id === buyerId) {
                 return res.status(422).json({
                     success: false,
-                    error: 'Cannot contact yourself'
+                    error: 'Cannot create conversation with yourself'
                 });
             }
 
@@ -184,30 +184,30 @@ export class ChatController {
             });
         } catch (error: any) {
 
-            if (error.message.includes('Product not found')) {
+            if (error.message === 'Product not found') {
                 return res.status(404).json({
                     success: false,
                     error: 'Product not found'
                 });
             }
 
-            if (error.message.includes('User not found')) {
+            if (error.message === 'User not found with this email') {
                 return res.status(404).json({
                     success: false,
                     error: 'Seller not found'
                 });
             }
 
-            if (error.message.includes('Cannot create conversation with yourself')) {
+            if (error.message === 'Cannot create conversation with yourself') {
                 return res.status(422).json({
                     success: false,
-                    error: 'Cannot contact yourself'
+                    error: 'Cannot create conversation with yourself'
                 });
             }
 
             return res.status(500).json({
                 success: false,
-                error: 'Failed to contact seller: ' + error.message
+                error: 'Internal server error' + error.message
             });
         }
     };

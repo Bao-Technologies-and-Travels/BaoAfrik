@@ -6,10 +6,10 @@ pipeline {
         NODE_ENV = 'staging'
         SSH_KEY_ID = 'baoafrik-key'
         SSH_HOST = 'ubuntu@54.162.69.251'
-        APP_DIR = '~/BaoAfrik'
+        FRONTEND_DIR = '~/BaoAfrik/frontend'
         BACKEND_DIR = '~/BaoAfrik/backend'
-        APP_NAME_FRONTEND = 'baoafrik-frontend'
-        APP_NAME_BACKEND = 'baoafrik-backend'
+        APP_NAME_FRONTEND = 'frontend'
+        APP_NAME_BACKEND = 'backend'
         REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
         BRANCH = 'fonsah-staging'
         DOMAIN = 'staging.baoafrik.com'
@@ -94,7 +94,7 @@ pipeline {
                             git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
                         fi
 
-                        cd ${APP_DIR}
+                        cd ${FRONTEND_DIR}
                         git fetch origin ${BRANCH}
                         git checkout ${BRANCH}
                         git reset --hard origin/${BRANCH}
@@ -115,7 +115,7 @@ pipeline {
                         sh """
                         ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                             set -e
-                            cd ${APP_DIR}
+                            cd ${FRONTEND_DIR}
 
                             # Remove existing .env if any
                             rm -f .env
@@ -223,7 +223,7 @@ EOF
                         echo "Backend deployed successfully."
                         echo "Starting frontend deployment..."
 
-                        cd ${APP_DIR}
+                        cd ${FRONTEND_DIR}
                         rm -rf node_modules package-lock.json build
 
                         npm install
@@ -301,29 +301,29 @@ EOF
                     )
             }
         }
-        // success {
-        //     script {
-        //         emailext(
-        //         subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
-        //         to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
-        //         from: 'jenkins.baoafrik.com',
-        //         replyTo: 'no-reply@baotechnologiesandtravels.com',
-        //         body: """
-        //             <html>
-        //                 <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-        //                     <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
-        //                     <p><strong>Job:</strong> ${env.JOB_NAME}</p>
-        //                     <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-        //                     <p><strong>Changes made:</strong>Synchronized changes to front-end: User account page, notifications, archived chats, homepage modifications. Aligned product details with products in database from API. Fixed contact seller bug and message sending issues.</p>
-        //                     <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
-        //                     <hr>
-        //                     <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
-        //                 </body>
-        //             </html>
-        //         """,
-        //         mimeType: 'text/html'
-        //         )
-        //     }
-        // }
+        success {
+            script {
+                emailext(
+                subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
+                to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
+                from: 'jenkins.baoafrik.com',
+                replyTo: 'no-reply@baotechnologiesandtravels.com',
+                body: """
+                    <html>
+                        <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+                            <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
+                            <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+                            <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
+                            <p><strong>Changes made:</strong>Restructured working directory, moved frontend files into frontend directory to keep dependencies of each environment isolated for a cleaner structure.</p>
+                            <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
+                            <hr>
+                            <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
+                        </body>
+                    </html>
+                """,
+                mimeType: 'text/html'
+                )
+            }
+        }
     }
 }

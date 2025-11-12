@@ -9,6 +9,7 @@
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
+    "types": ["node"],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
@@ -64,7 +65,6 @@
   },
   "include": [
     "src/**/*",
-    "@/src/utils/globalApiInterceptor.ts"
   ],
   "exclude": [
     "node_modules",

@@ -235,6 +235,7 @@ enum MessageType {
   IMAGE
   AUDIO
   FILE
+  SYSTEM
 }
 
 enum MessageStatusType {

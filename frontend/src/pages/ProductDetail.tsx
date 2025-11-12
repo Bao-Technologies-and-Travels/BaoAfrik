@@ -473,7 +473,13 @@ const ProductDetail: React.FC = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to contact seller');
+        console.error('Chat API returned error:', result);
+        const errorMessage =
+          result?.error ||
+          result?.message ||
+          result?.data?.error ||
+          'Failed to contact seller';
+        throw new Error(errorMessage);
       }
 
       console.log('Chat API success:', result);
@@ -481,7 +487,11 @@ const ProductDetail: React.FC = () => {
       if (result.success) {
         await handleConversationClick(result.data.conversation.id);
       } else {
-        throw new Error(result.error || 'Failed to contact seller');
+        const errorMessage =
+          result?.error ||
+          result?.message ||
+          'Failed to contact seller';
+        throw new Error(errorMessage);
       }
     } catch (error: any) {
       console.error('Error in handleContactSeller:', error);
@@ -640,7 +650,7 @@ const ProductDetail: React.FC = () => {
             </Link>
             <span className="text-gray-300">/</span>
             <Link to="/" className="hover:text-gray-600 font-medium">
-              Spices
+              {product.category}
             </Link>
             <span className="text-gray-300">/</span>
             <span className="text-gray-900 font-semibold">

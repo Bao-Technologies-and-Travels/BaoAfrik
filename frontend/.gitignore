@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-**/node_modules/
 /.pnp
 .pnp.js
 
@@ -9,9 +8,6 @@ node_modules/
 
 # Production
 build/
-**/build/
-dist/
-**/dist
 
 # Misc
 .DS_Store
@@ -21,8 +17,6 @@ dist/
 .env.production.local
 
 # Logs
-logs/
-**/logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -36,6 +30,3 @@ yarn-error.log*
 
 # Lock files
 package-lock.json
-**/package-lock.json
-
-**/emailService.ts.backup
