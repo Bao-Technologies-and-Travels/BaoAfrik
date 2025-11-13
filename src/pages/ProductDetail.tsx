@@ -771,7 +771,7 @@ const ProductDetail: React.FC = () => {
       </div>
 
       {/* Reviews and Ratings Section */}
-      <div className="bg-white">
+      <div className="bg-white mt-16">
         {/* Tab Navigation */}
         <div className="border-b" style={{ borderColor: '#E5E5E5' }}>
           <div className="max-w-7xl mx-auto px-6">
@@ -808,7 +808,7 @@ const ProductDetail: React.FC = () => {
             {/* LEFT COLUMN - Reviews List */}
             <div className="lg:col-span-2">
               {/* Filter Dropdown */}
-              <div className="relative mb-6 pb-3" ref={filterDropdownRef}>
+              <div className="relative mb-4 pb-3" ref={filterDropdownRef}>
                 <button 
                   onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
                   className="flex items-center hover:opacity-80 transition-opacity"
@@ -878,13 +878,13 @@ const ProductDetail: React.FC = () => {
                     </div>
                   </div>
                   <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                    Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages.
+                    Outstanding quality! This product exceeded all my expectations. The white pepper has an amazing aroma and rich flavor that's perfect for my cooking. The packaging was beautiful and it arrived in perfect condition ahead of schedule.
                   </p>
                   
                   {/* Helpfulness Section */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
+                      <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
                       <div className="flex items-center space-x-2">
                         <button 
                           onClick={() => setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'yes' ? null : 'yes' }))}
@@ -947,13 +947,13 @@ const ProductDetail: React.FC = () => {
                     </div>
                   </div>
                   <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                    Amazing seller! The product quality exceeded my expectations. Fast shipping and excellent communication throughout the process. The item was exactly as described and arrived in perfect condition.
+                    Amazing product! The quality exceeded my expectations. The white pepper has such a distinct, mild heat that enhances every dish. Fast shipping and the item was exactly as described. Highly recommend for authentic African spices!
                   </p>
                   
                   {/* Helpfulness Section */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
+                      <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
                       <div className="flex items-center space-x-2">
                         <button 
                           onClick={() => setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'yes' ? null : 'yes' }))}
@@ -1021,13 +1021,13 @@ const ProductDetail: React.FC = () => {
                     </div>
                   </div>
                   <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                    The product was okay, but not exactly what I expected. Shipping took longer than anticipated. Communication could have been better.
+                    The product was okay, but not exactly what I expected. The flavor wasn't as strong as I hoped for and the quantity seemed less than advertised. Shipping took longer than anticipated. It's decent but there are better options available.
                   </p>
                   
                   {/* Helpfulness Section */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
+                      <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
                       <div className="flex items-center space-x-2">
                         <button 
                           onClick={() => setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'yes' ? null : 'yes' }))}
