@@ -18,6 +18,7 @@ import dislikeIcon from '../assets/images/pre/dislike.svg';
 import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
 import bookmarkIcon from '../assets/images/pre/bm.svg';
+import pencilIcon from '../assets/images/pre/pencil.svg';
 import shareIcon from '../assets/images/pre/Share.svg';
 import warningIcon from '../assets/images/pre/warning.svg';
 import fbIcon from '../assets/images/pre/FB1.svg';
@@ -69,6 +70,10 @@ const SellerProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'reviews' | 'items'>(tabFromUrl || 'reviews');
   const [sharedProducts, setSharedProducts] = useState<Set<string>>(new Set());
   const [wishlistProducts, setWishlistProducts] = useState<Set<string>>(new Set());
+  const [userRating, setUserRating] = useState(0);
+  const [userReviewText, setUserReviewText] = useState('');
+  const [isReviewPosted, setIsReviewPosted] = useState(false);
+  const [postedReview, setPostedReview] = useState<{rating: number; text: string; date: string} | null>(null);
 
   // Update active tab when URL parameter changes
   useEffect(() => {
@@ -124,8 +129,6 @@ const SellerProfile: React.FC = () => {
   const [expandedDiscussions, setExpandedDiscussions] = useState<string[]>([]);
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('The most relevant');
-  const [userRating, setUserRating] = useState(0);
-  const [userReviewText, setUserReviewText] = useState('');
   const [reviewHelpfulness, setReviewHelpfulness] = useState<{[key: string]: 'yes' | 'no' | null}>({});
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -923,73 +926,193 @@ const SellerProfile: React.FC = () => {
 
                 {/* Give Your Opinion Section */}
                 <div className="pt-24 text-center">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Give your opinion</h3>
-                  <p className="text-xs mb-6" style={{ color: '#B0B0B0' }}>Share your opinion about this user and help others learn a bit more about them.</p>
-                  
-                  {/* Star Rating Input */}
-                  <div className="flex items-center justify-center space-x-1 mb-6">
-                    {[1,2,3,4,5].map((star) => (
-            <button 
-                        key={star}
-                        onClick={() => setUserRating(star)}
-                        className="focus:outline-none hover:scale-110 transition-transform"
-                      >
-                        <svg 
-                          className="w-7 h-7" 
-                          viewBox="0 0 24 24"
-                          fill={userRating >= star ? '#FBBC05' : 'none'}
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                  {!isReviewPosted ? (
+                    <>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Give your opinion</h3>
+                      <p className="text-xs mb-6" style={{ color: '#B0B0B0' }}>Share your opinion about this user and help others learn a bit more about them.</p>
+                      
+                      {/* Star Rating Input */}
+                      <div className="flex items-center justify-center space-x-1 mb-2">
+                        {[1,2,3,4,5].map((star) => (
+                          <button 
+                            key={star}
+                            onClick={() => setUserRating(star)}
+                            className="focus:outline-none hover:scale-110 transition-transform"
+                          >
+                            <svg 
+                              className="w-7 h-7" 
+                              viewBox="0 0 24 24"
+                              fill={userRating >= star ? '#FBBC05' : 'none'}
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path 
+                                d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
+                                stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
+                              />
+                            </svg>
+                          </button>
+                        ))}
+                      </div>
+                      
+                      {/* Give a note text/rating */}
+                      <div className="text-center mb-6" style={{ 
+                        color: userRating > 0 ? '#64B5F6' : (userReviewText.length > 0 ? '#64B5F6' : '#D9D9D9'), 
+                        fontSize: '10px' 
+                      }}>
+                        {userRating > 0 ? `${userRating}.0` : 'give a note'}
+                      </div>
+                      
+                      {/* Review Text Input */}
+                      <div className="flex items-start space-x-3 mb-4 pl-8">
+                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <style dangerouslySetInnerHTML={{__html: `
+                          .custom-placeholder::placeholder {
+                            color: #D9D9D9;
+                            opacity: 1;
+                          }
+                          .custom-placeholder::-webkit-scrollbar {
+                            display: none;
+                          }
+                          .custom-placeholder {
+                            -ms-overflow-style: none;
+                            scrollbar-width: none;
+                          }
+                        `}} />
+                        <textarea
+                          value={userReviewText}
+                          onChange={(e) => {
+                            if (e.target.value.length <= 1000) {
+                              setUserReviewText(e.target.value);
+                            }
+                          }}
+                          placeholder="What do you think of this article?"
+                          className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none resize-none custom-placeholder"
+                          style={{ 
+                            border: 'none',
+                            minHeight: '80px',
+                            color: '#6A6A6A',
+                            backgroundColor: 'transparent'
+                          }}
+                          maxLength={1000}
+                        />
+                      </div>
+                      
+                      {/* Post Review Button */}
+                      <div className="pl-8 relative">
+                        <button 
+                          onClick={() => {
+                            if (userRating > 0 && userReviewText.trim()) {
+                              const today = new Date();
+                              const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                              const dateStr = `${today.getDate()} ${months[today.getMonth()]}, ${today.getFullYear()}`;
+                              setPostedReview({
+                                rating: userRating,
+                                text: userReviewText,
+                                date: dateStr
+                              });
+                              setIsReviewPosted(true);
+                            }
+                          }}
+                          className="w-full py-2.5 rounded-lg font-medium transition-all mt-6"
+                          style={{ 
+                            backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
+                            color: userRating > 0 ? 'white' : '#6A6A6A'
+                          }}
+                          disabled={userRating === 0}
                         >
-                          <path 
-                            d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
-                            stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
-                          />
-                        </svg>
-            </button>
-                    ))}
-          </div>
-                  
-                  {/* Review Text Input */}
-                  <div className="flex items-start space-x-3 mb-4 pl-8">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <style dangerouslySetInnerHTML={{__html: `
-                      .custom-placeholder::placeholder {
-                        color: #D9D9D9;
-                        opacity: 1;
-                      }
-                    `}} />
-                    <textarea
-                      value={userReviewText}
-                      onChange={(e) => setUserReviewText(e.target.value)}
-                      placeholder="What do you think of this article?"
-                      className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none resize-none custom-placeholder"
-                      style={{ 
-                        border: 'none',
-                        minHeight: '80px',
-                        color: '#6A6A6A',
-                        backgroundColor: 'transparent'
-                      }}
-                    />
-                  </div>
-                  
-                  {/* Post Review Button */}
-                  <div className="pl-8">
-                    <button 
-                      className="w-full py-2.5 rounded-lg font-medium transition-all mt-6"
-                      style={{ 
-                        backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
-                        color: userRating > 0 ? 'white' : '#6A6A6A'
-                      }}
-                    >
-                      Post the review
-                    </button>
-                  </div>
+                          Post the review
+                        </button>
+                        {/* Character Counter */}
+                        {userReviewText.length > 0 && (
+                          <div 
+                            className="absolute"
+                            style={{ 
+                              top: '-18px', 
+                              right: '0', 
+                              color: '#64B5F6', 
+                              fontSize: '12px' 
+                            }}
+                          >
+                            {userReviewText.length}/1000
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Thank You State */}
+                      <div className="mb-6 text-center">
+                        <h3 className="text-2xl font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#939393' }}>
+                          Thank you for your<br/>feedback. 😊
+                        </h3>
+                      </div>
+                      
+                      {/* Posted Review Card */}
+                      <div className="border rounded-3xl text-left mx-auto" style={{ borderColor: '#E1E1E1', maxWidth: '500px' }}>
+                        <div className="p-5">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-start space-x-3">
+                            {/* Avatar */}
+                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                              <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                            
+                            <div>
+                              {/* Name */}
+                              <h4 className="font-semibold mb-1" style={{ color: '#0E0E0E', fontSize: '14px' }}>You</h4>
+                              
+                              {/* Star Rating */}
+                              <div className="flex items-center space-x-2">
+                                <div className="flex items-center">
+                                  {[1,2,3,4,5].map((star) => (
+                                    <svg 
+                                      key={star} 
+                                      className="w-3 h-3 fill-current" 
+                                      style={{ color: star <= (postedReview?.rating || 0) ? '#FBBC05' : '#E9E9E9' }}
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                </div>
+                                <span className="text-xs" style={{ color: '#939393' }}>{postedReview?.rating}.0</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Edit Button and Date */}
+                          <div className="flex flex-col items-end space-y-1.5 flex-shrink-0">
+                            <button
+                              onClick={() => {
+                                setIsReviewPosted(false);
+                                // Keep the rating and text so user can edit
+                              }}
+                              className="flex items-center space-x-1.5 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50"
+                              style={{ borderColor: '#D9D9D9' }}
+                            >
+                              <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                              <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
+                            </button>
+                            <span className="text-[10px] whitespace-nowrap" style={{ color: '#B0B0B0' }}>{postedReview?.date}</span>
+                          </div>
+                        </div>
+                        
+                          {/* Review Text - Spans full width below */}
+                          <p className="text-sm leading-relaxed" style={{ color: '#939393' }}>
+                            {postedReview?.text}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
