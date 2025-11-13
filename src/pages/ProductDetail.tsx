@@ -43,6 +43,7 @@ import likeIcon from '../assets/images/pre/like.svg';
 import dislikeIcon from '../assets/images/pre/dislike.svg';
 import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
+import locationIcon from '../assets/images/pre/PL.svg';
 
 // Country mapping for products
 const getProductCountry = (productId: number) => {
@@ -513,15 +514,35 @@ const ProductDetail: React.FC = () => {
                 {/* Save for Later Button */}
                 <button
                   onClick={handleSave}
-                  className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl transition-colors hover:opacity-80"
-                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', fontSize: '13px', fontWeight: 500, width: 'fit-content' }}
+                  className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl transition-colors hover:opacity-80 relative"
+                  style={{ 
+                    backgroundColor: isSaved ? '#F0F8FE' : '#F4F4F4', 
+                    color: isSaved ? '#64B5F6' : '#6A6A6A', 
+                    fontSize: '13px', 
+                    fontWeight: 500, 
+                    width: 'fit-content' 
+                  }}
                 >
-                  <img 
-                    src={bookmarkIcon} 
-                    alt="Bookmark" 
-                    className="w-4 h-4"
-                    style={{ filter: isSaved ? 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)' }}
-                  />
+                  {isSaved ? (
+                    <div className="w-4 h-4 relative flex items-center justify-center">
+                      <img 
+                        src={bookmarkIcon} 
+                        alt="Bookmark" 
+                        className="w-4 h-4 absolute"
+                        style={{ filter: 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' }}
+                      />
+                      <svg className="w-2 h-2 absolute text-white z-10" fill="currentColor" viewBox="0 0 20 20" style={{ marginTop: '-2px' }}>
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <img 
+                      src={bookmarkIcon} 
+                      alt="Bookmark" 
+                      className="w-4 h-4"
+                      style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)' }}
+                    />
+                  )}
                   <span>Save for later</span>
                 </button>
               </div>
@@ -771,7 +792,7 @@ const ProductDetail: React.FC = () => {
       </div>
 
       {/* Reviews and Ratings Section */}
-      <div className="bg-white mt-16">
+      <div className="bg-white mt-8">
         {/* Tab Navigation */}
         <div className="border-b" style={{ borderColor: '#E5E5E5' }}>
           <div className="max-w-7xl mx-auto px-6">
@@ -800,7 +821,7 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
         
-        <div className="max-w-7xl mx-auto px-6 py-4 mt-8">
+        <div className="max-w-7xl mx-auto px-6 py-4 mt-4">
           
           {/* Reviews Content */}
           {activeTab === 'reviews' && (
@@ -1124,7 +1145,7 @@ const ProductDetail: React.FC = () => {
                 <p className="text-xs mb-6" style={{ color: '#B0B0B0' }}>Share your opinion about this product and help others learn a bit more about it.</p>
                 
                 {/* Star Rating Input */}
-                <div className="flex items-center justify-center space-x-1 mb-6">
+                <div className="flex items-center justify-center space-x-1 mb-2">
                   {[1,2,3,4,5].map((star) => (
                     <button 
                       key={star}
@@ -1147,6 +1168,11 @@ const ProductDetail: React.FC = () => {
                     </button>
                   ))}
                 </div>
+                
+                {/* Give a note link */}
+                <button className="text-center mb-6" style={{ color: '#64B5F6', fontSize: '10px' }}>
+                  give a note
+                </button>
                 
                 {/* Review Text Input */}
                 <div className="flex items-start space-x-3 mb-4 pl-8">
@@ -1186,26 +1212,942 @@ const ProductDetail: React.FC = () => {
                   >
                     Post the review
                   </button>
-                </div>
               </div>
             </div>
           </div>
+          </div>
+          )}
+          
+          {/* You May Also Like Section - Below Reviews */}
+          {activeTab === 'reviews' && (
+            <div className="mt-12">
+              <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                You may also like
+              </h2>
+              
+              {/* Product Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
+                {/* Product cards 1-12 */}
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((productNum) => (
+                  <Link key={productNum} to={`/product/${productNum}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                      <img 
+                        src={[pre1, pre2, pre3, pre4, pre5, pre6][productNum % 6]} 
+                        alt={`Product ${productNum}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        style={{ borderRadius: '12px' }}
+                      />
+                      <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                        display: 'flex', 
+                        padding: '2px 6px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        top: '8px',
+                        left: '8px'
+                      }}>
+                        <img 
+                          src={getProductCountry(productNum).flag} 
+                          alt={getProductCountry(productNum).name}
+                          style={{ 
+                            width: '14px',
+                            height: '14px',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
+                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                          {getProductCountry(productNum).abbreviation}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                          USD 31.7
+                        </div>
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                          display: 'flex', 
+                          padding: '1px 4px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '1px', 
+                          fontSize: '9px' 
+                        }}>
+                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <span>Verified seller</span>
+                        </div>
+                      </div>
+                      <h3 className="line-clamp-2 font-medium" style={{ 
+                        fontSize: '13px', 
+                        color: '#212121',
+                        marginBottom: '4px'
+                      }}>Product Name</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-gray-500 flex-1">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                            width: '10px',
+                            height: '10px',
+                            marginRight: '4px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                        </div>
+                        <div style={{ marginLeft: '8px' }}>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newSet = new Set(wishlistProducts);
+                              if (newSet.has(`reviews-product-${productNum}`)) {
+                                newSet.delete(`reviews-product-${productNum}`);
+                              } else {
+                                newSet.add(`reviews-product-${productNum}`);
+                              }
+                              setWishlistProducts(newSet);
+                            }}
+                            className="transition-colors touch-manipulation"
+                            style={{ 
+                              width: '20px', 
+                              height: '20px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center' 
+                            }}
+                          >
+                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                              width: '20px',
+                              height: '20px',
+                              filter: wishlistProducts.has(`reviews-product-${productNum}`) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                            }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* Seller Items Content */}
           {activeTab === 'items' && (
-            <div>
-              <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                {product.seller.name} items
-              </h2>
-              
-              {/* Product Grid - Showing other products from this seller */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-                <p className="col-span-full text-center text-gray-500 py-8">
-                  Other products from this seller will be displayed here
-                </p>
+            <>
+              {/* Section 1: Seller Items */}
+              <div className="mb-12">
+                {/* Title with Navigation Arrows */}
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-medium text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    {product.seller.name} items
+                  </h2>
+                  <div className="flex items-center gap-3">
+                    <button 
+                      className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                      aria-label="Previous"
+                    >
+                      <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                    </button>
+                    <button 
+                      className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                      style={{ filter: 'brightness(0) saturate(100%) invert(30%)' }}
+                      aria-label="Next"
+                    >
+                      <img src={grayArrowIcon} alt="Next" className="w-full h-full rotate-180" />
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Product Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
+                  {/* Product 1 */}
+                  <Link to={`/product/1`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                      <img 
+                        src={pre1} 
+                        alt="White Pepper"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        style={{ borderRadius: '12px' }}
+                      />
+                      <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                        display: 'flex', 
+                        padding: '2px 6px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        top: '8px',
+                        left: '8px'
+                      }}>
+                        <img 
+                          src={getProductCountry(1).flag} 
+                          alt={getProductCountry(1).name}
+                          style={{ 
+                            width: '14px',
+                            height: '14px',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
+                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                          {getProductCountry(1).abbreviation}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                          USD 31.7
+                        </div>
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                          display: 'flex', 
+                          padding: '1px 4px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '1px', 
+                          fontSize: '9px' 
+                        }}>
+                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <span>Verified seller</span>
+                        </div>
+                      </div>
+                      <h3 className="line-clamp-2 font-medium" style={{ 
+                        fontSize: '13px', 
+                        color: '#212121',
+                        marginBottom: '4px'
+                      }}>White Pepper</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-gray-500 flex-1">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                            width: '10px',
+                            height: '10px',
+                            marginRight: '4px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                        </div>
+                        <div style={{ marginLeft: '8px' }}>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newSet = new Set(wishlistProducts);
+                              if (newSet.has('product-1')) {
+                                newSet.delete('product-1');
+                              } else {
+                                newSet.add('product-1');
+                              }
+                              setWishlistProducts(newSet);
+                            }}
+                            className="transition-colors touch-manipulation"
+                            style={{ 
+                              width: '20px', 
+                              height: '20px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center' 
+                            }}
+                          >
+                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                              width: '20px',
+                              height: '20px',
+                              filter: wishlistProducts.has('product-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                            }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Product 2 */}
+                  <Link to={`/product/2`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                      <img 
+                        src={pre2} 
+                        alt="Chickpeas"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        style={{ borderRadius: '12px' }}
+                      />
+                      <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                        display: 'flex', 
+                        padding: '2px 6px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        top: '8px',
+                        left: '8px'
+                      }}>
+                        <img 
+                          src={getProductCountry(2).flag} 
+                          alt={getProductCountry(2).name}
+                          style={{ 
+                            width: '14px',
+                            height: '14px',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
+                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                          {getProductCountry(2).abbreviation}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                          USD 31.7
+                        </div>
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                          display: 'flex', 
+                          padding: '1px 4px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '1px', 
+                          fontSize: '9px' 
+                        }}>
+                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <span>Verified seller</span>
+                        </div>
+                      </div>
+                      <h3 className="line-clamp-2 font-medium" style={{ 
+                        fontSize: '13px', 
+                        color: '#212121',
+                        marginBottom: '4px'
+                      }}>Chickpeas</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-gray-500 flex-1">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                            width: '10px',
+                            height: '10px',
+                            marginRight: '4px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                        </div>
+                        <div style={{ marginLeft: '8px' }}>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newSet = new Set(wishlistProducts);
+                              if (newSet.has('product-2')) {
+                                newSet.delete('product-2');
+                              } else {
+                                newSet.add('product-2');
+                              }
+                              setWishlistProducts(newSet);
+                            }}
+                            className="transition-colors touch-manipulation"
+                            style={{ 
+                              width: '20px', 
+                              height: '20px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center' 
+                            }}
+                          >
+                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                              width: '20px',
+                              height: '20px',
+                              filter: wishlistProducts.has('product-2') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                            }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Product 3 */}
+                  <Link to={`/product/3`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                      <img 
+                        src={pre3} 
+                        alt="Cherry Tomatoes"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        style={{ borderRadius: '12px' }}
+                      />
+                      <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                        display: 'flex', 
+                        padding: '2px 6px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        top: '8px',
+                        left: '8px'
+                      }}>
+                        <img 
+                          src={getProductCountry(3).flag} 
+                          alt={getProductCountry(3).name}
+                          style={{ 
+                            width: '14px',
+                            height: '14px',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
+                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                          {getProductCountry(3).abbreviation}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                          USD 31.7
+                        </div>
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                          display: 'flex', 
+                          padding: '1px 4px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '1px', 
+                          fontSize: '9px' 
+                        }}>
+                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <span>Verified seller</span>
+                        </div>
+                      </div>
+                      <h3 className="line-clamp-2 font-medium" style={{ 
+                        fontSize: '13px', 
+                        color: '#212121',
+                        marginBottom: '4px'
+                      }}>Cherry Tomatoes</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-gray-500 flex-1">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                            width: '10px',
+                            height: '10px',
+                            marginRight: '4px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                        </div>
+                        <div style={{ marginLeft: '8px' }}>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newSet = new Set(wishlistProducts);
+                              if (newSet.has('product-3')) {
+                                newSet.delete('product-3');
+                              } else {
+                                newSet.add('product-3');
+                              }
+                              setWishlistProducts(newSet);
+                            }}
+                            className="transition-colors touch-manipulation"
+                            style={{ 
+                              width: '20px', 
+                              height: '20px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center' 
+                            }}
+                          >
+                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                              width: '20px',
+                              height: '20px',
+                              filter: wishlistProducts.has('product-3') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                            }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Product 4 */}
+                  <Link to={`/product/4`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                      <img 
+                        src={pre4} 
+                        alt="Dried Shrimp"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        style={{ borderRadius: '12px' }}
+                      />
+                      <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                        display: 'flex', 
+                        padding: '2px 6px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        top: '8px',
+                        left: '8px'
+                      }}>
+                        <img 
+                          src={getProductCountry(4).flag} 
+                          alt={getProductCountry(4).name}
+                          style={{ 
+                            width: '14px',
+                            height: '14px',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
+                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                          {getProductCountry(4).abbreviation}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                          USD 31.7
+                        </div>
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                          display: 'flex', 
+                          padding: '1px 4px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '1px', 
+                          fontSize: '9px' 
+                        }}>
+                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <span>Verified seller</span>
+                        </div>
+                      </div>
+                      <h3 className="line-clamp-2 font-medium" style={{ 
+                        fontSize: '13px', 
+                        color: '#212121',
+                        marginBottom: '4px'
+                      }}>Dried Shrimp</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-gray-500 flex-1">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                            width: '10px',
+                            height: '10px',
+                            marginRight: '4px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                        </div>
+                        <div style={{ marginLeft: '8px' }}>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newSet = new Set(wishlistProducts);
+                              if (newSet.has('product-4')) {
+                                newSet.delete('product-4');
+                              } else {
+                                newSet.add('product-4');
+                              }
+                              setWishlistProducts(newSet);
+                            }}
+                            className="transition-colors touch-manipulation"
+                            style={{ 
+                              width: '20px', 
+                              height: '20px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center' 
+                            }}
+                          >
+                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                              width: '20px',
+                              height: '20px',
+                              filter: wishlistProducts.has('product-4') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                            }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Product 5 */}
+                  <Link to={`/product/5`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                      <img 
+                        src={pre5} 
+                        alt="Green Vegetables"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        style={{ borderRadius: '12px' }}
+                      />
+                      <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                        display: 'flex', 
+                        padding: '2px 6px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        top: '8px',
+                        left: '8px'
+                      }}>
+                        <img 
+                          src={getProductCountry(5).flag} 
+                          alt={getProductCountry(5).name}
+                          style={{ 
+                            width: '14px',
+                            height: '14px',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
+                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                          {getProductCountry(5).abbreviation}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                          USD 31.7
+                        </div>
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                          display: 'flex', 
+                          padding: '1px 4px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '1px', 
+                          fontSize: '9px' 
+                        }}>
+                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <span>Verified seller</span>
+                        </div>
+                      </div>
+                      <h3 className="line-clamp-2 font-medium" style={{ 
+                        fontSize: '13px', 
+                        color: '#212121',
+                        marginBottom: '4px'
+                      }}>Green Vegetables</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-gray-500 flex-1">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                            width: '10px',
+                            height: '10px',
+                            marginRight: '4px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                        </div>
+                        <div style={{ marginLeft: '8px' }}>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newSet = new Set(wishlistProducts);
+                              if (newSet.has('product-5')) {
+                                newSet.delete('product-5');
+                              } else {
+                                newSet.add('product-5');
+                              }
+                              setWishlistProducts(newSet);
+                            }}
+                            className="transition-colors touch-manipulation"
+                            style={{ 
+                              width: '20px', 
+                              height: '20px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center' 
+                            }}
+                          >
+                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                              width: '20px',
+                              height: '20px',
+                              filter: wishlistProducts.has('product-5') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                            }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Product 6 */}
+                  <Link to={`/product/6`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                      <img 
+                        src={pre6} 
+                        alt="Yam and Yam Flour"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        style={{ borderRadius: '12px' }}
+                      />
+                      <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                        display: 'flex', 
+                        padding: '2px 6px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        top: '8px',
+                        left: '8px'
+                      }}>
+                        <img 
+                          src={getProductCountry(6).flag} 
+                          alt={getProductCountry(6).name}
+                          style={{ 
+                            width: '14px',
+                            height: '14px',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
+                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                          {getProductCountry(6).abbreviation}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                          USD 31.7
+                        </div>
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                          display: 'flex', 
+                          padding: '1px 4px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '1px', 
+                          fontSize: '9px' 
+                        }}>
+                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <span>Verified seller</span>
+                        </div>
+                      </div>
+                      <h3 className="line-clamp-2 font-medium" style={{ 
+                        fontSize: '13px', 
+                        color: '#212121',
+                        marginBottom: '4px'
+                      }}>Yam and Yam Flour</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-gray-500 flex-1">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                            width: '10px',
+                            height: '10px',
+                            marginRight: '4px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                        </div>
+                        <div style={{ marginLeft: '8px' }}>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newSet = new Set(wishlistProducts);
+                              if (newSet.has('product-6')) {
+                                newSet.delete('product-6');
+                              } else {
+                                newSet.add('product-6');
+                              }
+                              setWishlistProducts(newSet);
+                            }}
+                            className="transition-colors touch-manipulation"
+                            style={{ 
+                              width: '20px', 
+                              height: '20px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center' 
+                            }}
+                          >
+                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                              width: '20px',
+                              height: '20px',
+                              filter: wishlistProducts.has('product-6') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                            }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
               </div>
-            </div>
+
+              {/* Section 2: You May Also Like */}
+              <div>
+                <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  You may also like
+                </h2>
+                
+                {/* Product Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
+                  {/* Recommended Product 1 */}
+                  <Link to={`/product/7`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                      <img 
+                        src={pre1} 
+                        alt="White Pepper"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        style={{ borderRadius: '12px' }}
+                      />
+                      <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                        display: 'flex', 
+                        padding: '2px 6px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        top: '8px',
+                        left: '8px'
+                      }}>
+                        <img 
+                          src={getProductCountry(1).flag} 
+                          alt={getProductCountry(1).name}
+                          style={{ 
+                            width: '14px',
+                            height: '14px',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
+                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                          {getProductCountry(1).abbreviation}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                          USD 31.7
+                        </div>
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                          display: 'flex', 
+                          padding: '1px 4px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '1px', 
+                          fontSize: '9px' 
+                        }}>
+                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <span>Verified seller</span>
+                        </div>
+                      </div>
+                      <h3 className="line-clamp-2 font-medium" style={{ 
+                        fontSize: '13px', 
+                        color: '#212121',
+                        marginBottom: '4px'
+                      }}>White Pepper</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-gray-500 flex-1">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                            width: '10px',
+                            height: '10px',
+                            marginRight: '4px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                        </div>
+                        <div style={{ marginLeft: '8px' }}>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newSet = new Set(wishlistProducts);
+                              if (newSet.has('recommended-1')) {
+                                newSet.delete('recommended-1');
+                              } else {
+                                newSet.add('recommended-1');
+                              }
+                              setWishlistProducts(newSet);
+                            }}
+                            className="transition-colors touch-manipulation"
+                            style={{ 
+                              width: '20px', 
+                              height: '20px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center' 
+                            }}
+                          >
+                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                              width: '20px',
+                              height: '20px',
+                              filter: wishlistProducts.has('recommended-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                            }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Recommended Products 2-12 - Similar structure */}
+                  {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => (
+                    <Link key={num} to={`/product/${num + 7}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                      <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                        <img 
+                          src={[pre2, pre3, pre4, pre5, pre6, pre1, pre2, pre3, pre4, pre5, pre6][(num - 2) % 11]} 
+                          alt={`Product ${num}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          style={{ borderRadius: '12px' }}
+                        />
+                        <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                          display: 'flex', 
+                          padding: '2px 6px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '4px',
+                          top: '8px',
+                          left: '8px'
+                        }}>
+                          <img 
+                            src={getProductCountry(num).flag} 
+                            alt={getProductCountry(num).name}
+                            style={{ 
+                              width: '14px',
+                              height: '14px',
+                              objectFit: 'cover',
+                              borderRadius: '50%'
+                            }}
+                          />
+                          <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                            {getProductCountry(num).abbreviation}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                        <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                          <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                            USD 31.7
+                          </div>
+                          <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                            display: 'flex', 
+                            padding: '1px 4px', 
+                            justifyContent: 'center', 
+                            alignItems: 'center', 
+                            gap: '1px', 
+                            fontSize: '9px' 
+                          }}>
+                            <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                            <span>Verified seller</span>
+                          </div>
+                        </div>
+                        <h3 className="line-clamp-2 font-medium" style={{ 
+                          fontSize: '13px', 
+                          color: '#212121',
+                          marginBottom: '4px'
+                        }}>Product Name</h3>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center text-gray-500 flex-1">
+                            <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                              width: '10px',
+                              height: '10px',
+                              marginRight: '4px'
+                            }} />
+                            <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                          </div>
+                          <div style={{ marginLeft: '8px' }}>
+                            <button 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const newSet = new Set(wishlistProducts);
+                                if (newSet.has(`recommended-${num}`)) {
+                                  newSet.delete(`recommended-${num}`);
+                                } else {
+                                  newSet.add(`recommended-${num}`);
+                                }
+                                setWishlistProducts(newSet);
+                              }}
+                              className="transition-colors touch-manipulation"
+                              style={{ 
+                                width: '20px', 
+                                height: '20px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center' 
+                            }}
+                            >
+                              <img src={bookmarkIcon} alt="Bookmark" style={{
+                                width: '20px',
+                                height: '20px',
+                                filter: wishlistProducts.has(`recommended-${num}`) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              }} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
