@@ -1485,8 +1485,8 @@ const Messages: React.FC = () => {
                     >
                       <img src={faIcon} alt="Report" className="w-4 h-4" />
                     </button>
-                  </div>
-                </div>
+        </div>
+      </div>
 
                 {/* Full Profile Header */}
                 <div className="px-6 pb-4 pt-0">
@@ -1497,7 +1497,7 @@ const Messages: React.FC = () => {
                     alt="Joaquin EDIMO"
                     className="w-16 h-16 rounded-full object-cover border-4 border-white"
                   />
-                </div>
+    </div>
                 
                 {/* Name and Rating */}
                 <div className="flex items-center justify-center space-x-1.5 mb-2">
