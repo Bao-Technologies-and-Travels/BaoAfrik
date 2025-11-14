@@ -99,22 +99,28 @@ const ProductDetail: React.FC = () => {
   const [userRating, setUserRating] = useState(0);
   const [userReviewText, setUserReviewText] = useState('');
   const [reviewHelpfulness, setReviewHelpfulness] = useState<{[key: string]: 'yes' | 'no' | null}>({});
+  const [reviewHelpfulCounts, setReviewHelpfulCounts] = useState<{[key: string]: {yes: number; no: number}}>({
+    review1: { yes: 27, no: 2 },
+    review2: { yes: 15, no: 3 },
+    review3: { yes: 8, no: 12 }
+  });
+  const [expandedDiscussions, setExpandedDiscussions] = useState<string[]>([]);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const [isReviewPosted, setIsReviewPosted] = useState(false);
   const [postedReview, setPostedReview] = useState<{rating: number; text: string; date: string} | null>(null);
   
   // Filter options
   const filterOptions = [
-    'The most relevant',
-    'Newest first',
-    'Oldest first',
-    'Highest rating',
-    'Lowest rating'
+    { id: 'relevant', label: 'The most relevant', description: 'Show most engaging reviews first', icon: 'star' },
+    { id: 'newest', label: 'Newest', description: 'Show newest reviews first', icon: 'clock' }
   ];
   
   // Function to handle filter selection
-  const handleFilterSelect = (filter: string) => {
-    setSelectedFilter(filter);
+  const handleFilterSelect = (filterId: string) => {
+    const filter = filterOptions.find(f => f.id === filterId);
+    if (filter) {
+      setSelectedFilter(filter.label);
+    }
     setFilterDropdownOpen(false);
   };
 
@@ -856,20 +862,46 @@ const ProductDetail: React.FC = () => {
                 
                 {/* Dropdown Menu */}
                 {filterDropdownOpen && (
-                  <div className="absolute top-8 left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-48">
-                    {filterOptions.map((option) => (
-                      <button
-                        key={option}
-                        onClick={() => handleFilterSelect(option)}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                          selectedFilter === option ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
-                        } ${option === filterOptions[0] ? 'rounded-t-lg' : ''} ${
-                          option === filterOptions[filterOptions.length - 1] ? 'rounded-b-lg' : ''
-                        }`}
-                      >
-                        {option}
-                      </button>
-                    ))}
+                  <div className="absolute top-8 left-0 bg-white border border-gray-200 shadow-lg z-10 p-2" style={{ borderRadius: '12px', minWidth: '280px' }}>
+                    {filterOptions.map((option, index) => {
+                      const isSelected = selectedFilter === option.label;
+                      return (
+                        <button
+                          key={option.id}
+                          onClick={() => handleFilterSelect(option.id)}
+                          className="w-full text-left px-3 py-3 transition-colors flex items-start space-x-3"
+                          style={{
+                            backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
+                            borderRadius: isSelected ? '10px' : '0',
+                            marginBottom: index < filterOptions.length - 1 ? '4px' : '0'
+                          }}
+                        >
+                          {/* Icon */}
+                          <div className="flex-shrink-0 mt-0.5">
+                            {option.icon === 'star' ? (
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                              </svg>
+                            ) : (
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 6v6l4 2"/>
+                              </svg>
+                            )}
+                          </div>
+                          
+                          {/* Text */}
+                          <div className="flex-1">
+                            <div className="text-sm font-medium mb-0.5" style={{ color: isSelected ? '#64B5F6' : '#212121' }}>
+                              {option.label}
+                            </div>
+                            <div className="text-xs" style={{ color: '#939393' }}>
+                              {option.description}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -908,41 +940,119 @@ const ProductDetail: React.FC = () => {
                   {/* Helpfulness Section */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
+                      {!reviewHelpfulness.review1 && (
+                        <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
+                      )}
                       <div className="flex items-center space-x-2">
                         <button 
-                          onClick={() => setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'yes' ? null : 'yes' }))}
-                          className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                          onClick={() => {
+                            setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'yes' ? null : 'yes' }));
+                            if (reviewHelpfulness.review1 !== 'yes') {
+                              setReviewHelpfulCounts(prev => ({
+                                ...prev,
+                                review1: { ...prev.review1, yes: prev.review1.yes + 1 }
+                              }));
+                            }
+                          }}
+                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
                           style={{ 
-                            border: '1px solid #E1E1E1',
-                            color: '#6A6A6A',
-                            backgroundColor: reviewHelpfulness.review1 === 'yes' ? '#F0F0F0' : 'white'
+                            border: `1px solid ${reviewHelpfulness.review1 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
+                            backgroundColor: reviewHelpfulness.review1 === 'yes' ? '#F0F8FE' : 'white'
                           }}
                         >
-                          <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
-                          <span className="text-xs">Yes</span>
+                          <span className="text-xs" style={{ color: reviewHelpfulness.review1 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
+                            {reviewHelpfulness.review1 ? reviewHelpfulCounts.review1.yes : 'Yes'}
+                          </span>
+                          <img 
+                            src={likeIcon} 
+                            alt="Like" 
+                            className="w-3.5 h-3.5" 
+                            style={{ 
+                              filter: reviewHelpfulness.review1 === 'yes' 
+                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
+                                : 'none' 
+                            }}
+                          />
                         </button>
                         <button 
-                          onClick={() => setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'no' ? null : 'no' }))}
-                          className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                          onClick={() => {
+                            setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'no' ? null : 'no' }));
+                            if (reviewHelpfulness.review1 !== 'no') {
+                              setReviewHelpfulCounts(prev => ({
+                                ...prev,
+                                review1: { ...prev.review1, no: prev.review1.no + 1 }
+                              }));
+                            }
+                          }}
+                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
                           style={{ 
-                            border: '1px solid #E1E1E1',
-                            color: '#6A6A6A',
-                            backgroundColor: reviewHelpfulness.review1 === 'no' ? '#F0F0F0' : 'white'
+                            border: `1px solid ${reviewHelpfulness.review1 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
+                            backgroundColor: reviewHelpfulness.review1 === 'no' ? '#F0F8FE' : 'white'
                           }}
                         >
-                          <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
-                          <span className="text-xs">No</span>
+                          <span className="text-xs" style={{ color: reviewHelpfulness.review1 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
+                            {reviewHelpfulness.review1 ? reviewHelpfulCounts.review1.no : 'No'}
+                          </span>
+                          <img 
+                            src={dislikeIcon} 
+                            alt="Dislike" 
+                            className="w-3.5 h-3.5" 
+                            style={{ 
+                              filter: reviewHelpfulness.review1 === 'no' 
+                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
+                                : 'none' 
+                            }}
+                          />
                         </button>
                       </div>
                     </div>
                     <button 
+                      onClick={() => {
+                        setExpandedDiscussions(prev => 
+                          prev.includes('review1') 
+                            ? prev.filter(id => id !== 'review1')
+                            : [...prev, 'review1']
+                        );
+                      }}
                       className="text-xs hover:underline"
                       style={{ color: '#64B5F6' }}
                     >
-                      View the discussion (1)
+                      {expandedDiscussions.includes('review1') ? 'View less' : 'View the discussion (1)'}
                     </button>
                   </div>
+                  
+                  {/* Discussion Thread */}
+                  {expandedDiscussions.includes('review1') && (
+                    <div className="mt-4 ml-8 space-y-4">
+                      {/* Reply 1 - Product Owner */}
+                      <div className="relative pl-4">
+                        {/* Left Border Line */}
+                        <div className="absolute left-0 top-0 bottom-0 w-px" style={{ backgroundColor: '#E1E1E1' }}></div>
+                        
+                        <div className="flex items-start space-x-2.5 mb-2">
+                          <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <h5 className="font-semibold text-sm" style={{ color: '#212121' }}>Joaquin EDIMO</h5>
+                                <div className="px-2 py-0.5 text-xs" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                  Profile Owner
+                                </div>
+                              </div>
+                              <span className="text-[10px]" style={{ color: '#939393' }}>2 Jan 2025</span>
+                            </div>
+                            <p className="text-xs leading-relaxed" style={{ color: '#B0B0B0' }}>
+                              I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Review 2 - Kael Otto */}
@@ -977,41 +1087,114 @@ const ProductDetail: React.FC = () => {
                   {/* Helpfulness Section */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
+                      {!reviewHelpfulness.review2 && (
+                        <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
+                      )}
                       <div className="flex items-center space-x-2">
                         <button 
-                          onClick={() => setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'yes' ? null : 'yes' }))}
-                          className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                          onClick={() => {
+                            setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'yes' ? null : 'yes' }));
+                            if (reviewHelpfulness.review2 !== 'yes') {
+                              setReviewHelpfulCounts(prev => ({
+                                ...prev,
+                                review2: { ...prev.review2, yes: prev.review2.yes + 1 }
+                              }));
+                            }
+                          }}
+                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
                           style={{ 
-                            border: '1px solid #E1E1E1',
-                            color: '#6A6A6A',
-                            backgroundColor: reviewHelpfulness.review2 === 'yes' ? '#F0F0F0' : 'white'
+                            border: `1px solid ${reviewHelpfulness.review2 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
+                            backgroundColor: reviewHelpfulness.review2 === 'yes' ? '#F0F8FE' : 'white'
                           }}
                         >
-                          <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
-                          <span className="text-xs">Yes</span>
+                          <span className="text-xs" style={{ color: reviewHelpfulness.review2 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
+                            {reviewHelpfulness.review2 ? reviewHelpfulCounts.review2.yes : 'Yes'}
+                          </span>
+                          <img 
+                            src={likeIcon} 
+                            alt="Like" 
+                            className="w-3.5 h-3.5" 
+                            style={{ 
+                              filter: reviewHelpfulness.review2 === 'yes' 
+                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
+                                : 'none' 
+                            }}
+                          />
                         </button>
                         <button 
-                          onClick={() => setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'no' ? null : 'no' }))}
-                          className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                          onClick={() => {
+                            setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'no' ? null : 'no' }));
+                            if (reviewHelpfulness.review2 !== 'no') {
+                              setReviewHelpfulCounts(prev => ({
+                                ...prev,
+                                review2: { ...prev.review2, no: prev.review2.no + 1 }
+                              }));
+                            }
+                          }}
+                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
                           style={{ 
-                            border: '1px solid #E1E1E1',
-                            color: '#6A6A6A',
-                            backgroundColor: reviewHelpfulness.review2 === 'no' ? '#F0F0F0' : 'white'
+                            border: `1px solid ${reviewHelpfulness.review2 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
+                            backgroundColor: reviewHelpfulness.review2 === 'no' ? '#F0F8FE' : 'white'
                           }}
                         >
-                          <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
-                          <span className="text-xs">No</span>
+                          <span className="text-xs" style={{ color: reviewHelpfulness.review2 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
+                            {reviewHelpfulness.review2 ? reviewHelpfulCounts.review2.no : 'No'}
+                          </span>
+                          <img 
+                            src={dislikeIcon} 
+                            alt="Dislike" 
+                            className="w-3.5 h-3.5" 
+                            style={{ 
+                              filter: reviewHelpfulness.review2 === 'no' 
+                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
+                                : 'none' 
+                            }}
+                          />
                         </button>
                       </div>
                     </div>
                     <button 
+                      onClick={() => {
+                        setExpandedDiscussions(prev => 
+                          prev.includes('review2') 
+                            ? prev.filter(id => id !== 'review2')
+                            : [...prev, 'review2']
+                        );
+                      }}
                       className="text-xs hover:underline"
                       style={{ color: '#64B5F6' }}
                     >
-                      View the discussion (3)
+                      {expandedDiscussions.includes('review2') ? 'View less' : 'View the discussion (3)'}
                     </button>
                   </div>
+                  
+                  {/* Discussion Thread */}
+                  {expandedDiscussions.includes('review2') && (
+                    <div className="mt-4 ml-8 space-y-4">
+                      {/* Reply 1 */}
+                      <div className="relative pl-4">
+                        <div className="absolute left-0 top-0 bottom-0 w-px" style={{ backgroundColor: '#E1E1E1' }}></div>
+                        <div className="flex items-start space-x-2.5 mb-2">
+                          <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <h5 className="font-semibold text-sm" style={{ color: '#212121' }}>User Name</h5>
+                              </div>
+                              <span className="text-[10px]" style={{ color: '#939393' }}>3 Jan 2025</span>
+                            </div>
+                            <p className="text-xs leading-relaxed" style={{ color: '#B0B0B0' }}>
+                              Great comment about the product quality!
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Review 3 - Alex Johnson */}
@@ -1051,41 +1234,114 @@ const ProductDetail: React.FC = () => {
                   {/* Helpfulness Section */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
+                      {!reviewHelpfulness.review3 && (
+                        <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
+                      )}
                       <div className="flex items-center space-x-2">
                         <button 
-                          onClick={() => setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'yes' ? null : 'yes' }))}
-                          className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                          onClick={() => {
+                            setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'yes' ? null : 'yes' }));
+                            if (reviewHelpfulness.review3 !== 'yes') {
+                              setReviewHelpfulCounts(prev => ({
+                                ...prev,
+                                review3: { ...prev.review3, yes: prev.review3.yes + 1 }
+                              }));
+                            }
+                          }}
+                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
                           style={{ 
-                            border: '1px solid #E1E1E1',
-                            color: '#6A6A6A',
-                            backgroundColor: reviewHelpfulness.review3 === 'yes' ? '#F0F0F0' : 'white'
+                            border: `1px solid ${reviewHelpfulness.review3 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
+                            backgroundColor: reviewHelpfulness.review3 === 'yes' ? '#F0F8FE' : 'white'
                           }}
                         >
-                          <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
-                          <span className="text-xs">Yes</span>
+                          <span className="text-xs" style={{ color: reviewHelpfulness.review3 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
+                            {reviewHelpfulness.review3 ? reviewHelpfulCounts.review3.yes : 'Yes'}
+                          </span>
+                          <img 
+                            src={likeIcon} 
+                            alt="Like" 
+                            className="w-3.5 h-3.5" 
+                            style={{ 
+                              filter: reviewHelpfulness.review3 === 'yes' 
+                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
+                                : 'none' 
+                            }}
+                          />
                         </button>
                         <button 
-                          onClick={() => setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'no' ? null : 'no' }))}
-                          className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
+                          onClick={() => {
+                            setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'no' ? null : 'no' }));
+                            if (reviewHelpfulness.review3 !== 'no') {
+                              setReviewHelpfulCounts(prev => ({
+                                ...prev,
+                                review3: { ...prev.review3, no: prev.review3.no + 1 }
+                              }));
+                            }
+                          }}
+                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
                           style={{ 
-                            border: '1px solid #E1E1E1',
-                            color: '#6A6A6A',
-                            backgroundColor: reviewHelpfulness.review3 === 'no' ? '#F0F0F0' : 'white'
+                            border: `1px solid ${reviewHelpfulness.review3 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
+                            backgroundColor: reviewHelpfulness.review3 === 'no' ? '#F0F8FE' : 'white'
                           }}
                         >
-                          <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
-                          <span className="text-xs">No</span>
+                          <span className="text-xs" style={{ color: reviewHelpfulness.review3 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
+                            {reviewHelpfulness.review3 ? reviewHelpfulCounts.review3.no : 'No'}
+                          </span>
+                          <img 
+                            src={dislikeIcon} 
+                            alt="Dislike" 
+                            className="w-3.5 h-3.5" 
+                            style={{ 
+                              filter: reviewHelpfulness.review3 === 'no' 
+                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
+                                : 'none' 
+                            }}
+                          />
                         </button>
                       </div>
                     </div>
                     <button 
+                      onClick={() => {
+                        setExpandedDiscussions(prev => 
+                          prev.includes('review3') 
+                            ? prev.filter(id => id !== 'review3')
+                            : [...prev, 'review3']
+                        );
+                      }}
                       className="text-xs hover:underline"
                       style={{ color: '#64B5F6' }}
                     >
-                      View the discussion (2)
+                      {expandedDiscussions.includes('review3') ? 'View less' : 'View the discussion (2)'}
                     </button>
                   </div>
+                  
+                  {/* Discussion Thread */}
+                  {expandedDiscussions.includes('review3') && (
+                    <div className="mt-4 ml-8 space-y-4">
+                      {/* Reply 1 */}
+                      <div className="relative pl-4">
+                        <div className="absolute left-0 top-0 bottom-0 w-px" style={{ backgroundColor: '#E1E1E1' }}></div>
+                        <div className="flex items-start space-x-2.5 mb-2">
+                          <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <h5 className="font-semibold text-sm" style={{ color: '#212121' }}>Another User</h5>
+                              </div>
+                              <span className="text-[10px]" style={{ color: '#939393' }}>10 Nov 2024</span>
+                            </div>
+                            <p className="text-xs leading-relaxed" style={{ color: '#B0B0B0' }}>
+                              I had a similar experience with this product.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1183,8 +1439,8 @@ const ProductDetail: React.FC = () => {
                     </div>
                     
                     {/* Review Text Input */}
-                    <div className="flex items-start space-x-3 mb-4 pl-8">
-                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                    <div className="flex items-center space-x-3 mb-4 pl-8">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 self-start mt-2">
                         <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
@@ -1214,7 +1470,7 @@ const ProductDetail: React.FC = () => {
                         style={{ 
                           border: 'none',
                           minHeight: '80px',
-                          color: '#6A6A6A',
+                          color: '#939393',
                           backgroundColor: 'transparent'
                         }}
                         maxLength={1000}
@@ -1222,7 +1478,7 @@ const ProductDetail: React.FC = () => {
                     </div>
                     
                     {/* Post Review Button */}
-                    <div className="pl-8 relative">
+                    <div className="pl-8 relative mt-4">
                       <button 
                         onClick={() => {
                           if (userRating > 0 && userReviewText.trim()) {
@@ -1237,7 +1493,7 @@ const ProductDetail: React.FC = () => {
                             setIsReviewPosted(true);
                           }
                         }}
-                        className="w-full py-2.5 rounded-lg font-medium transition-all mt-6"
+                        className="w-full py-2.5 rounded-lg font-medium transition-all mt-12 relative"
                         style={{ 
                           backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
                           color: userRating > 0 ? 'white' : '#6A6A6A'
@@ -1245,21 +1501,21 @@ const ProductDetail: React.FC = () => {
                         disabled={userRating === 0}
                       >
                         Post the review
+                        {/* Character Counter */}
+                        {userReviewText.length > 0 && (
+                          <div 
+                            className="absolute"
+                            style={{ 
+                              top: '-26px', 
+                              right: '0', 
+                              color: '#64B5F6', 
+                              fontSize: '12px' 
+                            }}
+                          >
+                            {userReviewText.length}/1000
+                          </div>
+                        )}
                       </button>
-                      {/* Character Counter */}
-                      {userReviewText.length > 0 && (
-                        <div 
-                          className="absolute"
-                          style={{ 
-                            top: '-18px', 
-                            right: '0', 
-                            color: '#64B5F6', 
-                            fontSize: '12px' 
-                          }}
-                        >
-                          {userReviewText.length}/1000
-                        </div>
-                      )}
                     </div>
                   </>
                 ) : (
@@ -1323,10 +1579,10 @@ const ProductDetail: React.FC = () => {
                           </div>
                         </div>
                         
-                        {/* Review Text - Spans full width below */}
-                        <p className="text-sm leading-relaxed" style={{ color: '#939393' }}>
-                          {postedReview?.text}
-                        </p>
+                          {/* Review Text - Spans full width below */}
+                          <p className="text-sm leading-relaxed" style={{ color: '#939393', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                            {postedReview?.text}
+                          </p>
                       </div>
                     </div>
                   </>
