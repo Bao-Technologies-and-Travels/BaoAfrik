@@ -200,11 +200,7 @@ const Home: React.FC = () => {
 
         if (productsArray.length > 0) {
           setProducts(productsArray);
-        } else {
-          console.log('No products in array, using fallback');
-        }
-      } else {
-        console.warn('Unexpected API structure, using fallback data');
+        } 
       }
 
     } catch (error) {
@@ -867,7 +863,6 @@ const Home: React.FC = () => {
             } else {
               // Fallback: copy to clipboard
               await navigator.clipboard.writeText(window.location.href);
-              console.log('Product link copied to clipboard!');
             }
           } catch (error) {
             console.log('Error sharing:', error);

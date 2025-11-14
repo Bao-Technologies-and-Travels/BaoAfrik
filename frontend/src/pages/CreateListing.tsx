@@ -549,8 +549,6 @@ const CreateListing: React.FC = () => {
         deliveryAvailable
       };
 
-      console.log('Product data to send (createListing page):', productData);
-
       let createResponse;
       let productId;
 
@@ -567,7 +565,6 @@ const CreateListing: React.FC = () => {
         productId = id;
       } else {
         // Create new product
-        console.log('Create mode - creating new product');
         createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
           method: 'POST',
           headers: {
@@ -578,10 +575,7 @@ const CreateListing: React.FC = () => {
         });
       }
 
-      console.log('API Response status:', createResponse.status);
-
       const createResult = await createResponse.json();
-      console.log('Create product response (createListing page):', createResult);
 
       if (!createResponse.ok) {
         throw new Error(createResult.message || `Failed to ${isEditMode ? 'update' : 'create'} product`);
@@ -589,7 +583,6 @@ const CreateListing: React.FC = () => {
 
       if (createResult.success) {
         const productId = createResult.data.id;
-        console.log('Product ID from response (create listing page):', productId);
 
         // Upload images
         if (images.length > 0) {
@@ -607,7 +600,6 @@ const CreateListing: React.FC = () => {
         });
 
         const publishResult = await publishResponse.json();
-        console.log('Publish response:', publishResult);
 
         if (!publishResponse.ok) {
           throw new Error(publishResult.message || 'Failed to publish product');

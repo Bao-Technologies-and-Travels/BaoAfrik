@@ -1,11 +1,30 @@
+import { error } from 'console';
+import { authService } from '../services';
 import { API_CONFIG } from './apiConfig';
 
 // Token management utilities
 export class TokenManager {
+  private static isRefreshing = false;
+  private static failedQueue: Array<{ resolve: (token: string) => void; reject: (error: any) => void }> = [];
+
+  private static processQueue(error: any, token: string | null = null) {
+    this.failedQueue.forEach(({ resolve, reject }) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(token!);
+      }
+    });
+    this.failedQueue = [];
+  }
+
   // Store tokens securely
   static setTokens(accessToken: string, refreshToken: string): void {
     localStorage.setItem(API_CONFIG.TOKEN_STORAGE_KEY, accessToken);
     localStorage.setItem(API_CONFIG.REFRESH_TOKEN_KEY, refreshToken);
+
+    // schedule automatic token refresh
+    this.scheduleTokenRefresh();
   }
 
   // Get access token
@@ -52,8 +71,42 @@ export class TokenManager {
     }
   }
 
+  // Refresh token method
+  static async refreshToken(): Promise<string> {
+    if (this.isRefreshing) {
+      return new Promise((resolve, reject) => {
+        this.failedQueue.push({ resolve, reject });
+      });
+    }
+
+    this.isRefreshing = true;
+
+    try {
+      const response = await authService.refreshToken();
+
+      if (!response.success || !response.data) {
+        throw new Error(response.message || 'Token refresh failed');
+      }
+
+      const { accessToken } = response.data;
+
+      localStorage.setItem(API_CONFIG.TOKEN_STORAGE_KEY, accessToken);
+
+      this.processQueue(null, accessToken);
+      return accessToken;
+
+    } catch (error) {
+      this.processQueue(error, null);
+      this.clearTokens();
+      throw error;
+
+    } finally {
+      this.isRefreshing = false;
+    }
+  }
+
   // Auto-refresh token before expiration
-  static scheduleTokenRefresh(refreshCallback: () => Promise<void>): void {
+  static scheduleTokenRefresh(): void {
     const token = this.getAccessToken();
     if (!token) return;
 
@@ -67,12 +120,34 @@ export class TokenManager {
     if (refreshTime > 0) {
       setTimeout(async () => {
         try {
-          await refreshCallback();
+          await this.refreshToken();
+          // reschedule next refresh
+          this.scheduleTokenRefresh();
+
         } catch (error) {
-          console.error('Token refresh failed:', error);
+          console.error('Scheduled token refresh failed:', error);
           this.clearTokens();
+          window.location.href = '/login?message=session_expired';
         }
       }, refreshTime);
+    } else if (timeUntilExpiry > 0) {
+      // Token expires soon but we missed the 5-minute window, refresh immediately
+      this.refreshToken().catch(error => {
+        console.error('Immediate token refresh failed:', error);
+        this.clearTokens();
+        window.location.href = '/login?message=session_expired';
+      });
     }
+  }
+
+  // get time until token expiry
+  static getTimeUntilExpiry(): number {
+    const token = this.getAccessToken();
+    if (!token) return 0;
+
+    const expirationTime = this.getTokenExpiration(token);
+    if (!expirationTime) return 0;
+
+    return (expirationTime - Date.now()) / (60 * 1000);
   }
 }

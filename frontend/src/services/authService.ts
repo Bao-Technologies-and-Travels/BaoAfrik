@@ -101,8 +101,30 @@ export class AuthService {
 
   // Refresh access token
   async refreshToken(): Promise<ApiResponse<{ accessToken: string; expiresIn: number }>> {
-    const refreshToken = localStorage.getItem('refreshToken');
-    return apiClient.post('/auth/refresh', { refreshToken });
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
+      }
+
+      const response = await apiClient.post<{ accessToken: string; expiresIn: number }>('/auth/refresh', {
+        refreshToken
+      });
+      return response;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        'Token refresh failed';
+
+        return {
+          success: false,
+          message: errorMessage,
+          data: undefined
+        };
+    }
   }
 
   // Get current user profile

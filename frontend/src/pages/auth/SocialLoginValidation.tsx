@@ -4,13 +4,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 
-interface SocialLoginValidationProps {}
+interface SocialLoginValidationProps { }
 
 const SocialLoginValidation: React.FC<SocialLoginValidationProps> = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  
+
   // Get provider and login type from navigation state
   const provider = location.state?.provider || 'social media';
   const isLogin = location.state?.isLogin || false;
@@ -19,24 +19,32 @@ const SocialLoginValidation: React.FC<SocialLoginValidationProps> = () => {
     if (isLogin) {
       // For login flow - get user data and login directly
       const socialUserData = JSON.parse(localStorage.getItem('tempSocialUser') || '{}');
-      
+
       // Login the user with social data
       if (socialUserData.id) {
-        login(socialUserData);
+        const accessToken = socialUserData.accessToken; 
+        const refreshToken = socialUserData.refreshToken; 
+
+        if (!accessToken) {
+          console.error('No access token received from social login');
+          return;
+        }
+
+        login(socialUserData, accessToken, refreshToken);
       }
-      
+
       // Clean up temporary storage
       localStorage.removeItem('tempSocialUser');
-      
+
       // Redirect to home
       navigate('/');
     } else {
       // For registration flow - continue to profile setup
-      navigate('/profile-setup', { 
-        state: { 
+      navigate('/profile-setup', {
+        state: {
           fromSocialLogin: true,
-          provider: provider 
-        } 
+          provider: provider
+        }
       });
     }
   };
@@ -46,20 +54,20 @@ const SocialLoginValidation: React.FC<SocialLoginValidationProps> = () => {
     <div className="min-h-screen bg-white flex flex-col px-4 sm:px-6 lg:px-8">
       {/* Desktop Logo - Top Left */}
       <div className="hidden lg:block absolute top-6 left-8">
-        <img 
-          src={logoFull} 
-          alt="BaoAfrik Logo" 
+        <img
+          src={logoFull}
+          alt="BaoAfrik Logo"
           className="h-8 object-contain"
         />
       </div>
-      
+
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
           {/* Mobile Logo - Centered */}
           <div className="lg:hidden w-12 h-12 sm:w-16 sm:h-16 mb-8 sm:mb-12 mx-auto">
-            <img 
-              src={logoSmall} 
-              alt="BaoAfrik Logo" 
+            <img
+              src={logoSmall}
+              alt="BaoAfrik Logo"
               className="w-full h-full object-contain"
             />
           </div>

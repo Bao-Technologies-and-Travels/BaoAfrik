@@ -48,9 +48,7 @@ const ArchivedChats: React.FC = () => {
     }
   };
 
-  const handleActionSelect = (action: string, chatId: number) => {
-    console.log(`Action: ${action} for chat: ${chatId}`);
-    
+  const handleActionSelect = (action: string, chatId: number) => {    
     if (action === 'Pin the chat') {
       setPinnedChats(prev => new Set(prev).add(chatId));
     } else if (action === 'Unpin the chat') {

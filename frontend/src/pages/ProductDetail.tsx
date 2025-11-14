@@ -426,13 +426,9 @@ const ProductDetail: React.FC = () => {
       );
 
       if (existingConversation) {
-        console.log('Using existing conversation with seller:', existingConversation.id);
         await handleConversationClick(existingConversation.id);
         return;
       }
-
-      console.log('Starting contact seller process for product:', product.id);
-      console.log('Seller data:', product.seller);
 
       const token = localStorage.getItem("accessToken");
 
@@ -452,7 +448,6 @@ const ProductDetail: React.FC = () => {
         },
       };
 
-      console.log('Sending request to chat API...');
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/chat/contact-seller`,
         {
@@ -468,8 +463,6 @@ const ProductDetail: React.FC = () => {
         }
       );
 
-      console.log('Chat API response status:', response.status);
-
       const result = await response.json();
 
       if (!response.ok) {
@@ -481,8 +474,6 @@ const ProductDetail: React.FC = () => {
           'Failed to contact seller';
         throw new Error(errorMessage);
       }
-
-      console.log('Chat API success:', result);
 
       if (result.success) {
         await handleConversationClick(result.data.conversation.id);

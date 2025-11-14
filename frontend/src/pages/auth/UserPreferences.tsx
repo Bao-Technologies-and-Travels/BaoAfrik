@@ -87,16 +87,30 @@ const UserPreferences: React.FC = () => {
 
       // Complete user registration by logging them in with stored profile data
       const storedUser = JSON.parse(localStorage.getItem('tempUserProfile') || '{}');
-      login({
-        id: '1',
-        firstName: storedUser.firstName,
-        lastName: storedUser.lastName,
-        email: storedUser.email || 'user@example.com',
-        profileImage: storedUser.profileImage
-      });
+      const accessToken = localStorage.getItem('tempAccessToken');
+      const refreshToken = localStorage.getItem('tempRefreshToken');
+
+      if (!accessToken) {
+        console.error('No access token available for login');
+        return;
+      }
+
+      login(
+        {
+          id: storedUser.id || '1',
+          firstName: storedUser.firstName,
+          lastName: storedUser.lastName,
+          email: storedUser.email || 'user@example.com',
+          profileImage: storedUser.profileImage
+        },
+        accessToken,
+        refreshToken || ''
+      );
 
       // Clear temporary storage
       localStorage.removeItem('tempUserProfile');
+      localStorage.removeItem('tempAccessToken');
+      localStorage.removeItem('tempRefreshToken');
 
       // On success, redirect to home page
       navigate('/');
@@ -276,8 +290,8 @@ const UserPreferences: React.FC = () => {
                 type="submit"
                 disabled={isLoading || !isFormValid}
                 className={`w-full font-medium py-3 sm:py-4 px-6 rounded-xl transition-colors duration-200 text-sm sm:text-base ${isFormValid && !isLoading
-                    ? 'text-white'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'text-white'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                 style={isFormValid && !isLoading ? { backgroundColor: '#F9A825' } : {}}
               >

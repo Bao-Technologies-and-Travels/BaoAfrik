@@ -153,13 +153,13 @@ const SellerProfile: React.FC = () => {
   // Mock seller data - in real app this would come from API
   const seller = {
     id: sellerId || '1',
-    name: user?.firstName && user?.lastName || 'Joaquin EDIMO',
-    avatar: user?.profileImage || sellerAvatar,
+    name:  'Joaquin EDIMO',
+    avatar: sellerAvatar,
     coverPhoto: defaultCoverImage, // Can be updated when seller uploads cover photo
     isVerified: true,
     bio: 'Passionate farmer and entrepreneur with over 15 years of experience in sustainable agriculture. Specializing in organic produce and traditional farming methods. Committed to providing fresh, high-quality products directly from farm to table.',
     location: 'London, United Kingdom',
-    memberSince: user?.createdAt || 'May 2025',
+    memberSince: 'May 2025',
     rating: 4.3,
     totalReviews: 456,
     reviews: [

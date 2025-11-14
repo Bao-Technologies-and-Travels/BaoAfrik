@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { authService, AuthService } from "../services/authService";
 import { useToast } from "./ToastContext";
+import { TokenManager } from "../utils/tokenManager";
 
 interface User {
   id: string;
@@ -22,11 +23,12 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isVisitor: boolean;
-  login: (user: User, accessToken?: string, refreshToken?: string) => void;
+  login: (user: User, accessToken: string, refreshToken?: string) => void;
   logout: () => Promise<void>;
   setVisitorMode: (isVisitor: boolean) => void;
   updateUserProfile: (profileData: Partial<User>) => void;
   isLoading: boolean;
+  refreshTokens: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -57,30 +59,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { addToast } = useToast();
 
+  // Initialize token refresh on app start
+  useEffect(() => {
+    if (TokenManager.isAuthenticated()) {
+      TokenManager.scheduleTokenRefresh();
+    }
+  }, []);
+
   const login = (
     userData: User,
-    accessToken?: string,
+    accessToken: string,
     refreshToken?: string
   ) => {
     setUser(userData);
     setIsVisitor(false);
     localStorage.setItem("user", JSON.stringify(userData));
 
-    if (accessToken) {
-      localStorage.setItem("accessToken", accessToken);
-    }
+    // if refreshToken is provided
     if (refreshToken) {
-      localStorage.setItem("refreshToken", refreshToken);
+      TokenManager.setTokens(accessToken, refreshToken);
+    } else {
+      // Just set access token if no refresh token
+      localStorage.setItem("accessToken", accessToken);
     }
   };
 
   const logout = async (): Promise<void> => {
     try {
       setIsLoading(true);
+      TokenManager.clearTokens();
 
       localStorage.removeItem("user");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
       localStorage.removeItem("rememberedEmail");
       localStorage.removeItem("currentConversation");
       localStorage.removeItem("activeConversationId");
@@ -91,33 +100,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       try {
         await authService.logout();
-      } catch (error) {}
+      } catch (error) { }
 
       addToast({
         type: "success",
         title: "Logged out",
         message: "You have been successfully logged out.",
-        duration: 3000,
+        duration: 2500,
       });
 
       window.location.href = '/login';
-      
+
     } catch (error: any) {
       // clear frontend even when there is an error
       setUser(null);
       setIsVisitor(false);
+      TokenManager.clearTokens();
       localStorage.clear();
       sessionStorage.clear();
-      window.location.href = '/login';
 
       addToast({
         type: "success",
         title: "Logged out",
         message: "You have been logged out from this device.",
-        duration: 3000,
+        duration: 2500,
       });
+
+      window.location.href = '/login';
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const refreshTokens = async () => {
+    try {
+      const newAccessToken = await TokenManager.refreshToken();
+    } catch (error) {
+      await logout();
+      throw error;
     }
   };
 
@@ -125,6 +145,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsVisitor(visitor);
     if (visitor) {
       setUser(null); // Clear user data when in visitor mode
+      TokenManager.clearTokens();
     }
   };
 
@@ -146,6 +167,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setVisitorMode,
     updateUserProfile,
     isLoading,
+    refreshTokens,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -39,12 +39,14 @@ export class WebSocketService {
       const token = socket.handshake.auth.token;
 
       if (!token) {
-        return next(new Error('Authentication token required'));
+        // Allow connection but without user data
+        return next();
       }
 
       const jwtSecret = process.env.JWT_SECRET;
       if (!jwtSecret) {
-        return next(new Error('JWT secret not configured'));
+        // return next(new Error('JWT secret not configured'));
+        return next(new Error('Server configuration error'));
       }
 
       const decoded = jwt.verify(token, jwtSecret) as any;
@@ -67,23 +69,23 @@ export class WebSocketService {
       });
 
       if (!user) {
-        return next(new Error('User not found or inactive'));
-      }
-
-      if (!user.emailVerified) {
-        return next(new Error('Email verification required'));
+        // Allow connection but without user data
+        return next();
       }
 
       socket.user = user;
       next();
     } catch (error) {
       if (error instanceof jwt.JsonWebTokenError) {
-        return next(new Error('Invalid access token'));
+        return next(new Error('Invalid token format'));
       } else if (error instanceof jwt.TokenExpiredError) {
         return next(new Error('Access token expired'));
       } else {
-        return next(new Error('Authentication error'));
+        return next(new Error('Websocket Authentication error:'));
       }
+
+      // allow connection without user data, don't throw any error to prevent socket disconnection
+      next();
     }
   }
 
@@ -92,12 +94,27 @@ export class WebSocketService {
       const authenticatedSocket = socket as AuthenticatedSocket;
 
       if (!authenticatedSocket.user) {
-        socket.disconnect();
-        return;
+
+        // Allow limited functionality for unauthenticated users
+        socket.emit('connected', {
+          authenticated: false,
+          message: 'Connected as guest'
+        });
+
+        // Basic events that don't require authentication
+        socket.on('ping', (cb) => {
+          if (typeof cb === 'function') {
+            cb('pong');
+          }
+        });
+
+        socket.on('disconnect', (reason) => {
+        });
+
+        return; 
       }
 
       const userId = authenticatedSocket.user.id;
-      const userEmail = authenticatedSocket.user.email;
 
       // store user connection
       this.userSockets.set(userId, socket.id);

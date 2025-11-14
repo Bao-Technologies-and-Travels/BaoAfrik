@@ -163,27 +163,12 @@ const Messages: React.FC = () => {
   const [hasSentInitialProductMessage, setHasSentInitialProductMessage] =
     useState(false);
   const [hasSentProductData, setHasSentProductData] = useState(false);
-  const renderCount = useRef(0);
   const hasProcessedLocationState = useRef(false);
   const currentMessageIdRef = useRef<string | null>(null);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   const [lastTypingTime, setLastTypingTime] = useState<number>(0);
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
-  const handleProfileSetup = () => {
-    navigate("/profile-setup");
-  };
-
-  // Track re-renders for debugging
-  useEffect(() => {
-    renderCount.current += 1;
-  });
 
   // Get current user on component mount
   useEffect(() => {
@@ -211,6 +196,12 @@ const Messages: React.FC = () => {
     // Prevent multiple connections
     if (socketRef.current?.connected) {
       return;
+    }
+
+    // If there's an existing socket that's disconnected, clean it up first
+    if (socketRef.current && !socketRef.current.connected) {
+      socketRef.current.removeAllListeners();
+      socketRef.current = null;
     }
 
     const newSocket = io(process.env.REACT_APP_WS_URL!, {
@@ -420,7 +411,7 @@ const Messages: React.FC = () => {
     });
 
     newSocket.on("conversation_joined", (data) => {
-      console.log('✅ Joined conversation:', data.conversationId);
+      console.log('Joined conversation:', data.conversationId);
     });
 
     // cleanup function
@@ -438,10 +429,13 @@ const Messages: React.FC = () => {
       newSocket.off("message_delivered", handleMessageDelivered);
       newSocket.off("message_read", handleMessageRead);
 
-      if (newSocket.connected) {
+      // Only disconnect socket when unmounting the component
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      const shouldDisconnect = !isDevelopment || newSocket.connected;
+
+      if (shouldDisconnect) {
         newSocket.disconnect();
-      }
-      setSocket(null);
+      } 
     };
   }, [activeConversationId, currentUser?.id, typingTimer]);
 
@@ -459,33 +453,24 @@ const Messages: React.FC = () => {
       }
 
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations`
+        `${process.env.REACT_APP_API_URL}/chat/conversations`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
       );
-
 
       if (!response.ok) {
         if (response.status === 401) {
-          localStorage.removeItem("accessToken");
           throw new Error("Authentication failed. Please log in again.");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-
-      // Debug each conversation
-      if (data.data && data.data.length > 0) {
-        console.log('📨 Loaded conversations:', data.data.length);
-        data.data.forEach((conv: any, index: number) => {
-          console.log(`Conversation ${index + 1}:`, {
-            id: conv.id,
-            participants: conv.participants?.length || 0,
-            lastMessage: conv.lastMessage?.content?.substring(0, 50)
-          });
-        });
-      }
-
       setConversations(data.data || []);
+
     } catch (error) {
       if (
         error instanceof Error &&
@@ -551,7 +536,6 @@ const Messages: React.FC = () => {
 
     loadInitialData();
   }, [location.state]);
-
   // persist product inquiry state
   useEffect(() => {
     if (productData) {
@@ -622,7 +606,7 @@ const Messages: React.FC = () => {
         return;
       }
 
-      // Only prevent if actively loading, but allow same conversation clicks for refresh
+      // Prevent if actively loading, but allow same conversation clicks for refresh
       if (isLoadingMessages) {
         return;
       }
@@ -630,8 +614,15 @@ const Messages: React.FC = () => {
       try {
         setIsLoadingMessages(true);
 
+        const token = localStorage.getItem("accessToken");
+
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/messages`
+          `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/messages`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
         );
 
         if (!response.ok) {
@@ -2482,14 +2473,6 @@ const Messages: React.FC = () => {
     };
   }, [typingTimeout, socket, isSocketConnected, currentConversation?.id, currentUser?.id]);
 
-  useEffect(() => {
-    return () => {
-      if (socket) {
-        socket.disconnect();
-      }
-    };
-  }, [socket]);
-
   const formatMessageTime = (timestamp: any): string => {
     if (!timestamp) return '--:--';
 
@@ -2544,23 +2527,11 @@ const Messages: React.FC = () => {
     const getStatusIcon = () => {
       if (isIncoming) return null;
 
-      console.log('Rendering status icon for:', status);
-
       switch (status) {
         case "sending":
           return (
-            <svg
-              className="w-4 h-4 text-gray-400 animate-pulse"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           );
         case "sent":
@@ -2580,43 +2551,19 @@ const Messages: React.FC = () => {
         case "delivered":
           return (
             <div className="flex items-center">
-              <svg
-                className="w-4 h-4 text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
+              <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </div>
           );
         case "read":
           return (
             <div className="flex items-center">
-              <svg
-                className="w-4 h-4 text-blue-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
+              <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
-              <svg
-                className="w-4 h-4 -ml-2.5 text-blue-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
+              <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </div>
           );
@@ -2695,6 +2642,7 @@ const Messages: React.FC = () => {
                   <Link to="/">
                     <img src={logo} alt="bao'Afrik" className="h-8 w-auto" />
                   </Link>
+                  {/* ash4lyf */}
                   <button className="bg-white hover:bg-gray-50 rounded-lg transition-colors w-10 h-10 flex items-center justify-center">
                     <img
                       src={sideIcon}
@@ -2841,8 +2789,6 @@ const Messages: React.FC = () => {
                               alt={displayName}
                               className="w-10 h-10 rounded-full object-cover"
                               crossOrigin="anonymous"
-                              onError={(e) => console.log(" Image error")}
-                              onLoad={() => console.log(" Image loaded")}
                             />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
@@ -3577,8 +3523,7 @@ const Messages: React.FC = () => {
                           <div className="px-3 pt-3 border-t border-gray-100">
                             <button
                               onClick={() => {
-                                handleLogout();
-                                setIsMenuDropdownOpen(false);
+                                logout();
                               }}
                               className="w-full bg-gray-100 px-3 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                             >
