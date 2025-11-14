@@ -55,7 +55,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   });
 
-  const [isVisitor, setIsVisitor] = useState(false);
+  const [isVisitor, setIsVisitor] = useState(() => {
+    return localStorage.getItem('isVisitor') === 'true';
+  });
   const [isLoading, setIsLoading] = useState(false);
   const { addToast } = useToast();
 
@@ -74,6 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(userData);
     setIsVisitor(false);
     localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.removeItem("isVisitor");
 
     // if refreshToken is provided
     if (refreshToken) {
@@ -93,6 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem("rememberedEmail");
       localStorage.removeItem("currentConversation");
       localStorage.removeItem("activeConversationId");
+      localStorage.removeItem("isVisitor");
 
       sessionStorage.clear();
       setUser(null);
@@ -146,6 +150,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (visitor) {
       setUser(null); // Clear user data when in visitor mode
       TokenManager.clearTokens();
+      localStorage.setItem('isVisitor', 'true');
+    } else {
+      localStorage.removeItem('isVisitor');
     }
   };
 

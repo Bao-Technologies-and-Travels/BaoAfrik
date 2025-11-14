@@ -405,16 +405,7 @@ const SellerProfile: React.FC = () => {
 
             {/* Name and Status - Positioned next to avatar */}
             <div className="absolute left-40 bottom-[-65px]">
-              <h1 className="text-base font-semibold text-gray-900 mb-1.5">{user?.firstName && user?.lastName
-                ? `${user.firstName} ${user.lastName}`
-                : user?.firstName
-                  ? user.firstName
-                  : user?.lastName
-                    ? user.lastName
-                    : user?.email
-                      ? user.email.split("@")[0]
-                      : "User"}
-              </h1>
+              <h1 className="text-base font-semibold text-gray-900 mb-1.5">{seller.name}</h1>
               {seller.isVerified && (
                 <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
                   <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />

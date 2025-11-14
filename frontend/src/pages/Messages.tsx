@@ -1327,14 +1327,11 @@ const Messages: React.FC = () => {
       if (error instanceof Error) {
         if (error.message.includes("User not found")) {
           errorMessage = "Seller not found. Please try again later.";
-        } else if (
-          error.message.includes("Cannot create conversation with yourself")
-        ) {
+        } else if (error.message.includes("Cannot create conversation with yourself")) {
           errorMessage = "You cannot contact yourself.";
         } else if (error.message.includes("HTTP error")) {
-          errorMessage =
-            "Server connection failed. Please check your internet connection";
-        }
+          errorMessage = "Server connection failed. Please check your internet connection";
+        } 
       }
 
       addToast({

@@ -229,7 +229,6 @@ const ProductDetail: React.FC = () => {
   const [conversations, setConversations] = useState<any[]>([]);
 
   const { addToast } = useToast();
-  const { logout } = useAuth();
 
   // Product images array - main image first, then thumbnail images
   const defaultImages = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
@@ -306,10 +305,6 @@ const ProductDetail: React.FC = () => {
   const getSellerName = (seller: Seller | undefined): string => {
     if (!seller) return "Unknown Seller";
     return `${seller.firstName || ''} ${seller.lastName || ''}`.trim() || "Unknown Seller";
-  };
-
-  const getSellerEmail = (seller: Seller | undefined): string => {
-    return seller?.email || "";
   };
 
   const getSellerProfileImage = (seller: Seller | undefined): string => {
@@ -497,17 +492,15 @@ const ProductDetail: React.FC = () => {
 
       if (error.message.includes("User not found")) {
         errorMessage = "Seller not found. Please try again later.";
-      } else if (
-        error.message.includes("Cannot create conversation with yourself")
-      ) {
+      } else if (error.message.includes("Cannot create conversation with yourself")) {
         errorMessage = "You cannot contact yourself.";
-      } else if (error.message.includes("Email verification required")) {
-        errorMessage = "Please verify your email before contacting sellers.";
+      }  else if (error.message.includes("Invalid access token")) {
+        errorMessage = "You need to login to chat with a seller."
       }
 
       addToast({
         type: "error",
-        title: "Error starting conversation",
+        title: "Cannot contact seller",
         message: errorMessage,
         duration: 3000,
       });
@@ -958,41 +951,6 @@ const ProductDetail: React.FC = () => {
                     />
                   </svg>
                 </button>
-
-                {/* Additional Information Section */}
-                {showAdditionalInfo && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-3">
-                      Additional Product Information
-                    </h4>
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <div className="flex justify-between">
-                        <span className="font-medium">Origin:</span>
-                        <span>{product.origin}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Processing Method:</span>
-                        <span>Retting process</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Shelf Life:</span>
-                        <span>2-3 years when stored properly</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Storage:</span>
-                        <span>Cool, dry place away from sunlight</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Package Weight:</span>
-                        <span>100g</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Organic:</span>
-                        <span>Yes, certified organic</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Seller Info */}
@@ -1185,68 +1143,6 @@ const ProductDetail: React.FC = () => {
               />
             </svg>
           </button>
-
-          {/* Additional Information Section - Mobile */}
-          {showAdditionalInfo && (
-            // <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            //   <h4 className="font-semibold text-gray-900 mb-3">
-            //     Additional Product Information
-            //   </h4>
-            //   <div className="space-y-2 text-sm text-gray-600">
-            //     <div className="flex justify-between">
-            //       <span className="font-medium">Origin:</span>
-            //       <span>{product.origin}</span>
-            //     </div>
-            //     <div className="flex justify-between">
-            //       <span className="font-medium">Quantity Available:</span>
-            //       <span>{product.quantity}</span>
-            //     </div>
-            //     <div className="flex justify-between">
-            //       <span className="font-medium">Sale Type:</span>
-            //       <span>{product.saleType}</span>
-            //     </div>
-            //     <div className="flex justify-between">
-            //       <span className="font-medium">Delivery Available:</span>
-            //       <span>{product.deliveryAvailable ? "Yes" : "No"}</span>
-            //     </div>
-            //     <div className="flex justify-between">
-            //       <span className="font-medium">Status:</span>
-            //       <span className="capitalize">{product.status.toLowerCase()}</span>
-            //     </div>
-            //   </div>
-            // </div>
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h4 className="font-semibold text-gray-900 mb-3">
-                Additional Product Information
-              </h4>
-              <div className="space-y-2 text-sm text-gray-600">
-                <div className="flex justify-between">
-                  <span className="font-medium">Origin:</span>
-                  <span>Kerala, India (Malabar Coast)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Processing Method:</span>
-                  <span>Retting process</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Shelf Life:</span>
-                  <span>2-3 years when stored properly</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Storage:</span>
-                  <span>Cool, dry place away from sunlight</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Package Weight:</span>
-                  <span>100g</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Organic:</span>
-                  <span>Yes, certified organic</span>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Seller Profile */}
