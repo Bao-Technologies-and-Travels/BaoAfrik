@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
@@ -75,6 +75,7 @@ const getProductCountry = (productId: number) => {
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const routerLocation = useLocation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -87,7 +88,7 @@ const ProductDetail: React.FC = () => {
   const [currentRecommendedIndex, setCurrentRecommendedIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [location, setLocation] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [isContactingSeller, setIsContactingSeller] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -104,7 +105,7 @@ const ProductDetail: React.FC = () => {
     review2: { yes: 15, no: 3 },
     review3: { yes: 8, no: 12 }
   });
-  const [expandedDiscussions, setExpandedDiscussions] = useState<string[]>([]);
+  const [expandedDiscussions, setExpandedDiscussions] = useState<{[key: string]: boolean}>({});
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const [isReviewPosted, setIsReviewPosted] = useState(false);
   const [postedReview, setPostedReview] = useState<{rating: number; text: string; date: string} | null>(null);
@@ -114,6 +115,7 @@ const ProductDetail: React.FC = () => {
     { id: 'relevant', label: 'The most relevant', description: 'Show most engaging reviews first', icon: 'star' },
     { id: 'newest', label: 'Newest', description: 'Show newest reviews first', icon: 'clock' }
   ];
+
   
   // Function to handle filter selection
   const handleFilterSelect = (filterId: string) => {
@@ -122,6 +124,143 @@ const ProductDetail: React.FC = () => {
       setSelectedFilter(filter.label);
     }
     setFilterDropdownOpen(false);
+  };
+
+  const handleDiscussionToggle = (reviewId: string) => {
+    setExpandedDiscussions(prev => ({
+      ...prev,
+      [reviewId]: !prev[reviewId]
+    }));
+  };
+
+  const handleHelpfulnessClick = (itemId: string, choice: 'yes' | 'no') => {
+    setReviewHelpfulness(prevSelection => {
+      const currentSelection = prevSelection[itemId];
+      const nextSelection = currentSelection === choice ? null : choice;
+
+      if (currentSelection !== choice) {
+        setReviewHelpfulCounts(prevCounts => {
+          const existing = prevCounts[itemId] || { yes: 0, no: 0 };
+          return {
+            ...prevCounts,
+            [itemId]: {
+              ...existing,
+              [choice]: existing[choice] + 1
+            }
+          };
+        });
+      }
+
+      return { ...prevSelection, [itemId]: nextSelection };
+    });
+  };
+
+  const BookmarkIcon = ({ saved }: { saved: boolean }) => (
+    <div className="w-4 h-4 relative flex items-center justify-center">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {!saved && (
+          <>
+            <path
+              d="M12.0837 8.87549H7.91699"
+              stroke="#BABABA"
+              strokeWidth="1.25"
+              strokeMiterlimit="10"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10 6.8418V11.0085"
+              stroke="#BABABA"
+              strokeWidth="1.25"
+              strokeMiterlimit="10"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </>
+        )}
+        <path
+          d="M14.0166 1.6665H5.98327C4.20827 1.6665 2.7666 3.1165 2.7666 4.88317V16.6248C2.7666 18.1248 3.8416 18.7582 5.15827 18.0332L9.22493 15.7748C9.65827 15.5332 10.3583 15.5332 10.7833 15.7748L14.8499 18.0332C16.1666 18.7665 17.2416 18.1332 17.2416 16.6248V4.88317C17.2333 3.1165 15.7916 1.6665 14.0166 1.6665Z"
+          stroke={saved ? '#64B5F6' : '#BABABA'}
+          strokeWidth="1.25"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill={saved ? '#64B5F6' : 'none'}
+        />
+      </svg>
+      {saved && (
+        <svg className="w-2 h-2 absolute text-white" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+        </svg>
+      )}
+    </div>
+  );
+
+  const renderHelpfulnessControls = (
+    itemId: string,
+    questionText = 'Was this review helpful to you?',
+    alignment: 'left' | 'right' = 'left',
+    fullWidth = false
+  ) => {
+    const selection = reviewHelpfulness[itemId];
+    const counts = reviewHelpfulCounts[itemId] || { yes: 0, no: 0 };
+
+    return (
+      <div
+        className={`flex items-center space-x-3 ${fullWidth ? 'w-full' : ''} ${alignment === 'right' ? 'justify-end' : 'justify-start'}`}
+      >
+        {!selection && (
+          <span className="text-xs" style={{ color: '#212121' }}>
+            {questionText}
+          </span>
+        )}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => handleHelpfulnessClick(itemId, 'yes')}
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+            style={{
+              border: `1px solid ${selection === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
+              backgroundColor: selection === 'yes' ? '#F0F8FE' : 'white'
+            }}
+          >
+            <span className="text-xs" style={{ color: selection === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
+              {selection ? counts.yes : 'Yes'}
+            </span>
+            <img
+              src={likeIcon}
+              alt="Like"
+              className="w-3.5 h-3.5"
+              style={{
+                filter: selection === 'yes'
+                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                  : 'none'
+              }}
+            />
+          </button>
+          <button
+            onClick={() => handleHelpfulnessClick(itemId, 'no')}
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+            style={{
+              border: `1px solid ${selection === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
+              backgroundColor: selection === 'no' ? '#F0F8FE' : 'white'
+            }}
+          >
+            <span className="text-xs" style={{ color: selection === 'no' ? '#64B5F6' : '#6A6A6A' }}>
+              {selection ? counts.no : 'No'}
+            </span>
+            <img
+              src={dislikeIcon}
+              alt="Dislike"
+              className="w-3.5 h-3.5"
+              style={{
+                filter: selection === 'no'
+                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                  : 'none'
+              }}
+            />
+          </button>
+        </div>
+      </div>
+    );
   };
 
   // Product images array - main image first, then thumbnail images
@@ -158,8 +297,10 @@ const ProductDetail: React.FC = () => {
     setSharedProducts(newSet);
   };
 
+  const sellerVerifiedFromState = (routerLocation.state as { sellerVerified?: boolean } | null)?.sellerVerified;
+
   // Mock product data (in real app, this would come from API based on id)
-  const product = {
+  const defaultProduct = {
     id: id || '12890',
     name: 'White pepper',
     price: 31.7,
@@ -178,6 +319,71 @@ const ProductDetail: React.FC = () => {
       description: 'Passionate about discovering unique products and always on the lookout for great deals. I enjoy exploring new brands, trying out innovative items, and supporting businesses that deliver quality and creativity.',
       website: 'user-randomlink.com'
     }
+  };
+
+  const product = {
+    ...defaultProduct,
+    seller: {
+      ...defaultProduct.seller,
+      verified: sellerVerifiedFromState ?? defaultProduct.seller.verified
+    }
+  };
+
+  const reviewDiscussionData: {[key: string]: Array<{id: string; author: string; role?: string; date: string; text: string; isOwner?: boolean; avatar?: string}>} = {
+    review1: [
+      {
+        id: 'review1-comment1',
+        author: product.seller.name,
+        role: 'Product Owner',
+        date: '2 Jan 2025',
+        text: 'I am glad the flavor worked well for your dishes, Samine. Each batch is sourced carefully so you can count on the same aroma every time.',
+        isOwner: true,
+        avatar: product.seller.avatar
+      }
+    ],
+    review2: [
+      {
+        id: 'review2-comment1',
+        author: 'Ibrahim Kalu',
+        date: '13 Dec 2024',
+        text: 'Thanks for the detailed feedback, Kael! I also noticed the aroma lingers nicely when simmered slowly.',
+        avatar: sellerAvatar
+      },
+      {
+        id: 'review2-comment2',
+        author: product.seller.name,
+        role: 'Product Owner',
+        date: '13 Dec 2024',
+        text: 'Happy you enjoyed it, Kael. Feel free to reach out if you ever need larger quantities for your kitchen.',
+        isOwner: true,
+        avatar: product.seller.avatar
+      },
+      {
+        id: 'review2-comment3',
+        author: 'Ada Ifeoma',
+        date: '14 Dec 2024',
+        text: 'Totally agree—shipping was quick for me too. Perfect for soups!',
+        avatar: sellerAvatar
+      }
+    ],
+    review3: [
+      {
+        id: 'review3-comment1',
+        author: product.seller.name,
+        role: 'Product Owner',
+        date: '9 Nov 2024',
+        text: 'Thanks for sharing, Alex. I can offer a bolder batch next time—send me a message and I will make it right.',
+        isOwner: true,
+        avatar: product.seller.avatar
+      },
+      {
+        id: 'review3-comment2',
+        author: 'Chinedu Bassey',
+        date: '10 Nov 2024',
+        text: 'I had a stronger flavor experience, maybe try it freshly ground. It made a difference for me.',
+        avatar: sellerAvatar
+      }
+    ]
   };
 
   const handleSave = () => {
@@ -281,7 +487,7 @@ const ProductDetail: React.FC = () => {
     const searchParams = new URLSearchParams();
     if (searchQuery) searchParams.set('q', searchQuery);
     if (selectedCategory) searchParams.set('category', selectedCategory);
-    if (location) searchParams.set('location', location);
+    if (locationFilter) searchParams.set('location', locationFilter);
     
     navigate(`/?${searchParams.toString()}`);
   };
@@ -532,26 +738,7 @@ const ProductDetail: React.FC = () => {
                     width: 'fit-content' 
                   }}
                 >
-                  {isSaved ? (
-                    <div className="w-4 h-4 relative flex items-center justify-center">
-                      <img 
-                        src={bookmarkIcon} 
-                        alt="Bookmark" 
-                        className="w-4 h-4 absolute"
-                        style={{ filter: 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' }}
-                      />
-                      <svg className="w-2 h-2 absolute text-white z-10" fill="currentColor" viewBox="0 0 20 20" style={{ marginTop: '-2px' }}>
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  ) : (
-                    <img 
-                      src={bookmarkIcon} 
-                      alt="Bookmark" 
-                      className="w-4 h-4"
-                      style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)' }}
-                    />
-                  )}
+                  <BookmarkIcon saved={isSaved} />
                   <span>Save for later</span>
                 </button>
               </div>
@@ -803,32 +990,40 @@ const ProductDetail: React.FC = () => {
       {/* Reviews and Ratings Section */}
       <div className="bg-white mt-8">
         {/* Tab Navigation */}
-        <div className="border-b" style={{ borderColor: '#E5E5E5' }}>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex">
-              <button 
-                onClick={() => setActiveTab('reviews')}
-                className="px-4 py-1 text-sm font-medium border-b-2 transition-colors"
-                style={{
-                  color: activeTab === 'reviews' ? '#64B5F6' : '#BABABA',
-                  borderColor: activeTab === 'reviews' ? '#64B5F6' : 'transparent'
-                }}
-              >
-                Reviews and Ratings
-              </button>
-              <button 
-                onClick={() => setActiveTab('items')}
-                className="px-4 py-1 text-sm font-medium ml-8 border-b-2 transition-colors"
-                style={{
-                  color: activeTab === 'items' ? '#64B5F6' : '#BABABA',
-                  borderColor: activeTab === 'items' ? '#64B5F6' : 'transparent'
-                }}
-              >
-                Seller Items
-              </button>
+        {product.seller.verified ? (
+          <div className="border-b" style={{ borderColor: '#E5E5E5' }}>
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="flex">
+                <button 
+                  onClick={() => setActiveTab('reviews')}
+                  className="px-4 py-1 text-sm font-medium border-b-2 transition-colors"
+                  style={{
+                    color: activeTab === 'reviews' ? '#64B5F6' : '#BABABA',
+                    borderColor: activeTab === 'reviews' ? '#64B5F6' : 'transparent'
+                  }}
+                >
+                  Reviews and Ratings
+                </button>
+                <button 
+                  onClick={() => setActiveTab('items')}
+                  className="px-4 py-1 text-sm font-medium ml-8 border-b-2 transition-colors"
+                  style={{
+                    color: activeTab === 'items' ? '#64B5F6' : '#BABABA',
+                    borderColor: activeTab === 'items' ? '#64B5F6' : 'transparent'
+                  }}
+                >
+                  Seller Items
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="max-w-7xl mx-auto px-6 pb-4">
+            <h2 className="text-3xl font-semibold" style={{ color: '#000000', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Reviews and ratings
+            </h2>
+          </div>
+        )}
         
         <div className="max-w-7xl mx-auto px-6 py-4 mt-4">
           
@@ -938,119 +1133,53 @@ const ProductDetail: React.FC = () => {
                   </p>
                   
                   {/* Helpfulness Section */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      {!reviewHelpfulness.review1 && (
-                        <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                      )}
-                      <div className="flex items-center space-x-2">
-                        <button 
-                          onClick={() => {
-                            setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'yes' ? null : 'yes' }));
-                            if (reviewHelpfulness.review1 !== 'yes') {
-                              setReviewHelpfulCounts(prev => ({
-                                ...prev,
-                                review1: { ...prev.review1, yes: prev.review1.yes + 1 }
-                              }));
-                            }
-                          }}
-                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                          style={{ 
-                            border: `1px solid ${reviewHelpfulness.review1 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-                            backgroundColor: reviewHelpfulness.review1 === 'yes' ? '#F0F8FE' : 'white'
-                          }}
-                        >
-                          <span className="text-xs" style={{ color: reviewHelpfulness.review1 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-                            {reviewHelpfulness.review1 ? reviewHelpfulCounts.review1.yes : 'Yes'}
-                          </span>
-                          <img 
-                            src={likeIcon} 
-                            alt="Like" 
-                            className="w-3.5 h-3.5" 
-                            style={{ 
-                              filter: reviewHelpfulness.review1 === 'yes' 
-                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                : 'none' 
-                            }}
-                          />
-                        </button>
-                        <button 
-                          onClick={() => {
-                            setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'no' ? null : 'no' }));
-                            if (reviewHelpfulness.review1 !== 'no') {
-                              setReviewHelpfulCounts(prev => ({
-                                ...prev,
-                                review1: { ...prev.review1, no: prev.review1.no + 1 }
-                              }));
-                            }
-                          }}
-                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                          style={{ 
-                            border: `1px solid ${reviewHelpfulness.review1 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-                            backgroundColor: reviewHelpfulness.review1 === 'no' ? '#F0F8FE' : 'white'
-                          }}
-                        >
-                          <span className="text-xs" style={{ color: reviewHelpfulness.review1 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-                            {reviewHelpfulness.review1 ? reviewHelpfulCounts.review1.no : 'No'}
-                          </span>
-                          <img 
-                            src={dislikeIcon} 
-                            alt="Dislike" 
-                            className="w-3.5 h-3.5" 
-                            style={{ 
-                              filter: reviewHelpfulness.review1 === 'no' 
-                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                : 'none' 
-                            }}
-                          />
-                        </button>
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    {renderHelpfulnessControls('review1')}
                     <button 
-                      onClick={() => {
-                        setExpandedDiscussions(prev => 
-                          prev.includes('review1') 
-                            ? prev.filter(id => id !== 'review1')
-                            : [...prev, 'review1']
-                        );
-                      }}
                       className="text-xs hover:underline"
                       style={{ color: '#64B5F6' }}
+                      onClick={() => handleDiscussionToggle('review1')}
                     >
-                      {expandedDiscussions.includes('review1') ? 'View less' : 'View the discussion (1)'}
+                      {expandedDiscussions.review1 ? 'View less' : `View the discussion (${reviewDiscussionData.review1?.length || 0})`}
                     </button>
                   </div>
-                  
-                  {/* Discussion Thread */}
-                  {expandedDiscussions.includes('review1') && (
-                    <div className="mt-4 ml-8 space-y-4">
-                      {/* Reply 1 - Product Owner */}
-                      <div className="relative pl-4">
-                        {/* Left Border Line */}
-                        <div className="absolute left-0 top-0 bottom-0 w-px" style={{ backgroundColor: '#E1E1E1' }}></div>
-                        
-                        <div className="flex items-start space-x-2.5 mb-2">
-                          <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
-                            <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center space-x-2">
-                                <h5 className="font-semibold text-sm" style={{ color: '#212121' }}>Joaquin EDIMO</h5>
-                                <div className="px-2 py-0.5 text-xs" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                  Profile Owner
-                                </div>
+                  {expandedDiscussions.review1 && reviewDiscussionData.review1 && (
+                    <div className="mt-4 space-y-4">
+                      {reviewDiscussionData.review1.map((comment) => (
+                        <div key={comment.id} className="flex space-x-3">
+                          <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
+                          <div className="flex-1 pl-4">
+                            <div className="flex items-start space-x-3">
+                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                {comment.avatar ? (
+                                  <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                                ) : (
+                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                  </svg>
+                                )}
                               </div>
-                              <span className="text-[10px]" style={{ color: '#939393' }}>2 Jan 2025</span>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                                    {comment.isOwner && (
+                                      <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                        {comment.role || 'Product Owner'}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                </div>
+                                <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                              </div>
                             </div>
-                            <p className="text-xs leading-relaxed" style={{ color: '#B0B0B0' }}>
-                              I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.
-                            </p>
+                            <div className="mt-3 pl-12">
+                              {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -1085,114 +1214,53 @@ const ProductDetail: React.FC = () => {
                   </p>
                   
                   {/* Helpfulness Section */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      {!reviewHelpfulness.review2 && (
-                        <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                      )}
-                      <div className="flex items-center space-x-2">
-                        <button 
-                          onClick={() => {
-                            setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'yes' ? null : 'yes' }));
-                            if (reviewHelpfulness.review2 !== 'yes') {
-                              setReviewHelpfulCounts(prev => ({
-                                ...prev,
-                                review2: { ...prev.review2, yes: prev.review2.yes + 1 }
-                              }));
-                            }
-                          }}
-                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                          style={{ 
-                            border: `1px solid ${reviewHelpfulness.review2 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-                            backgroundColor: reviewHelpfulness.review2 === 'yes' ? '#F0F8FE' : 'white'
-                          }}
-                        >
-                          <span className="text-xs" style={{ color: reviewHelpfulness.review2 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-                            {reviewHelpfulness.review2 ? reviewHelpfulCounts.review2.yes : 'Yes'}
-                          </span>
-                          <img 
-                            src={likeIcon} 
-                            alt="Like" 
-                            className="w-3.5 h-3.5" 
-                            style={{ 
-                              filter: reviewHelpfulness.review2 === 'yes' 
-                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                : 'none' 
-                            }}
-                          />
-                        </button>
-                        <button 
-                          onClick={() => {
-                            setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'no' ? null : 'no' }));
-                            if (reviewHelpfulness.review2 !== 'no') {
-                              setReviewHelpfulCounts(prev => ({
-                                ...prev,
-                                review2: { ...prev.review2, no: prev.review2.no + 1 }
-                              }));
-                            }
-                          }}
-                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                          style={{ 
-                            border: `1px solid ${reviewHelpfulness.review2 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-                            backgroundColor: reviewHelpfulness.review2 === 'no' ? '#F0F8FE' : 'white'
-                          }}
-                        >
-                          <span className="text-xs" style={{ color: reviewHelpfulness.review2 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-                            {reviewHelpfulness.review2 ? reviewHelpfulCounts.review2.no : 'No'}
-                          </span>
-                          <img 
-                            src={dislikeIcon} 
-                            alt="Dislike" 
-                            className="w-3.5 h-3.5" 
-                            style={{ 
-                              filter: reviewHelpfulness.review2 === 'no' 
-                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                : 'none' 
-                            }}
-                          />
-                        </button>
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    {renderHelpfulnessControls('review2')}
                     <button 
-                      onClick={() => {
-                        setExpandedDiscussions(prev => 
-                          prev.includes('review2') 
-                            ? prev.filter(id => id !== 'review2')
-                            : [...prev, 'review2']
-                        );
-                      }}
                       className="text-xs hover:underline"
                       style={{ color: '#64B5F6' }}
+                      onClick={() => handleDiscussionToggle('review2')}
                     >
-                      {expandedDiscussions.includes('review2') ? 'View less' : 'View the discussion (3)'}
+                      {expandedDiscussions.review2 ? 'View less' : `View the discussion (${reviewDiscussionData.review2?.length || 0})`}
                     </button>
                   </div>
-                  
-                  {/* Discussion Thread */}
-                  {expandedDiscussions.includes('review2') && (
-                    <div className="mt-4 ml-8 space-y-4">
-                      {/* Reply 1 */}
-                      <div className="relative pl-4">
-                        <div className="absolute left-0 top-0 bottom-0 w-px" style={{ backgroundColor: '#E1E1E1' }}></div>
-                        <div className="flex items-start space-x-2.5 mb-2">
-                          <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
-                            <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center space-x-2">
-                                <h5 className="font-semibold text-sm" style={{ color: '#212121' }}>User Name</h5>
+                  {expandedDiscussions.review2 && reviewDiscussionData.review2 && (
+                    <div className="mt-4 space-y-4">
+                      {reviewDiscussionData.review2.map((comment) => (
+                        <div key={comment.id} className="flex space-x-3">
+                          <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
+                          <div className="flex-1 pl-4">
+                            <div className="flex items-start space-x-3">
+                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                {comment.avatar ? (
+                                  <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                                ) : (
+                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                  </svg>
+                                )}
                               </div>
-                              <span className="text-[10px]" style={{ color: '#939393' }}>3 Jan 2025</span>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                                    {comment.isOwner && (
+                                      <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                        {comment.role || 'Product Owner'}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                </div>
+                                <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                              </div>
                             </div>
-                            <p className="text-xs leading-relaxed" style={{ color: '#B0B0B0' }}>
-                              Great comment about the product quality!
-                            </p>
+                            <div className="mt-3 pl-12">
+                              {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -1232,114 +1300,53 @@ const ProductDetail: React.FC = () => {
                   </p>
                   
                   {/* Helpfulness Section */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      {!reviewHelpfulness.review3 && (
-                        <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                      )}
-                      <div className="flex items-center space-x-2">
-                        <button 
-                          onClick={() => {
-                            setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'yes' ? null : 'yes' }));
-                            if (reviewHelpfulness.review3 !== 'yes') {
-                              setReviewHelpfulCounts(prev => ({
-                                ...prev,
-                                review3: { ...prev.review3, yes: prev.review3.yes + 1 }
-                              }));
-                            }
-                          }}
-                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                          style={{ 
-                            border: `1px solid ${reviewHelpfulness.review3 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-                            backgroundColor: reviewHelpfulness.review3 === 'yes' ? '#F0F8FE' : 'white'
-                          }}
-                        >
-                          <span className="text-xs" style={{ color: reviewHelpfulness.review3 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-                            {reviewHelpfulness.review3 ? reviewHelpfulCounts.review3.yes : 'Yes'}
-                          </span>
-                          <img 
-                            src={likeIcon} 
-                            alt="Like" 
-                            className="w-3.5 h-3.5" 
-                            style={{ 
-                              filter: reviewHelpfulness.review3 === 'yes' 
-                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                : 'none' 
-                            }}
-                          />
-                        </button>
-                        <button 
-                          onClick={() => {
-                            setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'no' ? null : 'no' }));
-                            if (reviewHelpfulness.review3 !== 'no') {
-                              setReviewHelpfulCounts(prev => ({
-                                ...prev,
-                                review3: { ...prev.review3, no: prev.review3.no + 1 }
-                              }));
-                            }
-                          }}
-                          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                          style={{ 
-                            border: `1px solid ${reviewHelpfulness.review3 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-                            backgroundColor: reviewHelpfulness.review3 === 'no' ? '#F0F8FE' : 'white'
-                          }}
-                        >
-                          <span className="text-xs" style={{ color: reviewHelpfulness.review3 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-                            {reviewHelpfulness.review3 ? reviewHelpfulCounts.review3.no : 'No'}
-                          </span>
-                          <img 
-                            src={dislikeIcon} 
-                            alt="Dislike" 
-                            className="w-3.5 h-3.5" 
-                            style={{ 
-                              filter: reviewHelpfulness.review3 === 'no' 
-                                ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                : 'none' 
-                            }}
-                          />
-                        </button>
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    {renderHelpfulnessControls('review3')}
                     <button 
-                      onClick={() => {
-                        setExpandedDiscussions(prev => 
-                          prev.includes('review3') 
-                            ? prev.filter(id => id !== 'review3')
-                            : [...prev, 'review3']
-                        );
-                      }}
                       className="text-xs hover:underline"
                       style={{ color: '#64B5F6' }}
+                      onClick={() => handleDiscussionToggle('review3')}
                     >
-                      {expandedDiscussions.includes('review3') ? 'View less' : 'View the discussion (2)'}
+                      {expandedDiscussions.review3 ? 'View less' : `View the discussion (${reviewDiscussionData.review3?.length || 0})`}
                     </button>
                   </div>
-                  
-                  {/* Discussion Thread */}
-                  {expandedDiscussions.includes('review3') && (
-                    <div className="mt-4 ml-8 space-y-4">
-                      {/* Reply 1 */}
-                      <div className="relative pl-4">
-                        <div className="absolute left-0 top-0 bottom-0 w-px" style={{ backgroundColor: '#E1E1E1' }}></div>
-                        <div className="flex items-start space-x-2.5 mb-2">
-                          <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
-                            <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center space-x-2">
-                                <h5 className="font-semibold text-sm" style={{ color: '#212121' }}>Another User</h5>
+                  {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
+                    <div className="mt-4 space-y-4">
+                      {reviewDiscussionData.review3.map((comment) => (
+                        <div key={comment.id} className="flex space-x-3">
+                          <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
+                          <div className="flex-1 pl-4">
+                            <div className="flex items-start space-x-3">
+                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                {comment.avatar ? (
+                                  <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                                ) : (
+                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                  </svg>
+                                )}
                               </div>
-                              <span className="text-[10px]" style={{ color: '#939393' }}>10 Nov 2024</span>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                                    {comment.isOwner && (
+                                      <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                        {comment.role || 'Product Owner'}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                </div>
+                                <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                              </div>
                             </div>
-                            <p className="text-xs leading-relaxed" style={{ color: '#B0B0B0' }}>
-                              I had a similar experience with this product.
-                            </p>
+                            <div className="mt-3 pl-12">
+                              {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -1704,7 +1711,7 @@ const ProductDetail: React.FC = () => {
           )}
 
           {/* Seller Items Content */}
-          {activeTab === 'items' && (
+          {product.seller.verified && activeTab === 'items' && (
             <>
               {/* Section 1: Seller Items */}
               <div className="mb-12">
@@ -2543,6 +2550,17 @@ const ProductDetail: React.FC = () => {
               onClick={(e) => e.stopPropagation()}
               style={{ padding: '32px 24px', marginTop: '40px' }}
             >
+              {/* Product Picture - Half Outside Modal */}
+              <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '-40px' }}>
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white overflow-hidden">
+                  <img
+                    src={images[selectedImageIndex]}
+                    alt={product.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                </div>
+              </div>
+
               {/* Close Button */}
               <button
                 onClick={() => setShowShareModal(false)}
@@ -2600,7 +2618,9 @@ const ProductDetail: React.FC = () => {
                     <span className="text-xs" style={{ color: '#B0B0B0' }}>X</span>
                   </button>
                   <button className="flex flex-col items-center space-y-2">
-                    <img src={tgIcon} alt="Telegram" className="w-10 h-10" />
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0088cc' }}>
+                      <img src={tgIcon} alt="Telegram" className="w-6 h-6" />
+                    </div>
                     <span className="text-xs" style={{ color: '#B0B0B0' }}>Telegram</span>
                   </button>
                   <button className="flex flex-col items-center space-y-2">

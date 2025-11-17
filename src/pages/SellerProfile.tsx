@@ -126,7 +126,7 @@ const SellerProfile: React.FC = () => {
 
   const [likes, setLikes] = useState({ review1: 5, review2: 5, review3: 5 });
   const [likedReviews, setLikedReviews] = useState<string[]>([]);
-  const [expandedDiscussions, setExpandedDiscussions] = useState<string[]>([]);
+  const [expandedDiscussions, setExpandedDiscussions] = useState<{[key: string]: boolean}>({});
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('The most relevant');
   const [reviewHelpfulness, setReviewHelpfulness] = useState<{[key: string]: 'yes' | 'no' | null}>({});
@@ -154,6 +154,103 @@ const SellerProfile: React.FC = () => {
       setSelectedFilter(filter.label);
     }
     setFilterDropdownOpen(false);
+  };
+
+  const handleDiscussionToggle = (reviewId: string) => {
+    setExpandedDiscussions(prev => ({
+      ...prev,
+      [reviewId]: !prev[reviewId]
+    }));
+  };
+
+  const handleHelpfulnessClick = (itemId: string, choice: 'yes' | 'no') => {
+    setReviewHelpfulness(prevSelection => {
+      const currentSelection = prevSelection[itemId];
+      const nextSelection = currentSelection === choice ? null : choice;
+
+      if (currentSelection !== choice) {
+        setReviewHelpfulCounts(prevCounts => {
+          const existing = prevCounts[itemId] || { yes: 0, no: 0 };
+          return {
+            ...prevCounts,
+            [itemId]: {
+              ...existing,
+              [choice]: existing[choice] + 1
+            }
+          };
+        });
+      }
+
+      return { ...prevSelection, [itemId]: nextSelection };
+    });
+  };
+
+  const renderHelpfulnessControls = (
+    itemId: string,
+    questionText = 'Was this review helpful to you?',
+    alignment: 'left' | 'right' = 'left',
+    fullWidth = false
+  ) => {
+    const selection = reviewHelpfulness[itemId];
+    const counts = reviewHelpfulCounts[itemId] || { yes: 0, no: 0 };
+
+    return (
+      <div
+        className={`flex items-center space-x-3 ${fullWidth ? 'w-full' : ''} ${alignment === 'right' ? 'justify-end' : 'justify-start'}`}
+      >
+        {!selection && (
+          <span className="text-xs" style={{ color: '#212121' }}>
+            {questionText}
+          </span>
+        )}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => handleHelpfulnessClick(itemId, 'yes')}
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+            style={{
+              border: `1px solid ${selection === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
+              backgroundColor: selection === 'yes' ? '#F0F8FE' : 'white'
+            }}
+          >
+            <span className="text-xs" style={{ color: selection === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
+              {selection ? counts.yes : 'Yes'}
+            </span>
+            <img
+              src={likeIcon}
+              alt="Like"
+              className="w-3.5 h-3.5"
+              style={{
+                filter: selection === 'yes'
+                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                  : 'none'
+              }}
+            />
+          </button>
+          <button
+            onClick={() => handleHelpfulnessClick(itemId, 'no')}
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+            style={{
+              border: `1px solid ${selection === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
+              backgroundColor: selection === 'no' ? '#F0F8FE' : 'white'
+            }}
+          >
+            <span className="text-xs" style={{ color: selection === 'no' ? '#64B5F6' : '#6A6A6A' }}>
+              {selection ? counts.no : 'No'}
+            </span>
+            <img
+              src={dislikeIcon}
+              alt="Dislike"
+              className="w-3.5 h-3.5"
+              style={{
+                filter: selection === 'no'
+                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                  : 'none'
+              }}
+            />
+          </button>
+        </div>
+      </div>
+    );
   };
 
   // Mock seller data - in real app this would come from API
@@ -195,6 +292,49 @@ const SellerProfile: React.FC = () => {
         date: 'Publié le 04 Août 2025',
         comment: 'Lorem ipsum dolor sit amet consectetur. Lobortis velit magna sit turpis mi dignissim. Tellus pharetra eu dui et nit. Imperdiet adipiscing dictum morbi quam. Vivamus in vitae diam eget eget sed mi commodo. Id ornare diam ultrices facilisis vitae. Dignissim suscipit bibendum.',
         helpful: 5
+      }
+    ]
+  };
+
+  const reviewDiscussionData: {[key: string]: Array<{id: string; author: string; role?: string; date: string; text: string; isOwner?: boolean; avatar?: string}>} = {
+    review1: [
+      {
+        id: 'seller-review1-comment1',
+        author: seller.name,
+        role: 'Product Owner',
+        date: '2 Jan 2025',
+        text: 'Thank you, Samine! We always make sure our packaging keeps everything fresh until it reaches you.',
+        isOwner: true,
+        avatar: seller.avatar
+      }
+    ],
+    review2: [
+      {
+        id: 'seller-review2-comment1',
+        author: seller.name,
+        role: 'Product Owner',
+        date: '12 Dec 2024',
+        text: 'So happy to hear that, Kael. Reach out anytime you want to restock or need special requests.',
+        isOwner: true,
+        avatar: seller.avatar
+      }
+    ],
+    review3: [
+      {
+        id: 'seller-review3-comment1',
+        author: seller.name,
+        role: 'Product Owner',
+        date: '9 Nov 2024',
+        text: 'Sorry about the delay, Alex. I would love to offer you an express replacement—please send me a DM.',
+        isOwner: true,
+        avatar: seller.avatar
+      },
+      {
+        id: 'seller-review3-comment2',
+        author: 'Nia Okoye',
+        date: '10 Nov 2024',
+        text: 'I had a smoother delivery this week, maybe check if your courier had a strike? Hope it gets sorted!',
+        avatar: sellerAvatar
       }
     ]
   };
@@ -719,121 +859,56 @@ const SellerProfile: React.FC = () => {
               </p>
                     
                     {/* Helpfulness Section */}
-              <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {!reviewHelpfulness.review1 && (
-                          <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                        )}
-                        <div className="flex items-center space-x-2">
-                          <button 
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'yes' ? null : 'yes' }));
-                              if (reviewHelpfulness.review1 !== 'yes') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review1: { ...prev.review1, yes: prev.review1.yes + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{ 
-                              border: `1px solid ${reviewHelpfulness.review1 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review1 === 'yes' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review1 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review1 ? reviewHelpfulCounts.review1.yes : 'Yes'}
-                            </span>
-                            <img 
-                              src={likeIcon} 
-                              alt="Like" 
-                              className="w-3.5 h-3.5" 
-                              style={{ 
-                                filter: reviewHelpfulness.review1 === 'yes' 
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                  : 'none' 
-                              }}
-                            />
-                          </button>
-                          <button 
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'no' ? null : 'no' }));
-                              if (reviewHelpfulness.review1 !== 'no') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review1: { ...prev.review1, no: prev.review1.no + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{ 
-                              border: `1px solid ${reviewHelpfulness.review1 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review1 === 'no' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review1 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review1 ? reviewHelpfulCounts.review1.no : 'No'}
-                            </span>
-                            <img 
-                              src={dislikeIcon} 
-                              alt="Dislike" 
-                              className="w-3.5 h-3.5" 
-                              style={{ 
-                                filter: reviewHelpfulness.review1 === 'no' 
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                  : 'none' 
-                              }}
-                            />
-                          </button>
-                        </div>
-                      </div>
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                      {renderHelpfulnessControls('review1')}
                       <button 
-                        onClick={() => {
-                          setExpandedDiscussions(prev => 
-                            prev.includes('review1') 
-                              ? prev.filter(id => id !== 'review1')
-                              : [...prev, 'review1']
-                          );
-                        }}
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
+                        onClick={() => handleDiscussionToggle('review1')}
                       >
-                        {expandedDiscussions.includes('review1') ? 'View less' : 'View the discussion (1)'}
+                        {expandedDiscussions.review1 ? 'View less' : `View the discussion (${reviewDiscussionData.review1?.length || 0})`}
                       </button>
                     </div>
-                    
-                    {/* Discussion Thread */}
-                    {expandedDiscussions.includes('review1') && (
-                      <div className="mt-4 ml-8 space-y-4">
-                        {/* Reply 1 - Seller */}
-                        <div className="relative pl-4">
-                          <div className="absolute left-0 top-0 bottom-0 w-px" style={{ backgroundColor: '#E1E1E1' }}></div>
-                          <div className="flex items-start space-x-2.5 mb-2">
-                            <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center space-x-2">
-                                  <h5 className="font-semibold text-sm" style={{ color: '#212121' }}>Joaquin EDIMO</h5>
-                                  <div className="px-2 py-0.5 text-xs" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                    Profile Owner
-                                  </div>
+                    {expandedDiscussions.review1 && reviewDiscussionData.review1 && (
+                      <div className="mt-4 space-y-4">
+                        {reviewDiscussionData.review1.map((comment) => (
+                          <div key={comment.id} className="flex space-x-3">
+                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
+                            <div className="flex-1 pl-4">
+                              <div className="flex items-start space-x-3">
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                  {comment.avatar ? (
+                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    </svg>
+                                  )}
                                 </div>
-                                <span className="text-[10px]" style={{ color: '#939393' }}>2 Jan 2025</span>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                                      {comment.isOwner && (
+                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                          {comment.role || 'Product Owner'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                </div>
                               </div>
-                              <p className="text-xs leading-relaxed" style={{ color: '#B0B0B0' }}>
-                                Thank you for your kind words! I'm glad you enjoyed the product.
-                              </p>
+                              <div className="mt-3 pl-12">
+                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
                     )}
                   </div>
-            </div>
 
                   {/* Review 2 - Kael Otto */}
                   <div className="pb-6">
@@ -865,118 +940,56 @@ const SellerProfile: React.FC = () => {
               </p>
                     
                     {/* Helpfulness Section */}
-              <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {!reviewHelpfulness.review2 && (
-                          <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                        )}
-                        <div className="flex items-center space-x-2">
-                          <button 
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'yes' ? null : 'yes' }));
-                              if (reviewHelpfulness.review2 !== 'yes') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review2: { ...prev.review2, yes: prev.review2.yes + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{ 
-                              border: `1px solid ${reviewHelpfulness.review2 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review2 === 'yes' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review2 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review2 ? reviewHelpfulCounts.review2.yes : 'Yes'}
-                            </span>
-                            <img 
-                              src={likeIcon} 
-                              alt="Like" 
-                              className="w-3.5 h-3.5" 
-                              style={{ 
-                                filter: reviewHelpfulness.review2 === 'yes' 
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                  : 'none' 
-                              }}
-                            />
-                          </button>
-                          <button 
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'no' ? null : 'no' }));
-                              if (reviewHelpfulness.review2 !== 'no') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review2: { ...prev.review2, no: prev.review2.no + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{ 
-                              border: `1px solid ${reviewHelpfulness.review2 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review2 === 'no' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review2 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review2 ? reviewHelpfulCounts.review2.no : 'No'}
-                            </span>
-                            <img 
-                              src={dislikeIcon} 
-                              alt="Dislike" 
-                              className="w-3.5 h-3.5" 
-                              style={{ 
-                                filter: reviewHelpfulness.review2 === 'no' 
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                  : 'none' 
-                              }}
-                            />
-                          </button>
-                        </div>
-                      </div>
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                      {renderHelpfulnessControls('review2')}
                       <button 
-                        onClick={() => {
-                          setExpandedDiscussions(prev => 
-                            prev.includes('review2') 
-                              ? prev.filter(id => id !== 'review2')
-                              : [...prev, 'review2']
-                          );
-                        }}
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
+                        onClick={() => handleDiscussionToggle('review2')}
                       >
-                        {expandedDiscussions.includes('review2') ? 'View less' : 'View the discussion (3)'}
+                        {expandedDiscussions.review2 ? 'View less' : `View the discussion (${reviewDiscussionData.review2?.length || 0})`}
                       </button>
                     </div>
-                    
-                    {/* Discussion Thread */}
-                    {expandedDiscussions.includes('review2') && (
-                      <div className="mt-4 ml-8 space-y-4">
-                        {/* Reply 1 */}
-                        <div className="relative pl-4">
-                          <div className="absolute left-0 top-0 bottom-0 w-px" style={{ backgroundColor: '#E1E1E1' }}></div>
-                          <div className="flex items-start space-x-2.5 mb-2">
-                            <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center space-x-2">
-                                  <h5 className="font-semibold text-sm" style={{ color: '#212121' }}>User Name</h5>
+                    {expandedDiscussions.review2 && reviewDiscussionData.review2 && (
+                      <div className="mt-4 space-y-4">
+                        {reviewDiscussionData.review2.map((comment) => (
+                          <div key={comment.id} className="flex space-x-3">
+                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
+                            <div className="flex-1 pl-4">
+                              <div className="flex items-start space-x-3">
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                  {comment.avatar ? (
+                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    </svg>
+                                  )}
                                 </div>
-                                <span className="text-[10px]" style={{ color: '#939393' }}>13 Dec 2024</span>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                                      {comment.isOwner && (
+                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                          {comment.role || 'Product Owner'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                </div>
                               </div>
-                              <p className="text-xs leading-relaxed" style={{ color: '#B0B0B0' }}>
-                                Great seller experience!
-                              </p>
+                              <div className="mt-3 pl-12">
+                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
                     )}
                   </div>
-            </div>
 
                   {/* Review 3 - Alex Johnson */}
                   <div className="pb-6">
@@ -1013,118 +1026,56 @@ const SellerProfile: React.FC = () => {
               </p>
                     
                     {/* Helpfulness Section */}
-              <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {!reviewHelpfulness.review3 && (
-                          <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                        )}
-                        <div className="flex items-center space-x-2">
-                          <button 
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'yes' ? null : 'yes' }));
-                              if (reviewHelpfulness.review3 !== 'yes') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review3: { ...prev.review3, yes: prev.review3.yes + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{ 
-                              border: `1px solid ${reviewHelpfulness.review3 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review3 === 'yes' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review3 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review3 ? reviewHelpfulCounts.review3.yes : 'Yes'}
-                            </span>
-                            <img 
-                              src={likeIcon} 
-                              alt="Like" 
-                              className="w-3.5 h-3.5" 
-                              style={{ 
-                                filter: reviewHelpfulness.review3 === 'yes' 
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                  : 'none' 
-                              }}
-                            />
-                          </button>
-                          <button 
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'no' ? null : 'no' }));
-                              if (reviewHelpfulness.review3 !== 'no') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review3: { ...prev.review3, no: prev.review3.no + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{ 
-                              border: `1px solid ${reviewHelpfulness.review3 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review3 === 'no' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review3 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review3 ? reviewHelpfulCounts.review3.no : 'No'}
-                            </span>
-                            <img 
-                              src={dislikeIcon} 
-                              alt="Dislike" 
-                              className="w-3.5 h-3.5" 
-                              style={{ 
-                                filter: reviewHelpfulness.review3 === 'no' 
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' 
-                                  : 'none' 
-                              }}
-                            />
-                          </button>
-                        </div>
-                      </div>
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                      {renderHelpfulnessControls('review3')}
                       <button 
-                        onClick={() => {
-                          setExpandedDiscussions(prev => 
-                            prev.includes('review3') 
-                              ? prev.filter(id => id !== 'review3')
-                              : [...prev, 'review3']
-                          );
-                        }}
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
+                        onClick={() => handleDiscussionToggle('review3')}
                       >
-                        {expandedDiscussions.includes('review3') ? 'View less' : 'View the discussion (2)'}
+                        {expandedDiscussions.review3 ? 'View less' : `View the discussion (${reviewDiscussionData.review3?.length || 0})`}
                       </button>
                     </div>
-                    
-                    {/* Discussion Thread */}
-                    {expandedDiscussions.includes('review3') && (
-                      <div className="mt-4 ml-8 space-y-4">
-                        {/* Reply 1 */}
-                        <div className="relative pl-4">
-                          <div className="absolute left-0 top-0 bottom-0 w-px" style={{ backgroundColor: '#E1E1E1' }}></div>
-                          <div className="flex items-start space-x-2.5 mb-2">
-                            <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center space-x-2">
-                                  <h5 className="font-semibold text-sm" style={{ color: '#212121' }}>Another User</h5>
+                    {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
+                      <div className="mt-4 space-y-4">
+                        {reviewDiscussionData.review3.map((comment) => (
+                          <div key={comment.id} className="flex space-x-3">
+                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
+                            <div className="flex-1 pl-4">
+                              <div className="flex items-start space-x-3">
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                  {comment.avatar ? (
+                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    </svg>
+                                  )}
                                 </div>
-                                <span className="text-[10px]" style={{ color: '#939393' }}>10 Nov 2024</span>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                                      {comment.isOwner && (
+                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                          {comment.role || 'Product Owner'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                </div>
                               </div>
-                              <p className="text-xs leading-relaxed" style={{ color: '#B0B0B0' }}>
-                                I understand your concerns about this seller.
-                              </p>
+                              <div className="mt-3 pl-12">
+                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
                     )}
                   </div>
-                      </div>
                           </div>
 
                 {/* Pagination */}
