@@ -1158,29 +1158,29 @@ const ProductDetail: React.FC = () => {
                 {/* Review 1 - Samine Herald */}
                 <div className="pb-6">
                   <div className="flex items-start space-x-3 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                      <svg className="w-[22px] h-[22px] lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
                 </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-2">Samine Herald</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2 text-[13px] lg:text-sm">Samine Herald</h4>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <div className="flex items-center">
                             {[1,2,3,4,5].map((star) => (
-                              <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                              <svg key={star} className="w-3 lg:w-3.5 h-3 lg:h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                               </svg>
                             ))}
                           </div>
-                          <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
+                          <span className="text-xs lg:text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
                         </div>
-                        <span className="text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
+                        <span className="text-[10px] lg:text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                  <p className="text-xs lg:text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
                     Outstanding quality! This product exceeded all my expectations. The white pepper has an amazing aroma and rich flavor that's perfect for my cooking. The packaging was beautiful and it arrived in perfect condition ahead of schedule.
                   </p>
                   
@@ -1239,29 +1239,29 @@ const ProductDetail: React.FC = () => {
                 {/* Review 2 - Kael Otto */}
                 <div className="pb-6">
                   <div className="flex items-start space-x-3 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                      <svg className="w-[22px] h-[22px] lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-2">Kael Otto</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2 text-[13px] lg:text-sm">Kael Otto</h4>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <div className="flex items-center">
                             {[1,2,3,4,5].map((star) => (
-                              <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                              <svg key={star} className="w-3 lg:w-3.5 h-3 lg:h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                               </svg>
                             ))}
                           </div>
-                          <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
+                          <span className="text-xs lg:text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
                         </div>
-                        <span className="text-xs" style={{ color: '#939393' }}>Posted on 12 Dec 2024</span>
+                        <span className="text-[10px] lg:text-xs" style={{ color: '#939393' }}>Posted on 12 Dec 2024</span>
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                  <p className="text-xs lg:text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
                     Amazing product! The quality exceeded my expectations. The white pepper has such a distinct, mild heat that enhances every dish. Fast shipping and the item was exactly as described. Highly recommend for authentic African spices!
                   </p>
                   
@@ -1320,34 +1320,34 @@ const ProductDetail: React.FC = () => {
                 {/* Review 3 - Alex Johnson */}
                 <div className="pb-6">
                   <div className="flex items-start space-x-3 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                      <svg className="w-[22px] h-[22px] lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
       </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-2">Alex Johnson</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2 text-[13px] lg:text-sm">Alex Johnson</h4>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <div className="flex items-center">
                             {[1,2].map((star) => (
-                              <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                              <svg key={star} className="w-3 lg:w-3.5 h-3 lg:h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                               </svg>
                             ))}
                             {[1,2,3].map((star) => (
-                              <svg key={`empty-${star}`} className="w-3.5 h-3.5 text-gray-300 fill-current" viewBox="0 0 24 24">
+                              <svg key={`empty-${star}`} className="w-3 lg:w-3.5 h-3 lg:h-3.5 text-gray-300 fill-current" viewBox="0 0 24 24">
                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                               </svg>
                             ))}
                           </div>
-                          <span className="text-sm font-medium" style={{ color: '#939393' }}>2.1</span>
+                          <span className="text-xs lg:text-sm font-medium" style={{ color: '#939393' }}>2.1</span>
                         </div>
-                        <span className="text-xs" style={{ color: '#939393' }}>Posted on 8 Nov 2024</span>
+                        <span className="text-[10px] lg:text-xs" style={{ color: '#939393' }}>Posted on 8 Nov 2024</span>
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                  <p className="text-xs lg:text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
                     The product was okay, but not exactly what I expected. The flavor wasn't as strong as I hoped for and the quantity seemed less than advertised. Shipping took longer than anticipated. It's decent but there are better options available.
                   </p>
                   
@@ -1474,27 +1474,27 @@ const ProductDetail: React.FC = () => {
               {isReviewPosted && postedReview && (
                 <div className="lg:hidden mt-6">
                   <div className="border rounded-3xl text-left" style={{ borderColor: '#E1E1E1' }}>
-                    <div className="p-5">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-start space-x-3">
+                    <div className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-start space-x-2.5">
                           {/* Avatar */}
-                          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                            <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                             </svg>
                           </div>
 
                           <div>
                             {/* Name */}
-                            <h4 className="font-semibold text-gray-900 mb-2">You</h4>
+                            <h4 className="font-semibold text-gray-900 mb-1.5" style={{ fontSize: '13px' }}>You</h4>
                             
-                            {/* Star Rating with Date */}
+                            {/* Star Rating */}
                             <div className="flex items-center space-x-2">
                               <div className="flex items-center">
                                 {[1,2,3,4,5].map((star) => (
                                   <svg 
                                     key={star}
-                                    className="w-3.5 h-3.5" 
+                                    className="w-3 h-3" 
                                     fill={star <= postedReview.rating ? '#F9A825' : '#E9E9E9'}
                                     stroke="none"
                                     viewBox="0 0 24 24"
@@ -1503,35 +1503,32 @@ const ProductDetail: React.FC = () => {
                                   </svg>
                                 ))}
                               </div>
-                              <span className="text-sm font-medium" style={{ color: '#939393' }}>{postedReview.rating}.0</span>
-                              <span className="text-xs" style={{ color: '#939393' }}>{postedReview.date}</span>
+                              <span className="text-xs font-medium" style={{ color: '#939393' }}>{postedReview.rating}.0</span>
                             </div>
                           </div>
                         </div>
                         
-                        {/* Edit Button - Desktop Style */}
-                        <button 
-                          onClick={() => {
-                            setShowGiveOpinionModal(true);
-                            setIsReviewPosted(false);
-                          }}
-                          className="flex items-center space-x-1.5 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50 flex-shrink-0"
-                          style={{ borderColor: '#D9D9D9' }}
-                        >
-                          <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
-                          <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
-                        </button>
+                        {/* Edit Button and Date */}
+                        <div className="flex flex-col items-end space-y-1 flex-shrink-0">
+                          <button 
+                            onClick={() => {
+                              setShowGiveOpinionModal(true);
+                              setIsReviewPosted(false);
+                            }}
+                            className="flex items-center space-x-1.5 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50"
+                            style={{ borderColor: '#D9D9D9' }}
+                          >
+                            <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                            <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
+                          </button>
+                          <span className="text-[10px]" style={{ color: '#939393' }}>{postedReview.date}</span>
+                        </div>
                       </div>
                       
                       {/* Review Text */}
-                      <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                      <p className="text-xs leading-relaxed mb-0" style={{ color: '#B0B0B0', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {postedReview.text}
                       </p>
-                      
-                      {/* Helpfulness Section */}
-                      <div className="flex items-center justify-between flex-wrap gap-3">
-                        {renderHelpfulnessControls('user-review')}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -2805,19 +2802,35 @@ const ProductDetail: React.FC = () => {
               <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-28 h-1 rounded-full" style={{ backgroundColor: '#E1E1E1' }}></div>
               
               {/* Top Section - Pill Shape with X */}
-              <div className="flex items-center justify-between px-5 pt-5 pb-3 relative">
-                <button
-                  onClick={() => setShowGiveOpinionModal(false)}
-                  className="w-6 h-6 flex items-center justify-center absolute right-5"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              {!isReviewPosted && (
+                <div className="flex items-center justify-between px-5 pt-5 pb-3 relative">
+                  <button
+                    onClick={() => setShowGiveOpinionModal(false)}
+                    className="w-6 h-6 flex items-center justify-center absolute right-5"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                </button>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border mx-auto" style={{ borderColor: '#E1E1E1', backgroundColor: 'white' }}>
-                  <span className="text-xs" style={{ color: '#B0B0B0' }}>Reviews & Ratings</span>
+                  </button>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border mx-auto" style={{ borderColor: '#E1E1E1', backgroundColor: 'white' }}>
+                    <span className="text-[10px]" style={{ color: '#B0B0B0' }}>Reviews & Ratings</span>
+                  </div>
                 </div>
-              </div>
+              )}
+              
+              {/* X Button for Feedback State */}
+              {isReviewPosted && (
+                <div className="flex items-center justify-end px-5 pt-5 pb-3">
+                  <button
+                    onClick={() => setShowGiveOpinionModal(false)}
+                    className="w-6 h-6 flex items-center justify-center"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
 
               {/* Content */}
               <div className="px-5 pb-8">
@@ -2874,12 +2887,16 @@ const ProductDetail: React.FC = () => {
                           }
                         }}
                         placeholder="What do you think of this product?"
-                        className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none resize-none"
+                        className="flex-1 rounded-lg px-3 text-sm focus:outline-none resize-none"
                         style={{ 
                           border: 'none',
                           minHeight: '80px',
+                          paddingTop: '12px',
+                          paddingBottom: '12px',
                           color: '#939393',
-                          backgroundColor: 'transparent'
+                          backgroundColor: 'transparent',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word'
                         }}
                         maxLength={1000}
                       />
@@ -2945,14 +2962,14 @@ const ProductDetail: React.FC = () => {
                             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                               <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
+                              </svg>
                             </div>
 
                             <div>
                               {/* Name */}
                               <h4 className="font-semibold mb-1" style={{ color: '#0E0E0E', fontSize: '14px' }}>You</h4>
                               
-                              {/* Star Rating with Date */}
+                              {/* Star Rating */}
                               <div className="flex items-center space-x-2">
                                 <div className="flex items-center">
                                   {[1,2,3,4,5].map((star) => (
@@ -2968,30 +2985,32 @@ const ProductDetail: React.FC = () => {
                                   ))}
                                 </div>
                                 <span className="text-sm font-medium" style={{ color: '#939393' }}>{postedReview!.rating}.0</span>
-                                <span className="text-xs ml-2" style={{ color: '#939393' }}>{postedReview!.date}</span>
                               </div>
                             </div>
                           </div>
                           
-                          {/* Edit Button - Desktop Style */}
-                          <button 
-                            onClick={() => {
-                              setIsReviewPosted(false);
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50 flex-shrink-0"
-                            style={{ borderColor: '#D9D9D9' }}
-                          >
-                            <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
-                            <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
-                  </button>
-                </div>
+                          {/* Edit Button and Date */}
+                          <div className="flex flex-col items-end space-y-1 flex-shrink-0">
+                            <button 
+                              onClick={() => {
+                                setIsReviewPosted(false);
+                              }}
+                              className="flex items-center space-x-1.5 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50"
+                              style={{ borderColor: '#D9D9D9' }}
+                            >
+                              <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                              <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
+                            </button>
+                            <span className="text-[10px]" style={{ color: '#939393' }}>{postedReview!.date}</span>
+                          </div>
+                        </div>
                         
                         {/* Review Text */}
-                        <p className="text-sm leading-relaxed" style={{ color: '#939393' }}>
+                        <p className="text-sm leading-relaxed" style={{ color: '#939393', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                           {postedReview!.text}
                         </p>
-              </div>
-            </div>
+                      </div>
+                    </div>
                     
                     {/* Close Button */}
                     <button
