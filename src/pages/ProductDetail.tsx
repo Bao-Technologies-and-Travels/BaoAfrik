@@ -93,6 +93,7 @@ const ProductDetail: React.FC = () => {
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [isContactingSeller, setIsContactingSeller] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showGiveOpinionModal, setShowGiveOpinionModal] = useState(false);
   
   // Reviews section state
   const [activeTab, setActiveTab] = useState<'reviews' | 'items'>('reviews');
@@ -204,32 +205,33 @@ const ProductDetail: React.FC = () => {
   ) => {
     const selection = reviewHelpfulness[itemId];
     const counts = reviewHelpfulCounts[itemId] || { yes: 0, no: 0 };
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
     return (
       <div
-        className={`flex items-center space-x-3 ${fullWidth ? 'w-full' : ''} ${alignment === 'right' ? 'justify-end' : 'justify-start'}`}
+        className={`flex items-center ${isMobile ? 'space-x-2' : 'space-x-3'} ${fullWidth ? 'w-full' : ''} ${alignment === 'right' ? 'justify-end' : 'justify-start'}`}
       >
         {!selection && (
-          <span className="text-xs" style={{ color: '#212121' }}>
+          <span className={isMobile ? 'text-[10px]' : 'text-xs'} style={{ color: '#212121' }}>
             {questionText}
           </span>
         )}
-        <div className="flex items-center space-x-2">
+        <div className={`flex items-center ${isMobile ? 'space-x-1.5' : 'space-x-2'}`}>
           <button
             onClick={() => handleHelpfulnessClick(itemId, 'yes')}
-            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+            className={`flex items-center ${isMobile ? 'space-x-1 px-2 py-0.5' : 'space-x-1.5 px-2.5 py-1'} rounded-full transition-colors`}
             style={{
               border: `1px solid ${selection === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
               backgroundColor: selection === 'yes' ? '#F0F8FE' : 'white'
             }}
           >
-            <span className="text-xs" style={{ color: selection === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
+            <span className={isMobile ? 'text-[10px]' : 'text-xs'} style={{ color: selection === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
               {selection ? counts.yes : 'Yes'}
             </span>
             <img
               src={likeIcon}
               alt="Like"
-              className="w-3.5 h-3.5"
+              className={isMobile ? 'w-3 h-3' : 'w-3.5 h-3.5'}
               style={{
                 filter: selection === 'yes'
                   ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
@@ -239,19 +241,19 @@ const ProductDetail: React.FC = () => {
           </button>
           <button
             onClick={() => handleHelpfulnessClick(itemId, 'no')}
-            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+            className={`flex items-center ${isMobile ? 'space-x-1 px-2 py-0.5' : 'space-x-1.5 px-2.5 py-1'} rounded-full transition-colors`}
             style={{
               border: `1px solid ${selection === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
               backgroundColor: selection === 'no' ? '#F0F8FE' : 'white'
             }}
           >
-            <span className="text-xs" style={{ color: selection === 'no' ? '#64B5F6' : '#6A6A6A' }}>
+            <span className={isMobile ? 'text-[10px]' : 'text-xs'} style={{ color: selection === 'no' ? '#64B5F6' : '#6A6A6A' }}>
               {selection ? counts.no : 'No'}
             </span>
             <img
               src={dislikeIcon}
               alt="Dislike"
-              className="w-3.5 h-3.5"
+              className={isMobile ? 'w-3 h-3' : 'w-3.5 h-3.5'}
               style={{
                 filter: selection === 'no'
                   ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
@@ -611,15 +613,18 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
           
-          {/* Image Dots Indicator */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+          {/* Thumbnail Slider - Above Product Info */}
+          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full z-10" style={{ backgroundColor: '#21212199' }}>
             {images.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImageIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  selectedImageIndex === index ? 'bg-white' : 'bg-white bg-opacity-50'
-                }`}
+                className="transition-all rounded-full"
+                style={{
+                  width: selectedImageIndex === index ? '16px' : '6px',
+                  height: '6px',
+                  backgroundColor: selectedImageIndex === index ? '#FFFFFF' : '#B0B0B0'
+                }}
               />
             ))}
           </div>
@@ -691,7 +696,7 @@ const ProductDetail: React.FC = () => {
                   </button>
                 ))}
               </div>
-            </div>
+              </div>
 
             {/* Right Side - Product Info */}
             <div className="flex-1 max-w-3xl">
@@ -758,13 +763,13 @@ const ProductDetail: React.FC = () => {
                     className="w-3.5 h-3.5 rounded-full object-cover"
                   />
                   <span className="font-light" style={{ color: '#939393' }}>Cameroun</span>
-                </div>
+              </div>
                 
                 {/* Category Badge */}
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
                   <img src={pepperIcon} alt="Pepper" className="w-3 h-3" />
                   <span className="font-light" style={{ color: '#939393' }}>Spices</span>
-                </div>
+            </div>
 
                 {/* Availability Badge */}
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
@@ -772,7 +777,7 @@ const ProductDetail: React.FC = () => {
                   <span className="font-light" style={{ color: '#939393' }}>Available : 1</span>
                 </div>
               </div>
-
+              
               {/* Description */}
               <p className="font-light leading-relaxed text-sm" style={{ color: '#B0B0B0', marginBottom: '2px' }}>
                 Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste of tradition.
@@ -833,12 +838,12 @@ const ProductDetail: React.FC = () => {
                             strokeWidth={2}
                             d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
                           />
-                        </svg>
+                  </svg>
                       ))}
                       <span className="ml-1 text-xs font-light" style={{ color: '#939393' }}>
                         {product.seller.rating}
                       </span>
-                    </div>
+                </div>
                 </div>
               </div>
 
@@ -872,14 +877,14 @@ const ProductDetail: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <button
-                onClick={handleSave}
+                  <button 
+                    onClick={handleSave}
                 className="w-10 h-10 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: '#F4F4F4' }}
               >
                 <BookmarkIcon saved={isSaved} />
-              </button>
-              <button
+                  </button>
+                  <button 
                 onClick={() => setShowShareModal(true)}
                 className="w-10 h-10 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: '#F4F4F4' }}
@@ -890,9 +895,9 @@ const ProductDetail: React.FC = () => {
                   className="w-4 h-4"
                   style={{ filter: 'brightness(0) saturate(100%) invert(74%) sepia(3%) saturate(524%) hue-rotate(182deg) brightness(90%) contrast(90%)' }}
                 />
-              </button>
-            </div>
-          </div>
+                  </button>
+                </div>
+              </div>
 
           <div className="flex items-center justify-between text-xs mt-4">
             <div className="flex items-center gap-1.5" style={{ color: '#939393' }}>
@@ -949,42 +954,42 @@ const ProductDetail: React.FC = () => {
           </p>
 
           {/* Read More Link */}
-          <button 
-            onClick={toggleAdditionalInfo}
+                <button 
+                  onClick={toggleAdditionalInfo}
             className="font-medium mb-6 hover:underline text-sm"
             style={{ color: '#64B5F6', textDecoration: 'none' }}
-          >
+                >
             Read more
-          </button>
-
-          {showAdditionalInfo && (
+                </button>
+                
+                {showAdditionalInfo && (
             <div className="mt-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-sm text-gray-600 space-y-2">
-              <div className="flex justify-between">
+                      <div className="flex justify-between">
                 <span className="font-medium text-gray-800">Origin</span>
-                <span>Kerala, India (Malabar Coast)</span>
-              </div>
-              <div className="flex justify-between">
+                        <span>Kerala, India (Malabar Coast)</span>
+                      </div>
+                      <div className="flex justify-between">
                 <span className="font-medium text-gray-800">Processing</span>
-                <span>Retting process</span>
-              </div>
-              <div className="flex justify-between">
+                        <span>Retting process</span>
+                      </div>
+                      <div className="flex justify-between">
                 <span className="font-medium text-gray-800">Shelf Life</span>
                 <span>2-3 years</span>
-              </div>
-            </div>
-          )}
+                    </div>
+                  </div>
+                )}
 
           {/* Seller Profile Section - Mobile */}
           <div className="mt-1 mb-0">
-            <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-gray-100 border overflow-hidden flex-shrink-0" style={{ borderColor: '#E0E0E0' }}>
-                  <img
-                    src={product.seller.avatar}
-                    alt={product.seller.name}
+                    <img
+                      src={product.seller.avatar}
+                      alt={product.seller.name}
                     className="w-full h-full object-cover"
-                  />
-                </div>
+                    />
+                    </div>
                 <div className="flex flex-col leading-tight">
                   <span className="font-medium text-sm" style={{ color: '#212121' }}>
                     {product.seller.name}
@@ -993,7 +998,7 @@ const ProductDetail: React.FC = () => {
                     <div className="inline-flex items-center gap-1 bg-green-50 rounded-full mt-1" style={{ padding: '2px 6px', fontSize: '10px', color: '#45C55B' }}>
                       <img src={verifyIcon} alt="Verified" className="w-3 h-3" />
                       <span>Verified Seller</span>
-                    </div>
+                  </div>
                   ) : (
                     <div className="inline-flex items-center text-gray-600 bg-gray-100 rounded-full mt-1" style={{ padding: '2px 6px', fontSize: '10px' }}>
                       <img src={unverifyIcon} alt="Unverified" className="w-3 h-3 mr-1" />
@@ -1012,25 +1017,25 @@ const ProductDetail: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-      </div>
-      
+                </div>
+              </div>
+
       {/* Mobile Sticky Action Bar */}
       <div
         className="lg:hidden fixed bottom-0 left-0 right-0 bg-white p-4 z-50"
         style={{ boxShadow: '0 -6px 18px rgba(0, 0, 0, 0.05)' }}
       >
-        <button
-          onClick={handleContactSeller}
+              <button 
+                onClick={handleContactSeller}
           className="w-full text-white py-3 px-6 rounded-xl font-normal transition-colors duration-200 flex items-center justify-center space-x-2"
           style={{backgroundColor: '#F9A825', borderRadius: '12px'}}
-          onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
-          onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
-        >
+                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
+                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
+              >
           <span>Chat with seller</span>
           <img src={basketIcon} alt="Chat" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
-        </button>
-      </div>
+              </button>
+            </div>
 
       {/* Reviews and Ratings Section */}
       <div className="bg-white mt-1 lg:mt-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -1061,15 +1066,15 @@ const ProductDetail: React.FC = () => {
                 >
                   Seller Items
             </button>
-              </div>
-            </div>
           </div>
+        </div>
+      </div>
         ) : (
           <div className="max-w-7xl mx-auto px-6 pb-4">
             <h2 className="text-xl lg:text-3xl font-semibold text-left lg:text-left" style={{ color: '#000000', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Reviews and ratings
             </h2>
-          </div>
+            </div>
         )}
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6 py-4 mt-4">
@@ -1098,7 +1103,7 @@ const ProductDetail: React.FC = () => {
                     <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
                     <line x1="3" y1="14" x2="17" y2="14" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
                     <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
-                </svg>
+              </svg>
                   <span className="text-sm">{selectedFilter}</span>
               </button>
                 
@@ -1108,7 +1113,7 @@ const ProductDetail: React.FC = () => {
                     {filterOptions.map((option, index) => {
                       const isSelected = selectedFilter === option.label;
                       return (
-              <button 
+            <button 
                           key={option.id}
                           onClick={() => handleFilterSelect(option.id)}
                           className="w-full text-left px-3 py-3 transition-colors flex items-start space-x-3"
@@ -1123,7 +1128,7 @@ const ProductDetail: React.FC = () => {
                             {option.icon === 'star' ? (
                               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
+              </svg>
                             ) : (
                               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
                                 <circle cx="12" cy="12" r="10"/>
@@ -1141,13 +1146,13 @@ const ProductDetail: React.FC = () => {
                               {option.description}
         </div>
             </div>
-                        </button>
+            </button>
                       );
                     })}
-                </div>
+          </div>
                 )}
-              </div>
-
+        </div>
+        
               {/* Review Cards */}
               <div className="space-y-4">
                 {/* Review 1 - Samine Herald */}
@@ -1182,14 +1187,14 @@ const ProductDetail: React.FC = () => {
                   {/* Helpfulness Section */}
                   <div className="flex items-center justify-between flex-wrap gap-3">
                     {renderHelpfulnessControls('review1')}
-                  <button 
+          <button 
                       className="text-xs hover:underline"
                       style={{ color: '#64B5F6' }}
                       onClick={() => handleDiscussionToggle('review1')}
-                  >
+          >
                       {expandedDiscussions.review1 ? 'View less' : `View the discussion (${reviewDiscussionData.review1?.length || 0})`}
-                  </button>
-                  </div>
+          </button>
+                </div>
                   {expandedDiscussions.review1 && reviewDiscussionData.review1 && (
                     <div className="mt-4 space-y-3 lg:space-y-4">
                       {reviewDiscussionData.review1.map((comment) => (
@@ -1205,7 +1210,7 @@ const ProductDetail: React.FC = () => {
                                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                   </svg>
                                 )}
-                              </div>
+                </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2">
                                   <div className="flex items-center space-x-1.5 lg:space-x-2 flex-1 min-w-0">
@@ -1215,22 +1220,22 @@ const ProductDetail: React.FC = () => {
                                         {comment.role || 'Product Owner'}
                                       </span>
                                     )}
-                                  </div>
+                </div>
                                   <span className="text-[10px] lg:text-xs flex-shrink-0" style={{ color: '#939393' }}>{comment.date}</span>
-                                </div>
+                </div>
                                 <p className="text-xs lg:text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                              </div>
-                            </div>
+                </div>
+                </div>
                             <div className="mt-2 lg:mt-3 pl-10 lg:pl-12">
                               {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                            </div>
+              </div>
                           </div>
                         </div>
                       ))}
-                    </div>
-                  )}
-                </div>
-
+            </div>
+          )}
+        </div>
+        
                 {/* Review 2 - Kael Otto */}
                 <div className="pb-6">
                   <div className="flex items-start space-x-3 mb-3">
@@ -1285,8 +1290,8 @@ const ProductDetail: React.FC = () => {
                                   <svg className="w-3 h-3 lg:w-4 lg:h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                   </svg>
-                                )}
-              </div>
+              )}
+            </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2">
                                   <div className="flex items-center space-x-1.5 lg:space-x-2 flex-1 min-w-0">
@@ -1296,7 +1301,7 @@ const ProductDetail: React.FC = () => {
                                         {comment.role || 'Product Owner'}
                                       </span>
                                     )}
-            </div>
+          </div>
                                   <span className="text-[10px] lg:text-xs flex-shrink-0" style={{ color: '#939393' }}>{comment.date}</span>
           </div>
                                 <p className="text-xs lg:text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
@@ -1310,8 +1315,8 @@ const ProductDetail: React.FC = () => {
                       ))}
                     </div>
                   )}
-                </div>
-
+        </div>
+        
                 {/* Review 3 - Alex Johnson */}
                 <div className="pb-6">
                   <div className="flex items-start space-x-3 mb-3">
@@ -1319,7 +1324,7 @@ const ProductDetail: React.FC = () => {
                       <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
-                </div>
+      </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900 mb-2">Alex Johnson</h4>
                       <div className="flex items-center justify-between">
@@ -1349,13 +1354,13 @@ const ProductDetail: React.FC = () => {
                   {/* Helpfulness Section */}
                   <div className="flex items-center justify-between flex-wrap gap-3">
                     {renderHelpfulnessControls('review3')}
-                  <button 
+        <button
                       className="text-xs hover:underline"
                       style={{ color: '#64B5F6' }}
                       onClick={() => handleDiscussionToggle('review3')}
                     >
                       {expandedDiscussions.review3 ? 'View less' : `View the discussion (${reviewDiscussionData.review3?.length || 0})`}
-                    </button>
+        </button>
                   </div>
                   {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
                     <div className="mt-4 space-y-3 lg:space-y-4">
@@ -1397,24 +1402,24 @@ const ProductDetail: React.FC = () => {
                     </div>
                   )}
                 </div>
-              </div>
+      </div>
 
               {/* Pagination */}
               <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
                 <div className="flex items-center justify-between">
                   <span className="text-sm" style={{ color: '#BABABA' }}>1 - 4 out of 23</span>
                   <div className="flex items-center space-x-1">
-                    <button 
+            <button 
                       disabled
                       className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
-                    >
+            >
                       <img src={grayArrowIcon} alt="Previous" style={{ width: '20px', height: '20px' }} />
-                  </button>
-                  <button 
+            </button>
+              <button 
                       className="transition-opacity hover:opacity-80"
-                  >
+              >
                       <img src={blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
-                  </button>
+              </button>
                 </div>
               </div>
             </div>
@@ -1431,15 +1436,18 @@ const ProductDetail: React.FC = () => {
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                     </svg>
                   </div>
-                  <div className="lg:hidden">
-                    <button
-                      className="px-4 py-2 rounded-md text-xs font-medium"
-                      style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                    >
-                      Give feedback
-                    </button>
-                  </div>
-            </div>
+                  {!isReviewPosted && (
+                    <div className="lg:hidden">
+                      <button
+                        onClick={() => setShowGiveOpinionModal(true)}
+                        className="px-4 py-2 rounded-md text-xs font-medium"
+                        style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                      >
+                        Give feedback
+                      </button>
+                    </div>
+                  )}
+          </div>
                 <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
                 
                 {/* Rating Bars */}
@@ -1461,6 +1469,73 @@ const ProductDetail: React.FC = () => {
                   </div>
                 </div>
               </div>
+              
+              {/* Mobile Posted Review - Below Ratings Bar */}
+              {isReviewPosted && postedReview && (
+                <div className="lg:hidden mt-6">
+                  <div className="border rounded-3xl text-left" style={{ borderColor: '#E1E1E1' }}>
+                    <div className="p-5">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-start space-x-3">
+                          {/* Avatar */}
+                          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+
+                          <div>
+                            {/* Name */}
+                            <h4 className="font-semibold text-gray-900 mb-2">You</h4>
+                            
+                            {/* Star Rating with Date */}
+                            <div className="flex items-center space-x-2">
+                              <div className="flex items-center">
+                                {[1,2,3,4,5].map((star) => (
+                                  <svg 
+                                    key={star}
+                                    className="w-3.5 h-3.5" 
+                                    fill={star <= postedReview.rating ? '#F9A825' : '#E9E9E9'}
+                                    stroke="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                  </svg>
+                                ))}
+                              </div>
+                              <span className="text-sm font-medium" style={{ color: '#939393' }}>{postedReview.rating}.0</span>
+                              <span className="text-xs" style={{ color: '#939393' }}>{postedReview.date}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Edit Button - Desktop Style */}
+                        <button 
+                          onClick={() => {
+                            setShowGiveOpinionModal(true);
+                            setIsReviewPosted(false);
+                          }}
+                          className="flex items-center space-x-1.5 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50 flex-shrink-0"
+                          style={{ borderColor: '#D9D9D9' }}
+                        >
+                          <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                          <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
+                        </button>
+                      </div>
+                      
+                      {/* Review Text */}
+                      <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                        {postedReview.text}
+                      </p>
+                      
+                      {/* Helpfulness Section */}
+                      <div className="flex items-center justify-between flex-wrap gap-3">
+                        {renderHelpfulnessControls('user-review')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Give Your Opinion Section */}
               <div className="pt-24 text-center hidden lg:block">
@@ -1793,8 +1868,8 @@ const ProductDetail: React.FC = () => {
             >
                       <img src={grayArrowIcon} alt="Next" className="w-full h-full rotate-180" />
             </button>
-          </div>
-        </div>
+            </div>
+                </div>
 
         {/* Product Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
@@ -1829,7 +1904,7 @@ const ProductDetail: React.FC = () => {
                         <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                           {getProductCountry(1).abbreviation}
                         </span>
-            </div>
+              </div>
                 </div>
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
@@ -2225,13 +2300,13 @@ const ProductDetail: React.FC = () => {
                         <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                           {getProductCountry(5).abbreviation}
                         </span>
-            </div>
-                </div>
+          </div>
+        </div>
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                           USD 31.7
-              </div>
+      </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
                           padding: '1px 3px', 
@@ -2260,7 +2335,7 @@ const ProductDetail: React.FC = () => {
                           <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
                         <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
-                  <button 
+            <button 
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -2287,7 +2362,7 @@ const ProductDetail: React.FC = () => {
                               height: window.innerWidth < 1024 ? '16px' : '20px',
                               filter: wishlistProducts.has('product-5') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
-                  </button>
+            </button>
                         </div>
                       </div>
                     </div>
@@ -2359,7 +2434,7 @@ const ProductDetail: React.FC = () => {
                           <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
                         <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
-                  <button 
+            <button 
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -2386,21 +2461,21 @@ const ProductDetail: React.FC = () => {
                               height: window.innerWidth < 1024 ? '16px' : '20px',
                               filter: wishlistProducts.has('product-6') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
-                  </button>
+            </button>
                 </div>
               </div>
                     </div>
                   </Link>
-            </div>
           </div>
+        </div>
 
               {/* Section 2: You May Also Like */}
               <div>
                 <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   You may also like
                 </h2>
-                
-                {/* Product Grid */}
+
+        {/* Product Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
                   {/* Recommended Product 1 */}
                   <Link to={`/product/7`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
@@ -2472,14 +2547,14 @@ const ProductDetail: React.FC = () => {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              const newSet = new Set(wishlistProducts);
+                      const newSet = new Set(wishlistProducts);
                               if (newSet.has('recommended-1')) {
                                 newSet.delete('recommended-1');
-                              } else {
+                      } else {
                                 newSet.add('recommended-1');
-                              }
-                              setWishlistProducts(newSet);
-                            }}
+                      }
+                      setWishlistProducts(newSet);
+                    }}
                             className="transition-colors touch-manipulation"
                             style={{ 
                               width: window.innerWidth < 1024 ? '18px' : '20px', 
@@ -2496,9 +2571,9 @@ const ProductDetail: React.FC = () => {
                               filter: wishlistProducts.has('recommended-1') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
                   </button>
-                        </div>
-                      </div>
-                    </div>
+                </div>
+              </div>
+            </div>
                   </Link>
 
                   {/* Recommended Products 2-12 - Similar structure */}
@@ -2533,13 +2608,13 @@ const ProductDetail: React.FC = () => {
                           <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
                             {getProductCountry(num).abbreviation}
                           </span>
-                        </div>
-                      </div>
+            </div>
+                </div>
                       <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                         <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                             USD 31.7
-                          </div>
+              </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
                           padding: '1px 3px', 
@@ -2550,7 +2625,7 @@ const ProductDetail: React.FC = () => {
                         }}>
                           <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                             <span>Verified seller</span>
-                          </div>
+                </div>
                         </div>
                         <h3 className="line-clamp-2 font-medium" style={{ 
                           fontSize: '12px', 
@@ -2595,18 +2670,18 @@ const ProductDetail: React.FC = () => {
                                 height: window.innerWidth < 1024 ? '16px' : '20px',
                                 filter: wishlistProducts.has(`recommended-${num}`) ? 'none' : 'grayscale(100%) opacity(0.6)'
                               }} />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+                  </button>
                 </div>
               </div>
+            </div>
+                    </Link>
+                  ))}
+          </div>
+            </div>
             </>
           )}
-        </div>
-      </div>
+                </div>
+              </div>
 
       {/* Share Modal */}
       {showShareModal && (
@@ -2626,14 +2701,14 @@ const ProductDetail: React.FC = () => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button - At Top */}
-              <button
+                  <button 
                 onClick={() => setShowShareModal(false)}
                 className="absolute top-4 right-4 lg:top-4 lg:right-4 w-6 h-6 lg:w-8 lg:h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
               >
                 <svg className="w-4 h-4 lg:w-5 lg:h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-              </button>
+                  </button>
 
               {/* Product Picture - Half Outside Modal */}
               <div className="absolute left-1/2 -translate-x-1/2 lg:-top-10" style={{ top: '-20px' }}>
@@ -2665,8 +2740,8 @@ const ProductDetail: React.FC = () => {
                   className="flex-1 px-3 py-2 lg:px-4 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium focus:outline-none"
                   style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', border: 'none' }}
                 />
-                <button
-                  onClick={() => {
+                  <button 
+                    onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                   }}
                   className="px-3 py-2 lg:px-4 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium text-white transition-colors hover:opacity-90"
@@ -2703,6 +2778,234 @@ const ProductDetail: React.FC = () => {
                     <span className="text-[10px] lg:text-xs" style={{ color: '#B0B0B0' }}>Whatsapp</span>
                   </button>
             </div>
+          </div>
+            </div>
+                </div>
+        </>
+      )}
+
+      {/* Mobile Give Your Opinion Modal */}
+      {showGiveOpinionModal && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="lg:hidden fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={() => setShowGiveOpinionModal(false)}
+          />
+          
+          {/* Modal */}
+          <div className="lg:hidden fixed inset-x-0 z-50 flex items-end justify-center" style={{ top: '15%', bottom: '0' }}>
+            <div 
+              className="bg-white w-full max-w-full relative"
+              style={{ borderRadius: '30px', maxHeight: '90vh', overflowY: 'auto' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Gray Pill-Shaped Line at Bottom */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-28 h-1 rounded-full" style={{ backgroundColor: '#E1E1E1' }}></div>
+              
+              {/* Top Section - Pill Shape with X */}
+              <div className="flex items-center justify-between px-5 pt-5 pb-3 relative">
+                <button
+                  onClick={() => setShowGiveOpinionModal(false)}
+                  className="w-6 h-6 flex items-center justify-center absolute right-5"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border mx-auto" style={{ borderColor: '#E1E1E1', backgroundColor: 'white' }}>
+                  <span className="text-xs" style={{ color: '#B0B0B0' }}>Reviews & Ratings</span>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="px-5 pb-8">
+                {!isReviewPosted ? (
+                  <>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Give your opinion</h3>
+                    <p className="text-xs mb-6 text-center" style={{ color: '#B0B0B0' }}>Share your opinion about this product and help others learn a bit more about it.</p>
+                    
+                    {/* Star Rating Input */}
+                    <div className="flex items-center justify-center space-x-1 mb-2">
+                      {[1,2,3,4,5].map((star) => (
+                  <button 
+                          key={star}
+                          onClick={() => setUserRating(star)}
+                          className="focus:outline-none hover:scale-110 transition-transform"
+                        >
+                          <svg 
+                            className="w-7 h-7" 
+                            viewBox="0 0 24 24"
+                            fill={userRating >= star ? '#FBBC05' : 'none'}
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path 
+                              d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
+                              stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
+                            />
+                    </svg>
+                  </button>
+                      ))}
+                    </div>
+                    
+                    {/* Give a note text/rating */}
+                    <div className="text-center mb-6" style={{ 
+                      color: userRating > 0 ? '#64B5F6' : (userReviewText.length > 0 ? '#64B5F6' : '#D9D9D9'), 
+                      fontSize: '10px' 
+                    }}>
+                      {userRating > 0 ? `${userRating}.0` : 'give a note'}
+                    </div>
+                    
+                    {/* Review Text Input */}
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 self-start mt-2">
+                        <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <textarea
+                        value={userReviewText}
+                        onChange={(e) => {
+                          if (e.target.value.length <= 1000) {
+                            setUserReviewText(e.target.value);
+                          }
+                        }}
+                        placeholder="What do you think of this product?"
+                        className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none resize-none"
+                        style={{ 
+                          border: 'none',
+                          minHeight: '80px',
+                          color: '#939393',
+                          backgroundColor: 'transparent'
+                        }}
+                        maxLength={1000}
+                      />
+                    </div>
+                    
+                    {/* Post Review Button */}
+                    <div className="relative mt-4">
+                  <button 
+                    onClick={() => {
+                          if (userRating > 0 && userReviewText.trim()) {
+                            const today = new Date();
+                            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            const dateStr = `${today.getDate()} ${months[today.getMonth()]}, ${today.getFullYear()}`;
+                            setPostedReview({
+                              rating: userRating,
+                              text: userReviewText,
+                              date: dateStr
+                            });
+                            setIsReviewPosted(true);
+                          }
+                        }}
+                        className="w-full py-2.5 font-normal transition-all relative"
+                        style={{ 
+                          backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
+                          color: userRating > 0 ? 'white' : '#6A6A6A',
+                          borderRadius: '12px'
+                        }}
+                        disabled={userRating === 0}
+                      >
+                        Post the review
+                        {/* Character Counter - Top Left */}
+                        {userReviewText.length > 0 && (
+                          <div 
+                            className="absolute"
+                            style={{ 
+                              top: '-26px', 
+                              left: '0', 
+                              color: '#64B5F6', 
+                              fontSize: '12px' 
+                            }}
+                          >
+                            {userReviewText.length}/1000
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Thank You State */}
+                    <div className="mb-6 text-center">
+                      <h3 className="text-xl font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#212121' }}>
+                        Thank you for your<br/>feedback. 😊
+                      </h3>
+                    </div>
+                    
+                    {/* Posted Review Card */}
+                    <div className="border rounded-3xl text-left mx-auto mb-4" style={{ borderColor: '#E1E1E1', maxWidth: '500px' }}>
+                      <div className="p-5">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-start space-x-3">
+                            {/* Avatar */}
+                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                              <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                            </div>
+
+                            <div>
+                              {/* Name */}
+                              <h4 className="font-semibold mb-1" style={{ color: '#0E0E0E', fontSize: '14px' }}>You</h4>
+                              
+                              {/* Star Rating with Date */}
+                              <div className="flex items-center space-x-2">
+                                <div className="flex items-center">
+                                  {[1,2,3,4,5].map((star) => (
+                                    <svg 
+                                      key={star}
+                                      className="w-3.5 h-3.5" 
+                                      fill={star <= postedReview!.rating ? '#F9A825' : '#E9E9E9'}
+                                      stroke="none"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                </div>
+                                <span className="text-sm font-medium" style={{ color: '#939393' }}>{postedReview!.rating}.0</span>
+                                <span className="text-xs ml-2" style={{ color: '#939393' }}>{postedReview!.date}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Edit Button - Desktop Style */}
+                          <button 
+                            onClick={() => {
+                              setIsReviewPosted(false);
+                            }}
+                            className="flex items-center space-x-1.5 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50 flex-shrink-0"
+                            style={{ borderColor: '#D9D9D9' }}
+                          >
+                            <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                            <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
+                  </button>
+                </div>
+                        
+                        {/* Review Text */}
+                        <p className="text-sm leading-relaxed" style={{ color: '#939393' }}>
+                          {postedReview!.text}
+                        </p>
+              </div>
+            </div>
+                    
+                    {/* Close Button */}
+                    <button
+                      onClick={() => {
+                        setShowGiveOpinionModal(false);
+                        // Don't reset state - keep the review posted so it shows below ratings
+                      }}
+                      className="w-full py-3 font-normal text-white transition-colors"
+                      style={{ backgroundColor: '#F9A825', borderRadius: '12px' }}
+                    >
+                      Close
+                    </button>
+                  </>
+                )}
           </div>
         </div>
       </div>
