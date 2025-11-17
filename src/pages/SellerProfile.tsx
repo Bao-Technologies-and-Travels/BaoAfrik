@@ -146,7 +146,7 @@ const SellerProfile: React.FC = () => {
     { id: 'relevant', label: 'The most relevant', description: 'Show most engaging reviews first', icon: 'star' },
     { id: 'newest', label: 'Newest', description: 'Show newest reviews first', icon: 'clock' }
   ];
-  
+
   // Function to handle filter selection
   const handleFilterSelect = (filterId: string) => {
     const filter = filterOptions.find(f => f.id === filterId);
@@ -801,31 +801,31 @@ const SellerProfile: React.FC = () => {
                       <div className="flex-shrink-0 mt-0.5">
                         {option.icon === 'star' ? (
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                          </svg>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
                         ) : (
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
                             <circle cx="12" cy="12" r="10"/>
                             <path d="M12 6v6l4 2"/>
                           </svg>
                         )}
-                      </div>
+                </div>
                       
                       {/* Text */}
                       <div className="flex-1">
                         <div className="text-sm font-medium mb-0.5" style={{ color: isSelected ? '#64B5F6' : '#212121' }}>
                           {option.label}
-                        </div>
+              </div>
                         <div className="text-xs" style={{ color: '#939393' }}>
                           {option.description}
-                        </div>
-                      </div>
+                    </div>
+                  </div>
                     </button>
                   );
                 })}
-              </div>
+                    </div>
             )}
-          </div>
+                  </div>
 
           {/* Review Cards */}
                 <div className="space-y-4">
@@ -840,19 +840,19 @@ const SellerProfile: React.FC = () => {
                 <div className="flex-1">
                         <h4 className="font-semibold text-gray-900 mb-2">Samine Herald</h4>
                     <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                       <div className="flex items-center">
                               {[1,2,3,4,5].map((star) => (
                                 <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                           </svg>
                         ))}
-                      </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
                     </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
+                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
                   </div>
-                </div>
+                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
+                    </div>
+                  </div>
               </div>
                     <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
                       Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages.
@@ -887,28 +887,28 @@ const SellerProfile: React.FC = () => {
                                 </div>
                                 <div className="flex-1">
                                   <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                                       <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
                                       {comment.isOwner && (
                                         <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
                                           {comment.role || 'Product Owner'}
                                         </span>
                                       )}
-                                    </div>
+                    </div>
                                     <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
-                                  </div>
+                  </div>
                                   <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                                </div>
-                              </div>
+                </div>
+              </div>
                               <div className="mt-3 pl-12">
                                 {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                              </div>
-                            </div>
+            </div>
+          </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
                   {/* Review 2 - Kael Otto */}
                   <div className="pb-6">
@@ -942,21 +942,21 @@ const SellerProfile: React.FC = () => {
                     {/* Helpfulness Section */}
               <div className="flex items-center justify-between flex-wrap gap-3">
                       {renderHelpfulnessControls('review2')}
-                      <button 
+                    <button 
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
                         onClick={() => handleDiscussionToggle('review2')}
                       >
                         {expandedDiscussions.review2 ? 'View less' : `View the discussion (${reviewDiscussionData.review2?.length || 0})`}
-                      </button>
-                    </div>
+                    </button>
+                  </div>
                     {expandedDiscussions.review2 && reviewDiscussionData.review2 && (
                       <div className="mt-4 space-y-4">
                         {reviewDiscussionData.review2.map((comment) => (
                           <div key={comment.id} className="flex space-x-3">
                             <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
                             <div className="flex-1 pl-4">
-                              <div className="flex items-start space-x-3">
+                      <div className="flex items-start space-x-3">
                                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                                   {comment.avatar ? (
                                     <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
@@ -966,30 +966,30 @@ const SellerProfile: React.FC = () => {
                                     </svg>
                                   )}
                                 </div>
-                                <div className="flex-1">
+                        <div className="flex-1">
                                   <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2">
                                       <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
                                       {comment.isOwner && (
                                         <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
                                           {comment.role || 'Product Owner'}
                                         </span>
                                       )}
-                                    </div>
+                          </div>
                                     <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
-                                  </div>
+                        </div>
                                   <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                                </div>
-                              </div>
+                      </div>
+                          </div>
                               <div className="mt-3 pl-12">
                                 {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                              </div>
-                            </div>
+                        </div>
+                      </div>
                           </div>
                         ))}
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
+            </div>
 
                   {/* Review 3 - Alex Johnson */}
                   <div className="pb-6">
@@ -1028,21 +1028,21 @@ const SellerProfile: React.FC = () => {
                     {/* Helpfulness Section */}
               <div className="flex items-center justify-between flex-wrap gap-3">
                       {renderHelpfulnessControls('review3')}
-                      <button 
+                    <button 
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
                         onClick={() => handleDiscussionToggle('review3')}
                       >
                         {expandedDiscussions.review3 ? 'View less' : `View the discussion (${reviewDiscussionData.review3?.length || 0})`}
-                      </button>
-                    </div>
+                    </button>
+                  </div>
                     {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
                       <div className="mt-4 space-y-4">
                         {reviewDiscussionData.review3.map((comment) => (
                           <div key={comment.id} className="flex space-x-3">
                             <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
                             <div className="flex-1 pl-4">
-                              <div className="flex items-start space-x-3">
+                      <div className="flex items-start space-x-3">
                                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                                   {comment.avatar ? (
                                     <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
@@ -1052,35 +1052,35 @@ const SellerProfile: React.FC = () => {
                                     </svg>
                                   )}
                                 </div>
-                                <div className="flex-1">
+                        <div className="flex-1">
                                   <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2">
                                       <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
                                       {comment.isOwner && (
                                         <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
                                           {comment.role || 'Product Owner'}
                                         </span>
                                       )}
-                                    </div>
+                          </div>
                                     <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
-                                  </div>
+                        </div>
                                   <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                                </div>
-                              </div>
+                      </div>
+                          </div>
                               <div className="mt-3 pl-12">
                                 {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                              </div>
-                            </div>
+                        </div>
+                      </div>
                           </div>
                         ))}
-                      </div>
-                    )}
+                    </div>
+                  )}
                   </div>
-                          </div>
+            </div>
 
                 {/* Pagination */}
                 <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
-                  <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                     <span className="text-sm" style={{ color: '#BABABA' }}>1 - 4 out of 23</span>
                     <div className="flex items-center space-x-1">
                       <button 
@@ -1106,9 +1106,9 @@ const SellerProfile: React.FC = () => {
                   <div className="flex items-center justify-center space-x-2 mb-3">
                     <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
                     <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-          </div>
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                      </div>
                   <div className="text-sm mb-8" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
                   
                   {/* Rating Bars */}
@@ -1118,13 +1118,13 @@ const SellerProfile: React.FC = () => {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-1">
                       <div className="bg-yellow-400 h-1 rounded-full" style={{width: '60%'}}></div>
-                    </div>
+                  </div>
                     <div className="w-full bg-gray-200 rounded-full h-1">
                       <div className="bg-yellow-400 h-1 rounded-full" style={{width: '40%'}}></div>
-                    </div>
+                </div>
                     <div className="w-full bg-gray-200 rounded-full h-1">
                       <div className="bg-yellow-400 h-1 rounded-full" style={{width: '20%'}}></div>
-                    </div>
+              </div>
                     <div className="w-full bg-gray-200 rounded-full h-1">
                       <div className="bg-yellow-400 h-1 rounded-full" style={{width: '10%'}}></div>
                     </div>
@@ -1141,11 +1141,11 @@ const SellerProfile: React.FC = () => {
                       {/* Star Rating Input */}
                       <div className="flex items-center justify-center space-x-1 mb-2">
                         {[1,2,3,4,5].map((star) => (
-                          <button 
+                    <button 
                             key={star}
                             onClick={() => setUserRating(star)}
                             className="focus:outline-none hover:scale-110 transition-transform"
-                          >
+                    >
                             <svg 
                               className="w-7 h-7" 
                               viewBox="0 0 24 24"
@@ -1158,8 +1158,8 @@ const SellerProfile: React.FC = () => {
                                 d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
                                 stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
                               />
-                            </svg>
-                          </button>
+                      </svg>
+                    </button>
                         ))}
                       </div>
                       
@@ -1212,8 +1212,8 @@ const SellerProfile: React.FC = () => {
                       
                       {/* Post Review Button */}
                       <div className="pl-8 relative mt-4">
-                        <button 
-                          onClick={() => {
+                    <button 
+                      onClick={() => {
                             if (userRating > 0 && userReviewText.trim()) {
                               const today = new Date();
                               const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -1224,8 +1224,8 @@ const SellerProfile: React.FC = () => {
                                 date: dateStr
                               });
                               setIsReviewPosted(true);
-                            }
-                          }}
+                        }
+                      }}
                           className="w-full py-2.5 rounded-lg font-medium transition-all mt-12 relative"
                           style={{ 
                             backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
@@ -1248,8 +1248,8 @@ const SellerProfile: React.FC = () => {
                               {userReviewText.length}/1000
                             </div>
                           )}
-                        </button>
-                      </div>
+                    </button>
+                  </div>
                     </>
                   ) : (
                     <>
@@ -1258,13 +1258,13 @@ const SellerProfile: React.FC = () => {
                         <h3 className="text-2xl font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#939393' }}>
                           Thank you for your<br/>feedback. 😊
                         </h3>
-                      </div>
+                          </div>
                       
                       {/* Posted Review Card */}
                       <div className="border rounded-3xl text-left mx-auto" style={{ borderColor: '#E1E1E1', maxWidth: '500px' }}>
                         <div className="p-5">
                           <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-start space-x-3">
+                      <div className="flex items-start space-x-3">
                             {/* Avatar */}
                             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                               <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
@@ -1277,7 +1277,7 @@ const SellerProfile: React.FC = () => {
                               <h4 className="font-semibold mb-1" style={{ color: '#0E0E0E', fontSize: '14px' }}>You</h4>
                               
                               {/* Star Rating */}
-                              <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2">
                                 <div className="flex items-center">
                                   {[1,2,3,4,5].map((star) => (
                                     <svg 
@@ -1289,15 +1289,15 @@ const SellerProfile: React.FC = () => {
                                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                                     </svg>
                                   ))}
-                                </div>
-                                <span className="text-xs" style={{ color: '#939393' }}>{postedReview?.rating}.0</span>
-                              </div>
-                            </div>
                           </div>
-                          
+                                <span className="text-xs" style={{ color: '#939393' }}>{postedReview?.rating}.0</span>
+                        </div>
+            </div>
+          </div>
+
                           {/* Edit Button and Date */}
                           <div className="flex flex-col items-end space-y-1.5 flex-shrink-0">
-                            <button
+            <button 
                               onClick={() => {
                                 setIsReviewPosted(false);
                                 // Keep the rating and text so user can edit
@@ -1307,7 +1307,7 @@ const SellerProfile: React.FC = () => {
                             >
                               <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
                               <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
-                            </button>
+            </button>
                             <span className="text-[10px] whitespace-nowrap" style={{ color: '#B0B0B0' }}>{postedReview?.date}</span>
                           </div>
                         </div>
@@ -1317,8 +1317,8 @@ const SellerProfile: React.FC = () => {
                             {postedReview?.text}
                           </p>
                         </div>
-                      </div>
-                    </>
+          </div>
+            </>
                   )}
                 </div>
               </div>
