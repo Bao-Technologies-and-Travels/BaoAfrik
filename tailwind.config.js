@@ -48,6 +48,7 @@ module.exports = {
         'display': ['Poppins', 'system-ui', 'sans-serif'],
         'heading': ['Poppins', 'system-ui', 'sans-serif'],
         'body': ['Inter', 'system-ui', 'sans-serif'],
+        'bricolage': ['Bricolage Grotesque', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'xs': ['0.75rem', { lineHeight: '1rem' }],
