@@ -613,8 +613,8 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
           
-          {/* Thumbnail Slider - Above Product Info */}
-          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full z-10" style={{ backgroundColor: '#21212199' }}>
+          {/* Thumbnail Slider - Center Top of Image */}
+          <div className="absolute top-64 left-1/2 transform -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full z-10" style={{ backgroundColor: '#21212199' }}>
             {images.map((_, index) => (
               <button
                 key={index}
@@ -1081,11 +1081,11 @@ const ProductDetail: React.FC = () => {
           
           {/* Reviews Content */}
           {(activeTab === 'reviews' || !product.seller.verified) && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
             {/* LEFT COLUMN - Reviews List */}
             <div className="lg:col-span-2 order-2 lg:order-1">
               {/* Filter Dropdown */}
-              <div className="relative mb-4 pb-3" ref={filterDropdownRef}>
+              <div className="relative mb-2 lg:mb-4 pb-3" ref={filterDropdownRef}>
               <button 
                   onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
                   className="flex items-center hover:opacity-80 transition-opacity"
@@ -1451,7 +1451,7 @@ const ProductDetail: React.FC = () => {
                 <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
                 
                 {/* Rating Bars */}
-                <div className="space-y-2">
+                <div className="space-y-2 mb-2 lg:mb-0">
                   <div className="w-full bg-gray-200 rounded-full h-1">
                     <div className="bg-yellow-400 h-1 rounded-full" style={{width: '70%'}}></div>
                 </div>
@@ -3034,7 +3034,7 @@ const ProductDetail: React.FC = () => {
       {/* Add spacing before footer */}
       <div className="pb-4 lg:pb-32">
         {/* Mobile Footer Divider - Just above footer logo */}
-        <div className="lg:hidden border-t pt-0.5 mb-0.5" style={{ borderColor: '#E5E5E5' }}></div>
+        <div className="lg:hidden border-t pt-1 mb-1" style={{ borderColor: '#E5E5E5' }}></div>
       </div>
     </div>
   );
