@@ -125,7 +125,6 @@ export class TokenManager {
           this.scheduleTokenRefresh();
 
         } catch (error) {
-          console.error('Scheduled token refresh failed:', error);
           this.clearTokens();
           window.location.href = '/login?message=session_expired';
         }
@@ -133,7 +132,6 @@ export class TokenManager {
     } else if (timeUntilExpiry > 0) {
       // Token expires soon but we missed the 5-minute window, refresh immediately
       this.refreshToken().catch(error => {
-        console.error('Immediate token refresh failed:', error);
         this.clearTokens();
         window.location.href = '/login?message=session_expired';
       });

@@ -26,7 +26,6 @@ const SocialLoginValidation: React.FC<SocialLoginValidationProps> = () => {
         const refreshToken = socialUserData.refreshToken; 
 
         if (!accessToken) {
-          console.error('No access token received from social login');
           return;
         }
 

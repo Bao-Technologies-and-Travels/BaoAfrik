@@ -165,7 +165,7 @@ export class WebSocketService {
       });
 
       socket.on('error', (error) => {
-        console.error(`Socket error for user ${userId}:`, error);
+       throw new Error(`Socket error for user ${userId}:`);
       });
 
       // Heartbeat to keep connection alive
@@ -187,7 +187,7 @@ export class WebSocketService {
 
       socket.join(userId);
     } catch (error) {
-      console.error('Error joining conversations:', error);
+     throw new Error('Error joining conversations');
     }
   }
 
@@ -258,7 +258,6 @@ export class WebSocketService {
       socket.emit('conversation_created', { conversation });
 
     } catch (error: any) {
-      console.error(' Contact seller error:', error);
       socket.emit('contact_seller_error', { error: error.message || 'Failed to contact seller' });
     }
   }
@@ -433,7 +432,6 @@ export class WebSocketService {
       });
 
     } catch (error) {
-      console.error(' Mark as read error:', error);
       socket.emit('read_error', { error: 'Failed to mark messages as read' });
     }
   }

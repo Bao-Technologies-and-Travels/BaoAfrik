@@ -144,7 +144,7 @@ const Header: React.FC<HeaderProps> = ({
         <div className="max-w-7xl mx-auto px-1 sm:px-2 lg:px-3">
           <div className="flex justify-between items-center h-20">
             {/* Logo - Positioned further left */}
-            <div className="flex-shrink-0 -ml-6 sm:-ml-12">
+            <div className="flex-shrink-0 ml-0 sm:-ml-6 md:-ml-12">
               <Link
                 to="/"
                 className="flex items-center focus:outline-none rounded transition-all duration-200"
@@ -340,7 +340,8 @@ const Header: React.FC<HeaderProps> = ({
                     )}
                   </div>
 
-                  <Link
+                  {/* start selling button */}
+                  {/* <Link
                     to="/register"
                     className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
                     style={{ backgroundColor: "#FEF6E9" }}
@@ -360,7 +361,7 @@ const Header: React.FC<HeaderProps> = ({
                     >
                       Start selling
                     </span>
-                  </Link>
+                  </Link> */}
 
                   {/* Notification Icon */}
                   <div className="relative notification-dropdown">
@@ -610,7 +611,7 @@ const Header: React.FC<HeaderProps> = ({
                         }}
                       >
                         {/* Start selling button with exit */}
-                        <div className="px-3 pb-3 flex items-center justify-between">
+                        {/* <div className="px-3 pb-3 flex items-center justify-between">
                           <Link
                             to="/register"
                             className="inline-flex items-center px-3 py-1.5 rounded-lg font-normal text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
@@ -662,7 +663,7 @@ const Header: React.FC<HeaderProps> = ({
                               />
                             </svg>
                           </button>
-                        </div>
+                        </div> */}
 
                         {/* Profile Section */}
                         <div className="flex items-center justify-around">
@@ -1394,7 +1395,7 @@ const Header: React.FC<HeaderProps> = ({
                   // Logged in user mobile menu - Matches Desktop
                   <div className="space-y-4">
                     {/* Start selling button */}
-                    <div className="pb-2">
+                    {/* <div className="pb-2">
                       <Link
                         to="/register"
                         className="inline-flex items-center px-3 py-2 rounded-lg font-normal text-sm transition-colors duration-200 focus:outline-none"
@@ -1406,7 +1407,7 @@ const Header: React.FC<HeaderProps> = ({
                         </svg>
                         Start selling
                       </Link>
-                    </div>
+                    </div> */}
 
                     {/* Profile Section */}
                     <div className="flex items-center space-x-3 py-3 border-b border-gray-100">

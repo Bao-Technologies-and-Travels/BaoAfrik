@@ -2,6 +2,7 @@ import { PrismaClient, MessageType } from '@prisma/client';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -36,6 +37,9 @@ export interface CreateConversationData {
 
 export class ChatService {
     private s3Client: S3Client;
+    private algorithm = 'aes-256-gcm';
+    private encryptionKey: Buffer;
+    private dbEncryptionEnabled: boolean = false
 
     constructor() {
         this.s3Client = new S3Client({
@@ -45,6 +49,46 @@ export class ChatService {
                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
             },
         });
+
+        this.encryptionKey = crypto.scryptSync(
+            process.env.APP_ENCRYPTION_KEY!,
+            'app-salt',
+            32
+        );
+
+    }
+
+    // app level encryption
+    private encryptMessage(content: string): { encrypted: string, iv: string, authTag: string } {
+        const iv = crypto.randomBytes(16);
+        const cipher: crypto.CipherGCM = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv) as crypto.CipherGCM;
+
+        let encrypted = cipher.update(content, 'utf8', 'hex');
+        encrypted += cipher.final('hex');
+
+        const authTag = cipher.getAuthTag().toString('hex');
+
+        return { encrypted, iv: iv.toString('hex'), authTag };
+    }
+
+    // app level decryption
+    private decryptMessage(encryptedData: string, iv: string, authTag: string): string {
+        try {
+            const decipher: crypto.DecipherGCM = crypto.createDecipheriv(
+                this.algorithm,
+                this.encryptionKey,
+                Buffer.from(iv, 'hex')
+            ) as crypto.DecipherGCM;
+
+            decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+
+            let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+            decrypted += decipher.final('utf8');
+
+            return decrypted;
+        } catch (error) {
+            throw new Error('Failed to decrypt message');
+        }
     }
 
     private formatTo12HourTime(date: Date): string {
@@ -101,6 +145,9 @@ export class ChatService {
                         content: true,
                         messageType: true,
                         createdAt: true,
+                        productData: true,
+                        encryptionIv: true,
+                        encryptionAuthTag: true,
                         sender: {
                             select: {
                                 id: true,
@@ -141,12 +188,52 @@ export class ChatService {
 
             const currentUserParticipant = conv.participants.find(p => p.userId === userId);
 
+            // parse productData from conversation
+            let conversationProductData = null;
+            try {
+                if (conv.productData) {
+                    conversationProductData = JSON.parse(conv.productData);
+                }
+            } catch (error) {
+                conversationProductData = null;
+            }
+
+            let lastMessageContent = '';
+            let lastMessageProductData = null;
+
+            if(conv.lastMessage) {
+                try {
+                    // decrypt last message content
+                    if(conv.lastMessage.encryptionIv && conv.lastMessage.encryptionAuthTag) {
+                        lastMessageContent = this.decryptMessage(
+                            conv.lastMessage.content,
+                            conv.lastMessage.encryptionIv,
+                            conv.lastMessage.encryptionAuthTag
+                        );
+                    } else {
+                        lastMessageContent = conv.lastMessage.content;
+                    }
+
+                    // parse productData from last message
+                    if(conv.lastMessage.productData) {
+                        lastMessageProductData = JSON.parse(conv.lastMessage.productData);
+                    }
+                } catch (error) {
+                    lastMessageContent = '[Encrypted message]';
+                    lastMessageProductData = null;
+                }
+            }
+
+
             const result = {
                 id: conv.id,
                 participant: otherParticipant,
                 product: conv.product,
+                productData: conversationProductData,
                 lastMessage: conv.lastMessage ? {
                     ...conv.lastMessage,
+                    content: lastMessageContent,
+                    productdata: lastMessageProductData,
                     formattedTime: this.formatTo12HourTime(conv.lastMessage.createdAt)
                 } : null,
                 unreadCount: conv.messages.length,
@@ -228,27 +315,48 @@ export class ChatService {
 
         // Parse productData from JSON string 
         const processedMessages = messages.map((message) => {
-            let parsedProductData = null;
 
+            let parsedProductData = null;
             try {
+                // parse product data
                 if (message.productData) {
                     parsedProductData = JSON.parse(message.productData);
                 }
-            } catch (error) {
-                parsedProductData = null;
-            }
 
-            return {
-                ...message,
-                productData: parsedProductData,
-                fileUrl: message.fileUrl,
-                fileName: message.fileName,
-                fileSize: message.fileSize,
-                imageUrl: message.imageUrl,
-                audioUrl: message.audioUrl,
-                formattedTime: this.formatTo12HourTime(message.createdAt)
-            };
-        });
+                // app level decryption
+                const plainText = this.decryptMessage(
+                    message.content,
+                    message.encryptionIv!,
+                    message.encryptionAuthTag!
+                );
+
+                return {
+                    ...message,
+                    content: plainText,
+                    productData: parsedProductData,
+                    fileUrl: message.fileUrl,
+                    fileName: message.fileName,
+                    fileSize: message.fileSize,
+                    imageUrl: message.imageUrl,
+                    audioUrl: message.audioUrl,
+                    formattedTime: this.formatTo12HourTime(message.createdAt)
+                };
+
+            } catch (error) {
+                return {
+                    ...message,
+                    content: '[Secure message - decryption failed]',
+                    decryptionError: true,
+                    productData: parsedProductData,
+                    fileUrl: message.fileUrl,
+                    fileName: message.fileName,
+                    fileSize: message.fileSize,
+                    imageUrl: message.imageUrl,
+                    audioUrl: message.audioUrl,
+                    formattedTime: this.formatTo12HourTime(message.createdAt)
+                };
+            }
+        })
 
         return processedMessages;
     }
@@ -282,6 +390,7 @@ export class ChatService {
             const conversation = await tx.conversation.create({
                 data: {
                     productId: data.productId || null,
+                    productData: data.productData ? JSON.stringify(data.productData) : null,
                     participants: {
                         create: [
                             { userId: data.creatorId },
@@ -326,11 +435,22 @@ export class ChatService {
 
             // Add initial message if provided
             if (data.initialMessage && data.initialMessage.trim()) {
+                // encrypt the innitial message
+                const appEncrypted = this.encryptMessage(data.initialMessage);
+
+                // database level encryptionfor initial message
+                const dbEncryptedContent = await tx.$queryRaw<{ db_encrypted: string }[]>`
+                SELECT db_encrypt(${appEncrypted.encrypted}) as db_encrypted
+                `;
+
                 const initialMessage = await tx.message.create({
                     data: {
                         conversationId: conversation.id,
                         senderId: data.creatorId,
-                        content: data.initialMessage,
+                        content: appEncrypted.encrypted,
+                        dbEncryptedContent: dbEncryptedContent[0]?.db_encrypted || null,
+                        encryptionIv: appEncrypted.iv,
+                        encryptionAuthTag: appEncrypted.authTag,
                         messageType: MessageType.TEXT,
                         productData: data.productData ? JSON.stringify(data.productData) : null,
                         createdAt: now
@@ -352,6 +472,16 @@ export class ChatService {
                 });
             }
 
+            // parse productData for response
+            let parsedProductData = null;
+            try {
+                if (conversation.productData) {
+                    parsedProductData = JSON.parse(conversation.productData);
+                }
+            } catch (error) {
+                parsedProductData = null;
+            }
+
             return {
                 ...conversation,
                 lastMessage: lastMessage ? {
@@ -361,7 +491,7 @@ export class ChatService {
                     createdAt: lastMessage.createdAt,
                     formattedTime: this.formatTo12HourTime(lastMessage.createdAt)
                 } : null,
-                productData: data.productData || null,
+                productData: parsedProductData,
                 formattedCreatedAt: this.formatTo12HourTime(conversation.createdAt),
                 formattedUpdatedAt: this.formatTo12HourTime(conversation.updatedAt)
             };
@@ -410,17 +540,20 @@ export class ChatService {
                 normalizedMessageType = data.messageType;
             }
 
-            // Create message
-            const shouldIncludeProductData = data.productData;
-
             const now = new Date();
+
+            // encryption at app level
+            const appEncrypted = this.encryptMessage(data.content);
 
             // Create message
             const message = await tx.message.create({
                 data: {
                     conversationId: data.conversationId,
                     senderId: data.senderId,
-                    content: data.content,
+                    content: appEncrypted.encrypted,
+                    dbEncryptedContent: null,
+                    encryptionIv: appEncrypted.iv,
+                    encryptionAuthTag: appEncrypted.authTag,
                     messageType: normalizedMessageType,
                     fileUrl: data.fileUrl,
                     fileName: data.fileName,
@@ -428,7 +561,7 @@ export class ChatService {
                     imageUrl: data.imageUrl,
                     audioUrl: data.audioUrl,
                     replyToId: data.replyToId,
-                    productData: shouldIncludeProductData ? JSON.stringify(data.productData) : null,
+                    productData: data.productData ? JSON.stringify(data.productData) : null,
                     createdAt: now
                 },
                 include: {
@@ -465,10 +598,20 @@ export class ChatService {
                 }
             });
 
-            // Parse productData back to object for response
-            const messageWithProductData = {
+            // parse productData back to object for response
+            let parsedProductData = null;
+            try {
+                if (message.productData) {
+                    parsedProductData = JSON.parse(message.productData);
+                }
+            } catch (error) {
+                parsedProductData = null;
+            }
+
+            return {
                 ...message,
-                productData: shouldIncludeProductData ? data.productData : null,
+                content: data.content,
+                productData: parsedProductData,
                 fileUrl: message.fileUrl,
                 fileName: message.fileName,
                 fileSize: message.fileSize,
@@ -476,8 +619,6 @@ export class ChatService {
                 audioUrl: message.audioUrl,
                 formattedTime: this.formatTo12HourTime(message.createdAt)
             };
-
-            return messageWithProductData;
         });
     }
 

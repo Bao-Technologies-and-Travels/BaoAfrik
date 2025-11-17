@@ -1,5 +1,3 @@
--- complete_migrations.sql
-
 -- 1. CreateEnum only if it doesn't exist
 DO $$ 
 BEGIN
@@ -418,3 +416,66 @@ WHERE NOT EXISTS (
     SELECT 1 FROM "message_status" ms 
     WHERE ms.message_id = m.id AND ms.user_id = m.receiver_id
 );
+
+-- Enable pgcrypto
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Database-level encryption key
+CREATE OR REPLACE FUNCTION get_db_encryption_key()
+RETURNS TEXT AS $$
+BEGIN
+    RETURN current_setting('app.db_encryption_key');
+END;
+$$ LANGUAGE plpgsql;
+
+-- Database level encryption
+CREATE OR REPLACE FUNCTION db_encrypt(data TEXT)
+RETURN TEXT AS $$
+DECLARE
+    encryption_key TEXT;
+BEGIN
+    -- Get the encryption key from environment or use fallback
+    BEGIN
+        encryption_key := current_setting('app.db_encryption_key');
+    EXCEPTION 
+        WHEN undefined_object THEN
+            encryption_key := 'fallback-db-encryption-key-change-in-prod';
+    END;
+
+    -- Encrypt the data
+    RETURN encode(
+        encrypt(
+            convert_to(data, 'UTF8');
+            db_key,
+            'aes'
+        ),
+        'base64'
+    );
+END
+$$ LANGUAGE plpgsql;
+
+-- Database level decryption  
+CREATE OR REPLACE FUNCTION db_decrypt(encrypted_data TEXT)
+RETURNS TEXT AS $$
+DECLARE
+    encryption_key TEXT;
+BEGIN
+    -- Get the encryption key from environment or use a fallback
+    BEGIN
+        encryption_key := current_setting('app.db_encryption_key');
+    EXCEPTION 
+        WHEN undefined_object THEN
+            encryption_key := 'fallback-db-encryption-key-change-in-prod';
+    END;
+    
+    -- Decrypt the data
+    RETURN convert_from(
+        decrypt(
+            decode(encrypted_data, 'base64'), 
+            encryption_key, 
+            'aes'
+        ), 
+        'UTF8'
+    );
+END;
+$$ LANGUAGE plpgsql;

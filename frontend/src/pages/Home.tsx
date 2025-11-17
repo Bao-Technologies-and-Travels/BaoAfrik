@@ -108,7 +108,6 @@ interface Notification {
 
 const Home: React.FC = () => {
   const { user, isVisitor } = useAuth();
-  const navigationLocation = useLocation();
   const productGridRef = React.useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -525,12 +524,9 @@ const Home: React.FC = () => {
 
   const getAllProducts = (): FrontendProduct[] => {
     if (products.length > 0) {
-      const transformed = transformToFrontendProducts(products);
-      return transformed;
-    } else {
-      const fallback = Object.values(allProducts).flat();
-      return fallback;
+      return transformToFrontendProducts(products);
     }
+    return Object.values(allProducts).flat();
   };
 
   const getAllProductsByCategory = (): CategoryProducts => {
@@ -683,7 +679,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     if (isSearchActive) {
       // Automatically apply country filter to current search results
-      let products = Object.values(allProducts).flat();
+      let products = Object.values(allProductsComputed).flat();
 
       // Reapply all search filters
       if (searchQuery.trim()) {
@@ -2052,7 +2048,7 @@ const Home: React.FC = () => {
             (() => {
               // Check if any category has products after country filter
               const hasAnyProducts = categories.filter(cat => cat !== 'All').some((category) => {
-                const categoryProducts = (allProducts[category as keyof typeof allProducts] || []);
+                const categoryProducts = (allProductsComputed[category as keyof typeof allProducts] || []);
                 const filteredProducts = selectedCountry
                   ? categoryProducts.filter(product => getProductCountry(product.id).name === selectedCountry)
                   : categoryProducts;
@@ -2266,7 +2262,7 @@ const Home: React.FC = () => {
               return (
                 <div className="space-y-8">
                   {categories.filter(cat => cat !== 'All').map((category) => {
-                    const categoryProducts = (allProducts[category as keyof typeof allProducts] || []);
+                    const categoryProducts = (allProductsComputed[category as keyof typeof allProducts] || []);
                     // Filter products by selected country
                     const filteredProducts = selectedCountry
                       ? categoryProducts.filter(product => getProductCountry(product.id).name === selectedCountry)
@@ -2542,7 +2538,7 @@ const Home: React.FC = () => {
 
                     {/* Product Cards */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-                      {Object.values(allProducts).flat().slice(0, 6).map((product) => (
+                      {Object.values(allProductsComputed).flat().slice(0, 6).map((product: FrontendProduct) => (
                         <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
                           {/* Product Image - Top */}
                           <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>

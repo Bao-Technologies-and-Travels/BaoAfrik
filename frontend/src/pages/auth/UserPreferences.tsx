@@ -91,7 +91,6 @@ const UserPreferences: React.FC = () => {
       const refreshToken = localStorage.getItem('tempRefreshToken');
 
       if (!accessToken) {
-        console.error('No access token available for login');
         return;
       }
 

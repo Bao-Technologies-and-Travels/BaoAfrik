@@ -50,7 +50,7 @@ export class ChatController {
                             lastName: true,
                             profileImage: true
                         }
-                    }
+                    },
                 }
             });
 
@@ -72,6 +72,7 @@ export class ChatController {
                 id: product.id,
                 name: product.title,
                 price: product.price,
+                currency: 'USD',
                 location: product.location,
                 category: product.category,
                 description: product.description,

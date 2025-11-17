@@ -193,7 +193,7 @@ const MyListings: React.FC = () => {
                 updateStats(result.data.products);
             }
         } catch (error) {
-            console.error('Error fetching listings:', error);
+            throw new Error('Error fetching listings');
         } finally {
             setLoading(false);
         }

@@ -444,7 +444,6 @@ const CreateListing: React.FC = () => {
       await Promise.all(uploadPromises);
 
     } catch (error) {
-      console.error('Error uploading product images:', error);
       throw error;
     } finally {
       setIsLoading(false);

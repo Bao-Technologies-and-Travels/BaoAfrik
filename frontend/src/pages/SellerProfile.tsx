@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -19,6 +19,7 @@ import dislikeIcon from '../assets/images/pre/dislike.svg';
 import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
 import bookmarkIcon from '../assets/images/pre/bm.svg';
+import pencilIcon from '../assets/images/pre/pencil.svg';
 import shareIcon from '../assets/images/pre/Share.svg';
 import warningIcon from '../assets/images/pre/warning.svg';
 import fbIcon from '../assets/images/pre/FB1.svg';
@@ -70,7 +71,34 @@ const SellerProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'reviews' | 'items'>(tabFromUrl || 'reviews');
   const [sharedProducts, setSharedProducts] = useState<Set<string>>(new Set());
   const [wishlistProducts, setWishlistProducts] = useState<Set<string>>(new Set());
+  const [userRating, setUserRating] = useState(0);
+  const [userReviewText, setUserReviewText] = useState('');
+  const [isReviewPosted, setIsReviewPosted] = useState(false);
+  const [postedReview, setPostedReview] = useState<{ rating: number; text: string; date: string } | null>(null);
   const { user } = useAuth();
+
+  const [seller, setSeller] = useState<any>(null);
+  const [sellerProducts, setSellerProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [likes, setLikes] = useState({ review1: 5, review2: 5, review3: 5 });
+  const [likedReviews, setLikedReviews] = useState<string[]>([]);
+  const [expandedDiscussions, setExpandedDiscussions] = useState<{ [key: string]: boolean }>({});
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState('The most relevant');
+  const [reviewHelpfulness, setReviewHelpfulness] = useState<{ [key: string]: 'yes' | 'no' | null }>({});
+  const [reviewHelpfulCounts, setReviewHelpfulCounts] = useState<{ [key: string]: { yes: number; no: number } }>({
+    review1: { yes: 27, no: 2 },
+    review2: { yes: 15, no: 3 },
+    review3: { yes: 8, no: 12 }
+  });
+  const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const optionsModalRef = useRef<HTMLDivElement>(null);
+  const { sellerId } = useParams<{ sellerId: string }>();
 
   // Update active tab when URL parameter changes
   useEffect(() => {
@@ -78,6 +106,106 @@ const SellerProfile: React.FC = () => {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
+
+  // fetch seller data
+  useEffect(() => {
+    const fetchSellerData = async () => {
+      if (!sellerId) {
+        setError("Seller identifier is required");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const realSellerId = sessionStorage.getItem(`seller_${sellerId}_id`);
+        const sellerDataFromStorage = sessionStorage.getItem(`seller_${sellerId}_data`);
+
+        if (sellerDataFromStorage) {
+          setSeller(JSON.parse(sellerDataFromStorage));
+        }
+
+        if (!realSellerId) {
+          setError("Seller information not available");
+          setIsLoading(false);
+          return;
+        }
+
+        const token = localStorage.getItem("accessToken");
+        const apiUrl = `${process.env.REACT_APP_API_URL}/products/user/${sellerId}`;
+
+        const response = await fetch(apiUrl, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error(`Seller with ID ${sellerId} not found (404)`);
+          }
+          throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          setSellerProducts(result.data.products || result.data || []);
+        }
+      } catch (error: any) {
+        setError(error.message || "Failed to load seller profile");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSellerData();
+
+  }, [sellerId]);
+
+  // Fetch seller's products
+  useEffect(() => {
+    const fetchSellerProducts = async () => {
+      if (!sellerId) return;
+
+      try {
+        setIsLoadingProducts(true);
+        const token = localStorage.getItem("accessToken");
+
+        // Use the user products endpoint from your routes
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/products/user/${sellerId}`,
+          {
+            headers: token ? {
+              'Authorization': `Bearer ${token}`
+            } : {}
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+
+          if (result.success && result.data) {
+            // Handle different possible response structures
+            const products = result.data.products || result.data || [];
+            setSellerProducts(products);
+          } else {
+            setSellerProducts([]);
+          }
+        } else {
+          setSellerProducts([]);
+        }
+      } catch (error) {
+        setSellerProducts([]);
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    };
+
+    if (sellerId) {
+      fetchSellerProducts();
+    }
+  }, [sellerId]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -121,74 +249,226 @@ const SellerProfile: React.FC = () => {
     setSharedProducts(newSet);
   };
 
-  const [likes, setLikes] = useState({ review1: 5, review2: 5, review3: 5 });
-  const [likedReviews, setLikedReviews] = useState<string[]>([]);
-  const [expandedDiscussions, setExpandedDiscussions] = useState<string[]>([]);
-  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState('The most relevant');
-  const [userRating, setUserRating] = useState(0);
-  const [userReviewText, setUserReviewText] = useState('');
-  const [reviewHelpfulness, setReviewHelpfulness] = useState<{ [key: string]: 'yes' | 'no' | null }>({});
-  const [showOptionsModal, setShowOptionsModal] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const filterDropdownRef = useRef<HTMLDivElement>(null);
-  const optionsModalRef = useRef<HTMLDivElement>(null);
-  const { sellerId } = useParams<{ sellerId: string }>();
+  const handleWishlist = async (productId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const method = wishlistProducts.has(productId) ? "DELETE" : "POST";
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/wishlist/${productId}`,
+        {
+          method,
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        setWishlistProducts((prev) => {
+          const newSet = new Set(prev);
+          if (newSet.has(productId)) {
+            newSet.delete(productId);
+          } else {
+            newSet.add(productId);
+          }
+          return newSet;
+        });
+      } else {
+        throw new Error("Failed to update wishlist");
+      }
+    } catch (error) {
+      throw new Error("Error updating wishlist")
+    }
+  };
 
   // Filter options
   const filterOptions = [
-    'The most relevant',
-    'Newest first',
-    'Oldest first',
-    'Highest rating',
-    'Lowest rating'
+    { id: 'relevant', label: 'The most relevant', description: 'Show most engaging reviews first', icon: 'star' },
+    { id: 'newest', label: 'Newest', description: 'Show newest reviews first', icon: 'clock' }
   ];
 
   // Function to handle filter selection
-  const handleFilterSelect = (filter: string) => {
-    setSelectedFilter(filter);
+  const handleFilterSelect = (filterId: string) => {
+    const filter = filterOptions.find(f => f.id === filterId);
+    if (filter) {
+      setSelectedFilter(filter.label);
+    }
     setFilterDropdownOpen(false);
   };
 
-  // Mock seller data - in real app this would come from API
-  const seller = {
-    id: sellerId || '1',
-    name:  'Joaquin EDIMO',
-    avatar: sellerAvatar,
-    coverPhoto: defaultCoverImage, // Can be updated when seller uploads cover photo
-    isVerified: true,
-    bio: 'Passionate farmer and entrepreneur with over 15 years of experience in sustainable agriculture. Specializing in organic produce and traditional farming methods. Committed to providing fresh, high-quality products directly from farm to table.',
-    location: 'London, United Kingdom',
-    memberSince: 'May 2025',
-    rating: 4.3,
-    totalReviews: 456,
-    reviews: [
+  const handleDiscussionToggle = (reviewId: string) => {
+    setExpandedDiscussions(prev => ({
+      ...prev,
+      [reviewId]: !prev[reviewId]
+    }));
+  };
+
+  const handleHelpfulnessClick = (itemId: string, choice: 'yes' | 'no') => {
+    setReviewHelpfulness(prevSelection => {
+      const currentSelection = prevSelection[itemId];
+      const nextSelection = currentSelection === choice ? null : choice;
+
+      if (currentSelection !== choice) {
+        setReviewHelpfulCounts(prevCounts => {
+          const existing = prevCounts[itemId] || { yes: 0, no: 0 };
+          return {
+            ...prevCounts,
+            [itemId]: {
+              ...existing,
+              [choice]: existing[choice] + 1
+            }
+          };
+        });
+      }
+
+      return { ...prevSelection, [itemId]: nextSelection };
+    });
+  };
+
+  const renderHelpfulnessControls = (
+    itemId: string,
+    questionText = 'Was this review helpful to you?',
+    alignment: 'left' | 'right' = 'left',
+    fullWidth = false
+  ) => {
+    const selection = reviewHelpfulness[itemId];
+    const counts = reviewHelpfulCounts[itemId] || { yes: 0, no: 0 };
+
+    return (
+      <div
+        className={`flex items-center space-x-3 ${fullWidth ? 'w-full' : ''} ${alignment === 'right' ? 'justify-end' : 'justify-start'}`}
+      >
+        {!selection && (
+          <span className="text-xs" style={{ color: '#212121' }}>
+            {questionText}
+          </span>
+        )}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => handleHelpfulnessClick(itemId, 'yes')}
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+            style={{
+              border: `1px solid ${selection === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
+              backgroundColor: selection === 'yes' ? '#F0F8FE' : 'white'
+            }}
+          >
+            <span className="text-xs" style={{ color: selection === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
+              {selection ? counts.yes : 'Yes'}
+            </span>
+            <img
+              src={likeIcon}
+              alt="Like"
+              className="w-3.5 h-3.5"
+              style={{
+                filter: selection === 'yes'
+                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                  : 'none'
+              }}
+            />
+          </button>
+          <button
+            onClick={() => handleHelpfulnessClick(itemId, 'no')}
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+            style={{
+              border: `1px solid ${selection === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
+              backgroundColor: selection === 'no' ? '#F0F8FE' : 'white'
+            }}
+          >
+            <span className="text-xs" style={{ color: selection === 'no' ? '#64B5F6' : '#6A6A6A' }}>
+              {selection ? counts.no : 'No'}
+            </span>
+            <img
+              src={dislikeIcon}
+              alt="Dislike"
+              className="w-3.5 h-3.5"
+              style={{
+                filter: selection === 'no'
+                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                  : 'none'
+              }}
+            />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const getSellerName = (sellerData: any): string => {
+    if (!sellerData) return "Unknown Seller";
+    if (sellerData.businessName) return sellerData.businessName;
+    return `${sellerData.firstName || ''} ${sellerData.lastName || ''}`.trim() || "Unknown Seller";
+  };
+
+  const getSellerAvatar = (sellerData: any): string => {
+    return sellerData?.profileImage || sellerAvatar;
+  };
+
+  const getSellerLocation = (sellerData: any): string => {
+    return sellerData?.location || "Location not specified";
+  };
+
+  const isSellerVerified = (sellerData: any): boolean => {
+    return sellerData?.verified || false;
+  };
+
+  const getSellerJoinDate = (sellerData: any): string => {
+    if (!sellerData?.createdAt) return "Recently joined";
+
+    const joinDate = new Date(sellerData.createdAt);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - joinDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 30) return "Recently joined";
+    if (diffDays < 365) return `Joined ${Math.ceil(diffDays / 30)} months ago`;
+    return `Joined ${Math.ceil(diffDays / 365)} years ago`;
+  };
+
+  const getSellerBio = (sellerData: any): string => {
+    return sellerData?.description || sellerData?.bio || "No bio available.";
+  };
+
+  const reviewDiscussionData: { [key: string]: Array<{ id: string; author: string; role?: string; date: string; text: string; isOwner?: boolean; avatar?: string }> } = {
+    review1: [
       {
-        id: 1,
-        reviewerName: 'Miles KENEDY',
-        reviewerAvatar: sellerAvatar,
-        rating: 5,
-        date: 'Publié le 04 Août 2025',
-        comment: 'Lorem ipsum dolor sit amet consectetur. Lobortis velit magna sit turpis mi dignissim. Tellus pharetra eu dui et nit. Imperdiet adipiscing dictum morbi quam. Vivamus in vitae diam eget eget sed mi commodo. Id ornare diam ultrices facilisis vitae. Dignissim suscipit bibendum.',
-        helpful: 5
+        id: 'seller-review1-comment1',
+        author: getSellerName(seller),
+        role: 'Product Owner',
+        date: '2 Jan 2025',
+        text: 'Thank you, Samine! We always make sure our packaging keeps everything fresh until it reaches you.',
+        isOwner: true,
+        avatar: getSellerAvatar(seller)
+      }
+    ],
+    review2: [
+      {
+        id: 'seller-review2-comment1',
+        author: getSellerName(seller),
+        role: 'Product Owner',
+        date: '12 Dec 2024',
+        text: 'So happy to hear that, Kael. Reach out anytime you want to restock or need special requests.',
+        isOwner: true,
+        avatar: getSellerAvatar(seller)
+      }
+    ],
+    review3: [
+      {
+        id: 'seller-review3-comment1',
+        author: getSellerName(seller),
+        role: 'Product Owner',
+        date: '9 Nov 2024',
+        text: 'Sorry about the delay, Alex. I would love to offer you an express replacement—please send me a DM.',
+        isOwner: true,
+        avatar: getSellerAvatar(seller)
       },
       {
-        id: 2,
-        reviewerName: 'Samine Herald',
-        reviewerAvatar: sellerAvatar,
-        rating: 4,
-        date: 'Publié le 04 Août 2025',
-        comment: 'Lorem ipsum dolor sit amet consectetur. Lobortis velit magna sit turpis mi dignissim. Tellus pharetra eu dui et nit. Imperdiet adipiscing dictum morbi quam. Vivamus in vitae diam eget eget sed mi commodo. Id ornare diam ultrices facilisis vitae. Dignissim suscipit bibendum.',
-        helpful: 5
-      },
-      {
-        id: 3,
-        reviewerName: 'Samine Herald',
-        reviewerAvatar: sellerAvatar,
-        rating: 4,
-        date: 'Publié le 04 Août 2025',
-        comment: 'Lorem ipsum dolor sit amet consectetur. Lobortis velit magna sit turpis mi dignissim. Tellus pharetra eu dui et nit. Imperdiet adipiscing dictum morbi quam. Vivamus in vitae diam eget eget sed mi commodo. Id ornare diam ultrices facilisis vitae. Dignissim suscipit bibendum.',
-        helpful: 5
+        id: 'seller-review3-comment2',
+        author: 'Nia Okoye',
+        date: '10 Nov 2024',
+        text: 'I had a smoother delivery this week, maybe check if your courier had a strike? Hope it gets sorted!',
+        avatar: sellerAvatar
       }
     ]
   };
@@ -283,8 +563,8 @@ const SellerProfile: React.FC = () => {
             <div className="absolute left-6 bottom-[-68px]">
               <div className="w-28 h-28 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
                 <img
-                  src={user?.profileImage || seller.avatar}
-                  alt={seller.name}
+                  src={getSellerAvatar(seller)}
+                  alt={getSellerName(seller)}
                   className="w-24 h-24 rounded-xl object-cover"
                 />
               </div>
@@ -405,8 +685,8 @@ const SellerProfile: React.FC = () => {
 
             {/* Name and Status - Positioned next to avatar */}
             <div className="absolute left-40 bottom-[-65px]">
-              <h1 className="text-base font-semibold text-gray-900 mb-1.5">{seller.name}</h1>
-              {seller.isVerified && (
+              <h1 className="text-base font-semibold text-gray-900 mb-1.5">{getSellerName(seller)}</h1>
+              {isSellerVerified(seller) && (
                 <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
                   <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
                   <span className="text-xs" style={{ color: '#45C55B', fontWeight: '300' }}>Verified Seller</span>
@@ -444,8 +724,8 @@ const SellerProfile: React.FC = () => {
           <div className="absolute left-4 md:left-6 -top-8">
             <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
               <img
-                src={user?.profileImage || seller.avatar}
-                alt={seller.name}
+                src={getSellerAvatar(seller)}
+                alt={getSellerName(seller)}
                 className="w-14 h-14 md:w-16 md:h-16 rounded-xl object-cover"
               />
             </div>
@@ -453,7 +733,7 @@ const SellerProfile: React.FC = () => {
 
           {/* Verified Badge - Moved Down */}
           <div className="absolute right-4 md:right-6 top-2">
-            {seller.isVerified && (
+            {isSellerVerified(seller) && (
               <div className="inline-flex items-center space-x-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg text-xs md:text-sm whitespace-nowrap" style={{ backgroundColor: '#EDFBF0' }}>
                 <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5 md:w-3 md:h-3" />
                 <span className="font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
@@ -463,7 +743,7 @@ const SellerProfile: React.FC = () => {
 
           {/* Name and Info - Below Avatar */}
           <div className="pt-10 md:pt-12">
-            <h1 className="text-base md:text-lg font-semibold text-gray-900 mb-2">{seller.name}</h1>
+            <h1 className="text-base md:text-lg font-semibold text-gray-900 mb-2">{getSellerName(seller)}</h1>
 
             {/* Location, Member Info, and Rating */}
             <div className="flex items-start justify-between mb-3">
@@ -474,7 +754,7 @@ const SellerProfile: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>London, United Kingdom</span>
+                  <span>{getSellerLocation(seller)}</span>
                 </div>
 
                 {/* Member Info */}
@@ -482,7 +762,7 @@ const SellerProfile: React.FC = () => {
                   <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span>Member since 2025</span>
+                  <span>Member since {getSellerJoinDate(seller)}</span>
                 </div>
               </div>
 
@@ -514,7 +794,7 @@ const SellerProfile: React.FC = () => {
             <div className="xl:col-span-2 pl-8">
               <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#6A6A6A' }}>Bio</h3>
               <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
-                {seller.bio}
+                {getSellerBio(seller)}
               </p>
 
               {/* Social Media Icons */}
@@ -538,7 +818,7 @@ const SellerProfile: React.FC = () => {
                 <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Location</h4>
                 <div className="flex items-center space-x-2">
                   <img src={locationIcon} alt="Location" className="w-4 h-4" />
-                  <span className="text-sm" style={{ color: '#64B5F6' }}>London, United Kingdom</span>
+                  <span className="text-sm" style={{ color: '#64B5F6' }}>{getSellerLocation(seller)}</span>
                 </div>
               </div>
 
@@ -556,7 +836,7 @@ const SellerProfile: React.FC = () => {
                 <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Member Since</h4>
                 <div className="flex items-center space-x-2">
                   <img src={profileIcon} alt="Profile" className="w-4 h-4" />
-                  <span className="text-sm" style={{ color: '#6A6A6A' }}>{seller.memberSince}</span>
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>{getSellerJoinDate(seller)}</span>
                 </div>
               </div>
             </div>
@@ -568,7 +848,7 @@ const SellerProfile: React.FC = () => {
       <div className="lg:hidden bg-white px-4 md:px-6 py-3 md:py-4">
         <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Bio</h3>
         <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-          {seller.bio}
+          {getSellerBio(seller)}
         </p>
       </div>
 
@@ -637,18 +917,46 @@ const SellerProfile: React.FC = () => {
 
                   {/* Dropdown Menu */}
                   {filterDropdownOpen && (
-                    <div className="absolute top-8 left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-48">
-                      {filterOptions.map((option) => (
-                        <button
-                          key={option}
-                          onClick={() => handleFilterSelect(option)}
-                          className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${selectedFilter === option ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
-                            } ${option === filterOptions[0] ? 'rounded-t-lg' : ''} ${option === filterOptions[filterOptions.length - 1] ? 'rounded-b-lg' : ''
-                            }`}
-                        >
-                          {option}
-                        </button>
-                      ))}
+                    <div className="absolute top-8 left-0 bg-white border border-gray-200 shadow-lg z-10 p-2" style={{ borderRadius: '12px', minWidth: '280px' }}>
+                      {filterOptions.map((option, index) => {
+                        const isSelected = selectedFilter === option.label;
+                        return (
+                          <button
+                            key={option.id}
+                            onClick={() => handleFilterSelect(option.id)}
+                            className="w-full text-left px-3 py-3 transition-colors flex items-start space-x-3"
+                            style={{
+                              backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
+                              borderRadius: isSelected ? '10px' : '0',
+                              marginBottom: index < filterOptions.length - 1 ? '4px' : '0'
+                            }}
+                          >
+                            {/* Icon */}
+                            <div className="flex-shrink-0 mt-0.5">
+                              {option.icon === 'star' ? (
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                              ) : (
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                  <circle cx="12" cy="12" r="10" />
+                                  <path d="M12 6v6l4 2" />
+                                </svg>
+                              )}
+                            </div>
+
+                            {/* Text */}
+                            <div className="flex-1">
+                              <div className="text-sm font-medium mb-0.5" style={{ color: isSelected ? '#64B5F6' : '#212121' }}>
+                                {option.label}
+                              </div>
+                              <div className="text-xs" style={{ color: '#939393' }}>
+                                {option.description}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -685,43 +993,55 @@ const SellerProfile: React.FC = () => {
                     </p>
 
                     {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'yes' ? null : 'yes' }))}
-                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
-                            style={{
-                              border: '1px solid #E1E1E1',
-                              color: '#6A6A6A',
-                              backgroundColor: reviewHelpfulness.review1 === 'yes' ? '#F0F0F0' : 'white'
-                            }}
-                          >
-                            <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
-                            <span className="text-xs">Yes</span>
-                          </button>
-                          <button
-                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'no' ? null : 'no' }))}
-                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
-                            style={{
-                              border: '1px solid #E1E1E1',
-                              color: '#6A6A6A',
-                              backgroundColor: reviewHelpfulness.review1 === 'no' ? '#F0F0F0' : 'white'
-                            }}
-                          >
-                            <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
-                            <span className="text-xs">No</span>
-                          </button>
-                        </div>
-                      </div>
+                    <div className="flex items-center justify-between flex-wrap gap-3">
+                      {renderHelpfulnessControls('review1')}
                       <button
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
+                        onClick={() => handleDiscussionToggle('review1')}
                       >
-                        View the discussion (1)
+                        {expandedDiscussions.review1 ? 'View less' : `View the discussion (${reviewDiscussionData.review1?.length || 0})`}
                       </button>
                     </div>
+                    {expandedDiscussions.review1 && reviewDiscussionData.review1 && (
+                      <div className="mt-4 space-y-4">
+                        {reviewDiscussionData.review1.map((comment) => (
+                          <div key={comment.id} className="flex space-x-3">
+                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
+                            <div className="flex-1 pl-4">
+                              <div className="flex items-start space-x-3">
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                  {comment.avatar ? (
+                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    </svg>
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                                      {comment.isOwner && (
+                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                          {comment.role || 'Product Owner'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                </div>
+                              </div>
+                              <div className="mt-3 pl-12">
+                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Review 2 - Kael Otto */}
@@ -754,43 +1074,55 @@ const SellerProfile: React.FC = () => {
                     </p>
 
                     {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'yes' ? null : 'yes' }))}
-                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
-                            style={{
-                              border: '1px solid #E1E1E1',
-                              color: '#6A6A6A',
-                              backgroundColor: reviewHelpfulness.review2 === 'yes' ? '#F0F0F0' : 'white'
-                            }}
-                          >
-                            <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
-                            <span className="text-xs">Yes</span>
-                          </button>
-                          <button
-                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'no' ? null : 'no' }))}
-                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
-                            style={{
-                              border: '1px solid #E1E1E1',
-                              color: '#6A6A6A',
-                              backgroundColor: reviewHelpfulness.review2 === 'no' ? '#F0F0F0' : 'white'
-                            }}
-                          >
-                            <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
-                            <span className="text-xs">No</span>
-                          </button>
-                        </div>
-                      </div>
+                    <div className="flex items-center justify-between flex-wrap gap-3">
+                      {renderHelpfulnessControls('review2')}
                       <button
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
+                        onClick={() => handleDiscussionToggle('review2')}
                       >
-                        View the discussion (3)
+                        {expandedDiscussions.review2 ? 'View less' : `View the discussion (${reviewDiscussionData.review2?.length || 0})`}
                       </button>
                     </div>
+                    {expandedDiscussions.review2 && reviewDiscussionData.review2 && (
+                      <div className="mt-4 space-y-4">
+                        {reviewDiscussionData.review2.map((comment) => (
+                          <div key={comment.id} className="flex space-x-3">
+                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
+                            <div className="flex-1 pl-4">
+                              <div className="flex items-start space-x-3">
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                  {comment.avatar ? (
+                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    </svg>
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                                      {comment.isOwner && (
+                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                          {comment.role || 'Product Owner'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                </div>
+                              </div>
+                              <div className="mt-3 pl-12">
+                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Review 3 - Alex Johnson */}
@@ -828,43 +1160,55 @@ const SellerProfile: React.FC = () => {
                     </p>
 
                     {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-xs" style={{ color: '#6A6A6A' }}>Was this review helpful to you?</span>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'yes' ? null : 'yes' }))}
-                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
-                            style={{
-                              border: '1px solid #E1E1E1',
-                              color: '#6A6A6A',
-                              backgroundColor: reviewHelpfulness.review3 === 'yes' ? '#F0F0F0' : 'white'
-                            }}
-                          >
-                            <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
-                            <span className="text-xs">Yes</span>
-                          </button>
-                          <button
-                            onClick={() => setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'no' ? null : 'no' }))}
-                            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full transition-colors"
-                            style={{
-                              border: '1px solid #E1E1E1',
-                              color: '#6A6A6A',
-                              backgroundColor: reviewHelpfulness.review3 === 'no' ? '#F0F0F0' : 'white'
-                            }}
-                          >
-                            <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
-                            <span className="text-xs">No</span>
-                          </button>
-                        </div>
-                      </div>
+                    <div className="flex items-center justify-between flex-wrap gap-3">
+                      {renderHelpfulnessControls('review3')}
                       <button
                         className="text-xs hover:underline"
                         style={{ color: '#64B5F6' }}
+                        onClick={() => handleDiscussionToggle('review3')}
                       >
-                        View the discussion (2)
+                        {expandedDiscussions.review3 ? 'View less' : `View the discussion (${reviewDiscussionData.review3?.length || 0})`}
                       </button>
                     </div>
+                    {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
+                      <div className="mt-4 space-y-4">
+                        {reviewDiscussionData.review3.map((comment) => (
+                          <div key={comment.id} className="flex space-x-3">
+                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
+                            <div className="flex-1 pl-4">
+                              <div className="flex items-start space-x-3">
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                  {comment.avatar ? (
+                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    </svg>
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                                      {comment.isOwner && (
+                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                          {comment.role || 'Product Owner'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                </div>
+                              </div>
+                              <div className="mt-3 pl-12">
+                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -923,74 +1267,194 @@ const SellerProfile: React.FC = () => {
 
                 {/* Give Your Opinion Section */}
                 <div className="pt-24 text-center">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Give your opinion</h3>
-                  <p className="text-xs mb-6" style={{ color: '#B0B0B0' }}>Share your opinion about this user and help others learn a bit more about them.</p>
+                  {!isReviewPosted ? (
+                    <>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Give your opinion</h3>
+                      <p className="text-xs mb-6" style={{ color: '#B0B0B0' }}>Share your opinion about this user and help others learn a bit more about them.</p>
 
-                  {/* Star Rating Input */}
-                  <div className="flex items-center justify-center space-x-1 mb-6">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        onClick={() => setUserRating(star)}
-                        className="focus:outline-none hover:scale-110 transition-transform"
-                      >
-                        <svg
-                          className="w-7 h-7"
-                          viewBox="0 0 24 24"
-                          fill={userRating >= star ? '#FBBC05' : 'none'}
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                      {/* Star Rating Input */}
+                      <div className="flex items-center justify-center space-x-1 mb-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onClick={() => setUserRating(star)}
+                            className="focus:outline-none hover:scale-110 transition-transform"
+                          >
+                            <svg
+                              className="w-7 h-7"
+                              viewBox="0 0 24 24"
+                              fill={userRating >= star ? '#FBBC05' : 'none'}
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path
+                                d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
+                                stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
+                              />
+                            </svg>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Give a note text/rating */}
+                      <div className="text-center mb-6" style={{
+                        color: userRating > 0 ? '#64B5F6' : (userReviewText.length > 0 ? '#64B5F6' : '#D9D9D9'),
+                        fontSize: '10px'
+                      }}>
+                        {userRating > 0 ? `${userRating}.0` : 'give a note'}
+                      </div>
+
+                      {/* Review Text Input */}
+                      <div className="flex items-center space-x-3 mb-4 pl-8">
+                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 self-start mt-2">
+                          <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <style dangerouslySetInnerHTML={{
+                          __html: `
+                          .custom-placeholder::placeholder {
+                            color: #D9D9D9;
+                            opacity: 1;
+                          }
+                          .custom-placeholder::-webkit-scrollbar {
+                            display: none;
+                          }
+                          .custom-placeholder {
+                            -ms-overflow-style: none;
+                            scrollbar-width: none;
+                          }
+                        `}} />
+                        <textarea
+                          value={userReviewText}
+                          onChange={(e) => {
+                            if (e.target.value.length <= 1000) {
+                              setUserReviewText(e.target.value);
+                            }
+                          }}
+                          placeholder="What do you think of this article?"
+                          className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none resize-none custom-placeholder"
+                          style={{
+                            border: 'none',
+                            minHeight: '80px',
+                            color: '#939393',
+                            backgroundColor: 'transparent'
+                          }}
+                          maxLength={1000}
+                        />
+                      </div>
+
+                      {/* Post Review Button */}
+                      <div className="pl-8 relative mt-4">
+                        <button
+                          onClick={() => {
+                            if (userRating > 0 && userReviewText.trim()) {
+                              const today = new Date();
+                              const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                              const dateStr = `${today.getDate()} ${months[today.getMonth()]}, ${today.getFullYear()}`;
+                              setPostedReview({
+                                rating: userRating,
+                                text: userReviewText,
+                                date: dateStr
+                              });
+                              setIsReviewPosted(true);
+                            }
+                          }}
+                          className="w-full py-2.5 rounded-lg font-medium transition-all mt-12 relative"
+                          style={{
+                            backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
+                            color: userRating > 0 ? 'white' : '#6A6A6A'
+                          }}
+                          disabled={userRating === 0}
                         >
-                          <path
-                            d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
-                            stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
-                          />
-                        </svg>
-                      </button>
-                    ))}
-                  </div>
+                          Post the review
+                          {/* Character Counter */}
+                          {userReviewText.length > 0 && (
+                            <div
+                              className="absolute"
+                              style={{
+                                top: '-26px',
+                                right: '0',
+                                color: '#64B5F6',
+                                fontSize: '12px'
+                              }}
+                            >
+                              {userReviewText.length}/1000
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Thank You State */}
+                      <div className="mb-6 text-center">
+                        <h3 className="text-2xl font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#939393' }}>
+                          Thank you for your<br />feedback. 😊
+                        </h3>
+                      </div>
 
-                  {/* Review Text Input */}
-                  <div className="flex items-start space-x-3 mb-4 pl-8">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <style dangerouslySetInnerHTML={{
-                      __html: `
-                      .custom-placeholder::placeholder {
-                        color: #D9D9D9;
-                        opacity: 1;
-                      }
-                    `}} />
-                    <textarea
-                      value={userReviewText}
-                      onChange={(e) => setUserReviewText(e.target.value)}
-                      placeholder="What do you think of this article?"
-                      className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none resize-none custom-placeholder"
-                      style={{
-                        border: 'none',
-                        minHeight: '80px',
-                        color: '#6A6A6A',
-                        backgroundColor: 'transparent'
-                      }}
-                    />
-                  </div>
+                      {/* Posted Review Card */}
+                      <div className="border rounded-3xl text-left mx-auto" style={{ borderColor: '#E1E1E1', maxWidth: '500px' }}>
+                        <div className="p-5">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-start space-x-3">
+                              {/* Avatar */}
+                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                                <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                </svg>
+                              </div>
 
-                  {/* Post Review Button */}
-                  <div className="pl-8">
-                    <button
-                      className="w-full py-2.5 rounded-lg font-medium transition-all mt-6"
-                      style={{
-                        backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
-                        color: userRating > 0 ? 'white' : '#6A6A6A'
-                      }}
-                    >
-                      Post the review
-                    </button>
-                  </div>
+                              <div>
+                                {/* Name */}
+                                <h4 className="font-semibold mb-1" style={{ color: '#0E0E0E', fontSize: '14px' }}>You</h4>
+
+                                {/* Star Rating */}
+                                <div className="flex items-center space-x-2">
+                                  <div className="flex items-center">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <svg
+                                        key={star}
+                                        className="w-3 h-3 fill-current"
+                                        style={{ color: star <= (postedReview?.rating || 0) ? '#FBBC05' : '#E9E9E9' }}
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                      </svg>
+                                    ))}
+                                  </div>
+                                  <span className="text-xs" style={{ color: '#939393' }}>{postedReview?.rating}.0</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Edit Button and Date */}
+                            <div className="flex flex-col items-end space-y-1.5 flex-shrink-0">
+                              <button
+                                onClick={() => {
+                                  setIsReviewPosted(false);
+                                  // Keep the rating and text so user can edit
+                                }}
+                                className="flex items-center space-x-1.5 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50"
+                                style={{ borderColor: '#D9D9D9' }}
+                              >
+                                <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                                <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
+                              </button>
+                              <span className="text-[10px] whitespace-nowrap" style={{ color: '#B0B0B0' }}>{postedReview?.date}</span>
+                            </div>
+                          </div>
+
+                          {/* Review Text - Spans full width below */}
+                          <p className="text-sm leading-relaxed" style={{ color: '#939393', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                            {postedReview?.text}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -1000,952 +1464,193 @@ const SellerProfile: React.FC = () => {
           {activeTab === 'items' && (
             <>
               {/* Title */}
-              <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{seller.name} items</h2>
+              <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                {getSellerName(seller)} items
+              </h2>
 
-              {/* Product Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-                {/* Product 1 - African Textiles */}
-                <Link to={`/product/1`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                  {/* Product Image - Top */}
-                  <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                    <img
-                      src={pre1}
-                      alt="African Textiles"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      style={{ borderRadius: '12px' }}
-                    />
-
-                    {/* Country Badge */}
-                    <div className="absolute bg-white rounded-md shadow-sm" style={{
-                      display: 'flex',
-                      padding: '2px 6px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      top: '8px',
-                      left: '8px'
-                    }}>
-                      <img
-                        src={getProductCountry(1).flag}
-                        alt={getProductCountry(1).name}
-                        style={{
-                          width: '12px',
-                          height: '8px',
-                          objectFit: 'cover',
-                          borderRadius: '2px'
-                        }}
-                      />
-                      <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                        {getProductCountry(1).abbreviation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                    {/* Price and Verified Badge Row */}
-                    <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                      <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-                        $13.9
-                      </div>
-                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                        display: 'flex',
-                        padding: '1px 4px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '1px',
-                        fontSize: '9px'
-                      }}>
-                        <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-                        <span>Verified seller</span>
-                      </div>
-                    </div>
-
-                    {/* Product Name */}
-                    <h3 className="line-clamp-2 font-medium" style={{
-                      fontSize: '13px',
-                      color: '#212121',
-                      marginBottom: '4px'
-                    }}>African Textiles</h3>
-
-                    {/* Location and Bookmark Row - Below Product Name */}
-                    <div className="flex items-center justify-between">
-                      {/* Location */}
-                      <div className="flex items-center text-gray-500 flex-1">
-                        <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                          width: '10px',
-                          height: '10px',
-                          marginRight: '4px'
-                        }} />
-                        <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
-                      </div>
-
-                      {/* Bookmark Button */}
-                      <div style={{ marginLeft: '8px' }}>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const newSet = new Set(wishlistProducts);
-                            if (newSet.has('textiles-1')) {
-                              newSet.delete('textiles-1');
-                            } else {
-                              newSet.add('textiles-1');
-                            }
-                            setWishlistProducts(newSet);
+              {isLoadingProducts ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                </div>
+              ) : sellerProducts.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
+                  {sellerProducts.map((product) => (
+                    <Link
+                      key={product.id}
+                      to={`/product/${product.id}`}
+                      className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group"
+                    >
+                      {/* Product Image - Top */}
+                      <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                        <img
+                          src={product.images && product.images.length > 0 ? product.images[0].url : pre1}
+                          alt={product.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          style={{ borderRadius: '12px' }}
+                          onError={(e) => {
+                            e.currentTarget.src = pre1; // Fallback image
                           }}
-                          className="transition-colors touch-manipulation"
-                          title={wishlistProducts.has('textiles-1') ? 'Remove from saved' : 'Save product'}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: wishlistProducts.has('textiles-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                          }} />
-                        </button>
+                        />
+
+                        {/* Country Badge */}
+                        <div className="absolute bg-white rounded-md shadow-sm" style={{
+                          display: 'flex',
+                          padding: '2px 6px',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: '4px',
+                          top: '8px',
+                          left: '8px'
+                        }}>
+                          <img
+                            src={getProductCountry(parseInt(product.id) || 1).flag}
+                            alt={getProductCountry(parseInt(product.id) || 1).name}
+                            style={{
+                              width: '12px',
+                              height: '8px',
+                              objectFit: 'cover',
+                              borderRadius: '2px'
+                            }}
+                          />
+                          <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                            {getProductCountry(parseInt(product.id) || 1).abbreviation}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+
+                      {/* Product Content */}
+                      <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                        {/* Price and Verified Badge Row */}
+                        <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                          <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                            {product.currency} {product.price}
+                          </div>
+                          {seller.isVerified && (
+                            <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
+                              <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
+                              <span className="text-xs" style={{ color: '#45C55B', fontWeight: '300' }}>Verified Seller</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Product Name */}
+                        <h3 className="line-clamp-2 font-medium" style={{
+                          fontSize: '13px',
+                          color: '#212121',
+                          marginBottom: '4px'
+                        }}>{product.title}</h3>
+
+                        {/* Location and Bookmark Row */}
+                        <div className="flex items-center justify-between">
+                          {/* Location */}
+                          <div className="flex items-center text-gray-500 flex-1">
+                            <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
+                              width: '10px',
+                              height: '10px',
+                              marginRight: '4px'
+                            }} />
+                            <span className="truncate font-normal" style={{ fontSize: '10px' }}>
+                              {product.location}
+                            </span>
+                          </div>
+
+                          {/* Bookmark Button */}
+                          <div style={{ marginLeft: '8px' }}>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleWishlist(product.id);
+                              }}
+                              className="transition-colors touch-manipulation"
+                              title={wishlistProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <img src={bookmarkIcon} alt="Bookmark" style={{
+                                width: '20px',
+                                height: '20px',
+                                filter: wishlistProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              }} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m8-8V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v1M9 7h6" />
+                    </svg>
                   </div>
-                </Link>
-
-                {/* Product 2 - Fresh Tomatoes */}
-                <Link to={`/product/2`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                  {/* Product Image - Top */}
-                  <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                    <img
-                      src={pre2}
-                      alt="Fresh Tomatoes"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      style={{ borderRadius: '12px' }}
-                    />
-
-                    {/* Country Badge */}
-                    <div className="absolute bg-white rounded-md shadow-sm" style={{
-                      display: 'flex',
-                      padding: '2px 6px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      top: '8px',
-                      left: '8px'
-                    }}>
-                      <img
-                        src={getProductCountry(2).flag}
-                        alt={getProductCountry(2).name}
-                        style={{
-                          width: '12px',
-                          height: '8px',
-                          objectFit: 'cover',
-                          borderRadius: '2px'
-                        }}
-                      />
-                      <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                        {getProductCountry(2).abbreviation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                    {/* Price and Verified Badge Row */}
-                    <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                      <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-                        $45
-                      </div>
-                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                        display: 'flex',
-                        padding: '1px 4px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '1px',
-                        fontSize: '9px'
-                      }}>
-                        <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-                        <span>Verified seller</span>
-                      </div>
-                    </div>
-
-                    {/* Product Name */}
-                    <h3 className="line-clamp-2 font-medium" style={{
-                      fontSize: '13px',
-                      color: '#212121',
-                      marginBottom: '4px'
-                    }}>Fresh Tomatoes</h3>
-
-                    {/* Location and Bookmark Row - Below Product Name */}
-                    <div className="flex items-center justify-between">
-                      {/* Location */}
-                      <div className="flex items-center text-gray-500 flex-1">
-                        <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                          width: '10px',
-                          height: '10px',
-                          marginRight: '4px'
-                        }} />
-                        <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
-                      </div>
-
-                      {/* Bookmark Button */}
-                      <div style={{ marginLeft: '8px' }}>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const newSet = new Set(wishlistProducts);
-                            if (newSet.has('tomatoes-1')) {
-                              newSet.delete('tomatoes-1');
-                            } else {
-                              newSet.add('tomatoes-1');
-                            }
-                            setWishlistProducts(newSet);
-                          }}
-                          className="transition-colors touch-manipulation"
-                          title={wishlistProducts.has('tomatoes-1') ? 'Remove from saved' : 'Save product'}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: wishlistProducts.has('tomatoes-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                          }} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Product 3 - Dried Shrimp */}
-                <Link to={`/product/3`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                  {/* Product Image - Top */}
-                  <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                    <img
-                      src={pre3}
-                      alt="Dried Shrimp"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      style={{ borderRadius: '12px' }}
-                    />
-
-                    {/* Country Badge */}
-                    <div className="absolute bg-white rounded-md shadow-sm" style={{
-                      display: 'flex',
-                      padding: '2px 6px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      top: '8px',
-                      left: '8px'
-                    }}>
-                      <img
-                        src={getProductCountry(3).flag}
-                        alt={getProductCountry(3).name}
-                        style={{
-                          width: '12px',
-                          height: '8px',
-                          objectFit: 'cover',
-                          borderRadius: '2px'
-                        }}
-                      />
-                      <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                        {getProductCountry(3).abbreviation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                    {/* Price and Verified Badge Row */}
-                    <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                      <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-                        $8.09
-                      </div>
-                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                        display: 'flex',
-                        padding: '1px 4px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '1px',
-                        fontSize: '9px'
-                      }}>
-                        <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-                        <span>Verified seller</span>
-                      </div>
-                    </div>
-
-                    {/* Product Name */}
-                    <h3 className="line-clamp-2 font-medium" style={{
-                      fontSize: '13px',
-                      color: '#212121',
-                      marginBottom: '4px'
-                    }}>Dried Shrimp</h3>
-
-                    {/* Location and Bookmark Row - Below Product Name */}
-                    <div className="flex items-center justify-between">
-                      {/* Location */}
-                      <div className="flex items-center text-gray-500 flex-1">
-                        <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                          width: '10px',
-                          height: '10px',
-                          marginRight: '4px'
-                        }} />
-                        <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
-                      </div>
-
-                      {/* Bookmark Button */}
-                      <div style={{ marginLeft: '8px' }}>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const newSet = new Set(wishlistProducts);
-                            if (newSet.has('shrimp-1')) {
-                              newSet.delete('shrimp-1');
-                            } else {
-                              newSet.add('shrimp-1');
-                            }
-                            setWishlistProducts(newSet);
-                          }}
-                          className="transition-colors touch-manipulation"
-                          title={wishlistProducts.has('shrimp-1') ? 'Remove from saved' : 'Save product'}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: wishlistProducts.has('shrimp-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                          }} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Product 4 - Ndolé Leaves */}
-                <Link to={`/product/4`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                  {/* Product Image - Top */}
-                  <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                    <img
-                      src={pre4}
-                      alt="Ndolé Leaves"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      style={{ borderRadius: '12px' }}
-                    />
-
-                    {/* Country Badge */}
-                    <div className="absolute bg-white rounded-md shadow-sm" style={{
-                      display: 'flex',
-                      padding: '2px 6px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      top: '8px',
-                      left: '8px'
-                    }}>
-                      <img
-                        src={getProductCountry(4).flag}
-                        alt={getProductCountry(4).name}
-                        style={{
-                          width: '12px',
-                          height: '8px',
-                          objectFit: 'cover',
-                          borderRadius: '2px'
-                        }}
-                      />
-                      <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                        {getProductCountry(4).abbreviation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                    {/* Price and Verified Badge Row */}
-                    <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                      <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-                        $11.5
-                      </div>
-                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                        display: 'flex',
-                        padding: '1px 4px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '1px',
-                        fontSize: '9px'
-                      }}>
-                        <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-                        <span>Verified seller</span>
-                      </div>
-                    </div>
-
-                    {/* Product Name */}
-                    <h3 className="line-clamp-2 font-medium" style={{
-                      fontSize: '13px',
-                      color: '#212121',
-                      marginBottom: '4px'
-                    }}>Ndolé Leaves</h3>
-
-                    {/* Location and Bookmark Row - Below Product Name */}
-                    <div className="flex items-center justify-between">
-                      {/* Location */}
-                      <div className="flex items-center text-gray-500 flex-1">
-                        <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                          width: '10px',
-                          height: '10px',
-                          marginRight: '4px'
-                        }} />
-                        <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
-                      </div>
-
-                      {/* Bookmark Button */}
-                      <div style={{ marginLeft: '8px' }}>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const newSet = new Set(wishlistProducts);
-                            if (newSet.has('ndole-1')) {
-                              newSet.delete('ndole-1');
-                            } else {
-                              newSet.add('ndole-1');
-                            }
-                            setWishlistProducts(newSet);
-                          }}
-                          className="transition-colors touch-manipulation"
-                          title={wishlistProducts.has('ndole-1') ? 'Remove from saved' : 'Save product'}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: wishlistProducts.has('ndole-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                          }} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Product 5 - Plantain Chips */}
-                <Link to={`/product/5`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                  {/* Product Image - Top */}
-                  <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                    <img
-                      src={pre5}
-                      alt="Plantain Chips"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      style={{ borderRadius: '12px' }}
-                    />
-
-                    {/* Country Badge */}
-                    <div className="absolute bg-white rounded-md shadow-sm" style={{
-                      display: 'flex',
-                      padding: '2px 6px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      top: '8px',
-                      left: '8px'
-                    }}>
-                      <img
-                        src={getProductCountry(5).flag}
-                        alt={getProductCountry(5).name}
-                        style={{
-                          width: '12px',
-                          height: '8px',
-                          objectFit: 'cover',
-                          borderRadius: '2px'
-                        }}
-                      />
-                      <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                        {getProductCountry(5).abbreviation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                    {/* Price and Verified Badge Row */}
-                    <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                      <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-                        $6.50
-                      </div>
-                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                        display: 'flex',
-                        padding: '1px 4px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '1px',
-                        fontSize: '9px'
-                      }}>
-                        <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-                        <span>Verified seller</span>
-                      </div>
-                    </div>
-
-                    {/* Product Name */}
-                    <h3 className="line-clamp-2 font-medium" style={{
-                      fontSize: '13px',
-                      color: '#212121',
-                      marginBottom: '4px'
-                    }}>Plantain Chips</h3>
-
-                    {/* Location and Bookmark Row - Below Product Name */}
-                    <div className="flex items-center justify-between">
-                      {/* Location */}
-                      <div className="flex items-center text-gray-500 flex-1">
-                        <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                          width: '10px',
-                          height: '10px',
-                          marginRight: '4px'
-                        }} />
-                        <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
-                      </div>
-
-                      {/* Bookmark Button */}
-                      <div style={{ marginLeft: '8px' }}>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const newSet = new Set(wishlistProducts);
-                            if (newSet.has('plantain-1')) {
-                              newSet.delete('plantain-1');
-                            } else {
-                              newSet.add('plantain-1');
-                            }
-                            setWishlistProducts(newSet);
-                          }}
-                          className="transition-colors touch-manipulation"
-                          title={wishlistProducts.has('plantain-1') ? 'Remove from saved' : 'Save product'}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: wishlistProducts.has('plantain-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                          }} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Product 6 - Yam Flour */}
-                <Link to={`/product/6`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                  {/* Product Image - Top */}
-                  <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                    <img
-                      src={pre6}
-                      alt="Yam Flour"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      style={{ borderRadius: '12px' }}
-                    />
-
-                    {/* Country Badge */}
-                    <div className="absolute bg-white rounded-md shadow-sm" style={{
-                      display: 'flex',
-                      padding: '2px 6px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      top: '8px',
-                      left: '8px'
-                    }}>
-                      <img
-                        src={getProductCountry(6).flag}
-                        alt={getProductCountry(6).name}
-                        style={{
-                          width: '12px',
-                          height: '8px',
-                          objectFit: 'cover',
-                          borderRadius: '2px'
-                        }}
-                      />
-                      <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                        {getProductCountry(6).abbreviation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                    {/* Price and Verified Badge Row */}
-                    <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                      <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-                        $9.75
-                      </div>
-                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                        display: 'flex',
-                        padding: '1px 4px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '1px',
-                        fontSize: '9px'
-                      }}>
-                        <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-                        <span>Verified seller</span>
-                      </div>
-                    </div>
-
-                    {/* Product Name */}
-                    <h3 className="line-clamp-2 font-medium" style={{
-                      fontSize: '13px',
-                      color: '#212121',
-                      marginBottom: '4px'
-                    }}>Yam Flour</h3>
-
-                    {/* Location and Bookmark Row - Below Product Name */}
-                    <div className="flex items-center justify-between">
-                      {/* Location */}
-                      <div className="flex items-center text-gray-500 flex-1">
-                        <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                          width: '10px',
-                          height: '10px',
-                          marginRight: '4px'
-                        }} />
-                        <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
-                      </div>
-
-                      {/* Bookmark Button */}
-                      <div style={{ marginLeft: '8px' }}>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const newSet = new Set(wishlistProducts);
-                            if (newSet.has('yam-1')) {
-                              newSet.delete('yam-1');
-                            } else {
-                              newSet.add('yam-1');
-                            }
-                            setWishlistProducts(newSet);
-                          }}
-                          className="transition-colors touch-manipulation"
-                          title={wishlistProducts.has('yam-1') ? 'Remove from saved' : 'Save product'}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: wishlistProducts.has('yam-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                          }} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Product 7 - Palm Oil */}
-                <Link to={`/product/7`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                  {/* Product Image - Top */}
-                  <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                    <img
-                      src={pre7}
-                      alt="Palm Oil"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      style={{ borderRadius: '12px' }}
-                    />
-
-                    {/* Country Badge */}
-                    <div className="absolute bg-white rounded-md shadow-sm" style={{
-                      display: 'flex',
-                      padding: '2px 6px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      top: '8px',
-                      left: '8px'
-                    }}>
-                      <img
-                        src={getProductCountry(7).flag}
-                        alt={getProductCountry(7).name}
-                        style={{
-                          width: '12px',
-                          height: '8px',
-                          objectFit: 'cover',
-                          borderRadius: '2px'
-                        }}
-                      />
-                      <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                        {getProductCountry(7).abbreviation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                    {/* Price and Verified Badge Row */}
-                    <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                      <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-                        $15.20
-                      </div>
-                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                        display: 'flex',
-                        padding: '1px 4px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '1px',
-                        fontSize: '9px'
-                      }}>
-                        <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-                        <span>Verified seller</span>
-                      </div>
-                    </div>
-
-                    {/* Product Name */}
-                    <h3 className="line-clamp-2 font-medium" style={{
-                      fontSize: '13px',
-                      color: '#212121',
-                      marginBottom: '4px'
-                    }}>Palm Oil</h3>
-
-                    {/* Location and Bookmark Row - Below Product Name */}
-                    <div className="flex items-center justify-between">
-                      {/* Location */}
-                      <div className="flex items-center text-gray-500 flex-1">
-                        <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                          width: '10px',
-                          height: '10px',
-                          marginRight: '4px'
-                        }} />
-                        <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
-                      </div>
-
-                      {/* Bookmark Button */}
-                      <div style={{ marginLeft: '8px' }}>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const newSet = new Set(wishlistProducts);
-                            if (newSet.has('palm-1')) {
-                              newSet.delete('palm-1');
-                            } else {
-                              newSet.add('palm-1');
-                            }
-                            setWishlistProducts(newSet);
-                          }}
-                          className="transition-colors touch-manipulation"
-                          title={wishlistProducts.has('palm-1') ? 'Remove from saved' : 'Save product'}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: wishlistProducts.has('palm-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                          }} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Product 8 - African Spices */}
-                <Link to={`/product/8`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                  {/* Product Image - Top */}
-                  <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                    <img
-                      src={pre8}
-                      alt="African Spices"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      style={{ borderRadius: '12px' }}
-                    />
-
-                    {/* Country Badge */}
-                    <div className="absolute bg-white rounded-md shadow-sm" style={{
-                      display: 'flex',
-                      padding: '2px 6px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      top: '8px',
-                      left: '8px'
-                    }}>
-                      <img
-                        src={getProductCountry(8).flag}
-                        alt={getProductCountry(8).name}
-                        style={{
-                          width: '12px',
-                          height: '8px',
-                          objectFit: 'cover',
-                          borderRadius: '2px'
-                        }}
-                      />
-                      <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                        {getProductCountry(8).abbreviation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                    {/* Price and Verified Badge Row */}
-                    <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                      <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-                        $22.00
-                      </div>
-                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                        display: 'flex',
-                        padding: '1px 4px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '1px',
-                        fontSize: '9px'
-                      }}>
-                        <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-                        <span>Verified seller</span>
-                      </div>
-                    </div>
-
-                    {/* Product Name */}
-                    <h3 className="line-clamp-2 font-medium" style={{
-                      fontSize: '13px',
-                      color: '#212121',
-                      marginBottom: '4px'
-                    }}>African Spices</h3>
-
-                    {/* Location and Bookmark Row - Below Product Name */}
-                    <div className="flex items-center justify-between">
-                      {/* Location */}
-                      <div className="flex items-center text-gray-500 flex-1">
-                        <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                          width: '10px',
-                          height: '10px',
-                          marginRight: '4px'
-                        }} />
-                        <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
-                      </div>
-
-                      {/* Bookmark Button */}
-                      <div style={{ marginLeft: '8px' }}>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const newSet = new Set(wishlistProducts);
-                            if (newSet.has('spices-1')) {
-                              newSet.delete('spices-1');
-                            } else {
-                              newSet.add('spices-1');
-                            }
-                            setWishlistProducts(newSet);
-                          }}
-                          className="transition-colors touch-manipulation"
-                          title={wishlistProducts.has('spices-1') ? 'Remove from saved' : 'Save product'}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                            width: '20px',
-                            height: '20px',
-                            filter: wishlistProducts.has('spices-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                          }} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No products yet</h3>
+                  <p className="text-gray-500">This seller hasn't listed any products yet.</p>
+                </div>
+              )}
 
               {/* Pagination */}
-              <div className="flex items-center justify-between mt-8">
-                <div className="flex-1"></div>
+              {sellerProducts.length > 0 && (
+                <div className="flex items-center justify-between mt-8">
+                  <div className="flex-1"></div>
 
-                <div className="flex items-center space-x-12">
-                  <button
-                    disabled={true}
-                    className="font-normal transition-colors disabled:cursor-not-allowed"
-                    style={{ fontSize: '16px', color: '#BABABA' }}
-                  >
-                    Previous
-                  </button>
-
-                  <div className="flex items-baseline space-x-6">
+                  <div className="flex items-center space-x-12">
                     <button
-                      className="font-normal transition-colors relative pb-1"
-                      style={{ fontSize: '16px', color: '#212121' }}
-                    >
-                      <span>1</span>
-                      <div
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2"
-                        style={{
-                          width: '200%',
-                          height: '2px',
-                          backgroundColor: '#212121'
-                        }}
-                      />
-                    </button>
-                    <button
-                      className="font-normal transition-colors hover:text-gray-900"
+                      disabled={true}
+                      className="font-normal transition-colors disabled:cursor-not-allowed"
                       style={{ fontSize: '16px', color: '#BABABA' }}
                     >
-                      2
+                      Previous
+                    </button>
+
+                    <div className="flex items-baseline space-x-6">
+                      <button
+                        className="font-normal transition-colors relative pb-1"
+                        style={{ fontSize: '16px', color: '#212121' }}
+                      >
+                        <span>1</span>
+                        <div
+                          className="absolute bottom-0 left-1/2 -translate-x-1/2"
+                          style={{
+                            width: '200%',
+                            height: '2px',
+                            backgroundColor: '#212121'
+                          }}
+                        />
+                      </button>
+                      <button
+                        className="font-normal transition-colors hover:text-gray-900"
+                        style={{ fontSize: '16px', color: '#BABABA' }}
+                      >
+                        2
+                      </button>
+                    </div>
+
+                    <button
+                      className="font-normal transition-colors"
+                      style={{ fontSize: '16px', color: '#212121' }}
+                    >
+                      Next
                     </button>
                   </div>
 
-                  <button
-                    className="font-normal transition-colors"
-                    style={{ fontSize: '16px', color: '#212121' }}
-                  >
-                    Next
-                  </button>
-                </div>
-
-                <div className="flex-1 flex justify-end">
-                  <div className="flex items-center space-x-1">
-                    <div className="px-3 py-1 rounded border" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9' }}>
-                      <span className="font-normal" style={{ fontSize: '16px', color: '#212121' }}>1</span>
+                  <div className="flex-1 flex justify-end">
+                    <div className="flex items-center space-x-1">
+                      <div className="px-3 py-1 rounded border" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9' }}>
+                        <span className="font-normal" style={{ fontSize: '16px', color: '#212121' }}>1</span>
+                      </div>
+                      <span className="font-normal" style={{ fontSize: '16px', color: '#BABABA' }}>/ 2</span>
                     </div>
-                    <span className="font-normal" style={{ fontSize: '16px', color: '#BABABA' }}>/ 2</span>
                   </div>
                 </div>
-              </div>
+              )}
             </>
           )}
         </div>
@@ -2005,8 +1710,8 @@ const SellerProfile: React.FC = () => {
               <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '-40px' }}>
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
                   <img
-                    src={user?.profileImage || seller.avatar}
-                    alt={seller.name}
+                    src={getSellerAvatar(seller)}
+                    alt={getSellerName(seller)}
                     className="w-16 h-16 rounded-full object-cover"
                   />
                 </div>

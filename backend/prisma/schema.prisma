@@ -133,11 +133,26 @@ model Message {
   productData     String?
   productSnapshot Json?       @map("product_snapshot")
   subject         String?
-  content         String
   isRead          Boolean     @default(false) @map("is_read")
   messageType     MessageType @default(INQUIRY) @map("message_type")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  // app level encryption
+  content           String @db.Text
+  encryptionIv      String
+  encryptionAuthTag String
+
+  // database level encryption
+  dbEncryptedContent String? @db.Text
+
+  // metadata
+  encryptedAt      DateTime @default(now())
+  encryptedVersion String   @default("v1-aes256-gcm")
+
+  // Security audit
+  integrityHash  String? // Hash of original content
+  tamperDetected Boolean @default(false)
 
   // Relations
   sender                    User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
@@ -148,6 +163,7 @@ model Message {
   statuses                  MessageStatus[]
   conversationAsLastMessage Conversation[]  @relation("ConversationLastMessage")
 
+  @@index([encryptedAt])
   @@map("messages")
 }
 
@@ -199,6 +215,7 @@ model Conversation {
   lastMessageAt DateTime? @map("last_message_at")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
+  productData   String?
 
   // Relations
   product      Product?                  @relation(fields: [productId], references: [id], onDelete: SetNull)
