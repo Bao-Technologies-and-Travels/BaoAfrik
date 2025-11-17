@@ -38,6 +38,7 @@ import unverifyIcon from '../assets/images/pre/unverify.svg';
 import pepperIcon from '../assets/images/pre/pepper.svg';
 import bookmarkIcon from '../assets/images/pre/bm.svg';
 import spIcon from '../assets/images/pre/sp.svg';
+import availableIcon from '../assets/images/pre/av.svg';
 // Import icons for reviews section
 import likeIcon from '../assets/images/pre/like.svg';
 import dislikeIcon from '../assets/images/pre/dislike.svg';
@@ -763,7 +764,13 @@ const ProductDetail: React.FC = () => {
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
                   <img src={pepperIcon} alt="Pepper" className="w-3 h-3" />
                   <span className="font-light" style={{ color: '#939393' }}>Spices</span>
-                      </div>
+                </div>
+
+                {/* Availability Badge */}
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
+                  <img src={availableIcon} alt="Available" className="w-3 h-3" />
+                  <span className="font-light" style={{ color: '#939393' }}>Available : 1</span>
+                </div>
               </div>
 
               {/* Description */}
@@ -851,8 +858,10 @@ const ProductDetail: React.FC = () => {
       </div>
       
       {/* Mobile Product Info */}
-      <div className="lg:hidden -mt-10 pb-8 relative z-10" style={{ fontFamily: 'Poppins, sans-serif' }}>
-        <div className="bg-white rounded-t-3xl p-5 mx-0" style={{ boxShadow: 'none' }}>
+      <div className="lg:hidden -mt-10 pb-4 relative z-10" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="bg-white rounded-t-3xl p-5 mx-0 pt-6" style={{ boxShadow: 'none' }}>
+          {/* Gray Pill-Shaped Line at Top Center */}
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-1 rounded-full" style={{ backgroundColor: '#E1E1E1' }}></div>
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="font-normal capitalize" style={{ fontSize: '16px', color: '#939393' }}>
@@ -864,6 +873,13 @@ const ProductDetail: React.FC = () => {
             </div>
             <div className="flex items-center space-x-2">
               <button
+                onClick={handleSave}
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#F4F4F4' }}
+              >
+                <BookmarkIcon saved={isSaved} />
+              </button>
+              <button
                 onClick={() => setShowShareModal(true)}
                 className="w-10 h-10 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: '#F4F4F4' }}
@@ -874,13 +890,6 @@ const ProductDetail: React.FC = () => {
                   className="w-4 h-4"
                   style={{ filter: 'brightness(0) saturate(100%) invert(74%) sepia(3%) saturate(524%) hue-rotate(182deg) brightness(90%) contrast(90%)' }}
                 />
-              </button>
-              <button
-                onClick={handleSave}
-                className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: '#F4F4F4' }}
-              >
-                <BookmarkIcon saved={isSaved} />
               </button>
             </div>
           </div>
@@ -929,8 +938,8 @@ const ProductDetail: React.FC = () => {
 
             {/* Availability Badge */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border" style={{ borderColor: '#E1E1E1' }}>
-              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#45C55B' }}></span>
-              <span className="font-light" style={{ color: '#939393' }}>Available</span>
+              <img src={availableIcon} alt="Available" className="w-3 h-3" />
+              <span className="font-light" style={{ color: '#939393' }}>Available : 1</span>
             </div>
           </div>
 
@@ -966,10 +975,10 @@ const ProductDetail: React.FC = () => {
           )}
 
           {/* Seller Profile Section - Mobile */}
-          <div className="mt-4">
+          <div className="mt-1 mb-0">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-11 h-11 rounded-full bg-gray-100 border overflow-hidden flex-shrink-0" style={{ borderColor: '#E0E0E0' }}>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-gray-100 border overflow-hidden flex-shrink-0" style={{ borderColor: '#E0E0E0' }}>
                   <img
                     src={product.seller.avatar}
                     alt={product.seller.name}
@@ -981,13 +990,13 @@ const ProductDetail: React.FC = () => {
                     {product.seller.name}
                   </span>
                   {product.seller.verified ? (
-                    <div className="inline-flex items-center bg-green-50 rounded-full mt-1" style={{ padding: '2px 6px', fontSize: '10px', color: '#45C55B' }}>
-                      <span className="w-1.5 h-1.5 rounded-full mr-1" style={{ backgroundColor: '#45C55B' }}></span>
+                    <div className="inline-flex items-center gap-1 bg-green-50 rounded-full mt-1" style={{ padding: '2px 6px', fontSize: '10px', color: '#45C55B' }}>
+                      <img src={verifyIcon} alt="Verified" className="w-3 h-3" />
                       <span>Verified Seller</span>
                     </div>
                   ) : (
                     <div className="inline-flex items-center text-gray-600 bg-gray-100 rounded-full mt-1" style={{ padding: '2px 6px', fontSize: '10px' }}>
-                      <span className="w-1.5 h-1.5 rounded-full mr-1" style={{ backgroundColor: '#B0B0B0' }}></span>
+                      <img src={unverifyIcon} alt="Unverified" className="w-3 h-3 mr-1" />
                       <span>Unverified Seller</span>
                     </div>
                   )}
@@ -1013,20 +1022,18 @@ const ProductDetail: React.FC = () => {
       >
         <button
           onClick={handleContactSeller}
-          className="w-full text-white py-4 px-6 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
-          style={{backgroundColor: '#F9A825'}}
+          className="w-full text-white py-3 px-6 rounded-xl font-normal transition-colors duration-200 flex items-center justify-center space-x-2"
+          style={{backgroundColor: '#F9A825', borderRadius: '12px'}}
           onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6941F'}
           onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-4.906-1.456L3 21l2.456-5.094A8.959 8.959 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
-          </svg>
           <span>Chat with seller</span>
+          <img src={basketIcon} alt="Chat" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
         </button>
       </div>
 
       {/* Reviews and Ratings Section */}
-      <div className="bg-white mt-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <div className="bg-white mt-1 lg:mt-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
           {/* Tab Navigation */}
         {product.seller.verified ? (
           <div className="border-b" style={{ borderColor: '#E5E5E5' }}>
@@ -1059,7 +1066,7 @@ const ProductDetail: React.FC = () => {
           </div>
         ) : (
           <div className="max-w-7xl mx-auto px-6 pb-4">
-            <h2 className="text-3xl font-semibold" style={{ color: '#000000', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            <h2 className="text-xl lg:text-3xl font-semibold text-left lg:text-left" style={{ color: '#000000', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Reviews and ratings
             </h2>
           </div>
@@ -1068,7 +1075,7 @@ const ProductDetail: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6 py-4 mt-4">
           
           {/* Reviews Content */}
-          {activeTab === 'reviews' && (
+          {(activeTab === 'reviews' || !product.seller.verified) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* LEFT COLUMN - Reviews List */}
             <div className="lg:col-span-2 order-2 lg:order-1">
@@ -1184,37 +1191,37 @@ const ProductDetail: React.FC = () => {
                   </button>
                   </div>
                   {expandedDiscussions.review1 && reviewDiscussionData.review1 && (
-                    <div className="mt-4 space-y-4">
+                    <div className="mt-4 space-y-3 lg:space-y-4">
                       {reviewDiscussionData.review1.map((comment) => (
-                        <div key={comment.id} className="flex space-x-3">
+                        <div key={comment.id} className="flex space-x-2 lg:space-x-3">
                           <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                          <div className="flex-1 pl-4">
-                            <div className="flex items-start space-x-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                          <div className="flex-1 pl-3 lg:pl-4">
+                            <div className="flex items-start space-x-2 lg:space-x-3">
+                              <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
                                 {comment.avatar ? (
                                   <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
                                 ) : (
-                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg className="w-3 h-3 lg:w-4 lg:h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                   </svg>
                                 )}
                               </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center space-x-1.5 lg:space-x-2 flex-1 min-w-0">
+                                    <span className="text-xs lg:text-sm font-medium lg:font-semibold text-gray-900 truncate">{comment.author}</span>
                                     {comment.isOwner && (
-                                      <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                      <span className="text-[9px] lg:text-[10px] font-medium px-1.5 lg:px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
                                         {comment.role || 'Product Owner'}
                                       </span>
                                     )}
                                   </div>
-                                  <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  <span className="text-[10px] lg:text-xs flex-shrink-0" style={{ color: '#939393' }}>{comment.date}</span>
                                 </div>
-                                <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                <p className="text-xs lg:text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
                               </div>
                             </div>
-                            <div className="mt-3 pl-12">
+                            <div className="mt-2 lg:mt-3 pl-10 lg:pl-12">
                               {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
                             </div>
                           </div>
@@ -1265,37 +1272,37 @@ const ProductDetail: React.FC = () => {
                   </button>
                 </div>
                   {expandedDiscussions.review2 && reviewDiscussionData.review2 && (
-                    <div className="mt-4 space-y-4">
+                    <div className="mt-4 space-y-3 lg:space-y-4">
                       {reviewDiscussionData.review2.map((comment) => (
-                        <div key={comment.id} className="flex space-x-3">
+                        <div key={comment.id} className="flex space-x-2 lg:space-x-3">
                           <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                          <div className="flex-1 pl-4">
-                            <div className="flex items-start space-x-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                          <div className="flex-1 pl-3 lg:pl-4">
+                            <div className="flex items-start space-x-2 lg:space-x-3">
+                              <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
                                 {comment.avatar ? (
                                   <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
                                 ) : (
-                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg className="w-3 h-3 lg:w-4 lg:h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                   </svg>
                                 )}
               </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center space-x-1.5 lg:space-x-2 flex-1 min-w-0">
+                                    <span className="text-xs lg:text-sm font-medium lg:font-semibold text-gray-900 truncate">{comment.author}</span>
                                     {comment.isOwner && (
-                                      <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                      <span className="text-[9px] lg:text-[10px] font-medium px-1.5 lg:px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
                                         {comment.role || 'Product Owner'}
                                       </span>
                                     )}
             </div>
-                                  <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  <span className="text-[10px] lg:text-xs flex-shrink-0" style={{ color: '#939393' }}>{comment.date}</span>
           </div>
-                                <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                <p className="text-xs lg:text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
             </div>
                 </div>
-                            <div className="mt-3 pl-12">
+                            <div className="mt-2 lg:mt-3 pl-10 lg:pl-12">
                               {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
               </div>
                           </div>
@@ -1351,37 +1358,37 @@ const ProductDetail: React.FC = () => {
                     </button>
                   </div>
                   {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
-                    <div className="mt-4 space-y-4">
+                    <div className="mt-4 space-y-3 lg:space-y-4">
                       {reviewDiscussionData.review3.map((comment) => (
-                        <div key={comment.id} className="flex space-x-3">
+                        <div key={comment.id} className="flex space-x-2 lg:space-x-3">
                           <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                          <div className="flex-1 pl-4">
-                            <div className="flex items-start space-x-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                          <div className="flex-1 pl-3 lg:pl-4">
+                            <div className="flex items-start space-x-2 lg:space-x-3">
+                              <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
                                 {comment.avatar ? (
                                   <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
                                 ) : (
-                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg className="w-3 h-3 lg:w-4 lg:h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
                                 )}
                               </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center space-x-1.5 lg:space-x-2 flex-1 min-w-0">
+                                    <span className="text-xs lg:text-sm font-medium lg:font-semibold text-gray-900 truncate">{comment.author}</span>
                                     {comment.isOwner && (
-                                      <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                      <span className="text-[9px] lg:text-[10px] font-medium px-1.5 lg:px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
                                         {comment.role || 'Product Owner'}
                                       </span>
                                     )}
                                   </div>
-                                  <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  <span className="text-[10px] lg:text-xs flex-shrink-0" style={{ color: '#939393' }}>{comment.date}</span>
                                 </div>
-                                <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                <p className="text-xs lg:text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
                               </div>
                             </div>
-                            <div className="mt-3 pl-12">
+                            <div className="mt-2 lg:mt-3 pl-10 lg:pl-12">
                               {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
                             </div>
                           </div>
@@ -1417,17 +1424,19 @@ const ProductDetail: React.FC = () => {
             <div className="lg:col-span-1 order-1 lg:order-2 w-full">
               {/* Overall Rating Summary */}
               <div className="mb-6 text-left lg:text-center">
-                <div className="flex items-center justify-start lg:justify-center space-x-2 mb-2">
-                  <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
-                  <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                  <div className="ml-auto lg:hidden">
+                <div className="flex items-center justify-between lg:justify-center space-x-2 mb-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
+                    <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  </div>
+                  <div className="lg:hidden">
                     <button
-                      className="px-4 py-2 rounded-md text-xs font-semibold"
+                      className="px-4 py-2 rounded-md text-xs font-medium"
                       style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
                     >
-                      Give your opinion
+                      Give feedback
                     </button>
                   </div>
             </div>
@@ -1690,38 +1699,39 @@ const ProductDetail: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                           USD 31.7
-                        </div>
+              </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
-                          padding: '1px 4px', 
+                          padding: '1px 3px', 
                           justifyContent: 'center', 
                           alignItems: 'center', 
                           gap: '1px', 
-                          fontSize: '9px' 
+                          fontSize: '8px' 
                         }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                           <span>Verified seller</span>
                         </div>
                       </div>
                       <h3 className="line-clamp-2 font-medium" style={{ 
-                        fontSize: '13px', 
+                        fontSize: '12px', 
                         color: '#212121',
-                        marginBottom: '4px'
+                        marginBottom: '3px',
+                        lineHeight: '1.3'
                       }}>Product Name</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-500 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
                           <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                            width: '10px',
-                            height: '10px',
-                            marginRight: '4px'
+                            width: '9px',
+                            height: '9px',
+                            marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
-                        <div style={{ marginLeft: '8px' }}>
+                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                   <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -1736,17 +1746,18 @@ const ProductDetail: React.FC = () => {
                     }}
                             className="transition-colors touch-manipulation"
                             style={{ 
-                              width: '20px', 
-                              height: '20px', 
+                              width: window.innerWidth < 1024 ? '18px' : '20px', 
+                              height: window.innerWidth < 1024 ? '18px' : '20px', 
                               display: 'flex', 
                               alignItems: 'center', 
-                              justifyContent: 'center' 
+                              justifyContent: 'center',
+                              padding: '2px'
                             }}
                   >
                             <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: '20px',
-                              height: '20px',
-                              filter: wishlistProducts.has(`reviews-product-${productNum}`) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              width: window.innerWidth < 1024 ? '16px' : '20px',
+                              height: window.innerWidth < 1024 ? '16px' : '20px',
+                              filter: wishlistProducts.has(`reviews-product-${productNum}`) ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
                   </button>
                 </div>
@@ -1768,7 +1779,7 @@ const ProductDetail: React.FC = () => {
                   <h2 className="text-2xl font-medium text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     {product.seller.name} items
                   </h2>
-                  <div className="flex items-center gap-3">
+                  <div className="hidden lg:flex items-center gap-3">
             <button 
                       className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
                       aria-label="Previous"
@@ -1820,38 +1831,39 @@ const ProductDetail: React.FC = () => {
                         </span>
             </div>
                 </div>
-                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                           USD 31.7
               </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
-                          padding: '1px 4px', 
+                          padding: '1px 3px', 
                           justifyContent: 'center', 
                           alignItems: 'center', 
                           gap: '1px', 
-                          fontSize: '9px' 
+                          fontSize: '8px' 
                         }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                           <span>Verified seller</span>
                 </div>
                       </div>
                       <h3 className="line-clamp-2 font-medium" style={{ 
-                        fontSize: '13px', 
+                        fontSize: '12px', 
                         color: '#212121',
-                        marginBottom: '4px'
+                        marginBottom: '3px',
+                        lineHeight: '1.3'
                       }}>White Pepper</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-500 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
                           <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                            width: '10px',
-                            height: '10px',
-                            marginRight: '4px'
+                            width: '9px',
+                            height: '9px',
+                            marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
-                        <div style={{ marginLeft: '8px' }}>
+                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                   <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -1866,17 +1878,18 @@ const ProductDetail: React.FC = () => {
                             }}
                             className="transition-colors touch-manipulation"
                             style={{ 
-                              width: '20px', 
-                              height: '20px', 
+                              width: window.innerWidth < 1024 ? '18px' : '20px', 
+                              height: window.innerWidth < 1024 ? '18px' : '20px', 
                               display: 'flex', 
                               alignItems: 'center', 
-                              justifyContent: 'center' 
+                              justifyContent: 'center',
+                              padding: '2px'
                             }}
                           >
                             <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: '20px',
-                              height: '20px',
-                              filter: wishlistProducts.has('product-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              width: window.innerWidth < 1024 ? '16px' : '20px',
+                              height: window.innerWidth < 1024 ? '16px' : '20px',
+                              filter: wishlistProducts.has('product-1') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
                   </button>
                         </div>
@@ -1917,38 +1930,39 @@ const ProductDetail: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                           USD 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
-                          padding: '1px 4px', 
+                          padding: '1px 3px', 
                           justifyContent: 'center', 
                           alignItems: 'center', 
                           gap: '1px', 
-                          fontSize: '9px' 
+                          fontSize: '8px' 
                         }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                           <span>Verified seller</span>
                         </div>
                       </div>
                       <h3 className="line-clamp-2 font-medium" style={{ 
-                        fontSize: '13px', 
+                        fontSize: '12px', 
                         color: '#212121',
-                        marginBottom: '4px'
+                        marginBottom: '3px',
+                        lineHeight: '1.3'
                       }}>Chickpeas</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-500 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
                           <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                            width: '10px',
-                            height: '10px',
-                            marginRight: '4px'
+                            width: '9px',
+                            height: '9px',
+                            marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
-                        <div style={{ marginLeft: '8px' }}>
+                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                   <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -1963,17 +1977,18 @@ const ProductDetail: React.FC = () => {
                     }}
                             className="transition-colors touch-manipulation"
                             style={{ 
-                              width: '20px', 
-                              height: '20px', 
+                              width: window.innerWidth < 1024 ? '18px' : '20px', 
+                              height: window.innerWidth < 1024 ? '18px' : '20px', 
                               display: 'flex', 
                               alignItems: 'center', 
-                              justifyContent: 'center' 
+                              justifyContent: 'center',
+                              padding: '2px'
                             }}
                           >
                             <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: '20px',
-                              height: '20px',
-                              filter: wishlistProducts.has('product-2') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              width: window.innerWidth < 1024 ? '16px' : '20px',
+                              height: window.innerWidth < 1024 ? '16px' : '20px',
+                              filter: wishlistProducts.has('product-2') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
                   </button>
                 </div>
@@ -2014,38 +2029,39 @@ const ProductDetail: React.FC = () => {
                         </span>
             </div>
                 </div>
-                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                           USD 31.7
               </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
-                          padding: '1px 4px', 
+                          padding: '1px 3px', 
                           justifyContent: 'center', 
                           alignItems: 'center', 
                           gap: '1px', 
-                          fontSize: '9px' 
+                          fontSize: '8px' 
                         }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                           <span>Verified seller</span>
                 </div>
                       </div>
                       <h3 className="line-clamp-2 font-medium" style={{ 
-                        fontSize: '13px', 
+                        fontSize: '12px', 
                         color: '#212121',
-                        marginBottom: '4px'
+                        marginBottom: '3px',
+                        lineHeight: '1.3'
                       }}>Cherry Tomatoes</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-500 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
                           <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                            width: '10px',
-                            height: '10px',
-                            marginRight: '4px'
+                            width: '9px',
+                            height: '9px',
+                            marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
-                        <div style={{ marginLeft: '8px' }}>
+                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                   <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -2060,17 +2076,18 @@ const ProductDetail: React.FC = () => {
                             }}
                             className="transition-colors touch-manipulation"
                             style={{ 
-                              width: '20px', 
-                              height: '20px', 
+                              width: window.innerWidth < 1024 ? '18px' : '20px', 
+                              height: window.innerWidth < 1024 ? '18px' : '20px', 
                               display: 'flex', 
                               alignItems: 'center', 
-                              justifyContent: 'center' 
+                              justifyContent: 'center',
+                              padding: '2px'
                             }}
                           >
                             <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: '20px',
-                              height: '20px',
-                              filter: wishlistProducts.has('product-3') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              width: window.innerWidth < 1024 ? '16px' : '20px',
+                              height: window.innerWidth < 1024 ? '16px' : '20px',
+                              filter: wishlistProducts.has('product-3') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
                   </button>
                         </div>
@@ -2111,38 +2128,39 @@ const ProductDetail: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                           USD 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
-                          padding: '1px 4px', 
+                          padding: '1px 3px', 
                           justifyContent: 'center', 
                           alignItems: 'center', 
                           gap: '1px', 
-                          fontSize: '9px' 
+                          fontSize: '8px' 
                         }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                           <span>Verified seller</span>
                         </div>
                       </div>
                       <h3 className="line-clamp-2 font-medium" style={{ 
-                        fontSize: '13px', 
+                        fontSize: '12px', 
                         color: '#212121',
-                        marginBottom: '4px'
+                        marginBottom: '3px',
+                        lineHeight: '1.3'
                       }}>Dried Shrimp</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-500 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
                           <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                            width: '10px',
-                            height: '10px',
-                            marginRight: '4px'
+                            width: '9px',
+                            height: '9px',
+                            marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
-                        <div style={{ marginLeft: '8px' }}>
+                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                   <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -2157,17 +2175,18 @@ const ProductDetail: React.FC = () => {
                     }}
                             className="transition-colors touch-manipulation"
                             style={{ 
-                              width: '20px', 
-                              height: '20px', 
+                              width: window.innerWidth < 1024 ? '18px' : '20px', 
+                              height: window.innerWidth < 1024 ? '18px' : '20px', 
                               display: 'flex', 
                               alignItems: 'center', 
-                              justifyContent: 'center' 
+                              justifyContent: 'center',
+                              padding: '2px'
                             }}
                   >
                             <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: '20px',
-                              height: '20px',
-                              filter: wishlistProducts.has('product-4') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              width: window.innerWidth < 1024 ? '16px' : '20px',
+                              height: window.innerWidth < 1024 ? '16px' : '20px',
+                              filter: wishlistProducts.has('product-4') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
                   </button>
                 </div>
@@ -2208,38 +2227,39 @@ const ProductDetail: React.FC = () => {
                         </span>
             </div>
                 </div>
-                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                           USD 31.7
               </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
-                          padding: '1px 4px', 
+                          padding: '1px 3px', 
                           justifyContent: 'center', 
                           alignItems: 'center', 
                           gap: '1px', 
-                          fontSize: '9px' 
+                          fontSize: '8px' 
                         }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                           <span>Verified seller</span>
                 </div>
                       </div>
                       <h3 className="line-clamp-2 font-medium" style={{ 
-                        fontSize: '13px', 
+                        fontSize: '12px', 
                         color: '#212121',
-                        marginBottom: '4px'
+                        marginBottom: '3px',
+                        lineHeight: '1.3'
                       }}>Green Vegetables</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-500 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
                           <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                            width: '10px',
-                            height: '10px',
-                            marginRight: '4px'
+                            width: '9px',
+                            height: '9px',
+                            marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
-                        <div style={{ marginLeft: '8px' }}>
+                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                   <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -2254,17 +2274,18 @@ const ProductDetail: React.FC = () => {
                             }}
                             className="transition-colors touch-manipulation"
                             style={{ 
-                              width: '20px', 
-                              height: '20px', 
+                              width: window.innerWidth < 1024 ? '18px' : '20px', 
+                              height: window.innerWidth < 1024 ? '18px' : '20px', 
                               display: 'flex', 
                               alignItems: 'center', 
-                              justifyContent: 'center' 
+                              justifyContent: 'center',
+                              padding: '2px'
                             }}
                           >
                             <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: '20px',
-                              height: '20px',
-                              filter: wishlistProducts.has('product-5') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              width: window.innerWidth < 1024 ? '16px' : '20px',
+                              height: window.innerWidth < 1024 ? '16px' : '20px',
+                              filter: wishlistProducts.has('product-5') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
                   </button>
                         </div>
@@ -2305,38 +2326,39 @@ const ProductDetail: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                           USD 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
-                          padding: '1px 4px', 
+                          padding: '1px 3px', 
                           justifyContent: 'center', 
                           alignItems: 'center', 
                           gap: '1px', 
-                          fontSize: '9px' 
+                          fontSize: '8px' 
                         }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                           <span>Verified seller</span>
                         </div>
                       </div>
                       <h3 className="line-clamp-2 font-medium" style={{ 
-                        fontSize: '13px', 
+                        fontSize: '12px', 
                         color: '#212121',
-                        marginBottom: '4px'
+                        marginBottom: '3px',
+                        lineHeight: '1.3'
                       }}>Yam and Yam Flour</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-500 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
                           <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                            width: '10px',
-                            height: '10px',
-                            marginRight: '4px'
+                            width: '9px',
+                            height: '9px',
+                            marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
-                        <div style={{ marginLeft: '8px' }}>
+                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                   <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -2351,17 +2373,18 @@ const ProductDetail: React.FC = () => {
                     }}
                             className="transition-colors touch-manipulation"
                             style={{ 
-                              width: '20px', 
-                              height: '20px', 
+                              width: window.innerWidth < 1024 ? '18px' : '20px', 
+                              height: window.innerWidth < 1024 ? '18px' : '20px', 
                               display: 'flex', 
                               alignItems: 'center', 
-                              justifyContent: 'center' 
+                              justifyContent: 'center',
+                              padding: '2px'
                             }}
                   >
                             <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: '20px',
-                              height: '20px',
-                              filter: wishlistProducts.has('product-6') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              width: window.innerWidth < 1024 ? '16px' : '20px',
+                              height: window.innerWidth < 1024 ? '16px' : '20px',
+                              filter: wishlistProducts.has('product-6') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
                   </button>
                 </div>
@@ -2412,38 +2435,39 @@ const ProductDetail: React.FC = () => {
                         </span>
             </div>
                 </div>
-                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                           USD 31.7
               </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                           display: 'flex', 
-                          padding: '1px 4px', 
+                          padding: '1px 3px', 
                           justifyContent: 'center', 
                           alignItems: 'center', 
                           gap: '1px', 
-                          fontSize: '9px' 
+                          fontSize: '8px' 
                         }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                           <span>Verified seller</span>
                 </div>
                       </div>
                       <h3 className="line-clamp-2 font-medium" style={{ 
-                        fontSize: '13px', 
+                        fontSize: '12px', 
                         color: '#212121',
-                        marginBottom: '4px'
+                        marginBottom: '3px',
+                        lineHeight: '1.3'
                       }}>White Pepper</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-500 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
                           <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                            width: '10px',
-                            height: '10px',
-                            marginRight: '4px'
+                            width: '9px',
+                            height: '9px',
+                            marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
                         </div>
-                        <div style={{ marginLeft: '8px' }}>
+                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                   <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -2458,17 +2482,18 @@ const ProductDetail: React.FC = () => {
                             }}
                             className="transition-colors touch-manipulation"
                             style={{ 
-                              width: '20px', 
-                              height: '20px', 
+                              width: window.innerWidth < 1024 ? '18px' : '20px', 
+                              height: window.innerWidth < 1024 ? '18px' : '20px', 
                               display: 'flex', 
                               alignItems: 'center', 
-                              justifyContent: 'center' 
+                              justifyContent: 'center',
+                              padding: '2px'
                             }}
                           >
                             <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: '20px',
-                              height: '20px',
-                              filter: wishlistProducts.has('recommended-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                              width: window.innerWidth < 1024 ? '16px' : '20px',
+                              height: window.innerWidth < 1024 ? '16px' : '20px',
+                              filter: wishlistProducts.has('recommended-1') ? 'none' : 'grayscale(100%) opacity(0.6)'
                             }} />
                   </button>
                         </div>
@@ -2510,38 +2535,39 @@ const ProductDetail: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                        <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                          <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                      <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
+                        <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
                             USD 31.7
                           </div>
-                          <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
-                            display: 'flex', 
-                            padding: '1px 4px', 
-                            justifyContent: 'center', 
-                            alignItems: 'center', 
-                            gap: '1px', 
-                            fontSize: '9px' 
-                          }}>
-                            <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                          display: 'flex', 
+                          padding: '1px 3px', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          gap: '1px', 
+                          fontSize: '8px' 
+                        }}>
+                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                             <span>Verified seller</span>
                           </div>
                         </div>
                         <h3 className="line-clamp-2 font-medium" style={{ 
-                          fontSize: '13px', 
+                          fontSize: '12px', 
                           color: '#212121',
-                          marginBottom: '4px'
+                          marginBottom: '3px',
+                          lineHeight: '1.3'
                         }}>Product Name</h3>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center text-gray-500 flex-1">
-                            <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                              width: '10px',
-                              height: '10px',
-                              marginRight: '4px'
-                            }} />
-                            <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
-                          </div>
-                          <div style={{ marginLeft: '8px' }}>
+                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                            width: '9px',
+                            height: '9px',
+                            marginRight: '3px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
+                        </div>
+                          <div style={{ marginLeft: '4px' }}>
                   <button 
                               onClick={(e) => {
                                 e.preventDefault();
@@ -2556,17 +2582,18 @@ const ProductDetail: React.FC = () => {
                     }}
                               className="transition-colors touch-manipulation"
                               style={{ 
-                                width: '20px', 
-                                height: '20px', 
+                                width: window.innerWidth < 1024 ? '18px' : '20px', 
+                                height: window.innerWidth < 1024 ? '18px' : '20px', 
                                 display: 'flex', 
                                 alignItems: 'center', 
-                                justifyContent: 'center' 
+                                justifyContent: 'center',
+                                padding: '2px'
                             }}
                             >
                               <img src={bookmarkIcon} alt="Bookmark" style={{
-                                width: '20px',
-                                height: '20px',
-                                filter: wishlistProducts.has(`recommended-${num}`) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                                width: window.innerWidth < 1024 ? '16px' : '20px',
+                                height: window.innerWidth < 1024 ? '16px' : '20px',
+                                filter: wishlistProducts.has(`recommended-${num}`) ? 'none' : 'grayscale(100%) opacity(0.6)'
                               }} />
                             </button>
                           </div>
@@ -2594,55 +2621,55 @@ const ProductDetail: React.FC = () => {
           {/* Share Modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div 
-              className="bg-white rounded-2xl shadow-xl relative max-w-md w-full"
+              className="bg-white shadow-xl relative max-w-md w-full p-5 mt-5 lg:rounded-2xl lg:px-6 lg:py-8 lg:mt-10"
+              style={{ borderRadius: '30px' }}
               onClick={(e) => e.stopPropagation()}
-              style={{ padding: '32px 24px', marginTop: '40px' }}
             >
-              {/* Product Picture - Half Outside Modal */}
-              <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '-40px' }}>
-                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white overflow-hidden">
-                  <img
-                    src={images[selectedImageIndex]}
-                    alt={product.name}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                </div>
-              </div>
-
-              {/* Close Button */}
+              {/* Close Button - At Top */}
               <button
                 onClick={() => setShowShareModal(false)}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
+                className="absolute top-4 right-4 lg:top-4 lg:right-4 w-6 h-6 lg:w-8 lg:h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
               >
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 lg:w-5 lg:h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
               </button>
 
+              {/* Product Picture - Half Outside Modal */}
+              <div className="absolute left-1/2 -translate-x-1/2 lg:-top-10" style={{ top: '-20px' }}>
+                <div className="w-14 h-14 lg:w-20 lg:h-20 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white overflow-hidden">
+                  <img
+                    src={images[selectedImageIndex]}
+                    alt={product.name}
+                    className="w-10 h-10 lg:w-16 lg:h-16 rounded-full object-cover"
+                  />
+                </div>
+              </div>
+
               {/* Heading */}
-              <h3 className="text-xl font-semibold text-center mb-3 mt-8" style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <h3 className="text-base lg:text-xl font-semibold text-center mb-3 mt-6 lg:mt-8" style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Share this product with your loved ones
               </h3>
 
               {/* Description */}
-              <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0' }}>
+              <p className="text-[11px] lg:text-xs text-center mb-4 lg:mb-6" style={{ color: '#B0B0B0' }}>
                 Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!
               </p>
 
               {/* Copy Link Section */}
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-2 mb-4 lg:mb-6">
                 <input
                   type="text"
                   readOnly
                   value={`${window.location.origin}/product/${product.id}`}
-                  className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium focus:outline-none"
+                  className="flex-1 px-3 py-2 lg:px-4 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium focus:outline-none"
                   style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', border: 'none' }}
                 />
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                   }}
-                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90"
+                  className="px-3 py-2 lg:px-4 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium text-white transition-colors hover:opacity-90"
                   style={{ backgroundColor: '#000000' }}
                 >
                   Copy link
@@ -2651,29 +2678,29 @@ const ProductDetail: React.FC = () => {
 
               {/* Share To Section */}
               <div>
-                <p className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Share to</p>
-                <div className="flex items-center justify-center space-x-6">
-                  <button className="flex flex-col items-center space-y-2">
-                    <img src={fbIcon} alt="Facebook" className="w-10 h-10" />
-                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Facebook</span>
+                <p className="text-xs lg:text-sm mb-3" style={{ color: '#6A6A6A' }}>Share to</p>
+                <div className="flex items-center justify-center space-x-4 lg:space-x-6">
+                  <button className="flex flex-col items-center space-y-1.5 lg:space-y-2">
+                    <img src={fbIcon} alt="Facebook" className="w-8 h-8 lg:w-10 lg:h-10" />
+                    <span className="text-[10px] lg:text-xs" style={{ color: '#B0B0B0' }}>Facebook</span>
                   </button>
-                  <button className="flex flex-col items-center space-y-2">
-                    <img src={igIcon} alt="Instagram" className="w-10 h-10" />
-                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Instagram</span>
+                  <button className="flex flex-col items-center space-y-1.5 lg:space-y-2">
+                    <img src={igIcon} alt="Instagram" className="w-8 h-8 lg:w-10 lg:h-10" />
+                    <span className="text-[10px] lg:text-xs" style={{ color: '#B0B0B0' }}>Instagram</span>
                   </button>
-                  <button className="flex flex-col items-center space-y-2">
-                    <img src={xIcon} alt="X" className="w-10 h-10" />
-                    <span className="text-xs" style={{ color: '#B0B0B0' }}>X</span>
+                  <button className="flex flex-col items-center space-y-1.5 lg:space-y-2">
+                    <img src={xIcon} alt="X" className="w-8 h-8 lg:w-10 lg:h-10" />
+                    <span className="text-[10px] lg:text-xs" style={{ color: '#B0B0B0' }}>X</span>
                   </button>
-                  <button className="flex flex-col items-center space-y-2">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0088cc' }}>
-                      <img src={tgIcon} alt="Telegram" className="w-6 h-6" />
+                  <button className="flex flex-col items-center space-y-1.5 lg:space-y-2">
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0088cc' }}>
+                      <img src={tgIcon} alt="Telegram" className="w-5 h-5 lg:w-6 lg:h-6" />
               </div>
-                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Telegram</span>
+                    <span className="text-[10px] lg:text-xs" style={{ color: '#B0B0B0' }}>Telegram</span>
                   </button>
-                  <button className="flex flex-col items-center space-y-2">
-                    <img src={zapIcon} alt="WhatsApp" className="w-10 h-10" />
-                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Whatsapp</span>
+                  <button className="flex flex-col items-center space-y-1.5 lg:space-y-2">
+                    <img src={zapIcon} alt="WhatsApp" className="w-8 h-8 lg:w-10 lg:h-10" />
+                    <span className="text-[10px] lg:text-xs" style={{ color: '#B0B0B0' }}>Whatsapp</span>
                   </button>
             </div>
           </div>
@@ -2683,7 +2710,10 @@ const ProductDetail: React.FC = () => {
       )}
 
       {/* Add spacing before footer */}
-      <div className="pb-32"></div>
+      <div className="pb-4 lg:pb-32">
+        {/* Mobile Footer Divider - Just above footer logo */}
+        <div className="lg:hidden border-t pt-0.5 mb-0.5" style={{ borderColor: '#E5E5E5' }}></div>
+      </div>
     </div>
   );
 };
