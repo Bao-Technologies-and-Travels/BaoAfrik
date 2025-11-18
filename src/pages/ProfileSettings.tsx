@@ -27,6 +27,13 @@ import logoIcon from '../assets/images/logos/ba-brand-icon-colored.png';
 import avatar from '../assets/images/logos/avatar.png';
 import messageAvatarIcon from '../assets/images/pre/main.png';
 import appNotificationIcon from '../assets/images/pre/nof.svg';
+import pi1Icon from '../assets/images/pre/pi1.svg';
+import pi2Icon from '../assets/images/pre/pi2.svg';
+import v1Icon from '../assets/images/pre/v1.svg';
+import v2Icon from '../assets/images/pre/v2.svg';
+import cameraIcon from '../assets/images/pre/camera.svg';
+import locationIcon from '../assets/images/pre/PL.svg';
+import pencilIcon from '../assets/images/pre/pencil.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -698,19 +705,19 @@ const ProfileSettings: React.FC = () => {
           {/* Main Content */}
           <div className="flex-1 mx-8 mt-8 mb-0 flex gap-6 overflow-hidden" style={{ minHeight: 'calc(100vh - 140px)', maxHeight: 'calc(100vh - 140px)' }}>
             {/* Left Content Area */}
-            <div className="flex-1 bg-white border border-gray-200 rounded-[20px] p-4 overflow-y-auto scrollbar-hide">
+            <div className="flex-1 bg-white border border-gray-200 rounded-[20px] px-8 py-4 overflow-y-auto scrollbar-hide">
               {/* Section Header */}
-              <div className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm">
-                <div className="mb-3">
-                <h1 className="text-lg font-semibold text-gray-900 mb-1">Profile Setting</h1>
-                <p className="text-xs" style={{ color: '#BABABA' }}>
+              <div className="bg-white p-2 mb-3">
+                <div className="mb-2">
+                <h1 className="text-sm font-semibold text-gray-900 mb-0.5">Profile Setting</h1>
+                <p className="text-[10px]" style={{ color: '#BABABA' }}>
                   Update your profile and control what others see on BAO' Afrik.
                 </p>
               </div>
               </div>
 
               {/* Sub-navigation Tabs */}
-              <div className="flex items-center space-x-4 mb-4 border-b border-gray-200">
+              <div className="flex items-center space-x-4 mb-6 -mx-4 px-4 border-b border-gray-200">
                 <button
                   onClick={() => setActiveTab('personal')}
                   className={`flex items-center space-x-1.5 pb-2 relative ${
@@ -720,10 +727,12 @@ const ProfileSettings: React.FC = () => {
                     borderBottomColor: activeTab === 'personal' ? '#64B5F6' : 'transparent'
                   }}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: activeTab === 'personal' ? '#64B5F6' : '#6A6A6A' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  <span className="text-xs font-medium" style={{ color: activeTab === 'personal' ? '#64B5F6' : '#6A6A6A' }}>
+                  <img 
+                    src={activeTab === 'personal' ? pi2Icon : pi1Icon} 
+                    alt="Personal Information" 
+                    className="w-4 h-4"
+                  />
+                  <span className="text-xs font-normal" style={{ color: activeTab === 'personal' ? '#64B5F6' : '#B0B0B0' }}>
                     Personal Information
                   </span>
                 </button>
@@ -736,10 +745,12 @@ const ProfileSettings: React.FC = () => {
                     borderBottomColor: activeTab === 'verification' ? '#64B5F6' : 'transparent'
                   }}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: activeTab === 'verification' ? '#64B5F6' : '#6A6A6A' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="text-xs font-medium" style={{ color: activeTab === 'verification' ? '#64B5F6' : '#6A6A6A' }}>
+                  <img 
+                    src={activeTab === 'verification' ? v2Icon : v1Icon} 
+                    alt="Verification" 
+                    className="w-4 h-4"
+                  />
+                  <span className="text-xs font-normal" style={{ color: activeTab === 'verification' ? '#64B5F6' : '#B0B0B0' }}>
                     Verification
                   </span>
                 </button>
@@ -748,104 +759,97 @@ const ProfileSettings: React.FC = () => {
               {/* Personal Information Tab Content */}
               {activeTab === 'personal' && (
                 <div className="space-y-3">
-                  <div className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm">
+                  <div className="bg-white">
                     {/* Upload Photo Section */}
-                    <div>
-                    <div className="flex items-center justify-center mb-2">
-                      <div className="w-32 h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center" style={{ borderColor: '#E1E1E1' }}>
-                        <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-24 h-24 border-2 border-dashed flex flex-col items-center justify-center" style={{ borderColor: '#E1E1E1', borderRadius: '13px' }}>
+                        <img src={cameraIcon} alt="Camera" className="w-8 h-8" />
+                      </div>
+                      <div className="flex flex-col">
+                        <button 
+                          className="px-2 py-1.5 rounded-lg text-xs font-normal transition-colors border mb-1"
+                          style={{ backgroundColor: 'white', color: '#6A6A6A', borderColor: '#D9D9D9', width: 'fit-content' }}
+                        >
+                          Upload a photo
+                        </button>
+                        <p className="text-[10px]" style={{ color: '#ACAAAA' }}>
+                          At least 800 x 800 px recommanded.<br />
+                          JPG or PNG allowed
+                        </p>
                       </div>
                     </div>
-                    <div className="flex flex-col items-center space-y-1">
-                      <button 
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-                        style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
-                      >
-                        Upload a photo
-                      </button>
-                      <p className="text-[10px]" style={{ color: '#BABABA' }}>
-                        At least 800 x 800 px recommended. JPG or PNG allowed.
-                      </p>
-                    </div>
                   </div>
-                  </div>
+                  {/* Divider */}
+                  <div className="mt-4 -mx-4" style={{ height: '0.5px', backgroundColor: '#E9E9E9' }}></div>
 
                   {/* Profile Setting Details */}
-                  <div className="border rounded-2xl p-3 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-semibold text-gray-900">Profile Setting</h3>
+                  <div className="border rounded-2xl p-2 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xs font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
                       <button
                         onClick={() => setIsEditingProfile(!isEditingProfile)}
                         className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
                         style={{ borderColor: '#D9D9D9' }}
                       >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#6A6A6A' }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
+                        <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
                         <span className="text-[10px]" style={{ color: '#6A6A6A' }}>Edit</span>
                       </button>
                     </div>
-                    <div className="space-y-2">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <label className="text-[10px] mb-0.5 block" style={{ color: '#BABABA' }}>Full name</label>
-                        <p className="text-xs font-semibold text-gray-900">Jean Kameni</p>
+                        <label className="text-[10px] mb-0.5 block" style={{ color: '#212121' }}>Full name</label>
+                        <p className="text-xs font-normal" style={{ color: '#212121' }}>Jean Kameni</p>
                       </div>
                       <div>
-                        <label className="text-[10px] mb-0.5 block" style={{ color: '#BABABA' }}>Gender</label>
-                        <p className="text-xs text-gray-900">Male</p>
+                        <label className="text-[10px] mb-0.5 block" style={{ color: '#212121' }}>Gender</label>
+                        <p className="text-xs font-normal" style={{ color: '#212121' }}>Male</p>
                       </div>
                       <div>
-                        <label className="text-[10px] mb-0.5 block" style={{ color: '#BABABA' }}>Birthday</label>
-                        <p className="text-xs text-gray-900">13/09/2000</p>
+                        <label className="text-[10px] mb-0.5 block" style={{ color: '#212121' }}>Birthday</label>
+                        <p className="text-xs font-normal" style={{ color: '#212121' }}>13/09/2000</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Location Section */}
                   <div className="border rounded-2xl p-3 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Location</h3>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-gray-900">Geolocation</span>
-                      <button
-                        onClick={() => setIsGeolocationEnabled(!isGeolocationEnabled)}
-                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                          isGeolocationEnabled ? 'bg-blue-600' : 'bg-gray-300'
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                            isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0.5'
+                      <h3 className="text-sm font-normal" style={{ color: '#6A6A6A' }}>Location</h3>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-[10px]" style={{ color: '#64B5F6' }}>Geolocation</span>
+                        <button
+                          onClick={() => setIsGeolocationEnabled(!isGeolocationEnabled)}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                            isGeolocationEnabled ? 'bg-blue-600' : 'bg-gray-300'
                           }`}
-                        />
-                      </button>
+                        >
+                          <span
+                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                              isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0.5'
+                            }`}
+                          />
+                        </button>
+                      </div>
                     </div>
                     <div className="relative">
                       <input
                         type="text"
                         value="London, United Kingdom"
                         readOnly
-                        className="w-full px-3 py-2 pl-8 rounded-lg text-xs focus:outline-none"
-                        style={{ backgroundColor: '#F1F1F1', color: '#212121' }}
+                        className="w-full px-3 py-2 pl-8 rounded-xl text-xs focus:outline-none"
+                        style={{ backgroundColor: 'white', color: '#6A6A6A', border: '1px solid #E9E9E9', borderRadius: '12px' }}
                       />
-                      <svg 
-                        className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                        style={{ color: '#64B5F6' }}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                      <img 
+                        src={locationIcon} 
+                        alt="Location" 
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4"
+                        style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
+                      />
                     </div>
                   </div>
 
                   {/* Biography Section */}
                   <div className="border rounded-2xl p-3 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Biography</h3>
                     <div className="relative">
                       <textarea
                         value={biography}
@@ -854,22 +858,30 @@ const ProfileSettings: React.FC = () => {
                             setBiography(e.target.value);
                           }
                         }}
-                        placeholder="Can you tell us more about yourself?"
+                        placeholder="Can you tell us more about yourself ?"
                         className="w-full px-3 py-2 rounded-lg text-xs focus:outline-none resize-none"
                         style={{ 
-                          backgroundColor: '#F1F1F1', 
+                          backgroundColor: 'white', 
                           color: '#212121',
-                          minHeight: '80px'
+                          minHeight: '80px',
+                          border: 'none'
                         }}
                         maxLength={500}
                       />
+                      <style>
+                        {`
+                          textarea::placeholder {
+                            color: #D9D9D9;
+                          }
+                        `}
+                      </style>
                       <div className="flex items-center justify-between mt-1.5">
-                        <span className="text-[10px]" style={{ color: '#64B5F6' }}>
+                        <span className="text-[10px]" style={{ color: '#D9D9D9' }}>
                           {biography.length}/500
                         </span>
                         <button
-                          className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-                          style={{ backgroundColor: '#F1F1F1', color: '#6A6A6A' }}
+                          className="px-3 py-1.5 rounded-lg text-[10px] font-medium transition-colors"
+                          style={{ backgroundColor: '#E9E9E9', color: '#6A6A6A' }}
                         >
                           Save biographie
                         </button>
