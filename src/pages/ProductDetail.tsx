@@ -1122,7 +1122,7 @@ const ProductDetail: React.FC = () => {
                             borderRadius: isSelected ? '10px' : '0',
                             marginBottom: index < filterOptions.length - 1 ? '4px' : '0'
                           }}
-                        >
+            >
                           {/* Icon */}
                           <div className="flex-shrink-0 mt-0.5">
                             {option.icon === 'star' ? (
@@ -1438,14 +1438,14 @@ const ProductDetail: React.FC = () => {
                   </div>
                   {!isReviewPosted && (
                     <div className="lg:hidden">
-                      <button
+              <button 
                         onClick={() => setShowGiveOpinionModal(true)}
                         className="px-4 py-2 rounded-md text-xs font-medium"
                         style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                      >
+              >
                         Give feedback
-                      </button>
-                    </div>
+              </button>
+            </div>
                   )}
           </div>
                 <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
@@ -1454,13 +1454,13 @@ const ProductDetail: React.FC = () => {
                 <div className="space-y-2 mb-2 lg:mb-0">
                   <div className="w-full bg-gray-200 rounded-full h-1">
                     <div className="bg-yellow-400 h-1 rounded-full" style={{width: '70%'}}></div>
-                </div>
+            </div>
                   <div className="w-full bg-gray-200 rounded-full h-1">
                     <div className="bg-yellow-400 h-1 rounded-full" style={{width: '60%'}}></div>
-              </div>
+                </div>
                   <div className="w-full bg-gray-200 rounded-full h-1">
                     <div className="bg-yellow-400 h-1 rounded-full" style={{width: '40%'}}></div>
-                </div>
+              </div>
                   <div className="w-full bg-gray-200 rounded-full h-1">
                     <div className="bg-yellow-400 h-1 rounded-full" style={{width: '20%'}}></div>
                   </div>
@@ -1481,7 +1481,7 @@ const ProductDetail: React.FC = () => {
                           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                             <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
+                    </svg>
                           </div>
 
                           <div>
@@ -1528,8 +1528,8 @@ const ProductDetail: React.FC = () => {
                       {/* Review Text */}
                       <p className="text-xs leading-relaxed mb-0" style={{ color: '#B0B0B0', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {postedReview.text}
-                      </p>
-                    </div>
+                  </p>
+                </div>
                   </div>
                 </div>
               )}
@@ -2701,7 +2701,7 @@ const ProductDetail: React.FC = () => {
                   <button 
                 onClick={() => setShowShareModal(false)}
                 className="absolute top-4 right-4 lg:top-4 lg:right-4 w-6 h-6 lg:w-8 lg:h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
-              >
+                  >
                 <svg className="w-4 h-4 lg:w-5 lg:h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -2740,7 +2740,7 @@ const ProductDetail: React.FC = () => {
                   <button 
                     onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
-                  }}
+                    }}
                   className="px-3 py-2 lg:px-4 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium text-white transition-colors hover:opacity-90"
                   style={{ backgroundColor: '#000000' }}
                 >
@@ -2814,7 +2814,7 @@ const ProductDetail: React.FC = () => {
                   </button>
                   <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border mx-auto" style={{ borderColor: '#E1E1E1', backgroundColor: 'white' }}>
                     <span className="text-[10px]" style={{ color: '#B0B0B0' }}>Reviews & Ratings</span>
-                  </div>
+              </div>
                 </div>
               )}
               
@@ -2846,7 +2846,7 @@ const ProductDetail: React.FC = () => {
                           key={star}
                           onClick={() => setUserRating(star)}
                           className="focus:outline-none hover:scale-110 transition-transform"
-                        >
+                  >
                           <svg 
                             className="w-7 h-7" 
                             viewBox="0 0 24 24"
@@ -2917,7 +2917,7 @@ const ProductDetail: React.FC = () => {
                             });
                             setIsReviewPosted(true);
                           }
-                        }}
+                    }}
                         className="w-full py-2.5 font-normal transition-all relative"
                         style={{ 
                           backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
@@ -2962,7 +2962,7 @@ const ProductDetail: React.FC = () => {
                             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                               <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                              </svg>
+                    </svg>
                             </div>
 
                             <div>
@@ -3000,17 +3000,17 @@ const ProductDetail: React.FC = () => {
                             >
                               <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
                               <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
-                            </button>
+                  </button>
                             <span className="text-[10px]" style={{ color: '#939393' }}>{postedReview!.date}</span>
-                          </div>
-                        </div>
+                </div>
+              </div>
                         
                         {/* Review Text */}
                         <p className="text-sm leading-relaxed" style={{ color: '#939393', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                           {postedReview!.text}
                         </p>
-                      </div>
-                    </div>
+            </div>
+          </div>
                     
                     {/* Close Button */}
                     <button
@@ -3025,8 +3025,8 @@ const ProductDetail: React.FC = () => {
                     </button>
                   </>
                 )}
-          </div>
         </div>
+      </div>
       </div>
         </>
       )}

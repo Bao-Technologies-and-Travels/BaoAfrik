@@ -84,19 +84,19 @@ const ProfileSettings: React.FC = () => {
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: 'Poppins, sans-serif' }}>
       <div className="flex h-screen">
         {/* Left Sidebar - Full Height */}
-        <div className="w-64 bg-white border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative">
+        <div className="w-72 bg-white border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative">
           {/* Header */}
           <header className="bg-white">
-            <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
+            <div className="w-full pl-6 pr-0 sm:pl-6 sm:pr-2 lg:pl-6 lg:pr-4">
               <div className="flex items-center justify-between h-16">
                 {/* Desktop - Logo and sidebar button */}
-                <div className="flex items-center space-x-36 pr-0">
+                <div className="flex items-center justify-between w-full">
                   <img 
                     src={logo} 
                     alt="bao'Afrik" 
                     className="h-8 w-auto"
                   />
-                  <button className="bg-white hover:bg-gray-50 rounded-lg transition-colors w-10 h-10 flex items-center justify-center">
+                  <button className="bg-white hover:bg-gray-50 rounded-lg transition-colors w-10 h-10 flex items-center justify-center ml-auto">
                     <img 
                       src={sideIcon} 
                       alt="Minimize sidebar" 
@@ -109,12 +109,12 @@ const ProfileSettings: React.FC = () => {
           </header>
 
           {/* Settings Navigation */}
-          <div className="flex-1 flex flex-col pt-6 px-6">
+          <div className="flex-1 flex flex-col pt-6 pl-6 pr-0">
             {/* Settings Title */}
             <h1 className="text-2xl font-medium text-gray-900 mb-6">Settings</h1>
             
             {/* Search Bar */}
-            <div className="relative mb-6">
+            <div className="relative mb-6 pr-6">
               <style>
                 {`
                   .sidebar-search::placeholder {
@@ -141,10 +141,11 @@ const ProfileSettings: React.FC = () => {
                     key={option.value}
                     onClick={() => setSelectedSidebarOption(option.value)}
                     type="button"
-                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors"
+                    className="w-full flex items-center space-x-3 pl-3 pr-0 py-2 rounded-l-lg rounded-r-none transition-colors"
                     style={{
                       backgroundColor: isActive ? '#F0F8FE' : 'transparent',
-                      borderRight: isActive ? '4px solid #64B5F6' : '4px solid transparent'
+                      borderRight: isActive ? '1px solid #64B5F6' : '1px solid transparent',
+                      marginRight: isActive ? '-1px' : '0'
                     }}
                   >
                     <img
@@ -172,11 +173,11 @@ const ProfileSettings: React.FC = () => {
             <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
               <div className="flex items-center justify-between h-16">
                 {/* Center - Breadcrumb */}
-                <div className="hidden md:flex items-center space-x-2 text-sm">
+                <div className="hidden md:flex items-center space-x-1 text-[10px] md:text-xs">
                   <img 
                     src={leftIcon} 
                     alt="Back" 
-                    className="w-5 h-5 cursor-pointer"
+                    className="w-4 h-4 cursor-pointer mr-2"
                     onClick={handleHomepageClick}
                   />
                   <span 
@@ -185,16 +186,16 @@ const ProfileSettings: React.FC = () => {
                   >
                     Homepage
                   </span>
-                  <span className="text-gray-400">/</span>
+                  <span className="mx-2" style={{ color: '#D4D4D4' }}>·</span>
                   <span 
                     className="text-gray-400 hover:text-gray-600 cursor-pointer"
                     onClick={handleMenuClick}
                   >
                     Menu
                   </span>
-                  <span className="text-gray-400">/</span>
+                  <span className="mx-2" style={{ color: '#D4D4D4' }}>·</span>
                   <span className="text-gray-400 hover:text-gray-600 cursor-pointer">Settings</span>
-                  <span className="text-gray-400">/</span>
+                  <span className="mx-2" style={{ color: '#D4D4D4' }}>·</span>
                   <span className="text-gray-900 font-medium">Profile Setting</span>
                 </div>
 
@@ -463,14 +464,16 @@ const ProfileSettings: React.FC = () => {
           </header>
 
           {/* Main Content */}
-          <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 my-8 flex overflow-y-auto">
-            <div className="flex-1 p-8">
+          <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 mt-8 mb-0 flex" style={{ minHeight: 'calc(100vh - 140px)' }}>
+            <div className="flex-1 p-8 space-y-6">
               {/* Section Header */}
-              <div className="mb-6">
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+                <div className="mb-6">
                 <h1 className="text-2xl font-semibold text-gray-900 mb-2">Profile Setting</h1>
                 <p className="text-sm" style={{ color: '#BABABA' }}>
                   Update your profile and control what others see on BAO' Afrik.
                 </p>
+              </div>
               </div>
 
               {/* Sub-navigation Tabs */}
@@ -511,9 +514,10 @@ const ProfileSettings: React.FC = () => {
 
               {/* Personal Information Tab Content */}
               {activeTab === 'personal' && (
-                <div className="space-y-8">
-                  {/* Upload Photo Section */}
-                  <div>
+                <div className="space-y-6">
+                  <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+                    {/* Upload Photo Section */}
+                    <div>
                     <div className="flex items-center justify-center mb-4">
                       <div className="w-48 h-48 border-2 border-dashed rounded-lg flex flex-col items-center justify-center" style={{ borderColor: '#E1E1E1' }}>
                         <svg className="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
@@ -534,9 +538,10 @@ const ProfileSettings: React.FC = () => {
                       </p>
                     </div>
                   </div>
+                  </div>
 
                   {/* Profile Setting Details */}
-                  <div className="border rounded-2xl p-6" style={{ borderColor: '#E1E1E1' }}>
+                  <div className="border rounded-3xl p-6 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-lg font-semibold text-gray-900">Profile Setting</h3>
                       <button
@@ -567,7 +572,7 @@ const ProfileSettings: React.FC = () => {
                   </div>
 
                   {/* Location Section */}
-                  <div className="border rounded-2xl p-6" style={{ borderColor: '#E1E1E1' }}>
+                  <div className="border rounded-3xl p-6 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Location</h3>
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-sm text-gray-900">Geolocation</span>
@@ -606,7 +611,7 @@ const ProfileSettings: React.FC = () => {
                   </div>
 
                   {/* Biography Section */}
-                  <div className="border rounded-2xl p-6" style={{ borderColor: '#E1E1E1' }}>
+                  <div className="border rounded-3xl p-6 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Biography</h3>
                     <div className="relative">
                       <textarea
@@ -643,7 +648,7 @@ const ProfileSettings: React.FC = () => {
 
               {/* Verification Tab Content */}
               {activeTab === 'verification' && (
-                <div className="text-center py-12">
+                <div className="text-center py-12 bg-white rounded-3xl border border-gray-100 shadow-sm">
                   <p className="text-gray-500">Verification content will be implemented here</p>
                 </div>
               )}
