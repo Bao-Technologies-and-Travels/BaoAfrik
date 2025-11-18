@@ -86,9 +86,63 @@ const Register: React.FC = () => {
       [name]: value
     }));
 
-    setTimeout(() => {
-      validateForm();
-    }, 0);
+    setFormData(prevData => {
+      const updatedData = { ...prevData, [name]: value };
+      validateFieldOnChange(name, value, updatedData);
+      return updatedData;
+    });
+  };
+
+  const validateFieldOnChange = (fieldName: string, value: string, formDataToValidate: typeof formData) => {
+    const newErrors = { ...errors };
+
+    if (fieldName === 'email') {
+      if (!value.trim()) {
+        newErrors.email = 'Email address is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        newErrors.email = 'Please enter a valid email address of format name@example.com';
+      } else {
+        delete newErrors.email;
+      }
+    } else if (fieldName === 'password') {
+      if (!value) {
+        newErrors.password = 'Password is required'
+      } else {
+        delete newErrors.password;
+        const requirements = [];
+        if (value.length < 8) {
+          requirements.push('at least 8 characters');
+        }
+        if (!/(?=.*[a-z])/.test(value)) {
+          requirements.push('one lowercase letter');
+        }
+        if (!/(?=.*[A-Z])/.test(value)) {
+          requirements.push('one uppercase letter');
+        }
+        if (!/(?=.*\d)/.test(value)) {
+          requirements.push('one number');
+        }
+        if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(value)) {
+          requirements.push('one special character');
+        }
+
+        if (requirements.length > 0) {
+          newErrors.passwordHint = `Password must contain: ${requirements.join(', ')}`;
+        } else {
+          delete newErrors.passwordHint;
+        }
+      }
+    } else if (fieldName === 'confirmPassword') {
+      if (!value) {
+        newErrors.confirmPassword = 'Please confirm your password';
+      } else if (formDataToValidate.password !== value) {
+        newErrors.confirmPassword = 'Passwords do not match. Please repeat the password entered above.';
+      } else {
+        delete newErrors.confirmPassword;
+      }
+    }
+
+    setErrors(newErrors);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
