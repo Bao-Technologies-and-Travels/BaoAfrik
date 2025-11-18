@@ -8,7 +8,7 @@ import basketIcon from '../assets/images/pre/basket.png';
 import leftIcon from '../assets/images/pre/left.png';
 import notificationIcon from '../assets/images/pre/notification.svg';
 import settingIcon from '../assets/images/pre/setting.svg';
-import translationToggleIcon from '../assets/images/pre/tt.svg';
+import arrowDownIcon from '../assets/images/pre/arrow-down.svg';
 import messageIcon from '../assets/images/pre/message.svg';
 import boxIcon from '../assets/images/pre/box.svg';
 import groupIcon from '../assets/images/pre/group.svg';
@@ -144,8 +144,8 @@ const ProfileSettings: React.FC = () => {
                     className="w-full flex items-center space-x-3 pl-3 pr-0 py-2 rounded-l-lg rounded-r-none transition-colors"
                     style={{
                       backgroundColor: isActive ? '#F0F8FE' : 'transparent',
-                      borderRight: isActive ? '1px solid #64B5F6' : '1px solid transparent',
-                      marginRight: isActive ? '-1px' : '0'
+                      borderRight: isActive ? '2px solid #64B5F6' : '2px solid transparent',
+                      marginRight: isActive ? '-2px' : '0'
                     }}
                   >
                     <img
@@ -205,10 +205,11 @@ const ProfileSettings: React.FC = () => {
                   <div className="relative language-selector">
                     <button 
                       onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                      className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
+                      style={{ borderColor: '#E4E4E4', color: '#BABABA' }}
                     >
-                      <span>{selectedLanguage}</span>
-                      <img src={translationToggleIcon} alt="Toggle" className="w-4 h-4" />
+                      {selectedLanguage}
+                      <img src={arrowDownIcon} alt="Arrow" className="ml-1 w-4 h-4" />
                     </button>
                     
                     {/* Dropdown Menu */}
@@ -256,8 +257,17 @@ const ProfileSettings: React.FC = () => {
                   </Link>
 
                   {/* Notification Button */}
-                  <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
-                    <img src={notificationIcon} alt="Notifications" className="w-6 h-6" />
+                  <button
+                    onClick={() => {}}
+                    className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
+                    title="Notifications"
+                  >
+                    <img 
+                      src={notificationIcon} 
+                      alt="Notifications" 
+                      className="w-6 h-6"
+                      style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
+                    />
                   </button>
 
                   {/* Profile Picture */}
@@ -464,8 +474,9 @@ const ProfileSettings: React.FC = () => {
           </header>
 
           {/* Main Content */}
-          <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 mt-8 mb-0 flex" style={{ minHeight: 'calc(100vh - 140px)' }}>
-            <div className="flex-1 p-8 space-y-6">
+          <div className="flex-1 mx-8 mt-8 mb-0 flex gap-6 overflow-hidden" style={{ minHeight: 'calc(100vh - 140px)', maxHeight: 'calc(100vh - 140px)' }}>
+            {/* Left Content Area */}
+            <div className="flex-1 bg-white border border-gray-200 rounded-[20px] p-8 overflow-y-auto scrollbar-hide">
               {/* Section Header */}
               <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
                 <div className="mb-6">
@@ -655,59 +666,59 @@ const ProfileSettings: React.FC = () => {
             </div>
 
             {/* Right Panel - Profile Completion */}
-            <div className="w-80 bg-white border-l border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Complete your profile</h3>
+            <div className="w-64 bg-white border border-gray-200 rounded-[20px] p-4 overflow-y-auto scrollbar-hide">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Complete your profile</h3>
               
               {/* Progress Indicator */}
-              <div className="flex flex-col items-center mb-6">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#E8F5E9' }}>
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CAF50' }}>
+              <div className="flex flex-col items-center mb-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: '#E8F5E9' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CAF50' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                  <div className="bg-green-500 h-2 rounded-full" style={{ width: '20%' }}></div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1.5">
+                  <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '20%' }}></div>
                 </div>
-                <span className="text-sm font-medium text-gray-900">20%</span>
+                <span className="text-xs font-medium text-gray-900">20%</span>
               </div>
 
               {/* Checklist */}
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CAF50' }}>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CAF50' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-sm text-gray-900">Setup account 10%</span>
+                  <span className="text-xs text-gray-900">Setup account 10%</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CAF50' }}>
+                <div className="flex items-center space-x-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CAF50' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-sm text-gray-900">Personnal information 10%</span>
+                  <span className="text-xs text-gray-900">Personnal information 10%</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
+                <div className="flex items-center space-x-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  <span className="text-sm text-gray-500">Upload your photo 10%</span>
+                  <span className="text-xs text-gray-500">Upload your photo 10%</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
+                <div className="flex items-center space-x-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  <span className="text-sm text-gray-500">Location 10%</span>
+                  <span className="text-xs text-gray-500">Location 10%</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
+                <div className="flex items-center space-x-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  <span className="text-sm text-gray-500">Description 10%</span>
+                  <span className="text-xs text-gray-500">Description 10%</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
+                <div className="flex items-center space-x-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  <span className="text-sm text-gray-500">Verification first step 25%</span>
+                  <span className="text-xs text-gray-500">Verification first step 25%</span>
                 </div>
               </div>
             </div>
