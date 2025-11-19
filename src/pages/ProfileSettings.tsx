@@ -1571,13 +1571,6 @@ const ProfileSettings: React.FC = () => {
                     <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
                       Manage your privacy preferences and keep your account secure on BAO' Afrik.
                     </p>
-                    <button
-                      onClick={() => setShowSessionHistory(prev => !prev)}
-                      className="px-3 py-1.5 text-xs rounded-lg border self-start"
-                      style={{ borderColor: '#D9D9D9', color: '#6A6A6A' }}
-                    >
-                      {showSessionHistory ? 'Hide mock session history' : 'Show mock session history'}
-                    </button>
                   </div>
 
                   <div className="space-y-6">
@@ -1626,24 +1619,33 @@ const ProfileSettings: React.FC = () => {
                     </div>
 
                     {/* Sessions Section */}
-                    <div className="space-y-3 mt-6">
-                      <div className="space-y-1.5">
-                        <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
-                        <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
-                          Review your active sessions and sign out of any devices you don't recognize.
-                        </p>
+                    <div className="space-y-3 mt-6 mb-8">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1.5">
+                          <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
+                          <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
+                            Review your active sessions and sign out of any devices you don't recognize.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setShowSessionHistory(!showSessionHistory)}
+                          className="px-3 py-1.5 text-[10px] font-normal rounded-lg border whitespace-nowrap"
+                          style={{ borderColor: '#D9D9D9', color: '#6A6A6A', borderRadius: '6px' }}
+                        >
+                          {showSessionHistory ? 'Hide mock session history' : 'Show mock session history'}
+                        </button>
                       </div>
                       <div className="space-y-3">
                         {sessions.map((session) => (
                           <div
                             key={session.id}
-                            className="flex items-center justify-between gap-4 flex-wrap"
+                            className="flex items-center gap-6"
                           >
-                            <div className="flex items-center gap-3 min-w-[200px]">
+                            <div className="flex items-center gap-3" style={{ minWidth: '220px', flexShrink: 0 }}>
                               <img
                                 src={session.icon}
                                 alt={session.browser}
-                                className="w-9 h-9 rounded-full object-cover"
+                                className="w-8 h-8 rounded-full object-cover"
                               />
                               <div>
                                 <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
@@ -1663,11 +1665,11 @@ const ProfileSettings: React.FC = () => {
                                 )}
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 text-xs" style={{ color: '#939393' }}>
+                            <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '180px', flexShrink: 0 }}>
                               <img src={deviceIcon} alt="Device" className="w-4 h-4" />
                               <span>{session.device}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs" style={{ color: '#939393' }}>
+                            <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '200px', flexShrink: 0 }}>
                               <img
                                 src={`https://flagcdn.com/24x18/${session.flag}.png`}
                                 alt={session.location}
@@ -1675,7 +1677,7 @@ const ProfileSettings: React.FC = () => {
                               />
                               <span>{session.location}</span>
                             </div>
-                            <button className="text-xs font-medium" style={{ color: '#6A6A6A', textDecoration: 'underline' }}>
+                            <button className="text-xs font-medium ml-auto" style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}>
                               Sign Out
                             </button>
                           </div>
@@ -1685,11 +1687,11 @@ const ProfileSettings: React.FC = () => {
 
                     {showSessionHistory && (
                       <div className="space-y-3 mt-8">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-4">
                           <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Other Sessions</p>
                           <button
-                            className="px-3 py-1.5 text-xs rounded-lg border"
-                            style={{ borderColor: '#D9D9D9', color: '#6A6A6A' }}
+                            className="px-3 py-1.5 text-xs font-normal rounded-lg border"
+                            style={{ borderColor: '#D9D9D9', color: '#6A6A6A', borderRadius: '6px' }}
                           >
                             Close all inactive sessions
                           </button>
@@ -1698,24 +1700,24 @@ const ProfileSettings: React.FC = () => {
                           {inactiveSessions.map(session => (
                             <div
                               key={session.id}
-                              className="flex items-center justify-between gap-4 flex-wrap"
+                              className="flex items-center gap-6"
                             >
-                              <div className="flex items-center gap-3 min-w-[200px]">
+                              <div className="flex items-center gap-3" style={{ minWidth: '220px', flexShrink: 0 }}>
                                 <img
                                   src={session.icon}
                                   alt={session.browser}
-                                  className="w-9 h-9 rounded-full object-cover"
+                                  className="w-8 h-8 rounded-full object-cover"
                                 />
                                 <div>
                                   <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
-                                  <p className="text-[11px]" style={{ color: '#B0B0B0' }}>{session.lastUsed}</p>
+                                  <p className="text-[10px] mt-0.5" style={{ color: '#B0B0B0' }}>{session.lastUsed}</p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2 text-xs" style={{ color: '#939393' }}>
+                              <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '180px', flexShrink: 0 }}>
                                 <img src={deviceIcon} alt="Device" className="w-4 h-4" />
                                 <span>{session.device}</span>
                               </div>
-                              <div className="flex items-center gap-2 text-xs" style={{ color: '#939393' }}>
+                              <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '200px', flexShrink: 0 }}>
                                 <img
                                   src={`https://flagcdn.com/24x18/${session.flag}.png`}
                                   alt={session.location}
@@ -1723,7 +1725,7 @@ const ProfileSettings: React.FC = () => {
                                 />
                                 <span>{session.location}</span>
                               </div>
-                              <button className="text-xs font-medium" style={{ color: '#6A6A6A', textDecoration: 'underline' }}>
+                              <button className="text-xs font-medium ml-auto" style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}>
                                 Sign Out
                               </button>
                             </div>
