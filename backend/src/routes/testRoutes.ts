@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { testEmailConnection, sendVerificationEmail } from '@/utils/emailService';
+import emailService from '@/utils/emailService';
 import logger from '@/config/logger';
 
 const router = Router();
@@ -25,7 +25,7 @@ const router = Router();
  */
 router.get('/email-connection', async (req: Request, res: Response) => {
   try {
-    const isConnected = await testEmailConnection();
+    const isConnected = await emailService.testEmailConnection();
     
     res.json({
       success: isConnected,
@@ -86,7 +86,7 @@ router.post('/send-email', async (req: Request, res: Response) => {
     // Generate a test verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     
-    const emailSent = await sendVerificationEmail(email, verificationCode);
+    const emailSent = await emailService.sendVerificationEmail(email, verificationCode);
     
     if (emailSent) {
       return res.json({
@@ -201,11 +201,8 @@ router.post('/send-test-email', async (req: Request, res: Response) => {
       });
     }
 
-    // Import email service
-    const emailService = await import('../utils/emailService');
-    
     // Send test email using the sendEmail method
-    await emailService.default.sendEmail({
+    await emailService.sendEmail({
       to: email,
       subject: 'BaoAfrik Email Service Test',
       html: `
