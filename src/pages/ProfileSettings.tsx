@@ -46,6 +46,9 @@ import chromeIcon from '../assets/images/pre/chrome1.svg';
 import safariIcon from '../assets/images/pre/safari1.svg';
 import edgeIcon from '../assets/images/pre/edge1.svg';
 import braveIcon from '../assets/images/pre/brave1.svg';
+import unlockIcon from '../assets/images/pre/unlock.svg';
+import resetIcon from '../assets/images/pre/reset.svg';
+import closeIcon from '../assets/images/pre/CLose.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -108,6 +111,13 @@ const ProfileSettings: React.FC = () => {
     x: false
   });
   const [showSessionHistory, setShowSessionHistory] = useState(false);
+  
+  // Password section state
+  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'strong'>('weak'); // Change to 'strong' to test
+  const [isPasswordEditClicked, setIsPasswordEditClicked] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [selectedPasswordOption, setSelectedPasswordOption] = useState<string | null>(null);
+  const passwordModalRef = useRef<HTMLDivElement>(null);
 
   const socialPlatforms = [
     {
@@ -311,6 +321,20 @@ const ProfileSettings: React.FC = () => {
     setSocialConnections(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const handlePasswordEditClick = () => {
+    setIsPasswordEditClicked(true);
+    setIsPasswordModalOpen(true);
+  };
+
+  const handlePasswordOptionClick = (option: string) => {
+    setSelectedPasswordOption(option);
+    if (option === 'close') {
+      setIsPasswordModalOpen(false);
+      setIsPasswordEditClicked(false);
+      setSelectedPasswordOption(null);
+    }
+  };
+
   const formatDate = (date: Date) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -401,13 +425,19 @@ const ProfileSettings: React.FC = () => {
       if (phoneDropdownRef.current && !phoneDropdownRef.current.contains(target) && isPhoneCodeDropdownOpen) {
         setIsPhoneCodeDropdownOpen(false);
       }
+
+      if (passwordModalRef.current && !passwordModalRef.current.contains(target) && isPasswordModalOpen) {
+        setIsPasswordModalOpen(false);
+        setIsPasswordEditClicked(false);
+        setSelectedPasswordOption(null);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen]);
+  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen]);
 
   return (
     <>
@@ -1582,23 +1612,107 @@ const ProfileSettings: React.FC = () => {
 
                   <div className="space-y-6">
                     {/* Password Section */}
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="flex items-start justify-between gap-4 flex-wrap relative">
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Password</p>
-                          <span className="px-2.5 py-0.5 rounded" style={{ backgroundColor: '#EDFBF0', color: '#4CD964', borderRadius: '6px', fontSize: '10px', fontWeight: 500 }}>
-                            Your password is strong
+                          <span 
+                            className="px-2.5 py-0.5 rounded" 
+                            style={{ 
+                              backgroundColor: passwordStrength === 'weak' ? '#FEF6E9' : '#EDFBF0', 
+                              color: passwordStrength === 'weak' ? '#F9A825' : '#4CD964', 
+                              borderRadius: '6px', 
+                              fontSize: '10px', 
+                              fontWeight: 500 
+                            }}
+                          >
+                            {passwordStrength === 'weak' ? 'Your password is weak' : 'Your password is strong'}
                           </span>
                         </div>
                         <p className="text-xs" style={{ color: '#B0B0B0' }}>Set a password to protect your account.</p>
                       </div>
                       <button
-                        className="flex items-center justify-center space-x-1 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#D9D9D9', minWidth: '70px' }}
+                        onClick={handlePasswordEditClick}
+                        className="flex items-center justify-center space-x-1 px-2.5 py-1 border rounded-lg transition-colors"
+                        style={{ 
+                          backgroundColor: isPasswordEditClicked ? '#F0F8FE' : 'transparent',
+                          borderColor: isPasswordEditClicked ? '#CFE8FC' : '#D9D9D9', 
+                          minWidth: '70px' 
+                        }}
                       >
-                        <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
-                        <span className="text-[11px]" style={{ color: '#6A6A6A' }}>Edit</span>
+                        <img 
+                          src={pencilIcon} 
+                          alt="Edit" 
+                          className="w-3 h-3" 
+                          style={{ 
+                            filter: isPasswordEditClicked 
+                              ? 'brightness(0) saturate(100%) invert(67%) sepia(60%) saturate(2000%) hue-rotate(180deg) brightness(1) contrast(1)' 
+                              : 'none' 
+                          }}
+                        />
+                        <span 
+                          className="text-[11px]" 
+                          style={{ color: isPasswordEditClicked ? '#64B5F6' : '#6A6A6A' }}
+                        >
+                          Edit
+                        </span>
                       </button>
+                      
+                      {/* Password Modal */}
+                      {isPasswordModalOpen && (
+                        <div 
+                          ref={passwordModalRef}
+                          className="absolute right-0 top-full mt-2 z-50 bg-white border rounded-xl shadow-lg"
+                          style={{ 
+                            borderColor: '#E9E9E9',
+                            borderRadius: '12px',
+                            minWidth: '200px'
+                          }}
+                        >
+                          <div 
+                            className="px-4 py-3 flex items-center gap-3 cursor-pointer transition-colors"
+                            style={{ 
+                              backgroundColor: selectedPasswordOption === 'update' ? '#FAFAFA' : 'transparent',
+                              borderRadius: '8px',
+                              margin: '4px'
+                            }}
+                            onClick={() => handlePasswordOptionClick('update')}
+                            onMouseEnter={() => !selectedPasswordOption && setSelectedPasswordOption('update')}
+                            onMouseLeave={() => selectedPasswordOption === 'update' && setSelectedPasswordOption(null)}
+                          >
+                            <img src={unlockIcon} alt="Update password" className="w-4 h-4" />
+                            <span style={{ color: '#939393', fontSize: '13px' }}>Update password</span>
+                          </div>
+                          <div 
+                            className="px-4 py-3 flex items-center gap-3 cursor-pointer transition-colors"
+                            style={{ 
+                              backgroundColor: selectedPasswordOption === 'reset' ? '#FAFAFA' : 'transparent',
+                              borderRadius: '8px',
+                              margin: '4px'
+                            }}
+                            onClick={() => handlePasswordOptionClick('reset')}
+                            onMouseEnter={() => !selectedPasswordOption && setSelectedPasswordOption('reset')}
+                            onMouseLeave={() => selectedPasswordOption === 'reset' && setSelectedPasswordOption(null)}
+                          >
+                            <img src={resetIcon} alt="Reset Password" className="w-4 h-4" />
+                            <span style={{ color: '#939393', fontSize: '13px' }}>Reset Password</span>
+                          </div>
+                          <div 
+                            className="px-4 py-3 flex items-center gap-3 cursor-pointer transition-colors"
+                            style={{ 
+                              backgroundColor: selectedPasswordOption === 'close' ? '#FAFAFA' : 'transparent',
+                              borderRadius: '8px',
+                              margin: '4px'
+                            }}
+                            onClick={() => handlePasswordOptionClick('close')}
+                            onMouseEnter={() => !selectedPasswordOption && setSelectedPasswordOption('close')}
+                            onMouseLeave={() => selectedPasswordOption === 'close' && setSelectedPasswordOption(null)}
+                          >
+                            <img src={closeIcon} alt="Close" className="w-4 h-4" />
+                            <span style={{ color: '#939393', fontSize: '13px' }}>Close</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Two Step Verification Section */}
