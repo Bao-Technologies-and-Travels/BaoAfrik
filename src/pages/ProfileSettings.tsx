@@ -41,10 +41,11 @@ import fbIcon from '../assets/images/pre/FB1.svg';
 import igIcon from '../assets/images/pre/IG1.svg';
 import xIcon from '../assets/images/pre/x.svg';
 import deviceIcon from '../assets/images/pre/device.svg';
-import chromeIcon from '../assets/images/pre/chrome.svg';
-import safariIcon from '../assets/images/pre/safari.svg';
-import edgeIcon from '../assets/images/pre/edge.svg';
-import braveIcon from '../assets/images/pre/brave.svg';
+import mobileIcon from '../assets/images/pre/mobile.svg';
+import chromeIcon from '../assets/images/pre/chrome1.svg';
+import safariIcon from '../assets/images/pre/safari1.svg';
+import edgeIcon from '../assets/images/pre/edge1.svg';
+import braveIcon from '../assets/images/pre/brave1.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -140,6 +141,12 @@ const ProfileSettings: React.FC = () => {
       icon: xIcon
     }
   ] as const;
+
+  // Helper function to check if device is mobile
+  const isMobileDevice = (deviceName: string) => {
+    const mobileKeywords = ['iPhone', 'iPad', 'Android', 'Mobile', 'Phone'];
+    return mobileKeywords.some(keyword => deviceName.toLowerCase().includes(keyword.toLowerCase()));
+  };
 
   const sessions = [
     {
@@ -1619,11 +1626,11 @@ const ProfileSettings: React.FC = () => {
                     </div>
 
                     {/* Sessions Section */}
-                    <div className="space-y-3 mt-6 mb-8">
+                    <div className="space-y-3 mt-6 mb-10">
                       <div className="flex items-center justify-between">
                         <div className="space-y-1.5">
                           <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
-                          <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
+                          <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '12px' }}>
                             Review your active sessions and sign out of any devices you don't recognize.
                           </p>
                         </div>
@@ -1648,9 +1655,9 @@ const ProfileSettings: React.FC = () => {
                                 className="w-8 h-8 rounded-full object-cover"
                               />
                               <div>
-                                <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
+                                <p className="text-xs font-medium" style={{ color: '#6A6A6A', marginBottom: '-4px' }}>{session.browser}</p>
                                 {session.isCurrent && (
-                                  <div className="inline-flex items-center gap-1 mt-0.5">
+                                  <div className="inline-flex items-center gap-1" style={{ marginTop: '0px', lineHeight: '1' }}>
                                     <span
                                       style={{
                                         width: '6px',
@@ -1666,7 +1673,7 @@ const ProfileSettings: React.FC = () => {
                               </div>
                             </div>
                             <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '180px', flexShrink: 0 }}>
-                              <img src={deviceIcon} alt="Device" className="w-4 h-4" />
+                              <img src={isMobileDevice(session.device) ? mobileIcon : deviceIcon} alt="Device" className="w-4 h-4" />
                               <span>{session.device}</span>
                             </div>
                             <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '200px', flexShrink: 0 }}>
@@ -1687,7 +1694,7 @@ const ProfileSettings: React.FC = () => {
 
                     {showSessionHistory && (
                       <div className="space-y-3 mt-8">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-5">
                           <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Other Sessions</p>
                           <button
                             className="px-3 py-1.5 text-xs font-normal rounded-lg border"
@@ -1709,12 +1716,12 @@ const ProfileSettings: React.FC = () => {
                                   className="w-8 h-8 rounded-full object-cover"
                                 />
                                 <div>
-                                  <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
+                                  <p className="text-xs font-medium" style={{ color: '#6A6A6A', marginBottom: '-4px' }}>{session.browser}</p>
                                   <p className="text-[10px] mt-0.5" style={{ color: '#B0B0B0' }}>{session.lastUsed}</p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '180px', flexShrink: 0 }}>
-                                <img src={deviceIcon} alt="Device" className="w-4 h-4" />
+                                <img src={isMobileDevice(session.device) ? mobileIcon : deviceIcon} alt="Device" className="w-4 h-4" />
                                 <span>{session.device}</span>
                               </div>
                               <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '200px', flexShrink: 0 }}>
