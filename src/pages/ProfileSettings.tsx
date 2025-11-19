@@ -40,6 +40,8 @@ import zapIcon from '../assets/images/pre/zap1.svg';
 import fbIcon from '../assets/images/pre/FB1.svg';
 import igIcon from '../assets/images/pre/IG1.svg';
 import xIcon from '../assets/images/pre/x.svg';
+import deviceIcon from '../assets/images/pre/device.svg';
+import chromeIcon from '../assets/images/pre/chrome.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -51,6 +53,7 @@ const ProfileSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('personal');
   const [searchQuery, setSearchQuery] = useState('');
   const [isGeolocationEnabled, setIsGeolocationEnabled] = useState(false);
+  const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
   const [biography, setBiography] = useState('');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [selectedSidebarOption, setSelectedSidebarOption] = useState<'profile' | 'security' | 'language' | 'notifications'>('profile');
@@ -133,6 +136,22 @@ const ProfileSettings: React.FC = () => {
       icon: xIcon
     }
   ] as const;
+
+  const sessions = [
+    {
+      id: 1,
+      browser: 'Chrome Browser',
+      icon: chromeIcon,
+      device: 'DESKTOP-6R899ET',
+      location: 'London, United Kingdom',
+      flag: 'gb',
+      isCurrent: true
+    }
+  ];
+  
+  const leftPaneClasses = selectedSidebarOption === 'security'
+    ? 'flex-1 w-full px-0'
+    : 'flex-1 bg-white border border-gray-200 rounded-[20px] px-8';
   
   // Mock notification data with read/unread status
   const [notifications, setNotifications] = useState([
@@ -539,24 +558,24 @@ const ProfileSettings: React.FC = () => {
 
                   {/* Notification Button */}
                   <div className="relative notification-dropdown">
-                    <button
+                  <button
                       onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                      className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
-                      title="Notifications"
+                    className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
+                    title="Notifications"
                       aria-label="View notifications"
-                    >
-                      <img 
-                        src={notificationIcon} 
-                        alt="Notifications" 
-                        className="w-6 h-6"
-                        style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
-                      />
+                  >
+                    <img 
+                      src={notificationIcon} 
+                      alt="Notifications" 
+                      className="w-6 h-6"
+                      style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
+                    />
                       {unreadCount > 0 && (
                         <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FF0000' }}>
                           <span className="text-white font-medium" style={{ fontSize: '9px' }}>{unreadCount}</span>
                         </div>
                       )}
-                    </button>
+                  </button>
 
                     {/* Notification Dropdown */}
                     {isNotificationOpen && (
@@ -923,7 +942,9 @@ const ProfileSettings: React.FC = () => {
           {/* Main Content */}
           <div className="flex-1 mx-8 mt-8 mb-0 flex gap-6 overflow-hidden" style={{ minHeight: 'calc(100vh - 140px)', maxHeight: 'calc(100vh - 140px)' }}>
             {/* Left Content Area */}
-            <div className="flex-1 bg-white border border-gray-200 rounded-[20px] px-8 py-4 overflow-y-auto scrollbar-hide">
+            <div className={`${leftPaneClasses} py-4 overflow-y-auto scrollbar-hide`}>
+              {selectedSidebarOption === 'profile' && (
+                <>
               {/* Section Header */}
               <div className="bg-white p-2 mb-3">
                 <div className="mb-2">
@@ -1015,7 +1036,7 @@ const ProfileSettings: React.FC = () => {
                                   strokeDasharray={`${(uploadProgress / 100) * 138} 138`}
                                   strokeLinecap="round"
                                 />
-                              </svg>
+                        </svg>
                               {/* Icon in center */}
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <img 
@@ -1027,8 +1048,8 @@ const ProfileSettings: React.FC = () => {
                                     filter: 'brightness(0) saturate(100%) invert(70%) sepia(36%) saturate(624%) hue-rotate(172deg) brightness(100%) contrast(96%)'
                                   }}
                                 />
-                              </div>
-                            </div>
+                      </div>
+                    </div>
                             <p className="text-[8px] font-medium" style={{ color: '#83C4F8' }}>
                               {uploadProgress}%
                             </p>
@@ -1064,19 +1085,19 @@ const ProfileSettings: React.FC = () => {
                           ref={fileInputRef}
                           className="hidden"
                         />
-                        <button 
+                      <button 
                           onClick={handleUploadButtonClick}
                           className="px-2 py-1.5 rounded-lg text-xs font-normal transition-colors border mb-1"
                           style={{ backgroundColor: 'white', color: '#6A6A6A', borderColor: '#D9D9D9', width: 'fit-content' }}
-                        >
-                          Upload a photo
-                        </button>
+                      >
+                        Upload a photo
+                      </button>
                         <p className="text-[10px]" style={{ color: '#ACAAAA' }}>
                           At least 800 x 800 px recommanded.<br />
                           JPG or PNG allowed
-                        </p>
-                      </div>
+                      </p>
                     </div>
+                  </div>
                   </div>
                   {/* Divider */}
                   <div className="mt-4 -mx-8" style={{ height: '0.5px', backgroundColor: '#E9E9E9' }}></div>
@@ -1087,29 +1108,29 @@ const ProfileSettings: React.FC = () => {
                       <>
                         <div className="flex items-center justify-between mb-2" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
                           <h3 className="text-xs font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
-                          <button
+                      <button
                             onClick={() => setIsEditingProfile(true)}
                             className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
-                            style={{ borderColor: '#D9D9D9' }}
-                          >
+                        style={{ borderColor: '#D9D9D9' }}
+                      >
                             <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
                             <span className="text-[10px]" style={{ color: '#6A6A6A' }}>Edit</span>
-                          </button>
-                        </div>
+                      </button>
+                    </div>
                         <div className="flex items-center justify-between" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
                           <div style={{ marginRight: '4px' }}>
                             <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Full name</label>
                             <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.fullName}</p>
-                          </div>
-                          <div>
+                      </div>
+                      <div>
                             <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Gender</label>
                             <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.gender}</p>
-                          </div>
+                      </div>
                           <div style={{ marginLeft: '4px' }}>
                             <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Birthday</label>
                             <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthday}</p>
-                          </div>
-                        </div>
+                      </div>
+                    </div>
                       </>
                     ) : (
                       <div className="space-y-3">
@@ -1289,17 +1310,17 @@ const ProfileSettings: React.FC = () => {
                       <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Location</h3>
                       <div className="flex items-center space-x-2">
                         <span className="text-[10px]" style={{ color: '#64B5F6' }}>Geolocation</span>
-                        <button
-                          onClick={() => setIsGeolocationEnabled(!isGeolocationEnabled)}
+                      <button
+                        onClick={() => setIsGeolocationEnabled(!isGeolocationEnabled)}
                           className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
                           style={{ backgroundColor: isGeolocationEnabled ? '#4CD964' : '#D1D5DB' }}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                               isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0.5'
-                            }`}
-                          />
-                        </button>
+                          }`}
+                        />
+                      </button>
                       </div>
                     </div>
                     <div className="relative">
@@ -1506,9 +1527,127 @@ const ProfileSettings: React.FC = () => {
                   </div>
                 </div>
               )}
+                </>
+              )}
+
+              {selectedSidebarOption === 'security' && (
+                <div className="bg-white border rounded-[30px] p-5 sm:p-7" style={{ borderColor: '#E4E4E4' }}>
+                  <div className="mb-6">
+                    <h2 className="text-base font-semibold" style={{ color: '#212121' }}>Security & Privacy Setting</h2>
+                    <p className="text-xs" style={{ color: '#B0B0B0' }}>
+                      Manage your privacy preferences and keep your account secure on BAO' Afrik.
+                    </p>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Password Section */}
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Password</p>
+                          <span className="px-2.5 py-0.5 rounded" style={{ backgroundColor: '#EDFBF0', color: '#4CD964', borderRadius: '6px', fontSize: '10px', fontWeight: 500 }}>
+                            Your password is strong
+                          </span>
+                        </div>
+                        <p className="text-xs" style={{ color: '#B0B0B0' }}>Set a password to protect your account.</p>
+                      </div>
+                      <button
+                        className="flex items-center justify-center space-x-1 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50"
+                        style={{ borderColor: '#D9D9D9', minWidth: '70px' }}
+                      >
+                        <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                        <span className="text-[11px]" style={{ color: '#6A6A6A' }}>Edit</span>
+                      </button>
+                    </div>
+
+                    {/* Two Step Verification Section */}
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium mb-1" style={{ color: '#6A6A6A' }}>Two step verification</p>
+                        <p className="text-xs" style={{ color: '#B0B0B0' }}>
+                          Enable two-step verification for enhanced security.{' '}
+                          <button className="text-xs" style={{ color: '#64B5F6', textDecoration: 'underline', fontWeight: 400 }}>
+                            How does it work?
+                          </button>
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setIsTwoFactorEnabled(!isTwoFactorEnabled)}
+                        className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                        style={{ backgroundColor: isTwoFactorEnabled ? '#64B5F6' : '#E4E4E4' }}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                            isTwoFactorEnabled ? 'translate-x-5' : 'translate-x-0.5'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Sessions Section */}
+                    <div className="space-y-3 mt-6">
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
+                        <p className="text-xs" style={{ color: '#B0B0B0' }}>
+                          Review your active sessions and sign out of any devices you don't recognize.
+                        </p>
+                      </div>
+                      <div className="space-y-3">
+                        {sessions.map((session) => (
+                          <div
+                            key={session.id}
+                            className="flex items-center justify-between gap-4 flex-wrap"
+                          >
+                            <div className="flex items-center gap-3 min-w-[200px]">
+                              <img
+                                src={session.icon}
+                                alt={session.browser}
+                                className="w-11 h-11 rounded-full object-cover"
+                              />
+                              <div>
+                                <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
+                                {session.isCurrent && (
+                                  <div className="inline-flex items-center gap-1 mt-0.5">
+                                    <span
+                                      style={{
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '9999px',
+                                        backgroundColor: '#4CD964',
+                                        boxShadow: '0 0 0 4px #EDFBF0'
+                                      }}
+                                    ></span>
+                                    <span className="text-[10px] font-medium" style={{ color: '#4CD964' }}>Current session</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs" style={{ color: '#939393' }}>
+                              <img src={deviceIcon} alt="Device" className="w-4 h-4" />
+                              <span>{session.device}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs" style={{ color: '#939393' }}>
+                              <img
+                                src={`https://flagcdn.com/24x18/${session.flag}.png`}
+                                alt={session.location}
+                                className="w-5 h-5 rounded-full object-cover"
+                              />
+                              <span>{session.location}</span>
+                            </div>
+                            <button className="text-xs font-medium" style={{ color: '#6A6A6A', textDecoration: 'underline' }}>
+                              Sign Out
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right Panel - Profile Completion */}
+            {selectedSidebarOption === 'profile' && (
             <div className="w-64 bg-white border border-gray-200 rounded-[20px] p-4 overflow-y-auto scrollbar-hide" style={{ paddingBottom: '20px', maxHeight: 'fit-content' }}>
               <h3 className="text-sm font-medium text-gray-900 mb-4 text-center">Complete your profile</h3>
               
@@ -1521,7 +1660,7 @@ const ProfileSettings: React.FC = () => {
                   <span className="absolute -top-5 left-0 text-xs font-semibold" style={{ color: '#6A6A6A' }}>20%</span>
                   <div className="w-full bg-gray-200 rounded-full h-1.5" style={{ backgroundColor: '#F1F1F1' }}>
                     <div className="h-1.5 rounded-full" style={{ width: '20%', backgroundColor: '#4CD964' }}></div>
-                  </div>
+                </div>
                 </div>
               </div>
 
@@ -1565,6 +1704,7 @@ const ProfileSettings: React.FC = () => {
                 </div>
               </div>
             </div>
+            )}
           </div>
 
           {/* Footer */}
