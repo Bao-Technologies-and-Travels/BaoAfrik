@@ -248,7 +248,7 @@ const MyListings: React.FC = () => {
                     type: "success",
                     title: "Action completed",
                     message: "Listing deleted successfully",
-                    duration: 2000
+                    duration: 3000
                 });
             } else {
                 throw new Error('Failed to delete listing');
@@ -258,7 +258,7 @@ const MyListings: React.FC = () => {
                     type: "error",
                     title: "Action failed",
                     message: "Failed to delete listing. Please try again",
-                    duration: 2000
+                    duration: 3000
                 });
         }
     };
@@ -284,7 +284,7 @@ const MyListings: React.FC = () => {
                     type: "success",
                     title: "Action completed",
                     message: "Listing published successfully",
-                    duration: 2000
+                    duration: 3000
                 });
             } else {
                 throw new Error('Failed to publish listing');
@@ -294,7 +294,7 @@ const MyListings: React.FC = () => {
                     type: "error",
                     title: "Action failed",
                     message: "Failed to publish listing",
-                    duration: 2000
+                    duration: 3000
                 });
         }
     };

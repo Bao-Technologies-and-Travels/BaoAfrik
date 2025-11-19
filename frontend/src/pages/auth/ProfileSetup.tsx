@@ -138,7 +138,7 @@ const ProfileSetup: React.FC = () => {
           type: 'error',
           title: 'Data Loading Error',
           message: 'Failed to load your profile data. Please refresh the page.',
-          duration: 2000,
+          duration: 3000,
         });
       }
     };
@@ -349,7 +349,7 @@ const ProfileSetup: React.FC = () => {
         type: 'info',
         title: 'Profile unchanged',
         message: 'No changes were made to your profile.',
-        duration: 2000
+        duration: 3000
       });
       navigate('/');
       return;
@@ -361,7 +361,7 @@ const ProfileSetup: React.FC = () => {
         type: 'error',
         title: 'Validation Error',
         message: 'Please fix the errors in the form before submitting.',
-        duration: 2000,
+        duration: 3000,
       });
       return;
     }
@@ -431,7 +431,18 @@ const ProfileSetup: React.FC = () => {
 
           if (typeof (auth as any).setUser === 'function') {
             (auth as any).setUser(updatedUser);
+          } else if (typeof (auth as any).refreshUser === 'function') {
+            (auth as any).refreshUser(updatedUser);
           }
+
+          try {
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          } catch (e) { }
+
+          const event = new CustomEvent('userProfileUpdated', {
+            detail: { user: updatedUser, timestamp: Date.now() }
+          });
+          window.dispatchEvent(event);
         }
       } catch (fetchError) {
         console.warn('Failed to fetch updated user data:', fetchError);
@@ -445,8 +456,10 @@ const ProfileSetup: React.FC = () => {
       });
 
       // redirect to home and force refresh
+      // sessionStorage.setItem('forceRefreshUser', 'true');
       setTimeout(() => {
         window.location.href = '/';
+        // navigate("/");
       }, 2000);
 
     } catch (error: any) {
@@ -466,7 +479,7 @@ const ProfileSetup: React.FC = () => {
         type: 'error',
         title: toastTitle,
         message: toastMessage,
-        duration: 2000,
+        duration: 3000,
       });
     } finally {
       setIsLoading(false);

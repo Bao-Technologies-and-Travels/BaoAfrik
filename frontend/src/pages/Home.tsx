@@ -149,7 +149,8 @@ const Home: React.FC = () => {
           if (latest) {
             if (typeof (auth as any).setUser === 'function') {
               (auth as any).setUser(latest);
-            }
+            } 
+            localStorage.setItem('currentUser', JSON.stringify(latest));
           }
         }
       } catch (err) {
@@ -157,10 +158,27 @@ const Home: React.FC = () => {
       }
     };
 
+    const shouldForceRefresh = sessionStorage.getItem('forceRefreshUser');
+    if (shouldForceRefresh === 'true') {
+      sessionStorage.removeItem('forceRefreshUser');
+      refreshCurrentUser();
+    }
+
     if (routerLocation.pathname === '/') {
       refreshCurrentUser();
     }
-  }, [routerLocation.pathname, auth]);
+
+    const onUserUpdated = (e: Event) => {
+      refreshCurrentUser();
+    };
+
+    window.addEventListener('userUpdated', onUserUpdated);
+
+    return () => {
+      window.removeEventListener('userUpdated', onUserUpdated);
+    };
+
+  }, [routerLocation.pathname, routerLocation.state, auth]);
 
   // UseEffect for fetching products
   useEffect(() => {

@@ -132,7 +132,7 @@ const ResetPassword: React.FC = () => {
           type: "success",
           title: "New code sent",
           message: "Check your email and spam folder for a new code that has been sent",
-          duration: 2000,
+          duration: 3000,
         });
         inputRefs.current[0]?.focus();
       } else {
@@ -212,7 +212,7 @@ const ResetPassword: React.FC = () => {
         type: 'success',
         title: 'Password modified',
         message: 'Your password has been reset. Redirecting to login in 3 seconds...',
-        duration: 2000
+        duration: 3000
       })
 
       if (response.success) {
