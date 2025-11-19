@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
@@ -34,6 +34,7 @@ import v2Icon from '../assets/images/pre/v2.svg';
 import cameraIcon from '../assets/images/pre/camera.svg';
 import locationIcon from '../assets/images/pre/PL.svg';
 import pencilIcon from '../assets/images/pre/pencil.svg';
+import loadIcon from '../assets/images/pre/load.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -48,6 +49,25 @@ const ProfileSettings: React.FC = () => {
   const [biography, setBiography] = useState('');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [selectedSidebarOption, setSelectedSidebarOption] = useState<'profile' | 'security' | 'language' | 'notifications'>('profile');
+  const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
+  const genderDropdownRef = useRef<HTMLDivElement>(null);
+  const [isBirthdayCalendarOpen, setIsBirthdayCalendarOpen] = useState(false);
+  const birthdayCalendarRef = useRef<HTMLDivElement>(null);
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  
+  // Profile editing state
+  const [profileData, setProfileData] = useState({
+    fullName: 'Jean Kameni',
+    gender: 'Male',
+    birthday: '13/09/2000'
+  });
+  
+  // Image upload state
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const genderOptions = ['Male', 'Female', 'Other'];
   
   // Mock notification data with read/unread status
   const [notifications, setNotifications] = useState([
@@ -116,6 +136,102 @@ const ProfileSettings: React.FC = () => {
     setIsLanguageDropdownOpen(false);
   };
 
+  // Handle image upload
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsImageLoading(true);
+      setUploadProgress(0);
+      
+      // Simulate upload progress
+      const interval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setIsImageLoading(false);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setProfileImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 200);
+    }
+  };
+
+  const handleUploadButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Handle profile save
+  const handleSaveProfile = () => {
+    setIsEditingProfile(false);
+    setIsGenderDropdownOpen(false);
+    setIsBirthdayCalendarOpen(false);
+  };
+
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const parseBirthday = (value: string) => {
+    const [day, month, year] = value.split('/');
+    if (!day || !month || !year) return null;
+    const parsedDate = new Date(Number(year), Number(month) - 1, Number(day));
+    return isNaN(parsedDate.getTime()) ? null : parsedDate;
+  };
+
+  const handleGenderSelect = (gender: string) => {
+    setProfileData(prev => ({ ...prev, gender }));
+    setIsGenderDropdownOpen(false);
+  };
+
+  const handleMonthChange = (direction: 'prev' | 'next') => {
+    setCalendarDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() + (direction === 'next' ? 1 : -1));
+      return newDate;
+    });
+  };
+
+  const openBirthdayCalendar = () => {
+    const parsed = parseBirthday(profileData.birthday);
+    if (parsed) {
+      setCalendarDate(parsed);
+    }
+    setIsBirthdayCalendarOpen(true);
+  };
+
+  const generateCalendarDays = () => {
+    const startOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
+    const endOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
+    const startDay = startOfMonth.getDay();
+    const days: (Date | null)[] = [];
+
+    for (let i = 0; i < startDay; i++) {
+      days.push(null);
+    }
+
+    for (let day = 1; day <= endOfMonth.getDate(); day++) {
+      days.push(new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day));
+    }
+
+    while (days.length % 7 !== 0) {
+      days.push(null);
+    }
+
+    return days;
+  };
+
+  const calendarDays = generateCalendarDays();
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
   // Handle clicks outside dropdowns to close them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -135,15 +251,32 @@ const ProfileSettings: React.FC = () => {
       if (!notificationDropdown && isNotificationOpen) {
         setIsNotificationOpen(false);
       }
+
+      if (genderDropdownRef.current && !genderDropdownRef.current.contains(target) && isGenderDropdownOpen) {
+        setIsGenderDropdownOpen(false);
+      }
+
+      if (birthdayCalendarRef.current && !birthdayCalendarRef.current.contains(target) && isBirthdayCalendarOpen) {
+        setIsBirthdayCalendarOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen]);
+  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen]);
 
   return (
+    <>
+      <style>{`
+        .profile-edit-input::placeholder {
+          color: #BABABA !important;
+        }
+        .profile-edit-input-birthday::placeholder {
+          color: #BABABA !important;
+        }
+      `}</style>
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: 'Poppins, sans-serif' }}>
       <div className="flex h-screen">
         {/* Left Sidebar - Full Height */}
@@ -717,7 +850,7 @@ const ProfileSettings: React.FC = () => {
               </div>
 
               {/* Sub-navigation Tabs */}
-              <div className="flex items-center space-x-4 mb-6 -mx-4 px-4 border-b border-gray-200">
+              <div className="flex items-center space-x-4 mb-6 -mx-8 px-8 border-b border-gray-200">
                 <button
                   onClick={() => setActiveTab('personal')}
                   className={`flex items-center space-x-1.5 pb-2 relative ${
@@ -762,11 +895,92 @@ const ProfileSettings: React.FC = () => {
                   <div className="bg-white">
                     {/* Upload Photo Section */}
                     <div className="flex items-center space-x-3">
-                      <div className="w-24 h-24 border-2 border-dashed flex flex-col items-center justify-center" style={{ borderColor: '#E1E1E1', borderRadius: '13px' }}>
-                        <img src={cameraIcon} alt="Camera" className="w-8 h-8" />
+                      <div 
+                        className="w-24 h-24 border-2 border-dashed flex flex-col items-center justify-center relative overflow-hidden"
+                        style={{ 
+                          borderColor: isImageLoading ? '#83C4F8' : '#E1E1E1', 
+                          borderRadius: '13px',
+                          background: isImageLoading 
+                            ? 'repeating-linear-gradient(-45deg, #F5FBFF, #F5FBFF 18px, #F8FCFF 18px, #F8FCFF 36px)'
+                            : (profileImage ? 'transparent' : 'transparent'),
+                          border: isImageLoading ? '2px dashed #83C4F8' : (profileImage ? 'none' : '2px dashed #E1E1E1')
+                        }}
+                      >
+                        {isImageLoading ? (
+                          <div className="flex flex-col items-center justify-center">
+                            <div className="relative mb-2">
+                              {/* Gray base circle */}
+                              <svg width="48" height="48" className="transform -rotate-90">
+                                <circle
+                                  cx="24"
+                                  cy="24"
+                                  r="22"
+                                  fill="none"
+                                  stroke="#E9E9E9"
+                                  strokeWidth="2"
+                                />
+                                {/* Blue progress arc */}
+                                <circle
+                                  cx="24"
+                                  cy="24"
+                                  r="22"
+                                  fill="none"
+                                  stroke="#83C4F8"
+                                  strokeWidth="2"
+                                  strokeDasharray={`${(uploadProgress / 100) * 138} 138`}
+                                  strokeLinecap="round"
+                                />
+                              </svg>
+                              {/* Icon in center */}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <img 
+                                  src={loadIcon} 
+                                  alt="Loading" 
+                                  style={{ 
+                                    width: '20px', 
+                                    height: '20px',
+                                    filter: 'brightness(0) saturate(100%) invert(70%) sepia(36%) saturate(624%) hue-rotate(172deg) brightness(100%) contrast(96%)'
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            <p className="text-[8px] font-medium" style={{ color: '#83C4F8' }}>
+                              {uploadProgress}%
+                            </p>
+                          </div>
+                        ) : profileImage ? (
+                          <>
+                            <img
+                              src={profileImage}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                            />
+                            <div 
+                              className="absolute inset-0 flex items-center justify-center"
+                              style={{ backgroundColor: '#FFFFFF99' }}
+                            >
+                              <img 
+                                src={cameraIcon} 
+                                alt="Camera" 
+                                className="w-8 h-8" 
+                                style={{ filter: 'brightness(0) invert(1)' }}
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <img src={cameraIcon} alt="Camera" className="w-8 h-8" />
+                        )}
                       </div>
                       <div className="flex flex-col">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          ref={fileInputRef}
+                          className="hidden"
+                        />
                         <button 
+                          onClick={handleUploadButtonClick}
                           className="px-2 py-1.5 rounded-lg text-xs font-normal transition-colors border mb-1"
                           style={{ backgroundColor: 'white', color: '#6A6A6A', borderColor: '#D9D9D9', width: 'fit-content' }}
                         >
@@ -780,35 +994,209 @@ const ProfileSettings: React.FC = () => {
                     </div>
                   </div>
                   {/* Divider */}
-                  <div className="mt-4 -mx-4" style={{ height: '0.5px', backgroundColor: '#E9E9E9' }}></div>
+                  <div className="mt-4 -mx-8" style={{ height: '0.5px', backgroundColor: '#E9E9E9' }}></div>
 
                   {/* Profile Setting Details */}
                   <div className="border rounded-2xl p-2 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xs font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
-                      <button
-                        onClick={() => setIsEditingProfile(!isEditingProfile)}
-                        className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#D9D9D9' }}
-                      >
-                        <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
-                        <span className="text-[10px]" style={{ color: '#6A6A6A' }}>Edit</span>
-                      </button>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <label className="text-[10px] mb-0.5 block" style={{ color: '#212121' }}>Full name</label>
-                        <p className="text-xs font-normal" style={{ color: '#212121' }}>Jean Kameni</p>
+                    {!isEditingProfile ? (
+                      <>
+                        <div className="flex items-center justify-between mb-2" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
+                          <h3 className="text-xs font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
+                          <button
+                            onClick={() => setIsEditingProfile(true)}
+                            className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
+                            style={{ borderColor: '#D9D9D9' }}
+                          >
+                            <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                            <span className="text-[10px]" style={{ color: '#6A6A6A' }}>Edit</span>
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-between" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
+                          <div style={{ marginRight: '4px' }}>
+                            <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Full name</label>
+                            <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.fullName}</p>
+                          </div>
+                          <div>
+                            <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Gender</label>
+                            <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.gender}</p>
+                          </div>
+                          <div style={{ marginLeft: '4px' }}>
+                            <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Birthday</label>
+                            <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthday}</p>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="space-y-3">
+                        {/* Full Name Field */}
+                        <div className="relative">
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px]" style={{ color: '#6A6A6A' }}>Full name</label>
+                            <button
+                              onClick={handleSaveProfile}
+                              className="flex items-center space-x-1"
+                              style={{ color: '#BABABA' }}
+                            >
+                              <span className="text-[10px]">Save changes</span>
+                              <img src={arrowDownIcon} alt="Save" className="w-3 h-3" style={{ transform: 'rotate(180deg)' }} />
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            value={profileData.fullName}
+                            onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
+                            placeholder="Idriss Uswold"
+                            className="w-full px-3 py-2 rounded-lg text-xs focus:outline-none profile-edit-input"
+                            style={{ 
+                              backgroundColor: 'white', 
+                              border: '1px solid #E9E9E9',
+                              color: profileData.fullName ? '#212121' : '#BABABA'
+                            }}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = '#64B5F6';
+                              e.target.style.caretColor = '#64B5F6';
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = '#E9E9E9';
+                            }}
+                          />
+                        </div>
+                        {/* Gender and Birthday Fields */}
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-1 gender-dropdown" ref={genderDropdownRef}>
+                            <label className="text-[10px] mb-1 block" style={{ color: '#6A6A6A' }}>Gender</label>
+                            <div className="relative">
+                              <button
+                                type="button"
+                                onClick={() => setIsGenderDropdownOpen(prev => !prev)}
+                                className="w-full px-3 py-2 pl-7 rounded-lg text-xs text-left focus:outline-none"
+                                style={{ 
+                                  backgroundColor: 'white', 
+                                  border: '1px solid #E9E9E9',
+                                  color: profileData.gender ? '#212121' : '#B0B0B0'
+                                }}
+                              >
+                                {profileData.gender || 'Select gender'}
+                              </button>
+                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                  <path d="M6 9l6 6 6-6" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              </span>
+                              {isGenderDropdownOpen && (
+                                <div className="absolute z-10 mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-lg py-2">
+                                  {genderOptions.map(option => (
+                                    <button
+                                      type="button"
+                                      key={option}
+                                      onClick={() => handleGenderSelect(option)}
+                                      className="w-full text-left px-3 py-1.5 rounded-lg text-xs"
+                                      style={{
+                                        backgroundColor: profileData.gender === option ? '#F0F8FE' : 'transparent',
+                                        color: profileData.gender === option ? '#64B5F6' : '#B0B0B0'
+                                      }}
+                                    >
+                                      {option}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1" ref={birthdayCalendarRef}>
+                            <label className="text-[10px] mb-1 block" style={{ color: '#6A6A6A' }}>Birthday</label>
+                            <div className="relative birthday-calendar">
+                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                  <rect x="3" y="5" width="18" height="16" rx="2" stroke="#B0B0B0" strokeWidth="1.5" />
+                                  <path d="M3 10H21" stroke="#B0B0B0" strokeWidth="1.5" />
+                                  <path d="M8 3V7" stroke="#B0B0B0" strokeWidth="1.5" strokeLinecap="round" />
+                                  <path d="M16 3V7" stroke="#B0B0B0" strokeWidth="1.5" strokeLinecap="round" />
+                                </svg>
+                              </span>
+                              <input
+                                type="text"
+                                value={profileData.birthday}
+                                onChange={(e) => setProfileData({ ...profileData, birthday: e.target.value })}
+                                placeholder="13/09/2000"
+                                className="w-full px-3 py-2 pl-9 rounded-lg text-xs focus:outline-none profile-edit-input-birthday"
+                                style={{ 
+                                  backgroundColor: 'white', 
+                                  border: '1px solid #E9E9E9',
+                                  color: profileData.birthday ? '#212121' : '#BABABA'
+                                }}
+                                onFocus={(e) => {
+                                  e.target.style.borderColor = '#64B5F6';
+                                  e.target.style.caretColor = '#64B5F6';
+                                  openBirthdayCalendar();
+                                }}
+                                onClick={() => openBirthdayCalendar()}
+                                onBlur={(e) => {
+                                  e.target.style.borderColor = '#E9E9E9';
+                                }}
+                                readOnly
+                              />
+                              {isBirthdayCalendarOpen && (
+                                <div className="absolute z-20 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-lg p-3">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <button
+                                      type="button"
+                                      className="w-6 h-6 flex items-center justify-center rounded-full"
+                                      style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}
+                                      onClick={() => handleMonthChange('prev')}
+                                    >
+                                      ‹
+                                    </button>
+                                    <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                                      {calendarDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      className="w-6 h-6 flex items-center justify-center rounded-full"
+                                      style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}
+                                      onClick={() => handleMonthChange('next')}
+                                    >
+                                      ›
+                                    </button>
+                                  </div>
+                                  <div className="grid grid-cols-7 gap-1 text-[10px] mb-1" style={{ color: '#B0B0B0' }}>
+                                    {daysOfWeek.map(day => (
+                                      <span key={day} className="text-center font-medium">{day}</span>
+                                    ))}
+                                  </div>
+                                  <div className="grid grid-cols-7 gap-1 text-[11px]">
+                                    {calendarDays.map((day, index) => {
+                                      if (!day) {
+                                        return <span key={index} className="h-7 flex items-center justify-center text-gray-300 text-[10px]"> </span>;
+                                      }
+                                      const value = formatDate(day);
+                                      const isSelected = profileData.birthday === value;
+                                      return (
+                                        <button
+                                          type="button"
+                                          key={value}
+                                          className="h-7 rounded-full flex items-center justify-center transition-colors"
+                                          style={{
+                                            backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
+                                            color: isSelected ? '#64B5F6' : '#6A6A6A'
+                                          }}
+                                          onClick={() => {
+                                            setProfileData(prev => ({ ...prev, birthday: value }));
+                                            setIsBirthdayCalendarOpen(false);
+                                          }}
+                                        >
+                                          {day.getDate()}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <label className="text-[10px] mb-0.5 block" style={{ color: '#212121' }}>Gender</label>
-                        <p className="text-xs font-normal" style={{ color: '#212121' }}>Male</p>
-                      </div>
-                      <div>
-                        <label className="text-[10px] mb-0.5 block" style={{ color: '#212121' }}>Birthday</label>
-                        <p className="text-xs font-normal" style={{ color: '#212121' }}>13/09/2000</p>
-                      </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Location Section */}
@@ -819,12 +1207,11 @@ const ProfileSettings: React.FC = () => {
                         <span className="text-[10px]" style={{ color: '#64B5F6' }}>Geolocation</span>
                         <button
                           onClick={() => setIsGeolocationEnabled(!isGeolocationEnabled)}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                            isGeolocationEnabled ? 'bg-blue-600' : 'bg-gray-300'
-                          }`}
+                          className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                          style={{ backgroundColor: isGeolocationEnabled ? '#4CD964' : '#D1D5DB' }}
                         >
                           <span
-                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                               isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0.5'
                             }`}
                           />
@@ -986,6 +1373,7 @@ const ProfileSettings: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
