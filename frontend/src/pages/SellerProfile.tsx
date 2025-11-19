@@ -167,10 +167,14 @@ const SellerProfile: React.FC = () => {
   useEffect(() => {
     const fetchSellerProducts = async () => {
       if (!sellerId) return;
+      console.log('Current sellerId:', sellerId);
 
       try {
         setIsLoadingProducts(true);
         const token = localStorage.getItem("accessToken");
+
+        console.log('Fetching products for sellerId:', sellerId);
+        console.log('API URL:', `${process.env.REACT_APP_API_URL}/products/user/${sellerId}`);
 
         // Use the user products endpoint from your routes
         const response = await fetch(
@@ -182,17 +186,39 @@ const SellerProfile: React.FC = () => {
           }
         );
 
+        console.log('Response status:', response.status);
+
         if (response.ok) {
           const result = await response.json();
 
+          // debug log
+          console.log('result.data type:', typeof result.data);
+          console.log('result.data keys:', result.data ? Object.keys(result.data) : 'null');
+          console.log('result.data:', result.data);
+
           if (result.success && result.data) {
             // Handle different possible response structures
-            const products = result.data.products || result.data || [];
+            let products = [];
+            if (Array.isArray(result.data)) {
+              products = result.data;
+            } else if (result.data.products && Array.isArray(result.data.products)) {
+              products = result.data.products;
+            } else if (result.data.data && Array.isArray(result.data.data)) {
+              products = result.data.data;
+            } else {
+              console.warn('Unexpected data structure, checking for items:', result.data);
+              products = Object.values(result.data).filter((item: any) => item && typeof item === 'object' && item.id);
+            }
+
+            //  debug log
+            console.log('Parsed products:', products)
             setSellerProducts(products);
           } else {
+            console.warn('No success or data in repsonse', result);
             setSellerProducts([]);
           }
         } else {
+          console.error('API returned status:', response.status);
           setSellerProducts([]);
         }
       } catch (error) {
@@ -1488,7 +1514,7 @@ const SellerProfile: React.FC = () => {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           style={{ borderRadius: '12px' }}
                           onError={(e) => {
-                            e.currentTarget.src = pre1; // Fallback image
+                            (e.target as HTMLImageElement).src = pre1; // Fallback image
                           }}
                         />
 

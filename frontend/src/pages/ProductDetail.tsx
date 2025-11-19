@@ -1945,232 +1945,112 @@ const ProductDetail: React.FC = () => {
 
           {/* You May Also Like Section - Below Reviews */}
           {activeTab === 'reviews' && (
-            // <div className="mt-12">
-            //   <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-            //     You may also like
-            //   </h2>
-
-            //   {/* Product Grid */}
-            //   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-            //     {/* Product cards 1-12 */}
-            //     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((productNum) => (
-            //       <Link key={productNum} to={`/product/${productNum}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-            //         <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-            //           <img
-            //             src={[pre1, pre2, pre3, pre4, pre5, pre6][productNum % 6]}
-            //             alt={`Product ${productNum}`}
-            //             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-            //             style={{ borderRadius: '12px' }}
-            //           />
-            //           <div className="absolute bg-white rounded-md shadow-sm" style={{
-            //             display: 'flex',
-            //             padding: '2px 6px',
-            //             justifyContent: 'center',
-            //             alignItems: 'center',
-            //             gap: '4px',
-            //             top: '8px',
-            //             left: '8px'
-            //           }}>
-            //             <img
-            //               src={getProductCountry(productNum).flag}
-            //               alt={getProductCountry(productNum).name}
-            //               style={{
-            //                 width: '14px',
-            //                 height: '14px',
-            //                 objectFit: 'cover',
-            //                 borderRadius: '50%'
-            //               }}
-            //             />
-            //             <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-            //               {getProductCountry(productNum).abbreviation}
-            //             </span>
-            //           </div>
-            //         </div>
-            //         <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-            //           <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-            //             <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-            //               USD 31.7
-            //             </div>
-            //             <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-            //               display: 'flex',
-            //               padding: '1px 4px',
-            //               justifyContent: 'center',
-            //               alignItems: 'center',
-            //               gap: '1px',
-            //               fontSize: '9px'
-            //             }}>
-            //               <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-            //               <span>Verified seller</span>
-            //             </div>
-            //           </div>
-            //           <h3 className="line-clamp-2 font-medium" style={{
-            //             fontSize: '13px',
-            //             color: '#212121',
-            //             marginBottom: '4px'
-            //           }}>Product Name</h3>
-            //           <div className="flex items-center justify-between">
-            //             <div className="flex items-center text-gray-500 flex-1">
-            //               <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-            //                 width: '10px',
-            //                 height: '10px',
-            //                 marginRight: '4px'
-            //               }} />
-            //               <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
-            //             </div>
-            //             <div style={{ marginLeft: '8px' }}>
-            //               <button
-            //                 onClick={(e) => {
-            //                   e.preventDefault();
-            //                   e.stopPropagation();
-            //                   const newSet = new Set(wishlistProducts);
-            //                   if (newSet.has(`reviews-product-${productNum}`)) {
-            //                     newSet.delete(`reviews-product-${productNum}`);
-            //                   } else {
-            //                     newSet.add(`reviews-product-${productNum}`);
-            //                   }
-            //                   setWishlistProducts(newSet);
-            //                 }}
-            //                 className="transition-colors touch-manipulation"
-            //                 style={{
-            //                   width: '20px',
-            //                   height: '20px',
-            //                   display: 'flex',
-            //                   alignItems: 'center',
-            //                   justifyContent: 'center'
-            //                 }}
-            //               >
-            //                 <img src={bookmarkIcon} alt="Bookmark" style={{
-            //                   width: '20px',
-            //                   height: '20px',
-            //                   filter: wishlistProducts.has(`reviews-product-${productNum}`) ? 'none' : 'grayscale(100%) opacity(0.5)'
-            //                 }} />
-            //               </button>
-            //             </div>
-            //           </div>
-            //         </div>
-            //       </Link>
-            //     ))}
-            //   </div>
-            // </div>
             <div className="mt-12">
               <h2 className="text-2xl font-medium text-gray-900 mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                More products from {getSellerName(product?.seller)}
+                You may also like
               </h2>
 
-              {isLoadingSellerProducts ? (
-                <div className="flex justify-center py-8">
-                  <LoadingSpinner size="md" color="orange" />
-                </div>
-              ) : sellerProducts.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-                  {sellerProducts.map((sellerProduct) => (
-                    <Link
-                      key={sellerProduct.id}
-                      to={`/product/${sellerProduct.id}`}
-                      className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group"
-                    >
-                      <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+              {/* Product Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
+                {/* Product cards 1-12 */}
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((productNum) => (
+                  <Link key={productNum} to={`/product/${productNum}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                      <img
+                        src={[pre1, pre2, pre3, pre4, pre5, pre6][productNum % 6]}
+                        alt={`Product ${productNum}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        style={{ borderRadius: '12px' }}
+                      />
+                      <div className="absolute bg-white rounded-md shadow-sm" style={{
+                        display: 'flex',
+                        padding: '2px 6px',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '4px',
+                        top: '8px',
+                        left: '8px'
+                      }}>
                         <img
-                          src={sellerProduct.images && sellerProduct.images.length > 0 ? sellerProduct.images[0].url : pre1}
-                          alt={sellerProduct.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                          style={{ borderRadius: '12px' }}
-                          onError={(e) => {
-                            e.currentTarget.src = pre1; // Fallback image
+                          src={getProductCountry(productNum).flag}
+                          alt={getProductCountry(productNum).name}
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
                           }}
                         />
-                        <div className="absolute bg-white rounded-md shadow-sm" style={{
+                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                          {getProductCountry(productNum).abbreviation}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                        <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                          USD 31.7
+                        </div>
+                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
-                          padding: '2px 6px',
+                          padding: '1px 4px',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          gap: '4px',
-                          top: '8px',
-                          left: '8px'
+                          gap: '1px',
+                          fontSize: '9px'
                         }}>
-                          <img
-                            src={getProductCountry(parseInt(sellerProduct.id) || 1).flag}
-                            alt={getProductCountry(parseInt(sellerProduct.id) || 1).name}
-                            style={{
-                              width: '14px',
-                              height: '14px',
-                              objectFit: 'cover',
-                              borderRadius: '50%'
+                          <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                          <span>Verified seller</span>
+                        </div>
+                      </div>
+                      <h3 className="line-clamp-2 font-medium" style={{
+                        fontSize: '13px',
+                        color: '#212121',
+                        marginBottom: '4px'
+                      }}>Product Name</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-gray-500 flex-1">
+                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
+                            width: '10px',
+                            height: '10px',
+                            marginRight: '4px'
+                          }} />
+                          <span className="truncate font-normal" style={{ fontSize: '10px' }}>London, United Kingdom</span>
+                        </div>
+                        <div style={{ marginLeft: '8px' }}>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newSet = new Set(wishlistProducts);
+                              if (newSet.has(`reviews-product-${productNum}`)) {
+                                newSet.delete(`reviews-product-${productNum}`);
+                              } else {
+                                newSet.add(`reviews-product-${productNum}`);
+                              }
+                              setWishlistProducts(newSet);
                             }}
-                          />
-                          <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                            {getProductCountry(parseInt(sellerProduct.id) || 1).abbreviation}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
-                        <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                          <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
-                            {sellerProduct.currency} {sellerProduct.price}
-                          </div>
-                          {sellerProduct.seller?.verified && (
-                            <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
+                            className="transition-colors touch-manipulation"
+                            style={{
+                              width: '20px',
+                              height: '20px',
                               display: 'flex',
-                              padding: '1px 4px',
-                              justifyContent: 'center',
                               alignItems: 'center',
-                              gap: '1px',
-                              fontSize: '9px'
-                            }}>
-                              <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
-                              <span>Verified</span>
-                            </div>
-                          )}
-                        </div>
-                        <h3 className="line-clamp-2 font-medium" style={{
-                          fontSize: '13px',
-                          color: '#212121',
-                          marginBottom: '4px'
-                        }}>{sellerProduct.title}</h3>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center text-gray-500 flex-1">
-                            <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                              width: '10px',
-                              height: '10px',
-                              marginRight: '4px'
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                              width: '20px',
+                              height: '20px',
+                              filter: wishlistProducts.has(`reviews-product-${productNum}`) ? 'none' : 'grayscale(100%) opacity(0.5)'
                             }} />
-                            <span className="truncate font-normal" style={{ fontSize: '10px' }}>
-                              {sellerProduct.location}
-                            </span>
-                          </div>
-                          <div style={{ marginLeft: '8px' }}>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleWishlist(sellerProduct.id);
-                              }}
-                              className="transition-colors touch-manipulation"
-                              style={{
-                                width: '20px',
-                                height: '20px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                              }}
-                            >
-                              <img src={bookmarkIcon} alt="Bookmark" style={{
-                                width: '20px',
-                                height: '20px',
-                                filter: wishlistProducts.has(sellerProduct.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
-                              }} />
-                            </button>
-                          </div>
+                          </button>
                         </div>
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No other products from this seller</p>
-                </div>
-              )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
           )}
 

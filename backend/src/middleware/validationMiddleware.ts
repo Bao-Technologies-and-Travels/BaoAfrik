@@ -208,13 +208,10 @@ export const validateCreateProduct = [
 ];
 
 export const validateUpdateProduct = [
-  param('id')
-    .isUUID()
-    .withMessage('Invalid product ID'),
-
-  body('name')
-    .optional()
+  body('title')
     .trim()
+    .notEmpty()
+    .withMessage('Product name is required')
     .isLength({ min: 3, max: 200 })
     .withMessage('Product name must be between 3 and 200 characters'),
 
@@ -225,29 +222,36 @@ export const validateUpdateProduct = [
     .withMessage('Description must not exceed 2000 characters'),
 
   body('price')
-    .optional()
     .isFloat({ min: 0.01 })
     .withMessage('Price must be a positive number'),
 
-  body('category')
+  body('currency')
     .optional()
+    .isIn(['USD', 'EUR', 'GBP', 'CAD', 'AUD'])
+    .withMessage('Invalid currency code'),
+
+  body('category')
     .trim()
-    .isIn(['Food & Spices', 'Fashion & Textiles', 'Beauty & Wellness', 'Home & Decor', 'Books & Media'])
+    .notEmpty()
+    .withMessage('Category is required')
+    .isIn(['beauty', 'books', 'fashion', 'food', 'home'])
     .withMessage('Invalid category'),
 
   body('location')
-    .optional()
     .trim()
+    .notEmpty()
+    .withMessage('Location is required')
     .isLength({ max: 255 })
     .withMessage('Location must not exceed 255 characters'),
 
-  body('country')
-    .optional()
+  body('origin')
     .trim()
+    .notEmpty()
+    .withMessage('Country is required')
     .isLength({ max: 100 })
     .withMessage('Country must not exceed 100 characters'),
 
-  body('stock')
+  body('quantity')
     .optional()
     .isInt({ min: 0 })
     .withMessage('Stock must be a non-negative integer'),

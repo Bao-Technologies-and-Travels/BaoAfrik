@@ -124,8 +124,6 @@ const Home: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imageFormData, setImageFormData] = useState<FormData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
-  const totalPages = 48;
   const [searchHistory, setSearchHistory] = useState<string[]>(['Epices Camerounais', 'Vêtements', 'Produits Nigerians', 'Masque culturel', 'Accessoires traditionnels']);
   const [showSearchHistory, setShowSearchHistory] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -619,6 +617,13 @@ const Home: React.FC = () => {
 
     return displayProducts;
   }, [isSearchActive, searchResults, activeCategory, allProductsComputed, selectedCountry]);
+
+  // compute totalPages for pagination
+  const itemsPerPage = 20;
+  const totalPages = React.useMemo(() => {
+    const totalItems = productsToDisplay.length;
+    return Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  }, [productsToDisplay.length, itemsPerPage]);
 
   // Check if we should show "no results" state
   const shouldShowNoResultsState = () => {

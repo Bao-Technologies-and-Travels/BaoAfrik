@@ -24,6 +24,7 @@ import loadIcon from '../assets/images/pre/load.svg';
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from '../contexts/ToastContext';
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { add } from 'date-fns';
 
 const CreateListing: React.FC = () => {
   const navigate = useNavigate();
@@ -74,6 +75,22 @@ const CreateListing: React.FC = () => {
       fetchProductData(id);
     }
   }, [isEditMode, id]);
+
+  const validateRequiredFields = (): boolean => {
+    const missing: string[] = [];
+    if (!category || category.trim() === '') missing.push('Category');
+
+    if (missing.length > 0) {
+      addToast({
+        type: 'error',
+        title: 'Please complete required fields',
+        message: `Please select: ${missing.join(', ')}`,
+        duration: 4000
+      });
+      return false;
+    }
+    return true;
+  };
 
   const fetchProductData = async (productId: string) => {
     setIsLoadingProduct(true);
@@ -454,7 +471,7 @@ const CreateListing: React.FC = () => {
     try {
       const token = localStorage.getItem('accessToken');
 
-      const productData = {
+      const payload = {
         title,
         description,
         price: price,
@@ -476,7 +493,7 @@ const CreateListing: React.FC = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(productData)
+          body: JSON.stringify(payload)
         });
       } else {
         // Create new product
@@ -486,7 +503,7 @@ const CreateListing: React.FC = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(productData)
+          body: JSON.stringify(payload)
         });
       }
 
@@ -502,6 +519,39 @@ const CreateListing: React.FC = () => {
         // Upload new images if any
         if (images.length > 0 && productId) {
           await uploadProductImages(productId, images);
+        }
+
+        // if editing a published product, set it to draft
+        if(isEditMode && productId && productData && (productData as any).status === 'PUBLISHED') {
+          try {
+            const statusRep = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}/status`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ status: 'DRAFT'})
+            });
+
+            if(!statusRep.ok) {
+              const statusResult = await statusRep.json().catch(() => ({}));
+              addToast({
+                type: 'error',
+                title: 'Action failed',
+                message: 'Failed to save product as draft',
+                duration: 3000
+              });
+            } else {
+            setProductData((prev: any) => prev ? {...prev, status: 'DRAFT'} : prev);
+            }
+          } catch(err){
+            addToast({
+              type: 'error',
+              title: 'Action failed',
+              message: 'Unable to save product as draft',
+              duration: 3000
+            });
+          }
         }
 
         // Show success message
@@ -524,6 +574,7 @@ const CreateListing: React.FC = () => {
   };
 
   const handlePostListing = async () => {
+    if(!validateRequiredFields()) return;
     setIsLoading(true);
 
     try {
@@ -543,12 +594,12 @@ const CreateListing: React.FC = () => {
         deliveryAvailable
       };
 
-      let createResponse;
-      let productId;
+      let createResponse: Response;
+      let productId: string | undefined = isEditMode ? id : undefined;
 
       if (isEditMode && id) {
         // Update existing product
-        createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`, {
+        createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -873,6 +924,7 @@ const CreateListing: React.FC = () => {
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter product name"
                     className="create-listing-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
                   />
                 </div>
 
@@ -1881,17 +1933,27 @@ const CreateListing: React.FC = () => {
                       cursor: isFormComplete ? 'pointer' : 'not-allowed'
                     }}
                   >
-                    <span>{postButtonText}</span>
-                    <img
-                      src={flyIcon}
-                      alt="Post"
-                      className="w-5 h-5"
-                      style={{
-                        filter: isFormComplete
-                          ? 'brightness(0) invert(1)'
-                          : 'none'
-                      }}
-                    />
+                    {isLoading ? (
+                      <div className='flex items-center space-x-3'>
+                        {/* Spinner when products are uploading */}
+                        <LoadingSpinner size='sm' className='text-white' />
+                        <span>Uploading products...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <span>{postButtonText}</span>
+                        <img
+                          src={flyIcon}
+                          alt="Post"
+                          className='w-5 h-5'
+                          style={{
+                            filter: isFormComplete
+                              ? 'brightness(0) invert(1)'
+                              : 'none'
+                          }}
+                        />
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

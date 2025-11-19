@@ -105,10 +105,10 @@ const ProfileSetup: React.FC = () => {
   }, []);
 
   const token = localStorage.getItem("accessToken");
-  if (!token) {
-    logout();
-    // navigate("/login");
-  }
+  // if (!token) {
+  //   logout();
+  //   // navigate("/login");
+  // }
 
   // Fetch user data
   useEffect(() => {
@@ -142,7 +142,7 @@ const ProfileSetup: React.FC = () => {
           type: "error",
           title: "Data Loading Error",
           message: "Failed to load your profile data. Please refresh the page.",
-          duration: 5000,
+          duration: 3000,
         });
       }
     };
@@ -365,7 +365,7 @@ const ProfileSetup: React.FC = () => {
         type: "error",
         title: "Validation Error",
         message: "Please fix the errors in the form before submitting.",
-        duration: 5000,
+        duration: 3000,
       });
       return;
     }
