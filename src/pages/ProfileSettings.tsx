@@ -1532,7 +1532,7 @@ const ProfileSettings: React.FC = () => {
 
               {selectedSidebarOption === 'security' && (
                 <div className="bg-white border rounded-[30px] p-5 sm:p-7" style={{ borderColor: '#E4E4E4' }}>
-                  <div className="mb-6">
+                  <div className="mb-6 space-y-1.5">
                     <h2 className="text-base font-semibold" style={{ color: '#212121' }}>Security & Privacy Setting</h2>
                     <p className="text-xs" style={{ color: '#B0B0B0' }}>
                       Manage your privacy preferences and keep your account secure on BAO' Afrik.
@@ -1542,8 +1542,8 @@ const ProfileSettings: React.FC = () => {
                   <div className="space-y-6">
                     {/* Password Section */}
                     <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
                           <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Password</p>
                           <span className="px-2.5 py-0.5 rounded" style={{ backgroundColor: '#EDFBF0', color: '#4CD964', borderRadius: '6px', fontSize: '10px', fontWeight: 500 }}>
                             Your password is strong
@@ -1562,8 +1562,8 @@ const ProfileSettings: React.FC = () => {
 
                     {/* Two Step Verification Section */}
                     <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium mb-1" style={{ color: '#6A6A6A' }}>Two step verification</p>
+                      <div className="flex-1 space-y-1">
+                        <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Two step verification</p>
                         <p className="text-xs" style={{ color: '#B0B0B0' }}>
                           Enable two-step verification for enhanced security.{' '}
                           <button className="text-xs" style={{ color: '#64B5F6', textDecoration: 'underline', fontWeight: 400 }}>
@@ -1586,7 +1586,7 @@ const ProfileSettings: React.FC = () => {
 
                     {/* Sessions Section */}
                     <div className="space-y-3 mt-6">
-                      <div>
+                      <div className="space-y-1.5">
                         <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
                         <p className="text-xs" style={{ color: '#B0B0B0' }}>
                           Review your active sessions and sign out of any devices you don't recognize.
@@ -1614,7 +1614,7 @@ const ProfileSettings: React.FC = () => {
                                         height: '6px',
                                         borderRadius: '9999px',
                                         backgroundColor: '#4CD964',
-                                        boxShadow: '0 0 0 4px #EDFBF0'
+                                        boxShadow: '0 0 0 2px #EDFBF0'
                                       }}
                                     ></span>
                                     <span className="text-[10px] font-medium" style={{ color: '#4CD964' }}>Current session</span>
