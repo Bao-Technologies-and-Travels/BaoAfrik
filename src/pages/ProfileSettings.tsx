@@ -1626,18 +1626,9 @@ const ProfileSettings: React.FC = () => {
                     </div>
 
                     {/* Sessions Section */}
-                    <div className="space-y-3 mt-6 mb-6">
+                    <div className="space-y-3 mt-6">
                       <div className="space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
-                          <button
-                            onClick={() => setShowSessionHistory(!showSessionHistory)}
-                            className="px-2 py-1 text-[10px] rounded-md border"
-                            style={{ borderColor: '#D9D9D9', color: '#6A6A6A', fontWeight: 400 }}
-                          >
-                            {showSessionHistory ? 'Hide' : 'Show'} mock history
-                          </button>
-                        </div>
+                        <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
                         <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
                           Review your active sessions and sign out of any devices you don't recognize.
                         </p>
@@ -1694,11 +1685,11 @@ const ProfileSettings: React.FC = () => {
 
                     {showSessionHistory && (
                       <div className="space-y-3 mt-8">
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center justify-between">
                           <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Other Sessions</p>
                           <button
-                            className="px-3 py-1.5 text-[10px] rounded-md border"
-                            style={{ borderColor: '#D9D9D9', color: '#6A6A6A', borderRadius: '6px', fontWeight: 400 }}
+                            className="px-3 py-1.5 text-xs rounded-lg border"
+                            style={{ borderColor: '#D9D9D9', color: '#6A6A6A' }}
                           >
                             Close all inactive sessions
                           </button>
@@ -1717,7 +1708,7 @@ const ProfileSettings: React.FC = () => {
                                 />
                                 <div>
                                   <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
-                                  <p className="text-[10px] mt-0.5" style={{ color: '#B0B0B0' }}>{session.lastUsed}</p>
+                                  <p className="text-[11px]" style={{ color: '#B0B0B0' }}>{session.lastUsed}</p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 text-xs" style={{ color: '#939393' }}>
