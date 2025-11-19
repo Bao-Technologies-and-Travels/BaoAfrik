@@ -36,6 +36,10 @@ import locationIcon from '../assets/images/pre/PL.svg';
 import pencilIcon from '../assets/images/pre/pencil.svg';
 import loadIcon from '../assets/images/pre/load.svg';
 import calendarIcon from '../assets/images/pre/calendar.svg';
+import zapIcon from '../assets/images/pre/zap1.svg';
+import fbIcon from '../assets/images/pre/FB1.svg';
+import igIcon from '../assets/images/pre/IG1.svg';
+import xIcon from '../assets/images/pre/x.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -69,6 +73,66 @@ const ProfileSettings: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const genderOptions = ['Male', 'Female', 'Other'];
+  const phoneDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [verificationForm, setVerificationForm] = useState({
+    email: 'google.mail@gmail.com',
+    phone: ''
+  });
+  const [selectedPhoneCode, setSelectedPhoneCode] = useState({
+    label: 'United States',
+    code: '+1',
+    flag: 'us'
+  });
+  const [isPhoneCodeDropdownOpen, setIsPhoneCodeDropdownOpen] = useState(false);
+  const phoneCodes = [
+    { label: 'United States', code: '+1', flag: 'us' },
+    { label: 'United Kingdom', code: '+44', flag: 'gb' },
+    { label: 'France', code: '+33', flag: 'fr' },
+    { label: 'Cameroon', code: '+237', flag: 'cm' },
+    { label: 'South Africa', code: '+27', flag: 'za' }
+  ];
+
+  const [socialConnections, setSocialConnections] = useState({
+    whatsapp: false,
+    facebook: false,
+    instagram: false,
+    linkedin: false,
+    x: false
+  });
+
+  const socialPlatforms = [
+    {
+      key: 'whatsapp',
+      name: 'Whatsapp',
+      description: 'Connect with your Whatsapp account',
+      icon: zapIcon
+    },
+    {
+      key: 'facebook',
+      name: 'Facebook',
+      description: 'Connect with your Facebook account',
+      icon: fbIcon
+    },
+    {
+      key: 'instagram',
+      name: 'Instagram',
+      description: 'Connect with your Instagram account',
+      icon: igIcon
+    },
+    {
+      key: 'linkedin',
+      name: 'LinkedIn',
+      description: 'Connect with your LinkedIn account',
+      icon: null
+    },
+    {
+      key: 'x',
+      name: 'X',
+      description: 'Connect with your X account',
+      icon: xIcon
+    }
+  ] as const;
   
   // Mock notification data with read/unread status
   const [notifications, setNotifications] = useState([
@@ -174,6 +238,19 @@ const ProfileSettings: React.FC = () => {
     setIsBirthdayCalendarOpen(false);
   };
 
+  const handleVerificationInput = (field: 'email' | 'phone', value: string) => {
+    setVerificationForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePhoneCodeSelect = (code: { label: string; flag: string; code: string }) => {
+    setSelectedPhoneCode(code);
+    setIsPhoneCodeDropdownOpen(false);
+  };
+
+  const handleSocialToggle = (key: keyof typeof socialConnections) => {
+    setSocialConnections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const formatDate = (date: Date) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -260,13 +337,17 @@ const ProfileSettings: React.FC = () => {
       if (birthdayCalendarRef.current && !birthdayCalendarRef.current.contains(target) && isBirthdayCalendarOpen) {
         setIsBirthdayCalendarOpen(false);
       }
+
+      if (phoneDropdownRef.current && !phoneDropdownRef.current.contains(target) && isPhoneCodeDropdownOpen) {
+        setIsPhoneCodeDropdownOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen]);
+  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen]);
 
   return (
     <>
@@ -276,6 +357,9 @@ const ProfileSettings: React.FC = () => {
         }
         .profile-edit-input-birthday::placeholder {
           color: #BABABA !important;
+        }
+        .verification-input::placeholder {
+          color: #D9D9D9 !important;
         }
       `}</style>
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -851,7 +935,7 @@ const ProfileSettings: React.FC = () => {
               </div>
 
               {/* Sub-navigation Tabs */}
-              <div className="flex items-center space-x-4 mb-6 -mx-8 px-8 border-b border-gray-200">
+              <div className="flex items-center space-x-4 mb-2 -mx-8 px-8 border-b border-gray-200">
                 <button
                   onClick={() => setActiveTab('personal')}
                   className={`flex items-center space-x-1.5 pb-2 relative ${
@@ -893,7 +977,7 @@ const ProfileSettings: React.FC = () => {
               {/* Personal Information Tab Content */}
               {activeTab === 'personal' && (
                 <div className="space-y-3">
-                  <div className="bg-white">
+                  <div className="bg-white py-3">
                     {/* Upload Photo Section */}
                     <div className="flex items-center space-x-3">
                       <div 
@@ -1280,8 +1364,146 @@ const ProfileSettings: React.FC = () => {
 
               {/* Verification Tab Content */}
               {activeTab === 'verification' && (
-                <div className="text-center py-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                  <p className="text-xs text-gray-500">Verification content will be implemented here</p>
+                <div className="bg-white rounded-2xl p-4">
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                          Email address
+                        </label>
+                        <button className="text-[10px] font-normal" style={{ color: '#64B5F6' }}>
+                          Change mail address
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="email"
+                          value={verificationForm.email}
+                          onChange={(e) => handleVerificationInput('email', e.target.value)}
+                          placeholder="Enter your email address"
+                          className="verification-input w-full px-4 py-2 pr-24 rounded-lg text-xs focus:outline-none"
+                          style={{ border: '1px solid #E9E9E9', borderRadius: '10px', color: '#212121' }}
+                        />
+                        <span className="absolute top-1/2 right-2 -translate-y-1/2">
+                          <span
+                            className="px-3.5 py-1 text-[10px] font-medium inline-flex items-center justify-center"
+                            style={{ backgroundColor: '#EDFBF0', color: '#4CD964', borderRadius: '6px' }}
+                          >
+                            Verified
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium mb-1 block" style={{ color: '#6A6A6A' }}>
+                        Phone number
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        <div className="relative" ref={phoneDropdownRef}>
+                          <button
+                            type="button"
+                            onClick={() => setIsPhoneCodeDropdownOpen(prev => !prev)}
+                          className="flex items-center space-x-2 px-3 py-2 rounded-lg border bg-white focus:outline-none"
+                          style={{ borderColor: '#E9E9E9', borderRadius: '10px' }}
+                          >
+                            <img
+                              src={`https://flagcdn.com/40x30/${selectedPhoneCode.flag}.png`}
+                              alt={selectedPhoneCode.label}
+                              className="w-5 h-5 rounded-full object-cover"
+                            />
+                          <span className="text-xs font-medium" style={{ color: '#B0B0B0' }}>
+                              {selectedPhoneCode.code}
+                            </span>
+                            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none">
+                              <path d="M6 9l6 6 6-6" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+                          {isPhoneCodeDropdownOpen && (
+                            <div className="absolute z-30 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-lg py-2">
+                              {phoneCodes.map(code => (
+                                <button
+                                  type="button"
+                                  key={code.code}
+                                  onClick={() => handlePhoneCodeSelect(code)}
+                                  className="w-full px-3 py-2 flex items-center space-x-2 text-left hover:bg-gray-50"
+                                >
+                                  <img
+                                    src={`https://flagcdn.com/40x30/${code.flag}.png`}
+                                    alt={code.label}
+                                    className="w-5 h-5 rounded-full object-cover"
+                                  />
+                                  <div className="flex items-center space-x-2">
+                                    <p className="text-xs font-medium" style={{ color: '#212121' }}>
+                                      {code.label}
+                                    </p>
+                                    <p className="text-[11px]" style={{ color: '#B0B0B0' }}>
+                                      {code.code}
+                                    </p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          type="tel"
+                          value={verificationForm.phone}
+                          onChange={(e) => handleVerificationInput('phone', e.target.value)}
+                          placeholder="Enter your phone number"
+                          className="verification-input flex-1 px-4 py-2 rounded-lg text-xs focus:outline-none"
+                          style={{ border: '1px solid #E9E9E9', borderRadius: '10px', color: '#212121' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <h3 className="text-sm font-medium mb-1.5" style={{ color: '#212121' }}>
+                      First level verification
+                    </h3>
+                    <p className="text-[11px] mb-5" style={{ color: '#939393' }}>
+                      Connect your social media accounts to verify your identity. Connecting at least two accounts will earn you a first-level verified badge.
+                    </p>
+                    <div className="space-y-3">
+                      {socialPlatforms.map(platform => (
+                        <div key={platform.key} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            {platform.key === 'linkedin' ? (
+                              <svg width="28" height="28" viewBox="0 0 448 512">
+                                <rect width="448" height="512" rx="90" fill="#0A66C2" />
+                                <path
+                                  d="M100.28 448H7.4V148.9h92.88zm-46.44-340a53.79 53.79 0 1153.79-53.79 53.79 53.79 0 01-53.79 53.79zM447.9 448h-92.68V302.4c0-34.7-.7-79.3-48.3-79.3-48.3 0-55.7 37.7-55.7 76.7V448h-92.7V148.9h89v40.8h1.3c12.4-23.6 42.6-48.3 87.7-48.3 93.8 0 111.1 61.8 111.1 142.3z"
+                                  fill="#fff"
+                                />
+                              </svg>
+                            ) : (
+                              <img src={platform.icon} alt={platform.name} className="w-6 h-6" />
+                            )}
+                            <div className="text-left">
+                              <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>
+                                {platform.name}
+                              </p>
+                              <p className="text-[11px]" style={{ color: '#B0B0B0' }}>
+                                {platform.description}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleSocialToggle(platform.key as keyof typeof socialConnections)}
+                            className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                            style={{ backgroundColor: socialConnections[platform.key as keyof typeof socialConnections] ? '#64B5F6' : '#E4E4E4' }}
+                          >
+                            <span
+                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                socialConnections[platform.key as keyof typeof socialConnections] ? 'translate-x-5' : 'translate-x-0.5'
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
