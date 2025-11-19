@@ -42,6 +42,9 @@ import igIcon from '../assets/images/pre/IG1.svg';
 import xIcon from '../assets/images/pre/x.svg';
 import deviceIcon from '../assets/images/pre/device.svg';
 import chromeIcon from '../assets/images/pre/chrome.svg';
+import safariIcon from '../assets/images/pre/safari.svg';
+import edgeIcon from '../assets/images/pre/edge.svg';
+import braveIcon from '../assets/images/pre/brave.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -103,6 +106,7 @@ const ProfileSettings: React.FC = () => {
     linkedin: false,
     x: false
   });
+  const [showSessionHistory, setShowSessionHistory] = useState(false);
 
   const socialPlatforms = [
     {
@@ -146,6 +150,36 @@ const ProfileSettings: React.FC = () => {
       location: 'London, United Kingdom',
       flag: 'gb',
       isCurrent: true
+    }
+  ];
+
+  const inactiveSessions = [
+    {
+      id: 2,
+      browser: 'Safari Browser',
+      icon: safariIcon,
+      device: 'iPhone 15 Pro',
+      location: 'London, United Kingdom',
+      flag: 'gb',
+      lastUsed: '1 month ago'
+    },
+    {
+      id: 3,
+      browser: 'Edge Browser',
+      icon: edgeIcon,
+      device: 'DESKTOP-6R899ET',
+      location: 'Montpellier, France',
+      flag: 'fr',
+      lastUsed: 'Tue, 4 July 2025'
+    },
+    {
+      id: 4,
+      browser: 'Brave Browser',
+      icon: braveIcon,
+      device: 'A3113 MacBook Air M3',
+      location: 'Chicago, United States',
+      flag: 'us',
+      lastUsed: 'Mon, 20 May 2025'
     }
   ];
   
@@ -1534,9 +1568,16 @@ const ProfileSettings: React.FC = () => {
                 <div className="bg-white border rounded-[30px] p-5 sm:p-7" style={{ borderColor: '#E4E4E4' }}>
                   <div className="mb-6 space-y-1.5">
                     <h2 className="text-base font-semibold" style={{ color: '#212121' }}>Security & Privacy Setting</h2>
-                    <p className="text-xs" style={{ color: '#B0B0B0' }}>
+                    <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
                       Manage your privacy preferences and keep your account secure on BAO' Afrik.
                     </p>
+                    <button
+                      onClick={() => setShowSessionHistory(prev => !prev)}
+                      className="px-3 py-1.5 text-xs rounded-lg border self-start"
+                      style={{ borderColor: '#D9D9D9', color: '#6A6A6A' }}
+                    >
+                      {showSessionHistory ? 'Hide mock session history' : 'Show mock session history'}
+                    </button>
                   </div>
 
                   <div className="space-y-6">
@@ -1564,7 +1605,7 @@ const ProfileSettings: React.FC = () => {
                     <div className="flex items-start justify-between gap-4 flex-wrap">
                       <div className="flex-1 space-y-1">
                         <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Two step verification</p>
-                        <p className="text-xs" style={{ color: '#B0B0B0' }}>
+                        <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
                           Enable two-step verification for enhanced security.{' '}
                           <button className="text-xs" style={{ color: '#64B5F6', textDecoration: 'underline', fontWeight: 400 }}>
                             How does it work?
@@ -1587,8 +1628,17 @@ const ProfileSettings: React.FC = () => {
                     {/* Sessions Section */}
                     <div className="space-y-3 mt-6 mb-6">
                       <div className="space-y-1.5">
-                        <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
-                        <p className="text-xs" style={{ color: '#B0B0B0' }}>
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
+                          <button
+                            onClick={() => setShowSessionHistory(!showSessionHistory)}
+                            className="px-2 py-1 text-[10px] rounded-md border"
+                            style={{ borderColor: '#D9D9D9', color: '#6A6A6A', fontWeight: 400 }}
+                          >
+                            {showSessionHistory ? 'Hide' : 'Show'} mock history
+                          </button>
+                        </div>
+                        <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
                           Review your active sessions and sign out of any devices you don't recognize.
                         </p>
                       </div>
@@ -1602,7 +1652,7 @@ const ProfileSettings: React.FC = () => {
                               <img
                                 src={session.icon}
                                 alt={session.browser}
-                                className="w-11 h-11 rounded-full object-cover"
+                                className="w-9 h-9 rounded-full object-cover"
                               />
                               <div>
                                 <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
@@ -1641,6 +1691,55 @@ const ProfileSettings: React.FC = () => {
                         ))}
                       </div>
                     </div>
+
+                    {showSessionHistory && (
+                      <div className="space-y-3 mt-8">
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Other Sessions</p>
+                          <button
+                            className="px-3 py-1.5 text-[10px] rounded-md border"
+                            style={{ borderColor: '#D9D9D9', color: '#6A6A6A', borderRadius: '6px', fontWeight: 400 }}
+                          >
+                            Close all inactive sessions
+                          </button>
+                        </div>
+                        <div className="space-y-3">
+                          {inactiveSessions.map(session => (
+                            <div
+                              key={session.id}
+                              className="flex items-center justify-between gap-4 flex-wrap"
+                            >
+                              <div className="flex items-center gap-3 min-w-[200px]">
+                                <img
+                                  src={session.icon}
+                                  alt={session.browser}
+                                  className="w-9 h-9 rounded-full object-cover"
+                                />
+                                <div>
+                                  <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
+                                  <p className="text-[10px] mt-0.5" style={{ color: '#B0B0B0' }}>{session.lastUsed}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs" style={{ color: '#939393' }}>
+                                <img src={deviceIcon} alt="Device" className="w-4 h-4" />
+                                <span>{session.device}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs" style={{ color: '#939393' }}>
+                                <img
+                                  src={`https://flagcdn.com/24x18/${session.flag}.png`}
+                                  alt={session.location}
+                                  className="w-5 h-5 rounded-full object-cover"
+                                />
+                                <span>{session.location}</span>
+                              </div>
+                              <button className="text-xs font-medium" style={{ color: '#6A6A6A', textDecoration: 'underline' }}>
+                                Sign Out
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
