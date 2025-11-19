@@ -28,7 +28,7 @@ export const AuthListener = () => {
                     type: event.detail?.type || 'warning',
                     title: 'Session Expired',
                     message: event.detail?.message || 'Your session has expired. Please log in again.',
-                    duration: 5000,
+                    duration: 2000,
                 });
             }
 

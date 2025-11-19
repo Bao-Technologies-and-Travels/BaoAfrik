@@ -318,7 +318,7 @@ EOF
                             <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>Fixed auth flow: users are automatically redirected to login after successful email verfiication (no more profile setup...user will fill in their info when logged in). Fixed issues navigating to product details from homepage. Buyers can view products and contact sellers to start conversations. Fixed listing functionality to work properly when creating/editing listings.</p>
+                            <p><strong>Changes made:</strong>Fixed profile setup flow: redirect to home and refresh page to pick up modifications. Display seller's products under seller-profile</p>
                             <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

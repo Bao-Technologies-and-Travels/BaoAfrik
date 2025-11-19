@@ -136,7 +136,7 @@ const EmailVerification: React.FC = () => {
           type: 'info',
           title: 'Verification code resent',
           message: 'New verification code sent! Please check your email.',
-          duration: 4000
+          duration: 2000
         });
 
       } else {

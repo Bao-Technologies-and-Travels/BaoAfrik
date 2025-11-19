@@ -198,7 +198,7 @@ const Register: React.FC = () => {
       type: 'info',
       title: 'Feature coming soon',
       message: `Social login with ${provider} coming soon.`,
-      duration: 4000
+      duration: 2000
     });
   };
 

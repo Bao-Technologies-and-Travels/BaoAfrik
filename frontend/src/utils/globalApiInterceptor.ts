@@ -7,6 +7,7 @@ const isAuthEndpoint = (url: string): boolean => {
   const authEndpoints = [
     '/api/auth/register',
     '/api/auth/login',
+    '/api/auth/logout',
     '/api/auth/refresh',
     '/api/auth/forgot-password',
     '/api/auth/reset-password',

@@ -134,7 +134,7 @@ const SellerProfile: React.FC = () => {
         }
 
         const token = localStorage.getItem("accessToken");
-        const apiUrl = `${process.env.REACT_APP_API_URL}/products/user/${sellerId}`;
+        const apiUrl = `${process.env.REACT_APP_API_URL}/products/user/${realSellerId}`;
 
         const response = await fetch(apiUrl, {
           headers: token ? { 'Authorization': `Bearer ${token}` } : {}
@@ -167,14 +167,27 @@ const SellerProfile: React.FC = () => {
   useEffect(() => {
     const fetchSellerProducts = async () => {
       if (!sellerId) return;
-      console.log('Current sellerId:', sellerId);
 
       try {
         setIsLoadingProducts(true);
+
+        const realSellerId = sessionStorage.getItem(`seller_${sellerId}_id`);
+        const sellerData = sessionStorage.getItem(`seller_${sellerId}_data`);
+
+        console.log('Seller slug:', sellerId);
+        console.log('Real seller ID:', realSellerId);
+        console.log('Seller data:', sellerData);
+
+        if (!realSellerId) {
+          console.error('No real seller ID found in sessionStorage');
+          setSellerProducts([]);
+          return;
+        }
+
         const token = localStorage.getItem("accessToken");
 
-        console.log('Fetching products for sellerId:', sellerId);
-        console.log('API URL:', `${process.env.REACT_APP_API_URL}/products/user/${sellerId}`);
+        console.log('Fetching products for realSellerID:', realSellerId);
+        console.log('API URL:', `${process.env.REACT_APP_API_URL}/products/user/${realSellerId}`);
 
         // Use the user products endpoint from your routes
         const response = await fetch(
@@ -192,6 +205,7 @@ const SellerProfile: React.FC = () => {
           const result = await response.json();
 
           // debug log
+          console.log('Pure result as [result]:', result);
           console.log('result.data type:', typeof result.data);
           console.log('result.data keys:', result.data ? Object.keys(result.data) : 'null');
           console.log('result.data:', result.data);
@@ -199,29 +213,29 @@ const SellerProfile: React.FC = () => {
           if (result.success && result.data) {
             // Handle different possible response structures
             let products = [];
-            if (Array.isArray(result.data)) {
-              products = result.data;
-            } else if (result.data.products && Array.isArray(result.data.products)) {
+
+            if (result.data.products) {
               products = result.data.products;
-            } else if (result.data.data && Array.isArray(result.data.data)) {
-              products = result.data.data;
+            } else if (Array.isArray(result.data)) {
+              products = result.data;
             } else {
-              console.warn('Unexpected data structure, checking for items:', result.data);
-              products = Object.values(result.data).filter((item: any) => item && typeof item === 'object' && item.id);
+              const possibleArrays = Object.values(result.data).filter((item: unknown) => Array.isArray(item)) as any[][];
+              products = possibleArrays.length > 0 ? possibleArrays[0] : [];
             }
 
             //  debug log
-            console.log('Parsed products:', products)
+            console.log('Final products array:', products)
             setSellerProducts(products);
           } else {
             console.warn('No success or data in repsonse', result);
             setSellerProducts([]);
           }
         } else {
-          console.error('API returned status:', response.status);
+          console.error('API returned status:', response.status, response.statusText);
           setSellerProducts([]);
         }
       } catch (error) {
+        console.error('Fetch error:', error);
         setSellerProducts([]);
       } finally {
         setIsLoadingProducts(false);
@@ -1509,7 +1523,7 @@ const SellerProfile: React.FC = () => {
                       {/* Product Image - Top */}
                       <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
                         <img
-                          src={product.images && product.images.length > 0 ? product.images[0].url : pre1}
+                          src={product.images?.[0]?.url || product.image || pre1}
                           alt={product.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           style={{ borderRadius: '12px' }}
@@ -1551,7 +1565,7 @@ const SellerProfile: React.FC = () => {
                           <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
                             {product.currency} {product.price}
                           </div>
-                          {seller.isVerified && (
+                          {seller?.isVerified && (
                             <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
                               <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
                               <span className="text-xs" style={{ color: '#45C55B', fontWeight: '300' }}>Verified Seller</span>

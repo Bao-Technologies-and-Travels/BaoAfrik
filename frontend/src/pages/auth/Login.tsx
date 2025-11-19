@@ -244,7 +244,7 @@ const Login: React.FC = () => {
       type: "info",
       title: "Feature coming soon",
       message: `Social login with ${provider} coming soon. Please login with email and password`,
-      duration: 4000,
+      duration: 2000,
     });
   };
 

@@ -85,7 +85,7 @@ const CreateListing: React.FC = () => {
         type: 'error',
         title: 'Please complete required fields',
         message: `Please select: ${missing.join(', ')}`,
-        duration: 4000
+        duration: 2000
       });
       return false;
     }
@@ -138,7 +138,7 @@ const CreateListing: React.FC = () => {
         type: "error",
         title: "Failed to load",
         message: "Unable to retrieve product data. Please check your internet connection.",
-        duration: 3000
+        duration: 2000
       });
       navigate('/my-listings');
     } finally {
@@ -267,7 +267,7 @@ const CreateListing: React.FC = () => {
           type: "error",
           title: "Upload limit",
           message: "You can only upload up to 10 images at a time",
-          duration: 3000
+          duration: 2000
         });
       }
     }
@@ -368,7 +368,7 @@ const CreateListing: React.FC = () => {
         type: "error",
         title: "Upload limit",
         message: "You can only upload up to 10 images at a time",
-        duration: 3000
+        duration: 2000
       });
     }
   };
@@ -539,7 +539,7 @@ const CreateListing: React.FC = () => {
                 type: 'error',
                 title: 'Action failed',
                 message: 'Failed to save product as draft',
-                duration: 3000
+                duration: 2000
               });
             } else {
             setProductData((prev: any) => prev ? {...prev, status: 'DRAFT'} : prev);
@@ -549,7 +549,7 @@ const CreateListing: React.FC = () => {
               type: 'error',
               title: 'Action failed',
               message: 'Unable to save product as draft',
-              duration: 3000
+              duration: 2000
             });
           }
         }
@@ -559,7 +559,7 @@ const CreateListing: React.FC = () => {
           type: "success",
           title: "Action completed",
           message: `${isEditMode ? 'Draft updated' : 'Draft saved'} successfully!`,
-          duration: 3000
+          duration: 2000
         });
         navigate('/my-listings?tab=drafts');
       }
@@ -568,7 +568,7 @@ const CreateListing: React.FC = () => {
         type: "error",
         title: "Action failed",
         message: `Failed to ${isEditMode ? 'update' : 'save'} draft: ${error.message}`,
-        duration: 3000
+        duration: 2000
       });
     }
   };
@@ -655,7 +655,7 @@ const CreateListing: React.FC = () => {
             type: "success",
             title: "Action completed",
             message: `Listing ${isEditMode ? 'updated' : 'posted'} successfully!`,
-            duration: 3000
+            duration: 2000
           });
           navigate('/my-listings?tab=all');
         }
@@ -665,7 +665,7 @@ const CreateListing: React.FC = () => {
         type: "error",
         title: "Action failed",
         message: "Failed to post listing. Please try again.",
-        duration: 3000
+        duration: 2000
       });
     } finally {
       setIsLoading(false);

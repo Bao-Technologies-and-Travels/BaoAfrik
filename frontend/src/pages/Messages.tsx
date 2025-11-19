@@ -794,7 +794,7 @@ const Messages: React.FC = () => {
           type: "error",
           title: "Error",
           message: "Failed to load messages",
-          duration: 3000,
+          duration: 2000,
         });
       } finally {
         setIsLoadingMessages(false);
@@ -834,7 +834,7 @@ const Messages: React.FC = () => {
           type: "error",
           title: "Connection Error",
           message: "Unable to send message. Please check your connection.",
-          duration: 3000,
+          duration: 2000,
         });
         return false;
       }
@@ -918,7 +918,7 @@ const Messages: React.FC = () => {
               type: "error",
               title: "Send Failed",
               message: response?.error || "Failed to send message",
-              duration: 3000,
+              duration: 2000,
             });
           }
         });
@@ -1203,7 +1203,7 @@ const Messages: React.FC = () => {
           type: "success",
           title: "Conversation Archived",
           message: "The conversation has been moved to archives",
-          duration: 3000,
+          duration: 2000,
         });
       }
     } catch (error) {
@@ -1211,7 +1211,7 @@ const Messages: React.FC = () => {
         type: "error",
         title: "Archive Failed",
         message: "Failed to archive conversation",
-        duration: 3000,
+        duration: 2000,
       });
     }
   };
@@ -1234,7 +1234,7 @@ const Messages: React.FC = () => {
           type: "success",
           title: "Conversation Muted",
           message: "You will no longer receive notifications from this chat",
-          duration: 3000,
+          duration: 2000,
         });
       }
     } catch (error) {
@@ -1242,7 +1242,7 @@ const Messages: React.FC = () => {
         type: "error",
         title: "Mute Failed",
         message: "Failed to mute conversation",
-        duration: 4000,
+        duration: 2000,
       });
     }
   };
@@ -1267,7 +1267,7 @@ const Messages: React.FC = () => {
           type: "success",
           title: "Conversation Pinned",
           message: "Conversation pinned to top",
-          duration: 3000,
+          duration: 2000,
         });
       }
     } catch (error) {
@@ -1275,7 +1275,7 @@ const Messages: React.FC = () => {
         type: "error",
         title: "Pin Failed",
         message: "Failed to pin conversation",
-        duration: 4000,
+        duration: 2000,
       });
     }
   };
@@ -1308,7 +1308,7 @@ const Messages: React.FC = () => {
           type: "success",
           title: "Conversation Deleted",
           message: "The conversation has been deleted",
-          duration: 3000,
+          duration: 2000,
         });
       } else {
         throw new Error("Delete failed");
@@ -1318,7 +1318,7 @@ const Messages: React.FC = () => {
         type: "error",
         title: "Delete Failed",
         message: "Failed to delete conversation",
-        duration: 4000,
+        duration: 2000,
       });
     }
   };
@@ -1501,7 +1501,7 @@ const Messages: React.FC = () => {
         type: "error",
         title: "Connection failed",
         message: errorMessage,
-        duration: 3000,
+        duration: 2000,
       });
       return null;
     }
@@ -1822,7 +1822,7 @@ const Messages: React.FC = () => {
         type: "error",
         title: "Connection Lost",
         message: "Please check your internet connection and try again.",
-        duration: 3000,
+        duration: 2000,
       });
       return false;
     }
@@ -1873,7 +1873,7 @@ const Messages: React.FC = () => {
         type: "error",
         title: "Error",
         message: "No conversation selected",
-        duration: 3000,
+        duration: 2000,
       });
       return;
     }
@@ -1887,7 +1887,7 @@ const Messages: React.FC = () => {
         type: "error",
         title: "Connection Error",
         message: "Unable to connect. Please check your internet and try again.",
-        duration: 4000,
+        duration: 2000,
       });
       return;
     }
@@ -1943,7 +1943,7 @@ const Messages: React.FC = () => {
             type: "error",
             title: "Voice message failed",
             message: "Unable to send voice message. Please try again",
-            duration: 4000,
+            duration: 2000,
           });
         }
       }
@@ -1957,7 +1957,7 @@ const Messages: React.FC = () => {
                 type: "error",
                 title: "Authentication Error",
                 message: "User not authenticated",
-                duration: 4000,
+                duration: 2000,
               });
               setIsSending(false);
               return;
@@ -1993,7 +1993,7 @@ const Messages: React.FC = () => {
               message:
                 error.message ||
                 "Unable to upload attachment. Please try again",
-              duration: 3000,
+              duration: 2000,
             });
             continue;
           }
@@ -2039,7 +2039,7 @@ const Messages: React.FC = () => {
         type: "error",
         title: "Send Failed",
         message: "Failed to send message. Please try again.",
-        duration: 3000,
+        duration: 2000,
       });
     } finally {
       setIsSending(false);

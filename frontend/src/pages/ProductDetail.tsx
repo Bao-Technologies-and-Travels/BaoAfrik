@@ -360,7 +360,7 @@ const ProductDetail: React.FC = () => {
           type: 'error',
           title: 'Error',
           message: error.message || "Failed to load product details",
-          duration: 3000
+          duration: 2000
         });
       } finally {
         setIsLoading(false);
@@ -478,7 +478,7 @@ const ProductDetail: React.FC = () => {
             type: "success",
             title: "Link Copied",
             message: "Product link copied to clipboard",
-            duration: 3000,
+            duration: 2000,
           });
         }
       } catch (error) {
@@ -486,7 +486,7 @@ const ProductDetail: React.FC = () => {
           type: "error",
           title: "Share failed",
           message: "Failed to share product",
-          duration: 3000
+          duration: 2000
         });
       }
     }
@@ -515,7 +515,7 @@ const ProductDetail: React.FC = () => {
           message: isSaved
             ? "Product removed from your saved items"
             : "Product added to your saved items",
-          duration: 3000,
+          duration: 2000,
         });
       } else {
         throw new Error("Failed to save product");
@@ -525,7 +525,7 @@ const ProductDetail: React.FC = () => {
         type: "error",
         title: "Save Failed",
         message: "Failed to save product. Please try again.",
-        duration: 3000,
+        duration: 2000,
       });
     }
   };
@@ -547,7 +547,7 @@ const ProductDetail: React.FC = () => {
         type: "error",
         title: "Error",
         message: "Seller information not available",
-        duration: 3000
+        duration: 2000
       });
       return;
     }
@@ -655,7 +655,7 @@ const ProductDetail: React.FC = () => {
         type: "error",
         title: "Cannot contact seller",
         message: errorMessage,
-        duration: 3000,
+        duration: 2000,
       });
     } finally {
       setIsContactingSeller(false);
@@ -767,7 +767,7 @@ const ProductDetail: React.FC = () => {
           message: wishlistProducts.has(productId)
             ? "Product removed from your wishlist"
             : "Product added to your wishlist",
-          duration: 3000,
+          duration: 2000,
         });
       } else {
         throw new Error("Failed to update wishlist");
@@ -777,7 +777,7 @@ const ProductDetail: React.FC = () => {
         type: "error",
         title: "Wishlist Failed",
         message: "Failed to update wishlist. Please try again.",
-        duration: 3000,
+        duration: 2000,
       });
     }
   };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { apiClient } from '../services/api';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -85,13 +86,6 @@ interface CategoryProducts {
   [key: string]: FrontendProduct[];
 }
 
-interface ApiResponse {
-  products: BaseProduct[];
-  totalPages: number;
-  currentPage: number;
-  total: number;
-}
-
 interface NotificationProduct {
   id: number;
   name: string;
@@ -107,12 +101,12 @@ interface Notification {
 }
 
 const Home: React.FC = () => {
-  const { user, isVisitor } = useAuth();
+  const auth = useAuth();
   const productGridRef = React.useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [location, setLocation] = useState('');
+  const [sellerLocation, setSellerLocation] = useState('');
   const [placeOfOrigin, setPlaceOfOrigin] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sharedProducts, setSharedProducts] = useState<Set<number>>(new Set());
@@ -143,6 +137,30 @@ const Home: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<FrontendProduct[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const routerLocation = useLocation();
+
+  // useEffect for refreshing currrent user after navigating to homepage
+  useEffect(() => {
+    const refreshCurrentUser = async () => {
+      try {
+        const res = await apiClient.getCurrentUser();
+        if (res?.success) {
+          const latest = res.data;
+          if (latest) {
+            if (typeof (auth as any).setUser === 'function') {
+              (auth as any).setUser(latest);
+            }
+          }
+        }
+      } catch (err) {
+        console.debug('Failed to refresh current user', err);
+      }
+    };
+
+    if (routerLocation.pathname === '/') {
+      refreshCurrentUser();
+    }
+  }, [routerLocation.pathname, auth]);
 
   // UseEffect for fetching products
   useEffect(() => {
@@ -197,7 +215,7 @@ const Home: React.FC = () => {
 
         if (productsArray.length > 0) {
           setProducts(productsArray);
-        } 
+        }
       }
 
     } catch (error) {
@@ -650,7 +668,7 @@ const Home: React.FC = () => {
 
   // Auto-search when certain filters change 
   useEffect(() => {
-    if (searchQuery.trim() || selectedCategoryText || selectedPlaceOfOriginText || location.trim()) {
+    if (searchQuery.trim() || selectedCategoryText || selectedPlaceOfOriginText || sellerLocation.trim()) {
       // Only auto-search if we have active search criteria
       handleSearch();
     }
@@ -661,7 +679,7 @@ const Home: React.FC = () => {
     setSearchQuery('');
     setSelectedCategory('');
     setSelectedCategoryText('');
-    setLocation('');
+    setSellerLocation('');
     setPlaceOfOrigin('');
     setSelectedPlaceOfOriginText('');
     setSearchResults([]);
@@ -715,9 +733,9 @@ const Home: React.FC = () => {
         );
       }
 
-      if (location.trim()) {
+      if (sellerLocation.trim()) {
         products = products.filter(product =>
-          product.location.toLowerCase().includes(location.toLowerCase())
+          product.location.toLowerCase().includes(sellerLocation.toLowerCase())
         );
       }
 
@@ -765,10 +783,10 @@ const Home: React.FC = () => {
     }
 
     // Apply seller location filter (Seller Location input - filters by location at bottom)
-    if (location.trim()) {
+    if (sellerLocation.trim()) {
       const beforeCount = productsToSearch.length;
       productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
-        product.location.toLowerCase().includes(location.toLowerCase())
+        product.location.toLowerCase().includes(sellerLocation.toLowerCase())
       );
     }
 
@@ -1190,8 +1208,8 @@ const Home: React.FC = () => {
               <input
                 type="text"
                 placeholder="Insert location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                value={sellerLocation}
+                onChange={(e) => setSellerLocation(e.target.value)}
                 onFocus={() => setFocusedSearchSection('sellerLocation')}
                 onBlur={() => {
                   setTimeout(() => setFocusedSearchSection(null), 200);
