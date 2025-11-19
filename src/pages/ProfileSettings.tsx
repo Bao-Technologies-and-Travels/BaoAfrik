@@ -35,6 +35,7 @@ import cameraIcon from '../assets/images/pre/camera.svg';
 import locationIcon from '../assets/images/pre/PL.svg';
 import pencilIcon from '../assets/images/pre/pencil.svg';
 import loadIcon from '../assets/images/pre/load.svg';
+import calendarIcon from '../assets/images/pre/calendar.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -369,7 +370,7 @@ const ProfileSettings: React.FC = () => {
             <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
               <div className="flex items-center justify-between h-16">
                 {/* Center - Breadcrumb */}
-                <div className="hidden md:flex items-center space-x-1 text-[10px] md:text-xs">
+                <div className="hidden md:flex items-center space-x-3 text-[10px] md:text-xs">
                   <img 
                     src={leftIcon} 
                     alt="Back" 
@@ -382,16 +383,16 @@ const ProfileSettings: React.FC = () => {
                   >
                     Homepage
                   </span>
-                  <span className="mx-2" style={{ color: '#D4D4D4' }}>·</span>
+                  <span className="mx-3" style={{ color: '#D4D4D4' }}>·</span>
                   <span 
                     className="text-gray-400 hover:text-gray-600 cursor-pointer"
                     onClick={handleMenuClick}
                   >
                     Menu
                   </span>
-                  <span className="mx-2" style={{ color: '#D4D4D4' }}>·</span>
+                  <span className="mx-3" style={{ color: '#D4D4D4' }}>·</span>
                   <span className="text-gray-400 hover:text-gray-600 cursor-pointer">Settings</span>
-                  <span className="mx-2" style={{ color: '#D4D4D4' }}>·</span>
+                  <span className="mx-3" style={{ color: '#D4D4D4' }}>·</span>
                   <span className="text-gray-900 font-medium">Profile Setting</span>
                 </div>
 
@@ -1069,7 +1070,7 @@ const ProfileSettings: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => setIsGenderDropdownOpen(prev => !prev)}
-                                className="w-full px-3 py-2 pl-7 rounded-lg text-xs text-left focus:outline-none"
+                                className="w-full px-3 py-2 pr-8 rounded-lg text-xs text-left focus:outline-none"
                                 style={{ 
                                   backgroundColor: 'white', 
                                   border: '1px solid #E9E9E9',
@@ -1078,7 +1079,7 @@ const ProfileSettings: React.FC = () => {
                               >
                                 {profileData.gender || 'Select gender'}
                               </button>
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                                   <path d="M6 9l6 6 6-6" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
@@ -1107,12 +1108,11 @@ const ProfileSettings: React.FC = () => {
                             <label className="text-[10px] mb-1 block" style={{ color: '#6A6A6A' }}>Birthday</label>
                             <div className="relative birthday-calendar">
                               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                                  <rect x="3" y="5" width="18" height="16" rx="2" stroke="#B0B0B0" strokeWidth="1.5" />
-                                  <path d="M3 10H21" stroke="#B0B0B0" strokeWidth="1.5" />
-                                  <path d="M8 3V7" stroke="#B0B0B0" strokeWidth="1.5" strokeLinecap="round" />
-                                  <path d="M16 3V7" stroke="#B0B0B0" strokeWidth="1.5" strokeLinecap="round" />
-                                </svg>
+                                <img 
+                                  src={calendarIcon} 
+                                  alt="Calendar" 
+                                  style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(79%) sepia(6%) saturate(136%) hue-rotate(189deg) brightness(88%) contrast(89%)' }}
+                                />
                               </span>
                               <input
                                 type="text"
@@ -1202,7 +1202,7 @@ const ProfileSettings: React.FC = () => {
                   {/* Location Section */}
                   <div className="border rounded-2xl p-3 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-normal" style={{ color: '#6A6A6A' }}>Location</h3>
+                      <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Location</h3>
                       <div className="flex items-center space-x-2">
                         <span className="text-[10px]" style={{ color: '#64B5F6' }}>Geolocation</span>
                         <button
@@ -1347,18 +1347,18 @@ const ProfileSettings: React.FC = () => {
 
           {/* Footer */}
           <footer className="bg-gray-50">
-            <div className="px-4 sm:px-6 lg:px-8 py-4">
-              <div className="flex items-center justify-between text-sm" style={{ color: '#BABABA' }}>
-                <div className="flex items-center space-x-2">
+            <div className="px-4 sm:px-6 lg:px-8 py-3">
+              <div className="flex items-center justify-between text-xs" style={{ color: '#BABABA' }}>
+                <div className="flex items-center space-x-1.5">
                   <img 
                     src={lilLogo} 
                     alt="lil" 
-                    className="w-6 h-6"
+                    className="w-5 h-5"
                   />
                   <span>©</span>
-                  <span>All rights reserved</span>
+                  <span className="text-[11px]">All rights reserved</span>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3 text-[11px]">
                   <Link to="/contact" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Contact Us</Link>
                   <span style={{ color: '#BABABA' }}>|</span>
                   <Link to="/terms" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
