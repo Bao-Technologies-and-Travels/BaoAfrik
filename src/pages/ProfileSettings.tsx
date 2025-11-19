@@ -1585,7 +1585,7 @@ const ProfileSettings: React.FC = () => {
                     </div>
 
                     {/* Sessions Section */}
-                    <div className="space-y-3 mt-6">
+                    <div className="space-y-3 mt-6 mb-6">
                       <div className="space-y-1.5">
                         <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
                         <p className="text-xs" style={{ color: '#B0B0B0' }}>
