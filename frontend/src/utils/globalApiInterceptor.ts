@@ -6,7 +6,6 @@ const originalFetch = window.fetch;
 const isAuthEndpoint = (url: string): boolean => {
   const authEndpoints = [
     '/api/auth/register',
-    '/api/auth/me',
     '/api/auth/login',
     '/api/auth/refresh',
     '/api/auth/forgot-password',

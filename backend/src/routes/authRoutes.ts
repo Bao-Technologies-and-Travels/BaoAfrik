@@ -2,7 +2,7 @@ import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import authController, { verifyResetCode } from '@/controllers/authController';
 import { authenticateToken } from '@/middleware/authMiddleware';
-import { 
+import {
   validateRegister,
   validateLogin,
   validateEmailVerification,
@@ -55,8 +55,7 @@ router.post('/refresh', authController.refreshToken);
 
 // Protected routes (authentication required)
 router.post('/logout', authController.logout);
-router.get('/me', authenticateToken, authController.getCurrentUser);
-router.put('/profile', authenticateToken, validateUpdateProfile, authController.updateProfile);
 router.put('/change-password', authenticateToken, validateChangePassword, authController.changePassword);
-
+router.put('/profile', authenticateToken, validateUpdateProfile, authController.updateProfile);
+router.get('/me', authenticateToken, validateUpdateProfile, authController.getCurrentUser);
 export default router;

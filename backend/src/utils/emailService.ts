@@ -99,7 +99,7 @@ class EmailService {
           throw new Error(result.error.message);
         }
 
-        logger.info('Email sent successfully via Resend', {
+        logger.info(`Email sent successfully via ${process.env.EMAIL_SERVICE}`, {
           to: options.to,
           subject: options.subject,
         });

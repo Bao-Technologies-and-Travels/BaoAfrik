@@ -189,7 +189,7 @@ const EmailVerification: React.FC = () => {
             Verify Your Email
           </h2>
           <p className="text-body text-gray-500 text-sm mb-6 sm:mb-8 px-2">
-            We've sent a 6-digit verification code to <span className="font-medium text-gray-700">{email}</span>
+            We've sent a 6-digit verification code to <span className="font-medium text-gray-700">{email}. </span>Check your inbox and spam folder.
           </p>
           {/* Error Message */}
           {error && (
