@@ -1970,14 +1970,14 @@ const ProfileSettings: React.FC = () => {
         {/* Overlay */}
         <div 
           className="fixed inset-0 z-50"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}
+          style={{ backgroundColor: '#0000001A' }}
           onClick={handleCloseUpdatePasswordModal}
         />
         
         {/* Modal */}
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
-            className="bg-white rounded-[30px] p-6 sm:p-8 relative max-w-md w-full"
+            className="bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 pb-10 relative max-w-md w-full"
             style={{ 
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)'
             }}
@@ -1986,9 +1986,9 @@ const ProfileSettings: React.FC = () => {
             {/* Close Button */}
             <button
               onClick={handleCloseUpdatePasswordModal}
-              className="absolute top-6 right-6 w-6 h-6 flex items-center justify-center"
+              className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center"
             >
-              <img src={closeIcon} alt="Close" className="w-4 h-4" />
+              <img src={closeIcon} alt="Close" className="w-5 h-5" />
             </button>
 
             {/* Icon */}
@@ -1997,31 +1997,41 @@ const ProfileSettings: React.FC = () => {
             </div>
 
             {/* Title */}
-            <h2 className="text-xl font-semibold text-center mb-2" style={{ color: '#212121' }}>
+            <h2
+              className="text-xl text-center mb-1.5"
+              style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+            >
               Update Password
             </h2>
 
             {/* Description */}
-            <p className="text-sm text-center mb-6" style={{ color: '#BABABA' }}>
+            <p className="text-xs text-center mb-4" style={{ color: '#BABABA', fontWeight: 400 }}>
               Please enter your Current password.
             </p>
 
             {/* Input Field */}
-            <div className="mb-6">
-              <label className="block text-sm mb-2" style={{ color: '#6A6A6A' }}>
+            <div className="mb-8 flex flex-col items-center">
+              <label className="w-full max-w-xs text-left text-xs mb-3 mt-5" style={{ color: '#6A6A6A', fontWeight: 500 }}>
                 Current password
               </label>
-              <div className="relative">
+              <div className="relative w-full max-w-xs">
                 <input
+                  className="update-password-input w-full px-4 py-2.5 pr-12 rounded-[12px] border focus:outline-none text-sm mx-auto"
                   type={showPassword ? 'text' : 'password'}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="Enter your current password"
-                  className="w-full px-4 py-3 pr-12 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-200"
                   style={{
                     backgroundColor: 'white',
                     borderColor: '#E9E9E9',
-                    color: '#212121'
+                    color: '#212121',
+                    borderRadius: '12px'
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#CFE8FC';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = '#E9E9E9';
                   }}
                 />
                 <button
@@ -2042,15 +2052,18 @@ const ProfileSettings: React.FC = () => {
                 </button>
               </div>
               <style>{`
-                input::placeholder {
+                .update-password-input::placeholder {
                   color: #D9D9D9 !important;
+                  font-size: 12px !important;
+                  font-weight: 400 !important;
                 }
               `}</style>
             </div>
 
             {/* Button */}
-            <button
-              className="w-full py-3 rounded-xl font-medium transition-colors"
+            <div className="flex justify-end w-full max-w-xs mx-auto">
+              <button
+                className="w-full py-2.5 rounded-[12px] text-sm font-normal transition-colors"
               style={{
                 backgroundColor: currentPassword.trim() ? '#F9A825' : '#E9E9E9',
                 color: '#FFFFFF',
@@ -2059,7 +2072,8 @@ const ProfileSettings: React.FC = () => {
               disabled={!currentPassword.trim()}
             >
               Save new password
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       </>
