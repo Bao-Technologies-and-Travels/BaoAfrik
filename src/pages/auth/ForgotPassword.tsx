@@ -78,7 +78,7 @@ const ForgotPassword: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Desktop Logo - Top Left with Background */}
-      <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8 border-b-2 border-orange-200">
+      <div className="hidden lg:block absolute top-0 left-0 right-0 py-4 px-8 border-b" style={{ backgroundColor: '#FEF6E9', borderColor: '#FCD79B' }}>
         <div className="flex items-center justify-between">
           <Link to="/">
             <img 
@@ -87,8 +87,8 @@ const ForgotPassword: React.FC = () => {
               className="h-8 object-contain cursor-pointer"
             />
           </Link>
-          <button className="p-2 rounded-lg hover:bg-orange-100 transition-colors">
-            <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button className="p-2 rounded-lg transition-colors" style={{ color: '#F9A825' }}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -106,8 +106,8 @@ const ForgotPassword: React.FC = () => {
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                  </svg>
                </div>
-               <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors bg-white border border-gray-200">
-                 <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button className="p-2 rounded-lg transition-colors bg-white border border-gray-200" style={{ color: '#F9A825' }}>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                  </svg>
                </button>
@@ -115,8 +115,8 @@ const ForgotPassword: React.FC = () => {
            </div>
 
           {/* Main content with border and shadow */}
-          <div className="bg-white border-0 lg:border border-gray-200 rounded-lg shadow-none lg:shadow-lg p-8 mt-0 lg:mt-16">
-            <div className="text-left lg:text-center mb-8">
+          <div className="bg-white rounded-[30px] shadow-lg p-8 lg:p-10 mt-0 lg:mt-16" style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}>
+            <div className="text-left lg:text-center mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {/* Profile Mail Icon - Hidden on mobile */}
               <div className="hidden lg:block mx-auto w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6">
                 <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,10 +124,10 @@ const ForgotPassword: React.FC = () => {
                 </svg>
               </div>
               
-              <h1 className="text-2xl font-medium text-gray-900 mb-3">
+              <h1 className="text-xl font-semibold mb-2" style={{ color: '#212121' }}>
                 Profile Mail
               </h1>
-              <p className="text-gray-500 text-sm px-0 lg:px-4">
+              <p className="text-xs lg:text-sm px-0 lg:px-4" style={{ color: '#BABABA' }}>
                 Please enter the email address associated with your BAO Afrik profile.
               </p>
             </div>
@@ -141,7 +141,7 @@ const ForgotPassword: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-xs font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
                   Email address
                 </label>
               <input
@@ -150,13 +150,17 @@ const ForgotPassword: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 onMouseEnter={(e) => (e.target as HTMLInputElement).focus()}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
+                className={`forgot-password-input w-full px-4 py-3 border rounded-xl focus:ring-1 focus:ring-blue-200 focus:border-transparent text-sm bg-white ${
+                  errors.email ? 'border-red-500' : ''
                 }`}
                 placeholder="Enter your email address"
                 required
                 disabled={isLoading}
                 autoFocus
+                style={{
+                  borderColor: errors.email ? '#EF4444' : '#E9E9E9',
+                  color: '#212121'
+                }}
               />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -167,16 +171,16 @@ const ForgotPassword: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading || !email.trim()}
-                  className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${
-                    email.trim() && !isLoading
-                      ? 'text-white'
-                      : 'bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-700'
-                  }`}
-                  style={email.trim() && !isLoading ? { backgroundColor: '#F9A825' } : {}}
+                  className="w-full py-2.5 px-4 rounded-xl transition-all duration-200 text-xs font-medium"
+                  style={{
+                    backgroundColor: '#E9E9E9',
+                    color: '#6A6A6A',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
-                      <LoadingSpinner size="md" color={email.trim() ? 'white' : 'gray'} className="mr-2" />
+                      <LoadingSpinner size="md" color="gray" className="mr-2" />
                       Sending...
                     </div>
                   ) : (
@@ -217,7 +221,7 @@ const ForgotPassword: React.FC = () => {
       {/* Footer - Hidden on mobile */}
       <div className="hidden lg:block py-6 px-4">
         <div className="border-t border-gray-200 pt-4">
-          <div className="flex items-center justify-between text-xs text-gray-400">
+          <div className="flex items-center justify-between text-xs" style={{ color: '#BABABA' }}>
             <div className="flex items-center space-x-1">
               <img src={lilLogo} alt="BaoAfrik" className="w-4 h-4" />
               <span>© All rights reserved</span>
@@ -234,6 +238,14 @@ const ForgotPassword: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <style>{`
+        .forgot-password-input::placeholder {
+          color: #E9E9E9 !important;
+          font-size: 12px !important;
+          font-family: 'Poppins', sans-serif !important;
+        }
+      `}</style>
     </div>
   );
 };
