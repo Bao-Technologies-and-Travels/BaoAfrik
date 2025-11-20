@@ -120,8 +120,13 @@ const ProfileSettings: React.FC = () => {
   const [selectedPasswordOption, setSelectedPasswordOption] = useState<string | null>(null);
   const passwordModalRef = useRef<HTMLDivElement>(null);
   const [isUpdatePasswordModalOpen, setIsUpdatePasswordModalOpen] = useState(false);
+  const [passwordModalStep, setPasswordModalStep] = useState<'current' | 'new' | 'success'>('current');
   const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const socialPlatforms = [
     {
@@ -339,6 +344,13 @@ const ProfileSettings: React.FC = () => {
     } else if (option === 'update') {
       setIsPasswordModalOpen(false);
       setIsUpdatePasswordModalOpen(true);
+      setPasswordModalStep('current');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowPassword(false);
+      setShowNewPassword(false);
+      setShowConfirmPassword(false);
       setSelectedPasswordOption(null);
     }
   };
@@ -347,7 +359,12 @@ const ProfileSettings: React.FC = () => {
     setIsUpdatePasswordModalOpen(false);
     setIsPasswordEditClicked(false);
     setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setPasswordModalStep('current');
     setShowPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
   };
 
   const formatDate = (date: Date) => {
@@ -1968,19 +1985,17 @@ const ProfileSettings: React.FC = () => {
     {isUpdatePasswordModalOpen && (
       <>
         {/* Overlay */}
-        <div 
+        <div
           className="fixed inset-0 z-50"
           style={{ backgroundColor: '#0000001A' }}
           onClick={handleCloseUpdatePasswordModal}
         />
-        
+
         {/* Modal */}
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
+          <div
             className="bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 pb-10 relative max-w-md w-full"
-            style={{ 
-              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)'
-            }}
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -1988,94 +2003,245 @@ const ProfileSettings: React.FC = () => {
               onClick={handleCloseUpdatePasswordModal}
               className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center"
             >
-              <img src={closeIcon} alt="Close" className="w-5 h-5" />
+              <img
+                src={closeIcon}
+                alt="Close"
+                className="w-5 h-5"
+                style={{ filter: passwordModalStep === 'success' ? 'brightness(0) saturate(100%) invert(79%) sepia(6%) saturate(178%) hue-rotate(169deg) brightness(88%) contrast(83%)' : 'none' }}
+              />
             </button>
 
-            {/* Icon */}
-            <div className="flex justify-center mb-4">
-              <img src={updateIcon} alt="Update" className="w-16 h-16" />
-            </div>
+            {passwordModalStep !== 'success' ? (
+              <>
+                {/* Icon */}
+                <div className="flex justify-center mb-4">
+                  <img src={updateIcon} alt="Update" className="w-16 h-16" />
+                </div>
 
-            {/* Title */}
-            <h2
-              className="text-xl text-center mb-1.5"
-              style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
-            >
-              Update Password
-            </h2>
-
-            {/* Description */}
-            <p className="text-xs text-center mb-4" style={{ color: '#BABABA', fontWeight: 400 }}>
-              Please enter your Current password.
-            </p>
-
-            {/* Input Field */}
-            <div className="mb-8 flex flex-col items-center">
-              <label className="w-full max-w-xs text-left text-xs mb-3 mt-5" style={{ color: '#6A6A6A', fontWeight: 500 }}>
-                Current password
-              </label>
-              <div className="relative w-full max-w-xs">
-                <input
-                  className="update-password-input w-full px-4 py-2.5 pr-12 rounded-[12px] border focus:outline-none text-sm mx-auto"
-                  type={showPassword ? 'text' : 'password'}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Enter your current password"
-                  style={{
-                    backgroundColor: 'white',
-                    borderColor: '#E9E9E9',
-                    color: '#212121',
-                    borderRadius: '12px'
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#CFE8FC';
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#E9E9E9';
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                {/* Title */}
+                <h2
+                  className="text-xl text-center mb-1.5"
+                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
                 >
-                  {showPassword ? (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
+                  Update Password
+                </h2>
+
+                {/* Description */}
+                <p className="text-xs text-center mb-4" style={{ color: '#BABABA', fontWeight: 400, fontFamily: 'Poppins, sans-serif' }}>
+                  {passwordModalStep === 'current'
+                    ? 'Please enter your Current password.'
+                    : 'Please enter your new password'}
+                </p>
+
+                {passwordModalStep === 'current' ? (
+                  <>
+                    <div className="mb-6 flex flex-col items-center">
+                      <label className="w-full max-w-xs text-left text-xs mb-3 mt-5" style={{ color: '#6A6A6A', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>
+                        Current password
+                      </label>
+                      <div className="relative w-full max-w-xs">
+                        <input
+                          className="update-password-input w-full px-4 py-2.5 pr-12 rounded-[12px] border focus:outline-none text-sm mx-auto"
+                          type={showPassword ? 'text' : 'password'}
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          placeholder="Enter your current password"
+                          style={{
+                            backgroundColor: 'white',
+                            borderColor: '#E9E9E9',
+                            color: '#212121',
+                            borderRadius: '12px'
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#CFE8FC';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '#E9E9E9';
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                        >
+                          {showPassword ? (
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                            </svg>
+                          ) : (
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end w-full max-w-xs mx-auto">
+                      <button
+                        className="w-full py-2.5 rounded-[12px] text-sm font-normal transition-colors"
+                        style={{
+                          backgroundColor: currentPassword.trim() ? '#F9A825' : '#E9E9E9',
+                          color: '#FFFFFF',
+                          borderRadius: '12px'
+                        }}
+                        disabled={!currentPassword.trim()}
+                        onClick={() => {
+                          if (currentPassword.trim()) {
+                            setPasswordModalStep('new');
+                            setShowPassword(false);
+                          }
+                        }}
+                      >
+                        Save new password
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-5 mb-8 flex flex-col items-center w-full">
+                      <div className="w-full max-w-xs">
+                        <label className="block text-xs mb-2" style={{ color: '#212121', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>
+                          New password
+                        </label>
+                        <div className="relative">
+                          <input
+                            className="update-password-input w-full px-4 py-2.5 pr-12 rounded-[12px] border focus:outline-none text-sm"
+                            type={showNewPassword ? 'text' : 'password'}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="Enter your new password"
+                            style={{
+                              backgroundColor: 'white',
+                              borderColor: '#E9E9E9',
+                              color: '#212121',
+                              borderRadius: '12px'
+                            }}
+                            onFocus={(e) => {
+                              e.currentTarget.style.borderColor = '#CFE8FC';
+                            }}
+                            onBlur={(e) => {
+                              e.currentTarget.style.borderColor = '#E9E9E9';
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                          >
+                            {showNewPassword ? (
+                              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                              </svg>
+                            ) : (
+                              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="w-full max-w-xs">
+                        <label className="block text-xs mb-2" style={{ color: '#212121', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>
+                          Confirm new password
+                        </label>
+                        <div className="relative">
+                          <input
+                            className="update-password-input w-full px-4 py-2.5 pr-12 rounded-[12px] border focus:outline-none text-sm"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm your new password"
+                            style={{
+                              backgroundColor: 'white',
+                              borderColor: '#E9E9E9',
+                              color: '#212121',
+                              borderRadius: '12px'
+                            }}
+                            onFocus={(e) => {
+                              e.currentTarget.style.borderColor = '#CFE8FC';
+                            }}
+                            onBlur={(e) => {
+                              e.currentTarget.style.borderColor = '#E9E9E9';
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                          >
+                            {showConfirmPassword ? (
+                              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                              </svg>
+                            ) : (
+                              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end w-full max-w-xs mx-auto">
+                      <button
+                        className="w-full py-2.5 rounded-[12px] text-sm font-normal transition-colors"
+                        style={{
+                          backgroundColor: newPassword.trim() && confirmPassword.trim() && newPassword === confirmPassword ? '#F9A825' : '#E9E9E9',
+                          color: '#FFFFFF',
+                          borderRadius: '12px'
+                        }}
+                        disabled={!newPassword.trim() || !confirmPassword.trim() || newPassword !== confirmPassword}
+                        onClick={() => {
+                          if (newPassword.trim() && confirmPassword.trim() && newPassword === confirmPassword) {
+                            setPasswordModalStep('success');
+                          }
+                        }}
+                      >
+                        Save new password
+                      </button>
+                    </div>
+                  </>
+                )}
+              </>
+            ) : (
+              <div className="text-center px-4">
+                <div className="flex justify-center mb-7">
+                  <img src={verifyIcon} alt="Verified" className="w-16 h-16" />
+                </div>
+                <h2
+                  className="text-xl mb-2"
+                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+                >
+                  Password updated successfully
+                </h2>
+                <p className="text-sm mb-12" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', fontWeight: 300 }}>
+                  Your password has been reset, you can now log in with this new password
+                </p>
+                <button
+                  className="w-full max-w-xs mx-auto py-2.5 rounded-[12px] text-sm font-normal transition-colors"
+                  style={{ backgroundColor: '#F9A825', color: '#FFFFFF', borderRadius: '12px' }}
+                  onClick={handleCloseUpdatePasswordModal}
+                >
+                  Close
                 </button>
               </div>
-              <style>{`
-                .update-password-input::placeholder {
-                  color: #D9D9D9 !important;
-                  font-size: 12px !important;
-                  font-weight: 400 !important;
-                }
-              `}</style>
-            </div>
-
-            {/* Button */}
-            <div className="flex justify-end w-full max-w-xs mx-auto">
-              <button
-                className="w-full py-2.5 rounded-[12px] text-sm font-normal transition-colors"
-              style={{
-                backgroundColor: currentPassword.trim() ? '#F9A825' : '#E9E9E9',
-                color: '#FFFFFF',
-                borderRadius: '12px'
-              }}
-              disabled={!currentPassword.trim()}
-            >
-              Save new password
-              </button>
-            </div>
+            )}
           </div>
         </div>
+        <style>{`
+          .update-password-input::placeholder {
+            color: #D9D9D9 !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+            font-family: 'Poppins', sans-serif !important;
+          }
+        `}</style>
       </>
     )}
     </>
