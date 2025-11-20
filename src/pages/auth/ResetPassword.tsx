@@ -4,6 +4,7 @@ import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.pn
 import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import leftIcon from '../../assets/images/pre/left.png';
+import unlockIcon from '../../assets/images/pre/unlock.svg';
 
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -108,7 +109,7 @@ const ResetPassword: React.FC = () => {
         <div className="w-full max-w-md">
           {/* Breadcrumbs - Only show when accessed from Profile Settings */}
           {fromProfileSettings && (
-            <div className="mb-0 -mt-4 w-full max-w-2xl" style={{ marginLeft: '-16px' }}>
+            <div className="mb-2 w-full mt-6" style={{ marginLeft: '-8px' }}>
               <nav className="flex items-center flex-nowrap space-x-2" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
                 <img 
                   src={leftIcon} 
@@ -177,9 +178,7 @@ const ResetPassword: React.FC = () => {
             <div className="text-center mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {/* Reset Password Icon */}
               <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-5" style={{ backgroundColor: '#F0F8FE' }}>
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                </svg>
+                <img src={unlockIcon} alt="Unlock" className="w-8 h-8" style={{ filter: 'brightness(0) saturate(100%) invert(68%) sepia(34%) saturate(641%) hue-rotate(177deg) brightness(98%) contrast(96%)' }} />
               </div>
               
               <h1 className="text-lg font-semibold mb-1.5" style={{ color: '#212121' }}>

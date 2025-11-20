@@ -12,14 +12,20 @@ const PasswordResetSuccess: React.FC = () => {
   const [countdown, setCountdown] = useState(15);
 
   useEffect(() => {
-    if (fromProfileSettings && countdown > 0) {
+    if (!fromProfileSettings) return;
+    
+    if (countdown > 0) {
       const timer = setTimeout(() => {
         setCountdown(countdown - 1);
       }, 1000);
       return () => clearTimeout(timer);
-    } else if (fromProfileSettings && countdown === 0) {
+    } else if (countdown === 0) {
       // Auto-redirect to security tab when countdown expires
-      navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } });
+      // Use window.location to ensure proper navigation
+      navigate('/profile-settings', { 
+        state: { selectedSidebarOption: 'security' },
+        replace: false
+      });
     }
   }, [fromProfileSettings, countdown, navigate]);
 
