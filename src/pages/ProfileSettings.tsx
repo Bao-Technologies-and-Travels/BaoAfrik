@@ -49,6 +49,7 @@ import braveIcon from '../assets/images/pre/brave1.svg';
 import unlockIcon from '../assets/images/pre/unlock.svg';
 import resetIcon from '../assets/images/pre/reset.svg';
 import closeIcon from '../assets/images/pre/CLose.svg';
+import updateIcon from '../assets/images/pre/update.svg.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -118,6 +119,9 @@ const ProfileSettings: React.FC = () => {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [selectedPasswordOption, setSelectedPasswordOption] = useState<string | null>(null);
   const passwordModalRef = useRef<HTMLDivElement>(null);
+  const [isUpdatePasswordModalOpen, setIsUpdatePasswordModalOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const socialPlatforms = [
     {
@@ -332,7 +336,18 @@ const ProfileSettings: React.FC = () => {
       setIsPasswordModalOpen(false);
       setIsPasswordEditClicked(false);
       setSelectedPasswordOption(null);
+    } else if (option === 'update') {
+      setIsPasswordModalOpen(false);
+      setIsUpdatePasswordModalOpen(true);
+      setSelectedPasswordOption(null);
     }
+  };
+
+  const handleCloseUpdatePasswordModal = () => {
+    setIsUpdatePasswordModalOpen(false);
+    setIsPasswordEditClicked(false);
+    setCurrentPassword('');
+    setShowPassword(false);
   };
 
   const formatDate = (date: Date) => {
@@ -1948,6 +1963,107 @@ const ProfileSettings: React.FC = () => {
         </div>
       </div>
     </div>
+
+    {/* Update Password Modal */}
+    {isUpdatePasswordModalOpen && (
+      <>
+        {/* Overlay */}
+        <div 
+          className="fixed inset-0 z-50"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}
+          onClick={handleCloseUpdatePasswordModal}
+        />
+        
+        {/* Modal */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="bg-white rounded-[30px] p-6 sm:p-8 relative max-w-md w-full"
+            style={{ 
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={handleCloseUpdatePasswordModal}
+              className="absolute top-6 right-6 w-6 h-6 flex items-center justify-center"
+            >
+              <img src={closeIcon} alt="Close" className="w-4 h-4" />
+            </button>
+
+            {/* Icon */}
+            <div className="flex justify-center mb-4">
+              <img src={updateIcon} alt="Update" className="w-16 h-16" />
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl font-semibold text-center mb-2" style={{ color: '#212121' }}>
+              Update Password
+            </h2>
+
+            {/* Description */}
+            <p className="text-sm text-center mb-6" style={{ color: '#BABABA' }}>
+              Please enter your Current password.
+            </p>
+
+            {/* Input Field */}
+            <div className="mb-6">
+              <label className="block text-sm mb-2" style={{ color: '#6A6A6A' }}>
+                Current password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter your current password"
+                  className="w-full px-4 py-3 pr-12 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  style={{
+                    backgroundColor: 'white',
+                    borderColor: '#E9E9E9',
+                    color: '#212121'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                >
+                  {showPassword ? (
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#E9E9E9' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              <style>{`
+                input::placeholder {
+                  color: #D9D9D9 !important;
+                }
+              `}</style>
+            </div>
+
+            {/* Button */}
+            <button
+              className="w-full py-3 rounded-xl font-medium transition-colors"
+              style={{
+                backgroundColor: currentPassword.trim() ? '#F9A825' : '#E9E9E9',
+                color: '#FFFFFF',
+                borderRadius: '12px'
+              }}
+              disabled={!currentPassword.trim()}
+            >
+              Save new password
+            </button>
+          </div>
+        </div>
+      </>
+    )}
     </>
   );
 };
