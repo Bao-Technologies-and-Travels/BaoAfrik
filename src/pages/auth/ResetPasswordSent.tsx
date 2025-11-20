@@ -4,11 +4,13 @@ import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.pn
 import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import updateIcon from '../../assets/images/pre/update.svg.svg';
+import leftIcon from '../../assets/images/pre/left.png';
 
 const ResetPasswordSent: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || '';
+  const fromProfileSettings = location.state?.fromProfileSettings || false;
   
   const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +82,8 @@ const ResetPasswordSent: React.FC = () => {
       // Navigate to reset password page
       navigate('/reset-password', { 
         state: { 
-          email: email 
+          email: email,
+          fromProfileSettings: fromProfileSettings
         } 
       });
       
@@ -140,6 +143,55 @@ const ResetPasswordSent: React.FC = () => {
       
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
+          {/* Breadcrumbs - Only show when accessed from Profile Settings */}
+          {fromProfileSettings && (
+            <div className="mb-6 -mt-4">
+              <nav className="flex items-center flex-nowrap space-x-2 overflow-x-auto" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                <img 
+                  src={leftIcon} 
+                  alt="Back" 
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0" 
+                  style={{ width: '14px', height: '14px' }}
+                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                />
+                <Link 
+                  to="/" 
+                  className="hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                >
+                  Homepage
+                </Link>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span 
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/')}
+                >
+                  Menu
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span 
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                >
+                  Settings
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span 
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                >
+                  Security & Privacy
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span className="font-medium whitespace-nowrap flex-shrink-0" style={{ color: '#212121' }}>
+                  Reset Password
+                </span>
+              </nav>
+            </div>
+          )}
           {/* Mobile Header - Fixed Position */}
           <div className="lg:hidden fixed top-5 right-5 z-50">
             <div className="flex items-center space-x-2">

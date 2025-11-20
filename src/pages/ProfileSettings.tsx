@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
 import lilLogo from '../assets/images/pre/lil.png';
@@ -53,6 +53,7 @@ import updateIcon from '../assets/images/pre/update.svg.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
@@ -352,6 +353,16 @@ const ProfileSettings: React.FC = () => {
       setShowNewPassword(false);
       setShowConfirmPassword(false);
       setSelectedPasswordOption(null);
+    } else if (option === 'reset') {
+      setIsPasswordModalOpen(false);
+      setIsPasswordEditClicked(false);
+      setSelectedPasswordOption(null);
+      // Navigate to forgot password flow with flag indicating it's from profile settings
+      navigate('/forgot-password', { 
+        state: { 
+          fromProfileSettings: true 
+        } 
+      });
     }
   };
 
@@ -470,6 +481,13 @@ const ProfileSettings: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen]);
+
+  // Handle navigation state to set selected sidebar option
+  useEffect(() => {
+    if (location.state?.selectedSidebarOption) {
+      setSelectedSidebarOption(location.state.selectedSidebarOption);
+    }
+  }, [location.state]);
 
   return (
     <>

@@ -1,10 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 import verifyIcon from '../../assets/images/pre/verify.png';
+import leftIcon from '../../assets/images/pre/left.png';
 
 const PasswordResetSuccess: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const fromProfileSettings = location.state?.fromProfileSettings || false;
+  const [countdown, setCountdown] = useState(15);
+
+  useEffect(() => {
+    if (fromProfileSettings && countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (fromProfileSettings && countdown === 0) {
+      // Auto-redirect to security tab when countdown expires
+      navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } });
+    }
+  }, [fromProfileSettings, countdown, navigate]);
+
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Desktop Logo - Top Left with Background */}
@@ -27,6 +45,55 @@ const PasswordResetSuccess: React.FC = () => {
       
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
+          {/* Breadcrumbs - Only show when accessed from Profile Settings */}
+          {fromProfileSettings && (
+            <div className="mb-6 -mt-4">
+              <nav className="flex items-center flex-nowrap space-x-2 overflow-x-auto" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                <img 
+                  src={leftIcon} 
+                  alt="Back" 
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0" 
+                  style={{ width: '14px', height: '14px' }}
+                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                />
+                <Link 
+                  to="/" 
+                  className="hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                >
+                  Homepage
+                </Link>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span 
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/')}
+                >
+                  Menu
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span 
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                >
+                  Settings
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span 
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                >
+                  Security & Privacy
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span className="font-medium whitespace-nowrap flex-shrink-0" style={{ color: '#212121' }}>
+                  Reset Password
+                </span>
+              </nav>
+            </div>
+          )}
 
           {/* Main content with border and shadow */}
           <div className="bg-white rounded-[30px] shadow-lg p-8 lg:p-10 mt-0 lg:mt-16" style={{ boxShadow: '0 4px 30px 0 rgba(0,0,0,0.05)' }}>
@@ -43,14 +110,24 @@ const PasswordResetSuccess: React.FC = () => {
                 Your password has been reset, you can now log in with the new password.
               </p>
 
-              {/* Back to Home Page Button */}
-              <Link 
-                to="/" 
-                className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-2.5 text-sm font-normal rounded-[10px] transition-colors duration-200"
-                style={{ backgroundColor: '#F9A825', color: '#FFFFFF' }}
-              >
-                Back to home page
-              </Link>
+              {/* Back Button - Different text based on source */}
+              {fromProfileSettings ? (
+                <button
+                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                  className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-2.5 text-sm font-light rounded-[10px] transition-colors duration-200"
+                  style={{ backgroundColor: '#F9A825', color: '#FFFFFF' }}
+                >
+                  Back to setting page ({countdown}s)
+                </button>
+              ) : (
+                <Link 
+                  to="/" 
+                  className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-2.5 text-sm font-normal rounded-[10px] transition-colors duration-200"
+                  style={{ backgroundColor: '#F9A825', color: '#FFFFFF' }}
+                >
+                  Back to home page
+                </Link>
+              )}
             </div>
           </div>
         </div>
