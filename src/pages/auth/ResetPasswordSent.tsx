@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import updateIcon from '../../assets/images/pre/update.svg.svg';
 
 const ResetPasswordSent: React.FC = () => {
   const navigate = useNavigate();
@@ -160,21 +161,30 @@ const ResetPasswordSent: React.FC = () => {
           <div className="bg-white rounded-[30px] shadow-lg p-8 lg:p-10 mt-0 lg:mt-16" style={{ boxShadow: '0 4px 30px 0 rgba(0,0,0,0.05)' }}>
             <div className="text-center mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {/* Mail Verification Icon */}
-              <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-5" style={{ backgroundColor: '#F0F8FE' }}>
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+              <div className="mx-auto w-16 h-16 flex items-center justify-center mb-5">
+                <img src={updateIcon} alt="Mail verification" className="w-12 h-12" />
               </div>
               
               <h1 className="text-lg font-semibold mb-1.5" style={{ color: '#212121' }}>
-                Email address verification
+                Mail verification
               </h1>
               <p className="text-xs px-4 mb-2" style={{ color: '#BABABA' }}>
-                Please enter the 6-digit code received at the email address <span className="font-medium" style={{ color: '#212121' }}>{maskEmail(email)}</span>
+                Please enter the 6-digit code received at the email address {maskEmail(email)}
               </p>
-              <p className="text-[11px]" style={{ color: '#F9A825', fontFamily: 'Poppins, sans-serif' }}>
-                Request another code 0:{countdown.toString().padStart(2, '0')}
-              </p>
+              {!canResend ? (
+                <p className="text-[11px] mt-1 mb-0" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                  Request another code 0:{countdown.toString().padStart(2, '0')}
+                </p>
+              ) : (
+                <button
+                  onClick={handleResendCode}
+                  disabled={isLoading}
+                  className="text-[11px] focus:outline-none"
+                  style={{ color: '#64B5F6', textDecoration: 'underline', fontFamily: 'Poppins, sans-serif' }}
+                >
+                  Request a new digital code
+                </button>
+              )}
             </div>
 
             {/* Error Message */}
@@ -201,7 +211,10 @@ const ResetPasswordSent: React.FC = () => {
                     className="verification-input w-12 h-12 text-center text-lg font-medium bg-white"
                     style={{ border: `1px solid ${error ? '#EF4444' : '#E9E9E9'}`, borderRadius: '10px', color: '#212121' }}
                     disabled={isLoading}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = '#BABABA')}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#BABABA';
+                      e.currentTarget.style.borderWidth = '0.5px';
+                    }}
                     onBlur={(e) => (e.currentTarget.style.borderColor = error ? '#EF4444' : '#E9E9E9')}
                   />
                 ))}
@@ -230,22 +243,7 @@ const ResetPasswordSent: React.FC = () => {
             </form>
 
             {/* Resend Code */}
-            <div className="mt-6 text-center">
-              {canResend ? (
-                <button
-                  onClick={handleResendCode}
-                  disabled={isLoading}
-                  className="text-sm focus:outline-none focus:underline disabled:opacity-50"
-                  style={{ color: '#64B5F6' }}
-                >
-                  Resend verification code
-                </button>
-              ) : (
-                <p className="text-sm text-gray-500">
-                  Resend code in {countdown} seconds
-                </p>
-              )}
-            </div>
+            <div className="mt-6 text-center"></div>
           </div>
 
         </div>

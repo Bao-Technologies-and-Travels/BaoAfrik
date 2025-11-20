@@ -160,7 +160,10 @@ const ForgotPassword: React.FC = () => {
                   color: '#212121',
                   borderRadius: '10px'
                 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = '#BABABA')}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = '#BABABA';
+                  e.currentTarget.style.borderWidth = '0.5px';
+                }}
                 onBlur={(e) => (e.currentTarget.style.borderColor = errors.email ? '#EF4444' : '#E9E9E9')}
               />
                 {errors.email && (

@@ -160,7 +160,10 @@ const ResetPassword: React.FC = () => {
                     required
                     disabled={isLoading}
                     style={{ borderColor: errors.password ? '#EF4444' : '#E9E9E9', borderRadius: '10px', color: '#212121' }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = '#BABABA')}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#BABABA';
+                      e.currentTarget.style.borderWidth = '0.5px';
+                    }}
                     onBlur={(e) => (e.currentTarget.style.borderColor = errors.password ? '#EF4444' : '#E9E9E9')}
                   />
                   <button
@@ -203,7 +206,10 @@ const ResetPassword: React.FC = () => {
                     required
                     disabled={isLoading}
                     style={{ borderColor: errors.confirmPassword ? '#EF4444' : '#E9E9E9', borderRadius: '10px', color: '#212121' }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = '#BABABA')}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#BABABA';
+                      e.currentTarget.style.borderWidth = '0.5px';
+                    }}
                     onBlur={(e) => (e.currentTarget.style.borderColor = errors.confirmPassword ? '#EF4444' : '#E9E9E9')}
                   />
                   <button
