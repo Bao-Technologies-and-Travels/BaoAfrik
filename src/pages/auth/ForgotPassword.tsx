@@ -103,8 +103,8 @@ const ForgotPassword: React.FC = () => {
         <div className="w-full max-w-md">
           {/* Breadcrumbs - Only show when accessed from Profile Settings */}
           {fromProfileSettings && (
-            <div className="mb-6 -mt-4">
-              <nav className="flex items-center flex-nowrap space-x-2 overflow-x-auto" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+            <div className="mb-0 -mt-4 w-full max-w-2xl" style={{ marginLeft: '-16px' }}>
+              <nav className="flex items-center flex-nowrap space-x-2" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
                 <img 
                   src={leftIcon} 
                   alt="Back" 
