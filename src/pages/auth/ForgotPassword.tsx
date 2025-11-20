@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import profileIcon from '../../assets/images/pre/profile.svg';
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -118,16 +118,14 @@ const ForgotPassword: React.FC = () => {
           <div className="bg-white rounded-[30px] shadow-lg p-8 lg:p-10 mt-0 lg:mt-16" style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}>
             <div className="text-left lg:text-center mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {/* Profile Mail Icon - Hidden on mobile */}
-              <div className="hidden lg:block mx-auto w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+              <div className="hidden lg:flex mx-auto w-16 h-16 rounded-2xl items-center justify-center mb-6" style={{ backgroundColor: '#F0F8FE' }}>
+                <img src={profileIcon} alt="Profile" className="w-8 h-8" style={{ filter: 'brightness(0) saturate(100%) invert(68%) sepia(34%) saturate(641%) hue-rotate(177deg) brightness(98%) contrast(96%)' }} />
               </div>
               
-              <h1 className="text-xl font-semibold mb-2" style={{ color: '#212121' }}>
+              <h1 className="text-lg font-semibold mb-1.5" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
                 Profile Mail
               </h1>
-              <p className="text-xs lg:text-sm px-0 lg:px-4" style={{ color: '#BABABA' }}>
+              <p className="text-[11px] lg:text-xs px-0 lg:px-4" style={{ color: '#BABABA', fontFamily: 'Poppins, sans-serif' }}>
                 Please enter the email address associated with your BAO Afrik profile.
               </p>
             </div>
@@ -141,7 +139,7 @@ const ForgotPassword: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-xs font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                <label htmlFor="email" className="block text-[11px] font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
                   Email address
                 </label>
               <input
@@ -150,7 +148,7 @@ const ForgotPassword: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 onMouseEnter={(e) => (e.target as HTMLInputElement).focus()}
-                className={`forgot-password-input w-full px-4 py-3 border rounded-xl focus:ring-1 focus:ring-blue-200 focus:border-transparent text-sm bg-white ${
+                className={`forgot-password-input w-full px-4 py-3 border rounded-xl text-sm bg-white ${
                   errors.email ? 'border-red-500' : ''
                 }`}
                 placeholder="Enter your email address"
@@ -159,8 +157,11 @@ const ForgotPassword: React.FC = () => {
                 autoFocus
                 style={{
                   borderColor: errors.email ? '#EF4444' : '#E9E9E9',
-                  color: '#212121'
+                  color: '#212121',
+                  borderRadius: '10px'
                 }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#BABABA')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = errors.email ? '#EF4444' : '#E9E9E9')}
               />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -173,9 +174,11 @@ const ForgotPassword: React.FC = () => {
                   disabled={isLoading || !email.trim()}
                   className="w-full py-2.5 px-4 rounded-xl transition-all duration-200 text-xs font-medium"
                   style={{
-                    backgroundColor: '#E9E9E9',
-                    color: '#6A6A6A',
-                    fontFamily: 'Poppins, sans-serif'
+                    backgroundColor: email.trim() && !isLoading ? '#F9A825' : '#E9E9E9',
+                    color: email.trim() && !isLoading ? '#FFFFFF' : '#6A6A6A',
+                    fontFamily: 'Poppins, sans-serif',
+                    borderRadius: '10px',
+                    fontWeight: 400
                   }}
                 >
                   {isLoading ? (
