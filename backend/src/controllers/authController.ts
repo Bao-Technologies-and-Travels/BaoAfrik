@@ -24,7 +24,8 @@ import {
   UpdateProfileRequest,
   ChangePasswordRequest,
   ForgotPasswordRequest,
-  ApiResponse
+  ApiResponse,
+  DeleteUserRequest
 } from '@/types/auth';
 import { sendVerificationEmail, sendPasswordResetEmail } from '@/utils/emailService';
 import logger from '@/config/logger';
@@ -731,6 +732,58 @@ export const changePassword = asyncHandler(async (req: Request<{}, {}, ChangePas
   res.json(response);
 });
 
+/**
+ * Delete user account
+ */
+export const deleteUser = asyncHandler(async (req: Request<{}, {}, DeleteUserRequest>, res: Response) => {
+  if(!req.user) {
+    throw createUnauthorizedError('User not authenticated');
+  }
+
+  const { email } = req.body;
+
+  if(!email) {
+    throw createValidationError('Email is required');
+  }
+
+  if(req.user.email != email) {
+    throw createUnauthorizedError('You are not authorized to delete this email');
+  }
+
+  const user = await prisma.user.findUnique({
+    where:{
+      email: email
+    },
+    select: {
+      id: true,
+      email: true
+    }
+  });
+
+  if(!user) {
+    throw createValidationError('User not found');
+  }
+
+  await prisma.refreshToken.deleteMany({
+    where: {
+      userId: user.id
+    }
+  });
+
+  await prisma.user.delete({
+    where: {
+      email: email
+    }
+  });
+
+  const response: ApiResponse = {
+    success: true,
+    message: 'User deleted successfully'
+  };
+  
+  res.json(response);
+})
+
 export default {
   register,
   login,
@@ -743,5 +796,6 @@ export default {
   forgotPassword,
   resetPassword,
   changePassword,
-  verifyResetCode
+  verifyResetCode,
+  deleteUser
 };

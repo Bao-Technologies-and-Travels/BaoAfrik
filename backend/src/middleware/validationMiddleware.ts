@@ -357,19 +357,29 @@ export const validateChangePassword = [
 
 export const validateFileUpload = [
   body('fileName')
-  .notEmpty()
-  .withMessage('File name is required'),
+    .notEmpty()
+    .withMessage('File name is required'),
 
   body('fileType')
-  .notEmpty()
-  .withMessage('File type is required'),
+    .notEmpty()
+    .withMessage('File type is required'),
 
   body('userId')
-  .notEmpty()
-  .withMessage('User ID is required'),
+    .notEmpty()
+    .withMessage('User ID is required'),
 
   handleValidationErrors,
 ];
+
+export const validateDeleteUser = [
+  body('email')
+    .trim()
+    .isEmail()
+    .withMessage('Please provide a valid email address')
+    .normalizeEmail()
+    .notEmpty()
+    .withMessage('Email is required')
+]
 
 // UUID parameter validation
 export const validateUUIDParam = (paramName: string = 'id') => [

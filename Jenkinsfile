@@ -318,7 +318,7 @@ EOF
                             <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>Fixed profile setup flow: redirect to home and refresh page to pick up modifications. Display seller's products under seller-profile</p>
+                            <p><strong>Changes made:</strong>Delete user backend endpoint to delete users by email</p>
                             <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

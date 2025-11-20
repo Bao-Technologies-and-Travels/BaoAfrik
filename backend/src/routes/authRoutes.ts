@@ -12,6 +12,7 @@ import {
   validateForgotPassword,
   validateResetPassword,
   validateVerifyResetCode,
+  validateDeleteUser,
 } from '@/middleware/validationMiddleware';
 
 const router = Router();
@@ -54,8 +55,9 @@ router.post('/reset-password', validateResetPassword, authController.resetPasswo
 router.post('/refresh', authController.refreshToken);
 
 // Protected routes (authentication required)
-router.post('/logout', authController.logout);
+router.post('/logout', authenticateToken, authController.logout);
 router.put('/change-password', authenticateToken, validateChangePassword, authController.changePassword);
 router.put('/profile', authenticateToken, validateUpdateProfile, authController.updateProfile);
 router.get('/me', authenticateToken, validateUpdateProfile, authController.getCurrentUser);
+router.delete('/delete-user', authenticateToken, validateDeleteUser, authController.deleteUser);
 export default router;

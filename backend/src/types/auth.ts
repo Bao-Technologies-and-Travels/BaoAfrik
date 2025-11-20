@@ -108,3 +108,7 @@ export interface VerifyResetCodeRequest {
   email: string;
   code: string;
 }
+
+export interface DeleteUserRequest {
+  email: string
+}

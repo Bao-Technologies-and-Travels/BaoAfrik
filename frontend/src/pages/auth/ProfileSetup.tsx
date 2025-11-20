@@ -456,10 +456,8 @@ const ProfileSetup: React.FC = () => {
       });
 
       // redirect to home and force refresh
-      // sessionStorage.setItem('forceRefreshUser', 'true');
       setTimeout(() => {
         window.location.href = '/';
-        // navigate("/");
       }, 2000);
 
     } catch (error: any) {
@@ -539,12 +537,6 @@ const ProfileSetup: React.FC = () => {
           <h1 className='text-2xl font-medium text-gray-900 mb-6 mt-16 text-center'>
             Profile Information
           </h1>
-
-          <div className='hidden sm:flex items-center justify-end mb-6'>
-            <div className='w-7 h-7 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium'>
-              1
-            </div>
-          </div>
 
           {/* Error Display */}
           {errors.general && (

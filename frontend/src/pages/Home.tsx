@@ -150,7 +150,6 @@ const Home: React.FC = () => {
             if (typeof (auth as any).setUser === 'function') {
               (auth as any).setUser(latest);
             } 
-            localStorage.setItem('currentUser', JSON.stringify(latest));
           }
         }
       } catch (err) {
@@ -160,7 +159,6 @@ const Home: React.FC = () => {
 
     const shouldForceRefresh = sessionStorage.getItem('forceRefreshUser');
     if (shouldForceRefresh === 'true') {
-      sessionStorage.removeItem('forceRefreshUser');
       refreshCurrentUser();
     }
 
