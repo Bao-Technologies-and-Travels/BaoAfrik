@@ -225,14 +225,14 @@ const ForgotPassword: React.FC = () => {
       </div>
 
       {/* Footer - Hidden on mobile */}
-      <div className="hidden lg:block py-4 px-4">
-        <div className="border-t border-gray-200 pt-3 max-w-4xl mx-auto">
+      <div className="hidden lg:block py-6 px-4">
+        <div className="border-t border-gray-200 pt-4">
           <div className="flex items-center justify-between text-xs" style={{ color: '#BABABA' }}>
             <div className="flex items-center space-x-1">
               <img src={lilLogo} alt="BaoAfrik" className="w-4 h-4" />
               <span>© All rights reserved</span>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
               <Link to="/contact" className="hover:text-gray-600">Contact Us</Link>
               <span>|</span>
               <Link to="/terms" className="hover:text-gray-600">Terms and conditions of use</Link>
