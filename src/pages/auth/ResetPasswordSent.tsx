@@ -159,10 +159,10 @@ const ResetPasswordSent: React.FC = () => {
 
           {/* Main content with border and shadow */}
           <div className="bg-white rounded-[30px] shadow-lg p-8 lg:p-10 mt-0 lg:mt-16" style={{ boxShadow: '0 4px 30px 0 rgba(0,0,0,0.05)' }}>
-            <div className="text-center mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <div className="text-center mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {/* Mail Verification Icon */}
               <div className="mx-auto w-16 h-16 flex items-center justify-center mb-5">
-                <img src={updateIcon} alt="Mail verification" className="w-12 h-12" />
+                <img src={updateIcon} alt="Mail verification" className="w-14 h-14" />
               </div>
               
               <h1 className="text-lg font-semibold mb-1.5" style={{ color: '#212121' }}>
@@ -250,14 +250,14 @@ const ResetPasswordSent: React.FC = () => {
       </div>
 
       {/* Footer - Hidden on mobile */}
-      <div className="hidden lg:block py-6 px-4">
-        <div className="border-t border-gray-200 pt-4">
+      <div className="hidden lg:block py-4 px-4">
+        <div className="border-t border-gray-200 pt-3 max-w-4xl mx-auto">
           <div className="flex items-center justify-between text-xs" style={{ color: '#BABABA' }}>
             <div className="flex items-center space-x-1">
               <img src={lilLogo} alt="BaoAfrik" className="w-4 h-4" />
               <span>© All rights reserved</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
               <Link to="/contact" className="hover:text-gray-600">Contact Us</Link>
               <span>|</span>
               <Link to="/terms" className="hover:text-gray-600">Terms and conditions of use</Link>

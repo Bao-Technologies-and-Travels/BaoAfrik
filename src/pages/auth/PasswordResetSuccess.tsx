@@ -39,17 +39,17 @@ const PasswordResetSuccess: React.FC = () => {
               <h1 className="text-lg font-semibold mb-2" style={{ color: '#212121' }}>
                 Password reset successfully
               </h1>
-              <p className="text-xs px-4 mb-8" style={{ color: '#BABABA' }}>
+              <p className="text-xs px-4 mb-8" style={{ color: '#6A6A6A' }}>
                 Your password has been reset, you can now log in with the new password.
               </p>
 
-              {/* Back to Sign In Page Button */}
+              {/* Back to Home Page Button */}
               <Link 
-                to="/login" 
-                className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-2.5 text-sm font-medium rounded-[10px] transition-colors duration-200"
+                to="/" 
+                className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-2.5 text-sm font-normal rounded-[10px] transition-colors duration-200"
                 style={{ backgroundColor: '#F9A825', color: '#FFFFFF' }}
               >
-                Back to sign in page
+                Back to home page
               </Link>
             </div>
           </div>
@@ -57,14 +57,14 @@ const PasswordResetSuccess: React.FC = () => {
       </div>
 
       {/* Footer - Hidden on mobile */}
-      <div className="hidden lg:block py-6 px-4">
-        <div className="border-t border-gray-200 pt-4">
+      <div className="hidden lg:block py-4 px-4">
+        <div className="border-t border-gray-200 pt-3 max-w-4xl mx-auto">
           <div className="flex items-center justify-between text-xs" style={{ color: '#BABABA' }}>
             <div className="flex items-center space-x-1">
               <img src={lilLogo} alt="BaoAfrik" className="w-4 h-4" />
               <span>© All rights reserved</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
               <Link to="/contact" className="hover:text-gray-600">Contact Us</Link>
               <span>|</span>
               <Link to="/terms" className="hover:text-gray-600">Terms and conditions of use</Link>
