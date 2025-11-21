@@ -2128,8 +2128,8 @@ const ProfileSettings: React.FC = () => {
                 <div className="flex items-center space-x-1.5">
                   {isPersonalInfoComplete ? (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CD964' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
                   ) : (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -2148,8 +2148,8 @@ const ProfileSettings: React.FC = () => {
                     </svg>
                   ) : (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                   )}
                   <span className="text-xs font-medium" style={{ color: isPhotoUploaded ? '#6A6A6A' : '#B0B0B0' }}>
                     Upload your photo <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span>
@@ -2164,8 +2164,8 @@ const ProfileSettings: React.FC = () => {
                     </svg>
                   ) : (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                   )}
                   <span className="text-xs font-medium" style={{ color: isLocationSet ? '#6A6A6A' : '#B0B0B0' }}>
                     Location <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span>
@@ -2180,8 +2180,8 @@ const ProfileSettings: React.FC = () => {
                     </svg>
                   ) : (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                   )}
                   <span className="text-xs font-medium" style={{ color: isDescriptionComplete ? '#6A6A6A' : '#B0B0B0' }}>
                     Description <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span>
@@ -2196,8 +2196,8 @@ const ProfileSettings: React.FC = () => {
                     </svg>
                   ) : (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                   )}
                   <span className="text-xs font-medium" style={{ color: isVerificationComplete ? '#6A6A6A' : '#B0B0B0' }}>
                     Verification first step <span className="font-medium" style={{ color: '#6A6A6A' }}>25%</span>
