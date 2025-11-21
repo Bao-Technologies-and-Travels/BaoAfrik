@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
@@ -113,6 +113,56 @@ const ProfileSettings: React.FC = () => {
     code: '+1',
     flag: 'us'
   });
+  
+  // Calculate profile completion progress
+  const calculateProfileProgress = () => {
+    let progress = 10; // Setup account (always complete when logged in)
+    
+    // Personal information (10%) - check if fullName, gender, and birthday are filled
+    if (profileData.fullName && profileData.fullName.trim() !== '' && 
+        profileData.gender && profileData.gender.trim() !== '' && 
+        profileData.birthday && profileData.birthday.trim() !== '') {
+      progress += 10;
+    }
+    
+    // Upload photo (10%) - check if profileImage is set
+    if (profileImage) {
+      progress += 10;
+    }
+    
+    // Location (10%) - check if geolocation is enabled
+    if (isGeolocationEnabled) {
+      progress += 10;
+    }
+    
+    // Description (10%) - check if biography is filled
+    if (biography && biography.trim() !== '') {
+      progress += 10;
+    }
+    
+    // Verification first step (25%) - check if email is verified (has verified badge)
+    // For now, we'll check if email field has a value and assume it's verified if it exists
+    // In real implementation, this should check actual verification status from backend
+    if (verificationForm.email && verificationForm.email.trim() !== '') {
+      progress += 25;
+    }
+    
+    return Math.min(progress, 100);
+  };
+  
+  // Calculate profile completion progress and check criteria (recalculated on every render)
+  const profileProgress = useMemo(() => calculateProfileProgress(), [profileData, profileImage, isGeolocationEnabled, biography, verificationForm.email]);
+  
+  const isPersonalInfoComplete = useMemo(() => 
+    profileData.fullName && profileData.fullName.trim() !== '' && 
+    profileData.gender && profileData.gender.trim() !== '' && 
+    profileData.birthday && profileData.birthday.trim() !== '', 
+    [profileData]
+  );
+  const isPhotoUploaded = useMemo(() => !!profileImage, [profileImage]);
+  const isLocationSet = useMemo(() => isGeolocationEnabled, [isGeolocationEnabled]);
+  const isDescriptionComplete = useMemo(() => biography && biography.trim() !== '', [biography]);
+  const isVerificationComplete = useMemo(() => verificationForm.email && verificationForm.email.trim() !== '', [verificationForm.email]);
   const [isPhoneCodeDropdownOpen, setIsPhoneCodeDropdownOpen] = useState(false);
   const phoneCodes = [
     { label: 'United States', code: '+1', flag: 'us' },
@@ -308,6 +358,16 @@ const ProfileSettings: React.FC = () => {
       replace: false,
       state: { 
         openMenu: true
+      }
+    });
+  };
+
+  const handleSettingsClick = () => {
+    navigate('/', { 
+      replace: false,
+      state: { 
+        openMenu: true,
+        highlightSettings: true
       }
     });
   };
@@ -2042,50 +2102,101 @@ const ProfileSettings: React.FC = () => {
                   <img src={verifyIcon} alt="Verify" className="w-14 h-14" />
                 </div>
                 <div className="w-full relative" style={{ marginTop: '12px', marginBottom: '12px' }}>
-                  <span className="absolute -top-5 left-0 text-xs font-semibold" style={{ color: '#6A6A6A' }}>20%</span>
+                  <span className="absolute -top-5 left-0 text-xs font-semibold" style={{ color: '#6A6A6A' }}>{profileProgress}%</span>
                   <div className="w-full bg-gray-200 rounded-full h-1.5" style={{ backgroundColor: '#F1F1F1' }}>
-                    <div className="h-1.5 rounded-full" style={{ width: '20%', backgroundColor: '#4CD964' }}></div>
+                    <div className="h-1.5 rounded-full transition-all duration-300" style={{ width: `${profileProgress}%`, backgroundColor: '#4CD964' }}></div>
                 </div>
                 </div>
               </div>
 
               {/* Checklist */}
               <div className="space-y-4">
+                {/* Setup account - Always complete */}
                 <div className="flex items-center space-x-1.5">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CD964' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Setup account <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span></span>
                 </div>
+                
+                {/* Personal information */}
                 <div className="flex items-center space-x-1.5">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CD964' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Personnal information <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span></span>
+                  {isPersonalInfoComplete ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CD964' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                  <span className="text-xs font-medium" style={{ color: isPersonalInfoComplete ? '#6A6A6A' : '#B0B0B0' }}>
+                    Personnal information <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span>
+                  </span>
                 </div>
+                
+                {/* Upload photo */}
                 <div className="flex items-center space-x-1.5">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  <span className="text-xs font-medium" style={{ color: '#B0B0B0' }}>Upload your photo <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span></span>
+                  {isPhotoUploaded ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CD964' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                  <span className="text-xs font-medium" style={{ color: isPhotoUploaded ? '#6A6A6A' : '#B0B0B0' }}>
+                    Upload your photo <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span>
+                  </span>
                 </div>
+                
+                {/* Location */}
                 <div className="flex items-center space-x-1.5">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  <span className="text-xs font-medium" style={{ color: '#B0B0B0' }}>Location <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span></span>
+                  {isLocationSet ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CD964' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                  <span className="text-xs font-medium" style={{ color: isLocationSet ? '#6A6A6A' : '#B0B0B0' }}>
+                    Location <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span>
+                  </span>
                 </div>
+                
+                {/* Description */}
                 <div className="flex items-center space-x-1.5">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  <span className="text-xs font-medium" style={{ color: '#B0B0B0' }}>Description <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span></span>
+                  {isDescriptionComplete ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CD964' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                  <span className="text-xs font-medium" style={{ color: isDescriptionComplete ? '#6A6A6A' : '#B0B0B0' }}>
+                    Description <span className="font-medium" style={{ color: '#6A6A6A' }}>10%</span>
+                  </span>
                 </div>
+                
+                {/* Verification first step */}
                 <div className="flex items-center space-x-1.5">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  <span className="text-xs font-medium" style={{ color: '#B0B0B0' }}>Verification first step <span className="font-medium" style={{ color: '#6A6A6A' }}>25%</span></span>
+                  {isVerificationComplete ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#4CD964' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B0B0B0' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                  <span className="text-xs font-medium" style={{ color: isVerificationComplete ? '#6A6A6A' : '#B0B0B0' }}>
+                    Verification first step <span className="font-medium" style={{ color: '#6A6A6A' }}>25%</span>
+                  </span>
                 </div>
               </div>
             </div>
