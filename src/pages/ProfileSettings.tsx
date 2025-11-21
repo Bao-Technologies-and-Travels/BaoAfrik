@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
@@ -53,13 +53,51 @@ import closeIcon from '../assets/images/pre/CLose.svg';
 import updateIcon from '../assets/images/pre/update.svg.svg';
 import keyIcon from '../assets/images/pre/key.svg';
 
+const currencyRates: Record<string, number> = {
+  USD: 1,
+  EUR: 0.93,
+  CAD: 1.34,
+  GBP: 0.81
+};
+
+const translationDictionary: Record<string, Record<string, string>> = {
+  fr: {
+    "Settings": "Paramètres",
+    "Search something ?": "Rechercher...",
+    "Profile": "Profil",
+    "Security & Privacy": "Sécurité & Confidentialité",
+    "Language & Currency": "Langue & Devise",
+    "Notifications": "Notifications",
+    "Language and Currency": "Langue et devise",
+    "Customize your language preferences and currency settings to enhance your shopping experience on BAO' Afrik.":
+      "Personnalisez vos préférences linguistiques et monétaires pour améliorer votre expérience d'achat sur BAO' Afrik.",
+    "Language Setting": "Paramètre de langue",
+    "Control what others are seeing from you on BAO' Afrik.": "Contrôlez ce que les autres voient de vous sur BAO' Afrik.",
+    "Currency Preferences": "Préférences de devise",
+    "Choose the currency you want to see product prices in.": "Choisissez la devise dans laquelle vous souhaitez voir les prix des produits."
+  }
+};
+
+declare global {
+  interface Window {
+    baoCurrencyPreference?: string;
+    baoLanguagePreference?: string;
+    baoConvertPrice?: (amountInUSD: number) => number;
+    baoFormatPrice?: (amountInUSD: number) => string;
+  }
+}
+
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
-  const [languagePreference, setLanguagePreference] = useState('English');
-  const [currencyPreference, setCurrencyPreference] = useState('USD');
+  const [languagePreference, setLanguagePreference] = useState<'en' | 'fr' | 'de' | 'es'>(() => {
+    return (localStorage.getItem('languagePreference') as 'en' | 'fr' | 'de' | 'es') || 'en';
+  });
+  const [currencyPreference, setCurrencyPreference] = useState<'USD' | 'EUR' | 'CAD' | 'GBP'>(() => {
+    return (localStorage.getItem('currencyPreference') as 'USD' | 'EUR' | 'CAD' | 'GBP') || 'USD';
+  });
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
@@ -85,6 +123,8 @@ const ProfileSettings: React.FC = () => {
   const [biography, setBiography] = useState('');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [selectedSidebarOption, setSelectedSidebarOption] = useState<'profile' | 'security' | 'language' | 'notifications'>('profile');
+  const pageRef = useRef<HTMLDivElement>(null);
+  const originalTextMap = useRef<WeakMap<Text, string>>(new WeakMap());
   const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
   const genderDropdownRef = useRef<HTMLDivElement>(null);
   const [isBirthdayCalendarOpen, setIsBirthdayCalendarOpen] = useState(false);
@@ -323,6 +363,44 @@ const ProfileSettings: React.FC = () => {
   });
 
   const unreadCount = notifications.filter(notif => !notif.isRead).length;
+  const languageOptions = useMemo(
+    () => [
+      { code: 'en', label: 'English', flag: 'gb' },
+      { code: 'fr', label: 'French', flag: 'fr' },
+      { code: 'de', label: 'Deushland', flag: 'de' },
+      { code: 'es', label: 'Spanish', flag: 'es' }
+    ],
+    []
+  );
+
+  const currencyOptions = useMemo(
+    () => [
+      { code: 'USD', flag: 'us', name: 'United States Dollar' },
+      { code: 'EUR', flag: 'eu', name: 'Euro' },
+      { code: 'CAD', flag: 'ca', name: 'Canadian Dollar' },
+      { code: 'GBP', flag: 'gb', name: 'British Pound' }
+    ],
+    []
+  );
+
+  const convertPrice = useCallback(
+    (amountInUSD: number) => {
+      const rate = currencyRates[currencyPreference] ?? 1;
+      return amountInUSD * rate;
+    },
+    [currencyPreference]
+  );
+
+  const formatPrice = useCallback(
+    (amountInUSD: number) => {
+      const converted = convertPrice(amountInUSD);
+      return new Intl.NumberFormat(languagePreference === 'fr' ? 'fr-FR' : 'en-US', {
+        style: 'currency',
+        currency: currencyPreference
+      }).format(converted);
+    },
+    [convertPrice, currencyPreference, languagePreference]
+  );
 
   const sidebarOptions = [
     {
@@ -374,8 +452,18 @@ const ProfileSettings: React.FC = () => {
     });
   };
 
+  useEffect(() => {
+    const shortCode = languagePreference === 'fr' ? 'FR' : languagePreference === 'de' ? 'DE' : languagePreference === 'es' ? 'ES' : 'EN';
+    setSelectedLanguage(shortCode);
+  }, [languagePreference]);
+
   const handleLanguageSelect = (lang: string) => {
     setSelectedLanguage(lang);
+    if (lang === 'EN') {
+      setLanguagePreference('en');
+    } else if (lang === 'FR') {
+      setLanguagePreference('fr');
+    }
     setIsLanguageDropdownOpen(false);
   };
 
@@ -654,6 +742,53 @@ const ProfileSettings: React.FC = () => {
     }
   }, [location.state]);
 
+  useEffect(() => {
+    localStorage.setItem('currencyPreference', currencyPreference);
+    window.baoCurrencyPreference = currencyPreference;
+    window.baoConvertPrice = convertPrice;
+    window.baoFormatPrice = formatPrice;
+    window.dispatchEvent(
+      new CustomEvent('baoCurrencyChange', {
+        detail: {
+          currency: currencyPreference
+        }
+      })
+    );
+  }, [currencyPreference, convertPrice, formatPrice]);
+
+  useEffect(() => {
+    localStorage.setItem('languagePreference', languagePreference);
+    window.baoLanguagePreference = languagePreference;
+    document.documentElement.lang = languagePreference === 'fr' ? 'fr' : 'en';
+    window.dispatchEvent(
+      new CustomEvent('baoLanguageChange', {
+        detail: {
+          language: languagePreference
+        }
+      })
+    );
+  }, [languagePreference]);
+
+  useEffect(() => {
+    if (!pageRef.current) {
+      return;
+    }
+    const dictionary = translationDictionary[languagePreference];
+    const walker = document.createTreeWalker(pageRef.current, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const textNode = walker.currentNode as Text;
+      const currentOriginal =
+        originalTextMap.current.get(textNode) ?? (textNode.textContent ? textNode.textContent : '');
+      if (!originalTextMap.current.has(textNode)) {
+        originalTextMap.current.set(textNode, currentOriginal);
+      }
+      const trimmed = currentOriginal.trim();
+      if (!trimmed) continue;
+      const translation = dictionary ? dictionary[trimmed] : undefined;
+      textNode.textContent = languagePreference === 'fr' && translation ? translation : currentOriginal;
+    }
+  }, [languagePreference]);
+
   return (
     <>
       <style>{`
@@ -667,7 +802,7 @@ const ProfileSettings: React.FC = () => {
           color: #D9D9D9 !important;
         }
       `}</style>
-    <div className="min-h-screen bg-gray-50" style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div ref={pageRef} className="min-h-screen bg-gray-50" style={{ fontFamily: 'Poppins, sans-serif' }}>
       <div className="flex h-screen">
         {/* Left Sidebar - Full Height */}
         <div className="w-72 bg-white border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative">
@@ -2115,7 +2250,7 @@ const ProfileSettings: React.FC = () => {
                   </div>
 
                   {/* Content Area */}
-                  <div className="bg-white border rounded-[20px] p-6" style={{ borderColor: '#E4E4E4', marginTop: '20px' }}>
+                  <div className="bg-white border rounded-[20px] p-6" style={{ borderColor: '#E4E4E4', marginTop: '32px' }}>
                     {/* Language Section */}
                     <div className="mb-10">
                       <h2 className="text-sm font-medium mb-1.5" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
@@ -2125,40 +2260,43 @@ const ProfileSettings: React.FC = () => {
                         Control what others are seeing from you on BAO' Afrik.
                       </p>
                       <div className="flex items-center gap-3 flex-wrap">
-                        {[
-                          { name: 'English', flag: 'gb', code: 'en' },
-                          { name: 'French', flag: 'fr', code: 'fr' },
-                          { name: 'Deushland', flag: 'de', code: 'de' },
-                          { name: 'Spanish', flag: 'es', code: 'es' }
-                        ].map((lang) => {
-                          const isSelected = languagePreference === lang.name;
+                        {languageOptions.map((lang) => {
+                          const isSelected = languagePreference === lang.code;
+                          const isSupported = lang.code === 'en' || lang.code === 'fr';
                           return (
                             <button
                               key={lang.code}
-                              onClick={() => setLanguagePreference(lang.name)}
-                              className="flex items-center gap-2 px-4 py-1.5 rounded-full border transition-colors"
+                              onClick={() => {
+                                if (!isSupported) return;
+                                setLanguagePreference(lang.code as 'en' | 'fr' | 'de' | 'es');
+                              }}
+                              className="flex items-center gap-2 px-4 py-1 rounded-full border transition-colors"
                               style={{
                                 backgroundColor: isSelected ? '#F0F8FE' : 'white',
                                 borderColor: isSelected ? '#CFE8FC' : '#E1E1E1',
-                                fontFamily: 'Poppins, sans-serif'
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: isSupported ? 'pointer' : 'not-allowed',
+                                opacity: isSupported ? 1 : 0.6
                               }}
+                              disabled={!isSupported}
+                              title={!isSupported ? 'Coming soon' : undefined}
                             >
                               {isSelected ? (
-                                <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#64B5F6' }}>
-                                  <svg className="w-3 h-3" fill="none" stroke="white" viewBox="0 0 24 24">
+                                <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#64B5F6' }}>
+                                  <svg className="w-2.5 h-2.5" fill="none" stroke="white" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                   </svg>
                                 </div>
                               ) : (
                                 <img
                                   src={`https://flagcdn.com/w20/${lang.flag}.png`}
-                                  alt={lang.name}
+                                  alt={lang.label}
                                   className="w-4 h-4 rounded-full"
                                   style={{ objectFit: 'cover' }}
                                 />
                               )}
                               <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
-                                {lang.name}
+                                {lang.label}
                               </span>
                             </button>
                           );
@@ -2185,8 +2323,8 @@ const ProfileSettings: React.FC = () => {
                           return (
                             <button
                               key={currency.code}
-                              onClick={() => setCurrencyPreference(currency.code)}
-                              className="flex items-center gap-2 px-4 py-1.5 rounded-full border transition-colors"
+                              onClick={() => setCurrencyPreference(currency.code as 'USD' | 'EUR' | 'CAD' | 'GBP')}
+                              className="flex items-center gap-2 px-4 py-1 rounded-full border transition-colors"
                               style={{
                                 backgroundColor: isSelected ? '#F0F8FE' : 'white',
                                 borderColor: isSelected ? '#CFE8FC' : '#E1E1E1',

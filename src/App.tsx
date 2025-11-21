@@ -126,9 +126,9 @@ function App() {
   return (
     <AuthProvider>
       <NotificationToastProvider>
-      <Router>
-        <AppContent />
-      </Router>
+        <Router>
+          <AppContent />
+        </Router>
       </NotificationToastProvider>
     </AuthProvider>
   );
