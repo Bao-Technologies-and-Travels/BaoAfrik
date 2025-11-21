@@ -22,7 +22,7 @@ const PasswordResetSuccess: React.FC = () => {
     } else if (countdown === 0) {
       // Auto-redirect to security tab when countdown expires
       // Use window.location to ensure proper navigation
-      navigate('/profile-settings', { 
+      navigate('/settings', { 
         state: { selectedSidebarOption: 'security' },
         replace: false
       });
@@ -60,7 +60,7 @@ const PasswordResetSuccess: React.FC = () => {
                   alt="Back" 
                   className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0" 
                   style={{ width: '14px', height: '14px' }}
-                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
                 />
                 <Link 
                   to="/" 
@@ -89,7 +89,7 @@ const PasswordResetSuccess: React.FC = () => {
                 <span 
                   className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
                   style={{ color: '#BABABA' }}
-                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
                 >
                   Security & Privacy
                 </span>
@@ -119,7 +119,7 @@ const PasswordResetSuccess: React.FC = () => {
               {/* Back Button - Different text based on source */}
               {fromProfileSettings ? (
                 <button
-                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
                   className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-2.5 text-sm font-light rounded-[10px] transition-colors duration-200"
                   style={{ backgroundColor: '#F9A825', color: '#FFFFFF' }}
                 >

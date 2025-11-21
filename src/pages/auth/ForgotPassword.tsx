@@ -110,7 +110,7 @@ const ForgotPassword: React.FC = () => {
                   alt="Back" 
                   className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0" 
                   style={{ width: '14px', height: '14px' }}
-                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
                 />
                 <Link 
                   to="/" 
@@ -139,7 +139,7 @@ const ForgotPassword: React.FC = () => {
                 <span 
                   className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
                   style={{ color: '#BABABA' }}
-                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
                 >
                   Security & Privacy
                 </span>
@@ -214,8 +214,8 @@ const ForgotPassword: React.FC = () => {
                   borderRadius: '10px'
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#BABABA';
-                  e.currentTarget.style.borderWidth = '0.5px';
+                  e.currentTarget.style.borderColor = '#E0E0E0';
+                  e.currentTarget.style.borderWidth = '1px';
                 }}
                 onBlur={(e) => (e.currentTarget.style.borderColor = errors.email ? '#EF4444' : '#E9E9E9')}
               />

@@ -785,7 +785,12 @@ const ProfileSettings: React.FC = () => {
                     Settings
                   </span>
                   <span className="mx-3" style={{ color: '#D4D4D4' }}>·</span>
-                  <span className="text-gray-900 font-medium">Profile Setting</span>
+                  <span className="text-gray-900 font-medium">
+                    {selectedSidebarOption === 'profile' && 'Profile Setting'}
+                    {selectedSidebarOption === 'security' && 'Security & Privacy'}
+                    {selectedSidebarOption === 'language' && 'Language & Currency'}
+                    {selectedSidebarOption === 'notifications' && 'Notifications Settings'}
+                  </span>
                 </div>
 
                 {/* Right side - Language, button, profile, notifications */}
