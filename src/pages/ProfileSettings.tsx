@@ -2500,11 +2500,11 @@ const ProfileSettings: React.FC = () => {
                             <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
                             <button
                               onClick={() => setGeneralNotifications({ ...generalNotifications, enabled: !generalNotifications.enabled })}
-                              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                              className="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
                               style={{ backgroundColor: generalNotifications.enabled ? '#87E697' : '#E4E4E4' }}
                             >
                               <span
-                                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                                   generalNotifications.enabled ? 'translate-x-5' : 'translate-x-0.5'
                                 }`}
                               />
@@ -2536,9 +2536,9 @@ const ProfileSettings: React.FC = () => {
                       {/* Third Column */}
                       <div className="space-y-4">
                         {/* Reviews and rates toggles - Horizontal row */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-5">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
                               onClick={() => setGeneralNotifications({
                                 ...generalNotifications,
@@ -2555,7 +2555,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                             <button
                               onClick={() => setGeneralNotifications({
                                 ...generalNotifications,
@@ -2572,7 +2572,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                             <button
                               onClick={() => setGeneralNotifications({
                                 ...generalNotifications,
@@ -2590,9 +2590,9 @@ const ProfileSettings: React.FC = () => {
                           </div>
                         </div>
                         {/* Subscription Renewal toggles - Horizontal row */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-5">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
                               onClick={() => setGeneralNotifications({
                                 ...generalNotifications,
@@ -2609,7 +2609,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                             <button
                               onClick={() => setGeneralNotifications({
                                 ...generalNotifications,
@@ -2626,7 +2626,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                             <button
                               onClick={() => setGeneralNotifications({
                                 ...generalNotifications,
@@ -2651,7 +2651,7 @@ const ProfileSettings: React.FC = () => {
                   <div className="bg-white border rounded-[24px] p-4" style={{ borderColor: '#E4E4E4' }}>
                     <div className="grid grid-cols-3 gap-4">
                       {/* First Column */}
-                      <div className="space-y-3">
+                      <div className="space-y-3 flex flex-col justify-between">
                         <div>
                           <h3 className="text-sm font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
                             Messages Notifications
@@ -2665,11 +2665,11 @@ const ProfileSettings: React.FC = () => {
                             <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
                             <button
                               onClick={() => setMessagesNotifications({ ...messagesNotifications, enabled: !messagesNotifications.enabled })}
-                              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                              className="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
                               style={{ backgroundColor: messagesNotifications.enabled ? '#87E697' : '#E4E4E4' }}
                             >
                               <span
-                                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                                   messagesNotifications.enabled ? 'translate-x-5' : 'translate-x-0.5'
                                 }`}
                               />
@@ -2709,9 +2709,9 @@ const ProfileSettings: React.FC = () => {
                       {/* Third Column */}
                       <div className="space-y-4">
                         {/* Messages toggles - Horizontal row */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-5">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
                               onClick={() => setMessagesNotifications({
                                 ...messagesNotifications,
@@ -2728,7 +2728,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                             <button
                               onClick={() => setMessagesNotifications({
                                 ...messagesNotifications,
@@ -2745,7 +2745,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                             <button
                               onClick={() => setMessagesNotifications({
                                 ...messagesNotifications,
@@ -2763,9 +2763,9 @@ const ProfileSettings: React.FC = () => {
                           </div>
                         </div>
                         {/* Message reminders toggles - Horizontal row */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-5">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
                               onClick={() => setMessagesNotifications({
                                 ...messagesNotifications,
@@ -2782,7 +2782,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                             <button
                               onClick={() => setMessagesNotifications({
                                 ...messagesNotifications,
@@ -2799,7 +2799,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                             <button
                               onClick={() => setMessagesNotifications({
                                 ...messagesNotifications,
@@ -2817,9 +2817,9 @@ const ProfileSettings: React.FC = () => {
                           </div>
                         </div>
                         {/* Chat Requests toggles - Horizontal row */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-5">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
                               onClick={() => setMessagesNotifications({
                                 ...messagesNotifications,
@@ -2836,7 +2836,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                             <button
                               onClick={() => setMessagesNotifications({
                                 ...messagesNotifications,
@@ -2853,7 +2853,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                             <button
                               onClick={() => setMessagesNotifications({
                                 ...messagesNotifications,
@@ -2887,16 +2887,16 @@ const ProfileSettings: React.FC = () => {
                             News and Updates from BAO 'Afrik
                           </p>
                         </div>
-                        <div className="pt-2">
+                        <div className="pt-4">
                           <div className="flex items-center gap-2">
                             <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
                             <button
                               onClick={() => setNewsNotifications({ ...newsNotifications, enabled: !newsNotifications.enabled })}
-                              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                              className="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
                               style={{ backgroundColor: newsNotifications.enabled ? '#87E697' : '#E4E4E4' }}
                             >
                               <span
-                                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                                   newsNotifications.enabled ? 'translate-x-5' : 'translate-x-0.5'
                                 }`}
                               />
@@ -2928,9 +2928,9 @@ const ProfileSettings: React.FC = () => {
                       {/* Third Column */}
                       <div className="space-y-4">
                         {/* Newsletter toggles - Horizontal row */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-5">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
                               onClick={() => setNewsNotifications({
                                 ...newsNotifications,
@@ -2947,7 +2947,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                             <button
                               onClick={() => setNewsNotifications({
                                 ...newsNotifications,
@@ -2964,7 +2964,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                             <button
                               onClick={() => setNewsNotifications({
                                 ...newsNotifications,
@@ -2982,9 +2982,9 @@ const ProfileSettings: React.FC = () => {
                           </div>
                         </div>
                         {/* Daily recommendations toggles - Horizontal row */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-5">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
                               onClick={() => setNewsNotifications({
                                 ...newsNotifications,
@@ -3001,7 +3001,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                             <button
                               onClick={() => setNewsNotifications({
                                 ...newsNotifications,
@@ -3018,7 +3018,7 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                             <button
                               onClick={() => setNewsNotifications({
                                 ...newsNotifications,
