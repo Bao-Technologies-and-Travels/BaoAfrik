@@ -778,7 +778,12 @@ const ProfileSettings: React.FC = () => {
                     Menu
                   </span>
                   <span className="mx-3" style={{ color: '#D4D4D4' }}>·</span>
-                  <span className="text-gray-400 hover:text-gray-600 cursor-pointer">Settings</span>
+                  <span 
+                    className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                    onClick={handleSettingsClick}
+                  >
+                    Settings
+                  </span>
                   <span className="mx-3" style={{ color: '#D4D4D4' }}>·</span>
                   <span className="text-gray-900 font-medium">Profile Setting</span>
                 </div>

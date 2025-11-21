@@ -31,6 +31,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [highlightChats, setHighlightChats] = useState(false);
+  const [highlightSettings, setHighlightSettings] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
   
@@ -78,17 +79,27 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
     setIsLanguageDropdownOpen(false);
   };
 
-  // Listen for navigation from Messages page to open menu and highlight Chats
+  // Listen for navigation to open menu and highlight options
   useEffect(() => {
     const state = location.state as any;
-    if (state?.openMenu && state?.highlightChats) {
+    if (state?.openMenu) {
       setIsDesktopMenuOpen(true);
-      setHighlightChats(true);
       
-      // Clear the highlight after 2 seconds
-      setTimeout(() => {
-        setHighlightChats(false);
-      }, 2000);
+      if (state?.highlightChats) {
+        setHighlightChats(true);
+        // Clear the highlight after 2 seconds
+        setTimeout(() => {
+          setHighlightChats(false);
+        }, 2000);
+      }
+      
+      if (state?.highlightSettings) {
+        setHighlightSettings(true);
+        // Clear the highlight after 2 seconds
+        setTimeout(() => {
+          setHighlightSettings(false);
+        }, 2000);
+      }
     }
   }, [location]);
 
@@ -1274,11 +1285,14 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       to="/settings" 
                       className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                       onClick={() => setIsMobileMenuOpen(false)}
+                      style={{
+                        backgroundColor: highlightSettings ? '#F0F8FE' : 'transparent'
+                      }}
                     >
                       <div className="flex items-center space-x-2">
                         <img src={settingIcon} alt="Setting" className="w-5 h-5" style={{color: '#64B5F6'}} />
                         <div>
-                          <div className="font-medium text-sm" style={{color: '#6A6A6A'}}>Settings</div>
+                          <div className="font-medium text-sm" style={{color: highlightSettings ? '#64B5F6' : '#6A6A6A'}}>Settings</div>
                           <div className="text-xs text-gray-500">Set your account preferences</div>
                         </div>
                            </div>

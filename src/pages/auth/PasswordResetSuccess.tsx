@@ -73,7 +73,7 @@ const PasswordResetSuccess: React.FC = () => {
                 <span 
                   className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
                   style={{ color: '#BABABA' }}
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/', { state: { openMenu: true } })}
                 >
                   Menu
                 </span>
@@ -81,7 +81,7 @@ const PasswordResetSuccess: React.FC = () => {
                 <span 
                   className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
                   style={{ color: '#BABABA' }}
-                  onClick={() => navigate('/profile-settings', { state: { selectedSidebarOption: 'security' } })}
+                  onClick={() => navigate('/', { state: { openMenu: true, highlightSettings: true } })}
                 >
                   Settings
                 </span>
