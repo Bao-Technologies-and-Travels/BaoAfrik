@@ -23,6 +23,7 @@ import languageActiveIcon from '../assets/images/pre/lc2.svg';
 import notificationInactiveIcon from '../assets/images/pre/n1.svg';
 import notificationActiveIcon from '../assets/images/pre/n2.svg';
 import verifyIcon from '../assets/images/pre/verify.svg';
+import verityIcon from '../assets/images/pre/verity.svg';
 import logoIcon from '../assets/images/logos/ba-brand-icon-colored.png';
 import avatar from '../assets/images/logos/avatar.png';
 import messageAvatarIcon from '../assets/images/pre/main.png';
@@ -50,6 +51,7 @@ import unlockIcon from '../assets/images/pre/unlock.svg';
 import resetIcon from '../assets/images/pre/reset.svg';
 import closeIcon from '../assets/images/pre/CLose.svg';
 import updateIcon from '../assets/images/pre/update.svg.svg';
+import keyIcon from '../assets/images/pre/key.svg';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -63,6 +65,21 @@ const ProfileSettings: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isGeolocationEnabled, setIsGeolocationEnabled] = useState(false);
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
+  const [isTwoFactorModalOpen, setIsTwoFactorModalOpen] = useState(false);
+  const [twoFactorModalStep, setTwoFactorModalStep] = useState<'email' | 'phone' | 'code' | 'success'>('email');
+  const [twoFactorEmail, setTwoFactorEmail] = useState('');
+  const [twoFactorPassword, setTwoFactorPassword] = useState('');
+  const [twoFactorPhone, setTwoFactorPhone] = useState('');
+  const [twoFactorSelectedPhoneCode, setTwoFactorSelectedPhoneCode] = useState({
+    label: 'United States',
+    code: '+1',
+    flag: 'us'
+  });
+  const [isTwoFactorPhoneCodeDropdownOpen, setIsTwoFactorPhoneCodeDropdownOpen] = useState(false);
+  const [twoFactorVerificationCode, setTwoFactorVerificationCode] = useState(['', '', '', '', '', '']);
+  const twoFactorModalRef = useRef<HTMLDivElement>(null);
+  const twoFactorPhoneCodeDropdownRef = useRef<HTMLDivElement>(null);
+  const twoFactorCodeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [biography, setBiography] = useState('');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [selectedSidebarOption, setSelectedSidebarOption] = useState<'profile' | 'security' | 'language' | 'notifications'>('profile');
@@ -102,7 +119,12 @@ const ProfileSettings: React.FC = () => {
     { label: 'United Kingdom', code: '+44', flag: 'gb' },
     { label: 'France', code: '+33', flag: 'fr' },
     { label: 'Cameroon', code: '+237', flag: 'cm' },
-    { label: 'South Africa', code: '+27', flag: 'za' }
+    { label: 'South Africa', code: '+27', flag: 'za' },
+    { label: 'Algeria', code: '+213', flag: 'dz' },
+    { label: 'Angola', code: '+244', flag: 'ao' },
+    { label: 'Benin', code: '+229', flag: 'bj' },
+    { label: 'Congo', code: '+242', flag: 'cg' },
+    { label: 'Gabon', code: '+241', flag: 'ga' }
   ];
 
   const [socialConnections, setSocialConnections] = useState({
@@ -378,6 +400,54 @@ const ProfileSettings: React.FC = () => {
     setShowConfirmPassword(false);
   };
 
+  const handleCloseTwoFactorModal = () => {
+    setIsTwoFactorModalOpen(false);
+    setTwoFactorModalStep('email');
+    setTwoFactorEmail('');
+    setTwoFactorPassword('');
+    setTwoFactorPhone('');
+    setTwoFactorVerificationCode(['', '', '', '', '', '']);
+    setTwoFactorSelectedPhoneCode({
+      label: 'United States',
+      code: '+1',
+      flag: 'us'
+    });
+  };
+
+  const handleTwoFactorEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setTwoFactorModalStep('phone');
+  };
+
+  const handleTwoFactorPhoneSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setTwoFactorModalStep('code');
+  };
+
+  const handleTwoFactorCodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setTwoFactorModalStep('success');
+  };
+
+  const handleTwoFactorCodeInputChange = (index: number, value: string) => {
+    if (value.length > 1) return;
+    
+    const newCode = [...twoFactorVerificationCode];
+    newCode[index] = value;
+    setTwoFactorVerificationCode(newCode);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      twoFactorCodeInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleTwoFactorCodeKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !twoFactorVerificationCode[index] && index > 0) {
+      twoFactorCodeInputRefs.current[index - 1]?.focus();
+    }
+  };
+
   const formatDate = (date: Date) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -474,13 +544,28 @@ const ProfileSettings: React.FC = () => {
         setIsPasswordEditClicked(false);
         setSelectedPasswordOption(null);
       }
+
+      if (twoFactorModalRef.current && !twoFactorModalRef.current.contains(target) && isTwoFactorModalOpen) {
+        if (!twoFactorPhoneCodeDropdownRef.current?.contains(target)) {
+          setIsTwoFactorModalOpen(false);
+          setTwoFactorModalStep('email');
+          setTwoFactorEmail('');
+          setTwoFactorPassword('');
+          setTwoFactorPhone('');
+          setTwoFactorVerificationCode(['', '', '', '', '', '']);
+        }
+      }
+
+      if (twoFactorPhoneCodeDropdownRef.current && !twoFactorPhoneCodeDropdownRef.current.contains(target) && isTwoFactorPhoneCodeDropdownOpen) {
+        setIsTwoFactorPhoneCodeDropdownOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen]);
+  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen, isTwoFactorModalOpen, isTwoFactorPhoneCodeDropdownOpen]);
 
   // Handle navigation state to set selected sidebar option
   useEffect(() => {
@@ -1777,7 +1862,12 @@ const ProfileSettings: React.FC = () => {
                         </p>
                       </div>
                       <button
-                        onClick={() => setIsTwoFactorEnabled(!isTwoFactorEnabled)}
+                        onClick={() => {
+                          if (!isTwoFactorEnabled) {
+                            setIsTwoFactorModalOpen(true);
+                            setTwoFactorModalStep('email');
+                          }
+                        }}
                         className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
                         style={{ backgroundColor: isTwoFactorEnabled ? '#64B5F6' : '#E4E4E4' }}
                       >
@@ -2258,6 +2348,443 @@ const ProfileSettings: React.FC = () => {
             font-size: 12px !important;
             font-weight: 400 !important;
             font-family: 'Poppins', sans-serif !important;
+          }
+        `}        </style>
+      </>
+    )}
+
+    {/* Two Step Verification Modal */}
+    {isTwoFactorModalOpen && (
+      <>
+        {/* Overlay */}
+        <div
+          className="fixed inset-0 z-50"
+          style={{ backgroundColor: '#0000001A' }}
+          onClick={handleCloseTwoFactorModal}
+        />
+
+        {/* Modal */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            ref={twoFactorModalRef}
+            className="bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 pb-16 relative max-w-md w-full"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={handleCloseTwoFactorModal}
+              className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center"
+            >
+              <img
+                src={closeIcon}
+                alt="Close"
+                className="w-5 h-5"
+                style={{ filter: 'brightness(0) saturate(100%) invert(79%) sepia(6%) saturate(178%) hue-rotate(169deg) brightness(88%) contrast(83%)' }}
+              />
+            </button>
+
+            {twoFactorModalStep === 'email' && (
+              <>
+                {/* Icon */}
+                <div className="flex justify-center mb-4">
+                  <img src={keyIcon} alt="Key" className="w-16 h-16" />
+                </div>
+
+                {/* Title */}
+                <h2
+                  className="text-xl text-center mb-1.5"
+                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}
+                >
+                  Two step authentication
+                </h2>
+
+                {/* Description */}
+                <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                  Please enter your information
+                </p>
+
+                {/* Form */}
+                <form onSubmit={handleTwoFactorEmailSubmit} className="space-y-4">
+                  {/* Email Input */}
+                  <div>
+                    <label className="block text-xs mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                      Email address
+                    </label>
+                    <input
+                      type="email"
+                      value={twoFactorEmail}
+                      onChange={(e) => setTwoFactorEmail(e.target.value)}
+                      placeholder="Enter your mail address"
+                      className="two-factor-input w-full px-4 py-3 border rounded-[12px] text-sm bg-white focus:outline-none"
+                      style={{
+                        borderColor: '#E9E9E9',
+                        color: '#212121',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = '#CFE8FC';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = '#E9E9E9';
+                      }}
+                    />
+                  </div>
+
+                  {/* Password Input */}
+                  <div>
+                    <label className="block text-xs mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      value={twoFactorPassword}
+                      onChange={(e) => setTwoFactorPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className="two-factor-input w-full px-4 py-3 border rounded-[12px] text-sm bg-white focus:outline-none"
+                      style={{
+                        borderColor: '#E9E9E9',
+                        color: '#212121',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = '#CFE8FC';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = '#E9E9E9';
+                      }}
+                    />
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex items-center gap-3 pt-4">
+                    {/* Cancel Button */}
+                    <button
+                      type="button"
+                      onClick={handleCloseTwoFactorModal}
+                      className="flex-1 py-3 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
+                      style={{ 
+                        backgroundColor: '#F1F1F1',
+                        color: '#6A6A6A',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      <span style={{ color: '#6A6A6A' }}>X</span>
+                      Cancel
+                    </button>
+
+                    {/* Continue Button */}
+                    <button
+                      type="submit"
+                      className="flex-1 py-3 px-4 rounded-[12px] text-sm font-light transition-colors"
+                      style={{ 
+                        backgroundColor: '#F9A825',
+                        color: '#FFFFFF',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {twoFactorModalStep === 'phone' && (
+              <>
+                {/* Icon */}
+                <div className="flex justify-center mb-4">
+                  <img src={keyIcon} alt="Key" className="w-16 h-16" />
+                </div>
+
+                {/* Title */}
+                <h2
+                  className="text-xl text-center mb-1.5"
+                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}
+                >
+                  Two step authentication
+                </h2>
+
+                {/* Description */}
+                <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                  We'll send a verification code to this number whenever you sign in to your account
+                </p>
+
+                {/* Form */}
+                <form onSubmit={handleTwoFactorPhoneSubmit} className="space-y-4">
+                  {/* Phone Number Input */}
+                  <div>
+                    <label className="block text-xs mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                      Phone number
+                    </label>
+                    <div className="flex gap-2">
+                      {/* Country Code Dropdown */}
+                      <div className="relative flex-shrink-0" ref={twoFactorPhoneCodeDropdownRef}>
+                        <button
+                          type="button"
+                          onClick={() => setIsTwoFactorPhoneCodeDropdownOpen(!isTwoFactorPhoneCodeDropdownOpen)}
+                          className="flex items-center gap-2 px-3 py-3 border rounded-[12px] bg-white focus:outline-none"
+                          style={{
+                            borderColor: '#E9E9E9',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}
+                        >
+                          <img
+                            src={`https://flagcdn.com/w20/${twoFactorSelectedPhoneCode.flag}.png`}
+                            alt={twoFactorSelectedPhoneCode.label}
+                            className="w-5 h-5 rounded-full"
+                            style={{ objectFit: 'cover' }}
+                          />
+                          <span className="text-xs" style={{ color: '#939393' }}>
+                            {twoFactorSelectedPhoneCode.code}
+                          </span>
+                          <img
+                            src={arrowDownIcon}
+                            alt="Arrow"
+                            className="w-4 h-4"
+                            style={{ filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }}
+                          />
+                        </button>
+
+                        {/* Dropdown */}
+                        {isTwoFactorPhoneCodeDropdownOpen && (
+                          <div 
+                            className="absolute top-full left-0 mt-1 bg-white z-50 w-48"
+                            style={{
+                              borderRadius: '20px',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            <div className="two-factor-dropdown" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                              {phoneCodes.map((code) => (
+                                <button
+                                  key={code.code}
+                                  type="button"
+                                  onClick={() => {
+                                    setTwoFactorSelectedPhoneCode(code);
+                                    setIsTwoFactorPhoneCodeDropdownOpen(false);
+                                  }}
+                                  className="w-full flex items-center gap-2 px-3 py-2 transition-colors"
+                                  style={{
+                                    backgroundColor: twoFactorSelectedPhoneCode.code === code.code ? '#F0F8FE' : 'transparent',
+                                    borderRadius: twoFactorSelectedPhoneCode.code === code.code ? '8px' : '0',
+                                    margin: twoFactorSelectedPhoneCode.code === code.code ? '4px' : '0'
+                                  }}
+                                >
+                                  <img
+                                    src={`https://flagcdn.com/w20/${code.flag}.png`}
+                                    alt={code.label}
+                                    className="w-4 h-4 rounded-full"
+                                    style={{ objectFit: 'cover' }}
+                                  />
+                                  <span
+                                    className="text-xs flex-1 text-left"
+                                    style={{
+                                      color: twoFactorSelectedPhoneCode.code === code.code ? '#64B5F6' : '#BABABA',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}
+                                  >
+                                    {code.code} · {code.label}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Phone Number Input */}
+                      <input
+                        type="tel"
+                        value={twoFactorPhone}
+                        onChange={(e) => setTwoFactorPhone(e.target.value)}
+                        placeholder="Enter your phone number"
+                        className="two-factor-input flex-1 px-4 py-3 border rounded-[12px] text-sm bg-white focus:outline-none"
+                        style={{
+                          borderColor: '#E9E9E9',
+                          color: '#212121',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = '#CFE8FC';
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = '#E9E9E9';
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex items-center gap-3 pt-4">
+                    {/* Cancel Button */}
+                    <button
+                      type="button"
+                      onClick={handleCloseTwoFactorModal}
+                      className="flex-1 py-3 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
+                      style={{ 
+                        backgroundColor: '#F1F1F1',
+                        color: '#6A6A6A',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      <span style={{ color: '#6A6A6A' }}>X</span>
+                      Cancel
+                    </button>
+
+                    {/* Continue Button */}
+                    <button
+                      type="submit"
+                      className="flex-1 py-3 px-4 rounded-[12px] text-sm font-light transition-colors"
+                      style={{ 
+                        backgroundColor: '#F9A825',
+                        color: '#FFFFFF',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {twoFactorModalStep === 'code' && (
+              <>
+                {/* Icon */}
+                <div className="flex justify-center mb-4">
+                  <img src={keyIcon} alt="Key" className="w-16 h-16" />
+                </div>
+
+                {/* Title */}
+                <h2
+                  className="text-xl text-center mb-1.5"
+                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}
+                >
+                  Two step authentication
+                </h2>
+
+                {/* Description */}
+                <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                  Enter the authentication code below we sent to<br />
+                  {twoFactorSelectedPhoneCode.code} {twoFactorPhone ? `${twoFactorPhone.charAt(0)}${'*'.repeat(Math.max(0, twoFactorPhone.length - 1))}` : '******'}
+                </p>
+
+                {/* Form */}
+                <form onSubmit={handleTwoFactorCodeSubmit} className="space-y-4">
+                  {/* 6-Digit Code Input */}
+                  <div className="flex justify-center gap-2 mt-4 mb-4">
+                    {twoFactorVerificationCode.map((digit, index) => (
+                      <input
+                        key={index}
+                        ref={(el) => (twoFactorCodeInputRefs.current[index] = el)}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => handleTwoFactorCodeInputChange(index, e.target.value)}
+                        onKeyDown={(e) => handleTwoFactorCodeKeyDown(index, e)}
+                        className="w-12 h-12 text-center text-lg font-medium bg-white border rounded-lg"
+                        style={{
+                          borderColor: '#E9E9E9',
+                          color: '#212121',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = '#CFE8FC';
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = '#E9E9E9';
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex items-center gap-3 pt-4">
+                    {/* Cancel Button */}
+                    <button
+                      type="button"
+                      onClick={handleCloseTwoFactorModal}
+                      className="flex-1 py-2 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
+                      style={{ 
+                        backgroundColor: '#F1F1F1',
+                        color: '#6A6A6A',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      <span style={{ color: '#6A6A6A' }}>X</span>
+                      Cancel
+                    </button>
+
+                    {/* Continue Button */}
+                    <button
+                      type="submit"
+                      className="flex-1 py-2 px-4 rounded-[12px] text-sm font-light transition-colors"
+                      style={{ 
+                        backgroundColor: '#F9A825',
+                        color: '#FFFFFF',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {twoFactorModalStep === 'success' && (
+              <div className="text-center px-4">
+                {/* Icon */}
+                <div className="flex justify-center mb-7">
+                  <img src={verityIcon} alt="Verified" className="w-16 h-16" />
+                </div>
+
+                {/* Title */}
+                <h2
+                  className="text-xl mb-4"
+                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+                >
+                  Successfully enable
+                </h2>
+
+                {/* Description */}
+                <p className="text-sm mb-12" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', fontWeight: 300 }}>
+                  Your phone number is set to {twoFactorSelectedPhoneCode.code} {twoFactorPhone ? `${twoFactorPhone.charAt(0)}${'*'.repeat(Math.max(0, twoFactorPhone.length - 1))}` : '******'}<br />
+                  Authentification code will be sent to this number when you logging in
+                </p>
+
+                {/* Close Button */}
+                <button
+                  className="w-full max-w-xs mx-auto py-2.5 rounded-[12px] text-sm font-normal transition-colors"
+                  style={{ backgroundColor: '#F9A825', color: '#FFFFFF', borderRadius: '12px' }}
+                  onClick={() => {
+                    setIsTwoFactorEnabled(true);
+                    handleCloseTwoFactorModal();
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+        <style>{`
+          .two-factor-input::placeholder {
+            color: #D9D9D9 !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+            font-family: 'Poppins', sans-serif !important;
+          }
+          .two-factor-dropdown::-webkit-scrollbar {
+            display: none;
+          }
+          .two-factor-dropdown {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
           }
         `}</style>
       </>
