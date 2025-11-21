@@ -74,7 +74,54 @@ const translationDictionary: Record<string, Record<string, string>> = {
     "Language Setting": "Paramètre de langue",
     "Control what others are seeing from you on BAO' Afrik.": "Contrôlez ce que les autres voient de vous sur BAO' Afrik.",
     "Currency Preferences": "Préférences de devise",
-    "Choose the currency you want to see product prices in.": "Choisissez la devise dans laquelle vous souhaitez voir les prix des produits."
+    "Choose the currency you want to see product prices in.": "Choisissez la devise dans laquelle vous souhaitez voir les prix des produits.",
+    "Profile Setting": "Paramètre de profil",
+    "Update your profile and control what others see on BAO' Afrik.": "Mettez à jour votre profil et contrôlez ce que les autres voient sur BAO' Afrik.",
+    "Personal Information": "Informations personnelles",
+    "Location": "Localisation",
+    "Description": "Description",
+    "Verification": "Vérification",
+    "Security & Privacy Setting": "Paramètre de sécurité et confidentialité",
+    "Manage your privacy preferences and keep your account secure on BAO' Afrik.": "Gérez vos préférences de confidentialité et gardez votre compte sécurisé sur BAO' Afrik.",
+    "Password": "Mot de passe",
+    "Your password is weak": "Votre mot de passe est faible",
+    "Your password is strong": "Votre mot de passe est fort",
+    "Set a password to protect your account.": "Définissez un mot de passe pour protéger votre compte.",
+    "Edit": "Modifier",
+    "Two step verification": "Vérification en deux étapes",
+    "Two-step verification": "Vérification en deux étapes",
+    "Enable two-step verification for enhanced security.": "Activez la vérification en deux étapes pour une sécurité renforcée.",
+    "How does it work?": "Comment ça marche ?",
+    "Sessions": "Sessions",
+    "Review your active sessions and sign out of any devices you don't recognize.": "Examinez vos sessions actives et déconnectez-vous de tout appareil que vous ne reconnaissez pas.",
+    "Current session": "Session actuelle",
+    "Sign Out": "Se déconnecter",
+    "Other Sessions": "Autres sessions",
+    "Close all inactive sessions": "Fermer toutes les sessions inactives",
+    "Show mock session history": "Afficher l'historique des sessions simulées",
+    "Hide mock session history": "Masquer l'historique des sessions simulées",
+    "Complete your profile": "Complétez votre profil",
+    "Setup account": "Configuration du compte",
+    "Personnal information": "Informations personnelles",
+    "Upload your photo": "Téléchargez votre photo",
+    "Verification first step": "Première étape de vérification",
+    "Email address": "Adresse e-mail",
+    "Phone number": "Numéro de téléphone",
+    "Verified": "Vérifié",
+    "First level verification": "Vérification de premier niveau",
+    "Connect your social media accounts to verify your identity. Connecting at least two accounts will earn you a first-level verified badge.": "Connectez vos comptes de réseaux sociaux pour vérifier votre identité. La connexion d'au moins deux comptes vous permettra d'obtenir un badge de vérification de premier niveau.",
+    "Full name": "Nom complet",
+    "Gender": "Genre",
+    "Birthday": "Anniversaire",
+    "Save": "Enregistrer",
+    "Cancel": "Annuler",
+    "Male": "Homme",
+    "Female": "Femme",
+    "Other": "Autre",
+    "Select gender": "Sélectionner le genre",
+    "Enter your email address": "Entrez votre adresse e-mail",
+    "Enter your phone number": "Entrez votre numéro de téléphone",
+    "Change mail address": "Changer l'adresse e-mail"
   }
 };
 
@@ -773,21 +820,26 @@ const ProfileSettings: React.FC = () => {
     if (!pageRef.current) {
       return;
     }
-    const dictionary = translationDictionary[languagePreference];
-    const walker = document.createTreeWalker(pageRef.current, NodeFilter.SHOW_TEXT);
-    while (walker.nextNode()) {
-      const textNode = walker.currentNode as Text;
-      const currentOriginal =
-        originalTextMap.current.get(textNode) ?? (textNode.textContent ? textNode.textContent : '');
-      if (!originalTextMap.current.has(textNode)) {
-        originalTextMap.current.set(textNode, currentOriginal);
+    // Small delay to ensure DOM is updated after tab switches
+    const timeoutId = setTimeout(() => {
+      if (!pageRef.current) return;
+      const dictionary = translationDictionary[languagePreference];
+      const walker = document.createTreeWalker(pageRef.current, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        const textNode = walker.currentNode as Text;
+        const currentOriginal =
+          originalTextMap.current.get(textNode) ?? (textNode.textContent ? textNode.textContent : '');
+        if (!originalTextMap.current.has(textNode)) {
+          originalTextMap.current.set(textNode, currentOriginal);
+        }
+        const trimmed = currentOriginal.trim();
+        if (!trimmed) continue;
+        const translation = dictionary ? dictionary[trimmed] : undefined;
+        textNode.textContent = languagePreference === 'fr' && translation ? translation : currentOriginal;
       }
-      const trimmed = currentOriginal.trim();
-      if (!trimmed) continue;
-      const translation = dictionary ? dictionary[trimmed] : undefined;
-      textNode.textContent = languagePreference === 'fr' && translation ? translation : currentOriginal;
-    }
-  }, [languagePreference]);
+    }, 100);
+    return () => clearTimeout(timeoutId);
+  }, [languagePreference, selectedSidebarOption]);
 
   return (
     <>
