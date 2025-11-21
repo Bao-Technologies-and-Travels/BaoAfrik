@@ -886,6 +886,75 @@ const ProfileSettings: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [languagePreference, selectedSidebarOption]);
 
+  // Handler for standalone "Switch on all"
+  const handleAllNotificationsToggle = () => {
+    const newValue = !allNotificationsEnabled;
+    setAllNotificationsEnabled(newValue);
+    
+    // Toggle all notifications in all sections
+    setGeneralNotifications({
+      enabled: newValue,
+      reviewsAndRates: { push: newValue, email: newValue, inApp: newValue },
+      subscriptionRenewal: { push: newValue, email: newValue, inApp: newValue }
+    });
+    
+    setMessagesNotifications({
+      enabled: newValue,
+      messages: { push: newValue, email: newValue, inApp: newValue },
+      messageReminders: { push: newValue, email: newValue, inApp: newValue },
+      chatRequests: { push: newValue, email: newValue, inApp: newValue }
+    });
+    
+    setNewsNotifications({
+      enabled: newValue,
+      newsletter: { push: newValue, email: newValue, inApp: newValue },
+      dailyRecommendations: { push: newValue, email: newValue, inApp: newValue }
+    });
+  };
+
+  // Handler for General Notifications "Switch on all"
+  const handleGeneralNotificationsToggle = () => {
+    const newValue = !generalNotifications.enabled;
+    setGeneralNotifications({
+      enabled: newValue,
+      reviewsAndRates: { push: newValue, email: newValue, inApp: newValue },
+      subscriptionRenewal: { push: newValue, email: newValue, inApp: newValue }
+    });
+  };
+
+  // Handler for Messages Notifications "Switch on all"
+  const handleMessagesNotificationsToggle = () => {
+    const newValue = !messagesNotifications.enabled;
+    setMessagesNotifications({
+      enabled: newValue,
+      messages: { push: newValue, email: newValue, inApp: newValue },
+      messageReminders: { push: newValue, email: newValue, inApp: newValue },
+      chatRequests: { push: newValue, email: newValue, inApp: newValue }
+    });
+  };
+
+  // Handler for News Notifications "Switch on all"
+  const handleNewsNotificationsToggle = () => {
+    const newValue = !newsNotifications.enabled;
+    setNewsNotifications({
+      enabled: newValue,
+      newsletter: { push: newValue, email: newValue, inApp: newValue },
+      dailyRecommendations: { push: newValue, email: newValue, inApp: newValue }
+    });
+  };
+
+  // Sync standalone toggle state with individual section states
+  useEffect(() => {
+    const allEnabled = 
+      generalNotifications.enabled &&
+      messagesNotifications.enabled &&
+      newsNotifications.enabled;
+    
+    if (allEnabled !== allNotificationsEnabled) {
+      setAllNotificationsEnabled(allEnabled);
+    }
+  }, [generalNotifications.enabled, messagesNotifications.enabled, newsNotifications.enabled]);
+
   return (
     <>
       <style>{`
@@ -2457,7 +2526,7 @@ const ProfileSettings: React.FC = () => {
               {selectedSidebarOption === 'notifications' && (
                 <div className="space-y-4 px-4 sm:px-6 lg:px-10">
                   {/* Standalone Title and Description Section */}
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
                     <div>
                       <h1 className="text-base font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
                         Notifications Setting
@@ -2467,9 +2536,9 @@ const ProfileSettings: React.FC = () => {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
+                      <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
                       <button
-                        onClick={() => setAllNotificationsEnabled(!allNotificationsEnabled)}
+                        onClick={handleAllNotificationsToggle}
                         className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
                         style={{ backgroundColor: allNotificationsEnabled ? '#87E697' : '#E4E4E4' }}
                       >
@@ -2484,7 +2553,7 @@ const ProfileSettings: React.FC = () => {
 
                   {/* General Notifications Content Area */}
                   <div className="bg-white border rounded-[24px] p-4" style={{ borderColor: '#E4E4E4' }}>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-6 items-start" style={{ paddingLeft: '8px' }}>
                       {/* First Column */}
                       <div className="space-y-3">
                         <div>
@@ -2499,7 +2568,7 @@ const ProfileSettings: React.FC = () => {
                           <div className="flex items-center gap-2">
                             <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
                             <button
-                              onClick={() => setGeneralNotifications({ ...generalNotifications, enabled: !generalNotifications.enabled })}
+                              onClick={handleGeneralNotificationsToggle}
                               className="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
                               style={{ backgroundColor: generalNotifications.enabled ? '#87E697' : '#E4E4E4' }}
                             >
@@ -2534,9 +2603,9 @@ const ProfileSettings: React.FC = () => {
                       </div>
 
                       {/* Third Column */}
-                      <div className="space-y-4">
+                      <div className="space-y-4" style={{ marginLeft: '8px' }}>
                         {/* Reviews and rates toggles - Horizontal row */}
-                        <div className="flex items-center gap-5">
+                        <div className="flex items-start gap-5 justify-end" style={{ paddingTop: '20px' }}>
                           <div className="flex items-center gap-1.5">
                             <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
@@ -2590,7 +2659,7 @@ const ProfileSettings: React.FC = () => {
                           </div>
                         </div>
                         {/* Subscription Renewal toggles - Horizontal row */}
-                        <div className="flex items-center gap-5">
+                        <div className="flex items-start gap-5 justify-end" style={{ paddingTop: '20px' }}>
                           <div className="flex items-center gap-1.5">
                             <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
@@ -2649,10 +2718,10 @@ const ProfileSettings: React.FC = () => {
 
                   {/* Messages Notifications Content Area */}
                   <div className="bg-white border rounded-[24px] p-4" style={{ borderColor: '#E4E4E4' }}>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-6 items-stretch" style={{ paddingLeft: '8px' }}>
                       {/* First Column */}
-                      <div className="space-y-3 flex flex-col justify-between">
-                        <div>
+                      <div className="flex flex-col">
+                        <div className="space-y-3">
                           <h3 className="text-sm font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
                             Messages Notifications
                           </h3>
@@ -2660,11 +2729,11 @@ const ProfileSettings: React.FC = () => {
                             All messages and mentions from our messagings
                           </p>
                         </div>
-                        <div className="pt-2">
+                        <div className="pt-2 mt-auto">
                           <div className="flex items-center gap-2">
                             <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
                             <button
-                              onClick={() => setMessagesNotifications({ ...messagesNotifications, enabled: !messagesNotifications.enabled })}
+                              onClick={handleMessagesNotificationsToggle}
                               className="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
                               style={{ backgroundColor: messagesNotifications.enabled ? '#87E697' : '#E4E4E4' }}
                             >
@@ -2679,7 +2748,7 @@ const ProfileSettings: React.FC = () => {
                       </div>
 
                       {/* Second Column */}
-                      <div className="space-y-4">
+                      <div className="space-y-4" style={{ marginLeft: '4px' }}>
                         <div>
                           <h4 className="text-xs font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
                             Messages
@@ -2707,9 +2776,9 @@ const ProfileSettings: React.FC = () => {
                       </div>
 
                       {/* Third Column */}
-                      <div className="space-y-4">
+                      <div className="space-y-4" style={{ marginLeft: '8px' }}>
                         {/* Messages toggles - Horizontal row */}
-                        <div className="flex items-center gap-5">
+                        <div className="flex items-start gap-5 justify-end" style={{ paddingTop: '20px' }}>
                           <div className="flex items-center gap-1.5">
                             <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
@@ -2763,7 +2832,7 @@ const ProfileSettings: React.FC = () => {
                           </div>
                         </div>
                         {/* Message reminders toggles - Horizontal row */}
-                        <div className="flex items-center gap-5">
+                        <div className="flex items-start gap-5 justify-end" style={{ paddingTop: '20px' }}>
                           <div className="flex items-center gap-1.5">
                             <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
@@ -2817,7 +2886,7 @@ const ProfileSettings: React.FC = () => {
                           </div>
                         </div>
                         {/* Chat Requests toggles - Horizontal row */}
-                        <div className="flex items-center gap-5">
+                        <div className="flex items-start gap-5 justify-end" style={{ paddingTop: '20px' }}>
                           <div className="flex items-center gap-1.5">
                             <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
@@ -2876,7 +2945,7 @@ const ProfileSettings: React.FC = () => {
 
                   {/* News and Updates Content Area */}
                   <div className="bg-white border rounded-[24px] p-4" style={{ borderColor: '#E4E4E4' }}>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-6 items-start" style={{ paddingLeft: '8px' }}>
                       {/* First Column */}
                       <div className="space-y-3">
                         <div>
@@ -2891,7 +2960,7 @@ const ProfileSettings: React.FC = () => {
                           <div className="flex items-center gap-2">
                             <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
                             <button
-                              onClick={() => setNewsNotifications({ ...newsNotifications, enabled: !newsNotifications.enabled })}
+                              onClick={handleNewsNotificationsToggle}
                               className="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
                               style={{ backgroundColor: newsNotifications.enabled ? '#87E697' : '#E4E4E4' }}
                             >
@@ -2926,9 +2995,9 @@ const ProfileSettings: React.FC = () => {
                       </div>
 
                       {/* Third Column */}
-                      <div className="space-y-4">
+                      <div className="space-y-4" style={{ marginLeft: '8px' }}>
                         {/* Newsletter toggles - Horizontal row */}
-                        <div className="flex items-center gap-5">
+                        <div className="flex items-start gap-5 justify-end" style={{ paddingTop: '20px' }}>
                           <div className="flex items-center gap-1.5">
                             <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
@@ -2982,7 +3051,7 @@ const ProfileSettings: React.FC = () => {
                           </div>
                         </div>
                         {/* Daily recommendations toggles - Horizontal row */}
-                        <div className="flex items-center gap-5">
+                        <div className="flex items-start gap-5 justify-end" style={{ paddingTop: '20px' }}>
                           <div className="flex items-center gap-1.5">
                             <span className="text-[10px]" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                             <button
