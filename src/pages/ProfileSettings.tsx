@@ -58,6 +58,8 @@ const ProfileSettings: React.FC = () => {
   const location = useLocation();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
+  const [languagePreference, setLanguagePreference] = useState('English');
+  const [currencyPreference, setCurrencyPreference] = useState('USD');
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
@@ -296,7 +298,7 @@ const ProfileSettings: React.FC = () => {
     setInactiveSessions([]);
   };
   
-  const leftPaneClasses = selectedSidebarOption === 'security'
+  const leftPaneClasses = (selectedSidebarOption === 'security' || selectedSidebarOption === 'language')
     ? 'flex-1 w-full px-0'
     : 'flex-1 bg-white border border-gray-200 rounded-[20px] px-8';
   
@@ -2096,6 +2098,123 @@ const ProfileSettings: React.FC = () => {
                         </div>
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {selectedSidebarOption === 'language' && (
+                <div className="space-y-6 px-4 sm:px-6 lg:px-10">
+                  {/* Title and Description */}
+                  <div className="mb-6">
+                    <h1 className="text-base font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                      Language and Currency
+                    </h1>
+                    <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                      Customize your language preferences and currency settings to enhance your shopping experience on BAO' Afrik.
+                    </p>
+                  </div>
+
+                  {/* Content Area */}
+                  <div className="bg-white border rounded-[20px] p-6" style={{ borderColor: '#E4E4E4', marginTop: '20px' }}>
+                    {/* Language Section */}
+                    <div className="mb-10">
+                      <h2 className="text-sm font-medium mb-1.5" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                        Language Setting
+                      </h2>
+                      <p className="text-xs mb-4" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                        Control what others are seeing from you on BAO' Afrik.
+                      </p>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {[
+                          { name: 'English', flag: 'gb', code: 'en' },
+                          { name: 'French', flag: 'fr', code: 'fr' },
+                          { name: 'Deushland', flag: 'de', code: 'de' },
+                          { name: 'Spanish', flag: 'es', code: 'es' }
+                        ].map((lang) => {
+                          const isSelected = languagePreference === lang.name;
+                          return (
+                            <button
+                              key={lang.code}
+                              onClick={() => setLanguagePreference(lang.name)}
+                              className="flex items-center gap-2 px-4 py-1.5 rounded-full border transition-colors"
+                              style={{
+                                backgroundColor: isSelected ? '#F0F8FE' : 'white',
+                                borderColor: isSelected ? '#CFE8FC' : '#E1E1E1',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}
+                            >
+                              {isSelected ? (
+                                <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#64B5F6' }}>
+                                  <svg className="w-3 h-3" fill="none" stroke="white" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </div>
+                              ) : (
+                                <img
+                                  src={`https://flagcdn.com/w20/${lang.flag}.png`}
+                                  alt={lang.name}
+                                  className="w-4 h-4 rounded-full"
+                                  style={{ objectFit: 'cover' }}
+                                />
+                              )}
+                              <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                                {lang.name}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Currency Section */}
+                    <div>
+                      <h2 className="text-sm font-medium mb-1.5" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                        Currency Preferences
+                      </h2>
+                      <p className="text-xs mb-4" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                        Choose the currency you want to see product prices in.
+                      </p>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {[
+                          { code: 'USD', flag: 'us', name: 'United States Dollar' },
+                          { code: 'EUR', flag: 'eu', name: 'Euro' },
+                          { code: 'CAD', flag: 'ca', name: 'Canadian Dollar' },
+                          { code: 'GBP', flag: 'gb', name: 'British Pound' }
+                        ].map((currency) => {
+                          const isSelected = currencyPreference === currency.code;
+                          return (
+                            <button
+                              key={currency.code}
+                              onClick={() => setCurrencyPreference(currency.code)}
+                              className="flex items-center gap-2 px-4 py-1.5 rounded-full border transition-colors"
+                              style={{
+                                backgroundColor: isSelected ? '#F0F8FE' : 'white',
+                                borderColor: isSelected ? '#CFE8FC' : '#E1E1E1',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}
+                            >
+                              {isSelected ? (
+                                <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#64B5F6' }}>
+                                  <svg className="w-3 h-3" fill="none" stroke="white" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </div>
+                              ) : (
+                                <img
+                                  src={`https://flagcdn.com/w20/${currency.flag}.png`}
+                                  alt={currency.name}
+                                  className="w-4 h-4 rounded-full"
+                                  style={{ objectFit: 'cover' }}
+                                />
+                              )}
+                              <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                                {currency.code}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
