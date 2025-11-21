@@ -24,8 +24,12 @@ const EmailVerification: React.FC = () => {
   const email = location.state?.email || 'your email';
   const fromRegistration = location.state?.fromRegistration || false;
 
-  // Countdown timer for resend functionality
+  // Auto-focus first input on component mount
+  useEffect(() => {
+    inputRefs.current[0]?.focus();
+  }, []);
 
+  // Countdown timer for resend functionality
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);

@@ -95,6 +95,13 @@ interface Seller {
   website?: string;
 }
 
+interface ProductImage {
+  key: string;
+  url: string;
+  order: number;
+  isPrimary: boolean;
+}
+
 interface Product {
   id: string;
   title: string;
@@ -110,13 +117,7 @@ interface Product {
   status: string;
   createdAt: string;
   updatedAt: string;
-  images: Array<{
-    id: string;
-    url: string;
-    isPrimary: boolean;
-    key: string;
-    order: number;
-  }>;
+  images: ProductImage[] | string;
   seller: Seller;
 }
 
@@ -317,8 +318,26 @@ const ProductDetail: React.FC = () => {
     );
   };
 
-  // Product images array - main image first, then thumbnail images
-  const defaultImages = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
+  // Get product images
+  const getProductImages = (product: Product | null) => {
+    const defaultImages = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
+
+    if(!product?.images) return defaultImages;
+
+    try {
+      const imagesArray: ProductImage[] = typeof product.images === 'string'
+      ? JSON.parse(product.images)
+      : product.images;
+
+      if(Array.isArray(imagesArray) && imagesArray.length > 0) {
+        return imagesArray.map((img:ProductImage) => img.url);
+      }
+    } catch (error) {
+      console.error('Error parsing product images:', error);
+    }
+
+    return defaultImages;
+  }
 
   // Fetch product data from API
   useEffect(() => {
@@ -360,7 +379,7 @@ const ProductDetail: React.FC = () => {
           type: 'error',
           title: 'Error',
           message: error.message || "Failed to load product details",
-          duration: 3000
+          duration: 2000
         });
       } finally {
         setIsLoading(false);
@@ -414,9 +433,8 @@ const ProductDetail: React.FC = () => {
     }
   }, [product?.seller?.id, product?.id]);
 
-  const images = product?.images && product.images.length > 0
-    ? product.images.map(img => img.url)
-    : defaultImages;
+  const images = getProductImages(product);
+
 
   // format published data
   const getPublishedDate = (createdAt: string) => {
@@ -434,7 +452,7 @@ const ProductDetail: React.FC = () => {
   // Safe seller access functions
   const getSellerName = (seller: Seller | undefined): string => {
     if (!seller) return "Unknown Seller";
-    return `${seller.firstName || ''} ${seller.lastName || ''}`.trim() || "Unknown Seller";
+    return `${seller.firstName || ''} ${seller.lastName || ''}`.trim() || seller?.email.split("@")[0] || "Unknown Seller";
   };
 
   const getSellerProfileImage = (seller: Seller | undefined): string => {
@@ -478,15 +496,15 @@ const ProductDetail: React.FC = () => {
             type: "success",
             title: "Link Copied",
             message: "Product link copied to clipboard",
-            duration: 3000,
+            duration: 2000,
           });
         }
       } catch (error) {
         addToast({
-          type: "error",
+          type: 'error',
           title: "Share failed",
           message: "Failed to share product",
-          duration: 3000
+          duration: 2000
         });
       }
     }
@@ -515,17 +533,17 @@ const ProductDetail: React.FC = () => {
           message: isSaved
             ? "Product removed from your saved items"
             : "Product added to your saved items",
-          duration: 3000,
+          duration: 2000,
         });
       } else {
         throw new Error("Failed to save product");
       }
     } catch (error) {
       addToast({
-        type: "error",
+        type: 'error',
         title: "Save Failed",
         message: "Failed to save product. Please try again.",
-        duration: 3000,
+        duration: 2000,
       });
     }
   };
@@ -544,10 +562,10 @@ const ProductDetail: React.FC = () => {
   const handleContactSeller = async () => {
     if (!product || !product.seller) {
       addToast({
-        type: "error",
+        type: 'error',
         title: "Error",
         message: "Seller information not available",
-        duration: 3000
+        duration: 2000
       });
       return;
     }
@@ -567,7 +585,7 @@ const ProductDetail: React.FC = () => {
         location: product.location,
         category: product.category,
         description: product.description,
-        images: images[0],
+        images: getProductImages(product),
         seller: {
           id: product.seller.id,
           name: getSellerName(product.seller),
@@ -626,7 +644,7 @@ const ProductDetail: React.FC = () => {
         state: {
           conversationId: targetConversationId,
           productData: productDataToSend,
-          preFilledMessage: `Hi, I'm interested in your product "${product.title}"`,
+          preFilledMessage: `Hi, I'm interested in your product "${product.title}". Is it still available?`,
           isProductInquiry: true,
           shouldOpenConversation: true
         },
@@ -652,10 +670,10 @@ const ProductDetail: React.FC = () => {
       }
 
       addToast({
-        type: "error",
+        type: 'error',
         title: "Cannot contact seller",
         message: errorMessage,
-        duration: 3000,
+        duration: 2000,
       });
     } finally {
       setIsContactingSeller(false);
@@ -767,17 +785,17 @@ const ProductDetail: React.FC = () => {
           message: wishlistProducts.has(productId)
             ? "Product removed from your wishlist"
             : "Product added to your wishlist",
-          duration: 3000,
+          duration: 2000,
         });
       } else {
         throw new Error("Failed to update wishlist");
       }
     } catch (error) {
       addToast({
-        type: "error",
+        type: 'error',
         title: "Wishlist Failed",
         message: "Failed to update wishlist. Please try again.",
-        duration: 3000,
+        duration: 2000,
       });
     }
   };
@@ -839,11 +857,6 @@ const ProductDetail: React.FC = () => {
       </div>
     );
   }
-
-  const sellerName = product.seller
-    ? `${product.seller.firstName} ${product.seller.lastName}`
-    : "Unknown Seller";
-
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -1147,7 +1160,7 @@ const ProductDetail: React.FC = () => {
                       <span className="font-medium text-sm" style={{ color: '#212121' }}>
                         {`${product?.seller.firstName} ${product?.seller.lastName}`}
                       </span>
-                      {product.seller.verified ? (
+                      {isSellerVerified(product.seller) ? (
                         <div className="flex items-center bg-green-50 rounded" style={{ padding: '1px 4px', gap: '1px', fontSize: '9px', color: '#45C55B' }}>
                           <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
                           <span>Verified seller</span>
@@ -2071,7 +2084,7 @@ const ProductDetail: React.FC = () => {
                     >
                       <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
                         <img
-                          src={sellerProduct.images && sellerProduct.images.length > 0 ? sellerProduct.images[0].url : pre1}
+                          src={getProductImages(sellerProduct)[0]}
                           alt={sellerProduct.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           style={{ borderRadius: '12px' }}

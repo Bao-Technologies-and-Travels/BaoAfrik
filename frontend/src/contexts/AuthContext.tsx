@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       addToast({
         type: "success",
-        title: "Logged out",
+        title: 'Logged out',
         message: "You have been successfully logged out.",
         duration: 2500,
       });
@@ -125,7 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       addToast({
         type: "success",
-        title: "Logged out",
+        title: 'Logged out',
         message: "You have been logged out from this device.",
         duration: 2500,
       });

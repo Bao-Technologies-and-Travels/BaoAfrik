@@ -135,10 +135,10 @@ const CreateListing: React.FC = () => {
       }
     } catch (error) {
       addToast({
-        type: "error",
+        type: 'error',
         title: "Failed to load",
         message: "Unable to retrieve product data. Please check your internet connection.",
-        duration: 3000
+        duration: 2000
       });
       navigate('/my-listings');
     } finally {
@@ -264,10 +264,10 @@ const CreateListing: React.FC = () => {
         });
       } else {
         addToast({
-          type: "error",
+          type: 'error',
           title: "Upload limit",
           message: "You can only upload up to 10 images at a time",
-          duration: 3000
+          duration: 2000
         });
       }
     }
@@ -365,10 +365,10 @@ const CreateListing: React.FC = () => {
       });
     } else {
       addToast({
-        type: "error",
+        type: 'error',
         title: "Upload limit",
         message: "You can only upload up to 10 images at a time",
-        duration: 3000
+        duration: 2000
       });
     }
   };
@@ -539,7 +539,7 @@ const CreateListing: React.FC = () => {
                 type: 'error',
                 title: 'Action failed',
                 message: 'Failed to save product as draft',
-                duration: 3000
+                duration: 2000
               });
             } else {
             setProductData((prev: any) => prev ? {...prev, status: 'DRAFT'} : prev);
@@ -549,7 +549,7 @@ const CreateListing: React.FC = () => {
               type: 'error',
               title: 'Action failed',
               message: 'Unable to save product as draft',
-              duration: 3000
+              duration: 2000
             });
           }
         }
@@ -557,18 +557,18 @@ const CreateListing: React.FC = () => {
         // Show success message
         addToast({
           type: "success",
-          title: "Action completed",
+          title: 'Action Completed',
           message: `${isEditMode ? 'Draft updated' : 'Draft saved'} successfully!`,
-          duration: 3000
+          duration: 2000
         });
         navigate('/my-listings?tab=drafts');
       }
     } catch (error: any) {
       addToast({
-        type: "error",
-        title: "Action failed",
+        type: 'error',
+        title: 'Action Failed',
         message: `Failed to ${isEditMode ? 'update' : 'save'} draft: ${error.message}`,
-        duration: 3000
+        duration: 2000
       });
     }
   };
@@ -653,19 +653,19 @@ const CreateListing: React.FC = () => {
         if (publishResult.success) {
           addToast({
             type: "success",
-            title: "Action completed",
+            title: 'Action Completed',
             message: `Listing ${isEditMode ? 'updated' : 'posted'} successfully!`,
-            duration: 3000
+            duration: 2000
           });
           navigate('/my-listings?tab=all');
         }
       }
     } catch (error: any) {
       addToast({
-        type: "error",
-        title: "Action failed",
+        type: 'error',
+        title: 'Action Failed',
         message: "Failed to post listing. Please try again.",
-        duration: 3000
+        duration: 2000
       });
     } finally {
       setIsLoading(false);

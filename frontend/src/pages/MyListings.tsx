@@ -45,7 +45,7 @@ const ConfirmationDialog: React.FC<{
                     </button>
                     <button
                         onClick={onConfirm}
-                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                     >
                         {confirmText}
                     </button>
@@ -160,7 +160,7 @@ const MyListings: React.FC = () => {
         onConfirm: () => { },
         confirmText: 'Delete'
     });
-    const {addToast} = useToast();
+    const { addToast } = useToast();
 
     useEffect(() => {
         fetchMyListings();
@@ -222,7 +222,10 @@ const MyListings: React.FC = () => {
             isOpen: true,
             title: 'Delete Listing',
             message: `Are you sure you want to delete "${productTitle}"? This action cannot be undone.`,
-            onConfirm: () => handleDeleteProduct(productId),
+            onConfirm: () => {
+                handleDeleteProduct(productId);
+                closeConfirmationDialog()
+            },
             confirmText: 'Delete'
         });
     };
@@ -246,20 +249,20 @@ const MyListings: React.FC = () => {
                 // Show success message
                 addToast({
                     type: "success",
-                    title: "Action completed",
+                    title: 'Action Completed',
                     message: "Listing deleted successfully",
-                    duration: 3000
+                    duration: 2000
                 });
             } else {
                 throw new Error('Failed to delete listing');
             }
         } catch (error) {
-           addToast({
-                    type: "error",
-                    title: "Action failed",
-                    message: "Failed to delete listing. Please try again",
-                    duration: 3000
-                });
+            addToast({
+                type: 'error',
+                title: 'Action Failed',
+                message: "Failed to delete listing. Please try again",
+                duration: 2000
+            });
         }
     };
 
@@ -282,20 +285,20 @@ const MyListings: React.FC = () => {
                 ));
                 addToast({
                     type: "success",
-                    title: "Action completed",
+                    title: 'Action Completed',
                     message: "Listing published successfully",
-                    duration: 3000
+                    duration: 2000
                 });
             } else {
                 throw new Error('Failed to publish listing');
             }
         } catch (error) {
             addToast({
-                    type: "error",
-                    title: "Action failed",
-                    message: "Failed to publish listing",
-                    duration: 3000
-                });
+                type: 'error',
+                title: 'Action Failed',
+                message: "Failed to publish listing",
+                duration: 2000
+            });
         }
     };
 
@@ -304,7 +307,10 @@ const MyListings: React.FC = () => {
             isOpen: true,
             title: 'Publish Listing',
             message: `Are you sure you want to publish "${productTitle}"? Once published, it will be visible to all users.`,
-            onConfirm: () => handlePublishProduct(productId),
+            onConfirm: () => {
+                handlePublishProduct(productId);
+                closeConfirmationDialog()
+            },
             confirmText: 'Publish'
         });
     };
@@ -356,7 +362,7 @@ const MyListings: React.FC = () => {
                 title={confirmationDialog.title}
                 message={confirmationDialog.message}
                 onConfirm={confirmationDialog.onConfirm}
-                onCancel={closeConfirmationDialog}
+                onCancel={() => { closeConfirmationDialog() }}
                 confirmText={confirmationDialog.confirmText}
             />
 
@@ -472,9 +478,9 @@ const MyListings: React.FC = () => {
                                                     <div className="font-medium text-gray-900">
                                                         {formatPrice(product.price, product.currency)}
                                                     </div>
-                                                    <div>📍 {product.location}</div>
-                                                    <div>👁️ {product.viewCount} views</div>
-                                                    <div>❤️ {product.likeCount} likes</div>
+                                                    <div>{product.location}</div>
+                                                    <div>{product.viewCount} views</div>
+                                                    <div>{product.likeCount} likes</div>
                                                     <div>
                                                         Created: {new Date(product.createdAt).toLocaleDateString()}
                                                     </div>
@@ -491,7 +497,7 @@ const MyListings: React.FC = () => {
                                                     )}
                                                     <button
                                                         onClick={() => handleEditProduct(product.id)}
-                                                        className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors"
+                                                        className="bg-orange-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors"
                                                     >
                                                         Edit
                                                     </button>

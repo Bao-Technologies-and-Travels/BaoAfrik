@@ -143,20 +143,32 @@ const Login: React.FC = () => {
         refreshToken
       );
 
-      addToast({
+      // check if user needs to complete profile setup
+      const profileIncomplete = !user.firstName || !user.lastName;
+
+      if (profileIncomplete) {
+        navigate("/profile-setup");
+        addToast({
+          type: 'info',
+          title: 'Action needed!',
+          message: 'Please complete your profile',
+          duration: 2500
+        })
+      } else {
+        navigate("/");
+        addToast({
         type: "success",
         title: "Login successful",
-        message: `Welcome back, ${
-          user?.firstName && user?.lastName
+        message: `Welcome back, ${user?.firstName && user?.lastName
             ? `${user.firstName} ${user.lastName}`
             : user?.firstName
-            ? user.firstName
-            : user?.email?.split("@")[0] || "User"
-        }!`,
-        duration: 2500,
+              ? user.firstName
+              : user?.email?.split("@")[0] || "User"
+          }!`,
+        duration: 2000,
       });
+      }
 
-      navigate("/");
     };
 
     try {
@@ -361,9 +373,8 @@ const Login: React.FC = () => {
                   autoComplete="email"
                   required
                   disabled={isLoading}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                    errors.email ? "border-red-500" : "border-gray-200"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.email ? "border-red-500" : "border-gray-200"
+                    }`}
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value.toLowerCase())}
@@ -389,9 +400,8 @@ const Login: React.FC = () => {
                     required
                     minLength={8}
                     disabled={isLoading}
-                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                      errors.password ? "border-red-500" : "border-gray-200"
-                    }`}
+                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed ${errors.password ? "border-red-500" : "border-gray-200"
+                      }`}
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

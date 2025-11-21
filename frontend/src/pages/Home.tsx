@@ -103,6 +103,7 @@ interface Notification {
 const Home: React.FC = () => {
   const auth = useAuth();
   const productGridRef = React.useRef<HTMLDivElement>(null);
+  const categoryRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -149,7 +150,7 @@ const Home: React.FC = () => {
           if (latest) {
             if (typeof (auth as any).setUser === 'function') {
               (auth as any).setUser(latest);
-            } 
+            }
           }
         }
       } catch (err) {
@@ -835,6 +836,20 @@ const Home: React.FC = () => {
       });
     }
   };
+
+  const scrollCategory = (category: string, direction: 'left' | 'right') => {
+    const el = categoryRefs.current[category];
+    if (!el) return;
+
+    const amount = Math.max(200, Math.floor(el.clientWidth * 0.6));
+    el.scrollBy({
+      left: direction === 'left' ? -amount : amount,
+      behavior: 'smooth'
+    });
+  };
+
+  const scrollCategoryLeft = (category: string) => scrollCategory(category, 'left');
+  const scrollCategoryRight = (category: string) => scrollCategory(category, 'right');
 
   // Handle scan functionality - trigger file input
   const handleScan = () => {
@@ -2337,7 +2352,10 @@ const Home: React.FC = () => {
                         )}
 
                         {/* Category Products - Horizontal Scroll */}
-                        <div className={filteredProducts.length <= 6 ? '' : 'overflow-x-auto scrollbar-hide'}>
+                        <div
+                          className={filteredProducts.length <= 6 ? '' : 'overflow-x-auto scrollbar-hide'}
+                          ref={(el) => { categoryRefs.current[category] = el; }}
+                        >
                           <div className={filteredProducts.length <= 6 ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6' : 'flex gap-5 sm:gap-6'}>
                             {filteredProducts.slice(0, 12).map((product) => (
                               <Link key={product.id} to={`/product/${product.id}`} className={`bg-white rounded-lg overflow-hidden transition-all duration-200 block group ${filteredProducts.length > 6 ? 'flex-shrink-0' : ''}`} style={filteredProducts.length > 6 ? { width: '200px' } : {}}>

@@ -138,7 +138,7 @@ const ProfileSetup: React.FC = () => {
           type: 'error',
           title: 'Data Loading Error',
           message: 'Failed to load your profile data. Please refresh the page.',
-          duration: 3000,
+          duration: 2000,
         });
       }
     };
@@ -349,7 +349,7 @@ const ProfileSetup: React.FC = () => {
         type: 'info',
         title: 'Profile unchanged',
         message: 'No changes were made to your profile.',
-        duration: 3000
+        duration: 2000
       });
       navigate('/');
       return;
@@ -361,7 +361,7 @@ const ProfileSetup: React.FC = () => {
         type: 'error',
         title: 'Validation Error',
         message: 'Please fix the errors in the form before submitting.',
-        duration: 3000,
+        duration: 2000,
       });
       return;
     }
@@ -477,7 +477,7 @@ const ProfileSetup: React.FC = () => {
         type: 'error',
         title: toastTitle,
         message: toastMessage,
-        duration: 3000,
+        duration: 2000,
       });
     } finally {
       setIsLoading(false);
