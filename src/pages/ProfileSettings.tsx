@@ -121,7 +121,24 @@ const translationDictionary: Record<string, Record<string, string>> = {
     "Select gender": "Sélectionner le genre",
     "Enter your email address": "Entrez votre adresse e-mail",
     "Enter your phone number": "Entrez votre numéro de téléphone",
-    "Change mail address": "Changer l'adresse e-mail"
+    "Change mail address": "Changer l'adresse e-mail",
+    "Can you tell us more about yourself ?": "Pouvez-vous nous en dire plus sur vous ?",
+    "Save biographie": "Enregistrer la biographie",
+    "Geolocation": "Géolocalisation",
+    "English": "Anglais",
+    "French": "Français",
+    "German": "Allemand",
+    "Spanish": "Espagnol",
+    "Whatsapp": "WhatsApp",
+    "Connect with your Whatsapp account": "Connectez votre compte WhatsApp",
+    "Facebook": "Facebook",
+    "Connect with your Facebook account": "Connectez votre compte Facebook",
+    "Instagram": "Instagram",
+    "Connect with your Instagram account": "Connectez votre compte Instagram",
+    "X": "X",
+    "Connect with your X account": "Connectez votre compte X",
+    "LinkedIn": "LinkedIn",
+    "Connect with your LinkedIn account": "Connectez votre compte LinkedIn"
   }
 };
 
@@ -197,6 +214,25 @@ const ProfileSettings: React.FC = () => {
     email: 'google.mail@gmail.com',
     phone: ''
   });
+  // Notifications state
+  const [allNotificationsEnabled, setAllNotificationsEnabled] = useState(false);
+  const [generalNotifications, setGeneralNotifications] = useState({
+    enabled: false,
+    reviewsAndRates: { push: true, email: false, inApp: true },
+    subscriptionRenewal: { push: false, email: false, inApp: true }
+  });
+  const [messagesNotifications, setMessagesNotifications] = useState({
+    enabled: false,
+    messages: { push: false, email: false, inApp: false },
+    messageReminders: { push: false, email: false, inApp: false },
+    chatRequests: { push: false, email: false, inApp: false }
+  });
+  const [newsNotifications, setNewsNotifications] = useState({
+    enabled: false,
+    newsletter: { push: false, email: false, inApp: false },
+    dailyRecommendations: { push: false, email: false, inApp: false }
+  });
+
   const [selectedPhoneCode, setSelectedPhoneCode] = useState({
     label: 'United States',
     code: '+1',
@@ -385,7 +421,7 @@ const ProfileSettings: React.FC = () => {
     setInactiveSessions([]);
   };
   
-  const leftPaneClasses = (selectedSidebarOption === 'security' || selectedSidebarOption === 'language')
+  const leftPaneClasses = (selectedSidebarOption === 'security' || selectedSidebarOption === 'language' || selectedSidebarOption === 'notifications')
     ? 'flex-1 w-full px-0'
     : 'flex-1 bg-white border border-gray-200 rounded-[20px] px-8';
   
@@ -825,19 +861,28 @@ const ProfileSettings: React.FC = () => {
       if (!pageRef.current) return;
       const dictionary = translationDictionary[languagePreference];
       const walker = document.createTreeWalker(pageRef.current, NodeFilter.SHOW_TEXT);
+      const textNodes: Text[] = [];
       while (walker.nextNode()) {
-        const textNode = walker.currentNode as Text;
+        textNodes.push(walker.currentNode as Text);
+      }
+      // Process all text nodes
+      textNodes.forEach((textNode) => {
         const currentOriginal =
           originalTextMap.current.get(textNode) ?? (textNode.textContent ? textNode.textContent : '');
         if (!originalTextMap.current.has(textNode)) {
           originalTextMap.current.set(textNode, currentOriginal);
         }
         const trimmed = currentOriginal.trim();
-        if (!trimmed) continue;
+        if (!trimmed) return;
         const translation = dictionary ? dictionary[trimmed] : undefined;
-        textNode.textContent = languagePreference === 'fr' && translation ? translation : currentOriginal;
-      }
-    }, 100);
+        if (languagePreference === 'fr' && translation) {
+          textNode.textContent = translation;
+        } else if (languagePreference === 'en') {
+          // Restore original text when switching back to English
+          textNode.textContent = currentOriginal;
+        }
+      });
+    }, 150);
     return () => clearTimeout(timeoutId);
   }, [languagePreference, selectedSidebarOption]);
 
@@ -2403,6 +2448,593 @@ const ProfileSettings: React.FC = () => {
                             </button>
                           );
                         })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedSidebarOption === 'notifications' && (
+                <div className="space-y-4 px-4 sm:px-6 lg:px-10">
+                  {/* Standalone Title and Description Section */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h1 className="text-base font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                        Notifications Setting
+                      </h1>
+                      <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                        Update your profile and control what others see on BAO' Afrik.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
+                      <button
+                        onClick={() => setAllNotificationsEnabled(!allNotificationsEnabled)}
+                        className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                        style={{ backgroundColor: allNotificationsEnabled ? '#87E697' : '#E4E4E4' }}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                            allNotificationsEnabled ? 'translate-x-5' : 'translate-x-0.5'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* General Notifications Content Area */}
+                  <div className="bg-white border rounded-[24px] p-4" style={{ borderColor: '#E4E4E4' }}>
+                    <div className="grid grid-cols-3 gap-4">
+                      {/* First Column */}
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="text-sm font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            General Notifications
+                          </h3>
+                          <p className="text-xs" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            All notifications from tour profile and your activities on our app
+                          </p>
+                        </div>
+                        <div className="pt-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
+                            <button
+                              onClick={() => setGeneralNotifications({ ...generalNotifications, enabled: !generalNotifications.enabled })}
+                              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: generalNotifications.enabled ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                  generalNotifications.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Second Column */}
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-xs font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            Reviews and rates
+                          </h4>
+                          <p className="text-[10px]" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            Receive alerts when users review or rate your products/Profile.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            Subscription Renewal
+                          </h4>
+                          <p className="text-[10px]" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            Remind users of upcoming subscription renewals, ensuring continuity of service.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Third Column */}
+                      <div className="space-y-4">
+                        {/* Reviews and rates toggles - Horizontal row */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <button
+                              onClick={() => setGeneralNotifications({
+                                ...generalNotifications,
+                                reviewsAndRates: { ...generalNotifications.reviewsAndRates, push: !generalNotifications.reviewsAndRates.push }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: generalNotifications.reviewsAndRates.push ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  generalNotifications.reviewsAndRates.push ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <button
+                              onClick={() => setGeneralNotifications({
+                                ...generalNotifications,
+                                reviewsAndRates: { ...generalNotifications.reviewsAndRates, email: !generalNotifications.reviewsAndRates.email }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: generalNotifications.reviewsAndRates.email ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  generalNotifications.reviewsAndRates.email ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <button
+                              onClick={() => setGeneralNotifications({
+                                ...generalNotifications,
+                                reviewsAndRates: { ...generalNotifications.reviewsAndRates, inApp: !generalNotifications.reviewsAndRates.inApp }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: generalNotifications.reviewsAndRates.inApp ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  generalNotifications.reviewsAndRates.inApp ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                        {/* Subscription Renewal toggles - Horizontal row */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <button
+                              onClick={() => setGeneralNotifications({
+                                ...generalNotifications,
+                                subscriptionRenewal: { ...generalNotifications.subscriptionRenewal, push: !generalNotifications.subscriptionRenewal.push }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: generalNotifications.subscriptionRenewal.push ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  generalNotifications.subscriptionRenewal.push ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <button
+                              onClick={() => setGeneralNotifications({
+                                ...generalNotifications,
+                                subscriptionRenewal: { ...generalNotifications.subscriptionRenewal, email: !generalNotifications.subscriptionRenewal.email }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: generalNotifications.subscriptionRenewal.email ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  generalNotifications.subscriptionRenewal.email ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <button
+                              onClick={() => setGeneralNotifications({
+                                ...generalNotifications,
+                                subscriptionRenewal: { ...generalNotifications.subscriptionRenewal, inApp: !generalNotifications.subscriptionRenewal.inApp }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: generalNotifications.subscriptionRenewal.inApp ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  generalNotifications.subscriptionRenewal.inApp ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Messages Notifications Content Area */}
+                  <div className="bg-white border rounded-[24px] p-4" style={{ borderColor: '#E4E4E4' }}>
+                    <div className="grid grid-cols-3 gap-4">
+                      {/* First Column */}
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="text-sm font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            Messages Notifications
+                          </h3>
+                          <p className="text-xs" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            All messages and mentions from our messagings
+                          </p>
+                        </div>
+                        <div className="pt-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
+                            <button
+                              onClick={() => setMessagesNotifications({ ...messagesNotifications, enabled: !messagesNotifications.enabled })}
+                              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.enabled ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Second Column */}
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-xs font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            Messages
+                          </h4>
+                          <p className="text-[10px]" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            Alert users when they receive a new direct message.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            Message reminders
+                          </h4>
+                          <p className="text-[10px]" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            Remind users to respond to unread messages, fostering engagement.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            Chat Requests
+                          </h4>
+                          <p className="text-[10px]" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            Notify users of new chat requests, even when is not initiated from a product page.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Third Column */}
+                      <div className="space-y-4">
+                        {/* Messages toggles - Horizontal row */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <button
+                              onClick={() => setMessagesNotifications({
+                                ...messagesNotifications,
+                                messages: { ...messagesNotifications.messages, push: !messagesNotifications.messages.push }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.messages.push ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.messages.push ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <button
+                              onClick={() => setMessagesNotifications({
+                                ...messagesNotifications,
+                                messages: { ...messagesNotifications.messages, email: !messagesNotifications.messages.email }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.messages.email ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.messages.email ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <button
+                              onClick={() => setMessagesNotifications({
+                                ...messagesNotifications,
+                                messages: { ...messagesNotifications.messages, inApp: !messagesNotifications.messages.inApp }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.messages.inApp ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.messages.inApp ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                        {/* Message reminders toggles - Horizontal row */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <button
+                              onClick={() => setMessagesNotifications({
+                                ...messagesNotifications,
+                                messageReminders: { ...messagesNotifications.messageReminders, push: !messagesNotifications.messageReminders.push }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.messageReminders.push ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.messageReminders.push ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <button
+                              onClick={() => setMessagesNotifications({
+                                ...messagesNotifications,
+                                messageReminders: { ...messagesNotifications.messageReminders, email: !messagesNotifications.messageReminders.email }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.messageReminders.email ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.messageReminders.email ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <button
+                              onClick={() => setMessagesNotifications({
+                                ...messagesNotifications,
+                                messageReminders: { ...messagesNotifications.messageReminders, inApp: !messagesNotifications.messageReminders.inApp }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.messageReminders.inApp ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.messageReminders.inApp ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                        {/* Chat Requests toggles - Horizontal row */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <button
+                              onClick={() => setMessagesNotifications({
+                                ...messagesNotifications,
+                                chatRequests: { ...messagesNotifications.chatRequests, push: !messagesNotifications.chatRequests.push }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.chatRequests.push ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.chatRequests.push ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <button
+                              onClick={() => setMessagesNotifications({
+                                ...messagesNotifications,
+                                chatRequests: { ...messagesNotifications.chatRequests, email: !messagesNotifications.chatRequests.email }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.chatRequests.email ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.chatRequests.email ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <button
+                              onClick={() => setMessagesNotifications({
+                                ...messagesNotifications,
+                                chatRequests: { ...messagesNotifications.chatRequests, inApp: !messagesNotifications.chatRequests.inApp }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: messagesNotifications.chatRequests.inApp ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  messagesNotifications.chatRequests.inApp ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* News and Updates Content Area */}
+                  <div className="bg-white border rounded-[24px] p-4" style={{ borderColor: '#E4E4E4' }}>
+                    <div className="grid grid-cols-3 gap-4">
+                      {/* First Column */}
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="text-sm font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            News and updates
+                          </h3>
+                          <p className="text-xs" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            News and Updates from BAO 'Afrik
+                          </p>
+                        </div>
+                        <div className="pt-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
+                            <button
+                              onClick={() => setNewsNotifications({ ...newsNotifications, enabled: !newsNotifications.enabled })}
+                              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: newsNotifications.enabled ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                  newsNotifications.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Second Column */}
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-xs font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            Newsletter
+                          </h4>
+                          <p className="text-[10px]" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            Get updates, offers, and trends in African art and culture.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-medium mb-1" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            Daily recommadations
+                          </h4>
+                          <p className="text-[10px]" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                            Get daily updates on the latest from the world of African art and culture.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Third Column */}
+                      <div className="space-y-4">
+                        {/* Newsletter toggles - Horizontal row */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <button
+                              onClick={() => setNewsNotifications({
+                                ...newsNotifications,
+                                newsletter: { ...newsNotifications.newsletter, push: !newsNotifications.newsletter.push }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: newsNotifications.newsletter.push ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  newsNotifications.newsletter.push ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <button
+                              onClick={() => setNewsNotifications({
+                                ...newsNotifications,
+                                newsletter: { ...newsNotifications.newsletter, email: !newsNotifications.newsletter.email }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: newsNotifications.newsletter.email ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  newsNotifications.newsletter.email ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <button
+                              onClick={() => setNewsNotifications({
+                                ...newsNotifications,
+                                newsletter: { ...newsNotifications.newsletter, inApp: !newsNotifications.newsletter.inApp }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: newsNotifications.newsletter.inApp ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  newsNotifications.newsletter.inApp ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                        {/* Daily recommendations toggles - Horizontal row */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                            <button
+                              onClick={() => setNewsNotifications({
+                                ...newsNotifications,
+                                dailyRecommendations: { ...newsNotifications.dailyRecommendations, push: !newsNotifications.dailyRecommendations.push }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: newsNotifications.dailyRecommendations.push ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  newsNotifications.dailyRecommendations.push ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                            <button
+                              onClick={() => setNewsNotifications({
+                                ...newsNotifications,
+                                dailyRecommendations: { ...newsNotifications.dailyRecommendations, email: !newsNotifications.dailyRecommendations.email }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: newsNotifications.dailyRecommendations.email ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  newsNotifications.dailyRecommendations.email ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                            <button
+                              onClick={() => setNewsNotifications({
+                                ...newsNotifications,
+                                dailyRecommendations: { ...newsNotifications.dailyRecommendations, inApp: !newsNotifications.dailyRecommendations.inApp }
+                              })}
+                              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                              style={{ backgroundColor: newsNotifications.dailyRecommendations.inApp ? '#87E697' : '#E4E4E4' }}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  newsNotifications.dailyRecommendations.inApp ? 'translate-x-4' : 'translate-x-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
