@@ -1864,8 +1864,11 @@ const ProfileSettings: React.FC = () => {
                       <button
                         onClick={() => {
                           if (!isTwoFactorEnabled) {
+                            setIsTwoFactorEnabled(true);
                             setIsTwoFactorModalOpen(true);
                             setTwoFactorModalStep('email');
+                          } else {
+                            setIsTwoFactorEnabled(false);
                           }
                         }}
                         className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
@@ -2462,7 +2465,7 @@ const ProfileSettings: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleCloseTwoFactorModal}
-                      className="flex-1 py-3 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
+                      className="flex-1 py-2 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
                       style={{ 
                         backgroundColor: '#F1F1F1',
                         color: '#6A6A6A',
@@ -2476,7 +2479,7 @@ const ProfileSettings: React.FC = () => {
                     {/* Continue Button */}
                     <button
                       type="submit"
-                      className="flex-1 py-3 px-4 rounded-[12px] text-sm font-light transition-colors"
+                      className="flex-1 py-2 px-4 rounded-[12px] text-sm font-light transition-colors"
                       style={{ 
                         backgroundColor: '#F9A825',
                         color: '#FFFFFF',
@@ -2565,11 +2568,12 @@ const ProfileSettings: React.FC = () => {
                                     setTwoFactorSelectedPhoneCode(code);
                                     setIsTwoFactorPhoneCodeDropdownOpen(false);
                                   }}
-                                  className="w-full flex items-center gap-2 px-3 py-2 transition-colors"
+                                  className="flex items-center gap-2 px-3 py-2 transition-colors"
                                   style={{
                                     backgroundColor: twoFactorSelectedPhoneCode.code === code.code ? '#F0F8FE' : 'transparent',
                                     borderRadius: twoFactorSelectedPhoneCode.code === code.code ? '8px' : '0',
-                                    margin: twoFactorSelectedPhoneCode.code === code.code ? '4px' : '0'
+                                    margin: twoFactorSelectedPhoneCode.code === code.code ? '4px 8px' : '0',
+                                    width: twoFactorSelectedPhoneCode.code === code.code ? 'calc(100% - 16px)' : '100%'
                                   }}
                                 >
                                   <img
@@ -2585,7 +2589,7 @@ const ProfileSettings: React.FC = () => {
                                       fontFamily: 'Poppins, sans-serif'
                                     }}
                                   >
-                                    {code.code} · {code.label}
+                                    {code.code} <span style={{ margin: '0 2px' }}>·</span> {code.label}
                                   </span>
                                 </button>
                               ))}
@@ -2622,7 +2626,7 @@ const ProfileSettings: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleCloseTwoFactorModal}
-                      className="flex-1 py-3 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
+                      className="flex-1 py-2 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
                       style={{ 
                         backgroundColor: '#F1F1F1',
                         color: '#6A6A6A',
@@ -2636,7 +2640,7 @@ const ProfileSettings: React.FC = () => {
                     {/* Continue Button */}
                     <button
                       type="submit"
-                      className="flex-1 py-3 px-4 rounded-[12px] text-sm font-light transition-colors"
+                      className="flex-1 py-2 px-4 rounded-[12px] text-sm font-light transition-colors"
                       style={{ 
                         backgroundColor: '#F9A825',
                         color: '#FFFFFF',
@@ -2674,7 +2678,7 @@ const ProfileSettings: React.FC = () => {
                 {/* Form */}
                 <form onSubmit={handleTwoFactorCodeSubmit} className="space-y-4">
                   {/* 6-Digit Code Input */}
-                  <div className="flex justify-center gap-2 mt-4 mb-4">
+                  <div className="flex justify-center gap-2 mt-8 mb-8">
                     {twoFactorVerificationCode.map((digit, index) => (
                       <input
                         key={index}
@@ -2740,13 +2744,13 @@ const ProfileSettings: React.FC = () => {
               <div className="text-center px-4">
                 {/* Icon */}
                 <div className="flex justify-center mb-7">
-                  <img src={verityIcon} alt="Verified" className="w-16 h-16" />
+                  <img src={verityIcon} alt="Verified" className="w-20 h-20" />
                 </div>
 
                 {/* Title */}
                 <h2
                   className="text-xl mb-4"
-                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}
                 >
                   Successfully enable
                 </h2>
