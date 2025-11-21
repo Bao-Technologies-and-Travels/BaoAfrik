@@ -2526,7 +2526,7 @@ const ProfileSettings: React.FC = () => {
               {selectedSidebarOption === 'notifications' && (
                 <div className="space-y-4 px-4 sm:px-6 lg:px-10">
                   {/* Standalone Title and Description Section */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
+                  <div className="flex items-center justify-between" style={{ marginTop: '-20px', marginBottom: '16px' }}>
                     <div>
                       <h1 className="text-base font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
                         Notifications Setting
