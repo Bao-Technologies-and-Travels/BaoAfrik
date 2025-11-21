@@ -136,6 +136,49 @@ const ProfileSettings: React.FC = () => {
   });
   const [showSessionHistory, setShowSessionHistory] = useState(false);
   
+  // Sessions state
+  const [sessions, setSessions] = useState([
+    {
+      id: 1,
+      browser: 'Chrome Browser',
+      icon: chromeIcon,
+      device: 'DESKTOP-6R899ET',
+      location: 'London, United Kingdom',
+      flag: 'gb',
+      isCurrent: true
+    }
+  ]);
+
+  const [inactiveSessions, setInactiveSessions] = useState([
+    {
+      id: 2,
+      browser: 'Safari Browser',
+      icon: safariIcon,
+      device: 'iPhone 15 Pro',
+      location: 'London, United Kingdom',
+      flag: 'gb',
+      lastUsed: '1 month ago'
+    },
+    {
+      id: 3,
+      browser: 'Edge Browser',
+      icon: edgeIcon,
+      device: 'DESKTOP-6R899ET',
+      location: 'Montpellier, France',
+      flag: 'fr',
+      lastUsed: 'Tue, 4 July 2025'
+    },
+    {
+      id: 4,
+      browser: 'Brave Browser',
+      icon: braveIcon,
+      device: 'A3113 MacBook Air M3',
+      location: 'Chicago, United States',
+      flag: 'us',
+      lastUsed: 'Mon, 20 May 2025'
+    }
+  ]);
+  
   // Password section state
   const [passwordStrength, setPasswordStrength] = useState<'weak' | 'strong'>('weak'); // Change to 'strong' to test
   const [isPasswordEditClicked, setIsPasswordEditClicked] = useState(false);
@@ -190,47 +233,18 @@ const ProfileSettings: React.FC = () => {
     return mobileKeywords.some(keyword => deviceName.toLowerCase().includes(keyword.toLowerCase()));
   };
 
-  const sessions = [
-    {
-      id: 1,
-      browser: 'Chrome Browser',
-      icon: chromeIcon,
-      device: 'DESKTOP-6R899ET',
-      location: 'London, United Kingdom',
-      flag: 'gb',
-      isCurrent: true
-    }
-  ];
+  // Handler functions for sessions
+  const handleSignOutSession = (sessionId: number) => {
+    setSessions(sessions.filter(session => session.id !== sessionId));
+  };
 
-  const inactiveSessions = [
-    {
-      id: 2,
-      browser: 'Safari Browser',
-      icon: safariIcon,
-      device: 'iPhone 15 Pro',
-      location: 'London, United Kingdom',
-      flag: 'gb',
-      lastUsed: '1 month ago'
-    },
-    {
-      id: 3,
-      browser: 'Edge Browser',
-      icon: edgeIcon,
-      device: 'DESKTOP-6R899ET',
-      location: 'Montpellier, France',
-      flag: 'fr',
-      lastUsed: 'Tue, 4 July 2025'
-    },
-    {
-      id: 4,
-      browser: 'Brave Browser',
-      icon: braveIcon,
-      device: 'A3113 MacBook Air M3',
-      location: 'Chicago, United States',
-      flag: 'us',
-      lastUsed: 'Mon, 20 May 2025'
-    }
-  ];
+  const handleSignOutInactiveSession = (sessionId: number) => {
+    setInactiveSessions(inactiveSessions.filter(session => session.id !== sessionId));
+  };
+
+  const handleCloseAllInactiveSessions = () => {
+    setInactiveSessions([]);
+  };
   
   const leftPaneClasses = selectedSidebarOption === 'security'
     ? 'flex-1 w-full px-0'
@@ -402,6 +416,10 @@ const ProfileSettings: React.FC = () => {
 
   const handleCloseTwoFactorModal = () => {
     setIsTwoFactorModalOpen(false);
+    // If closing from the initial step, reset the toggle to default
+    if (twoFactorModalStep === 'email') {
+      setIsTwoFactorEnabled(false);
+    }
     setTwoFactorModalStep('email');
     setTwoFactorEmail('');
     setTwoFactorPassword('');
@@ -1751,8 +1769,10 @@ const ProfileSettings: React.FC = () => {
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Password</p>
+                          {/* NOTE: Clickable badge is for testing only. Fonsah - remove click handler and implement real password strength check from backend */}
                           <span 
-                            className="px-2.5 py-0.5 rounded" 
+                            onClick={() => setPasswordStrength(passwordStrength === 'weak' ? 'strong' : 'weak')}
+                            className="px-2.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity" 
                             style={{ 
                               backgroundColor: passwordStrength === 'weak' ? '#FEF6E9' : '#EDFBF0', 
                               color: passwordStrength === 'weak' ? '#F9A825' : '#4CD964', 
@@ -1941,7 +1961,11 @@ const ProfileSettings: React.FC = () => {
                               />
                               <span>{session.location}</span>
                             </div>
-                            <button className="text-xs font-medium ml-auto" style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}>
+                            <button 
+                              onClick={() => handleSignOutSession(session.id)}
+                              className="text-xs font-medium ml-auto hover:opacity-80 transition-opacity" 
+                              style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}
+                            >
                               Sign Out
                             </button>
                           </div>
@@ -1954,7 +1978,8 @@ const ProfileSettings: React.FC = () => {
                         <div className="flex items-center justify-between mb-5">
                           <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Other Sessions</p>
                           <button
-                            className="px-3 py-1.5 text-xs font-normal rounded-lg border"
+                            onClick={handleCloseAllInactiveSessions}
+                            className="px-3 py-1.5 text-xs font-normal rounded-lg border hover:opacity-80 transition-opacity"
                             style={{ borderColor: '#D9D9D9', color: '#6A6A6A', borderRadius: '6px' }}
                           >
                             Close all inactive sessions
@@ -1989,7 +2014,11 @@ const ProfileSettings: React.FC = () => {
                                 />
                                 <span>{session.location}</span>
                               </div>
-                              <button className="text-xs font-medium ml-auto" style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}>
+                              <button 
+                                onClick={() => handleSignOutInactiveSession(session.id)}
+                                className="text-xs font-medium ml-auto hover:opacity-80 transition-opacity" 
+                                style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}
+                              >
                                 Sign Out
                               </button>
                             </div>
