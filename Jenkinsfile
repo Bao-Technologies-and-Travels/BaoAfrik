@@ -5,7 +5,7 @@ pipeline {
     environment {
         NODE_ENV = 'staging'
         SSH_KEY_ID = 'baoafrik-key'
-        SSH_HOST = 'ubuntu@54.162.69.251'
+        SSH_HOST = credentials('ssh_host')
         FRONTEND_DIR = '~/BaoAfrik/frontend'
         BACKEND_DIR = '~/BaoAfrik/backend'
         APP_NAME_FRONTEND = 'frontend'
@@ -199,7 +199,7 @@ EOF
 
         stage('Deploy Application') {
             steps {
-                echo "Deploying frontend and backend on server ${SSH_HOST}..."
+                echo 'Deploying frontend and backend on server...'
 
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
@@ -305,29 +305,29 @@ EOF
                     )
             }
         }
-        success {
-            script {
-                emailext(
-                subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
-                to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
-                from: 'jenkins.baoafrik.com',
-                replyTo: 'no-reply@baotechnologiesandtravels.com',
-                body: """
-                    <html>
-                        <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-                            <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
-                            <p><strong>Job:</strong> ${env.JOB_NAME}</p>
-                            <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>redirect after login to setup profile if not done already, scroll when products surpass the view</p>
-                            <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
-                            <hr>
-                            <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
-                        </body>
-                    </html>
-                """,
-                mimeType: 'text/html'
-                )
-            }
-        }
+        // success {
+        //     script {
+        //         emailext(
+        //         subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
+        //         to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
+        //         from: 'jenkins.baoafrik.com',
+        //         replyTo: 'no-reply@baotechnologiesandtravels.com',
+        //         body: """
+        //             <html>
+        //                 <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+        //                     <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
+        //                     <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+        //                     <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
+        //                     <p><strong>Changes made:</strong>redirect after login to setup profile if not done already, scroll when products surpass the view</p>
+        //                     <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
+        //                     <hr>
+        //                     <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
+        //                 </body>
+        //             </html>
+        //         """,
+        //         mimeType: 'text/html'
+        //         )
+        //     }
+        // }
     }
 }
