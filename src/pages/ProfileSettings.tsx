@@ -2519,11 +2519,11 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                     </div>
 
                     {/* Sessions Section */}
-                    <div className={isMobileSecurityView ? 'space-y-4 mt-4' : 'space-y-3 mt-6 mb-10'} style={isMobileSecurityView ? { marginLeft: '-8px' } : undefined}>
-                      <div className={`flex items-center justify-between ${isMobileSecurityView ? 'px-1' : ''}`}>
+                    <div className={isMobileSecurityView ? 'space-y-3 mt-2' : 'space-y-3 mt-6 mb-10'}>
+                      <div className={`flex items-center justify-between ${isMobileSecurityView ? 'px-2 mb-1' : ''}`}>
                         <div className="space-y-1.5">
                           <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
-                          <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '12px' }}>
+                          <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: isMobileSecurityView ? '2px' : '12px' }}>
                             Review your active sessions and sign out of any devices you don't recognize.
                           </p>
                         </div>
@@ -2537,10 +2537,10 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                           </button>
                         )}
                       </div>
-                      <div className={isMobileSecurityView ? 'space-y-4' : 'space-y-3'}>
+                      <div className={isMobileSecurityView ? 'space-y-1' : 'space-y-3'}>
                         {sessions.map((session) =>
                           isMobileSecurityView ? (
-                            <div key={session.id} className="p-4 rounded-2xl space-y-2 bg-white">
+                            <div key={session.id} className="p-4 rounded-2xl space-y-1.5 bg-white" style={{ marginTop: '0' }}>
                               <div className="flex items-start gap-3">
                                 <img src={session.icon} alt={session.browser} className="w-6 h-6 rounded-full object-cover" />
                                 <div className="flex-1">
@@ -2562,17 +2562,17 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     )}
                                   </div>
                                   <p className="text-[10px]" style={{ color: '#939393' }}>{session.device}</p>
-                                  <p className="text-[9px]" style={{ color: '#939393' }}>{session.location}</p>
+                                <div className="flex items-center justify-between" style={{ marginTop: '-2px' }}>
+                                    <p className="text-[9px]" style={{ color: '#939393' }}>{session.location}</p>
+                                    <button
+                                      onClick={() => handleSignOutSession(session.id)}
+                                      className="text-[11px] font-medium hover:opacity-80 transition-opacity"
+                                      style={{ color: '#6A6A6A', textDecoration: 'underline' }}
+                                    >
+                                      Sign Out
+                                    </button>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="flex items-center justify-end">
-                                <button
-                                  onClick={() => handleSignOutSession(session.id)}
-                                  className="text-xs font-medium hover:opacity-80 transition-opacity"
-                                  style={{ color: '#6A6A6A', textDecoration: 'underline' }}
-                                >
-                                  Sign Out
-                                </button>
                               </div>
                             </div>
                           ) : (
@@ -2623,8 +2623,8 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                     </div>
 
                     {shouldShowSessionHistory && (
-                      <div className={isMobileSecurityView ? 'space-y-4' : 'space-y-3 mt-8'}>
-                        <div className={`flex items-center justify-between mb-5 ${isMobileSecurityView ? 'px-1 gap-2' : ''}`}>
+                      <div className={isMobileSecurityView ? 'space-y-1 mt-1' : 'space-y-3 mt-8'}>
+                        <div className={`flex items-center justify-between ${isMobileSecurityView ? 'px-1 gap-2 mb-0' : 'mb-5'}`}>
                           <p className={`${isMobileSecurityView ? 'text-[13px]' : 'text-sm'} font-medium`} style={{ color: '#6A6A6A' }}>Other Sessions</p>
                           <button
                             onClick={handleCloseAllInactiveSessions}
@@ -2634,10 +2634,10 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                             Close all inactive sessions
                           </button>
                         </div>
-                      <div className={isMobileSecurityView ? 'space-y-4' : 'space-y-3'}>
-                          {inactiveSessions.map(session =>
+                        <div className={isMobileSecurityView ? '' : 'space-y-3'}>
+                          {inactiveSessions.map((session, index) =>
                             isMobileSecurityView ? (
-                              <div key={session.id} className="p-4 rounded-2xl space-y-2 bg-white">
+                              <div key={session.id} className="p-4 rounded-2xl space-y-1 bg-white" style={{ marginTop: index === 0 ? '0' : '2px', marginBottom: '0' }}>
                                 <div className="flex items-start gap-3">
                                   <img src={session.icon} alt={session.browser} className="w-6 h-6 rounded-full object-cover" />
                                   <div className="flex-1">
@@ -2646,17 +2646,17 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                       <span className="text-[10px]" style={{ color: '#B0B0B0' }}>{session.lastUsed}</span>
                                     </div>
                                     <p className="text-[10px]" style={{ color: '#939393' }}>{session.device}</p>
-                                    <p className="text-[9px]" style={{ color: '#939393' }}>{session.location}</p>
+                                    <div className="flex items-center justify-between" style={{ marginTop: '-2px' }}>
+                                      <p className="text-[9px]" style={{ color: '#939393' }}>{session.location}</p>
+                                      <button
+                                        onClick={() => handleSignOutInactiveSession(session.id)}
+                                        className="text-[11px] font-medium hover:opacity-80 transition-opacity"
+                                        style={{ color: '#6A6A6A', textDecoration: 'underline' }}
+                                      >
+                                        Sign Out
+                                      </button>
+                                    </div>
                                   </div>
-                                </div>
-                                <div className="flex items-center justify-end">
-                                  <button
-                                    onClick={() => handleSignOutInactiveSession(session.id)}
-                                    className="text-xs font-medium hover:opacity-80 transition-opacity"
-                                    style={{ color: '#6A6A6A', textDecoration: 'underline' }}
-                                  >
-                                    Sign Out
-                                  </button>
                                 </div>
                               </div>
                             ) : (
