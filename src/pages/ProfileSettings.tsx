@@ -1660,11 +1660,11 @@ const ProfileSettings: React.FC = () => {
               {selectedSidebarOption === 'profile' && (
                 <>
               {/* Section Header */}
-              <div className={`${isMobileProfileView ? '' : 'bg-white'} p-2 mb-3`}>
+                <div className={`${isMobileProfileView ? '' : 'bg-white'} p-2 mb-3`}>
                 <div className="mb-2">
                 <h1
                   className={`${isMobileProfileView ? 'text-base' : 'text-sm'} font-semibold text-gray-900 mb-0.5`}
-                  style={{ fontFamily: isMobileProfileView ? 'Bricolage Grotesque, sans-serif' : undefined, color: isMobileProfileView ? '#6A6A6A' : undefined }}
+                    style={{ fontFamily: isMobileProfileView ? 'Bricolage Grotesque, sans-serif' : undefined, color: isMobileProfileView ? '#171717' : undefined }}
                 >
                   Profile Setting
                 </h1>
@@ -1675,7 +1675,11 @@ const ProfileSettings: React.FC = () => {
               </div>
 
               {/* Sub-navigation Tabs */}
-              <div className={`flex items-center space-x-4 mb-2 border-b border-gray-200 ${isMobile ? '' : '-mx-8 px-8'}`}>
+              <div
+                className={`flex items-center space-x-4 mb-2 border-b border-gray-200 ${
+                  isMobileProfileView ? '-mx-4 px-4' : isMobile ? '' : '-mx-8 px-8'
+                }`}
+              >
                 <button
                   onClick={() => setActiveTab('personal')}
                   className={`flex items-center space-x-1.5 pb-2 relative ${
@@ -1824,42 +1828,76 @@ const ProfileSettings: React.FC = () => {
                   {/* Profile Setting Details */}
                 {isMobileProfileView && (
                   <div className="mb-2 px-1">
-                    <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
+                    <h3 className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
                   </div>
                 )}
-                <div className="border rounded-2xl p-2 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
+                <div
+                  className={`rounded-2xl p-2 bg-white ${
+                    isMobileProfileView && isEditingProfile ? '' : 'border shadow-sm'
+                  }`}
+                  style={isMobileProfileView && isEditingProfile ? undefined : { borderColor: '#E1E1E1' }}
+                >
                     {!isEditingProfile ? (
                       <>
-                        <div
-                          className={`flex items-center ${isMobileProfileView ? 'justify-end' : 'justify-between'} mb-2`}
-                          style={{ paddingLeft: '4px', paddingRight: '4px' }}
-                        >
-                          {!isMobileProfileView && (
+                        {!isMobileProfileView && (
+                          <div
+                            className="flex items-center justify-between mb-2"
+                            style={{ paddingLeft: '4px', paddingRight: '4px' }}
+                          >
                             <h3 className="text-xs font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
-                          )}
-                      <button
-                            onClick={() => setIsEditingProfile(true)}
-                            className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
-                        style={{ borderColor: '#D9D9D9' }}
-                      >
-                            <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
-                            <span className="text-[10px]" style={{ color: '#6A6A6A' }}>Edit</span>
-                      </button>
-                    </div>
-                        <div className="flex items-center justify-between" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
-                          <div style={{ marginRight: '4px' }}>
-                            <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Full name</label>
-                            <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.fullName}</p>
+                            <button
+                              onClick={() => setIsEditingProfile(true)}
+                              className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
+                              style={{ borderColor: '#D9D9D9' }}
+                            >
+                              <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                              <span className="text-[10px]" style={{ color: '#6A6A6A' }}>Edit</span>
+                            </button>
+                          </div>
+                        )}
+                        {isMobileProfileView ? (
+                          <div className="space-y-3" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
+                            <div className="flex items-start justify-between gap-4">
+                              <div>
+                                <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Full name</label>
+                                <p className="text-xs font-semibold" style={{ color: '#212121' }}>{profileData.fullName}</p>
+                              </div>
+                              <button
+                                onClick={() => setIsEditingProfile(true)}
+                                className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
+                                style={{ borderColor: '#D9D9D9' }}
+                              >
+                                <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                                <span className="text-[10px]" style={{ color: '#6A6A6A' }}>Edit</span>
+                              </button>
+                            </div>
+                            <div className="flex items-start justify-between gap-4">
+                              <div>
+                                <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Gender</label>
+                                <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.gender}</p>
+                              </div>
+                              <div className="text-right">
+                                <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Birthday</label>
+                                <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthday}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
+                            <div style={{ marginRight: '4px' }}>
+                              <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Full name</label>
+                              <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.fullName}</p>
                       </div>
                       <div>
-                            <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Gender</label>
-                            <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.gender}</p>
+                              <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Gender</label>
+                              <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.gender}</p>
                       </div>
-                          <div style={{ marginLeft: '4px' }}>
-                            <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Birthday</label>
-                            <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthday}</p>
-                      </div>
+                            <div style={{ marginLeft: '4px' }}>
+                              <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Birthday</label>
+                              <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthday}</p>
                     </div>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <div className="space-y-3">
@@ -2036,7 +2074,7 @@ const ProfileSettings: React.FC = () => {
                   {/* Location Section */}
                   <div className={`bg-white p-3 ${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'}`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Location</h3>
+                      <h3 className={`text-xs ${isMobileProfileView ? 'font-medium' : 'font-normal'}`} style={{ color: '#6A6A6A' }}>Location</h3>
                       <div className="flex items-center space-x-2">
                         <span className="text-[10px]" style={{ color: '#64B5F6' }}>Geolocation</span>
                       <button
@@ -2071,15 +2109,12 @@ const ProfileSettings: React.FC = () => {
 
                   {/* Biography Section */}
                   {isMobileProfileView && (
-                    <div className="mb-2 px-1">
-                      <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Biographie</h3>
+                    <div className="mb-0.5 px-1">
+                      <h3 className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Biographie</h3>
                     </div>
                   )}
                   <div className={`bg-white p-3 ${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'}`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
-                    <div className={`mb-2 ${isMobileProfileView ? 'hidden' : ''}`}>
-                      <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Biographie</h3>
-                    </div>
-                    <div className="relative">
+                    <div className={`${isMobileProfileView ? 'border border-[#E4E4E4] rounded-[14px] p-3' : ''}`}>
                       <textarea
                         value={biography}
                         onChange={(e) => {
@@ -2093,7 +2128,7 @@ const ProfileSettings: React.FC = () => {
                           backgroundColor: 'white', 
                           color: '#212121',
                           minHeight: '80px',
-                          border: isMobileProfileView ? '1px solid #E4E4E4' : 'none'
+                          border: isMobileProfileView ? 'none' : 'none'
                         }}
                         maxLength={500}
                       />
