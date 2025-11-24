@@ -2983,7 +2983,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                               {/* Reviews and rates */}
                               <div>
                                 <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
                                     Reviews and rates
                                   </h3>
                                   <button
@@ -3004,12 +3004,14 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     />
                                   </button>
                                 </div>
-                                <p className="text-xs mb-3" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                  Receive alerts when users review or rate your products/Profile.
-                                </p>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Receive alerts when users review or rate your products/Profile.
+                                  </p>
+                                </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                                     <button
                                       onClick={() => setGeneralNotifications({
                                         ...generalNotifications,
@@ -3026,7 +3028,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                                     <button
                                       onClick={() => setGeneralNotifications({
                                         ...generalNotifications,
@@ -3043,7 +3045,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                                     <button
                                       onClick={() => setGeneralNotifications({
                                         ...generalNotifications,
@@ -3065,7 +3067,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                               {/* Subscription Renewal */}
                               <div>
                                 <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
                                     Subscription Renewal
                                   </h3>
                                   <button
@@ -3086,12 +3088,14 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     />
                                   </button>
                                 </div>
-                                <p className="text-xs mb-3" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                  Remind users of upcoming subscription renewals, ensuring continuity of service.
-                                </p>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Remind users of upcoming subscription renewals, ensuring continuity of service.
+                                  </p>
+                                </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                                     <button
                                       onClick={() => setGeneralNotifications({
                                         ...generalNotifications,
@@ -3108,7 +3112,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                                     <button
                                       onClick={() => setGeneralNotifications({
                                         ...generalNotifications,
@@ -3125,7 +3129,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                                     <button
                                       onClick={() => setGeneralNotifications({
                                         ...generalNotifications,
@@ -3163,7 +3167,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                               {/* Messages */}
                               <div>
                                 <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
                                     Messages
                                   </h3>
                                   <button
@@ -3184,12 +3188,14 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     />
                                   </button>
                                 </div>
-                                <p className="text-xs mb-3" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                  Alert users when they receive a new direct message.
-                                </p>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Alert users when they receive a new direct message.
+                                  </p>
+                                </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                                     <button
                                       onClick={() => setMessagesNotifications({
                                         ...messagesNotifications,
@@ -3206,7 +3212,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                                     <button
                                       onClick={() => setMessagesNotifications({
                                         ...messagesNotifications,
@@ -3223,7 +3229,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                                     <button
                                       onClick={() => setMessagesNotifications({
                                         ...messagesNotifications,
@@ -3245,7 +3251,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                               {/* Message reminders */}
                               <div>
                                 <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
                                     Message reminders
                                   </h3>
                                   <button
@@ -3266,12 +3272,14 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     />
                                   </button>
                                 </div>
-                                <p className="text-xs mb-3" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                  Remind users to respond to unread messages, fostering engagement.
-                                </p>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Remind users to respond to unread messages, fostering engagement.
+                                  </p>
+                                </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                                     <button
                                       onClick={() => setMessagesNotifications({
                                         ...messagesNotifications,
@@ -3288,7 +3296,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                                     <button
                                       onClick={() => setMessagesNotifications({
                                         ...messagesNotifications,
@@ -3305,7 +3313,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                                     <button
                                       onClick={() => setMessagesNotifications({
                                         ...messagesNotifications,
@@ -3327,7 +3335,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                               {/* Chat Requests */}
                               <div>
                                 <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
                                     Chat Requests
                                   </h3>
                                   <button
@@ -3348,12 +3356,14 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     />
                                   </button>
                                 </div>
-                                <p className="text-xs mb-3" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                  Notify users of new chat requests, even when is not initiated from a product page.
-                                </p>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Notify users of new chat requests, even when is not initiated from a product page.
+                                  </p>
+                                </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                                     <button
                                       onClick={() => setMessagesNotifications({
                                         ...messagesNotifications,
@@ -3370,7 +3380,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                                     <button
                                       onClick={() => setMessagesNotifications({
                                         ...messagesNotifications,
@@ -3387,7 +3397,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                                     <button
                                       onClick={() => setMessagesNotifications({
                                         ...messagesNotifications,
@@ -3425,7 +3435,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                               {/* Newsletter */}
                               <div>
                                 <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
                                     Newsletter
                                   </h3>
                                   <button
@@ -3446,12 +3456,14 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     />
                                   </button>
                                 </div>
-                                <p className="text-xs mb-3" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                  Get updates, offers, and trends in African art and culture.
-                                </p>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Get updates, offers, and trends in African art and culture.
+                                  </p>
+                                </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                                     <button
                                       onClick={() => setNewsNotifications({
                                         ...newsNotifications,
@@ -3468,7 +3480,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                                     <button
                                       onClick={() => setNewsNotifications({
                                         ...newsNotifications,
@@ -3485,7 +3497,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                                     <button
                                       onClick={() => setNewsNotifications({
                                         ...newsNotifications,
@@ -3507,7 +3519,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                               {/* Daily recommendations */}
                               <div>
                                 <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
                                     Daily recommendations
                                   </h3>
                                   <button
@@ -3528,12 +3540,14 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     />
                                   </button>
                                 </div>
-                                <p className="text-xs mb-3" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                  Get daily updates on the latest from the world of African art and culture.
-                                </p>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Get daily updates on the latest from the world of African art and culture.
+                                  </p>
+                                </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Push</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Push</span>
                                     <button
                                       onClick={() => setNewsNotifications({
                                         ...newsNotifications,
@@ -3550,7 +3564,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Email</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Email</span>
                                     <button
                                       onClick={() => setNewsNotifications({
                                         ...newsNotifications,
@@ -3567,7 +3581,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                     </button>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
+                                    <span className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>In-App</span>
                                     <button
                                       onClick={() => setNewsNotifications({
                                         ...newsNotifications,
