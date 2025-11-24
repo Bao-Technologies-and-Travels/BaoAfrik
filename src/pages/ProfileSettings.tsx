@@ -441,6 +441,7 @@ const mainLayoutStyle = isMobile ? undefined : { minHeight: 'calc(100vh - 140px)
 const isMobileProfileView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'profile';
 const isMobileSecurityView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'security';
 const isMobileLanguageView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'language';
+const isMobileNotificationsView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'notifications';
 const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistory;
   
   // Mock notification data with read/unread status
@@ -1075,7 +1076,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
       `}</style>
     <div
       ref={pageRef}
-      className={`min-h-screen ${(isMobileProfileView || isMobileSecurityView || isMobileLanguageView) ? 'bg-white' : 'bg-gray-50'}`}
+      className={`min-h-screen ${(isMobileProfileView || isMobileSecurityView || isMobileLanguageView || isMobileNotificationsView) ? 'bg-white' : 'bg-gray-50'}`}
       style={{ fontFamily: 'Poppins, sans-serif' }}
     >
       {isMobile && isMobileSidebarVisible && renderMobileSidebar()}
@@ -1651,7 +1652,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
           <div className={`${mainLayoutClasses} ${isMobile ? '' : 'overflow-hidden'}`} style={mainLayoutStyle}>
             {/* Left Content Area */}
             <div className={`${leftPaneClasses} py-4 overflow-y-auto scrollbar-hide`}>
-             {(isMobileProfileView || isMobileSecurityView || isMobileLanguageView) && (
+             {(isMobileProfileView || isMobileSecurityView || isMobileLanguageView || isMobileNotificationsView) && (
                 <div className="flex items-center justify-between mb-4">
                   <button
                     type="button"
@@ -2852,32 +2853,118 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
               )}
 
               {selectedSidebarOption === 'notifications' && (
-                <div className="space-y-4 px-4 sm:px-6 lg:px-10">
-                  {/* Standalone Title and Description Section */}
-                  <div className="flex items-center justify-between" style={{ marginTop: '-20px', marginBottom: '16px' }}>
-                    <div>
-                      <h1 className="text-base font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
-                        Notifications Setting
-                      </h1>
-                      <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                        Update your profile and control what others see on BAO' Afrik.
-                      </p>
+                <>
+                  {isMobileNotificationsView ? (
+                    <div className="px-4">
+                      {/* Title and Description */}
+                      <div className="mb-6">
+                        <h1 className="text-base font-semibold mb-2" style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          Notifications Setting
+                        </h1>
+                        <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                          Update your profile and control what others see on BAO' Afrik.
+                        </p>
+                      </div>
+
+                      {/* Notification Categories List */}
+                      <div className="space-y-6">
+                        {/* General Notifications */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h3 className="text-xs font-medium mb-1" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                              General Notifications
+                            </h3>
+                            <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                              All notifications from tour profile and your activities on our app
+                            </p>
+                          </div>
+                          <button
+                            onClick={handleGeneralNotificationsToggle}
+                            className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors ml-4"
+                            style={{ backgroundColor: generalNotifications.enabled ? '#87E697' : '#E4E4E4' }}
+                          >
+                            <span
+                              className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                generalNotifications.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        {/* Messages Notifications */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h3 className="text-xs font-medium mb-1" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                              Messages Notifications
+                            </h3>
+                            <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                              All messages and mentions from our messagings
+                            </p>
+                          </div>
+                          <button
+                            onClick={handleMessagesNotificationsToggle}
+                            className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors ml-4"
+                            style={{ backgroundColor: messagesNotifications.enabled ? '#87E697' : '#E4E4E4' }}
+                          >
+                            <span
+                              className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                messagesNotifications.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        {/* News and updates */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h3 className="text-xs font-medium mb-1" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                              News and updates
+                            </h3>
+                            <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                              News and Updates from BAO 'Afrik
+                            </p>
+                          </div>
+                          <button
+                            onClick={handleNewsNotificationsToggle}
+                            className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors ml-4"
+                            style={{ backgroundColor: newsNotifications.enabled ? '#87E697' : '#E4E4E4' }}
+                          >
+                            <span
+                              className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                newsNotifications.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
-                      <button
-                        onClick={handleAllNotificationsToggle}
-                        className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                        style={{ backgroundColor: allNotificationsEnabled ? '#87E697' : '#E4E4E4' }}
-                      >
-                        <span
-                          className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                            allNotificationsEnabled ? 'translate-x-5' : 'translate-x-0.5'
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
+                  ) : (
+                    <div className="space-y-4 px-4 sm:px-6 lg:px-10">
+                      {/* Standalone Title and Description Section */}
+                      <div className="flex items-center justify-between" style={{ marginTop: '-20px', marginBottom: '16px' }}>
+                        <div>
+                          <h1 className="text-base font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                            Notifications Setting
+                          </h1>
+                          <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                            Update your profile and control what others see on BAO' Afrik.
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>Switch on all</span>
+                          <button
+                            onClick={handleAllNotificationsToggle}
+                            className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                            style={{ backgroundColor: allNotificationsEnabled ? '#87E697' : '#E4E4E4' }}
+                          >
+                            <span
+                              className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                allNotificationsEnabled ? 'translate-x-5' : 'translate-x-0.5'
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
 
                   {/* General Notifications Content Area */}
                   <div className="bg-white border rounded-[24px] p-4" style={{ borderColor: '#E4E4E4' }}>
@@ -3435,7 +3522,9 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                       </div>
                     </div>
                   </div>
-                </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
