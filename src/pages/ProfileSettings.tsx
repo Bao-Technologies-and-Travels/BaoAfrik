@@ -52,6 +52,7 @@ import resetIcon from '../assets/images/pre/reset.svg';
 import closeIcon from '../assets/images/pre/CLose.svg';
 import updateIcon from '../assets/images/pre/update.svg.svg';
 import keyIcon from '../assets/images/pre/key.svg';
+import backArrowIcon from '../assets/images/pre/back arrow.svg';
 
 const currencyRates: Record<string, number> = {
   USD: 1,
@@ -423,9 +424,19 @@ const ProfileSettings: React.FC = () => {
     setInactiveSessions([]);
   };
   
-  const leftPaneClasses = (selectedSidebarOption === 'security' || selectedSidebarOption === 'language' || selectedSidebarOption === 'notifications')
-    ? 'flex-1 w-full px-0'
-    : 'flex-1 bg-white border border-gray-200 rounded-[20px] px-8';
+  const leftPaneClasses = isMobile
+    ? 'flex-1 w-full'
+    : (selectedSidebarOption === 'security' || selectedSidebarOption === 'language' || selectedSidebarOption === 'notifications')
+      ? 'flex-1 w-full px-0'
+      : 'flex-1 bg-white border border-gray-200 rounded-[20px] px-8';
+
+  const mainLayoutClasses = isMobile
+    ? 'flex-1 flex flex-col px-4 pt-4 pb-6 gap-4'
+    : 'flex-1 mx-8 mt-8 mb-0 flex gap-6';
+
+  const mainLayoutStyle = isMobile ? undefined : { minHeight: 'calc(100vh - 140px)', maxHeight: 'calc(100vh - 140px)' };
+
+  const isMobileProfileView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'profile';
   
   // Mock notification data with read/unread status
   const [notifications, setNotifications] = useState([
@@ -985,11 +996,9 @@ const ProfileSettings: React.FC = () => {
           className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
           style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M15 18L9 12L15 6" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
         </button>
-        <p className="text-base font-medium" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#171717' }}>
+        <p className="text-base font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#171717' }}>
           Setting
         </p>
         <button
@@ -1015,8 +1024,8 @@ const ProfileSettings: React.FC = () => {
               setSelectedSidebarOption(option.value);
               setIsMobileSidebarVisible(false);
             }}
-            className="w-full flex items-center justify-between px-4 py-3 border rounded-2xl"
-            style={{ borderColor: '#F0F0F0', color: '#939393' }}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-2xl"
+            style={{ color: '#6F6F6F' }}
           >
             <div className="flex items-center gap-3">
               <img src={option.inactiveIcon} alt={option.label} className="w-5 h-5" />
@@ -1044,28 +1053,18 @@ const ProfileSettings: React.FC = () => {
           color: #D9D9D9 !important;
         }
       `}</style>
-    <div ref={pageRef} className="min-h-screen bg-gray-50" style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div
+      ref={pageRef}
+      className={`min-h-screen ${isMobileProfileView ? 'bg-white' : 'bg-gray-50'}`}
+      style={{ fontFamily: 'Poppins, sans-serif' }}
+    >
       {isMobile && isMobileSidebarVisible && renderMobileSidebar()}
-      {isMobile && !isMobileSidebarVisible && (
-        <button
-          type="button"
-          onClick={() => setIsMobileSidebarVisible(true)}
-          className="fixed top-4 left-4 z-40 w-10 h-10 rounded-full bg-white flex items-center justify-center lg:hidden"
-          style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
-          aria-label="Open settings menu"
-        >
-          <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
-            <path d="M1 1H17" stroke="#171717" strokeWidth="2" strokeLinecap="round" />
-            <path d="M1 6H13" stroke="#171717" strokeWidth="2" strokeLinecap="round" />
-            <path d="M1 11H9" stroke="#171717" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
-      )}
-      <div className="flex h-screen">
+      {(!isMobile || !isMobileSidebarVisible) && (
+      <div className={`flex ${isMobile ? 'flex-col min-h-screen' : 'h-screen'}`}>
         {/* Left Sidebar - Full Height */}
-        <div className="w-72 bg-white border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative">
+        <div className={`w-72 bg-white border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative ${isMobile ? 'hidden' : 'flex'}`}>
           {/* Header */}
-          <header className="bg-white">
+          <header className={`bg-white ${isMobile ? 'hidden' : ''}`}>
             <div className="w-full pl-6 pr-0 sm:pl-6 sm:pr-2 lg:pl-6 lg:pr-4">
               <div className="flex items-center justify-between h-16">
                 {/* Desktop - Logo and sidebar button */}
@@ -1148,7 +1147,7 @@ const ProfileSettings: React.FC = () => {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col">
           {/* Header */}
-          <header className="bg-gray-50">
+          <header className={`bg-gray-50 ${isMobile ? 'hidden' : ''}`}>
             <div className="w-full pl-6 pr-4 sm:pl-6 sm:pr-6 lg:pl-6 lg:pr-8">
               <div className="flex items-center justify-between h-16">
                 {/* Center - Breadcrumb */}
@@ -1629,15 +1628,46 @@ const ProfileSettings: React.FC = () => {
           </header>
 
           {/* Main Content */}
-          <div className="flex-1 mx-8 mt-8 mb-0 flex gap-6 overflow-hidden" style={{ minHeight: 'calc(100vh - 140px)', maxHeight: 'calc(100vh - 140px)' }}>
+          <div className={`${mainLayoutClasses} ${isMobile ? '' : 'overflow-hidden'}`} style={mainLayoutStyle}>
             {/* Left Content Area */}
-            <div className={`${leftPaneClasses} py-4 overflow-y-auto scrollbar-hide`}>
+           <div className={`${leftPaneClasses} py-4 overflow-y-auto scrollbar-hide`}>
+             {isMobileProfileView && (
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    type= "button"
+                    onClick={() => setIsMobileSidebarVisible(true)}
+                    className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                    style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                    aria-label="Back to menu"
+                  >
+                    <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+                  </button>
+                  <div className="w-10" />
+                  <button
+                    type="button"
+                    className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                    style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                    aria-label="More options"
+                  >
+                    <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                      <circle cx="4" cy="2" r="2" fill="#171717" />
+                      <circle cx="12" cy="2" r="2" fill="#171717" />
+                      <circle cx="20" cy="2" r="2" fill="#171717" />
+                    </svg>
+                  </button>
+                </div>
+             )}
               {selectedSidebarOption === 'profile' && (
                 <>
               {/* Section Header */}
-              <div className="bg-white p-2 mb-3">
+              <div className={`${isMobileProfileView ? '' : 'bg-white'} p-2 mb-3`}>
                 <div className="mb-2">
-                <h1 className="text-sm font-semibold text-gray-900 mb-0.5">Profile Setting</h1>
+                <h1
+                  className={`${isMobileProfileView ? 'text-base' : 'text-sm'} font-semibold text-gray-900 mb-0.5`}
+                  style={{ fontFamily: isMobileProfileView ? 'Bricolage Grotesque, sans-serif' : undefined, color: isMobileProfileView ? '#6A6A6A' : undefined }}
+                >
+                  Profile Setting
+                </h1>
                 <p className="text-[10px]" style={{ color: '#BABABA' }}>
                   Update your profile and control what others see on BAO' Afrik.
                 </p>
@@ -1645,7 +1675,7 @@ const ProfileSettings: React.FC = () => {
               </div>
 
               {/* Sub-navigation Tabs */}
-              <div className="flex items-center space-x-4 mb-2 -mx-8 px-8 border-b border-gray-200">
+              <div className={`flex items-center space-x-4 mb-2 border-b border-gray-200 ${isMobile ? '' : '-mx-8 px-8'}`}>
                 <button
                   onClick={() => setActiveTab('personal')}
                   className={`flex items-center space-x-1.5 pb-2 relative ${
@@ -1788,11 +1818,16 @@ const ProfileSettings: React.FC = () => {
                     </div>
                   </div>
                   </div>
-                  {/* Divider */}
-                  <div className="mt-4 -mx-8" style={{ height: '0.5px', backgroundColor: '#E9E9E9' }}></div>
+              {/* Divider */}
+              <div className={`mt-4 -mx-8 ${isMobileProfileView ? 'hidden' : ''}`} style={{ height: '0.5px', backgroundColor: '#E9E9E9' }}></div>
 
                   {/* Profile Setting Details */}
-                  <div className="border rounded-2xl p-2 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
+                {isMobileProfileView && (
+                  <div className="mb-2 px-1">
+                    <h3 className="text-sm font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
+                  </div>
+                )}
+                <div className="border rounded-2xl p-2 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
                     {!isEditingProfile ? (
                       <>
                         <div className="flex items-center justify-between mb-2" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
@@ -1994,7 +2029,7 @@ const ProfileSettings: React.FC = () => {
                   </div>
 
                   {/* Location Section */}
-                  <div className="border rounded-2xl p-3 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
+                  <div className={`${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'} p-3 bg-white`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Location</h3>
                       <div className="flex items-center space-x-2">
@@ -2030,7 +2065,10 @@ const ProfileSettings: React.FC = () => {
                   </div>
 
                   {/* Biography Section */}
-                  <div className="border rounded-2xl p-3 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
+                  <div className={`${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'} p-3 bg-white`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
+                    <div className="mb-2">
+                      <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Biographie</h3>
+                    </div>
                     <div className="relative">
                       <textarea
                         value={biography}
@@ -3204,8 +3242,8 @@ const ProfileSettings: React.FC = () => {
             </div>
 
             {/* Right Panel - Profile Completion */}
-            {selectedSidebarOption === 'profile' && (
-            <div className="w-64 bg-white border border-gray-200 rounded-[20px] p-4 overflow-y-auto scrollbar-hide" style={{ paddingBottom: '20px', maxHeight: 'fit-content' }}>
+          {selectedSidebarOption === 'profile' && (
+         <div className={`w-64 bg-white border border-gray-200 rounded-[20px] p-4 overflow-y-auto scrollbar-hide ${isMobile ? 'hidden' : ''}`} style={{ paddingBottom: '20px', maxHeight: 'fit-content' }}>
               <h3 className="text-sm font-medium text-gray-900 mb-4 text-center">Complete your profile</h3>
               
               {/* Progress Indicator */}
@@ -3316,7 +3354,7 @@ const ProfileSettings: React.FC = () => {
           </div>
 
           {/* Footer */}
-          <footer className="bg-gray-50">
+         <footer className={`bg-gray-50 ${isMobile ? 'hidden' : ''}`}>
             <div className="px-4 sm:px-6 lg:px-8 py-3">
               <div className="flex items-center justify-between text-xs" style={{ color: '#BABABA' }}>
                 <div className="flex items-center space-x-1.5">
@@ -3342,6 +3380,7 @@ const ProfileSettings: React.FC = () => {
           </footer>
         </div>
       </div>
+      )}
     </div>
 
     {/* Update Password Modal */}
