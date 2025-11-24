@@ -1634,7 +1634,7 @@ const ProfileSettings: React.FC = () => {
              {isMobileProfileView && (
                 <div className="flex items-center justify-between mb-4">
                   <button
-                    type= "button"
+                    type="button"
                     onClick={() => setIsMobileSidebarVisible(true)}
                     className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
                     style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
@@ -1824,14 +1824,19 @@ const ProfileSettings: React.FC = () => {
                   {/* Profile Setting Details */}
                 {isMobileProfileView && (
                   <div className="mb-2 px-1">
-                    <h3 className="text-sm font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
+                    <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
                   </div>
                 )}
                 <div className="border rounded-2xl p-2 bg-white shadow-sm" style={{ borderColor: '#E1E1E1' }}>
                     {!isEditingProfile ? (
                       <>
-                        <div className="flex items-center justify-between mb-2" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
-                          <h3 className="text-xs font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
+                        <div
+                          className={`flex items-center ${isMobileProfileView ? 'justify-end' : 'justify-between'} mb-2`}
+                          style={{ paddingLeft: '4px', paddingRight: '4px' }}
+                        >
+                          {!isMobileProfileView && (
+                            <h3 className="text-xs font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
+                          )}
                       <button
                             onClick={() => setIsEditingProfile(true)}
                             className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
@@ -2029,7 +2034,7 @@ const ProfileSettings: React.FC = () => {
                   </div>
 
                   {/* Location Section */}
-                  <div className={`${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'} p-3 bg-white`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
+                  <div className={`bg-white p-3 ${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'}`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Location</h3>
                       <div className="flex items-center space-x-2">
@@ -2065,8 +2070,13 @@ const ProfileSettings: React.FC = () => {
                   </div>
 
                   {/* Biography Section */}
-                  <div className={`${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'} p-3 bg-white`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
-                    <div className="mb-2">
+                  {isMobileProfileView && (
+                    <div className="mb-2 px-1">
+                      <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Biographie</h3>
+                    </div>
+                  )}
+                  <div className={`bg-white p-3 ${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'}`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
+                    <div className={`mb-2 ${isMobileProfileView ? 'hidden' : ''}`}>
                       <h3 className="text-xs font-normal" style={{ color: '#6A6A6A' }}>Biographie</h3>
                     </div>
                     <div className="relative">
@@ -2083,7 +2093,7 @@ const ProfileSettings: React.FC = () => {
                           backgroundColor: 'white', 
                           color: '#212121',
                           minHeight: '80px',
-                          border: 'none'
+                          border: isMobileProfileView ? '1px solid #E4E4E4' : 'none'
                         }}
                         maxLength={500}
                       />
