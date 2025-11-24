@@ -2819,8 +2819,10 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                 backgroundColor: isSelected ? '#F0F8FE' : 'white',
                                 borderColor: isSelected ? '#CFE8FC' : '#E1E1E1',
                                 fontFamily: 'Poppins, sans-serif',
-                                flex: isMobileLanguageView ? '1 1 0' : 'auto',
-                                minWidth: isMobileLanguageView ? 0 : 'auto'
+                                ...(isMobileLanguageView && {
+                                  flex: '1 1 0',
+                                  minWidth: 0
+                                })
                               }}
                             >
                               {isSelected ? (
