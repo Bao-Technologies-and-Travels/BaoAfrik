@@ -2501,8 +2501,13 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                         onClick={() => {
                           if (!isTwoFactorEnabled) {
                             setIsTwoFactorEnabled(true);
-                            setIsTwoFactorModalOpen(true);
-                            setTwoFactorModalStep('email');
+                            if (isMobileSecurityView) {
+                              // Navigate to mobile flow instead of opening modal
+                              navigate('/two-factor-email', { state: { fromProfileSettings: true } });
+                            } else {
+                              setIsTwoFactorModalOpen(true);
+                              setTwoFactorModalStep('email');
+                            }
                           } else {
                             setIsTwoFactorEnabled(false);
                           }

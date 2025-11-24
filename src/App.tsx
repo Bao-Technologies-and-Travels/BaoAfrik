@@ -17,6 +17,10 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPasswordSent from './pages/auth/ResetPasswordSent';
 import ResetPassword from './pages/auth/ResetPassword';
 import PasswordResetSuccess from './pages/auth/PasswordResetSuccess';
+import TwoFactorEmail from './pages/auth/TwoFactorEmail';
+import TwoFactorPhone from './pages/auth/TwoFactorPhone';
+import TwoFactorCode from './pages/auth/TwoFactorCode';
+import TwoFactorSuccess from './pages/auth/TwoFactorSuccess';
 import Profile from './pages/Profile';
 import ProductDetail from './pages/ProductDetail';
 import SellerProfile from './pages/SellerProfile';
@@ -34,7 +38,7 @@ function AppContent() {
   const location = useLocation();
   const isSellerProfilePage = location.pathname.startsWith('/seller/');
   const isUserAccountPage = location.pathname === '/account';
-  const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success'];
+  const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success', '/two-factor-email', '/two-factor-phone', '/two-factor-code', '/two-factor-success'];
   const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings'];
   const isAuthPage = authPages.includes(location.pathname);
   const isCustomLayoutPage = customLayoutPages.includes(location.pathname);
@@ -56,6 +60,10 @@ function AppContent() {
           <Route path="/reset-password-sent" element={<ResetPasswordSent />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/password-reset-success" element={<PasswordResetSuccess />} />
+          <Route path="/two-factor-email" element={<TwoFactorEmail />} />
+          <Route path="/two-factor-phone" element={<TwoFactorPhone />} />
+          <Route path="/two-factor-code" element={<TwoFactorCode />} />
+          <Route path="/two-factor-success" element={<TwoFactorSuccess />} />
         </Routes>
       </div>
     );
