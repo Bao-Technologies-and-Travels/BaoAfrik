@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 import verifyIcon from '../../assets/images/pre/verify.png';
+import verityIcon from '../../assets/images/pre/verity.svg';
 import leftIcon from '../../assets/images/pre/left.png';
 import backArrowIcon from '../../assets/images/pre/back arrow.svg';
 
@@ -147,7 +148,11 @@ const PasswordResetSuccess: React.FC = () => {
             <div className="text-center mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {/* Success Checkmark Icon */}
               <div className="mx-auto w-16 h-16 flex items-center justify-center mb-5">
-                <img src={verifyIcon} alt="Success" className="w-full h-full object-contain" />
+                {isMobileFromProfile ? (
+                  <img src={verityIcon} alt="Success" className="w-full h-full object-contain" />
+                ) : (
+                  <img src={verifyIcon} alt="Success" className="w-full h-full object-contain" />
+                )}
               </div>
               
               <h1 className="text-lg font-semibold mb-2" style={{ color: '#212121', fontFamily: isMobileFromProfile ? 'Bricolage Grotesque, sans-serif' : 'Poppins, sans-serif' }}>
