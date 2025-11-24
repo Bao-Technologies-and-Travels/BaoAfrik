@@ -2982,10 +2982,13 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                             <div className="space-y-6">
                               {/* Reviews and rates */}
                               <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
-                                    Reviews and rates
-                                  </h3>
+                                <h3 className="text-xs font-medium mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                                  Reviews and rates
+                                </h3>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-[10px] flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Receive alerts when users<br />review or rate your products/Profile.
+                                  </p>
                                   <button
                                     onClick={() => {
                                       const newState = !generalNotifications.reviewsAndRates.push && !generalNotifications.reviewsAndRates.email && !generalNotifications.reviewsAndRates.inApp;
@@ -2994,7 +2997,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                         reviewsAndRates: { push: newState, email: newState, inApp: newState }
                                       });
                                     }}
-                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0"
                                     style={{ backgroundColor: (generalNotifications.reviewsAndRates.push && generalNotifications.reviewsAndRates.email && generalNotifications.reviewsAndRates.inApp) ? '#87E697' : '#E4E4E4' }}
                                   >
                                     <span
@@ -3003,11 +3006,6 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                       }`}
                                     />
                                   </button>
-                                </div>
-                                <div className="flex items-start justify-between mb-3">
-                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                    Receive alerts when users review or rate your products/Profile.
-                                  </p>
                                 </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
@@ -3066,10 +3064,13 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
 
                               {/* Subscription Renewal */}
                               <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
-                                    Subscription Renewal
-                                  </h3>
+                                <h3 className="text-xs font-medium mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                                  Subscription Renewal
+                                </h3>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-[10px] flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Remind users of upcoming subscription<br />renewals, ensuring continuity of service.
+                                  </p>
                                   <button
                                     onClick={() => {
                                       const newState = !generalNotifications.subscriptionRenewal.push && !generalNotifications.subscriptionRenewal.email && !generalNotifications.subscriptionRenewal.inApp;
@@ -3078,7 +3079,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                         subscriptionRenewal: { push: newState, email: newState, inApp: newState }
                                       });
                                     }}
-                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0"
                                     style={{ backgroundColor: (generalNotifications.subscriptionRenewal.push && generalNotifications.subscriptionRenewal.email && generalNotifications.subscriptionRenewal.inApp) ? '#87E697' : '#E4E4E4' }}
                                   >
                                     <span
@@ -3087,11 +3088,6 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                       }`}
                                     />
                                   </button>
-                                </div>
-                                <div className="flex items-start justify-between mb-3">
-                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                    Remind users of upcoming subscription renewals, ensuring continuity of service.
-                                  </p>
                                 </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
@@ -3166,10 +3162,13 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                             <div className="space-y-6">
                               {/* Messages */}
                               <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
-                                    Messages
-                                  </h3>
+                                <h3 className="text-xs font-medium mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                                  Messages
+                                </h3>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-[10px] flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Alert users when they<br />receive a new direct message.
+                                  </p>
                                   <button
                                     onClick={() => {
                                       const newState = !messagesNotifications.messages.push && !messagesNotifications.messages.email && !messagesNotifications.messages.inApp;
@@ -3178,7 +3177,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                         messages: { push: newState, email: newState, inApp: newState }
                                       });
                                     }}
-                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0"
                                     style={{ backgroundColor: (messagesNotifications.messages.push && messagesNotifications.messages.email && messagesNotifications.messages.inApp) ? '#87E697' : '#E4E4E4' }}
                                   >
                                     <span
@@ -3187,11 +3186,6 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                       }`}
                                     />
                                   </button>
-                                </div>
-                                <div className="flex items-start justify-between mb-3">
-                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                    Alert users when they receive a new direct message.
-                                  </p>
                                 </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
@@ -3250,10 +3244,13 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
 
                               {/* Message reminders */}
                               <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
-                                    Message reminders
-                                  </h3>
+                                <h3 className="text-xs font-medium mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                                  Message reminders
+                                </h3>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-[10px] flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Remind users to respond to unread<br />messages, fostering engagement.
+                                  </p>
                                   <button
                                     onClick={() => {
                                       const newState = !messagesNotifications.messageReminders.push && !messagesNotifications.messageReminders.email && !messagesNotifications.messageReminders.inApp;
@@ -3262,7 +3259,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                         messageReminders: { push: newState, email: newState, inApp: newState }
                                       });
                                     }}
-                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0"
                                     style={{ backgroundColor: (messagesNotifications.messageReminders.push && messagesNotifications.messageReminders.email && messagesNotifications.messageReminders.inApp) ? '#87E697' : '#E4E4E4' }}
                                   >
                                     <span
@@ -3271,11 +3268,6 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                       }`}
                                     />
                                   </button>
-                                </div>
-                                <div className="flex items-start justify-between mb-3">
-                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                    Remind users to respond to unread messages, fostering engagement.
-                                  </p>
                                 </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
@@ -3334,10 +3326,13 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
 
                               {/* Chat Requests */}
                               <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
-                                    Chat Requests
-                                  </h3>
+                                <h3 className="text-xs font-medium mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                                  Chat Requests
+                                </h3>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-[10px] flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Notify users of new chat requests, even<br />when is not initiated from a product page.
+                                  </p>
                                   <button
                                     onClick={() => {
                                       const newState = !messagesNotifications.chatRequests.push && !messagesNotifications.chatRequests.email && !messagesNotifications.chatRequests.inApp;
@@ -3346,7 +3341,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                         chatRequests: { push: newState, email: newState, inApp: newState }
                                       });
                                     }}
-                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0"
                                     style={{ backgroundColor: (messagesNotifications.chatRequests.push && messagesNotifications.chatRequests.email && messagesNotifications.chatRequests.inApp) ? '#87E697' : '#E4E4E4' }}
                                   >
                                     <span
@@ -3355,11 +3350,6 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                       }`}
                                     />
                                   </button>
-                                </div>
-                                <div className="flex items-start justify-between mb-3">
-                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                    Notify users of new chat requests, even when is not initiated from a product page.
-                                  </p>
                                 </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
@@ -3434,10 +3424,13 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                             <div className="space-y-6">
                               {/* Newsletter */}
                               <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
-                                    Newsletter
-                                  </h3>
+                                <h3 className="text-xs font-medium mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                                  Newsletter
+                                </h3>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-[10px] flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Get updates, offers, and trends<br />in African art and culture.
+                                  </p>
                                   <button
                                     onClick={() => {
                                       const newState = !newsNotifications.newsletter.push && !newsNotifications.newsletter.email && !newsNotifications.newsletter.inApp;
@@ -3446,7 +3439,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                         newsletter: { push: newState, email: newState, inApp: newState }
                                       });
                                     }}
-                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0"
                                     style={{ backgroundColor: (newsNotifications.newsletter.push && newsNotifications.newsletter.email && newsNotifications.newsletter.inApp) ? '#87E697' : '#E4E4E4' }}
                                   >
                                     <span
@@ -3455,11 +3448,6 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                       }`}
                                     />
                                   </button>
-                                </div>
-                                <div className="flex items-start justify-between mb-3">
-                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                    Get updates, offers, and trends in African art and culture.
-                                  </p>
                                 </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
@@ -3518,10 +3506,13 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
 
                               {/* Daily recommendations */}
                               <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <h3 className="text-xs font-medium" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
-                                    Daily recommendations
-                                  </h3>
+                                <h3 className="text-xs font-medium mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                                  Daily recommendations
+                                </h3>
+                                <div className="flex items-start justify-between mb-3">
+                                  <p className="text-[10px] flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                                    Get daily updates on the latest<br />from the world of African art and culture.
+                                  </p>
                                   <button
                                     onClick={() => {
                                       const newState = !newsNotifications.dailyRecommendations.push && !newsNotifications.dailyRecommendations.email && !newsNotifications.dailyRecommendations.inApp;
@@ -3530,7 +3521,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                         dailyRecommendations: { push: newState, email: newState, inApp: newState }
                                       });
                                     }}
-                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0"
                                     style={{ backgroundColor: (newsNotifications.dailyRecommendations.push && newsNotifications.dailyRecommendations.email && newsNotifications.dailyRecommendations.inApp) ? '#87E697' : '#E4E4E4' }}
                                   >
                                     <span
@@ -3539,11 +3530,6 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                       }`}
                                     />
                                   </button>
-                                </div>
-                                <div className="flex items-start justify-between mb-3">
-                                  <p className="text-xs flex-1 pr-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                                    Get daily updates on the latest from the world of African art and culture.
-                                  </p>
                                 </div>
                                 <div className="space-y-3">
                                   <div className="flex items-center justify-between">
