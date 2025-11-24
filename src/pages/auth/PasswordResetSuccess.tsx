@@ -4,12 +4,14 @@ import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.pn
 import lilLogo from '../../assets/images/pre/lil.png';
 import verifyIcon from '../../assets/images/pre/verify.png';
 import leftIcon from '../../assets/images/pre/left.png';
+import backArrowIcon from '../../assets/images/pre/back arrow.svg';
 
 const PasswordResetSuccess: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const fromProfileSettings = location.state?.fromProfileSettings || false;
   const [countdown, setCountdown] = useState(15);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (!fromProfileSettings) return;
@@ -28,6 +30,17 @@ const PasswordResetSuccess: React.FC = () => {
       });
     }
   }, [fromProfileSettings, countdown, navigate]);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const isMobileFromProfile = isMobile && fromProfileSettings;
 
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -51,8 +64,8 @@ const PasswordResetSuccess: React.FC = () => {
       
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
-          {/* Breadcrumbs - Only show when accessed from Profile Settings */}
-          {fromProfileSettings && (
+          {/* Breadcrumbs - Only show when accessed from Profile Settings (desktop only) */}
+          {fromProfileSettings && !isMobile && (
             <div className="mb-0 -mt-4 w-full max-w-2xl" style={{ marginLeft: '-16px' }}>
               <nav className="flex items-center flex-nowrap space-x-2" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
                 <img 
@@ -101,15 +114,43 @@ const PasswordResetSuccess: React.FC = () => {
             </div>
           )}
 
+          {/* Mobile Header - Fixed Position */}
+          {isMobileFromProfile && (
+            <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="Back to security"
+              >
+                <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+              </button>
+              <div className="w-10" />
+              <button
+                type="button"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="More options"
+              >
+                <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                  <circle cx="4" cy="2" r="2" fill="#171717" />
+                  <circle cx="12" cy="2" r="2" fill="#171717" />
+                  <circle cx="20" cy="2" r="2" fill="#171717" />
+                </svg>
+              </button>
+            </div>
+          )}
+
           {/* Main content with border and shadow */}
-          <div className="bg-white rounded-[30px] shadow-lg p-8 lg:p-10 mt-0 lg:mt-16" style={{ boxShadow: '0 4px 30px 0 rgba(0,0,0,0.05)' }}>
+          <div className={`bg-white rounded-[30px] p-8 lg:p-10 mt-0 lg:mt-16 ${isMobileFromProfile ? '' : 'shadow-lg'}`} style={isMobileFromProfile ? {} : { boxShadow: '0 4px 30px 0 rgba(0,0,0,0.05)' }}>
             <div className="text-center mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {/* Success Checkmark Icon */}
               <div className="mx-auto w-16 h-16 flex items-center justify-center mb-5">
                 <img src={verifyIcon} alt="Success" className="w-full h-full object-contain" />
               </div>
               
-              <h1 className="text-lg font-semibold mb-2" style={{ color: '#212121' }}>
+              <h1 className="text-lg font-semibold mb-2" style={{ color: '#212121', fontFamily: isMobileFromProfile ? 'Bricolage Grotesque, sans-serif' : 'Poppins, sans-serif' }}>
                 Password reset successfully
               </h1>
               <p className="text-xs px-4 mb-8" style={{ color: '#6A6A6A' }}>

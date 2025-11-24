@@ -5,6 +5,7 @@ import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import updateIcon from '../../assets/images/pre/update.svg.svg';
 import leftIcon from '../../assets/images/pre/left.png';
+import backArrowIcon from '../../assets/images/pre/back arrow.svg';
 
 const ResetPasswordSent: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const ResetPasswordSent: React.FC = () => {
   const [error, setError] = useState('');
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const [isMobile, setIsMobile] = useState(false);
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -29,6 +31,16 @@ const ResetPasswordSent: React.FC = () => {
       setCanResend(true);
     }
   }, [countdown]);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Mask email for display
   const maskEmail = (email: string) => {
@@ -121,6 +133,8 @@ const ResetPasswordSent: React.FC = () => {
     }
   };
 
+  const isMobileFromProfile = isMobile && fromProfileSettings;
+
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Desktop Logo - Top Left with Background */}
@@ -143,8 +157,8 @@ const ResetPasswordSent: React.FC = () => {
       
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
-          {/* Breadcrumbs - Only show when accessed from Profile Settings */}
-          {fromProfileSettings && (
+          {/* Breadcrumbs - Only show when accessed from Profile Settings (desktop only) */}
+          {fromProfileSettings && !isMobile && (
             <div className="mb-0 -mt-4 w-full max-w-2xl" style={{ marginLeft: '-16px' }}>
               <nav className="flex items-center flex-nowrap space-x-2" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
                 <img 
@@ -193,31 +207,58 @@ const ResetPasswordSent: React.FC = () => {
             </div>
           )}
           {/* Mobile Header - Fixed Position */}
-          <div className="lg:hidden fixed top-5 right-5 z-50">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
-                <span className="text-sm font-medium text-gray-700">EN</span>
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-              <button className="p-2 rounded-lg transition-colors bg-white border border-gray-200" style={{ color: '#F9A825' }}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          {isMobileFromProfile ? (
+            <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="Back to security"
+              >
+                <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+              </button>
+              <div className="w-10" />
+              <button
+                type="button"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="More options"
+              >
+                <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                  <circle cx="4" cy="2" r="2" fill="#171717" />
+                  <circle cx="12" cy="2" r="2" fill="#171717" />
+                  <circle cx="20" cy="2" r="2" fill="#171717" />
                 </svg>
               </button>
             </div>
-          </div>
+          ) : (
+            <div className="lg:hidden fixed top-5 right-5 z-50">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
+                  <span className="text-sm font-medium text-gray-700">EN</span>
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                <button className="p-2 rounded-lg transition-colors bg-white border border-gray-200" style={{ color: '#F9A825' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Main content with border and shadow */}
-          <div className="bg-white rounded-[30px] shadow-lg p-8 lg:p-10 mt-0 lg:mt-16" style={{ boxShadow: '0 4px 30px 0 rgba(0,0,0,0.05)' }}>
+          <div className={`bg-white rounded-[30px] p-8 lg:p-10 mt-0 lg:mt-16 ${isMobileFromProfile ? '' : 'shadow-lg'}`} style={isMobileFromProfile ? {} : { boxShadow: '0 4px 30px 0 rgba(0,0,0,0.05)' }}>
             <div className="text-center mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {/* Mail Verification Icon */}
               <div className="mx-auto w-16 h-16 flex items-center justify-center mb-5">
                 <img src={updateIcon} alt="Mail verification" className="w-14 h-14" />
               </div>
               
-              <h1 className="text-lg font-semibold mb-1.5" style={{ color: '#212121' }}>
+              <h1 className="text-lg font-semibold mb-1.5" style={{ color: '#212121', fontFamily: isMobileFromProfile ? 'Bricolage Grotesque, sans-serif' : 'Poppins, sans-serif' }}>
                 Mail verification
               </h1>
               <p className="text-xs px-4 mb-2" style={{ color: '#BABABA' }}>
