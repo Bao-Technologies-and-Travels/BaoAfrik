@@ -124,7 +124,7 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use('/api/', limiter);
+app.use('/api/auth', limiter);
 app.set('trust proxy', 1);
 
 // Body parsing middleware

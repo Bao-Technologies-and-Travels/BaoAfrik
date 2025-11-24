@@ -37,7 +37,7 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                         # Install Node.js and npm if not already installed
                         curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
-                        sudo apt-get install -y nodejs
+                        sudo apt install -y nodejs
 
                         # Verify Node.js installation
                         echo "Node.js version:"
@@ -68,11 +68,7 @@ pipeline {
                         if ! command -v certbot &> /dev/null; then
                             sudo apt install -y certbot python3-certbot-nginx
                         fi
-
-                        # Configure firewall
-                        sudo ufw allow 22 80 443 3000 3001 8080
-                        sudo ufw --force enable
-
+                        
                         # Setup PM2
                         pm2 startup systemd
 

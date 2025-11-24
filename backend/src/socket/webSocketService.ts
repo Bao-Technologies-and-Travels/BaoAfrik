@@ -111,7 +111,7 @@ export class WebSocketService {
         socket.on('disconnect', (reason) => {
         });
 
-        return; 
+        return;
       }
 
       const userId = authenticatedSocket.user.id;
@@ -165,13 +165,13 @@ export class WebSocketService {
       });
 
       socket.on('error', (error) => {
-       throw new Error(`Socket error for user ${userId}:`);
+        throw new Error(`Socket error for user ${userId}:`);
       });
 
       // Heartbeat to keep connection alive
       socket.on('ping', (cb) => {
         if (typeof cb === 'function') {
-          cb('pong');
+          cb('ping');
         }
       });
     });
@@ -187,7 +187,7 @@ export class WebSocketService {
 
       socket.join(userId);
     } catch (error) {
-     throw new Error('Error joining conversations');
+      throw new Error('Error joining conversations');
     }
   }
 
@@ -264,6 +264,12 @@ export class WebSocketService {
 
   private async handleSendMessage(socket: AuthenticatedSocket, data: any, callback?: Function) {
     try {
+      console.log('📨 Backend received message data:', {
+        conversationId: data.conversationId,
+        hasProductData: !!data.productData,
+        productData: data.productData
+      });
+
       const { conversationId, content, messageType, fileUrl, fileName, fileSize, replyTo, tempId } = data;
       const senderId = socket.user!.id;
       const senderEmail = socket.user!.email;
@@ -297,6 +303,8 @@ export class WebSocketService {
       // Save message to database
       const message = await this.chatService.sendMessage(messageData);
 
+      console.log('💾 Message saved with productData:', message.productData);
+
       // Get conversation participants
       const participantsResult = await this.chatService.getConversationParticipants(conversationId);
       const participants = participantsResult.participants; // Extract the participants array
@@ -323,8 +331,11 @@ export class WebSocketService {
         });
       }
 
+      // emit to sender
+      socket.emit('message_sent', messageResponse);
+
       // Emit to all participants in the conversation
-      this.io.to(`conversation:${conversationId}`).emit('new_message', messageResponse);
+      socket.to(`conversation:${conversationId}`).emit('new_message', messageResponse);
 
       // Send notifications to other participants
       participants.forEach((participant: any) => {

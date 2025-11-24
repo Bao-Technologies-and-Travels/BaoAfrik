@@ -201,10 +201,10 @@ export class ChatService {
             let lastMessageContent = '';
             let lastMessageProductData = null;
 
-            if(conv.lastMessage) {
+            if (conv.lastMessage) {
                 try {
                     // decrypt last message content
-                    if(conv.lastMessage.encryptionIv && conv.lastMessage.encryptionAuthTag) {
+                    if (conv.lastMessage.encryptionIv && conv.lastMessage.encryptionAuthTag) {
                         lastMessageContent = this.decryptMessage(
                             conv.lastMessage.content,
                             conv.lastMessage.encryptionIv,
@@ -215,7 +215,7 @@ export class ChatService {
                     }
 
                     // parse productData from last message
-                    if(conv.lastMessage.productData) {
+                    if (conv.lastMessage.productData) {
                         lastMessageProductData = JSON.parse(conv.lastMessage.productData);
                     }
                 } catch (error) {
@@ -363,24 +363,34 @@ export class ChatService {
 
     async createConversation(data: CreateConversationData) {
         return await prisma.$transaction(async (tx) => {
-            // Check if conversation already exists
-            const existingConv = await tx.conversation.findFirst({
+            // Find conversations where both users are participants
+            const possibleConvs = await tx.conversation.findMany({
                 where: {
-                    productId: data.productId || null,
                     participants: {
-                        every: {
-                            userId: {
-                                in: [data.creatorId, data.participantId]
-                            }
-                        }
-                    }
+                        some: { userId: data.creatorId }
+                    },
+                    AND: [
+                        { participants: { some: { userId: data.participantId } } }
+                    ]
                 },
                 include: {
                     participants: true
                 }
             });
 
+            // Check if conversation already exists
+            const existingConv = possibleConvs.find(conv => conv.participants.length === 2);
+
             if (existingConv) {
+                if(data.productData) {
+                    await tx.conversation.update({
+                        where: { id: existingConv.id},
+                        data: {
+                            productData: JSON.stringify(data.productData)
+                        }
+                    });
+                    existingConv.productData = JSON.stringify(data.productData);
+                }
                 return existingConv;
             }
 
