@@ -3558,12 +3558,18 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
         />
 
         {/* Modal */}
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className={`fixed inset-0 z-50 flex ${isMobileSecurityView ? 'items-end justify-center' : 'items-center justify-center'} ${isMobileSecurityView ? 'px-2 pb-0' : 'p-4'}`}>
           <div
-            className="bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 pb-10 relative max-w-md w-full"
+            className={`bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 relative ${isMobileSecurityView ? 'w-full pb-16' : 'max-w-md w-full pb-10'}`}
             style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
             onClick={(e) => e.stopPropagation()}
           >
+            {isMobileSecurityView && (
+              <div
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 w-24 h-1 rounded-full"
+                style={{ backgroundColor: '#E9E9E9' }}
+              />
+            )}
             {/* Close Button */}
             <button
               onClick={handleCloseUpdatePasswordModal}
