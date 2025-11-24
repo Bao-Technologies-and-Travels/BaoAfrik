@@ -434,9 +434,11 @@ const ProfileSettings: React.FC = () => {
     ? 'flex-1 flex flex-col px-4 pt-4 pb-6 gap-4'
     : 'flex-1 mx-8 mt-8 mb-0 flex gap-6';
 
-  const mainLayoutStyle = isMobile ? undefined : { minHeight: 'calc(100vh - 140px)', maxHeight: 'calc(100vh - 140px)' };
+const mainLayoutStyle = isMobile ? undefined : { minHeight: 'calc(100vh - 140px)', maxHeight: 'calc(100vh - 140px)' };
 
-  const isMobileProfileView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'profile';
+const isMobileProfileView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'profile';
+const isMobileSecurityView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'security';
+const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistory;
   
   // Mock notification data with read/unread status
   const [notifications, setNotifications] = useState([
@@ -1055,7 +1057,7 @@ const ProfileSettings: React.FC = () => {
       `}</style>
     <div
       ref={pageRef}
-      className={`min-h-screen ${isMobileProfileView ? 'bg-white' : 'bg-gray-50'}`}
+      className={`min-h-screen ${(isMobileProfileView || isMobileSecurityView) ? 'bg-white' : 'bg-gray-50'}`}
       style={{ fontFamily: 'Poppins, sans-serif' }}
     >
       {isMobile && isMobileSidebarVisible && renderMobileSidebar()}
@@ -1630,8 +1632,8 @@ const ProfileSettings: React.FC = () => {
           {/* Main Content */}
           <div className={`${mainLayoutClasses} ${isMobile ? '' : 'overflow-hidden'}`} style={mainLayoutStyle}>
             {/* Left Content Area */}
-           <div className={`${leftPaneClasses} py-4 overflow-y-auto scrollbar-hide`}>
-             {isMobileProfileView && (
+            <div className={`${leftPaneClasses} py-4 overflow-y-auto scrollbar-hide`}>
+             {(isMobileProfileView || isMobileSecurityView) && (
                 <div className="flex items-center justify-between mb-4">
                   <button
                     type="button"
@@ -2303,63 +2305,129 @@ const ProfileSettings: React.FC = () => {
               )}
 
               {selectedSidebarOption === 'security' && (
-                <div className="bg-white border rounded-[30px] p-5 sm:p-7" style={{ borderColor: '#E4E4E4' }}>
-                  <div className="mb-6 space-y-1.5">
-                    <h2 className="text-base font-semibold" style={{ color: '#212121' }}>Security & Privacy Setting</h2>
-                    <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
+                <div
+                  className={
+                    isMobileSecurityView
+                      ? 'space-y-5'
+                      : 'bg-white border rounded-[30px] p-5 sm:p-7'
+                  }
+                  style={isMobileSecurityView ? undefined : { borderColor: '#E4E4E4' }}
+                >
+                  <div className={isMobileSecurityView ? 'px-1 mb-3 space-y-1' : 'mb-6 space-y-1.5'}>
+                    <h2
+                      className={`${isMobileSecurityView ? 'text-base font-semibold' : 'text-base font-semibold'}`}
+                      style={{ color: '#212121', fontFamily: isMobileSecurityView ? 'Bricolage Grotesque, sans-serif' : undefined }}
+                    >
+                      Security & Privacy Setting
+                    </h2>
+                    <p
+                      className={isMobileSecurityView ? 'text-[12px]' : 'text-xs'}
+                      style={{ color: '#B0B0B0', marginBottom: isMobileSecurityView ? '0' : '6px' }}
+                    >
                       Manage your privacy preferences and keep your account secure on BAO' Afrik.
                     </p>
                   </div>
 
-                  <div className="space-y-6">
+                    <div className={isMobileSecurityView ? 'space-y-5' : 'space-y-6'}>
                     {/* Password Section */}
-                    <div className="flex items-start justify-between gap-4 flex-wrap relative">
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Password</p>
-                          {/* NOTE: Clickable badge is for testing only. Fonsah - remove click handler and implement real password strength check from backend */}
-                          <span 
-                            onClick={() => setPasswordStrength(passwordStrength === 'weak' ? 'strong' : 'weak')}
-                            className="px-2.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity" 
+                    <div className={isMobileSecurityView ? 'relative rounded-2xl bg-white p-0' : 'flex items-start justify-between gap-4 flex-wrap relative'}>
+                      {isMobileSecurityView ? (
+                        <div className="flex items-start justify-between gap-3 px-1">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-semibold" style={{ color: '#6A6A6A' }}>Password</p>
+                              <span 
+                                onClick={() => setPasswordStrength(passwordStrength === 'weak' ? 'strong' : 'weak')}
+                                className="px-2.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity" 
+                                style={{ 
+                                  backgroundColor: passwordStrength === 'weak' ? '#FEF6E9' : '#EDFBF0', 
+                                  color: passwordStrength === 'weak' ? '#F9A825' : '#4CD964', 
+                                  borderRadius: '6px', 
+                                  fontSize: '10px', 
+                                  fontWeight: 500 
+                                }}
+                              >
+                                {passwordStrength === 'weak' ? 'Your password is weak' : 'Your password is strong'}
+                              </span>
+                            </div>
+                            <p className="text-xs mt-1 font-normal" style={{ color: '#B0B0B0' }}>Set a password to protect your account.</p>
+                          </div>
+                          <button
+                            onClick={handlePasswordEditClick}
+                            className="flex items-center justify-center space-x-1 px-3 py-1.5 border rounded-lg transition-colors"
                             style={{ 
-                              backgroundColor: passwordStrength === 'weak' ? '#FEF6E9' : '#EDFBF0', 
-                              color: passwordStrength === 'weak' ? '#F9A825' : '#4CD964', 
-                              borderRadius: '6px', 
-                              fontSize: '10px', 
-                              fontWeight: 500 
+                              backgroundColor: isPasswordEditClicked ? '#F0F8FE' : 'transparent',
+                              borderColor: isPasswordEditClicked ? '#CFE8FC' : '#D9D9D9', 
+                              minWidth: '62px' 
                             }}
                           >
-                            {passwordStrength === 'weak' ? 'Your password is weak' : 'Your password is strong'}
-                          </span>
+                            <img 
+                              src={pencilIcon} 
+                              alt="Edit" 
+                              className="w-3 h-3" 
+                              style={{ 
+                                filter: isPasswordEditClicked 
+                                  ? 'brightness(0) saturate(100%) invert(67%) sepia(60%) saturate(2000%) hue-rotate(180deg) brightness(1) contrast(1)' 
+                                  : 'none' 
+                              }}
+                            />
+                            <span 
+                              className="text-[10px]" 
+                              style={{ color: isPasswordEditClicked ? '#64B5F6' : '#6A6A6A' }}
+                            >
+                              Edit
+                            </span>
+                          </button>
                         </div>
-                        <p className="text-xs" style={{ color: '#B0B0B0' }}>Set a password to protect your account.</p>
-                      </div>
-                      <button
-                        onClick={handlePasswordEditClick}
-                        className="flex items-center justify-center space-x-1 px-2.5 py-1 border rounded-lg transition-colors"
-                        style={{ 
-                          backgroundColor: isPasswordEditClicked ? '#F0F8FE' : 'transparent',
-                          borderColor: isPasswordEditClicked ? '#CFE8FC' : '#D9D9D9', 
-                          minWidth: '70px' 
-                        }}
-                      >
-                        <img 
-                          src={pencilIcon} 
-                          alt="Edit" 
-                          className="w-3 h-3" 
-                          style={{ 
-                            filter: isPasswordEditClicked 
-                              ? 'brightness(0) saturate(100%) invert(67%) sepia(60%) saturate(2000%) hue-rotate(180deg) brightness(1) contrast(1)' 
-                              : 'none' 
-                          }}
-                        />
-                        <span 
-                          className="text-[11px]" 
-                          style={{ color: isPasswordEditClicked ? '#64B5F6' : '#6A6A6A' }}
-                        >
-                          Edit
-                        </span>
-                      </button>
+                      ) : (
+                        <>
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Password</p>
+                              <span 
+                                onClick={() => setPasswordStrength(passwordStrength === 'weak' ? 'strong' : 'weak')}
+                                className="px-2.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity" 
+                                style={{ 
+                                  backgroundColor: passwordStrength === 'weak' ? '#FEF6E9' : '#EDFBF0', 
+                                  color: passwordStrength === 'weak' ? '#F9A825' : '#4CD964', 
+                                  borderRadius: '6px', 
+                                  fontSize: '10px', 
+                                  fontWeight: 500 
+                                }}
+                              >
+                                {passwordStrength === 'weak' ? 'Your password is weak' : 'Your password is strong'}
+                              </span>
+                            </div>
+                            <p className="text-xs" style={{ color: '#B0B0B0' }}>Set a password to protect your account.</p>
+                          </div>
+                          <button
+                            onClick={handlePasswordEditClick}
+                            className="flex items-center justify-center space-x-1 px-2.5 py-1 border rounded-lg transition-colors"
+                            style={{ 
+                              backgroundColor: isPasswordEditClicked ? '#F0F8FE' : 'transparent',
+                              borderColor: isPasswordEditClicked ? '#CFE8FC' : '#D9D9D9', 
+                              minWidth: '70px' 
+                            }}
+                          >
+                            <img 
+                              src={pencilIcon} 
+                              alt="Edit" 
+                              className="w-3 h-3" 
+                              style={{ 
+                                filter: isPasswordEditClicked 
+                                  ? 'brightness(0) saturate(100%) invert(67%) sepia(60%) saturate(2000%) hue-rotate(180deg) brightness(1) contrast(1)' 
+                                  : 'none' 
+                              }}
+                            />
+                            <span 
+                              className="text-[11px]" 
+                              style={{ color: isPasswordEditClicked ? '#64B5F6' : '#6A6A6A' }}
+                            >
+                              Edit
+                            </span>
+                          </button>
+                        </>
+                      )}
                       
                       {/* Password Modal */}
                       {isPasswordModalOpen && (
@@ -2369,7 +2437,7 @@ const ProfileSettings: React.FC = () => {
                           style={{ 
                             borderColor: '#E9E9E9',
                             borderRadius: '12px',
-                            minWidth: '200px'
+                            minWidth: isMobileSecurityView ? '160px' : '200px'
                           }}
                         >
                           <div 
@@ -2419,8 +2487,8 @@ const ProfileSettings: React.FC = () => {
                     </div>
 
                     {/* Two Step Verification Section */}
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div className="flex-1 space-y-1">
+                    <div className={isMobileSecurityView ? 'p-4 rounded-2xl bg-white flex items-start justify-between gap-3' : 'flex items-start justify-between gap-4 flex-wrap'} style={isMobileSecurityView ? { marginLeft: '-8px' } : undefined}>
+                      <div className={isMobileSecurityView ? 'space-y-2' : 'flex-1 space-y-1'}>
                         <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Two step verification</p>
                         <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
                           Enable two-step verification for enhanced security.{' '}
@@ -2439,8 +2507,8 @@ const ProfileSettings: React.FC = () => {
                             setIsTwoFactorEnabled(false);
                           }
                         }}
-                        className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                        style={{ backgroundColor: isTwoFactorEnabled ? '#64B5F6' : '#E4E4E4' }}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isMobileSecurityView ? 'shrink-0' : ''}`}
+                        style={{ backgroundColor: isTwoFactorEnabled ? '#64B5F6' : '#E4E4E4', marginTop: isMobileSecurityView ? '4px' : undefined }}
                       >
                         <span
                           className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
@@ -2451,103 +2519,82 @@ const ProfileSettings: React.FC = () => {
                     </div>
 
                     {/* Sessions Section */}
-                    <div className="space-y-3 mt-6 mb-10">
-                      <div className="flex items-center justify-between">
+                    <div className={isMobileSecurityView ? 'space-y-4 mt-4' : 'space-y-3 mt-6 mb-10'} style={isMobileSecurityView ? { marginLeft: '-8px' } : undefined}>
+                      <div className={`flex items-center justify-between ${isMobileSecurityView ? 'px-1' : ''}`}>
                         <div className="space-y-1.5">
                           <p className="text-sm font-semibold" style={{ color: '#212121' }}>Sessions</p>
                           <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '12px' }}>
                             Review your active sessions and sign out of any devices you don't recognize.
                           </p>
                         </div>
-                        <button
-                          onClick={() => setShowSessionHistory(!showSessionHistory)}
-                          className="px-3 py-1.5 text-[10px] font-normal rounded-lg border whitespace-nowrap"
-                          style={{ borderColor: '#D9D9D9', color: '#6A6A6A', borderRadius: '6px' }}
-                        >
-                          {showSessionHistory ? 'Hide mock session history' : 'Show mock session history'}
-                        </button>
-                      </div>
-                      <div className="space-y-3">
-                        {sessions.map((session) => (
-                          <div
-                            key={session.id}
-                            className="flex items-center gap-6"
-                          >
-                            <div className="flex items-center gap-3" style={{ minWidth: '220px', flexShrink: 0 }}>
-                              <img
-                                src={session.icon}
-                                alt={session.browser}
-                                className="w-8 h-8 rounded-full object-cover"
-                              />
-                              <div>
-                                <p className="text-xs font-medium" style={{ color: '#6A6A6A', marginBottom: '-4px' }}>{session.browser}</p>
-                                {session.isCurrent && (
-                                  <div className="inline-flex items-center gap-1" style={{ marginTop: '0px', lineHeight: '1' }}>
-                                    <span
-                                      style={{
-                                        width: '6px',
-                                        height: '6px',
-                                        borderRadius: '9999px',
-                                        backgroundColor: '#4CD964',
-                                        boxShadow: '0 0 0 2px #EDFBF0'
-                                      }}
-                                    ></span>
-                                    <span className="text-[10px] font-medium" style={{ color: '#4CD964' }}>Current session</span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '180px', flexShrink: 0 }}>
-                              <img src={isMobileDevice(session.device) ? mobileIcon : deviceIcon} alt="Device" className="w-4 h-4" />
-                              <span>{session.device}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '200px', flexShrink: 0 }}>
-                              <img
-                                src={`https://flagcdn.com/24x18/${session.flag}.png`}
-                                alt={session.location}
-                                className="w-5 h-5 rounded-full object-cover"
-                              />
-                              <span>{session.location}</span>
-                            </div>
-                            <button 
-                              onClick={() => handleSignOutSession(session.id)}
-                              className="text-xs font-medium ml-auto hover:opacity-80 transition-opacity" 
-                              style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}
-                            >
-                              Sign Out
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {showSessionHistory && (
-                      <div className="space-y-3 mt-8">
-                        <div className="flex items-center justify-between mb-5">
-                          <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Other Sessions</p>
+                        {!isMobileSecurityView && (
                           <button
-                            onClick={handleCloseAllInactiveSessions}
-                            className="px-3 py-1.5 text-xs font-normal rounded-lg border hover:opacity-80 transition-opacity"
+                            onClick={() => setShowSessionHistory(!showSessionHistory)}
+                            className="rounded-lg border whitespace-nowrap transition-colors px-3 py-1.5 text-[10px]"
                             style={{ borderColor: '#D9D9D9', color: '#6A6A6A', borderRadius: '6px' }}
                           >
-                            Close all inactive sessions
+                          {shouldShowSessionHistory ? 'Hide mock session history' : 'Show mock session history'}
                           </button>
-                        </div>
-                        <div className="space-y-3">
-                          {inactiveSessions.map(session => (
-                            <div
-                              key={session.id}
-                              className="flex items-center gap-6"
-                            >
+                        )}
+                      </div>
+                      <div className={isMobileSecurityView ? 'space-y-4' : 'space-y-3'}>
+                        {sessions.map((session) =>
+                          isMobileSecurityView ? (
+                            <div key={session.id} className="p-4 rounded-2xl space-y-2 bg-white">
+                              <div className="flex items-start gap-3">
+                                <img src={session.icon} alt={session.browser} className="w-6 h-6 rounded-full object-cover" />
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <p className="text-[13px] font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
+                                    {session.isCurrent && (
+                                      <div className="inline-flex items-center gap-1">
+                                        <span
+                                          style={{
+                                            width: '6px',
+                                            height: '6px',
+                                            borderRadius: '9999px',
+                                            backgroundColor: '#4CD964',
+                                            boxShadow: '0 0 0 2px #EDFBF0'
+                                          }}
+                                        ></span>
+                                        <span className="text-[10px] font-medium" style={{ color: '#4CD964' }}>Current session</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <p className="text-[10px]" style={{ color: '#939393' }}>{session.device}</p>
+                                  <p className="text-[9px]" style={{ color: '#939393' }}>{session.location}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-end">
+                                <button
+                                  onClick={() => handleSignOutSession(session.id)}
+                                  className="text-xs font-medium hover:opacity-80 transition-opacity"
+                                  style={{ color: '#6A6A6A', textDecoration: 'underline' }}
+                                >
+                                  Sign Out
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div key={session.id} className="flex items-center gap-6">
                               <div className="flex items-center gap-3" style={{ minWidth: '220px', flexShrink: 0 }}>
-                                <img
-                                  src={session.icon}
-                                  alt={session.browser}
-                                  className="w-8 h-8 rounded-full object-cover"
-                                />
+                                <img src={session.icon} alt={session.browser} className="w-8 h-8 rounded-full object-cover" />
                                 <div>
                                   <p className="text-xs font-medium" style={{ color: '#6A6A6A', marginBottom: '-4px' }}>{session.browser}</p>
-                                  <p className="text-[10px] mt-0.5" style={{ color: '#B0B0B0' }}>{session.lastUsed}</p>
+                                  {session.isCurrent && (
+                                    <div className="inline-flex items-center gap-1" style={{ marginTop: '0px', lineHeight: '1' }}>
+                                      <span
+                                        style={{
+                                          width: '6px',
+                                          height: '6px',
+                                          borderRadius: '9999px',
+                                          backgroundColor: '#4CD964',
+                                          boxShadow: '0 0 0 2px #EDFBF0'
+                                        }}
+                                      ></span>
+                                      <span className="text-[10px] font-medium" style={{ color: '#4CD964' }}>Current session</span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '180px', flexShrink: 0 }}>
@@ -2562,15 +2609,87 @@ const ProfileSettings: React.FC = () => {
                                 />
                                 <span>{session.location}</span>
                               </div>
-                              <button 
-                                onClick={() => handleSignOutInactiveSession(session.id)}
-                                className="text-xs font-medium ml-auto hover:opacity-80 transition-opacity" 
+                              <button
+                                onClick={() => handleSignOutSession(session.id)}
+                                className="text-xs font-medium ml-auto hover:opacity-80 transition-opacity"
                                 style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}
                               >
                                 Sign Out
                               </button>
                             </div>
-                          ))}
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    {shouldShowSessionHistory && (
+                      <div className={isMobileSecurityView ? 'space-y-4' : 'space-y-3 mt-8'}>
+                        <div className={`flex items-center justify-between mb-5 ${isMobileSecurityView ? 'px-1 gap-2' : ''}`}>
+                          <p className={`${isMobileSecurityView ? 'text-[13px]' : 'text-sm'} font-medium`} style={{ color: '#6A6A6A' }}>Other Sessions</p>
+                          <button
+                            onClick={handleCloseAllInactiveSessions}
+                            className={`rounded-lg border hover:opacity-80 transition-opacity ${isMobileSecurityView ? 'px-2 py-1 text-[9px] whitespace-nowrap' : 'px-3 py-1.5 text-xs'}`}
+                            style={{ borderColor: '#D9D9D9', color: '#6A6A6A', borderRadius: '6px' }}
+                          >
+                            Close all inactive sessions
+                          </button>
+                        </div>
+                      <div className={isMobileSecurityView ? 'space-y-4' : 'space-y-3'}>
+                          {inactiveSessions.map(session =>
+                            isMobileSecurityView ? (
+                              <div key={session.id} className="p-4 rounded-2xl space-y-2 bg-white">
+                                <div className="flex items-start gap-3">
+                                  <img src={session.icon} alt={session.browser} className="w-6 h-6 rounded-full object-cover" />
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                      <p className="text-[13px] font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
+                                      <span className="text-[10px]" style={{ color: '#B0B0B0' }}>{session.lastUsed}</span>
+                                    </div>
+                                    <p className="text-[10px]" style={{ color: '#939393' }}>{session.device}</p>
+                                    <p className="text-[9px]" style={{ color: '#939393' }}>{session.location}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-end">
+                                  <button
+                                    onClick={() => handleSignOutInactiveSession(session.id)}
+                                    className="text-xs font-medium hover:opacity-80 transition-opacity"
+                                    style={{ color: '#6A6A6A', textDecoration: 'underline' }}
+                                  >
+                                    Sign Out
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div key={session.id} className="flex items-center gap-6">
+                                <div className="flex items-center gap-3" style={{ minWidth: '220px', flexShrink: 0 }}>
+                                  <img src={session.icon} alt={session.browser} className="w-8 h-8 rounded-full object-cover" />
+                                  <div>
+                                    <p className="text-xs font-medium" style={{ color: '#6A6A6A', marginBottom: '-4px' }}>{session.browser}</p>
+                                    <p className="text-[10px] mt-0.5" style={{ color: '#B0B0B0' }}>{session.lastUsed}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '180px', flexShrink: 0 }}>
+                                  <img src={isMobileDevice(session.device) ? mobileIcon : deviceIcon} alt="Device" className="w-4 h-4" />
+                                  <span>{session.device}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '200px', flexShrink: 0 }}>
+                                  <img
+                                    src={`https://flagcdn.com/24x18/${session.flag}.png`}
+                                    alt={session.location}
+                                    className="w-5 h-5 rounded-full object-cover"
+                                  />
+                                  <span>{session.location}</span>
+                                </div>
+                                <button
+                                  onClick={() => handleSignOutInactiveSession(session.id)}
+                                  className="text-xs font-medium ml-auto hover:opacity-80 transition-opacity"
+                                  style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}
+                                >
+                                  Sign Out
+                                </button>
+                              </div>
+                            )
+                          )}
                         </div>
                       </div>
                     )}
