@@ -440,6 +440,7 @@ const mainLayoutStyle = isMobile ? undefined : { minHeight: 'calc(100vh - 140px)
 
 const isMobileProfileView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'profile';
 const isMobileSecurityView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'security';
+const isMobileLanguageView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'language';
 const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistory;
   
   // Mock notification data with read/unread status
@@ -1074,7 +1075,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
       `}</style>
     <div
       ref={pageRef}
-      className={`min-h-screen ${(isMobileProfileView || isMobileSecurityView) ? 'bg-white' : 'bg-gray-50'}`}
+      className={`min-h-screen ${(isMobileProfileView || isMobileSecurityView || isMobileLanguageView) ? 'bg-white' : 'bg-gray-50'}`}
       style={{ fontFamily: 'Poppins, sans-serif' }}
     >
       {isMobile && isMobileSidebarVisible && renderMobileSidebar()}
@@ -1650,7 +1651,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
           <div className={`${mainLayoutClasses} ${isMobile ? '' : 'overflow-hidden'}`} style={mainLayoutStyle}>
             {/* Left Content Area */}
             <div className={`${leftPaneClasses} py-4 overflow-y-auto scrollbar-hide`}>
-             {(isMobileProfileView || isMobileSecurityView) && (
+             {(isMobileProfileView || isMobileSecurityView || isMobileLanguageView) && (
                 <div className="flex items-center justify-between mb-4">
                   <button
                     type="button"
@@ -1864,23 +1865,23 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                             style={{ paddingLeft: '4px', paddingRight: '4px' }}
                           >
                             <h3 className="text-xs font-semibold" style={{ color: '#6A6A6A' }}>Profile Setting</h3>
-                            <button
+                      <button
                               onClick={() => setIsEditingProfile(true)}
                               className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
-                              style={{ borderColor: '#D9D9D9' }}
-                            >
+                        style={{ borderColor: '#D9D9D9' }}
+                      >
                               <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
                               <span className="text-[10px]" style={{ color: '#6A6A6A' }}>Edit</span>
-                            </button>
-                          </div>
+                      </button>
+                    </div>
                         )}
                         {isMobileProfileView ? (
                           <div className="space-y-3" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
                             <div className="flex items-start justify-between gap-4">
-                              <div>
+                      <div>
                                 <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Full name</label>
                                 <p className="text-xs font-semibold" style={{ color: '#212121' }}>{profileData.fullName}</p>
-                              </div>
+                      </div>
                               <button
                                 onClick={() => setIsEditingProfile(true)}
                                 className="flex items-center space-x-1 px-2 py-1 border rounded-lg transition-colors hover:bg-gray-50"
@@ -1891,7 +1892,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                               </button>
                             </div>
                             <div className="flex items-start justify-between gap-4">
-                              <div>
+                      <div>
                                 <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Gender</label>
                                 <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.gender}</p>
                               </div>
@@ -2720,29 +2721,31 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
               )}
 
               {selectedSidebarOption === 'language' && (
-                <div className="space-y-6 px-4 sm:px-6 lg:px-10">
-                  {/* Title and Description */}
-                  <div className="mb-6">
-                    <h1 className="text-base font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
-                      Language and Currency
-                    </h1>
-                    <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
-                      Customize your language preferences and currency settings to enhance your shopping experience on BAO' Afrik.
-                    </p>
-                  </div>
+                <div className={`space-y-6 ${isMobileLanguageView ? 'px-1' : 'px-4 sm:px-6 lg:px-10'}`}>
+                  {/* Title and Description - Hidden on mobile */}
+                  {!isMobileLanguageView && (
+                    <div className="mb-6">
+                      <h1 className="text-base font-medium mb-2" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                        Language and Currency
+                      </h1>
+                      <p className="text-xs" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                        Customize your language preferences and currency settings to enhance your shopping experience on BAO' Afrik.
+                      </p>
+                    </div>
+                  )}
 
                   {/* Content Area */}
-                  <div className="bg-white border rounded-[20px] p-6" style={{ borderColor: '#E4E4E4', marginTop: '32px' }}>
+                  <div className={`bg-white ${isMobileLanguageView ? '' : 'border'} rounded-[20px] ${isMobileLanguageView ? 'p-4' : 'p-6'}`} style={isMobileLanguageView ? { marginLeft: '-4px' } : { borderColor: '#E4E4E4', marginTop: '32px' }}>
                     {/* Language Section */}
                     <div className="mb-10">
-                      <h2 className="text-sm font-medium mb-1.5" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                      <h2 className={`${isMobileLanguageView ? 'text-base font-semibold' : 'text-sm font-medium'} mb-1.5`} style={{ color: '#212121', fontFamily: isMobileLanguageView ? 'Bricolage Grotesque, sans-serif' : 'Poppins, sans-serif' }}>
                         Language Setting
                       </h2>
-                      <p className="text-xs mb-4" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                      <p className={`${isMobileLanguageView ? 'text-[11px]' : 'text-xs'} mb-4`} style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
                         Control what others are seeing from you on BAO' Afrik.
                       </p>
-                      <div className="flex items-center gap-3 flex-wrap">
-                        {languageOptions.map((lang) => {
+                      <div className={`flex items-center ${isMobileLanguageView ? 'gap-2' : 'gap-3'} flex-wrap`}>
+                        {languageOptions.map((lang, index) => {
                           const isSelected = languagePreference === lang.code;
                           const isSupported = lang.code === 'en' || lang.code === 'fr';
                           return (
@@ -2752,20 +2755,25 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                 if (!isSupported) return;
                                 setLanguagePreference(lang.code as 'en' | 'fr' | 'de' | 'es');
                               }}
-                              className="flex items-center gap-2 px-4 py-1 rounded-full border transition-colors"
+                              className={`flex items-center gap-2 ${isMobileLanguageView ? 'px-3 py-1' : 'px-4 py-1'} rounded-full border transition-colors`}
                               style={{
                                 backgroundColor: isSelected ? '#F0F8FE' : 'white',
                                 borderColor: isSelected ? '#CFE8FC' : '#E1E1E1',
                                 fontFamily: 'Poppins, sans-serif',
                                 cursor: isSupported ? 'pointer' : 'not-allowed',
-                                opacity: isSupported ? 1 : 0.6
+                                opacity: isSupported ? 1 : 0.6,
+                                ...(isMobileLanguageView && {
+                                  flexBasis: index < 3 ? 'calc((100% - 16px) / 3)' : 'auto',
+                                  maxWidth: index < 3 ? 'calc((100% - 16px) / 3)' : 'none',
+                                  flexShrink: 0
+                                })
                               }}
                               disabled={!isSupported}
                               title={!isSupported ? 'Coming soon' : undefined}
                             >
                               {isSelected ? (
-                                <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#64B5F6' }}>
-                                  <svg className="w-2.5 h-2.5" fill="none" stroke="white" viewBox="0 0 24 24">
+                                <div className={`${isMobileLanguageView ? 'w-3 h-3' : 'w-4 h-4'} rounded-full flex items-center justify-center`} style={{ backgroundColor: '#64B5F6' }}>
+                                  <svg className={`${isMobileLanguageView ? 'w-2 h-2' : 'w-2.5 h-2.5'}`} fill="none" stroke="white" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                   </svg>
                                 </div>
@@ -2773,11 +2781,11 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                 <img
                                   src={`https://flagcdn.com/w20/${lang.flag}.png`}
                                   alt={lang.label}
-                                  className="w-4 h-4 rounded-full"
+                                  className={`${isMobileLanguageView ? 'w-3 h-3' : 'w-4 h-4'} rounded-full`}
                                   style={{ objectFit: 'cover' }}
                                 />
                               )}
-                              <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                              <span className={`${isMobileLanguageView ? 'text-[10px]' : 'text-xs'} font-medium`} style={{ color: '#6A6A6A' }}>
                                 {lang.label}
                               </span>
                             </button>
@@ -2788,13 +2796,13 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
 
                     {/* Currency Section */}
                     <div>
-                      <h2 className="text-sm font-medium mb-1.5" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                      <h2 className={`${isMobileLanguageView ? 'text-base font-semibold' : 'text-sm font-medium'} mb-1.5`} style={{ color: '#212121', fontFamily: isMobileLanguageView ? 'Bricolage Grotesque, sans-serif' : 'Poppins, sans-serif' }}>
                         Currency Preferences
                       </h2>
-                      <p className="text-xs mb-4" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                      <p className={`${isMobileLanguageView ? 'text-[11px]' : 'text-xs'} mb-4`} style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
                         Choose the currency you want to see product prices in.
                       </p>
-                      <div className="flex items-center gap-3 flex-wrap">
+                      <div className={`flex items-center ${isMobileLanguageView ? 'gap-2' : 'gap-3'} ${isMobileLanguageView ? 'flex-nowrap' : 'flex-wrap'}`}>
                         {[
                           { code: 'USD', flag: 'us', name: 'United States Dollar' },
                           { code: 'EUR', flag: 'eu', name: 'Euro' },
@@ -2806,16 +2814,18 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                             <button
                               key={currency.code}
                               onClick={() => setCurrencyPreference(currency.code as 'USD' | 'EUR' | 'CAD' | 'GBP')}
-                              className="flex items-center gap-2 px-4 py-1 rounded-full border transition-colors"
+                              className={`flex items-center gap-2 ${isMobileLanguageView ? 'px-3 py-1' : 'px-4 py-1'} rounded-full border transition-colors`}
                               style={{
                                 backgroundColor: isSelected ? '#F0F8FE' : 'white',
                                 borderColor: isSelected ? '#CFE8FC' : '#E1E1E1',
-                                fontFamily: 'Poppins, sans-serif'
+                                fontFamily: 'Poppins, sans-serif',
+                                flex: isMobileLanguageView ? '1 1 0' : 'auto',
+                                minWidth: isMobileLanguageView ? 0 : 'auto'
                               }}
                             >
                               {isSelected ? (
-                                <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#64B5F6' }}>
-                                  <svg className="w-3 h-3" fill="none" stroke="white" viewBox="0 0 24 24">
+                                <div className={`${isMobileLanguageView ? 'w-3 h-3' : 'w-5 h-5'} rounded-full flex items-center justify-center`} style={{ backgroundColor: '#64B5F6' }}>
+                                  <svg className={`${isMobileLanguageView ? 'w-2 h-2' : 'w-3 h-3'}`} fill="none" stroke="white" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                   </svg>
                                 </div>
@@ -2823,11 +2833,11 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                                 <img
                                   src={`https://flagcdn.com/w20/${currency.flag}.png`}
                                   alt={currency.name}
-                                  className="w-4 h-4 rounded-full"
+                                  className={`${isMobileLanguageView ? 'w-3 h-3' : 'w-4 h-4'} rounded-full`}
                                   style={{ objectFit: 'cover' }}
                                 />
                               )}
-                              <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                              <span className={`${isMobileLanguageView ? 'text-[10px]' : 'text-xs'} font-medium`} style={{ color: '#6A6A6A' }}>
                                 {currency.code}
                               </span>
                             </button>
