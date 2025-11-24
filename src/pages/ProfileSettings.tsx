@@ -238,6 +238,8 @@ const ProfileSettings: React.FC = () => {
     code: '+1',
     flag: 'us'
   });
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMobileSidebarVisible, setIsMobileSidebarVisible] = useState(false);
   
   // Calculate profile completion progress
   const calculateProfileProgress = () => {
@@ -886,6 +888,25 @@ const ProfileSettings: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [languagePreference, selectedSidebarOption]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile((prev) => {
+        if (mobile && !prev) {
+          setIsMobileSidebarVisible(true);
+        }
+        if (!mobile) {
+          setIsMobileSidebarVisible(false);
+        }
+        return mobile;
+      });
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Handler for standalone "Switch on all"
   const handleAllNotificationsToggle = () => {
     const newValue = !allNotificationsEnabled;
@@ -955,6 +976,61 @@ const ProfileSettings: React.FC = () => {
     }
   }, [generalNotifications.enabled, messagesNotifications.enabled, newsNotifications.enabled]);
 
+  const renderMobileSidebar = () => (
+    <div className="fixed inset-0 z-50 bg-white px-5 pt-6 pb-10 overflow-y-auto lg:hidden">
+      <div className="flex items-center justify-between mb-8">
+        <button
+          type="button"
+          onClick={() => setIsMobileSidebarVisible(false)}
+          className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+          style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18L9 12L15 6" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <p className="text-base font-medium" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#171717' }}>
+          Setting
+        </p>
+        <button
+          type="button"
+          className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+          style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+          aria-label="More options"
+        >
+          <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+            <circle cx="4" cy="2" r="2" fill="#171717" />
+            <circle cx="12" cy="2" r="2" fill="#171717" />
+            <circle cx="20" cy="2" r="2" fill="#171717" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {sidebarOptions.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => {
+              setSelectedSidebarOption(option.value);
+              setIsMobileSidebarVisible(false);
+            }}
+            className="w-full flex items-center justify-between px-4 py-3 border rounded-2xl"
+            style={{ borderColor: '#F0F0F0', color: '#939393' }}
+          >
+            <div className="flex items-center gap-3">
+              <img src={option.inactiveIcon} alt={option.label} className="w-5 h-5" />
+              <span className="text-sm font-medium">{option.label}</span>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M9 6L15 12L9 18" stroke="#D9D9D9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <style>{`
@@ -969,6 +1045,22 @@ const ProfileSettings: React.FC = () => {
         }
       `}</style>
     <div ref={pageRef} className="min-h-screen bg-gray-50" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {isMobile && isMobileSidebarVisible && renderMobileSidebar()}
+      {isMobile && !isMobileSidebarVisible && (
+        <button
+          type="button"
+          onClick={() => setIsMobileSidebarVisible(true)}
+          className="fixed top-4 left-4 z-40 w-10 h-10 rounded-full bg-white flex items-center justify-center lg:hidden"
+          style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+          aria-label="Open settings menu"
+        >
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+            <path d="M1 1H17" stroke="#171717" strokeWidth="2" strokeLinecap="round" />
+            <path d="M1 6H13" stroke="#171717" strokeWidth="2" strokeLinecap="round" />
+            <path d="M1 11H9" stroke="#171717" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+      )}
       <div className="flex h-screen">
         {/* Left Sidebar - Full Height */}
         <div className="w-72 bg-white border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative">
