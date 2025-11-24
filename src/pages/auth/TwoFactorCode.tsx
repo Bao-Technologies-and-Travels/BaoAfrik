@@ -11,6 +11,8 @@ const TwoFactorCode: React.FC = () => {
   const phoneCode = location.state?.phoneCode || { code: '+1', label: 'United States' };
   const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
   const [isMobile, setIsMobile] = useState(false);
+  const [countdown, setCountdown] = useState(60);
+  const [canResend, setCanResend] = useState(false);
   const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -21,6 +23,23 @@ const TwoFactorCode: React.FC = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Countdown timer for resend functionality
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setCanResend(true);
+    }
+  }, [countdown]);
+
+  const handleResendCode = () => {
+    if (!canResend) return;
+    setCountdown(60);
+    setCanResend(false);
+    // TODO: Implement resend API call
+  };
 
   const handleCodeInputChange = (index: number, value: string) => {
     if (value.length > 1) return;
@@ -64,7 +83,7 @@ const TwoFactorCode: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
+      <div className={`flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 ${isMobileFromProfile ? 'pt-16' : 'pt-4 lg:pt-16'}`}>
         <div className="w-full max-w-md">
           {/* Mobile Header - Fixed Position */}
           {isMobileFromProfile && (
@@ -111,10 +130,24 @@ const TwoFactorCode: React.FC = () => {
               </h2>
 
               {/* Description */}
-              <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+              <p className="text-xs text-center mb-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
                 Enter the authentication code below we sent to<br />
                 {phoneCode.code} {maskPhone(phone)}
               </p>
+              {!canResend ? (
+                <p className="text-[11px] mt-3 mb-6" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                  Request another code 0:{countdown.toString().padStart(2, '0')}
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleResendCode}
+                  className="text-[11px] mt-3 mb-6 focus:outline-none"
+                  style={{ color: '#64B5F6', textDecoration: 'underline', fontFamily: 'Poppins, sans-serif' }}
+                >
+                  Request a new digital code
+                </button>
+              )}
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">

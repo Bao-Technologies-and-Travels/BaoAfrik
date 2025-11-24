@@ -69,7 +69,7 @@ const TwoFactorPhone: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
+      <div className={`flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 ${isMobileFromProfile ? 'pt-16' : 'pt-4 lg:pt-16'}`}>
         <div className="w-full max-w-md">
           {/* Mobile Header - Fixed Position */}
           {isMobileFromProfile && (
@@ -211,11 +211,12 @@ const TwoFactorPhone: React.FC = () => {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="Enter your phone number"
-                      className="flex-1 px-4 py-3 border rounded-[12px] text-sm bg-white focus:outline-none"
+                      className="flex-1 px-4 py-3 border rounded-[12px] bg-white focus:outline-none"
                       style={{
                         borderColor: '#E9E9E9',
                         color: '#212121',
-                        fontFamily: 'Poppins, sans-serif'
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobileFromProfile ? '11px' : '14px'
                       }}
                       onFocus={(e) => {
                         e.currentTarget.style.borderColor = '#CFE8FC';

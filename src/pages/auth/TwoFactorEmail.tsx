@@ -35,7 +35,7 @@ const TwoFactorEmail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
+      <div className={`flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 ${isMobileFromProfile ? 'pt-16' : 'pt-4 lg:pt-16'}`}>
         <div className="w-full max-w-md">
           {/* Mobile Header - Fixed Position */}
           {isMobileFromProfile && (

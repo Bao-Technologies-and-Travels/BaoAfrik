@@ -182,6 +182,8 @@ const ProfileSettings: React.FC = () => {
   });
   const [isTwoFactorPhoneCodeDropdownOpen, setIsTwoFactorPhoneCodeDropdownOpen] = useState(false);
   const [twoFactorVerificationCode, setTwoFactorVerificationCode] = useState(['', '', '', '', '', '']);
+  const [twoFactorCountdown, setTwoFactorCountdown] = useState(60);
+  const [canResendTwoFactorCode, setCanResendTwoFactorCode] = useState(false);
   const twoFactorModalRef = useRef<HTMLDivElement>(null);
   const twoFactorPhoneCodeDropdownRef = useRef<HTMLDivElement>(null);
   const twoFactorCodeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -678,6 +680,8 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
       code: '+1',
       flag: 'us'
     });
+    setTwoFactorCountdown(60);
+    setCanResendTwoFactorCode(false);
   };
 
   const handleTwoFactorEmailSubmit = (e: React.FormEvent) => {
@@ -688,6 +692,15 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
   const handleTwoFactorPhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setTwoFactorModalStep('code');
+    setTwoFactorCountdown(60);
+    setCanResendTwoFactorCode(false);
+  };
+
+  const handleTwoFactorResendCode = () => {
+    if (!canResendTwoFactorCode) return;
+    setTwoFactorCountdown(60);
+    setCanResendTwoFactorCode(false);
+    // TODO: Implement resend API call
   };
 
   const handleTwoFactorCodeSubmit = (e: React.FormEvent) => {
@@ -837,8 +850,12 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
   useEffect(() => {
     if (location.state?.selectedSidebarOption) {
       setSelectedSidebarOption(location.state.selectedSidebarOption);
+      // If navigating to security view on mobile, ensure sidebar is hidden
+      if (isMobile && location.state.selectedSidebarOption === 'security' && location.state.fromTwoFactorSuccess) {
+        setIsMobileSidebarVisible(false);
+      }
     }
-  }, [location.state]);
+  }, [location.state, isMobile]);
 
   useEffect(() => {
     localStorage.setItem('currencyPreference', currencyPreference);
@@ -4136,10 +4153,24 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                 </h2>
 
                 {/* Description */}
-                <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                <p className="text-xs text-center mb-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
                   Enter the authentication code below we sent to<br />
                   {twoFactorSelectedPhoneCode.code} {twoFactorPhone ? `${twoFactorPhone.charAt(0)}${'*'.repeat(Math.max(0, twoFactorPhone.length - 1))}` : '******'}
                 </p>
+                {!canResendTwoFactorCode ? (
+                  <p className="text-[11px] mt-1 mb-6 text-center" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                    Request another code 0:{twoFactorCountdown.toString().padStart(2, '0')}
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleTwoFactorResendCode}
+                    className="text-[11px] mb-6 mx-auto block focus:outline-none"
+                    style={{ color: '#64B5F6', textDecoration: 'underline', fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    Request a new digital code
+                  </button>
+                )}
 
                 {/* Form */}
                 <form onSubmit={handleTwoFactorCodeSubmit} className="space-y-4">
@@ -4224,7 +4255,8 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
                 {/* Description */}
                 <p className="text-sm mb-12" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', fontWeight: 300 }}>
                   Your phone number is set to {twoFactorSelectedPhoneCode.code} {twoFactorPhone ? `${twoFactorPhone.charAt(0)}${'*'.repeat(Math.max(0, twoFactorPhone.length - 1))}` : '******'}<br />
-                  Authentification code will be sent to this number when you logging in
+                  Authentification code will be sent to this number<br />
+                  when you logging in
                 </p>
 
                 {/* Close Button */}
