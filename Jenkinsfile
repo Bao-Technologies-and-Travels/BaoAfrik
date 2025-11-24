@@ -5,7 +5,7 @@ pipeline {
     environment {
         NODE_ENV = 'staging'
         SSH_KEY_ID = 'baoafrik-key'
-        SSH_HOST = credentials('ssh_host')
+        SSH_HOST = 'ubuntu@98.93.17.166'
         FRONTEND_DIR = '~/BaoAfrik/frontend'
         BACKEND_DIR = '~/BaoAfrik/backend'
         APP_NAME_FRONTEND = 'frontend'
@@ -68,7 +68,7 @@ pipeline {
                         if ! command -v certbot &> /dev/null; then
                             sudo apt install -y certbot python3-certbot-nginx
                         fi
-                        
+
                         # Setup PM2
                         pm2 startup systemd
 
