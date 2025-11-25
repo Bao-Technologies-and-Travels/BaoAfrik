@@ -780,9 +780,11 @@ const Messages: React.FC = () => {
         const currentConv = conversations.find((c) => c.id === conversationId);
         if (currentConv) {
           setCurrentConversation(currentConv);
-          if (currentConv.productData) {
-            setProductData(currentConv.productData);
-            setIsProductInquiry(true);
+          const navIsInquiry = !!location.state?.isProductInquiry;
+          if(!navIsInquiry && !hasProcessedLocationState.current) {
+            setProductData(undefined);
+            setIsProductInquiry(false);
+            setPreFilledMessage("");
           }
         }
 
@@ -4066,7 +4068,7 @@ const Messages: React.FC = () => {
                       {/* Content */}
                       <div className="flex-1">
                         <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                          {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
+                          {replyToMessage.isIncoming ? `${currentConversation.participant.firstName || ""} ${currentConversation.participant.lastName || "" }`.trim() : 'You'}
                         </div>
                         <div className="text-xs" style={{ color: '#6A6A6A' }}>
                           {replyToMessage.text}
@@ -6996,7 +6998,7 @@ const Messages: React.FC = () => {
                           {/* Content */}
                           <div className="flex-1">
                             <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                              {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
+                              {replyToMessage.isIncoming ? `${currentConversation.participant.firstName || ""} ${currentConversation.participant.lastName || "" }`.trim() : 'You'}
                             </div>
                             <div className="text-xs" style={{ color: '#6A6A6A' }}>
                               {replyToMessage.text}
