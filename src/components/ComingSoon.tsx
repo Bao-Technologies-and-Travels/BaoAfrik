@@ -16,17 +16,22 @@ import VerificationBadge from '../assets/images/Seller Verification.svg';
 import RatingStars from '../assets/images/Rating Stars.svg';
 import ProductTitleContainer from '../assets/images/Product Title Container.svg';
 
+// Slide 1 imports
+import Slide1MainProduct from '../assets/images/slide1/Main Product Image (1).svg';
+import Slide1ProductTitle from '../assets/images/slide1/Product Title Container (3).svg';
+import Slide1LocationImage from '../assets/images/slide1/Product Image.png';
+
 // Slide 2 imports
-import Slide2MainProduct from '../assets/images/slide2/Frame 930.png';
-import Slide2ProductTitle from '../assets/images/slide2/Product Title Container (1).svg';
-import Slide2LocationImage from '../assets/images/slide2/Frame 940.png';
+import Slide2MainProduct from '../assets/images/slide2/Frame 930 (2).svg';
+import Slide2ProductTitle from '../assets/images/slide2/Product Title Container (4).svg';
+import Slide2LocationImage from '../assets/images/slide2/Frame 940 (4).svg';
 import Slide2CountryBadge from '../assets/images/slide2/Product Location (1).svg';
 import Slide2NigeriaFlag from '../assets/images/slide2/nigeria.svg';
 import Slide2SellerBadge from '../assets/images/slide2/Seller Avatar Container (1).svg';
 
 // Slide 3 imports
-import Slide3MainProduct from '../assets/images/slide3/image.png';
-import Slide3ProductTitle from '../assets/images/slide3/Product Title Container (2).svg';
+import Slide3MainProduct from '../assets/images/slide3/Main Product Image (2).svg';
+import Slide3ProductTitle from '../assets/images/slide3/Product Title Container (5).svg';
 import Slide3LocationImage from '../assets/images/slide3/Frame 940 (1).png';
 import Slide3LocationDetails from '../assets/images/slide3/Location Details.svg';
 import Slide3SellerAvatar from '../assets/images/slide3/Seller Avatar (2).svg';
@@ -86,18 +91,18 @@ const ComingSoon: React.FC = () => {
 
   const slides = [
     {
-      mainProduct: MainProductImage,
-      productTitle: ProductTitleContainer,
-      locationImage: ProductImage,
+      mainProduct: Slide1MainProduct,
+      productTitle: Slide1ProductTitle,
+      locationImage: Slide1LocationImage,
       sellerName: 'Joaquin EDMO',
       sellerAvatar: SellerAvatar,
       useSellerContainer: false,
       country: 'Cameroon',
-      locationText: 'London, United Kingd...',
-      locationSubtext: 'Home, SW8 LONDON',
+      locationText: 'London, United Kingdom',
+      locationSubtext: 'map.google.com',
       showPriceCard: true,
       showLocationCard: true,
-      showCountryBadge: false,
+      showCountryBadge: true,
       countryIcon: LocationIcon
     },
     {
@@ -109,7 +114,7 @@ const ComingSoon: React.FC = () => {
       useSellerContainer: true,
       country: 'Nigeria',
       countryIcon: Slide2NigeriaFlag,
-      locationText: 'Saint-Etienne, France',
+      locationText: 'Birmingham, United Kingdom',
       locationSubtext: 'map.google.com',
       showPriceCard: true,
       showLocationCard: true,
@@ -124,7 +129,7 @@ const ComingSoon: React.FC = () => {
       useSellerContainer: false,
       country: 'Ivory Coast',
       countryIcon: Slide3IvoryCoastFlag,
-      locationText: 'Zurich, Switzerland',
+      locationText: 'Plymouth, United Kingdom',
       locationSubtext: 'map.google.com',
       locationDetails: Slide3LocationDetails,
       showPriceCard: true,
@@ -404,35 +409,35 @@ const ComingSoon: React.FC = () => {
             </div>
 
             {/* 1. Product Price Card - Position changes per slide */}
-            <div key={`price-${currentSlide}`} className={`absolute z-20 animate-float-2 ${currentSlide === 1 ? 'top-8 left-2 lg:top-12 lg:left-12' : 'top-0 right-2 lg:right-0'}`}>
-              <div className="relative bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-3 pl-4 lg:p-5 lg:pl-6 min-w-[140px] lg:min-w-[220px]">
+            <div key={`price-${currentSlide}`} className={`absolute z-20 animate-float-2 ${currentSlide === 1 ? 'top-2 left-2 lg:top-4 lg:left-8' : 'top-0 right-2 lg:right-0'}`}>
+              <div className="relative bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-2 pl-3 lg:p-4 lg:pl-5 min-w-[120px] lg:min-w-[200px]">
                 {/* Floating yellow price icon at the edge */}
-                <div className="absolute -left-3 lg:-left-4 top-2 lg:top-3 bg-[#F9A825] p-1.5 lg:p-2.5 rounded-full shadow-lg z-10">
-                  <img src={PriceIcon} alt="Price" className="w-3 h-3 lg:w-5 lg:h-5" />
+                <div className="absolute -left-2.5 lg:-left-3 top-2 lg:top-3 bg-[#F9A825] p-1 lg:p-2 rounded-full shadow-lg z-10">
+                  <img src={PriceIcon} alt="Price" className="w-2.5 h-2.5 lg:w-4 lg:h-4" />
                 </div>
                 
-                <div className="pl-4 lg:pl-6">
-                  <img src={slides[currentSlide].productTitle} alt="Product Price" className="w-full max-w-[100px] lg:max-w-[180px]" />
+                <div className="pl-3 lg:pl-5">
+                  <img src={slides[currentSlide].productTitle} alt="Product Price" className="w-full max-w-[85px] lg:max-w-[160px]" />
                 </div>
               </div>
             </div>
 
             {/* 2. Location Image Card - Position changes per slide */}
-            <div key={`location-${currentSlide}`} className={`absolute z-20 animate-float-1 ${currentSlide === 0 || currentSlide === 3 || currentSlide === 4 ? 'top-16 left-2 lg:top-20 lg:left-8' : currentSlide === 1 ? 'top-28 right-2 lg:top-36 lg:right-12' : 'top-8 left-2 lg:left-8'}`}>
-              <div className="relative bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-2 lg:p-3 max-w-[110px] lg:max-w-[170px]">
+            <div key={`location-${currentSlide}`} className={`absolute z-20 animate-float-1 ${currentSlide === 0 || currentSlide === 3 || currentSlide === 4 ? 'top-16 left-2 lg:top-20 lg:left-8' : currentSlide === 1 ? 'bottom-20 right-2 lg:bottom-24 lg:right-12' : 'top-8 left-2 lg:left-8'}`}>
+              <div className="relative bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-1.5 lg:p-2.5 max-w-[95px] lg:max-w-[150px]">
                 {/* Yellow camera icon floating at edge */}
-                <div className={`absolute bg-[#F9A825] p-1.5 lg:p-2.5 rounded-full shadow-lg z-10 ${currentSlide === 0 ? '-top-2 lg:-top-3 -left-2 lg:-left-3' : '-top-2 lg:-top-3 -left-2 lg:-left-3'}`}>
-                  <img src={ProductIcon} alt="Location" className="w-3 h-3 lg:w-5 lg:h-5" />
+                <div className={`absolute bg-[#F9A825] p-1 lg:p-2 rounded-full shadow-lg z-10 ${currentSlide === 1 ? '-top-1.5 lg:-top-2 -right-1.5 lg:-right-2' : '-top-1.5 lg:-top-2 -left-1.5 lg:-left-2'}`}>
+                  <img src={ProductIcon} alt="Location" className="w-2.5 h-2.5 lg:w-4 lg:h-4" />
                 </div>
                 
                 <img
                   src={slides[currentSlide].locationImage}
                   alt="Location"
-                  className="w-full h-20 lg:h-36 object-cover rounded-xl"
+                  className="w-full h-16 lg:h-32 object-cover rounded-xl"
                 />
-                <p className="text-[10px] lg:text-xs text-gray-900 font-medium mt-1.5 lg:mt-2.5 leading-tight">{slides[currentSlide].locationText}</p>
-                <p className="text-[8px] lg:text-[10px] text-gray-400 leading-tight">{slides[currentSlide].locationSubtext}</p>
-                <button className="mt-1.5 lg:mt-2.5 text-white text-[9px] lg:text-[11px] font-medium px-2 lg:px-4 py-1 lg:py-1.5 rounded-full transition-colors inline-block" style={{ backgroundColor: '#F9A825' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E89515'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9A825'}>
+                <p className="text-[9px] lg:text-[11px] text-gray-900 font-medium mt-1 lg:mt-2 leading-tight">{slides[currentSlide].locationText}</p>
+                <p className="text-[7px] lg:text-[9px] text-gray-400 leading-tight">{slides[currentSlide].locationSubtext}</p>
+                <button className="mt-1 lg:mt-2 text-white text-[8px] lg:text-[10px] font-medium px-1.5 lg:px-3 py-0.5 lg:py-1 rounded-full transition-colors inline-block" style={{ backgroundColor: '#F9A825' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E89515'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9A825'}>
                   Go to
                 </button>
               </div>
@@ -440,38 +445,38 @@ const ComingSoon: React.FC = () => {
 
             {/* 3. Bottom-Left Seller Badge */}
             <div key={`seller-${currentSlide}`} className="absolute bottom-20 left-2 lg:bottom-28 lg:left-16 z-20 animate-float-3">
-              <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-2 py-1.5 lg:px-3 lg:py-2 flex items-center gap-1.5 lg:gap-2.5 min-w-[120px] lg:min-w-[180px]">
+              <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-1.5 py-1 lg:px-2.5 lg:py-1.5 flex items-center gap-1 lg:gap-2 min-w-[100px] lg:min-w-[160px]">
                 <img
                   src={slides[currentSlide].useSellerContainer ? slides[currentSlide].sellerBadgeContainer : slides[currentSlide].sellerAvatar}
                   alt="Seller"
-                  className="w-7 h-7 lg:w-10 lg:h-10 rounded-full flex-shrink-0"
+                  className="w-6 h-6 lg:w-9 lg:h-9 rounded-full flex-shrink-0"
                 />
                 <div className="flex flex-col gap-0.5">
-                  <p className="font-semibold text-gray-900 text-[10px] lg:text-xs leading-tight whitespace-nowrap">{slides[currentSlide].sellerName}</p>
-                  <img src={VerificationBadge} alt="Verified Seller" className="h-3 lg:h-4" />
+                  <p className="font-semibold text-gray-900 text-[9px] lg:text-[11px] leading-tight whitespace-nowrap">{slides[currentSlide].sellerName}</p>
+                  <img src={VerificationBadge} alt="Verified Seller" className="h-2.5 lg:h-3.5" />
                 </div>
               </div>
               {/* Slide 3: Dimension badge */}
               {currentSlide === 2 && slides[currentSlide].locationDetails && (
-                <div className="mt-2 flex justify-center">
-                  <img src={slides[currentSlide].locationDetails} alt="Dimensions" className="h-6" />
+                <div className="mt-1.5 flex justify-center">
+                  <img src={slides[currentSlide].locationDetails} alt="Dimensions" className="h-5 lg:h-6" />
                 </div>
               )}
             </div>
 
             {/* 4. Country Tag/Badge - Same styling for all slides */}
-            <div key={`country-${currentSlide}`} className={`absolute z-20 animate-float-4 ${currentSlide === 1 ? 'top-8 right-2 lg:right-12' : 'bottom-16 right-2 lg:bottom-20 lg:right-16'}`}>
-              <div className="bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-2 py-1.5 lg:px-4 lg:py-2 flex items-center gap-1.5 lg:gap-2">
-                <img src={slides[currentSlide].countryIcon} alt={`${slides[currentSlide].country} Flag`} className="w-4 h-4 lg:w-6 lg:h-6" />
+            <div key={`country-${currentSlide}`} className={`absolute z-20 animate-float-4 ${currentSlide === 1 ? 'top-2 right-2 lg:top-4 lg:right-12' : 'bottom-16 right-2 lg:bottom-20 lg:right-16'}`}>
+              <div className="bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-1.5 py-1 lg:px-3 lg:py-1.5 flex items-center gap-1 lg:gap-1.5">
+                <img src={slides[currentSlide].countryIcon} alt={`${slides[currentSlide].country} Flag`} className="w-3.5 h-3.5 lg:w-5 lg:h-5" />
                 <div>
-                  <p className="text-[8px] lg:text-[10px] text-gray-400">From</p>
-                  <p className="text-[10px] lg:text-xs font-semibold text-gray-900">{slides[currentSlide].country}</p>
+                  <p className="text-[7px] lg:text-[9px] text-gray-400">From</p>
+                  <p className="text-[9px] lg:text-[11px] font-semibold text-gray-900">{slides[currentSlide].country}</p>
                 </div>
               </div>
               {/* Slide 4: Dimension badge */}
               {currentSlide === 3 && slides[currentSlide].locationDetails && (
-                <div className="mt-2 flex justify-center">
-                  <img src={slides[currentSlide].locationDetails} alt="Dimensions" className="h-6" />
+                <div className="mt-1.5 flex justify-center">
+                  <img src={slides[currentSlide].locationDetails} alt="Dimensions" className="h-5 lg:h-6" />
                 </div>
               )}
             </div>
