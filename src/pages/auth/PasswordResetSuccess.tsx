@@ -172,13 +172,13 @@ const PasswordResetSuccess: React.FC = () => {
                   Back to setting page ({countdown}s)
                 </button>
               ) : (
-                <Link 
+              <Link 
                   to="/" 
                   className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-2.5 text-sm font-normal rounded-[10px] transition-colors duration-200"
                   style={{ backgroundColor: '#F9A825', color: '#FFFFFF' }}
-                >
+              >
                   Back to home page
-                </Link>
+              </Link>
               )}
             </div>
           </div>

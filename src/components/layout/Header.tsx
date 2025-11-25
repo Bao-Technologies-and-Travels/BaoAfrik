@@ -87,10 +87,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
       
       if (state?.highlightChats) {
         setHighlightChats(true);
-        // Clear the highlight after 2 seconds
-        setTimeout(() => {
-          setHighlightChats(false);
-        }, 2000);
+      // Clear the highlight after 2 seconds
+      setTimeout(() => {
+        setHighlightChats(false);
+      }, 2000);
       }
       
       if (state?.highlightSettings) {
