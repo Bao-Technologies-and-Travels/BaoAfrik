@@ -62,22 +62,32 @@ interface CountdownTime {
   seconds: number;
 }
 
+interface UserSubmission {
+  fullName: string;
+  email: string;
+  userType: string;
+  timestamp: string;
+  ipAddress?: string;
+}
+
 const ComingSoon: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [userType, setUserType] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
-  
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Calculate initial countdown to December 31st
   const calculateTimeLeft = (): CountdownTime => {
     const now = new Date();
     const targetDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59); // December 31st, 11:59:59 PM
     const difference = targetDate.getTime() - now.getTime();
-    
+
     if (difference <= 0) {
       return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     }
-    
+
     return {
       days: Math.floor(difference / (1000 * 60 * 60 * 24)),
       hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
@@ -85,9 +95,84 @@ const ComingSoon: React.FC = () => {
       seconds: Math.floor((difference / 1000) % 60),
     };
   };
-  
+
   const [timeLeft, setTimeLeft] = useState<CountdownTime>(calculateTimeLeft());
   const [showModal, setShowModal] = useState(false);
+  const [submissions, setSubmissions] = useState<UserSubmission[]>([]);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+  const [lastExportDate, setLastExportDate] = useState<string>('');
+
+  // formatTimestamp to normal human readable format
+  const formatTimestamp = (date: Date): string => {
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    })
+  }
+
+  // Load submissions and last export on component mount
+  useEffect(() => {
+    const savedSubmissions = localStorage.getItem('baoafrikSubmissions');
+    const savedExportDate = localStorage.getItem('baoafrikLastExport');
+
+    if (savedSubmissions) {
+      try {
+        setSubmissions(JSON.parse(savedSubmissions));
+      } catch (error) {
+        console.error('Error loading submissions:', error);
+      }
+    }
+
+    if(savedExportDate) {
+      setLastExportDate(savedExportDate);
+    }
+  }, []);
+
+  // save submissions whenever submissions state changes
+  useEffect(() => {
+    localStorage.setItem('baoafrikSubmissions', JSON.stringify(submissions));
+  }, [submissions]);
+
+  // auto-export daily at midnight
+  useEffect(() => {
+    const checkAndExport = () => {
+      const today = new Date().toDateString();
+
+      // if we have not exported today and there are submissions
+      if (lastExportDate !== today && submissions.length > 0) {
+        autoExportData();
+        setLastExportDate(today);
+        localStorage.setItem('baoafrikLastExport', today);
+      }
+    };
+
+    // check hourly if we need to export
+    const interval = setInterval(checkAndExport, 60 * 60 * 1000);
+
+    // initial check
+    checkAndExport();
+    
+    return () => clearInterval(interval);
+  }, [submissions, lastExportDate]);
+
+  // admin panel toggle (hidden by default)
+  useEffect(() => {
+    // keyboard shortcut to show admin panel: ctrl + shift + q
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'Q') {
+        e.preventDefault();
+        setShowAdminPanel(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   const slides = [
     {
@@ -187,11 +272,182 @@ const ComingSoon: React.FC = () => {
     return () => clearInterval(slideTimer);
   }, [slides.length]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // get user IP address
+  const getUserIP = async (): Promise<string> => {
+    try {
+       const endpoints = [
+        'https://api.ipify.org?format=json',
+        'https://api64.ipify.org?format=json',
+        'https://jsonip.com',
+        'https://ipapi.co/json/'
+      ];
+
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Accept': 'application/json',
+            },
+          });
+
+          if(response.ok) {
+            const data = await response.json();
+            return data.ip || data.ipaddress || data.query || 'Unknown';
+          }
+        } catch (error) {
+          console.log(`Failed to fetch from ${endpoint}, trying next...`);
+          continue;
+        }
+      }
+
+      return 'IP not available';
+    } catch (error) {
+      console.error('Error fetching IP', error);
+      return 'Unknown';
+    }
+  };
+
+  // check if email already exists
+  const isEmailRegistered = (email: string): boolean => {
+    return submissions.some(sub => sub.email.toLowerCase() === email.toLowerCase());
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ fullName, email, userType });
-    // Show success modal
-    setShowModal(true);
+
+    // basic validation
+    if (!fullName.trim() || !email.trim() || !userType) {
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    if (isEmailRegistered(email)) {
+      setShowDuplicateModal(true);
+      return;
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // create new submission
+      const newSubmission: UserSubmission = {
+        fullName: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        userType,
+        timestamp: formatTimestamp(new Date()),
+        ipAddress: await getUserIP(),
+      };
+
+      setSubmissions(prev => [...prev, newSubmission]);
+
+      // reset form
+      setFullName('');
+      setEmail('');
+      setUserType('');
+
+      // Show success modal after a brief delay
+      setTimeout(() => {
+        setShowModal(true);
+      }, 100);
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('There was an error submitting the form. Please try again.');
+    }
+  };
+
+  // automatic daily export
+  const autoExportData = () => {
+    if (submissions.length === 0) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    const headers = ['Full Name', 'Email', 'User Type', 'Timestamp'];
+
+    const csvContent = [
+      headers.join(','),
+      ...submissions.map(sub => [
+        `"${sub.fullName.replace(/"/g, '""')}"`,
+        sub.email,
+        sub.userType,
+        `"${sub.timestamp}"`,
+        // sub.ipAddress,
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bao-afrik-leads-auto-${today}.csv`);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    console.log(`Auto-exported ${submissions.length} leads on ${today}`);
+  };
+
+  // export data to CSV
+  const exportToCSV = () => {
+    if (submissions.length === 0) {
+      alert('No data to export');
+      return;
+    }
+
+    const headers = ['Full Name', 'Email', 'User Type', 'Timestamp'];
+
+    const csvContent = [
+      headers.join(','),
+      ...submissions.map(sub => [
+        `"${sub.fullName.replace(/"/g, '""')}"`,
+        sub.email,
+        sub.userType,
+       `"${sub.timestamp}"`,
+        // sub.ipAddress,
+      ].join('.'))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `baoafrik-leads-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // export to JSON
+  const exportToJSON = () => {
+    if (submissions.length === 0) {
+      alert('No data to export');
+      return;
+    }
+
+    const dateStr = JSON.stringify(submissions, null, 2);
+    const blob = new Blob([dateStr], { type: 'application/json' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `baoafrik-leads-${new Date().toISOString().split('T')[0]}.json`);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const isFormComplete = fullName.trim() !== '' && email.trim() !== '' && userType !== '';
@@ -206,38 +462,38 @@ const ComingSoon: React.FC = () => {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black bg-opacity-40"
             onClick={() => setShowModal(false)}
           />
-          
+
           {/* Modal */}
           <div className="relative bg-white rounded-3xl shadow-2xl max-w-xl w-full mx-4 p-8 z-10">
             {/* Close button */}
-            <button 
+            <button
               onClick={() => setShowModal(false)}
               className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            
+
             {/* Success Icon */}
             <div className="flex justify-center mb-6">
               <img src={SuccessIcon} alt="Success" className="w-20 h-20" />
             </div>
-            
+
             {/* Heading */}
             <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">
               You have been registered
             </h2>
-            
+
             {/* Message */}
             <p className="text-gray-500 text-center mb-8 leading-relaxed">
               Thank you for committing to be one of the first users of BAO Afrik and its community. We will keep you informed once the platform is operational.
             </p>
-            
+
             {/* Close Button */}
             <button
               onClick={() => setShowModal(false)}
@@ -251,6 +507,89 @@ const ComingSoon: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Duplicate Email Modal */}
+      {showDuplicateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-40"
+            onClick={() => setShowDuplicateModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-white rounded-3xl shadow-2xl max-w-xl w-full mx-4 p-8 z-10">
+            {/* Close button */}
+            <button
+              onClick={() => setShowDuplicateModal(false)}
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            {/* Info Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="#F9A825" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Heading */}
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">
+              Already Waitlisted
+            </h2>
+
+            {/* Message */}
+            <p className="text-gray-500 text-center mb-8 leading-relaxed">
+              This email is already registered in our waitlist. You will be notified once the platform is operational.
+            </p>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowDuplicateModal(false)}
+              className="w-full py-4 rounded-xl font-semibold text-white transition-colors"
+              style={{ backgroundColor: '#F9A825' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E89515'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9A825'}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Admin panel (hidden by default) */}
+      {showAdminPanel && (
+        <div className="fixed top-4 right-4 z-40 bg-white p-4 rounded-lg shadow-lg border">
+          <div className="text-sm font-semibold mb-2">Admin Panel</div>
+          <div className="space-y-2">
+            <div className="text-xs">Leads: {submissions.length}</div>
+            <button
+              onClick={exportToCSV}
+              className="w-full bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600"
+            >
+              Export CSV
+            </button>
+            <button
+              onClick={exportToJSON}
+              className="w-full bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600"
+            >
+              Export JSON
+            </button>
+            {/* <button 
+              onClick={clearAllData}
+              className="w-full bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600"
+            >
+              Clear Data
+            </button> */}
+          </div>
+        </div>
+      )}
+
       <header className="px-6 lg:px-16 py-6">
         <div className="max-w-7xl mx-auto">
           {/* Desktop Header */}
@@ -288,7 +627,7 @@ const ComingSoon: React.FC = () => {
             <p className="text-xs text-gray-400">
               Bringing home closer to Africans abroad
             </p>
-            
+
             {/* Mobile Countdown */}
             <div className="mt-10">
               <div className="flex items-center justify-center gap-2">
@@ -298,21 +637,21 @@ const ComingSoon: React.FC = () => {
                   <span className="text-3xl font-bold" style={{ color: '#F9A825' }}>{formatTime(timeLeft.days)}</span>
                 </div>
                 <span className="text-3xl font-bold text-gray-300 mt-6">:</span>
-                
+
                 {/* Hours */}
                 <div className="flex flex-col items-center">
                   <span className="text-xs text-gray-400 uppercase tracking-wider mb-2">Hours</span>
                   <span className="text-3xl font-bold text-gray-900">{formatTime(timeLeft.hours)}</span>
                 </div>
                 <span className="text-3xl font-bold text-gray-300 mt-6">:</span>
-                
+
                 {/* Minutes */}
                 <div className="flex flex-col items-center">
                   <span className="text-xs text-gray-400 uppercase tracking-wider mb-2">Minutes</span>
                   <span className="text-3xl font-bold text-gray-900">{formatTime(timeLeft.minutes)}</span>
                 </div>
                 <span className="text-3xl font-bold text-gray-300 mt-6">:</span>
-                
+
                 {/* Seconds */}
                 <div className="flex flex-col items-center">
                   <span className="text-xs text-gray-400 uppercase tracking-wider mb-2">Seconds</span>
@@ -379,11 +718,10 @@ const ComingSoon: React.FC = () => {
               <button
                 type="submit"
                 disabled={!isFormComplete}
-                className={`w-full flex items-center justify-center gap-1.5 rounded-xl transition-all py-3 ${
-                  isFormComplete
-                    ? 'text-white cursor-pointer'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}
+                className={`w-full flex items-center justify-center gap-1.5 rounded-xl transition-all py-3 ${isFormComplete
+                  ? 'text-white cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
                 style={{
                   ...(isFormComplete && { backgroundColor: '#F9A825' })
                 }}
@@ -415,7 +753,7 @@ const ComingSoon: React.FC = () => {
                 <div className="absolute -left-2.5 lg:-left-3 top-2 lg:top-3 bg-[#F9A825] p-1 lg:p-2 rounded-full shadow-lg z-10">
                   <img src={PriceIcon} alt="Price" className="w-2.5 h-2.5 lg:w-4 lg:h-4" />
                 </div>
-                
+
                 <div className="pl-3 lg:pl-5">
                   <img src={slides[currentSlide].productTitle} alt="Product Price" className="w-full max-w-[85px] lg:max-w-[160px]" />
                 </div>
@@ -429,7 +767,7 @@ const ComingSoon: React.FC = () => {
                 <div className={`absolute bg-[#F9A825] p-1 lg:p-2 rounded-full shadow-lg z-10 ${currentSlide === 1 ? '-top-1.5 lg:-top-2 -right-1.5 lg:-right-2' : '-top-1.5 lg:-top-2 -left-1.5 lg:-left-2'}`}>
                   <img src={ProductIcon} alt="Location" className="w-2.5 h-2.5 lg:w-4 lg:h-4" />
                 </div>
-                
+
                 <img
                   src={slides[currentSlide].locationImage}
                   alt="Location"
