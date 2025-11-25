@@ -44,7 +44,7 @@ const MyListings: React.FC = () => {
   const primaryButtonLabel = isSearchNoResultsState ? 'Clear search' : 'Add listing';
 
   const renderEmptyState = () => (
-    <div className="text-center py-8">
+    <div className="text-center py-6">
       <img
         src={bagIcon}
         alt="Empty listings"
@@ -87,6 +87,10 @@ const MyListings: React.FC = () => {
   );
 
   const breadcrumbStyle = { color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' };
+  const toggleIconFilters = {
+    active: 'brightness(0) saturate(100%) invert(64%) sepia(21%) saturate(900%) hue-rotate(173deg) brightness(96%) contrast(96%)',
+    inactive: 'brightness(0) saturate(100%) invert(84%) sepia(9%) saturate(644%) hue-rotate(177deg) brightness(104%) contrast(91%)'
+  };
 
   return (
     <>
@@ -95,7 +99,7 @@ const MyListings: React.FC = () => {
         <div className="flex-1">
           <div className="max-w-6xl mx-auto w-full pl-0 pr-0 py-8 flex flex-col lg:flex-row lg:justify-between gap-8">
             <div className="flex-1 lg:pl-0 lg:-ml-16">
-              <nav className="flex items-center space-x-2 text-xs sm:text-sm mb-4" style={breadcrumbStyle}>
+              <nav className="flex items-center space-x-2 text-xs sm:text-sm mb-8" style={breadcrumbStyle}>
                 <img
                   src={arrowLeftIcon}
                   alt="Back"
@@ -116,51 +120,50 @@ const MyListings: React.FC = () => {
 
               <div>
                 <h1
-                  className="text-lg sm:text-xl font-semibold"
+                  className="text-base sm:text-lg font-semibold"
                   style={{ color: '#1E1E1E', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   Manage your listings
                 </h1>
                 <p
-                  className="text-xs sm:text-sm mt-2 max-w-3xl"
+                  className="text-[11px] sm:text-xs mt-2 max-w-3xl leading-relaxed"
                   style={{ color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}
                 >
-                  Manage product listings easily. Add items, update details, and track metrics to improve sales.
-                  Start by adding a listing or auditing inventory.
+                  Manage product listings easily. Add items, update details, and track metrics
+                  <span className="block">
+                    to improve sales. Start by adding a listing or auditing inventory.
+                  </span>
                 </p>
               </div>
             </div>
 
             <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-6">
               <div
-                className="inline-flex items-center px-2 py-1 border"
-                style={{ borderColor: '#CFE8FC', backgroundColor: '#FFFFFF', borderRadius: '16px' }}
+                className="inline-flex items-center border mb-4 overflow-hidden"
+                style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
               >
                 {(['list', 'grid'] as ViewMode[]).map((mode) => (
                   <button
                     key={mode}
                     type="button"
                     onClick={() => setViewMode(mode)}
-                    className="flex items-center justify-center px-3 py-2 rounded-2xl transition-colors"
+                    className="flex items-center justify-center px-3 py-2 transition-colors flex-1"
                     style={{
-                      backgroundColor: viewMode === mode ? '#64B5F6' : 'transparent'
+                      backgroundColor: viewMode === mode ? '#CFE8FC' : 'transparent'
                     }}
                   >
                     <img
                       src={mode === 'list' ? listIcon : gridIcon}
                       alt={`${mode} view`}
                       style={{
-                        filter:
-                          viewMode === mode
-                            ? 'brightness(0) saturate(100%) invert(100%)'
-                            : 'brightness(0) saturate(100%) invert(58%) sepia(19%) saturate(475%) hue-rotate(171deg) brightness(96%) contrast(95%)'
+                        filter: viewMode === mode ? toggleIconFilters.active : toggleIconFilters.inactive
                       }}
                     />
                   </button>
                 ))}
               </div>
 
-              <div className="w-full">
+              <div className="w-[90%]">
                 <input
                   type="text"
                   value={searchQuery}
@@ -180,7 +183,7 @@ const MyListings: React.FC = () => {
             </div>
           </div>
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-6">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-28 mb-0">
             {shouldShowEmptyState ? renderEmptyState() : null}
           </div>
         </div>
