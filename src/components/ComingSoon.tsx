@@ -67,16 +67,26 @@ interface UserSubmission {
   email: string;
   userType: string;
   timestamp: string;
-  ipAddress?: string;
 }
+
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? '/api'
+  : 'http://localhost:3001/api';
 
 const ComingSoon: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [userType, setUserType] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
+
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionsCount, setSubmissionsCount] = useState(0);
+  const [weeklyStats, setWeeklyStats] = useState({
+    weeklyCount: 0,
+    totalCount: 0,
+    weekStart: ''
+  });
 
   // Calculate initial countdown to December 31st
   const calculateTimeLeft = (): CountdownTime => {
@@ -113,52 +123,7 @@ const ComingSoon: React.FC = () => {
       second: '2-digit',
       hour12: true,
     })
-  }
-
-  // Load submissions and last export on component mount
-  useEffect(() => {
-    const savedSubmissions = localStorage.getItem('baoafrikSubmissions');
-    const savedExportDate = localStorage.getItem('baoafrikLastExport');
-
-    if (savedSubmissions) {
-      try {
-        setSubmissions(JSON.parse(savedSubmissions));
-      } catch (error) {
-        console.error('Error loading submissions:', error);
-      }
-    }
-
-    if(savedExportDate) {
-      setLastExportDate(savedExportDate);
-    }
-  }, []);
-
-  // save submissions whenever submissions state changes
-  useEffect(() => {
-    localStorage.setItem('baoafrikSubmissions', JSON.stringify(submissions));
-  }, [submissions]);
-
-  // auto-export daily at midnight
-  useEffect(() => {
-    const checkAndExport = () => {
-      const today = new Date().toDateString();
-
-      // if we have not exported today and there are submissions
-      if (lastExportDate !== today && submissions.length > 0) {
-        autoExportData();
-        setLastExportDate(today);
-        localStorage.setItem('baoafrikLastExport', today);
-      }
-    };
-
-    // check hourly if we need to export
-    const interval = setInterval(checkAndExport, 60 * 60 * 1000);
-
-    // initial check
-    checkAndExport();
-    
-    return () => clearInterval(interval);
-  }, [submissions, lastExportDate]);
+  };
 
   // admin panel toggle (hidden by default)
   useEffect(() => {
@@ -272,42 +237,39 @@ const ComingSoon: React.FC = () => {
     return () => clearInterval(slideTimer);
   }, [slides.length]);
 
-  // get user IP address
-  const getUserIP = async (): Promise<string> => {
+  // get submissions count from backend
+  const fetchSubmissionsCount = async () => {
     try {
-       const endpoints = [
-        'https://api.ipify.org?format=json',
-        'https://api64.ipify.org?format=json',
-        'https://jsonip.com',
-        'https://ipapi.co/json/'
-      ];
-
-      for (const endpoint of endpoints) {
-        try {
-          const response = await fetch(endpoint, {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-              'Accept': 'application/json',
-            },
-          });
-
-          if(response.ok) {
-            const data = await response.json();
-            return data.ip || data.ipaddress || data.query || 'Unknown';
-          }
-        } catch (error) {
-          console.log(`Failed to fetch from ${endpoint}, trying next...`);
-          continue;
-        }
+      const response = await fetch(`${API_BASE_URL}/admin/submissions`);
+      if (response.ok) {
+        const data = await response.json();
+        setSubmissionsCount(data.length);
       }
-
-      return 'IP not available';
     } catch (error) {
-      console.error('Error fetching IP', error);
-      return 'Unknown';
+      console.error('Error fetching submissions count:', error);
     }
   };
+
+  // get weekly stats from backend
+  const fetchWeeklyStats = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/weekly-stats`);
+      if (response.ok) {
+        const data = await response.json();
+        setWeeklyStats(data);
+      }
+    } catch (error) {
+      console.error('Error fetching weekly stats:', error);
+    }
+  };
+
+  // When admin panel opens
+  useEffect(() => {
+    if (showAdminPanel) {
+      fetchWeeklyStats();
+      fetchSubmissionsCount();
+    }
+  }, [showAdminPanel]);
 
   // check if email already exists
   const isEmailRegistered = (email: string): boolean => {
@@ -337,117 +299,110 @@ const ComingSoon: React.FC = () => {
 
     try {
       // create new submission
-      const newSubmission: UserSubmission = {
+      const submissionData = {
         fullName: fullName.trim(),
         email: email.trim().toLowerCase(),
         userType,
         timestamp: formatTimestamp(new Date()),
-        ipAddress: await getUserIP(),
       };
 
-      setSubmissions(prev => [...prev, newSubmission]);
+      const response = await fetch(`${API_BASE_URL}/waitlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
+      });
 
-      // reset form
-      setFullName('');
-      setEmail('');
-      setUserType('');
+      const result = await response.json();
 
-      // Show success modal after a brief delay
-      setTimeout(() => {
-        setShowModal(true);
-      }, 100);
+      if (response.status === 409) {
+        // duplicate email
+        setShowDuplicateModal(true);
+      } else if (result.success) {
+        // reset form
+        setFullName('');
+        setEmail('');
+        setUserType('');
+
+        // Show success modal after a brief delay
+        setTimeout(() => {
+          setShowModal(true);
+        }, 100);
+
+        // refresh count
+        fetchSubmissionsCount();
+        fetchWeeklyStats();
+      } else {
+        throw new Error(result.message || 'submission failed');
+      }
 
     } catch (error) {
       console.error('Error submitting form:', error);
       alert('There was an error submitting the form. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // automatic daily export
-  const autoExportData = () => {
-    if (submissions.length === 0) return;
+  const exportDataNow = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/export-now`, {
+        method: 'POST',
+      });
+      const result = await response.json();
 
-    const today = new Date().toISOString().split('T')[0];
-    const headers = ['Full Name', 'Email', 'User Type', 'Timestamp'];
-
-    const csvContent = [
-      headers.join(','),
-      ...submissions.map(sub => [
-        `"${sub.fullName.replace(/"/g, '""')}"`,
-        sub.email,
-        sub.userType,
-        `"${sub.timestamp}"`,
-        // sub.ipAddress,
-      ].join(','))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-
-    link.setAttribute('href', url);
-    link.setAttribute('download', `bao-afrik-leads-auto-${today}.csv`);
-    link.style.visibility = 'hidden';
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    console.log(`Auto-exported ${submissions.length} leads on ${today}`);
+      if (result.success) {
+        alert('Export completed and email sent to marketing team!');
+      } else {
+        alert('Export failed: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to trigger export');
+    }
   };
 
-  // export data to CSV
-  const exportToCSV = () => {
-    if (submissions.length === 0) {
-      alert('No data to export');
-      return;
+  const fetchAllSubmissions = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/submissions`);
+      if (response.ok) {
+        const data = await response.json();
+
+        // Convert to CSV and download
+        const headers = ['ID', 'Full Name', 'Email', 'User Type', 'Submission Date', 'Submission Time'];
+        const csvRows = data.map((row: any) => {
+          // Format the date and time properly
+          const submissionDate = new Date(row.created_at).toISOString().split('T')[0];
+          const submissionTime = new Date(row.created_at).toTimeString().split(' ')[0];
+
+          return [
+            row.id,
+            `"${row.full_name.replace(/"/g, '""')}"`,
+            row.email,
+            row.user_type,
+            submissionDate,
+            submissionTime
+          ].join(',');
+        });
+
+        const csvContent = [headers.join(','), ...csvRows].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `bao-afrik-leads-${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Error fetching submissions:', error);
     }
-
-    const headers = ['Full Name', 'Email', 'User Type', 'Timestamp'];
-
-    const csvContent = [
-      headers.join(','),
-      ...submissions.map(sub => [
-        `"${sub.fullName.replace(/"/g, '""')}"`,
-        sub.email,
-        sub.userType,
-       `"${sub.timestamp}"`,
-        // sub.ipAddress,
-      ].join('.'))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-
-    link.setAttribute('href', url);
-    link.setAttribute('download', `baoafrik-leads-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  // export to JSON
-  const exportToJSON = () => {
-    if (submissions.length === 0) {
-      alert('No data to export');
-      return;
-    }
-
-    const dateStr = JSON.stringify(submissions, null, 2);
-    const blob = new Blob([dateStr], { type: 'application/json' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-
-    link.setAttribute('href', url);
-    link.setAttribute('download', `baoafrik-leads-${new Date().toISOString().split('T')[0]}.json`);
-    link.style.visibility = 'hidden';
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   const isFormComplete = fullName.trim() !== '' && email.trim() !== '' && userType !== '';
@@ -564,28 +519,53 @@ const ComingSoon: React.FC = () => {
 
       {/* Admin panel (hidden by default) */}
       {showAdminPanel && (
-        <div className="fixed top-4 right-4 z-40 bg-white p-4 rounded-lg shadow-lg border">
-          <div className="text-sm font-semibold mb-2">Admin Panel</div>
-          <div className="space-y-2">
-            <div className="text-xs">Leads: {submissions.length}</div>
-            <button
-              onClick={exportToCSV}
-              className="w-full bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600"
-            >
-              Export CSV
+        <div className="fixed top-4 right-4 z-40 bg-white p-4 rounded-lg shadow-lg border min-w-[200px]">
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-sm font-semibold">Admin Panel</div>
+            <button onClick={() => setShowAdminPanel(false)} className="text-gray-400 hover:text-gray-600">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
-            <button
-              onClick={exportToJSON}
-              className="w-full bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600"
-            >
-              Export JSON
-            </button>
-            {/* <button 
-              onClick={clearAllData}
-              className="w-full bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600"
-            >
-              Clear Data
-            </button> */}
+          </div>
+
+          <div className="space-y-3">
+            {/* Stats */}
+            <div className="text-xs space-y-1">
+              <div className="flex justify-between">
+                <span>Total Leads:</span>
+                <span className="font-semibold">{submissionsCount}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>This Week:</span>
+                <span className="font-semibold text-green-600">{weeklyStats.weeklyCount}</span>
+              </div>
+            </div>
+
+            <div className="border-t pt-2 space-y-2">
+              <button
+                onClick={fetchAllSubmissions}
+                className="w-full bg-green-500 text-white px-3 py-1.5 rounded text-xs hover:bg-green-600 transition-colors"
+              >
+                Download Full CSV
+              </button>
+              <button
+                onClick={exportDataNow}
+                className="w-full bg-blue-500 text-white px-3 py-1.5 rounded text-xs hover:bg-blue-600 transition-colors"
+              >
+                Send Weekly Export Now
+              </button>
+              <button
+                onClick={fetchWeeklyStats}
+                className="w-full bg-gray-500 text-white px-3 py-1.5 rounded text-xs hover:bg-gray-600 transition-colors"
+              >
+                Refresh Stats
+              </button>
+            </div>
+
+            <div className="text-xs text-gray-500 text-center border-t pt-2">
+              Auto-export: Weekly (Mon 8AM)
+            </div>
           </div>
         </div>
       )}
