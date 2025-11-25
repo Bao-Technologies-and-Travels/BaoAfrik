@@ -165,7 +165,7 @@ pipeline {
                             <h2 style="color: #2E86C1;">BaoAfrik Production Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p>Bao'Afrik coming soon page deployed. Check it out at <a href="${DOMAIN}"></a>.</p>
+                            <p>Bao'Afrik coming soon page deployed. Check it out at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
                         </body>

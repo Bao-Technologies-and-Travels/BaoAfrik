@@ -504,16 +504,16 @@ const ComingSoon: React.FC = () => {
                 FOLLOW US
               </p>
               <div className="flex items-center justify-center gap-4">
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.linkedin.com/company/baoafrik/" className="hover:opacity-70 transition-opacity" target='_blank'>
                   <img src={LinkedInIcon} alt="LinkedIn" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.facebook.com/share/1BUhVwdrDZ/?mibextid=wwXIfr" className="hover:opacity-70 transition-opacity" target='_blank'>
                   <img src={FacebookIcon} alt="Facebook" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.instagram.com/baoafrik?igsh=MWFiamFzenNiaGZ4bQ%3D%3D&utm_source=qr" className="hover:opacity-70 transition-opacity" target='_blank'>
                   <img src={InstagramIcon} alt="Instagram" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.tiktok.com/@baoafrik?_r=1&_t=ZN-91fAWXYNOEB" className="hover:opacity-70 transition-opacity" target='_blank'>
                   <img src={TikTokIcon} alt="TikTok" className="w-7 h-7 opacity-60" />
                 </a>
               </div>
@@ -546,16 +546,16 @@ const ComingSoon: React.FC = () => {
                 FOLLOW US
               </p>
               <div className="flex items-center gap-3">
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.linkedin.com/company/baoafrik/" className="hover:opacity-70 transition-opacity" target="_blank">
                   <img src={LinkedInIcon} alt="LinkedIn" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.facebook.com/share/1BUhVwdrDZ/?mibextid=wwXIfr" className="hover:opacity-70 transition-opacity" target="_blank">
                   <img src={FacebookIcon} alt="Facebook" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.instagram.com/baoafrik?igsh=MWFiamFzenNiaGZ4bQ%3D%3D&utm_source=qr" className="hover:opacity-70 transition-opacity" target="_blank">
                   <img src={InstagramIcon} alt="Instagram" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.tiktok.com/@baoafrik?_r=1&_t=ZN-91fAWXYNOEB" className="hover:opacity-70 transition-opacity" target="_blank">
                   <img src={TikTokIcon} alt="TikTok" className="w-7 h-7 opacity-60" />
                 </a>
               </div>
