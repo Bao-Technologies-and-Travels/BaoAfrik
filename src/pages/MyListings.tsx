@@ -38,6 +38,7 @@ interface Listing {
   reviews: number;
   price: string;
   currency: string;
+  daysLeft?: number;
 }
 
 const MyListings: React.FC = () => {
@@ -46,15 +47,16 @@ const MyListings: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All Status');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   // Mock data - replace with actual data from backend
   const listings = useMemo<Listing[]>(() => [
     { id: '1', title: 'Bonga from Togo', image: a1, status: 'active', rating: 4.8, reviews: 88, price: '678', currency: 'USD' },
     { id: '2', title: 'Coconut Oil Ghana', image: a2, status: 'active', rating: 4.5, reviews: 120, price: '45', currency: 'USD' },
     { id: '3', title: 'Pepper from Benin', image: a3, status: 'inactive', rating: 4.2, reviews: 56, price: '32', currency: 'USD' },
-    { id: '4', title: 'Shrimps from Lome', image: a4, status: 'active', rating: 4.9, reviews: 200, price: '67.8', currency: 'USD' },
+    { id: '4', title: 'Shrimps from Lome', image: a4, status: 'active', rating: 4.9, reviews: 200, price: '67.8', currency: 'USD', daysLeft: 12 },
     { id: '5', title: 'Kinky hair Lagos', image: a5, status: 'active', rating: 4.7, reviews: 150, price: '25', currency: 'USD' },
-    { id: '6', title: 'Gold neck Accra', image: a6, status: 'active', rating: 4.6, reviews: 95, price: '38', currency: 'USD' },
+    { id: '6', title: 'Gold neck Accra', image: a6, status: 'active', rating: 4.6, reviews: 95, price: '38', currency: 'USD', daysLeft: 11 },
     { id: '7', title: 'Baobab nuts Kano', image: a7, status: 'inactive', rating: 4.3, reviews: 78, price: '42', currency: 'USD' },
     { id: '8', title: 'Cowrie bracelets', image: a8, status: 'active', rating: 4.8, reviews: 165, price: '55', currency: 'USD' },
     { id: '9', title: 'Ebony tribal masks', image: a9, status: 'active', rating: 4.9, reviews: 210, price: '89', currency: 'USD' },
@@ -166,26 +168,51 @@ const MyListings: React.FC = () => {
             {/* Status Badge and More Options */}
             <div className="flex items-center justify-between mb-2">
               {/* Status Badge */}
-              <div
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full"
-                style={{
-                  backgroundColor: listing.status === 'active' ? '#EDFBF0' : '#FFF5F5',
-                  fontSize: '10px'
-                }}
-              >
-                <img
-                  src={listing.status === 'active' ? activeIcon : inactiveIcon}
-                  alt={listing.status}
-                  className="w-3 h-3"
-                />
-                <span
-                  style={{
-                    color: listing.status === 'active' ? '#70E183' : '#FF5151',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}
-                >
-                  {listing.status === 'active' ? 'Active' : 'Inactive'}
-                </span>
+              <div>
+                {listing.daysLeft ? (
+                  <div
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: '#FEF6E9',
+                      fontSize: '10px'
+                    }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="10" fill="#FAB951" />
+                      <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span
+                      style={{
+                        color: '#FAB951',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      {listing.daysLeft} Day left
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: listing.status === 'active' ? '#EDFBF0' : '#FFF5F5',
+                      fontSize: '10px'
+                    }}
+                  >
+                    <img
+                      src={listing.status === 'active' ? activeIcon : inactiveIcon}
+                      alt={listing.status}
+                      className="w-3 h-3"
+                    />
+                    <span
+                      style={{
+                        color: listing.status === 'active' ? '#70E183' : '#FF5151',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      {listing.status === 'active' ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* More Options Button */}
@@ -261,59 +288,63 @@ const MyListings: React.FC = () => {
   );
 
   const renderPagination = () => (
-    <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-4 mt-10">
-      <div className="flex items-center gap-2">
-        <button
-          aria-label="Previous page"
-          style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #B0B0B0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
-
-        {paginationNumbers.map((page) => (
-          <span
-            key={page}
+    <div className="flex flex-col lg:flex-row items-center gap-6 mt-12 mb-32 w-full">
+      <div className="flex-1 flex justify-center w-full">
+        <div className="flex items-center gap-3">
+          <button
+            aria-label="Previous page"
             style={{
-              fontFamily: 'Bricolage Grotesque, sans-serif',
-              fontSize: '12px',
-              color: page === currentPage ? '#212121' : '#B0B0B0'
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              backgroundColor: '#F0F0F0',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
-            {page}
-          </span>
-        ))}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
 
-        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif' }}>…</span>
-        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{totalPages}</span>
+          <div className="flex items-center" style={{ gap: '20px' }}>
+            {paginationNumbers.map((page) => (
+              <span
+                key={page}
+                style={{
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontSize: '20px',
+                  color: page === currentPage ? '#212121' : '#B0B0B0'
+                }}
+              >
+                {page}
+              </span>
+            ))}
 
-        <button
-          aria-label="Next page"
-          style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
-            backgroundColor: '#B0B0B0',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 6l6 6-6 6" />
-          </svg>
-        </button>
+            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '20px' }}>…</span>
+            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '20px' }}>{totalPages}</span>
+          </div>
+
+          <button
+            aria-label="Next page"
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              backgroundColor: '#F0F0F0',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
@@ -432,14 +463,18 @@ const MyListings: React.FC = () => {
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search a listing ?"
                   style={{
-                    backgroundColor: '#F1F1F1',
+                    backgroundColor: isSearchFocused ? '#FFFFFF' : '#F1F1F1',
                     color: '#1E1E1E',
                     borderRadius: '8px',
-                    border: 'none',
+                    border: isSearchFocused ? '1px solid #CFE8FC' : '1px solid transparent',
+                    caretColor: '#64B5F6',
                     fontFamily: 'Poppins, sans-serif',
-                    fontSize: '13px'
+                    fontSize: '13px',
+                    transition: 'all 0.2s ease'
                   }}
                   className="w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CFE8FC] placeholder-[#B2B2B2]"
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setIsSearchFocused(false)}
                 />
               </div>
             </div>
@@ -448,7 +483,7 @@ const MyListings: React.FC = () => {
           {/* Filters and Action Buttons Bar */}
           {!shouldShowEmptyState && (
             <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-6 mb-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 lg:pr-0 lg:-mr-6 w-full">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 w-full">
                 {/* Left Side - Filters */}
                 <div className="flex items-center gap-3 flex-wrap">
                   {/* All Listings Badge */}
@@ -496,7 +531,7 @@ const MyListings: React.FC = () => {
                 </div>
 
                 {/* Right Side - Action Buttons */}
-                <div className="flex items-center gap-3 lg:pr-0 lg:-mr-6">
+                <div className="flex items-center gap-3 w-full sm:w-auto sm:self-center lg:ml-auto lg:pr-0 lg:-mr-10">
                   {/* Drafts Button */}
                   <button
                     className="flex items-center space-x-2 px-3 py-1 rounded-xl border"
@@ -550,13 +585,13 @@ const MyListings: React.FC = () => {
 
           {/* Listings Grid or Empty State */}
           <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-4 mb-6">
-            <div className="pl-0 lg:pl-0 lg:-ml-16 lg:pr-0 lg:-mr-6">
+            <div className="pl-0 lg:pl-0 lg:-ml-16">
               {shouldShowEmptyState ? renderEmptyState() : renderListingsGrid()}
             </div>
           </div>
           {!shouldShowEmptyState && (
             <div className="max-w-6xl mx-auto w-full pl-0 pr-0">
-              <div className="pl-0 lg:pl-0 lg:-ml-16 lg:pr-0 lg:-mr-6">
+              <div className="pl-0 lg:pl-0 lg:-ml-16">
                 {renderPagination()}
               </div>
             </div>
