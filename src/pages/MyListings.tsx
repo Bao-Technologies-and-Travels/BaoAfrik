@@ -84,7 +84,7 @@ const MyListings: React.FC = () => {
 
     if (statusFilter !== 'All Status') {
       filtered = filtered.filter((listing) => {
-        if (statusFilter === 'Active') return listing.status === 'active';
+        if (statusFilter === 'Active') return listing.status === 'active' && typeof listing.daysLeft !== 'number';
         if (statusFilter === 'Inactive') return listing.status === 'inactive';
         if (statusFilter === 'Days left') return typeof listing.daysLeft === 'number';
         return true;
@@ -335,7 +335,7 @@ const MyListings: React.FC = () => {
             </svg>
           </button>
 
-          <div className="flex items-center" style={{ gap: '24px' }}>
+          <div className="flex items-center" style={{ gap: '24px', marginLeft: '32px' }}>
             {paginationNumbers.map((page) => (
               <span
                 key={page}
@@ -405,6 +405,33 @@ const MyListings: React.FC = () => {
     </div>
   );
 
+  const badgeStyles = (filter: Exclude<StatusFilter, 'All Status'>) => {
+    if (filter === 'Active') {
+      return {
+        bg: '#EDFBF0',
+        color: '#70E183',
+        icon: <img src={activeIcon} alt="active" className="w-3 h-3" />
+      };
+    }
+    if (filter === 'Inactive') {
+      return {
+        bg: '#FFF5F5',
+        color: '#FF5151',
+        icon: <img src={inactiveIcon} alt="inactive" className="w-3 h-3" />
+      };
+    }
+    return {
+      bg: '#FEF6E9',
+      color: '#FAB951',
+      icon: (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#FAB951" />
+          <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )
+    };
+  };
+
   const breadcrumbStyle = { color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' };
   const toggleIconFilters = {
     active: 'brightness(0) saturate(100%) invert(64%) sepia(21%) saturate(900%) hue-rotate(173deg) brightness(96%) contrast(96%)',
@@ -456,7 +483,7 @@ const MyListings: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-2 lg:items-start">
+            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-14">
               <div
                 className="inline-flex items-center border mb-4 overflow-hidden"
                 style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
@@ -506,8 +533,8 @@ const MyListings: React.FC = () => {
             </div>
           </div>
 
-          {/* Filters and Action Buttons Bar */}
-          {!shouldShowEmptyState && (
+        {/* Filters and Action Buttons Bar */}
+        {(!shouldShowEmptyState || isSearchActive) && (
             <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-6 mb-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 w-full">
                 {/* Left Side - Filters */}
@@ -547,18 +574,54 @@ const MyListings: React.FC = () => {
 
                   {/* Status Filter */}
                   <div className="relative" ref={statusDropdownRef}>
-                    <button
-                      type="button"
-                      onClick={toggleStatusDropdown}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
-                      style={{
-                        backgroundColor: '#FAFAFA',
-                        fontFamily: 'Poppins, sans-serif'
-                      }}
-                    >
-                      <span style={{ color: '#939393', fontSize: '13px' }}>{statusFilter}</span>
-                      <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" style={{ filter: 'brightness(0) saturate(100%) invert(60%)' }} />
-                    </button>
+                    {statusFilter === 'All Status' ? (
+                      <button
+                        type="button"
+                        onClick={toggleStatusDropdown}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                        style={{
+                          backgroundColor: '#FAFAFA',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        <span style={{ color: '#939393', fontSize: '13px' }}>{statusFilter}</span>
+                        <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" style={{ filter: 'brightness(0) saturate(100%) invert(60%)' }} />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={toggleStatusDropdown}
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full"
+                        style={{
+                          backgroundColor: badgeStyles(statusFilter).bg,
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        {badgeStyles(statusFilter).icon}
+                        <span
+                          style={{
+                            color: badgeStyles(statusFilter).color,
+                            fontSize: '11px'
+                          }}
+                        >
+                          {statusFilter}
+                        </span>
+                        <span
+                          style={{
+                            color: badgeStyles(statusFilter).color,
+                            fontSize: '12px',
+                            lineHeight: 1,
+                            marginLeft: '4px'
+                          }}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            clearStatusFilter();
+                          }}
+                        >
+                          ×
+                        </span>
+                      </button>
+                    )}
 
                     {isStatusDropdownOpen && (
                       <div
@@ -604,59 +667,6 @@ const MyListings: React.FC = () => {
                       </div>
                     )}
                   </div>
-
-                  {statusFilter !== 'All Status' && (
-                    <div
-                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full"
-                      style={{
-                        backgroundColor:
-                          statusFilter === 'Active'
-                            ? '#EDFBF0'
-                            : statusFilter === 'Inactive'
-                            ? '#FFF5F5'
-                            : '#FEF6E9'
-                      }}
-                    >
-                      {statusFilter === 'Active' && <img src={activeIcon} alt="active" className="w-3 h-3" />}
-                      {statusFilter === 'Inactive' && <img src={inactiveIcon} alt="inactive" className="w-3 h-3" />}
-                      {statusFilter === 'Days left' && (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <circle cx="12" cy="12" r="10" fill="#FAB951" />
-                          <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                      <span
-                        style={{
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: '11px',
-                          color:
-                            statusFilter === 'Active'
-                              ? '#70E183'
-                              : statusFilter === 'Inactive'
-                              ? '#FF5151'
-                              : '#FAB951'
-                        }}
-                      >
-                        {statusFilter}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={clearStatusFilter}
-                        style={{
-                          fontSize: '12px',
-                          lineHeight: 1,
-                          color:
-                            statusFilter === 'Active'
-                              ? '#70E183'
-                              : statusFilter === 'Inactive'
-                              ? '#FF5151'
-                              : '#FAB951'
-                        }}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
                 </div>
 
                 {/* Right Side - Action Buttons */}
@@ -729,13 +739,12 @@ const MyListings: React.FC = () => {
             </div>
           )}
 
-          {/* Listings Grid or Empty State */}
           <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-4 mb-6">
             <div className="pl-0 lg:pl-0 lg:-ml-16">
               {shouldShowEmptyState ? renderEmptyState() : renderListingsGrid()}
             </div>
           </div>
-          {!shouldShowEmptyState && (
+      {(!shouldShowEmptyState || isSearchActive) && (
             <div className="max-w-6xl mx-auto w-full pl-0 pr-0">
               <div className="pl-0 lg:pl-0 lg:-ml-16">
                 {renderPagination()}
