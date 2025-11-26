@@ -671,7 +671,7 @@ const Home: React.FC = () => {
               {/* Scan Button */}
               <button 
                 onClick={handleScan}
-                className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full transition-colors flex-shrink-0 hover:border-orange-500 hover:text-orange-500"
+                className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full transition-colors flex-shrink-0 hover:border-orange-500"
                 title="Scan QR code"
               >
                 <img 
@@ -763,7 +763,7 @@ const Home: React.FC = () => {
                   <div className="flex gap-2 pt-2">
                     <button 
                       onClick={handleScan}
-                      className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg transition-colors hover:border-orange-500 hover:text-orange-500"
+                      className="p-2 text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg transition-colors hover:border-orange-500 "
                       title="Scan QR code"
                     >
                       <img 
@@ -1183,12 +1183,12 @@ const Home: React.FC = () => {
                     ${product.price}
                   </div>
                     {product.verified ? (
-                      <div className="flex items-center text-xs text-green-600 bg-green-50 px-1 py-0.5 rounded text-xs">
+                      <div className="flex items-center text-xs text-green-600 bg-green-50 px-1 py-0.5 rounded">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
                         <span className="text-xs">Verified seller</span>
                       </div>
                     ) : (
-                      <div className="flex items-center text-xs sm:text-xs text-gray-600 bg-gray-100 px-0.5 sm:px-1 py-0.5 rounded text-xs">
+                      <div className="flex items-center text-xs sm:text-xs text-gray-600 bg-gray-100 px-0.5 sm:px-1 py-0.5 rounded">
                         <svg className="w-1.5 h-1.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2l2.5 5.5L20 8l-4.5 4.5L17 18l-5-2.5L7 18l1.5-5.5L4 8l5.5-.5L12 2z" stroke="currentColor" strokeWidth="1" fill="none"/>
                           <text x="12" y="16" textAnchor="middle" fontSize="4" fill="currentColor" fontWeight="bold">!</text>

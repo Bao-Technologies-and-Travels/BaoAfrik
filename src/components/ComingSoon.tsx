@@ -62,22 +62,42 @@ interface CountdownTime {
   seconds: number;
 }
 
+interface UserSubmission {
+  fullName: string;
+  email: string;
+  userType: string;
+  timestamp: string;
+}
+
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? '/api'
+  : 'http://localhost:3001/api';
+
 const ComingSoon: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [userType, setUserType] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
-  
+
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionsCount, setSubmissionsCount] = useState(0);
+  const [weeklyStats, setWeeklyStats] = useState({
+    weeklyCount: 0,
+    totalCount: 0,
+    weekStart: ''
+  });
+
   // Calculate initial countdown to December 31st
   const calculateTimeLeft = (): CountdownTime => {
     const now = new Date();
     const targetDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59); // December 31st, 11:59:59 PM
     const difference = targetDate.getTime() - now.getTime();
-    
+
     if (difference <= 0) {
       return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     }
-    
+
     return {
       days: Math.floor(difference / (1000 * 60 * 60 * 24)),
       hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
@@ -85,9 +105,39 @@ const ComingSoon: React.FC = () => {
       seconds: Math.floor((difference / 1000) % 60),
     };
   };
-  
+
   const [timeLeft, setTimeLeft] = useState<CountdownTime>(calculateTimeLeft());
   const [showModal, setShowModal] = useState(false);
+  const [submissions, setSubmissions] = useState<UserSubmission[]>([]);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+  const [lastExportDate, setLastExportDate] = useState<string>('');
+
+  // formatTimestamp to normal human readable format
+  const formatTimestamp = (date: Date): string => {
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    })
+  };
+
+  // admin panel toggle (hidden by default)
+  useEffect(() => {
+    // keyboard shortcut to show admin panel: ctrl + shift + q
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'Q') {
+        e.preventDefault();
+        setShowAdminPanel(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   const slides = [
     {
@@ -187,11 +237,172 @@ const ComingSoon: React.FC = () => {
     return () => clearInterval(slideTimer);
   }, [slides.length]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // get submissions count from backend
+  const fetchSubmissionsCount = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/submissions`);
+      if (response.ok) {
+        const data = await response.json();
+        setSubmissionsCount(data.length);
+      }
+    } catch (error) {
+      console.error('Error fetching submissions count:', error);
+    }
+  };
+
+  // get weekly stats from backend
+  const fetchWeeklyStats = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/weekly-stats`);
+      if (response.ok) {
+        const data = await response.json();
+        setWeeklyStats(data);
+      }
+    } catch (error) {
+      console.error('Error fetching weekly stats:', error);
+    }
+  };
+
+  // When admin panel opens
+  useEffect(() => {
+    if (showAdminPanel) {
+      fetchWeeklyStats();
+      fetchSubmissionsCount();
+    }
+  }, [showAdminPanel]);
+
+  // check if email already exists
+  const isEmailRegistered = (email: string): boolean => {
+    return submissions.some(sub => sub.email.toLowerCase() === email.toLowerCase());
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ fullName, email, userType });
-    // Show success modal
-    setShowModal(true);
+
+    // basic validation
+    if (!fullName.trim() || !email.trim() || !userType) {
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    if (isEmailRegistered(email)) {
+      setShowDuplicateModal(true);
+      return;
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // create new submission
+      const submissionData = {
+        fullName: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        userType,
+        timestamp: formatTimestamp(new Date()),
+      };
+
+      const response = await fetch(`${API_BASE_URL}/waitlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      const result = await response.json();
+
+      if (response.status === 409) {
+        // duplicate email
+        setShowDuplicateModal(true);
+      } else if (result.success) {
+        // reset form
+        setFullName('');
+        setEmail('');
+        setUserType('');
+
+        // Show success modal after a brief delay
+        setTimeout(() => {
+          setShowModal(true);
+        }, 100);
+
+        // refresh count
+        fetchSubmissionsCount();
+        fetchWeeklyStats();
+      } else {
+        throw new Error(result.message || 'submission failed');
+      }
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('There was an error submitting the form. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const exportDataNow = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/export-now`, {
+        method: 'POST',
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        alert('Export completed and email sent to marketing team!');
+      } else {
+        alert('Export failed: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to trigger export');
+    }
+  };
+
+  const fetchAllSubmissions = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/submissions`);
+      if (response.ok) {
+        const data = await response.json();
+
+        // Convert to CSV and download
+        const headers = ['ID', 'Full Name', 'Email', 'User Type', 'Submission Date', 'Submission Time'];
+        const csvRows = data.map((row: any) => {
+          // Format the date and time properly
+          const submissionDate = new Date(row.created_at).toISOString().split('T')[0];
+          const submissionTime = new Date(row.created_at).toTimeString().split(' ')[0];
+
+          return [
+            row.id,
+            `"${row.full_name.replace(/"/g, '""')}"`,
+            row.email,
+            row.user_type,
+            submissionDate,
+            submissionTime
+          ].join(',');
+        });
+
+        const csvContent = [headers.join(','), ...csvRows].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `bao-afrik-leads-${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Error fetching submissions:', error);
+    }
   };
 
   const isFormComplete = fullName.trim() !== '' && email.trim() !== '' && userType !== '';
@@ -206,38 +417,38 @@ const ComingSoon: React.FC = () => {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black bg-opacity-40"
             onClick={() => setShowModal(false)}
           />
-          
+
           {/* Modal */}
           <div className="relative bg-white rounded-3xl shadow-2xl max-w-xl w-full mx-4 p-8 z-10">
             {/* Close button */}
-            <button 
+            <button
               onClick={() => setShowModal(false)}
               className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            
+
             {/* Success Icon */}
             <div className="flex justify-center mb-6">
               <img src={SuccessIcon} alt="Success" className="w-20 h-20" />
             </div>
-            
+
             {/* Heading */}
             <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">
               You have been registered
             </h2>
-            
+
             {/* Message */}
             <p className="text-gray-500 text-center mb-8 leading-relaxed">
               Thank you for committing to be one of the first users of BAO Afrik and its community. We will keep you informed once the platform is operational.
             </p>
-            
+
             {/* Close Button */}
             <button
               onClick={() => setShowModal(false)}
@@ -251,6 +462,114 @@ const ComingSoon: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Duplicate Email Modal */}
+      {showDuplicateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-40"
+            onClick={() => setShowDuplicateModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-white rounded-3xl shadow-2xl max-w-xl w-full mx-4 p-8 z-10">
+            {/* Close button */}
+            <button
+              onClick={() => setShowDuplicateModal(false)}
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            {/* Info Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="#F9A825" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Heading */}
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">
+              Already Waitlisted
+            </h2>
+
+            {/* Message */}
+            <p className="text-gray-500 text-center mb-8 leading-relaxed">
+              This email is already registered in our waitlist. You will be notified once the platform is operational.
+            </p>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowDuplicateModal(false)}
+              className="w-full py-4 rounded-xl font-semibold text-white transition-colors"
+              style={{ backgroundColor: '#F9A825' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E89515'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9A825'}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Admin panel (hidden by default) */}
+      {showAdminPanel && (
+        <div className="fixed top-4 right-4 z-40 bg-white p-4 rounded-lg shadow-lg border min-w-[200px]">
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-sm font-semibold">Admin Panel</div>
+            <button onClick={() => setShowAdminPanel(false)} className="text-gray-400 hover:text-gray-600">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {/* Stats */}
+            <div className="text-xs space-y-1">
+              <div className="flex justify-between">
+                <span>Total Leads:</span>
+                <span className="font-semibold">{submissionsCount}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>This Week:</span>
+                <span className="font-semibold text-green-600">{weeklyStats.weeklyCount}</span>
+              </div>
+            </div>
+
+            <div className="border-t pt-2 space-y-2">
+              <button
+                onClick={fetchAllSubmissions}
+                className="w-full bg-green-500 text-white px-3 py-1.5 rounded text-xs hover:bg-green-600 transition-colors"
+              >
+                Download Full CSV
+              </button>
+              <button
+                onClick={exportDataNow}
+                className="w-full bg-blue-500 text-white px-3 py-1.5 rounded text-xs hover:bg-blue-600 transition-colors"
+              >
+                Send Weekly Export Now
+              </button>
+              <button
+                onClick={fetchWeeklyStats}
+                className="w-full bg-gray-500 text-white px-3 py-1.5 rounded text-xs hover:bg-gray-600 transition-colors"
+              >
+                Refresh Stats
+              </button>
+            </div>
+
+            <div className="text-xs text-gray-500 text-center border-t pt-2">
+              Auto-export: Weekly (Mon 8AM)
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="px-6 lg:px-16 py-6">
         <div className="max-w-7xl mx-auto">
           {/* Desktop Header */}
@@ -288,7 +607,7 @@ const ComingSoon: React.FC = () => {
             <p className="text-xs text-gray-400">
               Bringing home closer to Africans abroad
             </p>
-            
+
             {/* Mobile Countdown */}
             <div className="mt-10">
               <div className="flex items-center justify-center gap-2">
@@ -298,21 +617,21 @@ const ComingSoon: React.FC = () => {
                   <span className="text-3xl font-bold" style={{ color: '#F9A825' }}>{formatTime(timeLeft.days)}</span>
                 </div>
                 <span className="text-3xl font-bold text-gray-300 mt-6">:</span>
-                
+
                 {/* Hours */}
                 <div className="flex flex-col items-center">
                   <span className="text-xs text-gray-400 uppercase tracking-wider mb-2">Hours</span>
                   <span className="text-3xl font-bold text-gray-900">{formatTime(timeLeft.hours)}</span>
                 </div>
                 <span className="text-3xl font-bold text-gray-300 mt-6">:</span>
-                
+
                 {/* Minutes */}
                 <div className="flex flex-col items-center">
                   <span className="text-xs text-gray-400 uppercase tracking-wider mb-2">Minutes</span>
                   <span className="text-3xl font-bold text-gray-900">{formatTime(timeLeft.minutes)}</span>
                 </div>
                 <span className="text-3xl font-bold text-gray-300 mt-6">:</span>
-                
+
                 {/* Seconds */}
                 <div className="flex flex-col items-center">
                   <span className="text-xs text-gray-400 uppercase tracking-wider mb-2">Seconds</span>
@@ -379,11 +698,10 @@ const ComingSoon: React.FC = () => {
               <button
                 type="submit"
                 disabled={!isFormComplete}
-                className={`w-full flex items-center justify-center gap-1.5 rounded-xl transition-all py-3 ${
-                  isFormComplete
-                    ? 'text-white cursor-pointer'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}
+                className={`w-full flex items-center justify-center gap-1.5 rounded-xl transition-all py-3 ${isFormComplete
+                  ? 'text-white cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
                 style={{
                   ...(isFormComplete && { backgroundColor: '#F9A825' })
                 }}
@@ -415,7 +733,7 @@ const ComingSoon: React.FC = () => {
                 <div className="absolute -left-2.5 lg:-left-3 top-2 lg:top-3 bg-[#F9A825] p-1 lg:p-2 rounded-full shadow-lg z-10">
                   <img src={PriceIcon} alt="Price" className="w-2.5 h-2.5 lg:w-4 lg:h-4" />
                 </div>
-                
+
                 <div className="pl-3 lg:pl-5">
                   <img src={slides[currentSlide].productTitle} alt="Product Price" className="w-full max-w-[85px] lg:max-w-[160px]" />
                 </div>
@@ -429,7 +747,7 @@ const ComingSoon: React.FC = () => {
                 <div className={`absolute bg-[#F9A825] p-1 lg:p-2 rounded-full shadow-lg z-10 ${currentSlide === 1 ? '-top-1.5 lg:-top-2 -right-1.5 lg:-right-2' : '-top-1.5 lg:-top-2 -left-1.5 lg:-left-2'}`}>
                   <img src={ProductIcon} alt="Location" className="w-2.5 h-2.5 lg:w-4 lg:h-4" />
                 </div>
-                
+
                 <img
                   src={slides[currentSlide].locationImage}
                   alt="Location"
@@ -504,16 +822,16 @@ const ComingSoon: React.FC = () => {
                 FOLLOW US
               </p>
               <div className="flex items-center justify-center gap-4">
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.linkedin.com/company/baoafrik/" className="hover:opacity-70 transition-opacity" target='_blank'>
                   <img src={LinkedInIcon} alt="LinkedIn" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.facebook.com/share/1BUhVwdrDZ/?mibextid=wwXIfr" className="hover:opacity-70 transition-opacity" target='_blank'>
                   <img src={FacebookIcon} alt="Facebook" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.instagram.com/baoafrik?igsh=MWFiamFzenNiaGZ4bQ%3D%3D&utm_source=qr" className="hover:opacity-70 transition-opacity" target='_blank'>
                   <img src={InstagramIcon} alt="Instagram" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.tiktok.com/@baoafrik?_r=1&_t=ZN-91fAWXYNOEB" className="hover:opacity-70 transition-opacity" target='_blank'>
                   <img src={TikTokIcon} alt="TikTok" className="w-7 h-7 opacity-60" />
                 </a>
               </div>
@@ -546,16 +864,16 @@ const ComingSoon: React.FC = () => {
                 FOLLOW US
               </p>
               <div className="flex items-center gap-3">
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.linkedin.com/company/baoafrik/" className="hover:opacity-70 transition-opacity" target="_blank">
                   <img src={LinkedInIcon} alt="LinkedIn" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.facebook.com/share/1BUhVwdrDZ/?mibextid=wwXIfr" className="hover:opacity-70 transition-opacity" target="_blank">
                   <img src={FacebookIcon} alt="Facebook" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.instagram.com/baoafrik?igsh=MWFiamFzenNiaGZ4bQ%3D%3D&utm_source=qr" className="hover:opacity-70 transition-opacity" target="_blank">
                   <img src={InstagramIcon} alt="Instagram" className="w-7 h-7 opacity-60" />
                 </a>
-                <a href="#" className="hover:opacity-70 transition-opacity">
+                <a href="https://www.tiktok.com/@baoafrik?_r=1&_t=ZN-91fAWXYNOEB" className="hover:opacity-70 transition-opacity" target="_blank">
                   <img src={TikTokIcon} alt="TikTok" className="w-7 h-7 opacity-60" />
                 </a>
               </div>
