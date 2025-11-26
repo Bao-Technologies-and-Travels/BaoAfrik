@@ -12,8 +12,6 @@ import arrowDownIcon from '../assets/images/pre/arrow-down.svg';
 import activeIcon from '../assets/images/pre/active.svg';
 import inactiveIcon from '../assets/images/pre/inactive.svg';
 import pencilIcon from '../assets/images/pre/pencil.svg';
-import optionIcon from '../assets/images/pre/option.svg';
-import starIcon from '../assets/images/pre/star.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -51,18 +49,18 @@ const MyListings: React.FC = () => {
 
   // Mock data - replace with actual data from backend
   const listings = useMemo<Listing[]>(() => [
-    { id: '1', title: 'Snails from South Africa', image: a1, status: 'active', rating: 4.8, reviews: 88, price: '678', currency: 'USD' },
-    { id: '2', title: 'Coconut Oil', image: a2, status: 'active', rating: 4.5, reviews: 120, price: '45', currency: 'USD' },
-    { id: '3', title: 'White Pepper', image: a3, status: 'inactive', rating: 4.2, reviews: 56, price: '32', currency: 'USD' },
-    { id: '4', title: 'Shea Butter', image: a4, status: 'active', rating: 4.9, reviews: 200, price: '67.8', currency: 'USD' },
-    { id: '5', title: 'African Black Soap', image: a5, status: 'active', rating: 4.7, reviews: 150, price: '25', currency: 'USD' },
-    { id: '6', title: 'Palm Oil', image: a6, status: 'active', rating: 4.6, reviews: 95, price: '38', currency: 'USD' },
-    { id: '7', title: 'Groundnut', image: a7, status: 'inactive', rating: 4.3, reviews: 78, price: '42', currency: 'USD' },
-    { id: '8', title: 'Honey', image: a8, status: 'active', rating: 4.8, reviews: 165, price: '55', currency: 'USD' },
-    { id: '9', title: 'Cashew Nuts', image: a9, status: 'active', rating: 4.9, reviews: 210, price: '89', currency: 'USD' },
-    { id: '10', title: 'Coffee Beans', image: a10, status: 'active', rating: 4.7, reviews: 140, price: '72', currency: 'USD' },
-    { id: '11', title: 'Cocoa Powder', image: a11, status: 'active', rating: 4.6, reviews: 110, price: '48', currency: 'USD' },
-    { id: '12', title: 'Moringa Powder', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: '35', currency: 'USD' },
+    { id: '1', title: 'Bonga from Togo', image: a1, status: 'active', rating: 4.8, reviews: 88, price: '678', currency: 'USD' },
+    { id: '2', title: 'Coconut Oil Ghana', image: a2, status: 'active', rating: 4.5, reviews: 120, price: '45', currency: 'USD' },
+    { id: '3', title: 'Pepper from Benin', image: a3, status: 'inactive', rating: 4.2, reviews: 56, price: '32', currency: 'USD' },
+    { id: '4', title: 'Shrimps from Lome', image: a4, status: 'active', rating: 4.9, reviews: 200, price: '67.8', currency: 'USD' },
+    { id: '5', title: 'Kinky hair Lagos', image: a5, status: 'active', rating: 4.7, reviews: 150, price: '25', currency: 'USD' },
+    { id: '6', title: 'Gold neck Accra', image: a6, status: 'active', rating: 4.6, reviews: 95, price: '38', currency: 'USD' },
+    { id: '7', title: 'Baobab nuts Kano', image: a7, status: 'inactive', rating: 4.3, reviews: 78, price: '42', currency: 'USD' },
+    { id: '8', title: 'Cowrie bracelets', image: a8, status: 'active', rating: 4.8, reviews: 165, price: '55', currency: 'USD' },
+    { id: '9', title: 'Ebony tribal masks', image: a9, status: 'active', rating: 4.9, reviews: 210, price: '89', currency: 'USD' },
+    { id: '10', title: 'River pepper Addis', image: a10, status: 'active', rating: 4.7, reviews: 140, price: '72', currency: 'USD' },
+    { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: '48', currency: 'USD' },
+    { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: '35', currency: 'USD' },
   ], []);
 
   const filteredListings = useMemo(() => {
@@ -92,6 +90,9 @@ const MyListings: React.FC = () => {
   const isSearchNoResultsState = shouldShowEmptyState && isSearchActive;
   const totalListings = listings.length;
   const draftCount = 3;
+  const currentPage = 1;
+  const totalPages = 48;
+  const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   const handlePrimaryCta = () => {
     if (isSearchNoResultsState) {
@@ -197,18 +198,17 @@ const MyListings: React.FC = () => {
                 }}
               >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="6" cy="2" r="1.5" fill="#B0B0B0"/>
-                  <circle cx="6" cy="6" r="1.5" fill="#B0B0B0"/>
-                  <circle cx="6" cy="10" r="1.5" fill="#B0B0B0"/>
+                  <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                  <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                  <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
                 </svg>
               </button>
             </div>
 
             {/* Product Name */}
             <h3
-              className="font-medium mb-1.5 line-clamp-2"
+              className="font-medium mb-1 text-[12px] truncate"
               style={{
-                fontSize: '13px',
                 color: '#212121',
                 fontFamily: 'Poppins, sans-serif'
               }}
@@ -257,6 +257,94 @@ const MyListings: React.FC = () => {
           </div>
         </div>
       ))}
+    </div>
+  );
+
+  const renderPagination = () => (
+    <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-4 mt-10">
+      <div className="flex items-center gap-2">
+        <button
+          aria-label="Previous page"
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #B0B0B0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+
+        {paginationNumbers.map((page) => (
+          <span
+            key={page}
+            style={{
+              fontFamily: 'Bricolage Grotesque, sans-serif',
+              fontSize: '12px',
+              color: page === currentPage ? '#212121' : '#B0B0B0'
+            }}
+          >
+            {page}
+          </span>
+        ))}
+
+        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif' }}>…</span>
+        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{totalPages}</span>
+
+        <button
+          aria-label="Next page"
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            backgroundColor: '#B0B0B0',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
+        <input
+          type="text"
+          placeholder="e.g 40"
+          style={{
+            border: '1px solid #BABABA',
+            borderRadius: '8px',
+            padding: '6px 10px',
+            fontFamily: 'Bricolage Grotesque, sans-serif',
+            fontSize: '12px',
+            color: '#D9D9D9',
+            width: '64px',
+            textAlign: 'center'
+          }}
+        />
+        <button
+          style={{
+            backgroundColor: '#212121',
+            color: '#FFFFFF',
+            borderRadius: '8px',
+            padding: '6px 14px',
+            fontFamily: 'Bricolage Grotesque, sans-serif',
+            fontSize: '12px'
+          }}
+        >
+          Go
+        </button>
+      </div>
     </div>
   );
 
@@ -360,7 +448,7 @@ const MyListings: React.FC = () => {
           {/* Filters and Action Buttons Bar */}
           {!shouldShowEmptyState && (
             <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-6 mb-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 lg:pr-0 lg:-mr-6 w-full">
                 {/* Left Side - Filters */}
                 <div className="flex items-center gap-3 flex-wrap">
                   {/* All Listings Badge */}
@@ -415,7 +503,7 @@ const MyListings: React.FC = () => {
                     style={{
                       backgroundColor: '#F0F8FE',
                       borderColor: '#CFE8FC',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       fontFamily: 'Poppins, sans-serif'
                     }}
                   >
@@ -438,7 +526,7 @@ const MyListings: React.FC = () => {
                     style={{
                       backgroundColor: '#64B5F6',
                       color: '#FFFFFF',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       fontFamily: 'Poppins, sans-serif'
                     }}
                   >
@@ -462,10 +550,17 @@ const MyListings: React.FC = () => {
 
           {/* Listings Grid or Empty State */}
           <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-4 mb-6">
-            <div className="pl-0 lg:pl-0 lg:-ml-16">
+            <div className="pl-0 lg:pl-0 lg:-ml-16 lg:pr-0 lg:-mr-6">
               {shouldShowEmptyState ? renderEmptyState() : renderListingsGrid()}
             </div>
           </div>
+          {!shouldShowEmptyState && (
+            <div className="max-w-6xl mx-auto w-full pl-0 pr-0">
+              <div className="pl-0 lg:pl-0 lg:-ml-16 lg:pr-0 lg:-mr-6">
+                {renderPagination()}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
