@@ -1,9 +1,7 @@
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { ChatService } from '../services/chatService';
-import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
+import prisma from '@/config/database';
 
 interface AuthenticatedSocket extends Socket {
   user?: {
@@ -181,7 +179,7 @@ export class WebSocketService {
     try {
       const conversations = await this.chatService.getUserConversations(userId);
 
-      conversations.forEach(conv => {
+      conversations.forEach((conv: any) => {
         socket.join(`conversation:${conv.id}`);
       });
 
@@ -225,7 +223,7 @@ export class WebSocketService {
 
   private async handleContactSeller(socket: AuthenticatedSocket, data: any) {
     try {
-      const { productId, initialMessage, sellerId } = data;
+      const { productId, initialMessage, sellerId , product} = data;
       const buyerId = socket.user!.id;
 
       if (!sellerId || !productId) {
@@ -253,6 +251,25 @@ export class WebSocketService {
           },
           product: data.product
         });
+      }
+
+      if(sellerSocketId) {
+        try {
+          const notifPayload = {
+            type: 'NEW_CONVERSATION',
+            title: 'New conversation started',
+            boody: `${socket.user!.firstName} started a conversation about your product.`,
+            conversationId: conversation.id,
+            product: data.product
+          };
+          this.io.to(product.seller?.id || data.sellerId).emit('notification', notifPayload);
+
+          const counts = await this.chatService.getUnreadCounts(product.seller.id || data.sellerId);
+          const totalUnread = (counts || []).reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
+          this.io.to(product.seller?.id || data.sellerId).emit('notification_count', { totalUnread});
+        } catch (e) {
+          console.warn('Failed to emit notification/count on contact_seller', e);
+        }
       }
 
       socket.emit('conversation_created', { conversation });
@@ -338,7 +355,7 @@ export class WebSocketService {
       socket.to(`conversation:${conversationId}`).emit('new_message', messageResponse);
 
       // Send notifications to other participants
-      participants.forEach((participant: any) => {
+      participants.forEach(async (participant: any) => {
         if (participant.id !== senderId) {
           const participantSocketId = this.userSockets.get(participant.id);
           if (!participantSocketId) {
@@ -358,6 +375,28 @@ export class WebSocketService {
             preview: content.substring(0, 100) || 'Sent a file',
             unreadCount: 1
           });
+
+          try {
+            const notifPayload = {
+              type: 'NEW_MESSAGE',
+              title: `${socket.user!.firstName} ${socket.user!.lastName}`.trim() || socket.user!.email,
+              body: content?.substring(0, 100) || 'Sent a file',
+              conversationId,
+              messageId: message.id,
+              timestamp: new Date().toISOString()
+            };
+            this.io.to(participant.id).emit('notification', notifPayload);
+
+            try {
+              const counts = await this.chatService.getUnreadCounts(participant.id);
+              const totalUnread = (counts || []).reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
+              this.io.to(participant.id).emit('notification_count', {totalUnread});
+            } catch (e) {
+              console.warn('Failed to compute unread counts for notification_count emit', e);
+            }
+          } catch (e) {
+            console.warn('Failed to emit notification to participant', e);
+          }
         }
       });
 

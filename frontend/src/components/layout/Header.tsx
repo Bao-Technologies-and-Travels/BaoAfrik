@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { io, Socket } from "socket.io-client";
+
 import logo from "../../assets/images/logos/ba-Primary-brand-logo-colored.png";
 import logoIcon from "../../assets/images/logos/ba-brand-icon-colored.png";
 import logoPre from "../../assets/images/pre/logo.png";
@@ -36,6 +38,8 @@ const Header: React.FC<HeaderProps> = ({
   const [highlightChats, setHighlightChats] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   // Mock notification data with read/unread status
   const [notifications, setNotifications] = useState([
@@ -81,6 +85,56 @@ const Header: React.FC<HeaderProps> = ({
     setSelectedLanguage(language);
     setIsLanguageDropdownOpen(false);
   };
+
+  // fetch unread counts
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch(`${process.env.REACY_APP_API_URL}/chat/unread-counts`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          const total = json.data.reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
+          setNotificationCount(total);
+        }
+      } catch (e) { }
+    }
+    fetchUnread();
+  }, []);
+
+  // socket events
+  useEffect(() => {
+    if (!socket) return;
+    const onNotification = (payload: any) => {
+      // push to list and increment badge
+      setNotifications(prev => [payload, ...prev]);
+      setNotificationCount(prev => prev + 1);
+    };
+    const onNewMessageNotification = (payload: any) => {
+      // keep compatibility with backend event name
+      setNotifications(prev => [payload, ...prev]);
+      setNotificationCount(prev => prev + 1);
+    };
+    const onNotificationCount = (payload: any) => {
+      if (typeof payload.totalUnread === 'number') {
+        setNotificationCount(payload.totalUnread);
+      }
+    };
+
+    socket.on('notification', onNotification);
+    socket.on('new_message_notification', onNewMessageNotification);
+    socket.on('notification_count', onNotificationCount);
+
+    return () => {
+      socket.off('notification', onNotification);
+      socket.off('new_message_notification', onNewMessageNotification);
+      socket.off('notification_count', onNotificationCount);
+    };
+  }, [socket]);
 
   // Listen for navigation from Messages page to open menu and highlight Chats
   useEffect(() => {
@@ -377,10 +431,10 @@ const Header: React.FC<HeaderProps> = ({
                         className="w-6 h-6"
                         style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
                       />
-                      {unreadCount > 0 && (
-                        <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FF0000' }}>
-                          <span className="text-white text-xs font-medium">{unreadCount}</span>
-                        </div>
+                      {notificationCount > 0 && (
+                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                          {notificationCount}
+                        </span>
                       )}
                     </button>
 

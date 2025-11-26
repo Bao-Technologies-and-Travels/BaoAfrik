@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/config/database';
 import { asyncHandler } from '@/middleware/errorMiddleware';
 import {
   createValidationError,
@@ -30,7 +30,14 @@ import {
 import { sendVerificationEmail, sendPasswordResetEmail } from '@/utils/emailService';
 import logger from '@/config/logger';
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient({
+//   datasources: {
+//     db: {
+//       url: process.env.DATABASE_URL,
+//     },
+//   },
+// } as any);
+
 
 interface VerifyResetCodeRequest {
   email: string;

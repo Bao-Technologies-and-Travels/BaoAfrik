@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import prisma from '@/config/database';
 import { asyncHandler } from "@/utils/asyncHandler";
 import {
   createUnauthorizedError,
@@ -9,7 +9,14 @@ import {
 import logger from "@/config/logger";
 import { Socket } from "socket.io";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient({
+//   datasources: {
+//     db: {
+//       url: process.env.DATABASE_URL,
+//     },
+//   },
+// } as any);
+
 
 interface JwtPayload {
   userId: string;

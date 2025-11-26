@@ -1,16 +1,17 @@
-import { PrismaClient, MessageType } from '@prisma/client';
+import prisma from '@/config/database';import { MessageType } from '../generated/client';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient({} as any);
 
 export interface CreateConversationData {
     creatorId: string;
     participantId: string;
     productId?: string;
     initialMessage?: string;
+    productData?: any;
 }
 
 export interface MessageData {
@@ -24,13 +25,6 @@ export interface MessageData {
     replyToId?: string;
     imageUrl?: string;
     audioUrl?: string;
-    productData?: any;
-}
-
-export interface CreateConversationData {
-    creatorId: string
-    participantId: string
-    productId?: string
     initialMessage?: string
     productData?: any
 }
@@ -172,11 +166,11 @@ export class ChatService {
             }
         });
 
-        const processedConversations = conversations.map(conv => {
-            const otherParticipants = conv.participants.filter(p => p.userId !== userId);
+        const processedConversations = conversations.map((conv: any) => {
+            const otherParticipants = conv.participants.filter((p :any)=> p.userId !== userId);
 
             if (otherParticipants.length === 0) {
-                console.warn('Conversation has no other participant. Conversation:', conv.id, 'All Participants:', conv.participants.map(p => p.user?.email));
+                console.warn('Conversation has no other participant. Conversation:', conv.id, 'All Participants:', conv.participants.map((p: any)=> p.user?.email));
                 return null;
             }
 
@@ -186,7 +180,7 @@ export class ChatService {
                 return null;
             }
 
-            const currentUserParticipant = conv.participants.find(p => p.userId === userId);
+            const currentUserParticipant = conv.participants.find((p: any) => p.userId === userId);
 
             // parse productData from conversation
             let conversationProductData = null;
@@ -246,7 +240,7 @@ export class ChatService {
             };
 
             return result;
-        }).filter((conv): conv is NonNullable<typeof conv> => conv !== null);
+        }).filter((conv: any): conv is NonNullable<typeof conv> => conv !== null);
 
         return processedConversations;
     }
@@ -314,7 +308,7 @@ export class ChatService {
         })
 
         // Parse productData from JSON string 
-        const processedMessages = messages.map((message) => {
+        const processedMessages = messages.map((message: any) => {
 
             let parsedProductData = null;
             try {
@@ -362,7 +356,7 @@ export class ChatService {
     }
 
     async createConversation(data: CreateConversationData) {
-        return await prisma.$transaction(async (tx) => {
+        return await prisma.$transaction(async (tx: any) => {
             // Find conversations where both users are participants
             const possibleConvs = await tx.conversation.findMany({
                 where: {
@@ -379,7 +373,7 @@ export class ChatService {
             });
 
             // Check if conversation already exists
-            const existingConv = possibleConvs.find(conv => conv.participants.length === 2);
+            const existingConv = possibleConvs.find((conv: any) => conv.participants.length === 2);
 
             if (existingConv) {
                 if(data.productData) {
@@ -509,7 +503,7 @@ export class ChatService {
     }
 
     async sendMessage(data: MessageData) {
-        return await prisma.$transaction(async (tx) => {
+        return await prisma.$transaction(async (tx: any) => {
             // Verify conversation exists and user is participant
             const conversation = await tx.conversation.findFirst({
                 where: {
@@ -759,7 +753,7 @@ export class ChatService {
             }
         });
 
-        return conversations.map(conv => ({
+        return conversations.map((conv: any) => ({
             conversationId: conv.id,
             unreadCount: conv.messages.length,
             checkedAt: this.formatTo12HourTime(new Date())
@@ -791,7 +785,7 @@ export class ChatService {
         }
 
         return {
-            participants: conversation.participants.map(p => p.user),
+            participants: conversation.participants.map((p: any) => p.user),
             fetchedAt: this.formatTo12HourTime(new Date())
         };
     }

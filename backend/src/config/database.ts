@@ -1,13 +1,26 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import logger from './logger';
+// import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+const { Pool } = require('pg');
+
+// Create PostgreSQL pool
+const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL 
+});
+
+// Create adapter
+const adapter = new PrismaPg(pool);
 
 declare global {
   var __prisma: PrismaClient | undefined;
 }
 
 // Prevent multiple instances of Prisma Client in development
-const prisma = globalThis.__prisma || new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+const prisma = new PrismaClient({
+  adapter: adapter,
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
 });
 
 if (process.env.NODE_ENV === 'development') {

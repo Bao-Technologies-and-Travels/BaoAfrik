@@ -1,8 +1,8 @@
-import { PrismaClient, Product, ProductStatus, SaleType, Prisma } from '@prisma/client';
+import prisma from '../config/database'; 
+import { Product, ProductStatus, SaleType, Prisma } from '../generated/client';
 import { v4 as uuidv4 } from 'uuid';
 import { s3Service } from './s3Service';
 
-const prisma = new PrismaClient();
 
 export interface CreateProductData {
     title: string;

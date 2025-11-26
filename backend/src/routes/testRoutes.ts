@@ -147,7 +147,13 @@ router.post('/get-verification-code', async (req: Request, res: Response) => {
 
     // Import prisma here to avoid circular dependencies
     const { PrismaClient } = require('@prisma/client');
-    const prisma = new PrismaClient();
+    const prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL,
+        },
+      },
+    });
     
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },

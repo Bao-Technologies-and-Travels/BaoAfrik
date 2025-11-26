@@ -24,6 +24,12 @@ import chatRoutes from '@/routes/chatRoutes';
 import productRoutes from './routes/productRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 
+// let WebSocketService: any;
+// (async () => {
+//   const module = await import('./socket/webSocketService');
+//   WebSocketService = module.WebSocketService;
+// })();
+
 const app = express();
 const server = createServer(app);
 const PORT = process.env.PORT || 3001;
