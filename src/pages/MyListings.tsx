@@ -316,7 +316,7 @@ const MyListings: React.FC = () => {
   const renderPagination = () => (
     <div className="flex flex-col lg:flex-row items-center gap-6 mt-12 mb-32 w-full">
       <div className="flex-1 flex justify-center w-full">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4" style={{ marginLeft: '80px' }}>
           <button
             aria-label="Previous page"
             style={{
@@ -335,7 +335,7 @@ const MyListings: React.FC = () => {
             </svg>
           </button>
 
-          <div className="flex items-center" style={{ gap: '24px', marginLeft: '32px' }}>
+          <div className="flex items-center" style={{ gap: '24px' }}>
             {paginationNumbers.map((page) => (
               <span
                 key={page}
@@ -483,7 +483,7 @@ const MyListings: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-14">
+            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-0">
               <div
                 className="inline-flex items-center border mb-4 overflow-hidden"
                 style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
@@ -534,7 +534,7 @@ const MyListings: React.FC = () => {
           </div>
 
         {/* Filters and Action Buttons Bar */}
-        {(!shouldShowEmptyState || isSearchActive) && (
+        {(!shouldShowEmptyState && !isSearchNoResultsState) && (
             <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-6 mb-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 w-full">
                 {/* Left Side - Filters */}
@@ -744,7 +744,7 @@ const MyListings: React.FC = () => {
               {shouldShowEmptyState ? renderEmptyState() : renderListingsGrid()}
             </div>
           </div>
-      {(!shouldShowEmptyState || isSearchActive) && (
+      {(!shouldShowEmptyState && !isSearchNoResultsState) && (
             <div className="max-w-6xl mx-auto w-full pl-0 pr-0">
               <div className="pl-0 lg:pl-0 lg:-ml-16">
                 {renderPagination()}
