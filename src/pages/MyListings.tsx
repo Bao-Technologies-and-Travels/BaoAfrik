@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import bagIcon from '../assets/images/pre/bag.svg';
@@ -41,13 +41,18 @@ interface Listing {
   daysLeft?: number;
 }
 
+const statusOptions = ['Active', 'Inactive', 'Days left'] as const;
+type StatusFilter = 'All Status' | (typeof statusOptions)[number];
+
 const MyListings: React.FC = () => {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('All');
-  const [statusFilter, setStatusFilter] = useState('All Status');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All Status');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const statusDropdownRef = useRef<HTMLDivElement | null>(null);
 
   // Mock data - replace with actual data from backend
   const listings = useMemo<Listing[]>(() => [
@@ -65,11 +70,13 @@ const MyListings: React.FC = () => {
     { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: '35', currency: 'USD' },
   ], []);
 
+  const trimmedSearchQuery = searchQuery.trim();
+
   const filteredListings = useMemo(() => {
     let filtered = listings;
-    
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+
+    if (trimmedSearchQuery) {
+      const query = trimmedSearchQuery.toLowerCase();
       filtered = filtered.filter((listing) =>
         listing.title.toLowerCase().includes(query)
       );
@@ -79,6 +86,7 @@ const MyListings: React.FC = () => {
       filtered = filtered.filter((listing) => {
         if (statusFilter === 'Active') return listing.status === 'active';
         if (statusFilter === 'Inactive') return listing.status === 'inactive';
+        if (statusFilter === 'Days left') return typeof listing.daysLeft === 'number';
         return true;
       });
     }
@@ -87,7 +95,7 @@ const MyListings: React.FC = () => {
   }, [listings, searchQuery, statusFilter]);
 
   const hasResults = filteredListings.length > 0;
-  const isSearchActive = searchQuery.trim().length > 0;
+  const isSearchActive = trimmedSearchQuery.length > 0;
   const shouldShowEmptyState = !hasResults;
   const isSearchNoResultsState = shouldShowEmptyState && isSearchActive;
   const totalListings = listings.length;
@@ -105,6 +113,24 @@ const MyListings: React.FC = () => {
   };
 
   const primaryButtonLabel = isSearchNoResultsState ? 'Clear search' : 'Add listing';
+
+  const toggleStatusDropdown = () => setIsStatusDropdownOpen((prev) => !prev);
+  const handleStatusSelect = (option: StatusFilter) => {
+    setStatusFilter(option);
+    setIsStatusDropdownOpen(false);
+  };
+  const clearStatusFilter = () => setStatusFilter('All Status');
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
+        setIsStatusDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const renderEmptyState = () => (
     <div className="text-center py-6">
@@ -290,12 +316,12 @@ const MyListings: React.FC = () => {
   const renderPagination = () => (
     <div className="flex flex-col lg:flex-row items-center gap-6 mt-12 mb-32 w-full">
       <div className="flex-1 flex justify-center w-full">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <button
             aria-label="Previous page"
             style={{
-              width: '36px',
-              height: '36px',
+              width: '28px',
+              height: '28px',
               borderRadius: '8px',
               backgroundColor: '#F0F0F0',
               border: 'none',
@@ -309,13 +335,13 @@ const MyListings: React.FC = () => {
             </svg>
           </button>
 
-          <div className="flex items-center" style={{ gap: '20px' }}>
+          <div className="flex items-center" style={{ gap: '24px' }}>
             {paginationNumbers.map((page) => (
               <span
                 key={page}
                 style={{
                   fontFamily: 'Bricolage Grotesque, sans-serif',
-                  fontSize: '20px',
+                  fontSize: '14px',
                   color: page === currentPage ? '#212121' : '#B0B0B0'
                 }}
               >
@@ -323,15 +349,15 @@ const MyListings: React.FC = () => {
               </span>
             ))}
 
-            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '20px' }}>…</span>
-            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '20px' }}>{totalPages}</span>
+            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>…</span>
+            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>{totalPages}</span>
           </div>
 
           <button
             aria-label="Next page"
             style={{
-              width: '36px',
-              height: '36px',
+              width: '28px',
+              height: '28px',
               borderRadius: '8px',
               backgroundColor: '#F0F0F0',
               border: 'none',
@@ -340,7 +366,7 @@ const MyListings: React.FC = () => {
               justifyContent: 'center'
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 6l6 6-6 6" />
             </svg>
           </button>
@@ -430,7 +456,7 @@ const MyListings: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-6">
+            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-2 lg:items-start">
               <div
                 className="inline-flex items-center border mb-4 overflow-hidden"
                 style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
@@ -487,22 +513,24 @@ const MyListings: React.FC = () => {
                 {/* Left Side - Filters */}
                 <div className="flex items-center gap-3 flex-wrap">
                   {/* All Listings Badge */}
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                      All listings
-                    </span>
-                    <span
-                      className="px-2 py-0.5 rounded-full font-medium"
-                      style={{
-                        backgroundColor: '#F1F1F1',
-                        color: '#939393',
-                        fontSize: '12px',
-                        fontFamily: 'Poppins, sans-serif'
-                      }}
-                    >
-                      {totalListings}
-                    </span>
-                  </div>
+                  {!isSearchActive && (
+                    <div className="flex items-center gap-2">
+                      <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                        All listings
+                      </span>
+                      <span
+                        className="px-2 py-0.5 rounded-full font-medium"
+                        style={{
+                          backgroundColor: '#F1F1F1',
+                          color: '#939393',
+                          fontSize: '12px',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        {totalListings}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Sort By Filter */}
                   <button
@@ -518,20 +546,121 @@ const MyListings: React.FC = () => {
                   </button>
 
                   {/* Status Filter */}
-                  <button
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
-                    style={{
-                      backgroundColor: '#FAFAFA',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                  >
-                    <span style={{ color: '#939393', fontSize: '13px' }}>{statusFilter}</span>
-                    <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" style={{ filter: 'brightness(0) saturate(100%) invert(60%)' }} />
-                  </button>
+                  <div className="relative" ref={statusDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={toggleStatusDropdown}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                      style={{
+                        backgroundColor: '#FAFAFA',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      <span style={{ color: '#939393', fontSize: '13px' }}>{statusFilter}</span>
+                      <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" style={{ filter: 'brightness(0) saturate(100%) invert(60%)' }} />
+                    </button>
+
+                    {isStatusDropdownOpen && (
+                      <div
+                        className="absolute right-0 mt-2 bg-white z-10"
+                        style={{
+                          borderRadius: '10px',
+                          border: '1px solid #E9E9E9',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          minWidth: '160px'
+                        }}
+                      >
+                        {statusOptions.map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => handleStatusSelect(option)}
+                            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 transition-colors"
+                            style={{ fontFamily: 'Poppins, sans-serif', fontSize: '13px', color: '#212121' }}
+                          >
+                            {option === 'Active' && (
+                              <div className="flex items-center gap-1">
+                                <img src={activeIcon} alt="Active" className="w-3 h-3" />
+                                <span style={{ color: '#70E183' }}>Active</span>
+                              </div>
+                            )}
+                            {option === 'Inactive' && (
+                              <div className="flex items-center gap-1">
+                                <img src={inactiveIcon} alt="Inactive" className="w-3 h-3" />
+                                <span style={{ color: '#FF5151' }}>Inactive</span>
+                              </div>
+                            )}
+                            {option === 'Days left' && (
+                              <div className="flex items-center gap-1">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                  <circle cx="12" cy="12" r="10" stroke="#FAB951" strokeWidth="1.5" />
+                                  <path d="M12 7v5l3 2" stroke="#FAB951" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                <span style={{ color: '#FAB951' }}>Days left</span>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {statusFilter !== 'All Status' && (
+                    <div
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor:
+                          statusFilter === 'Active'
+                            ? '#EDFBF0'
+                            : statusFilter === 'Inactive'
+                            ? '#FFF5F5'
+                            : '#FEF6E9'
+                      }}
+                    >
+                      {statusFilter === 'Active' && <img src={activeIcon} alt="active" className="w-3 h-3" />}
+                      {statusFilter === 'Inactive' && <img src={inactiveIcon} alt="inactive" className="w-3 h-3" />}
+                      {statusFilter === 'Days left' && (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" fill="#FAB951" />
+                          <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                      <span
+                        style={{
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '11px',
+                          color:
+                            statusFilter === 'Active'
+                              ? '#70E183'
+                              : statusFilter === 'Inactive'
+                              ? '#FF5151'
+                              : '#FAB951'
+                        }}
+                      >
+                        {statusFilter}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={clearStatusFilter}
+                        style={{
+                          fontSize: '12px',
+                          lineHeight: 1,
+                          color:
+                            statusFilter === 'Active'
+                              ? '#70E183'
+                              : statusFilter === 'Inactive'
+                              ? '#FF5151'
+                              : '#FAB951'
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Right Side - Action Buttons */}
-                <div className="flex items-center gap-3 w-full sm:w-auto sm:self-center lg:ml-auto lg:pr-0 lg:-mr-10">
+                <div className="flex items-center gap-3 w-full sm:w-auto sm:self-center lg:ml-auto lg:pr-0 lg:-mr-14">
                   {/* Drafts Button */}
                   <button
                     className="flex items-center space-x-2 px-3 py-1 rounded-xl border"
@@ -579,6 +708,23 @@ const MyListings: React.FC = () => {
                     </svg>
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {isSearchActive && filteredListings.length > 0 && (
+            <div className="max-w-6xl mx-auto w-full pl-0 pr-0">
+              <div className="pl-0 lg:pl-0 lg:-ml-16 mt-4 mb-2">
+                <p
+                  style={{
+                    color: '#212121',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontSize: '16px'
+                  }}
+                >
+                  Search results for “ {trimmedSearchQuery} “ ({filteredListings.length}{' '}
+                  {filteredListings.length === 1 ? 'item' : 'items'})
+                </p>
               </div>
             </div>
           )}
