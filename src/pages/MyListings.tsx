@@ -12,6 +12,9 @@ import arrowDownIcon from '../assets/images/pre/arrow-down.svg';
 import activeIcon from '../assets/images/pre/active.svg';
 import inactiveIcon from '../assets/images/pre/inactive.svg';
 import pencilIcon from '../assets/images/pre/pencil.svg';
+import moneyIcon from '../assets/images/pre/money.svg';
+import bulletIcon from '../assets/images/pre/bullet.svg';
+import chartIcon from '../assets/images/pre/chart.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -39,35 +42,143 @@ interface Listing {
   price: string;
   currency: string;
   daysLeft?: number;
+  createdAt: number;
+  priceValue: number;
+  messages: number;
 }
 
 const statusOptions = ['Active', 'Inactive', 'Days left'] as const;
 type StatusFilter = 'All Status' | (typeof statusOptions)[number];
+type SortValue =
+  | 'date_recent'
+  | 'date_older'
+  | 'name_az'
+  | 'name_za'
+  | 'price_high_low'
+  | 'price_low_high'
+  | 'reviews_more'
+  | 'reviews_less'
+  | 'messages_more';
+
+interface SortOption {
+  key: string;
+  label: string;
+  icon: string | null;
+  children: Array<{
+    key: string;
+    label: string;
+    value?: SortValue;
+    subChildren?: Array<{ key: string; label: string; value: SortValue }>;
+  }>;
+}
+
+const sortOptions: SortOption[] = [
+  {
+    key: 'date',
+    label: 'Date of creation',
+    icon: null,
+    children: [
+      { key: 'date_recent', label: 'Recent', value: 'date_recent' },
+      { key: 'date_older', label: 'Older', value: 'date_older' }
+    ]
+  },
+  {
+    key: 'name',
+    label: 'Name',
+    icon: bulletIcon,
+    children: [
+      { key: 'name_az', label: 'A - Z', value: 'name_az' },
+      { key: 'name_za', label: 'Z - A', value: 'name_za' }
+    ]
+  },
+  {
+    key: 'price',
+    label: 'Price',
+    icon: moneyIcon,
+    children: [
+      { key: 'price_high_low', label: 'More expensive', value: 'price_high_low' },
+      { key: 'price_low_high', label: 'Cheaper', value: 'price_low_high' }
+    ]
+  },
+  {
+    key: 'commitments',
+    label: 'Commitments',
+    icon: chartIcon,
+    children: [
+      {
+        key: 'reviews',
+        label: 'Reviews and rates',
+        subChildren: [
+          { key: 'reviews_more', label: 'More reviews', value: 'reviews_more' },
+          { key: 'reviews_less', label: 'Fewer reviews', value: 'reviews_less' }
+        ]
+      },
+      {
+        key: 'messages',
+        label: 'Messages',
+        value: 'messages_more'
+      }
+    ]
+  }
+];
+
+const getParentKeyByValue = (value: SortValue): string | null => {
+  for (const option of sortOptions) {
+    for (const child of option.children) {
+      if (child.value === value) return option.key;
+      if (child.subChildren) {
+        for (const sub of child.subChildren) {
+          if (sub.value === value) return option.key;
+        }
+      }
+    }
+  }
+  return null;
+};
+
+const renderSortIcon = (icon: string | null, key: string) => {
+  if (icon) {
+    return <img src={icon} alt={key} className="w-4 h-4" />;
+  }
+  if (key === 'date') {
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="#939393" strokeWidth="1.5" />
+        <path d="M12 7v5l3 2" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  return null;
+};
 
 const MyListings: React.FC = () => {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('All');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All Status');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const statusDropdownRef = useRef<HTMLDivElement | null>(null);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [activePrimarySort, setActivePrimarySort] = useState('date');
+  const [activeSecondarySort, setActiveSecondarySort] = useState<string | null>(null);
+  const [selectedSort, setSelectedSort] = useState<{ label: string; value: SortValue } | null>(null);
+  const sortDropdownRef = useRef<HTMLDivElement | null>(null);
 
   // Mock data - replace with actual data from backend
   const listings = useMemo<Listing[]>(() => [
-    { id: '1', title: 'Bonga from Togo', image: a1, status: 'active', rating: 4.8, reviews: 88, price: '678', currency: 'USD' },
-    { id: '2', title: 'Coconut Oil Ghana', image: a2, status: 'active', rating: 4.5, reviews: 120, price: '45', currency: 'USD' },
-    { id: '3', title: 'Pepper from Benin', image: a3, status: 'inactive', rating: 4.2, reviews: 56, price: '32', currency: 'USD' },
-    { id: '4', title: 'Shrimps from Lome', image: a4, status: 'active', rating: 4.9, reviews: 200, price: '67.8', currency: 'USD', daysLeft: 12 },
-    { id: '5', title: 'Kinky hair Lagos', image: a5, status: 'active', rating: 4.7, reviews: 150, price: '25', currency: 'USD' },
-    { id: '6', title: 'Gold neck Accra', image: a6, status: 'active', rating: 4.6, reviews: 95, price: '38', currency: 'USD', daysLeft: 11 },
-    { id: '7', title: 'Baobab nuts Kano', image: a7, status: 'inactive', rating: 4.3, reviews: 78, price: '42', currency: 'USD' },
-    { id: '8', title: 'Cowrie bracelets', image: a8, status: 'active', rating: 4.8, reviews: 165, price: '55', currency: 'USD' },
-    { id: '9', title: 'Ebony tribal masks', image: a9, status: 'active', rating: 4.9, reviews: 210, price: '89', currency: 'USD' },
-    { id: '10', title: 'River pepper Addis', image: a10, status: 'active', rating: 4.7, reviews: 140, price: '72', currency: 'USD' },
-    { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: '48', currency: 'USD' },
-    { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: '35', currency: 'USD' },
+    { id: '1', title: 'Bonga from Togo', image: a1, status: 'active', rating: 4.8, reviews: 88, price: 'USD 678', currency: 'USD', createdAt: 1690000000000, priceValue: 678, messages: 42 },
+    { id: '2', title: 'Coconut Oil Ghana', image: a2, status: 'active', rating: 4.5, reviews: 120, price: 'USD 45', currency: 'USD', createdAt: 1690500000000, priceValue: 45, messages: 27 },
+    { id: '3', title: 'Pepper from Benin', image: a3, status: 'inactive', rating: 4.2, reviews: 56, price: 'USD 32', currency: 'USD', createdAt: 1689500000000, priceValue: 32, messages: 12 },
+    { id: '4', title: 'Shrimps from Lome', image: a4, status: 'active', rating: 4.9, reviews: 200, price: 'USD 67.8', currency: 'USD', daysLeft: 12, createdAt: 1691000000000, priceValue: 67.8, messages: 51 },
+    { id: '5', title: 'Kinky hair Lagos', image: a5, status: 'active', rating: 4.7, reviews: 150, price: 'USD 25', currency: 'USD', createdAt: 1690800000000, priceValue: 25, messages: 19 },
+    { id: '6', title: 'Gold neck Accra', image: a6, status: 'active', rating: 4.6, reviews: 95, price: 'USD 38', currency: 'USD', daysLeft: 11, createdAt: 1690200000000, priceValue: 38, messages: 33 },
+    { id: '7', title: 'Baobab nuts Kano', image: a7, status: 'inactive', rating: 4.3, reviews: 78, price: 'USD 42', currency: 'USD', createdAt: 1689000000000, priceValue: 42, messages: 8 },
+    { id: '8', title: 'Cowrie bracelets', image: a8, status: 'active', rating: 4.8, reviews: 165, price: 'USD 55', currency: 'USD', createdAt: 1690400000000, priceValue: 55, messages: 23 },
+    { id: '9', title: 'Ebony tribal masks', image: a9, status: 'active', rating: 4.9, reviews: 210, price: 'USD 89', currency: 'USD', createdAt: 1689800000000, priceValue: 89, messages: 60 },
+    { id: '10', title: 'River pepper Addis', image: a10, status: 'active', rating: 4.7, reviews: 140, price: 'USD 72', currency: 'USD', createdAt: 1690600000000, priceValue: 72, messages: 31 },
+    { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: 'USD 48', currency: 'USD', createdAt: 1689300000000, priceValue: 48, messages: 17 },
+    { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: 'USD 35', currency: 'USD', createdAt: 1689700000000, priceValue: 35, messages: 14 },
   ], []);
 
   const trimmedSearchQuery = searchQuery.trim();
@@ -94,7 +205,45 @@ const MyListings: React.FC = () => {
     return filtered;
   }, [listings, searchQuery, statusFilter]);
 
-  const hasResults = filteredListings.length > 0;
+  const sortedListings = useMemo(() => {
+    const sorted = [...filteredListings];
+    if (selectedSort) {
+      switch (selectedSort.value) {
+        case 'date_recent':
+          sorted.sort((a, b) => b.createdAt - a.createdAt);
+          break;
+        case 'date_older':
+          sorted.sort((a, b) => a.createdAt - b.createdAt);
+          break;
+        case 'name_az':
+          sorted.sort((a, b) => a.title.localeCompare(b.title));
+          break;
+        case 'name_za':
+          sorted.sort((a, b) => b.title.localeCompare(a.title));
+          break;
+        case 'price_high_low':
+          sorted.sort((a, b) => b.priceValue - a.priceValue);
+          break;
+        case 'price_low_high':
+          sorted.sort((a, b) => a.priceValue - b.priceValue);
+          break;
+        case 'reviews_more':
+          sorted.sort((a, b) => b.reviews - a.reviews);
+          break;
+        case 'reviews_less':
+          sorted.sort((a, b) => a.reviews - b.reviews);
+          break;
+        case 'messages_more':
+          sorted.sort((a, b) => b.messages - a.messages);
+          break;
+        default:
+          break;
+      }
+    }
+    return sorted;
+  }, [filteredListings, selectedSort]);
+
+  const hasResults = sortedListings.length > 0;
   const isSearchActive = trimmedSearchQuery.length > 0;
   const shouldShowEmptyState = !hasResults;
   const isSearchNoResultsState = shouldShowEmptyState && isSearchActive;
@@ -123,14 +272,42 @@ const MyListings: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(target)) {
         setIsStatusDropdownOpen(false);
+      }
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(target)) {
+        setIsSortDropdownOpen(false);
+        setActiveSecondarySort(null);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (selectedSort) {
+      const parentKey = getParentKeyByValue(selectedSort.value);
+      if (parentKey) {
+        setActivePrimarySort(parentKey);
+      }
+    }
+  }, [selectedSort]);
+
+  useEffect(() => {
+    if (!isSortDropdownOpen) {
+      setActiveSecondarySort(null);
+      return;
+    }
+    const primary = sortOptions.find((option) => option.key === activePrimarySort) ?? sortOptions[0];
+    const firstWithSub = primary.children.find((child) => child.subChildren);
+    if (firstWithSub) {
+      setActiveSecondarySort(firstWithSub.key);
+    } else {
+      setActiveSecondarySort(null);
+    }
+  }, [isSortDropdownOpen, activePrimarySort]);
 
   const renderEmptyState = () => (
     <div className="text-center py-6">
@@ -177,7 +354,7 @@ const MyListings: React.FC = () => {
 
   const renderListingsGrid = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 md:gap-8">
-      {filteredListings.map((listing) => (
+      {sortedListings.map((listing) => (
         <div key={listing.id} className="bg-white rounded-lg overflow-hidden">
           {/* Product Image */}
           <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
@@ -559,18 +736,185 @@ const MyListings: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Sort By Filter */}
+                {/* Sort By Filter */}
+                <div className="relative" ref={sortDropdownRef}>
                   <button
+                    type="button"
+                    onClick={() => setIsSortDropdownOpen((prev) => !prev)}
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
                     style={{
-                      backgroundColor: '#FAFAFA',
+                      backgroundColor: isSortDropdownOpen ? '#F0F8FE' : '#FAFAFA',
                       fontFamily: 'Poppins, sans-serif'
                     }}
                   >
-                    <img src={filterIcon} alt="Filter" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(70%)' }} />
-                    <span style={{ color: '#939393', fontSize: '13px' }}>Sort by</span>
-                    <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" style={{ filter: 'brightness(0) saturate(100%) invert(40%)' }} />
+                    <img
+                      src={filterIcon}
+                      alt="Filter"
+                      className="w-4 h-4"
+                      style={{
+                        filter: selectedSort
+                          ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)'
+                          : 'brightness(0) saturate(100%) invert(70%)'
+                      }}
+                    />
+                    <span
+                      style={{
+                        color: selectedSort ? '#64B5F6' : '#939393',
+                        fontSize: '13px'
+                      }}
+                    >
+                      {selectedSort?.label ?? 'Sort by'}
+                    </span>
+                    <img
+                      src={arrowDownIcon}
+                      alt="Arrow"
+                      className="w-3 h-3"
+                      style={{
+                        filter: selectedSort
+                          ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)'
+                          : 'brightness(0) saturate(100%) invert(40%)'
+                      }}
+                    />
                   </button>
+
+                  {isSortDropdownOpen && (
+                    <div
+                      className="absolute mt-2 z-30 flex"
+                      style={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '12px',
+                        border: '1px solid #E9E9E9',
+                        boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                        padding: '8px',
+                        minWidth: '240px'
+                      }}
+                    >
+                      <div style={{ minWidth: '180px' }}>
+                        {sortOptions.map((option) => {
+                          const isActive = option.key === activePrimarySort;
+                          return (
+                            <button
+                              key={option.key}
+                              type="button"
+                              onMouseEnter={() => setActivePrimarySort(option.key)}
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg"
+                              style={{
+                                backgroundColor: isActive ? '#F0F8FE' : 'transparent',
+                                color: isActive ? '#64B5F6' : '#939393',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '13px'
+                              }}
+                            >
+                              <span className="flex items-center gap-2">
+                                {renderSortIcon(option.icon, option.key)}
+                                {option.label}
+                              </span>
+                              <img
+                                src={arrowDownIcon}
+                                alt="Arrow"
+                                className="w-3 h-3 rotate-[-90deg]"
+                                style={{
+                                  filter: isActive
+                                    ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)'
+                                    : 'brightness(0) saturate(100%) invert(60%)'
+                                }}
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div
+                        className="ml-2"
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '12px',
+                          border: '1px solid #E9E9E9',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          minWidth: '180px'
+                        }}
+                      >
+                        {(sortOptions.find((option) => option.key === activePrimarySort) ?? sortOptions[0]).children.map((child) => {
+                          const hasSub = Array.isArray(child.subChildren);
+                          const isSecondaryActive = child.key === activeSecondarySort || (!activeSecondarySort && child.key === ((sortOptions.find((option) => option.key === activePrimarySort) ?? sortOptions[0]).children.find((c) => c.subChildren)?.key));
+                          return (
+                            <button
+                              key={child.key}
+                              type="button"
+                              onMouseEnter={() => hasSub && setActiveSecondarySort(child.key)}
+                              onClick={() => {
+                                if (!hasSub && child.value) {
+                                  setSelectedSort({ label: child.label, value: child.value });
+                                  setIsSortDropdownOpen(false);
+                                } else if (hasSub) {
+                                  setActiveSecondarySort(child.key);
+                                }
+                              }}
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg"
+                              style={{
+                                backgroundColor: isSecondaryActive && hasSub ? '#F0F8FE' : 'transparent',
+                                color: isSecondaryActive && hasSub ? '#64B5F6' : '#939393',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '13px'
+                              }}
+                            >
+                              <span>{child.label}</span>
+                              {hasSub ? (
+                                <img
+                                  src={arrowDownIcon}
+                                  alt="Arrow"
+                                  className="w-3 h-3 rotate-[-90deg]"
+                                  style={{
+                                    filter: isSecondaryActive ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)' : 'brightness(0) saturate(100%) invert(60%)'
+                                  }}
+                                />
+                              ) : null}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {(sortOptions.find((option) => option.key === activePrimarySort) ?? sortOptions[0]).children
+                        .filter((child) => child.subChildren)
+                        .map((child) => (
+                          <div key={child.key}>
+                            {child.subChildren && child.key === activeSecondarySort && (
+                              <div
+                                className="ml-2"
+                                style={{
+                                  backgroundColor: '#FFFFFF',
+                                  borderRadius: '12px',
+                                  border: '1px solid #E9E9E9',
+                                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                                  minWidth: '160px'
+                                }}
+                              >
+                                {child.subChildren.map((sub) => (
+                                  <button
+                                    key={sub.key}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedSort({ label: sub.label, value: sub.value });
+                                      setIsSortDropdownOpen(false);
+                                      setActiveSecondarySort(null);
+                                    }}
+                                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#F0F8FE]"
+                                    style={{
+                                      fontFamily: 'Poppins, sans-serif',
+                                      fontSize: '13px',
+                                      color: '#939393'
+                                    }}
+                                  >
+                                    {sub.label}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
 
                   {/* Status Filter */}
                   <div className="relative" ref={statusDropdownRef}>
