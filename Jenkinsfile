@@ -36,14 +36,8 @@ pipeline {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                         # Install Node.js and npm if not already installed
-                        curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+                        curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
                         sudo apt install -y nodejs
-
-                        # Verify Node.js installation
-                        echo "Node.js version:"
-                        node --version
-                        echo "npm version:"
-                        npm --version
                     '
                     """
 
@@ -118,16 +112,15 @@ pipeline {
 
                             # Create .env file with actual secrets
                             cat > .env << EOF
-REACT_APP_API_URL=https://${DOMAIN}/api
-REACT_APP_WS_URL=wss://${DOMAIN}
-REACT_APP_AWS_REGION="${REACT_APP_AWS_REGION}"
-REACT_APP_S3_BUCKET_NAME="${REACT_APP_S3_BUCKET_NAME}"
-S3_PROFILE_PREFIX=profile-images
-S3_ATTACHMENTS_PREFIX=attachments
-EOF
+                            REACT_APP_API_URL=https://${DOMAIN}/api
+                            REACT_APP_WS_URL=wss://${DOMAIN}
+                            REACT_APP_AWS_REGION="${REACT_APP_AWS_REGION}"
+                            REACT_APP_S3_BUCKET_NAME="${REACT_APP_S3_BUCKET_NAME}"
+                            S3_PROFILE_PREFIX=profile-images
+                            S3_ATTACHMENTS_PREFIX=attachments
+                            EOF
 
                             chmod 600 .env
-                            echo "=== Environment file created securely ==="
                         '
                         """
                     }
@@ -156,36 +149,35 @@ EOF
 
                             # Create .env file with actual secrets
                             cat > .env << EOF
-NODE_ENV=staging
-PORT=3001
-DATABASE_URL="${DATABASE_URL}"
-JWT_SECRET="${JWT_SECRET}"
-JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}"
-JWT_EXPIRE_TIME=30m
-JWT_REFRESH_EXPIRE_TIME=7d
-EMAIL_SERVICE=resend
-RESEND_API_KEY="${RESEND_API_KEY}"
-EMAIL_FROM_ADDRESS=noreply@baoafrik.com
-EMAIL_FROM_NAME="BaoAfrik Team"
+                            NODE_ENV=staging
+                            PORT=3001
+                            DATABASE_URL="${DATABASE_URL}"
+                            JWT_SECRET="${JWT_SECRET}"
+                            JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}"
+                            JWT_EXPIRE_TIME=30m
+                            JWT_REFRESH_EXPIRE_TIME=7d
+                            EMAIL_SERVICE=resend
+                            RESEND_API_KEY="${RESEND_API_KEY}"
+                            EMAIL_FROM_ADDRESS=noreply@baoafrik.com
+                            EMAIL_FROM_NAME="BaoAfrik Team"
 
-AWS_REGION="${AWS_REGION}"
-AWS_S3_BUCKET="${AWS_S3_BUCKET}"
-S3_PROFILE_PREFIX=profile-images
-S3_ATTACHMENTS_PREFIX=chat-attachments
-S3_PRODUCT_PREFIX=product-images
+                            AWS_REGION="${AWS_REGION}"
+                            AWS_S3_BUCKET="${AWS_S3_BUCKET}"
+                            S3_PROFILE_PREFIX=profile-images
+                            S3_ATTACHMENTS_PREFIX=chat-attachments
+                            S3_PRODUCT_PREFIX=product-images
 
-APP_ENCRYPTION_KEY="fonsahappencrypt"
-DB_ENCRYPTION_KEY="fonsahdbencrypt"
+                            APP_ENCRYPTION_KEY="fonsahappencrypt"
+                            DB_ENCRYPTION_KEY="fonsahdbencrypt"
 
-FRONTEND_URL="https://${DOMAIN}"
-CORS_ORIGINS="https://${DOMAIN}"
-BCRYPT_ROUNDS=12
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
-EOF
+                            FRONTEND_URL="https://${DOMAIN}"
+                            CORS_ORIGINS="https://${DOMAIN}"
+                            BCRYPT_ROUNDS=12
+                            RATE_LIMIT_WINDOW_MS=900000
+                            RATE_LIMIT_MAX_REQUESTS=100
+                            EOF
 
                             chmod 600 .env
-                            echo "=== Environment file created securely ==="
                         '
                         """
                     }
@@ -209,11 +201,12 @@ EOF
                             exit 1
                         fi
 
-                        rm -rf node_modules package-lock.json
+                        rm -rf dist/ node_modules package-lock.json
 
                         npm install
                         npm run build
 
+                        npx prisma generate
                         npx prisma db push
 
                         pm2 delete ${APP_NAME_BACKEND} || true
@@ -224,15 +217,9 @@ EOF
                         echo "Starting frontend deployment..."
 
                         cd ${FRONTEND_DIR}
-                        rm -rf node_modules package-lock.json build
+                        rm -rf node_modules package-lock.json build/
 
                         npm install
-
-                        if ! npm list react-scripts | grep react-scripts > /dev/null 2>&1; then
-                            echo "Installing react-scripts..."
-                            npm install --save-dev react-scripts
-                        fi
-
                         npm run build
 
                         pm2 delete ${APP_NAME_FRONTEND} || true
@@ -247,33 +234,6 @@ EOF
                 }
             }
         }
-
-        stage('Verify Deployment') {
-            steps {
-                echo 'Verifying deployment...'
-
-                sshagent([env.SSH_KEY_ID]) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
-                        # Wait for services to start
-                        sleep 10
-
-                        echo "=== Deployment Verification ==="
-                        echo "PM2 Processes:"
-                        pm2 list
-
-                        echo "Testing Backend API:"
-                        curl -f http://localhost:3001/api/health > /dev/null && echo "Backend API is accessible" || echo "Backend API failed"
-
-                        echo "Testing Frontend:"
-                        curl -f http://localhost:3000 > /dev/null && echo "Frontend is accessible" || echo "Frontend failed"
-
-                        echo "=== Deployment Complete ==="
-                    '
-                    """
-                }
-            }
-        }
     }
 
     post {
@@ -283,7 +243,7 @@ EOF
                         subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
                         to: "${env.EMAIL}",
                         from: 'jenkins.baoafrik.com',
-                        replyTo: 'no-reply@baotechnologiesandtravels.com',
+                        replyTo: 'no-reply@baoafrik.com',
                         body: """
                             <html>
                                 <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
@@ -307,7 +267,7 @@ EOF
                 subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
                 to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
                 from: 'jenkins.baoafrik.com',
-                replyTo: 'no-reply@baotechnologiesandtravels.com',
+                replyTo: 'no-reply@baoafrik.com',
                 body: """
                     <html>
                         <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">

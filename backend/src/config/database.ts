@@ -1,6 +1,5 @@
 import { PrismaClient } from '../generated/client';
 import logger from './logger';
-// import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const { Pool } = require('pg');

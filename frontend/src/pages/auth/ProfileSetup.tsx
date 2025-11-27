@@ -755,6 +755,7 @@ const ProfileSetup: React.FC = () => {
                       showMonthDropdown
                       showYearDropdown
                       dropdownMode='select'
+                      {...({} as any)}
                       scrollableYearDropdown
                       maxDate={new Date()}
                       shouldCloseOnSelect
