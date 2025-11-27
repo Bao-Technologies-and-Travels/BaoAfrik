@@ -58,7 +58,8 @@ type SortValue =
   | 'price_low_high'
   | 'reviews_more'
   | 'reviews_less'
-  | 'messages_more';
+  | 'messages_more'
+  | 'messages_less';
 
 interface SortOption {
   key: string;
@@ -116,7 +117,10 @@ const sortOptions: SortOption[] = [
       {
         key: 'messages',
         label: 'Messages',
-        value: 'messages_more'
+        subChildren: [
+          { key: 'messages_more', label: 'More messages', value: 'messages_more' },
+          { key: 'messages_less', label: 'Fewer messages', value: 'messages_less' }
+        ]
       }
     ]
   }
@@ -136,15 +140,27 @@ const getParentKeyByValue = (value: SortValue): string | null => {
   return null;
 };
 
-const renderSortIcon = (icon: string | null, key: string) => {
-  if (icon) {
-    return <img src={icon} alt={key} className="w-4 h-4" />;
+const renderSortIcon = (option: SortOption, isSelected: boolean) => {
+  const color = isSelected ? '#64B5F6' : '#939393';
+  if (option.icon && option.key !== 'date') {
+    return (
+      <img
+        src={option.icon}
+        alt={option.label}
+        className="w-4 h-4"
+        style={{
+          filter: isSelected
+            ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)'
+            : 'brightness(0) saturate(100%) invert(55%) sepia(7%) saturate(381%) hue-rotate(171deg) brightness(92%) contrast(88%)'
+        }}
+      />
+    );
   }
-  if (key === 'date') {
+  if (option.key === 'date') {
     return (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="10" stroke="#939393" strokeWidth="1.5" />
-        <path d="M12 7v5l3 2" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="1.5" />
+        <path d="M12 7v5l3 2" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   }
@@ -160,8 +176,8 @@ const MyListings: React.FC = () => {
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const statusDropdownRef = useRef<HTMLDivElement | null>(null);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-  const [activePrimarySort, setActivePrimarySort] = useState('date');
-  const [activeSecondarySort, setActiveSecondarySort] = useState<string | null>(null);
+  const [hoveredPrimarySort, setHoveredPrimarySort] = useState<string | null>(null);
+  const [hoveredSecondarySort, setHoveredSecondarySort] = useState<string | null>(null);
   const [selectedSort, setSelectedSort] = useState<{ label: string; value: SortValue } | null>(null);
   const sortDropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -236,6 +252,9 @@ const MyListings: React.FC = () => {
         case 'messages_more':
           sorted.sort((a, b) => b.messages - a.messages);
           break;
+        case 'messages_less':
+          sorted.sort((a, b) => a.messages - b.messages);
+          break;
         default:
           break;
       }
@@ -278,7 +297,7 @@ const MyListings: React.FC = () => {
       }
       if (sortDropdownRef.current && !sortDropdownRef.current.contains(target)) {
         setIsSortDropdownOpen(false);
-        setActiveSecondarySort(null);
+        setHoveredSecondarySort(null);
       }
     };
 
@@ -286,28 +305,27 @@ const MyListings: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (selectedSort) {
-      const parentKey = getParentKeyByValue(selectedSort.value);
-      if (parentKey) {
-        setActivePrimarySort(parentKey);
+  const getSecondaryKeyByValue = (value: SortValue): string | null => {
+    for (const option of sortOptions) {
+      for (const child of option.children) {
+        if (child.value === value) return child.key;
+        if (child.subChildren) {
+          for (const sub of child.subChildren) {
+            if (sub.value === value) return child.key;
+          }
+        }
       }
     }
-  }, [selectedSort]);
+    return null;
+  };
 
-  useEffect(() => {
-    if (!isSortDropdownOpen) {
-      setActiveSecondarySort(null);
-      return;
-    }
-    const primary = sortOptions.find((option) => option.key === activePrimarySort) ?? sortOptions[0];
-    const firstWithSub = primary.children.find((child) => child.subChildren);
-    if (firstWithSub) {
-      setActiveSecondarySort(firstWithSub.key);
-    } else {
-      setActiveSecondarySort(null);
-    }
-  }, [isSortDropdownOpen, activePrimarySort]);
+  const selectedPrimaryKey = selectedSort ? getParentKeyByValue(selectedSort.value) : null;
+  const selectedSecondaryKey = selectedSort ? getSecondaryKeyByValue(selectedSort.value) : null;
+  const resolvedPrimaryKey = hoveredPrimarySort ?? selectedPrimaryKey ?? sortOptions[0].key;
+  const resolvedPrimaryIndex = sortOptions.findIndex((option) => option.key === resolvedPrimaryKey);
+  const secondaryOptions = sortOptions[resolvedPrimaryIndex]?.children ?? sortOptions[0].children;
+  const resolvedSecondaryKey = hoveredSecondarySort ?? selectedSecondaryKey ?? secondaryOptions[0]?.key ?? null;
+  const resolvedSecondaryIndex = secondaryOptions.findIndex((child) => child.key === resolvedSecondaryKey);
 
   const renderEmptyState = () => (
     <div className="text-center py-6">
@@ -778,141 +796,181 @@ const MyListings: React.FC = () => {
                   </button>
 
                   {isSortDropdownOpen && (
-                    <div
-                      className="absolute mt-2 z-30 flex"
-                      style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '12px',
-                        border: '1px solid #E9E9E9',
-                        boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                        padding: '8px',
-                        minWidth: '240px'
-                      }}
-                    >
-                      <div style={{ minWidth: '180px' }}>
-                        {sortOptions.map((option) => {
-                          const isActive = option.key === activePrimarySort;
-                          return (
-                            <button
-                              key={option.key}
-                              type="button"
-                              onMouseEnter={() => setActivePrimarySort(option.key)}
-                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg"
-                              style={{
-                                backgroundColor: isActive ? '#F0F8FE' : 'transparent',
-                                color: isActive ? '#64B5F6' : '#939393',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '13px'
-                              }}
-                            >
-                              <span className="flex items-center gap-2">
-                                {renderSortIcon(option.icon, option.key)}
-                                {option.label}
-                              </span>
-                              <img
-                                src={arrowDownIcon}
-                                alt="Arrow"
-                                className="w-3 h-3 rotate-[-90deg]"
-                                style={{
-                                  filter: isActive
-                                    ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)'
-                                    : 'brightness(0) saturate(100%) invert(60%)'
-                                }}
-                              />
-                            </button>
-                          );
-                        })}
-                      </div>
-
+                    <>
                       <div
-                        className="ml-2"
+                        className="absolute mt-2 z-30"
                         style={{
                           backgroundColor: '#FFFFFF',
                           borderRadius: '12px',
                           border: '1px solid #E9E9E9',
                           boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                          minWidth: '180px'
+                          padding: '8px',
+                          minWidth: '200px'
                         }}
                       >
-                        {(sortOptions.find((option) => option.key === activePrimarySort) ?? sortOptions[0]).children.map((child) => {
+                        {sortOptions.map((option) => {
+                          const isSelected = option.key === selectedPrimaryKey;
+                          const isHovered = option.key === hoveredPrimarySort;
+                          const backgroundColor = isSelected ? '#F0F8FE' : isHovered ? '#FAFAFA' : 'transparent';
+                          const textColor = isSelected ? '#64B5F6' : '#939393';
+                          return (
+                            <button
+                              key={option.key}
+                              type="button"
+                              onMouseEnter={() => {
+                                setHoveredPrimarySort(option.key);
+                                setHoveredSecondarySort(null);
+                              }}
+                              onClick={() => {
+                                setHoveredPrimarySort(option.key);
+                                setHoveredSecondarySort(null);
+                              }}
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors"
+                              style={{
+                                backgroundColor,
+                                color: textColor,
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '13px'
+                              }}
+                            >
+                              <span className="flex items-center gap-2">
+                                {renderSortIcon(option, isSelected)}
+                                {option.label}
+                              </span>
+                              <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M2 2l3 4-3 4"
+                                  stroke={isSelected ? '#64B5F6' : '#939393'}
+                                  strokeWidth="1.2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          onClick={() => setIsSortDropdownOpen(false)}
+                          className="mt-2 w-full flex items-center gap-2 px-3 py-2 rounded-lg"
+                          style={{
+                            backgroundColor: '#F8F8F8',
+                            color: '#939393',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px'
+                          }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                          </svg>
+                          Close
+                        </button>
+                      </div>
+
+                      <div
+                        className="absolute mt-2 z-40"
+                        style={{
+                          left: '210px',
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '12px',
+                          border: '1px solid #E9E9E9',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          minWidth: '130px',
+                          padding: '6px',
+                          top:
+                            (hoveredPrimarySort
+                              ? sortOptions.findIndex((option) => option.key === hoveredPrimarySort) * 44
+                              : selectedPrimaryKey
+                              ? sortOptions.findIndex((option) => option.key === selectedPrimaryKey) * 44
+                              : 0) + 8
+                        }}
+                      >
+                        {(sortOptions.find((option) => option.key === (hoveredPrimarySort ?? selectedPrimaryKey)) ?? sortOptions[0]).children.map((child) => {
                           const hasSub = Array.isArray(child.subChildren);
-                          const isSecondaryActive = child.key === activeSecondarySort || (!activeSecondarySort && child.key === ((sortOptions.find((option) => option.key === activePrimarySort) ?? sortOptions[0]).children.find((c) => c.subChildren)?.key));
+                          const isSelected = child.key === selectedSecondaryKey && !hasSub && selectedPrimaryKey === (hoveredPrimarySort ?? selectedPrimaryKey);
+                          const isHovered = child.key === hoveredSecondarySort;
+                          const backgroundColor = isSelected ? '#F0F8FE' : isHovered ? '#FAFAFA' : 'transparent';
+                          const textColor = isSelected ? '#64B5F6' : '#939393';
                           return (
                             <button
                               key={child.key}
                               type="button"
-                              onMouseEnter={() => hasSub && setActiveSecondarySort(child.key)}
+                              onMouseEnter={() => setHoveredSecondarySort(child.key)}
                               onClick={() => {
                                 if (!hasSub && child.value) {
                                   setSelectedSort({ label: child.label, value: child.value });
                                   setIsSortDropdownOpen(false);
-                                } else if (hasSub) {
-                                  setActiveSecondarySort(child.key);
                                 }
                               }}
-                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg"
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors"
                               style={{
-                                backgroundColor: isSecondaryActive && hasSub ? '#F0F8FE' : 'transparent',
-                                color: isSecondaryActive && hasSub ? '#64B5F6' : '#939393',
+                                backgroundColor,
+                                color: textColor,
                                 fontFamily: 'Poppins, sans-serif',
                                 fontSize: '13px'
                               }}
                             >
                               <span>{child.label}</span>
                               {hasSub ? (
-                                <img
-                                  src={arrowDownIcon}
-                                  alt="Arrow"
-                                  className="w-3 h-3 rotate-[-90deg]"
-                                  style={{
-                                    filter: isSecondaryActive ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)' : 'brightness(0) saturate(100%) invert(60%)'
-                                  }}
-                                />
+                                <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M2 2l3 4-3 4" stroke={child.key === hoveredSecondarySort ? '#64B5F6' : '#939393'} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
                               ) : null}
                             </button>
                           );
                         })}
                       </div>
 
-                      {(sortOptions.find((option) => option.key === activePrimarySort) ?? sortOptions[0]).children
-                        .filter((child) => child.subChildren)
+                      {(sortOptions.find((option) => option.key === (hoveredPrimarySort ?? selectedPrimaryKey)) ?? sortOptions[0]).children
+                        .filter((child) => child.subChildren && child.key === hoveredSecondarySort)
                         .map((child) => (
-                          <div key={child.key}>
-                            {child.subChildren && child.key === activeSecondarySort && (
-                              <div
-                                className="ml-2"
-                                style={{
-                                  backgroundColor: '#FFFFFF',
-                                  borderRadius: '12px',
-                                  border: '1px solid #E9E9E9',
-                                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                                  minWidth: '160px'
-                                }}
-                              >
-                                {child.subChildren.map((sub) => (
-                                  <button
-                                    key={sub.key}
-                                    type="button"
-                                    onClick={() => {
-                                      setSelectedSort({ label: sub.label, value: sub.value });
-                                      setIsSortDropdownOpen(false);
-                                      setActiveSecondarySort(null);
-                                    }}
-                                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#F0F8FE]"
-                                    style={{
-                                      fontFamily: 'Poppins, sans-serif',
-                                      fontSize: '13px',
-                                      color: '#939393'
-                                    }}
-                                  >
-                                    {sub.label}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
+                          <div
+                            key={child.key}
+                            className="absolute mt-2 z-50"
+                            style={{
+                              left: '340px',
+                              backgroundColor: '#FFFFFF',
+                              borderRadius: '12px',
+                              border: '1px solid #E9E9E9',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                              minWidth: '130px',
+                              padding: '6px',
+                              top:
+                                (hoveredPrimarySort
+                                  ? sortOptions.findIndex((option) => option.key === hoveredPrimarySort) * 44
+                                  : selectedPrimaryKey
+                                  ? sortOptions.findIndex((option) => option.key === selectedPrimaryKey) * 44
+                                  : 0) +
+                                (sortOptions.find((option) => option.key === (hoveredPrimarySort ?? selectedPrimaryKey)) ?? sortOptions[0]).children.findIndex((c) => c.key === hoveredSecondarySort) *
+                                  40 +
+                                8
+                            }}
+                          >
+                            {child.subChildren?.map((sub) => {
+                              const isSelected = selectedSort?.value === sub.value;
+                              return (
+                                <button
+                                  key={sub.key}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedSort({ label: sub.label, value: sub.value });
+                                    setIsSortDropdownOpen(false);
+                                  }}
+                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors"
+                                  style={{
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '13px',
+                                    color: isSelected ? '#64B5F6' : '#939393',
+                                    backgroundColor: isSelected ? '#F0F8FE' : 'transparent'
+                                  }}
+                                >
+                                  {sub.label}
+                                </button>
+                              );
+                            })}
                           </div>
                         ))}
-                    </div>
+                    </>
                   )}
                 </div>
 
