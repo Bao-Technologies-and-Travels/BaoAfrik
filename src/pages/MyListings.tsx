@@ -140,6 +140,32 @@ const getParentKeyByValue = (value: SortValue): string | null => {
   return null;
 };
 
+const getSortSelectionDetails = (value: SortValue) => {
+  for (const option of sortOptions) {
+    for (const child of option.children) {
+      if (child.value === value) {
+        return {
+          primary: option,
+          secondaryLabel: child.label,
+          tertiaryLabel: null as string | null
+        };
+      }
+      if (child.subChildren) {
+        for (const sub of child.subChildren) {
+          if (sub.value === value) {
+            return {
+              primary: option,
+              secondaryLabel: child.label,
+              tertiaryLabel: sub.label
+            };
+          }
+        }
+      }
+    }
+  }
+  return null;
+};
+
 const renderSortIcon = (option: SortOption, isSelected: boolean) => {
   const color = isSelected ? '#64B5F6' : '#939393';
   if (option.icon && option.key !== 'date') {
@@ -151,7 +177,7 @@ const renderSortIcon = (option: SortOption, isSelected: boolean) => {
         style={{
           filter: isSelected
             ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)'
-            : 'brightness(0) saturate(100%) invert(55%) sepia(7%) saturate(381%) hue-rotate(171deg) brightness(92%) contrast(88%)'
+            : 'grayscale(100%) opacity(0.5)'
         }}
       />
     );
@@ -280,7 +306,7 @@ const MyListings: React.FC = () => {
     navigate('/create-listing');
   };
 
-  const primaryButtonLabel = isSearchNoResultsState ? 'Clear search' : 'Add listing';
+  const primaryButtonLabel = 'Add listing';
 
   const toggleStatusDropdown = () => setIsStatusDropdownOpen((prev) => !prev);
   const handleStatusSelect = (option: StatusFilter) => {
@@ -288,6 +314,14 @@ const MyListings: React.FC = () => {
     setIsStatusDropdownOpen(false);
   };
   const clearStatusFilter = () => setStatusFilter('All Status');
+  const clearSelectedSort = (event?: React.MouseEvent) => {
+    if (event) {
+      event.stopPropagation();
+    }
+    setSelectedSort(null);
+    setHoveredPrimarySort(null);
+    setHoveredSecondarySort(null);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -321,11 +355,20 @@ const MyListings: React.FC = () => {
 
   const selectedPrimaryKey = selectedSort ? getParentKeyByValue(selectedSort.value) : null;
   const selectedSecondaryKey = selectedSort ? getSecondaryKeyByValue(selectedSort.value) : null;
+  const selectedSortDetails = selectedSort ? getSortSelectionDetails(selectedSort.value) : null;
   const resolvedPrimaryKey = hoveredPrimarySort ?? selectedPrimaryKey ?? sortOptions[0].key;
   const resolvedPrimaryIndex = sortOptions.findIndex((option) => option.key === resolvedPrimaryKey);
   const secondaryOptions = sortOptions[resolvedPrimaryIndex]?.children ?? sortOptions[0].children;
   const resolvedSecondaryKey = hoveredSecondarySort ?? selectedSecondaryKey ?? secondaryOptions[0]?.key ?? null;
   const resolvedSecondaryIndex = secondaryOptions.findIndex((child) => child.key === resolvedSecondaryKey);
+  const secondaryPanelWidths: Record<string, number> = {
+    date: 95,
+    name: 90,
+    price: 150,
+    commitments: 180
+  };
+  const secondaryPanelWidth = secondaryPanelWidths[resolvedPrimaryKey] ?? 130;
+  const tertiaryPanelLeft = 210 + secondaryPanelWidth + 12;
 
   const renderEmptyState = () => (
     <div className="text-center py-6">
@@ -756,44 +799,78 @@ const MyListings: React.FC = () => {
 
                 {/* Sort By Filter */}
                 <div className="relative" ref={sortDropdownRef}>
-                  <button
-                    type="button"
-                    onClick={() => setIsSortDropdownOpen((prev) => !prev)}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
-                    style={{
-                      backgroundColor: isSortDropdownOpen ? '#F0F8FE' : '#FAFAFA',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                  >
-                    <img
-                      src={filterIcon}
-                      alt="Filter"
-                      className="w-4 h-4"
+                  {selectedSortDetails ? (
+                    <button
+                      type="button"
+                      onClick={() => setIsSortDropdownOpen((prev) => !prev)}
+                      className="inline-flex items-center justify-between gap-3 px-3 py-1 rounded-full"
                       style={{
-                        filter: selectedSort
-                          ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)'
-                          : 'brightness(0) saturate(100%) invert(70%)'
-                      }}
-                    />
-                    <span
-                      style={{
-                        color: selectedSort ? '#64B5F6' : '#939393',
-                        fontSize: '13px'
+                        backgroundColor: '#F0F8FE',
+                        fontFamily: 'Poppins, sans-serif',
+                        color: '#64B5F6',
+                        minHeight: '30px'
                       }}
                     >
-                      {selectedSort?.label ?? 'Sort by'}
-                    </span>
-                    <img
-                      src={arrowDownIcon}
-                      alt="Arrow"
-                      className="w-3 h-3"
+                      <span className="flex items-center gap-1 text-[11px] sm:text-xs" style={{ color: '#64B5F6' }}>
+                        <span className="flex items-center gap-1">
+                          {renderSortIcon(selectedSortDetails.primary, true)}
+                          <span style={{ fontWeight: 500 }}>{selectedSortDetails.primary.label}</span>
+                        </span>
+                        <span>:</span>
+                        <span style={{ fontWeight: 500 }}>{selectedSortDetails.secondaryLabel}</span>
+                        {selectedSortDetails.tertiaryLabel && (
+                          <>
+                            <span>:</span>
+                            <span style={{ fontWeight: 500 }}>{selectedSortDetails.tertiaryLabel}</span>
+                          </>
+                        )}
+                      </span>
+                      <span
+                        role="button"
+                        aria-label="Clear sort selection"
+                        onClick={(event) => clearSelectedSort(event)}
+                        className="text-base leading-none cursor-pointer"
+                        style={{ color: '#64B5F6', lineHeight: 1 }}
+                      >
+                        ×
+                      </span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsSortDropdownOpen((prev) => !prev)}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
                       style={{
-                        filter: selectedSort
-                          ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)'
-                          : 'brightness(0) saturate(100%) invert(40%)'
+                        backgroundColor: isSortDropdownOpen ? '#F0F8FE' : '#FAFAFA',
+                        fontFamily: 'Poppins, sans-serif'
                       }}
-                    />
-                  </button>
+                    >
+                      <img
+                        src={filterIcon}
+                        alt="Filter"
+                        className="w-4 h-4"
+                        style={{
+                          filter: 'brightness(0) saturate(100%) invert(70%)'
+                        }}
+                      />
+                      <span
+                        style={{
+                          color: '#939393',
+                          fontSize: '13px'
+                        }}
+                      >
+                        Sort by
+                      </span>
+                      <img
+                        src={arrowDownIcon}
+                        alt="Arrow"
+                        className="w-3 h-3"
+                        style={{
+                          filter: 'brightness(0) saturate(100%) invert(40%)'
+                        }}
+                      />
+                    </button>
+                  )}
 
                   {isSortDropdownOpen && (
                     <>
@@ -875,13 +952,15 @@ const MyListings: React.FC = () => {
                           borderRadius: '12px',
                           border: '1px solid #E9E9E9',
                           boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                          minWidth: '130px',
-                          padding: '6px',
+                          width: `${secondaryPanelWidth}px`,
+                          minWidth: `${secondaryPanelWidth}px`,
+                          maxWidth: `${secondaryPanelWidth}px`,
+                          padding: '6px 10px',
                           top:
                             (hoveredPrimarySort
-                              ? sortOptions.findIndex((option) => option.key === hoveredPrimarySort) * 44
+                              ? sortOptions.findIndex((option) => option.key === hoveredPrimarySort) * 40
                               : selectedPrimaryKey
-                              ? sortOptions.findIndex((option) => option.key === selectedPrimaryKey) * 44
+                              ? sortOptions.findIndex((option) => option.key === selectedPrimaryKey) * 40
                               : 0) + 8
                         }}
                       >
@@ -902,17 +981,28 @@ const MyListings: React.FC = () => {
                                   setIsSortDropdownOpen(false);
                                 }
                               }}
-                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors"
+                              className="w-full flex items-center px-3 py-1.5 rounded-lg transition-colors"
                               style={{
                                 backgroundColor,
                                 color: textColor,
                                 fontFamily: 'Poppins, sans-serif',
-                                fontSize: '13px'
+                                fontSize: '12px',
+                                whiteSpace: 'nowrap',
+                                justifyContent: hasSub ? 'space-between' : 'flex-start',
+                                alignItems: 'center',
+                                columnGap: hasSub ? '16px' : '0'
                               }}
                             >
                               <span>{child.label}</span>
                               {hasSub ? (
-                                <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <svg
+                                  width="8"
+                                  height="12"
+                                  viewBox="0 0 8 12"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  style={{ flexShrink: 0 }}
+                                >
                                   <path d="M2 2l3 4-3 4" stroke={child.key === hoveredSecondarySort ? '#64B5F6' : '#939393'} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               ) : null}
@@ -928,21 +1018,23 @@ const MyListings: React.FC = () => {
                             key={child.key}
                             className="absolute mt-2 z-50"
                             style={{
-                              left: '340px',
+                              left: `${tertiaryPanelLeft}px`,
                               backgroundColor: '#FFFFFF',
                               borderRadius: '12px',
                               border: '1px solid #E9E9E9',
                               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                              minWidth: '130px',
-                              padding: '6px',
+                              minWidth: '120px',
+                              maxWidth: '150px',
+                              width: 'fit-content',
+                              padding: '4px 6px',
                               top:
                                 (hoveredPrimarySort
-                                  ? sortOptions.findIndex((option) => option.key === hoveredPrimarySort) * 44
+                                  ? sortOptions.findIndex((option) => option.key === hoveredPrimarySort) * 40
                                   : selectedPrimaryKey
-                                  ? sortOptions.findIndex((option) => option.key === selectedPrimaryKey) * 44
+                                  ? sortOptions.findIndex((option) => option.key === selectedPrimaryKey) * 40
                                   : 0) +
                                 (sortOptions.find((option) => option.key === (hoveredPrimarySort ?? selectedPrimaryKey)) ?? sortOptions[0]).children.findIndex((c) => c.key === hoveredSecondarySort) *
-                                  40 +
+                                  36 +
                                 8
                             }}
                           >
@@ -956,12 +1048,13 @@ const MyListings: React.FC = () => {
                                     setSelectedSort({ label: sub.label, value: sub.value });
                                     setIsSortDropdownOpen(false);
                                   }}
-                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors"
+                                  className="w-full text-left px-3 py-1.5 rounded-lg transition-colors"
                                   style={{
                                     fontFamily: 'Poppins, sans-serif',
-                                    fontSize: '13px',
+                                    fontSize: '12px',
                                     color: isSelected ? '#64B5F6' : '#939393',
-                                    backgroundColor: isSelected ? '#F0F8FE' : 'transparent'
+                                    backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
+                                    whiteSpace: 'nowrap'
                                   }}
                                 >
                                   {sub.label}
