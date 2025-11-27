@@ -7,6 +7,7 @@ import gridIcon from '../assets/images/pre/grid.svg';
 import lilLogo from '../assets/images/pre/lil.png';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
+import trashIcon from '../assets/images/pre/trash.svg';
 import filterIcon from '../assets/images/pre/filter.png';
 import arrowDownIcon from '../assets/images/pre/arrow-down.svg';
 import activeIcon from '../assets/images/pre/active.svg';
@@ -45,6 +46,17 @@ interface Listing {
   createdAt: number;
   priceValue: number;
   messages: number;
+}
+
+interface DraftListing {
+  id: string;
+  title: string;
+  price: string;
+  currency: string;
+  image: string;
+  description: string;
+  country: string;
+  countryColor: string;
 }
 
 const statusOptions = ['Active', 'Inactive', 'Days left'] as const;
@@ -193,6 +205,32 @@ const renderSortIcon = (option: SortOption, isSelected: boolean) => {
   return null;
 };
 
+const renderCountryBadge = (label: string, color: string) => (
+  <span
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '6px',
+      backgroundColor: '#F5F9FF',
+      color,
+      padding: '6px 10px',
+      borderRadius: '999px',
+      fontSize: '11px',
+      fontFamily: 'Poppins, sans-serif'
+    }}
+  >
+    <span
+      style={{
+        width: '6px',
+        height: '6px',
+        borderRadius: '50%',
+        backgroundColor: color
+      }}
+    />
+    {label}
+  </span>
+);
+
 const MyListings: React.FC = () => {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -206,6 +244,7 @@ const MyListings: React.FC = () => {
   const [hoveredSecondarySort, setHoveredSecondarySort] = useState<string | null>(null);
   const [selectedSort, setSelectedSort] = useState<{ label: string; value: SortValue } | null>(null);
   const sortDropdownRef = useRef<HTMLDivElement | null>(null);
+  const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
 
   // Mock data - replace with actual data from backend
   const listings = useMemo<Listing[]>(() => [
@@ -221,6 +260,49 @@ const MyListings: React.FC = () => {
     { id: '10', title: 'River pepper Addis', image: a10, status: 'active', rating: 4.7, reviews: 140, price: 'USD 72', currency: 'USD', createdAt: 1690600000000, priceValue: 72, messages: 31 },
     { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: 'USD 48', currency: 'USD', createdAt: 1689300000000, priceValue: 48, messages: 17 },
     { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: 'USD 35', currency: 'USD', createdAt: 1689700000000, priceValue: 35, messages: 14 },
+  ], []);
+
+  const draftListings = useMemo<DraftListing[]>(() => [
+    {
+      id: 'd1',
+      title: 'African Wristband',
+      price: '65.8',
+      currency: 'USD',
+      image: a1,
+      description: 'Premium white pepper sourced from the fertile soil of Africa.',
+      country: 'Cameroon',
+      countryColor: '#64B5F6'
+    },
+    {
+      id: 'd2',
+      title: 'African Comb',
+      price: '65.8',
+      currency: 'USD',
+      image: a2,
+      description: 'Adds an authentic touch of home to your dishes.',
+      country: 'Spice Coast',
+      countryColor: '#70E183'
+    },
+    {
+      id: 'd3',
+      title: 'African Wristband',
+      price: '65.8',
+      currency: 'USD',
+      image: a3,
+      description: 'Perfect for the diaspora seeking a taste of tradition.',
+      country: 'Benin',
+      countryColor: '#FAB951'
+    },
+    {
+      id: 'd4',
+      title: 'Bitter Cola',
+      price: 'N/A',
+      currency: 'USD',
+      image: a4,
+      description: 'Harvested from the lush regions of Lagos.',
+      country: 'Lagos',
+      countryColor: '#FF8A65'
+    }
   ], []);
 
   const trimmedSearchQuery = searchQuery.trim();
@@ -369,6 +451,142 @@ const MyListings: React.FC = () => {
   };
   const secondaryPanelWidth = secondaryPanelWidths[resolvedPrimaryKey] ?? 130;
   const tertiaryPanelLeft = 210 + secondaryPanelWidth + 12;
+
+  const renderDraftCard = (draft: DraftListing) => (
+    <div
+      key={draft.id}
+      className="flex items-center gap-3"
+      style={{
+        border: '1px solid #E9E9E9',
+        borderRadius: '14px',
+        padding: '12px',
+        backgroundColor: '#FFFFFF'
+      }}
+    >
+      <div
+        style={{
+          width: '72px',
+          height: '72px',
+          borderRadius: '18px',
+          overflow: 'hidden',
+          flexShrink: 0
+        }}
+      >
+        <img src={draft.image} alt={draft.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      </div>
+      <div style={{ flex: 1 }}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '15px' }}>
+            <span>{draft.title}</span>
+            <span style={{ color: '#B0B0B0' }}>·</span>
+            <span style={{ color: '#B0B0B0' }}>
+              {draft.currency} {draft.price}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              className="inline-flex items-center gap-1 px-2 py-1"
+              style={{
+                backgroundColor: '#F4F4F4',
+                color: '#939393',
+                borderRadius: '6px',
+                fontSize: '11px',
+                fontFamily: 'Poppins, sans-serif'
+              }}
+            >
+              <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+              Edit
+            </button>
+            <button
+              className="inline-flex items-center justify-center"
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                backgroundColor: '#FFE9E9'
+              }}
+            >
+              <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+        <div className="mt-3 flex items-center justify-between">
+          {renderCountryBadge(draft.country, draft.countryColor)}
+        </div>
+        <p
+          className="mt-3 text-right"
+          style={{
+            color: '#B0B0B0',
+            fontSize: '12px',
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 300
+          }}
+        >
+          {draft.description}
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderDraftsModal = () => {
+    if (!isDraftsModalOpen) return null;
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center"
+        style={{ backgroundColor: '#0000001A' }}
+        onClick={() => setIsDraftsModalOpen(false)}
+      >
+        <div
+          className="relative w-full max-w-xl"
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '30px',
+            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+            padding: '28px'
+          }}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2
+                style={{
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  color: '#1E1E1E',
+                  fontSize: '20px'
+                }}
+              >
+                Drafts ({draftListings.length})
+              </h2>
+            </div>
+            <button
+              aria-label="Close drafts"
+              onClick={() => setIsDraftsModalOpen(false)}
+              style={{
+                color: '#BABABA',
+                fontSize: '20px',
+                lineHeight: 1
+              }}
+            >
+              ×
+            </button>
+          </div>
+          <div
+            className="drafts-scroll"
+            style={{
+              maxHeight: '60vh',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+              paddingRight: '8px'
+            }}
+          >
+            {draftListings.map((draft) => renderDraftCard(draft))}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderEmptyState = () => (
     <div className="text-center py-6">
@@ -1168,6 +1386,7 @@ const MyListings: React.FC = () => {
                 <div className="flex items-center gap-3 w-full sm:w-auto sm:self-center lg:ml-auto lg:pr-0 lg:-mr-14">
                   {/* Drafts Button */}
                   <button
+                    onClick={() => setIsDraftsModalOpen(true)}
                     className="flex items-center space-x-2 px-3 py-1 rounded-xl border"
                     style={{
                       backgroundColor: '#F0F8FE',
@@ -1270,6 +1489,18 @@ const MyListings: React.FC = () => {
           </div>
         </footer>
       </div>
+      {renderDraftsModal()}
+      <style>
+        {`
+          .drafts-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .drafts-scroll::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
     </>
   );
 };
