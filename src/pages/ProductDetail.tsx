@@ -24,6 +24,7 @@ import pre6 from '../assets/images/pre/6.png';
 // Import share icon and arrow icon
 import shareIcon from '../assets/images/pre/Share.svg';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
+import backArrowIcon from '../assets/images/pre/back arrow.svg';
 // Import social media icons for share modal
 import fbIcon from '../assets/images/pre/FB1.svg';
 import igIcon from '../assets/images/pre/IG1.svg';
@@ -87,6 +88,7 @@ interface OwnerListingState {
     status: 'active' | 'inactive';
     daysLeft?: number;
     createdAt: number;
+    messages?: number;
   };
 }
 
@@ -651,7 +653,7 @@ const ProductDetail: React.FC = () => {
             
             {/* Right side - Owner Actions / Share */}
             {isOwnerView ? (
-              <div className="flex items-center gap-2" style={{ marginRight: '20px' }}>
+              <div className="flex items-center gap-2" style={{ marginRight: '20px', position: 'relative', left: '32px' }}>
                 <button
                   type="button"
                   className="flex items-center justify-center"
@@ -898,6 +900,71 @@ const ProductDetail: React.FC = () => {
                 Read more
               </button>
 
+              {/* Messages Received Component */}
+              {isOwnerView && ownerListing?.messages && ownerListing.messages > 0 && (
+                <div 
+                  className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mb-2"
+                  style={{ 
+                    backgroundColor: '#F8FCFF', 
+                    border: '1px solid #F0F8FE',
+                    width: 'fit-content',
+                    paddingTop: '1px',
+                    paddingBottom: '1px'
+                  }}
+                  onClick={() => {
+                    // Navigate to messages page or open modal
+                    navigate(`/messages?productId=${ownerListing.id}`);
+                  }}
+                >
+                  {/* Avatars */}
+                  <div className="flex items-center" style={{ marginRight: '6px' }}>
+                    {[1, 2, 3, 4].slice(0, Math.min(ownerListing.messages, 4)).map((_, index) => {
+                      const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
+                      return (
+                        <div
+                          key={index}
+                          className="rounded-full overflow-hidden border-2 border-white flex items-center justify-center"
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            marginLeft: index > 0 ? '-6px' : '0',
+                            zIndex: 4 - index,
+                            backgroundColor: avatarColors[index % avatarColors.length]
+                          }}
+                        >
+                          <img
+                            src={sellerAvatar}
+                            alt={`Buyer ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Text */}
+                  <span 
+                    className="text-xs font-normal"
+                    style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} received for this product
+                  </span>
+                  
+                  {/* Arrow Icon */}
+                  <img
+                    src={backArrowIcon}
+                    alt="Arrow"
+                    className="flex-shrink-0"
+                    style={{ 
+                      width: '14px', 
+                      height: '14px', 
+                      marginLeft: '6px',
+                      transform: 'scaleX(-1)'
+                    }}
+                  />
+                </div>
+              )}
+
               {/* Seller Profile Section */}
               <div className="flex items-start p-4 rounded-xl -ml-2 w-full">
                 <div className="flex items-center gap-3">
@@ -1067,6 +1134,71 @@ const ProductDetail: React.FC = () => {
                 >
             Read more
                 </button>
+
+                {/* Messages Received Component - Mobile */}
+                {isOwnerView && ownerListing?.messages && ownerListing.messages > 0 && (
+                  <div 
+                    className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mt-2"
+                    style={{ 
+                      backgroundColor: '#F8FCFF', 
+                      border: '1px solid #F0F8FE',
+                      width: 'fit-content',
+                      paddingTop: '1px',
+                      paddingBottom: '1px'
+                    }}
+                    onClick={() => {
+                      // Navigate to messages page or open modal
+                      navigate(`/messages?productId=${ownerListing.id}`);
+                    }}
+                  >
+                    {/* Avatars */}
+                    <div className="flex items-center" style={{ marginRight: '6px' }}>
+                      {[1, 2, 3, 4].slice(0, Math.min(ownerListing.messages, 4)).map((_, index) => {
+                        const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
+                        return (
+                          <div
+                            key={index}
+                            className="rounded-full overflow-hidden border-2 border-white flex items-center justify-center"
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              marginLeft: index > 0 ? '-6px' : '0',
+                              zIndex: 4 - index,
+                              backgroundColor: avatarColors[index % avatarColors.length]
+                            }}
+                          >
+                            <img
+                              src={sellerAvatar}
+                              alt={`Buyer ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Text */}
+                    <span 
+                      className="text-xs font-normal"
+                      style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}
+                    >
+                      {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} received for this product
+                    </span>
+                    
+                    {/* Arrow Icon */}
+                    <img
+                      src={backArrowIcon}
+                      alt="Arrow"
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: '14px', 
+                        height: '14px', 
+                        marginLeft: '6px',
+                        transform: 'scaleX(-1)'
+                      }}
+                    />
+                  </div>
+                )}
                 
                 {showAdditionalInfo && (
             <div className="mt-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-sm text-gray-600 space-y-2">
