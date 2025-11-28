@@ -174,7 +174,9 @@ const ProductDetail: React.FC = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showGiveOpinionModal, setShowGiveOpinionModal] = useState(false);
   const [showMessagesDropdown, setShowMessagesDropdown] = useState(false);
+  const [showRepostModal, setShowRepostModal] = useState(false);
   const messagesDropdownRef = useRef<HTMLDivElement>(null);
+  const repostModalRef = useRef<HTMLDivElement>(null);
   const ownerViewState = routerLocation.state as OwnerListingState | null;
   const ownerListing = ownerViewState?.listing;
   const isOwnerView = Boolean(ownerViewState?.fromMyListings && ownerListing);
@@ -202,16 +204,19 @@ const ProductDetail: React.FC = () => {
       if (messagesDropdownRef.current && !messagesDropdownRef.current.contains(event.target as Node)) {
         setShowMessagesDropdown(false);
       }
+      if (repostModalRef.current && !repostModalRef.current.contains(event.target as Node)) {
+        setShowRepostModal(false);
+      }
     };
 
-    if (showMessagesDropdown) {
+    if (showMessagesDropdown || showRepostModal) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showMessagesDropdown]);
+  }, [showMessagesDropdown, showRepostModal]);
 
   // Mock recent messages data
   const recentMessages = ownerListing?.messages ? [
@@ -734,18 +739,87 @@ const ProductDetail: React.FC = () => {
                     Edit listing
                   </button>
                 ) : (
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-                    style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '13px' }}
-                    onClick={() => {
-                      // Handle repost functionality
-                      console.log('Repost listing');
-                    }}
-                  >
-                    <img src={repostIcon} alt="Repost" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' }} />
-                    Repost
-                  </button>
+                  <div ref={repostModalRef} className="relative">
+                    <button
+                      type="button"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                      style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '13px' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowRepostModal(!showRepostModal);
+                      }}
+                    >
+                      <img src={repostIcon} alt="Repost" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' }} />
+                      Repost
+                    </button>
+
+                    {/* Repost Modal */}
+                    {showRepostModal && (
+                      <div
+                        className="absolute top-full left-0 mt-2 z-50"
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          border: '1px solid #E9E9E9',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          padding: '8px',
+                          minWidth: '180px'
+                        }}
+                      >
+                        {/* Option 1: Edit and repost */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate('/create-listing', { state: { draft: ownerListing ?? null } });
+                            setShowRepostModal(false);
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded transition-colors"
+                          style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '13px' }}
+                        >
+                          <img src={pencilIcon} alt="Edit" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
+                          <span>Edit and repost</span>
+                        </button>
+
+                        {/* Option 2: Repost the listing */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Handle repost functionality
+                            console.log('Repost the listing');
+                            setShowRepostModal(false);
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded transition-colors"
+                          style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '13px' }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 4v6h6M23 20v-6h-6" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <span>Repost the listing</span>
+                        </button>
+
+                        {/* Option 3: Close */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowRepostModal(false);
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded transition-colors mt-1"
+                          style={{ 
+                            backgroundColor: '#FAFAFA',
+                            color: '#939393', 
+                            fontFamily: 'Poppins, sans-serif', 
+                            fontSize: '13px' 
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6l12 12" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <span>Close</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             ) : (
