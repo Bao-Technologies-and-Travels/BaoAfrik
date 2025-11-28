@@ -17,6 +17,8 @@ import moneyIcon from '../assets/images/pre/money.svg';
 import bulletIcon from '../assets/images/pre/bullet.svg';
 import chartIcon from '../assets/images/pre/chart.svg';
 import mainieIcon from '../assets/images/pre/mainie.svg';
+import redtrashIcon from '../assets/images/pre/redtrash.svg';
+import verityIcon from '../assets/images/pre/verity.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -311,9 +313,11 @@ const MyListings: React.FC = () => {
   const currentDraftSeed = JSON.stringify(initialDraftListings);
   const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
   const moreOptionsRef = useRef<HTMLDivElement | null>(null);
+  const [listingToDelete, setListingToDelete] = useState<Listing | null>(null);
+  const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
 
   // Mock data - replace with actual data from backend
-  const listings = useMemo<Listing[]>(() => [
+  const initialListings: Listing[] = [
     { id: '1', title: 'Bonga from Togo', image: a1, status: 'active', rating: 4.8, reviews: 88, price: '678', currency: 'USD', createdAt: 1690000000000, priceValue: 678, messages: 42, category: 'Food & Spicy' },
     { id: '2', title: 'Coconut Oil Ghana', image: a2, status: 'active', rating: 4.5, reviews: 120, price: '45', currency: 'USD', createdAt: 1690500000000, priceValue: 45, messages: 27, category: 'Food & Spicy' },
     { id: '3', title: 'Pepper from Benin', image: a3, status: 'inactive', rating: 4.2, reviews: 56, price: '32', currency: 'USD', createdAt: 1689500000000, priceValue: 32, messages: 12, category: 'Food & Spicy' },
@@ -326,7 +330,8 @@ const MyListings: React.FC = () => {
     { id: '10', title: 'River pepper Addis', image: a10, status: 'active', rating: 4.7, reviews: 140, price: '72', currency: 'USD', createdAt: 1690600000000, priceValue: 72, messages: 31, category: 'Food & Spicy' },
     { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: '48', currency: 'USD', createdAt: 1689300000000, priceValue: 48, messages: 17, category: 'Food & Spicy' },
     { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: '35', currency: 'USD', createdAt: 1689700000000, priceValue: 35, messages: 14, category: 'Food & Spicy' },
-  ], []);
+  ];
+  const [listings, setListings] = useState<Listing[]>(initialListings);
 
   const trimmedSearchQuery = searchQuery.trim();
 
@@ -436,6 +441,27 @@ const MyListings: React.FC = () => {
 
   const handleDraftDelete = (draftId: string) => {
     setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
+  };
+
+  const handleDeleteClick = (listing: Listing) => {
+    setListingToDelete(listing);
+    setIsDeleteSuccess(false);
+    setMoreOptionsOpenFor(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (listingToDelete) {
+      setIsDeleteSuccess(true);
+    }
+  };
+
+  const handleDeleteClose = () => {
+    if (isDeleteSuccess && listingToDelete) {
+      // Actually delete the listing
+      setListings((prev) => prev.filter((listing) => listing.id !== listingToDelete.id));
+    }
+    setListingToDelete(null);
+    setIsDeleteSuccess(false);
   };
 
   useEffect(() => {
@@ -993,8 +1019,7 @@ const MyListings: React.FC = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        // TODO: Implement delete functionality
-                        setMoreOptionsOpenFor(null);
+                        handleDeleteClick(listing);
                       }}
                       style={{
                         width: '100%',
@@ -1047,7 +1072,21 @@ const MyListings: React.FC = () => {
             </div>
           </div>
           {index < sortedListings.length - 1 && (
-            <div style={{ height: '1px', backgroundColor: '#E4E4E4', margin: '0 20px', border: 'none' }} />
+            <div style={{ 
+              height: '1px', 
+              backgroundColor: '#E4E4E4', 
+              margin: '0 20px', 
+              border: 0,
+              borderTop: 0,
+              borderBottom: 0,
+              borderLeft: 0,
+              borderRight: 0,
+              borderWidth: 0,
+              outline: 'none',
+              boxSizing: 'border-box',
+              padding: 0,
+              lineHeight: 0
+            }} />
           )}
         </div>
       ))}
@@ -1913,6 +1952,150 @@ const MyListings: React.FC = () => {
         </footer>
       </div>
       {renderDraftsModal()}
+
+      {/* Delete Confirmation Modal */}
+      {listingToDelete && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#0000001A',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleDeleteClose();
+            }
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '30px',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              padding: '30px',
+              maxWidth: '500px',
+              width: '90%',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={handleDeleteClose}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            {/* Icon */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '20px' }}>
+              <img
+                src={isDeleteSuccess ? verityIcon : redtrashIcon}
+                alt={isDeleteSuccess ? 'Success' : 'Delete'}
+                style={{ width: '80px', height: '80px' }}
+              />
+            </div>
+
+            {/* Text */}
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+              <p
+                style={{
+                  color: '#212121',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontSize: '16px',
+                  lineHeight: '1.5',
+                  margin: 0
+                }}
+              >
+                {isDeleteSuccess
+                  ? `The item "${listingToDelete.title}" has been successfully removed.`
+                  : `The item "${listingToDelete.title}" will be permanently deleted, do you wish to continue ?`}
+              </p>
+            </div>
+
+            {/* Buttons */}
+            {isDeleteSuccess ? (
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  onClick={handleDeleteClose}
+                  style={{
+                    backgroundColor: '#F9A825',
+                    borderRadius: '12px',
+                    border: 'none',
+                    padding: '12px 32px',
+                    cursor: 'pointer',
+                    color: '#FFFFFF',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: 300
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  onClick={handleDeleteClose}
+                  style={{
+                    backgroundColor: '#F1F1F1',
+                    borderRadius: '12px',
+                    border: 'none',
+                    padding: '12px 24px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                  <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  style={{
+                    backgroundColor: '#FF5151',
+                    borderRadius: '12px',
+                    border: 'none',
+                    padding: '12px 24px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) invert(1)' }} />
+                  <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Yes, Delete</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <style>
         {`
           .drafts-scroll {
