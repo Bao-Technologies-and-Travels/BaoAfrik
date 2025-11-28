@@ -26,11 +26,11 @@ const router = Router();
 router.get('/email-connection', async (req: Request, res: Response) => {
   try {
     const isConnected = await emailService.testEmailConnection();
-    
+
     res.json({
       success: isConnected,
-      message: isConnected 
-        ? 'Email service connection successful' 
+      message: isConnected
+        ? 'Email service connection successful'
         : 'Email service connection failed'
     });
   } catch (error) {
@@ -75,19 +75,19 @@ router.get('/email-connection', async (req: Request, res: Response) => {
 router.post('/send-email', async (req: Request, res: Response) => {
   try {
     const { email, name } = req.body;
-    
+
     if (!email || !name) {
       return res.status(400).json({
         success: false,
         message: 'Email and name are required'
       });
     }
-    
+
     // Generate a test verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
+
     const emailSent = await emailService.sendVerificationEmail(email, verificationCode);
-    
+
     if (emailSent) {
       return res.json({
         success: true,
@@ -137,7 +137,7 @@ router.post('/send-email', async (req: Request, res: Response) => {
 router.post('/get-verification-code', async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -154,7 +154,7 @@ router.post('/get-verification-code', async (req: Request, res: Response) => {
         },
       },
     });
-    
+
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
       select: {
@@ -167,14 +167,14 @@ router.post('/get-verification-code', async (req: Request, res: Response) => {
     });
 
     await prisma.$disconnect();
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
+
     return res.json({
       success: true,
       message: 'Verification code retrieved (Development only)',
@@ -199,7 +199,7 @@ router.post('/get-verification-code', async (req: Request, res: Response) => {
 router.post('/send-test-email', async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -233,17 +233,17 @@ router.post('/send-test-email', async (req: Request, res: Response) => {
     });
 
     logger.info(`Test email sent successfully to ${email}`);
-    
+
     return res.json({
       success: true,
       message: `Test email sent successfully to ${email}`,
       timestamp: new Date().toLocaleTimeString('en-US', {
-          hour12: true,
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
+        hour12: true,
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
     });
-    
+
   } catch (error) {
     logger.error('Send test email error:', error);
     return res.status(500).json({

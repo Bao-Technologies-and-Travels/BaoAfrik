@@ -2,6 +2,7 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import { ChatService } from '../services/chatService';
 import jwt from 'jsonwebtoken';
 import prisma from '@/config/database';
+import { notificationService } from '@/services/notificationService';
 
 interface AuthenticatedSocket extends Socket {
   user?: {
@@ -223,7 +224,7 @@ export class WebSocketService {
 
   private async handleContactSeller(socket: AuthenticatedSocket, data: any) {
     try {
-      const { productId, initialMessage, sellerId , product} = data;
+      const { productId, initialMessage, sellerId, product } = data;
       const buyerId = socket.user!.id;
 
       if (!sellerId || !productId) {
@@ -253,7 +254,7 @@ export class WebSocketService {
         });
       }
 
-      if(sellerSocketId) {
+      if (sellerSocketId) {
         try {
           const notifPayload = {
             type: 'NEW_CONVERSATION',
@@ -266,7 +267,7 @@ export class WebSocketService {
 
           const counts = await this.chatService.getUnreadCounts(product.seller.id || data.sellerId);
           const totalUnread = (counts || []).reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
-          this.io.to(product.seller?.id || data.sellerId).emit('notification_count', { totalUnread});
+          this.io.to(product.seller?.id || data.sellerId).emit('notification_count', { totalUnread });
         } catch (e) {
           console.warn('Failed to emit notification/count on contact_seller', e);
         }
@@ -385,12 +386,27 @@ export class WebSocketService {
               messageId: message.id,
               timestamp: new Date().toISOString()
             };
+
+            // persist notification
+            try {
+              await notificationService.createNotification({
+                userId: participant.id,
+                actorId: socket.user!.id,
+                type: 'NEW_MESSAGE',
+                title: `${socket.user!.firstName || ''} ${socket.user!.lastName || ''}`.trim() || 'New message',
+                body: content?.substring(0, 100) || 'Sent a file',
+                meta: { conversationId, messageId: message.id }
+              });
+            } catch (e) {
+              console.warn('Failed to persist notification', e)
+            }
             this.io.to(participant.id).emit('notification', notifPayload);
+            this.io.to(participant.id).emit('notification_count', { totalUnread: await this.chatService.getUnreadCounts(participant.id).then(c => c.reduce((s: any, v: any) => s + v.unreadCount, 0)) });
 
             try {
               const counts = await this.chatService.getUnreadCounts(participant.id);
               const totalUnread = (counts || []).reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
-              this.io.to(participant.id).emit('notification_count', {totalUnread});
+              this.io.to(participant.id).emit('notification_count', { totalUnread });
             } catch (e) {
               console.warn('Failed to compute unread counts for notification_count emit', e);
             }

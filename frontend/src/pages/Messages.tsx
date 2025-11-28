@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { apiClient } from '../services/api';
 import EmojiPicker, { Emoji } from 'emoji-picker-react';
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
@@ -63,9 +62,11 @@ import closeIcon from '../assets/images/pre/cc.svg';
 import svgIcon from '../assets/images/pre/svg.svg';
 
 import { io, Socket } from "socket.io-client";
+import { useSocket } from '../contexts/socketContext'
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
 import { s3Service } from "../services/s3Service";
+import Header from '../components/layout/Header';
 
 // PDF Icon Component
 const PDFIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
@@ -166,6 +167,7 @@ const Messages: React.FC = () => {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const chatListRef = React.useRef<HTMLDivElement>(null);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const { addToast } = useToast();
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -199,6 +201,7 @@ const Messages: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const inquiryRef = useRef<{ productData: any, preFilledMessage: string } | null>(null);
+  const contextSocket = useSocket();
 
   // Load persisted product inquiry state on mount
   useEffect(() => {
@@ -248,9 +251,9 @@ const Messages: React.FC = () => {
       setIsProductInquiry(true);
       setPreFilledMessage(location.state.preFilledMessage || "")
       inquiryRef.current = {
-      productData: location.state.productData,
-      preFilledMessage: location.state.preFilledMessage || ""
-    };
+        productData: location.state.productData,
+        preFilledMessage: location.state.preFilledMessage || ""
+      };
     } else if (inquiryRef.current) {
       setProductData(inquiryRef.current.productData);
       setIsProductInquiry(true);
@@ -323,60 +326,39 @@ const Messages: React.FC = () => {
 
   // WebSocket useEffect connection plus cleanup
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-
-    // Prevent multiple connections
-    if (socketRef.current?.connected) {
-      return;
+    if (!contextSocket) {
+      return
     }
 
-    // If there's an existing socket that's disconnected, clean it up first
-    if (socketRef.current && !socketRef.current.connected) {
-      socketRef.current.removeAllListeners();
-      socketRef.current = null;
-    }
+    setSocket(contextSocket);
+    setIsSocketConnected(contextSocket.connected);
 
-    const newSocket = io(process.env.REACT_APP_WS_URL!, {
-      auth: { token },
-      transports: ["websocket", "polling"],
-      timeout: 10000,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000
-    });
-
-    socketRef.current = newSocket;
-    setSocket(newSocket);
-
-    // Connection events
+    // register handlers
     const handleConnect = () => {
       setIsSocketConnected(true);
       setConnectionStatus("connected");
+      contextSocket.emit("join_conversations");
 
-      newSocket.emit("join_conversations");
-
-      // Rejoin any active conversation
       if (activeConversationId) {
-        newSocket.emit("join_conversation", activeConversationId);
+        contextSocket.emit("join_conversation", activeConversationId);
       }
     };
 
-    const handleDisconnect = (reason: any) => {
+    const handleDisconnect = () => {
       setIsSocketConnected(false);
       setConnectionStatus("disconnected");
     };
 
-    const handleConnectError = (error: any) => {
+    const handleConnectError = () => {
       setIsSocketConnected(false);
       setConnectionStatus("disconnected");
     };
 
-    // message events
     const handleNewMessage = (serverMessage: any) => {
-      console.log('📨 New message received:', serverMessage);
-      console.log('📦 Product data in message:', serverMessage.productData);
-
+      console.log('New message received (ctx):', serverMessage);
       setMessages((prev) => {
         const isOurMessage = serverMessage.senderId === currentUser?.id;
+
         const existingMessageIndex = prev.findIndex(
           (msg) =>
             msg.id === serverMessage.id ||
@@ -391,55 +373,34 @@ const Messages: React.FC = () => {
           })
           : (serverMessage.timeString || '');
 
+        const normalized = {
+          ...serverMessage,
+          text: serverMessage.content || serverMessage.text,
+          content: serverMessage.content,
+          isIncoming: !isOurMessage,
+          timeStamp: serverMessage.createdAt,
+          dateString: serverMessage.createdAt ? new Date(serverMessage.createdAt).toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+          }) : "",
+          timeString,
+          status: isOurMessage ? "sent" : "read",
+          productData: serverMessage.productData || null,
+          isProductInquiry: !!serverMessage.productData
+        };
+
         if (existingMessageIndex >= 0) {
-          const updatedMessages = [...prev];
-          updatedMessages[existingMessageIndex] = {
-            ...serverMessage,
-            text: serverMessage.content || serverMessage.text,
-            content: serverMessage.content,
-            isIncoming: !isOurMessage,
-            timestamp: serverMessage.createdAt,
-            dateString: new Date(serverMessage.createdAt).toLocaleDateString(
-              "en-US",
-              {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }
-            ),
-            timeString,
-            status: isOurMessage ? "sent" : "read",
-          };
-          return updatedMessages;
-        } else {
-          return [
-            ...prev,
-            {
-              ...serverMessage,
-              text: serverMessage.content || serverMessage.text,
-              content: serverMessage.content,
-              isIncoming: !isOurMessage,
-              timestamp: serverMessage.createdAt,
-              dateString: new Date(serverMessage.createdAt).toLocaleDateString(
-                "en-US",
-                {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                }
-              ),
-              timeString,
-              status: isOurMessage ? "sent" : "read",
-            },
-          ];
+          const updated = [...prev];
+          updated[existingMessageIndex] = { ...updated[existingMessageIndex], ...normalized };
+          return updated;
         }
+        return [...prev, normalized];
       });
     };
 
     const handleMessageStatusUpdate = (data: any) => {
-      console.log('Message status update:', data);
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === data.messageId ? { ...msg, status: 'delivered' } : msg
@@ -448,7 +409,6 @@ const Messages: React.FC = () => {
     };
 
     const handleMessageSent = (data: any) => {
-      console.log('Message sent confirmation:', data);
       setIsSending(false);
       setMessages((prev) =>
         prev.map((msg) => {
@@ -456,7 +416,7 @@ const Messages: React.FC = () => {
             return {
               ...msg,
               ...data,
-              status: "sent",
+              status: 'sent',
               tempId: undefined
             };
           }
@@ -466,7 +426,6 @@ const Messages: React.FC = () => {
     };
 
     const handleMessageDelivered = (data: any) => {
-      console.log('Message delivered:', data);
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === data.messageId ? { ...msg, status: 'delivered' } : msg
@@ -475,108 +434,71 @@ const Messages: React.FC = () => {
     };
 
     const handleMessageRead = (data: any) => {
-      console.log('Message read:', data);
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === data.messageId ? { ...msg, status: 'read' } : msg
-        )
-      )
+          msg.id === data.messageId ? { ...msg, status: 'read' } : msg))
     };
 
-    // typing events
     const handleUserTyping = (data: any) => {
-      console.log('🔵 User typing event received:', data);
-      console.log('🔵 Current active conversation:', activeConversationId);
-      console.log('🔵 Current user ID:', currentUser?.id);
-      console.log('🔵 Typing user ID:', data.userId);
-
-      if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
-        console.log('Showing typing indicator for user:', data.userId);
-
-        // clear existing timeout
+      if (data.conversatonId === activeConversationId && data.userId != currentUser?.id) {
+        setIsSellerTyping(true);
+        setShowTypingIndicator(true);
         if (typingTimeout) {
           clearTimeout(typingTimeout);
-          setTypingTimeout(null);
         }
-
-        setShowTypingIndicator(true);
-        setIsSellerTyping(true);
-
-        const timeout = setTimeout(() => {
-          console.log('Auto-hiding typing indicator');
+        const t = window.setTimeout(() => {
           setShowTypingIndicator(false);
           setIsSellerTyping(false);
-          setTypingTimeout(null);
         }, 3000);
-
-        setTypingTimeout(timeout);
-
-        setTimeout(() => {
-          setShowTypingIndicator(true);
-        }, 0);
+        setTypingTimeout(t as any);
       }
     };
 
     const handleUserStopTyping = (data: any) => {
-      console.log('User stopped typing:', data);
       if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
-        console.log('Hiding typing indicator for user:', data.userId);
         setShowTypingIndicator(false);
         setIsSellerTyping(false);
-
-        // Clear timeout and hide indicator
         if (typingTimeout) {
           clearTimeout(typingTimeout);
           setTypingTimeout(null);
         }
-
-        setShowTypingIndicator(false);
       }
     };
 
-    newSocket.on("connect", handleConnect);
-    newSocket.on("disconnect", handleDisconnect);
-    newSocket.on("connect_error", handleConnectError);
+    contextSocket.on("connect", handleConnect);
+    contextSocket.on("disconnect", handleDisconnect);
+    contextSocket.on("connect_error", handleConnectError);
 
-    newSocket.on("new_message", handleNewMessage);
-    newSocket.on("message_status_update", handleMessageStatusUpdate);
-    newSocket.on("message_sent", handleMessageSent);
-    newSocket.on("message_delivered", handleMessageDelivered);
-    newSocket.on("messages_read", handleMessageRead);
+    contextSocket.on("new_message", handleNewMessage);
+    contextSocket.on("message_status_update", handleMessageStatusUpdate);
+    contextSocket.on("message_sent", handleMessageSent);
+    contextSocket.on("message_delivered", handleMessageDelivered);
+    contextSocket.on("message_read", handleMessageRead);
 
-    newSocket.on("user_typing", handleUserTyping);
-    newSocket.on("user_stop_typing", handleUserStopTyping);
+    contextSocket.on("user_typing", handleUserTyping);
+    contextSocket.on("user_stop_typing", handleUserStopTyping);
 
-    newSocket.on("connected", (data) => {
-    });
+    contextSocket.on("connected", () => { });
+    contextSocket.on("conversation_joined", () => { });
 
-    newSocket.on("conversation_joined", (data) => {
-    });
-
-    // cleanup function
     return () => {
-      newSocket.off("connect", handleConnect);
-      newSocket.off("disconnect", handleDisconnect);
-      newSocket.off("connect_error", handleConnectError);
-      newSocket.off("new_message", handleNewMessage);
-      newSocket.off("user_typing", handleUserTyping);
-      newSocket.off("user_stop_typing", handleUserStopTyping);
-      newSocket.off("connected");
-      newSocket.off("conversation_joined");
-      newSocket.off("message_sent");
-      newSocket.off("message_status_update", handleMessageStatusUpdate);
-      newSocket.off("message_delivered", handleMessageDelivered);
-      newSocket.off("message_read", handleMessageRead);
+      contextSocket.off("connect", handleConnect);
+      contextSocket.off("disconnect", handleDisconnect);
+      contextSocket.off("connect_error", handleConnectError);
 
-      // Only disconnect socket when unmounting the component
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      const shouldDisconnect = !isDevelopment || newSocket.connected;
+      contextSocket.off("new_message", handleNewMessage);
+      contextSocket.off("message_status_update", handleMessageStatusUpdate);
+      contextSocket.off("message_sent", handleMessageSent);
+      contextSocket.off("message_delivered", handleMessageDelivered);
+      contextSocket.off("message_read", handleMessageRead);
 
-      if (shouldDisconnect) {
-        newSocket.disconnect();
-      }
+      contextSocket.off("user_typing", handleUserTyping);
+      contextSocket.off("user_stop_typing", handleUserStopTyping);
+
+      contextSocket.off("connected");
+      contextSocket.off("conversation_joined");
     };
-  }, [activeConversationId, currentUser?.id, typingTimer]);
+  }, [contextSocket, activeConversationId, currentUser?.id, typingTimeout]);
 
   const fetchConversations = useCallback(async () => {
     if (isLoadingConversations) {
@@ -781,7 +703,7 @@ const Messages: React.FC = () => {
         if (currentConv) {
           setCurrentConversation(currentConv);
           const navIsInquiry = !!location.state?.isProductInquiry;
-          if(!navIsInquiry && !hasProcessedLocationState.current) {
+          if (!navIsInquiry && !hasProcessedLocationState.current) {
             setProductData(undefined);
             setIsProductInquiry(false);
             setPreFilledMessage("");
@@ -2098,83 +2020,13 @@ const Messages: React.FC = () => {
     };
   }, [socket, socketInitialized]);
 
-  // WebSocket message handler to prevent re-renders
+  // keep socket in sync with context socket
   useEffect(() => {
-    if (!socket) return;
-
-    const handleNewMessage = (serverMessage: any) => {
-      setMessages((prev) => {
-        const isOurMessage = serverMessage.senderId === currentUser?.id;
-
-        // Check if we already have this message (by ID or tempId)
-        const existingMessageIndex = prev.findIndex(
-          (msg) =>
-            msg.id === serverMessage.id ||
-            (serverMessage.tempId && msg.tempId === serverMessage.tempId)
-        );
-
-        if (existingMessageIndex >= 0) {
-          // Update existing message
-          const updatedMessages = [...prev];
-          updatedMessages[existingMessageIndex] = {
-            ...serverMessage,
-            text: serverMessage.content || serverMessage.text,
-            content: serverMessage.content,
-            isIncoming: !isOurMessage,
-            timestamp: new Date(serverMessage.createdAt).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: true
-            }),
-            dateString: new Date(serverMessage.createdAt).toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric"
-            }),
-            status: isOurMessage ? "delivered" : "read",
-            productData: serverMessage.productData || null,
-            isProductInquiry: !!serverMessage.productData
-          };
-          return updatedMessages;
-        } else {
-          // Add new message
-          return [
-            ...prev,
-            {
-              ...serverMessage,
-              text: serverMessage.content || serverMessage.text,
-              content: serverMessage.content,
-              isIncoming: !isOurMessage,
-              timestamp: new Date(serverMessage.createdAt).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-              }),
-              dateString: new Date(serverMessage.createdAt).toLocaleDateString(
-                "en-US",
-                {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                }
-              ),
-              status: isOurMessage ? "delivered" : "read",
-              productData: serverMessage.productData || null,
-              isProductInquiry: !!serverMessage.productData
-            },
-          ];
-        }
-      });
-    };
-
-    socket.on("new_message", handleNewMessage);
-
-    return () => {
-      socket.off("new_message", handleNewMessage);
-    };
-  }, [socket, currentUser?.id]);
+    if (!contextSocket) {
+      return;
+    }
+    setSocket(contextSocket);
+  }, [contextSocket]);
 
   // Auto-show mobile conversation view when product data is present
   useEffect(() => {
@@ -4068,7 +3920,7 @@ const Messages: React.FC = () => {
                       {/* Content */}
                       <div className="flex-1">
                         <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                          {replyToMessage.isIncoming ? `${currentConversation.participant.firstName || ""} ${currentConversation.participant.lastName || "" }`.trim() : 'You'}
+                          {replyToMessage.isIncoming ? `${currentConversation.participant.firstName || ""} ${currentConversation.participant.lastName || ""}`.trim() : 'You'}
                         </div>
                         <div className="text-xs" style={{ color: '#6A6A6A' }}>
                           {replyToMessage.text}
@@ -5185,7 +5037,12 @@ const Messages: React.FC = () => {
                   </Link> */}
 
                   {/* Notification Button */}
-                  <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
+                  <button
+                    className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                    title="Notifications"
+                    aria-label="View notifications"
+                  >
                     <img src={notificationIcon} alt="Notifications" className="w-6 h-6" />
                   </button>
 
@@ -5207,9 +5064,6 @@ const Messages: React.FC = () => {
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                       </svg>
-                      <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                        +9
-                      </div>
                     </button>
 
                     {/* Dropdown Menu */}
@@ -6998,7 +6852,7 @@ const Messages: React.FC = () => {
                           {/* Content */}
                           <div className="flex-1">
                             <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                              {replyToMessage.isIncoming ? `${currentConversation.participant.firstName || ""} ${currentConversation.participant.lastName || "" }`.trim() : 'You'}
+                              {replyToMessage.isIncoming ? `${currentConversation.participant.firstName || ""} ${currentConversation.participant.lastName || ""}`.trim() : 'You'}
                             </div>
                             <div className="text-xs" style={{ color: '#6A6A6A' }}>
                               {replyToMessage.text}

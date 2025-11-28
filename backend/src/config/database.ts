@@ -5,8 +5,8 @@ import { PrismaPg } from '@prisma/adapter-pg';
 const { Pool } = require('pg');
 
 // Create PostgreSQL pool
-const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
 });
 
 // Create adapter

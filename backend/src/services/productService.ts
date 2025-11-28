@@ -1,4 +1,4 @@
-import prisma from '../config/database'; 
+import prisma from '../config/database';
 import { Product, ProductStatus, SaleType, Prisma } from '../generated/client';
 import { v4 as uuidv4 } from 'uuid';
 import { s3Service } from './s3Service';

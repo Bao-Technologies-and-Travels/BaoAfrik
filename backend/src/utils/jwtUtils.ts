@@ -48,7 +48,7 @@ export function signRefreshToken(payload: TokenPayload): string {
  */
 export const generateTokenPair = (userId: string, email: string): TokenPair => {
   const payload: TokenPayload = { userId, email };
-  
+
   return {
     accessToken: signAccessToken(payload),
     refreshToken: signRefreshToken(payload),

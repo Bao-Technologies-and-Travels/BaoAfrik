@@ -13,7 +13,7 @@ export const connectRedis = async (): Promise<Redis | null> => {
 
   try {
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-    
+
     redis = new Redis(redisUrl, {
       enableReadyCheck: false,
       maxRetriesPerRequest: null,
@@ -57,7 +57,7 @@ export const connectRedis = async (): Promise<Redis | null> => {
       redisEnabled = false;
       return null;
     });
-    
+
     return redis;
   } catch (error) {
     logger.warn('Redis connection failed, continuing without it:', error);

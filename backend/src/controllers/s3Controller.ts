@@ -42,7 +42,7 @@ export const getPresignedUrl = async (req: Request, res: Response) => {
       ContentType: fileType,
     });
 
-    const uploadUrl = await getSignedUrl(s3, params, {expiresIn: 120});
+    const uploadUrl = await getSignedUrl(s3, params, { expiresIn: 120 });
 
     return res.json({
       uploadUrl,
@@ -57,7 +57,7 @@ export const getPresignedUrl = async (req: Request, res: Response) => {
 export const getViewPresignedUrl = async (req: Request, res: Response) => {
   try {
     const { key } = req.body;
-    
+
     if (!key) {
       return res.status(400).json({ message: 'Missing key' });
     }

@@ -7,6 +7,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 ## Tech Stack Requirements
 
 ### Frontend Stack (Current)
+
 - **Framework**: React 18 with TypeScript
 - **Styling**: Tailwind CSS with custom African-inspired color palette
 - **Routing**: React Router v6
@@ -15,6 +16,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 - **PWA**: Progressive Web App capabilities
 
 ### Recommended Backend Stack
+
 - **Runtime**: Node.js (v18+) or Python (Django/FastAPI)
 - **Database**: PostgreSQL or MongoDB
 - **Authentication**: JWT tokens + OAuth2 (Google, Facebook, GitHub)
@@ -29,6 +31,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 #### 1. Standard Registration (`POST /api/auth/register`)
 
 **Request Body:**
+
 ```json
 {
   "name": "string (required)",
@@ -40,6 +43,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 ```
 
 **Frontend Validation Rules:**
+
 - Name: Required, non-empty string
 - Email: Required, valid email format
 - Phone: Required, non-empty string
@@ -47,6 +51,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 - Confirm Password: Must match password field
 
 **Success Response (201):**
+
 ```json
 {
   "success": true,
@@ -60,6 +65,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 ```
 
 **Error Response (400/409):**
+
 ```json
 {
   "success": false,
@@ -75,6 +81,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 #### 2. Email Verification (`POST /api/auth/verify-email`)
 
 **Request Body:**
+
 ```json
 {
   "email": "string",
@@ -83,6 +90,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "success": true,
@@ -111,6 +119,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 **GitHub OAuth (`POST /api/auth/github`)**
 
 **Request Body:**
+
 ```json
 {
   "accessToken": "string (from OAuth provider)",
@@ -119,6 +128,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 ```
 
 **Success Response (200/201):**
+
 ```json
 {
   "success": true,
@@ -144,6 +154,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 #### 1. Standard Login (`POST /api/auth/login`)
 
 **Request Body:**
+
 ```json
 {
   "email": "string (required)",
@@ -153,10 +164,12 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 ```
 
 **Frontend Validation:**
+
 - Email: Required, valid format
 - Password: Required, minimum 8 characters with letters and numbers
 
 **Success Response (200):**
+
 ```json
 {
   "success": true,
@@ -178,6 +191,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 ```
 
 **Error Response (401):**
+
 ```json
 {
   "success": false,
@@ -191,6 +205,7 @@ BaoAfrik is an African marketplace platform that connects users to authentic Afr
 #### 2. Remember Me Functionality
 
 When `rememberMe: true` is sent:
+
 - Issue longer-lived refresh token (30 days instead of 7 days)
 - Frontend stores email in localStorage with 30-day expiration
 - Auto-populate email field on subsequent login attempts
@@ -222,6 +237,7 @@ interface AuthContextType {
 ### Visitor Mode
 
 The frontend supports visitor access without authentication:
+
 - Users can browse products without signing up
 - No API authentication required for public endpoints
 - Visitor state managed in frontend context
@@ -229,6 +245,7 @@ The frontend supports visitor access without authentication:
 ## API Endpoints Structure
 
 ### Authentication Endpoints
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/logout` - User logout
@@ -242,6 +259,7 @@ The frontend supports visitor access without authentication:
 - `POST /api/auth/github` - GitHub OAuth
 
 ### Product Endpoints
+
 - `GET /api/products` - List products with filters
 - `GET /api/products/:id` - Get product details
 - `POST /api/products` - Create product (authenticated sellers)
@@ -249,11 +267,13 @@ The frontend supports visitor access without authentication:
 - `DELETE /api/products/:id` - Delete product (authenticated sellers)
 
 ### User Profile Endpoints
+
 - `GET /api/users/profile` - Get user profile
 - `PUT /api/users/profile` - Update user profile
 - `POST /api/users/profile/image` - Upload profile image
 
 ### Marketplace Features
+
 - `POST /api/products/:id/like` - Like/unlike product
 - `POST /api/products/:id/save` - Save/unsave product
 - `GET /api/users/liked` - Get user's liked products
@@ -263,6 +283,7 @@ The frontend supports visitor access without authentication:
 ## Product Data Structure
 
 ### Product Model
+
 ```json
 {
   "id": "string",
@@ -301,7 +322,9 @@ The frontend supports visitor access without authentication:
 ```
 
 ### Categories
+
 The frontend expects these main categories:
+
 - **Food & Spices**: Traditional African spices, ingredients, and food products
 - **Fashion & Textiles**: Traditional clothing, fabrics, accessories
 - **Beauty & Wellness**: Natural beauty products, traditional remedies
@@ -311,7 +334,9 @@ The frontend expects these main categories:
 ## Frontend Component Integration
 
 ### Header Component
+
 The Header component expects these props:
+
 ```typescript
 interface HeaderProps {
   showSearchBar?: boolean;
@@ -320,7 +345,9 @@ interface HeaderProps {
 ```
 
 ### Product Detail Page
+
 The ProductDetail page expects a product object with:
+
 - Basic product information (name, price, description, location)
 - Image gallery with multiple images
 - Seller profile with verification status
@@ -329,7 +356,9 @@ The ProductDetail page expects a product object with:
 - Recommended articles/products
 
 ### Search and Filtering
+
 The frontend implements:
+
 - Text search across product names and descriptions
 - Category filtering
 - Location/country filtering
@@ -339,6 +368,7 @@ The frontend implements:
 ## Error Handling
 
 ### Standard Error Response Format
+
 ```json
 {
   "success": false,
@@ -352,6 +382,7 @@ The frontend implements:
 ```
 
 ### Common HTTP Status Codes
+
 - `200` - Success
 - `201` - Created
 - `400` - Bad Request (validation errors)
@@ -365,18 +396,21 @@ The frontend implements:
 ## Security Requirements
 
 ### Password Security
+
 - Minimum 8 characters
 - Must contain letters and numbers
 - Hash using bcrypt or similar
 - Implement rate limiting on login attempts
 
 ### JWT Token Management
+
 - Access tokens: Short-lived (15-30 minutes)
 - Refresh tokens: Longer-lived (7-30 days based on remember me)
 - Include user ID and basic info in token payload
 - Implement token blacklisting for logout
 
 ### API Security
+
 - CORS configuration for frontend domain
 - Rate limiting on all endpoints
 - Input validation and sanitization
@@ -386,12 +420,14 @@ The frontend implements:
 ## File Upload Requirements
 
 ### Profile Images
+
 - Maximum size: 5MB
 - Supported formats: JPEG, PNG, WebP
 - Automatic resizing to 300x300px
 - Generate multiple sizes (thumbnail, medium, large)
 
 ### Product Images
+
 - Maximum size: 10MB per image
 - Maximum 10 images per product
 - Supported formats: JPEG, PNG, WebP
@@ -400,12 +436,14 @@ The frontend implements:
 ## Email Templates
 
 ### Verification Email
+
 - Subject: "Verify your BaoAfrik account"
 - Include 6-digit verification code
 - Code expires in 10 minutes
 - Resend functionality available
 
 ### Password Reset
+
 - Subject: "Reset your BaoAfrik password"
 - Include secure reset link
 - Link expires in 1 hour
@@ -414,6 +452,7 @@ The frontend implements:
 ## Database Schema Considerations
 
 ### Users Table
+
 ```sql
 users (
   id UUID PRIMARY KEY,
@@ -432,6 +471,7 @@ users (
 ```
 
 ### Products Table
+
 ```sql
 products (
   id UUID PRIMARY KEY,
@@ -456,6 +496,7 @@ products (
 ```
 
 ### User Interactions Tables
+
 ```sql
 product_likes (
   id UUID PRIMARY KEY,
@@ -477,6 +518,7 @@ product_saves (
 ## Testing Requirements
 
 ### Authentication Testing
+
 - Test all registration validation rules
 - Test email verification flow
 - Test social login integration
@@ -484,6 +526,7 @@ product_saves (
 - Test token refresh mechanism
 
 ### API Testing
+
 - Unit tests for all endpoints
 - Integration tests for user flows
 - Load testing for high traffic scenarios
@@ -492,6 +535,7 @@ product_saves (
 ## Deployment Considerations
 
 ### Environment Variables
+
 ```env
 # Database
 DATABASE_URL=postgresql://...
@@ -527,6 +571,7 @@ CORS_ORIGINS=https://baoafrik.com,http://localhost:3000
 ```
 
 ### Docker Configuration
+
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
@@ -540,6 +585,7 @@ CMD ["npm", "start"]
 ## API Response Examples
 
 ### Product List Response
+
 ```json
 {
   "success": true,

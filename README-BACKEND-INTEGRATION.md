@@ -1,11 +1,13 @@
 # BaoAfrik Backend Integration Guide
 
 ## 📋 Overview
+
 This document outlines the backend integration requirements for the BaoAfrik marketplace frontend. All necessary API services, types, and utilities have been prepared for seamless backend integration.
 
 ## 🏗️ Backend-Ready Architecture
 
 ### API Services Layer
+
 - **`/src/services/api.ts`** - Core HTTP client with authentication
 - **`/src/services/authService.ts`** - Authentication endpoints
 - **`/src/services/passwordResetService.ts`** - Password reset flow
@@ -13,6 +15,7 @@ This document outlines the backend integration requirements for the BaoAfrik mar
 - **`/src/services/index.ts`** - Service exports
 
 ### Utilities & Configuration
+
 - **`/src/utils/apiConfig.ts`** - API configuration and endpoints
 - **`/src/utils/errorHandler.ts`** - Error handling utilities
 - **`/src/utils/tokenManager.ts`** - JWT token management
@@ -21,6 +24,7 @@ This document outlines the backend integration requirements for the BaoAfrik mar
 ## 🔌 Required Backend Endpoints
 
 ### Authentication Endpoints
+
 ```
 POST /api/auth/register
 POST /api/auth/login
@@ -37,6 +41,7 @@ POST /api/auth/social-login
 ```
 
 ### Password Reset Endpoints
+
 ```
 POST /api/auth/forgot-password
 POST /api/auth/verify-reset-code
@@ -45,6 +50,7 @@ POST /api/auth/resend-reset-code
 ```
 
 ### Marketplace Endpoints
+
 ```
 GET  /api/products
 POST /api/products
@@ -82,6 +88,7 @@ PUT  /api/notifications/read-all
 ## 🔧 Environment Variables Required
 
 Create a `.env` file with:
+
 ```env
 REACT_APP_API_URL=http://localhost:8000/api
 REACT_APP_WS_URL=ws://localhost:8000/ws
@@ -90,6 +97,7 @@ REACT_APP_WS_URL=ws://localhost:8000/ws
 ## 📱 Pages Ready for Backend Integration
 
 ### Authentication Flow
+
 - **Login** (`/src/pages/auth/Login.tsx`)
 - **Register** (`/src/pages/auth/Register.tsx`)
 - **EmailVerification** (`/src/pages/auth/EmailVerification.tsx`)
@@ -97,12 +105,14 @@ REACT_APP_WS_URL=ws://localhost:8000/ws
 - **UserPreferences** (`/src/pages/auth/UserPreferences.tsx`)
 
 ### Password Reset Flow
+
 - **ForgotPassword** (`/src/pages/auth/ForgotPassword.tsx`)
 - **ResetPasswordSent** (`/src/pages/auth/ResetPasswordSent.tsx`)
 - **ResetPassword** (`/src/pages/auth/ResetPassword.tsx`)
 - **PasswordResetSuccess** (`/src/pages/auth/PasswordResetSuccess.tsx`)
 
 ### Marketplace Pages
+
 - **Home** (`/src/pages/Home.tsx`)
 - **Listings** (`/src/pages/Listings.tsx`)
 - **CreateListing** (`/src/pages/CreateListing.tsx`)
@@ -113,35 +123,41 @@ REACT_APP_WS_URL=ws://localhost:8000/ws
 ## 🔄 Integration Steps
 
 ### 1. Update Environment Variables
+
 ```bash
 # Add to .env file
 REACT_APP_API_URL=https://your-backend-url.com/api
 ```
 
 ### 2. Replace Mock Data Calls
+
 All pages currently use localStorage for demo purposes. Replace with API calls:
 
 ```typescript
 // Before (mock)
-const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+const users = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
 
 // After (API)
-import { authService } from '../services';
+import { authService } from "../services";
 const response = await authService.login({ email, password });
 ```
 
 ### 3. Update AuthContext
+
 The AuthContext (`/src/contexts/AuthContext.tsx`) needs to be updated to use real API calls instead of localStorage.
 
 ### 4. Error Handling
+
 All error handling is already implemented using the ErrorHandler utility. Backend errors will be automatically formatted for user display.
 
 ### 5. File Uploads
+
 File upload functionality is ready for profile images and product images using FormData.
 
 ## 🚀 Features Ready for Backend
 
 ### ✅ Completed & Backend-Ready
+
 - User registration and login
 - Email verification flow
 - Password reset flow (4 pages)
@@ -154,6 +170,7 @@ File upload functionality is ready for profile images and product images using F
 - API service layer
 
 ### 🔄 Requires Backend Implementation
+
 - Real-time messaging
 - Product search and filtering
 - Image upload and storage
@@ -164,6 +181,7 @@ File upload functionality is ready for profile images and product images using F
 ## 📋 Backend Requirements Summary
 
 ### Database Models Needed
+
 - Users (with profile data)
 - Products/Listings
 - Categories
@@ -174,6 +192,7 @@ File upload functionality is ready for profile images and product images using F
 - Email Verification Tokens
 
 ### Third-Party Services
+
 - Email service (SendGrid, AWS SES, etc.)
 - File storage (AWS S3, Cloudinary, etc.)
 - Social login (Google, Facebook, GitHub)

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { io, Socket } from "socket.io-client";
+import { useSocket } from "../../contexts/socketContext";
 
 import logo from "../../assets/images/logos/ba-Primary-brand-logo-colored.png";
 import logoIcon from "../../assets/images/logos/ba-brand-icon-colored.png";
@@ -39,29 +39,20 @@ const Header: React.FC<HeaderProps> = ({
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
   const [notificationCount, setNotificationCount] = useState(0);
-  const [socket, setSocket] = useState<Socket | null>(null);
-
-  // Mock notification data with read/unread status
-  const [notifications, setNotifications] = useState([
-    { id: 1, type: 'message', isRead: false, sender: 'Nadine Ngum', text: 'sent you a message', subText: 'Click to view', time: '19 min ago', day: 'Today' },
-    { id: 2, type: 'app', isRead: false, text: 'Your profile has been updated,', subText: 'you are now...', subText2: 'Invoice 6 August 2025 Sequence: 2-7480...', time: '2 hrs ago', day: 'Today' },
-    { id: 3, type: 'message', isRead: true, text: 'New Reviews and Rates from Nadine Ngum...', subText: '"I recently purchased a beautiful Kente...', time: '17:12', day: 'Yesterday' },
-    { id: 4, type: 'app', isRead: true, text: 'New post alert', subText: 'A new listing regarding your recent search...', time: '14:57', day: 'Yesterday' },
-    { id: 5, type: 'message', isRead: true, sender: 'Elidiana IKE', text: 'sent you a message', subText: 'See more details', time: '11:31', day: 'Yesterday' },
-  ]);
+  const socket = useSocket();
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map(notif => ({ ...notif, isRead: true })));
+    setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })));
+    setNotificationCount(0);
   };
 
   const filteredNotifications = notifications.filter(notif => {
     if (notificationTab === 'all') return true;
     if (notificationTab === 'unread') return !notif.isRead;
-    if (notificationTab === 'messages') return notif.type === 'message';
+    if (notificationTab === 'messages') return notif.type === 'message' || notif.type === 'NEW_MESSAGE';
     return true;
   });
-
-  const unreadCount = notifications.filter(notif => !notif.isRead).length;
 
   const handleLogout = () => {
     logout();
@@ -91,17 +82,18 @@ const Header: React.FC<HeaderProps> = ({
     const fetchUnread = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const res = await fetch(`${process.env.REACY_APP_API_URL}/chat/unread-counts`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
         if (!res.ok) return;
         const json = await res.json();
-        if (json.success && Array.isArray(json.data)) {
-          const total = json.data.reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
-          setNotificationCount(total);
+        if (json.success && json.data) {
+          setNotificationCount(json.data.unreadCount ?? 0);
         }
-      } catch (e) { }
+      } catch (e) {
+        // ignore
+      }
     }
     fetchUnread();
   }, []);
@@ -109,19 +101,41 @@ const Header: React.FC<HeaderProps> = ({
   // socket events
   useEffect(() => {
     if (!socket) return;
+
+    const formatTime = (date: Date) =>
+      date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const getDayLabel = (date: Date) => {
+      const d = new Date(date);
+      const today = new Date();
+      if (d.toDateString() === today.toDateString()) {
+        return 'Today';
+      };
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+      if (d.toDateString() === yesterday.toDateString()) {
+        return 'Yesterday';
+      };
+      return d.toLocaleDateString();
+    };
+
     const onNotification = (payload: any) => {
-      // push to list and increment badge
-      setNotifications(prev => [payload, ...prev]);
+      const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
+      const normalized = { ...payload, day: getDayLabel(created), time: payload.time || formatTime(created) };
+      setNotifications(prev => [normalized, ...prev]);
       setNotificationCount(prev => prev + 1);
     };
+
     const onNewMessageNotification = (payload: any) => {
-      // keep compatibility with backend event name
-      setNotifications(prev => [payload, ...prev]);
+      const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
+      const normalized = { ...payload, day: getDayLabel(created), time: payload.time || formatTime(created) };
+      setNotifications(prev => [normalized, ...prev]);
       setNotificationCount(prev => prev + 1);
     };
+
     const onNotificationCount = (payload: any) => {
-      if (typeof payload.totalUnread === 'number') {
-        setNotificationCount(payload.totalUnread);
+      const count = (payload && (payload.totalUnread ?? payload.unreadCount ?? payload.total)) as number | undefined;
+      if (typeof count === 'number') {
+        setNotificationCount(count);
       }
     };
 
@@ -182,7 +196,30 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleProfileSetup = () => {
     navigate("/profile-setup");
-  }
+  };
+
+  const getNotificationSenderName = (notif: any) => {
+    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title) {
+      return notif.title;
+    }
+
+    if (notif.title && notif.title !== 'Notification') {
+      return notif.title
+    }
+
+    return 'Someone';
+  };
+
+  const getNotificationAvatar = (notif: any) => {
+    if (notif.actor?.profileImage) return notif.actor.profileImage;
+    if (notif.senderAvatar) return notif.senderAvatar;
+
+    if (notif.type === 'NEW_MESSAGE' && notif.title && notif.title !== 'Notification') {
+      return avatar;
+    }
+
+    return avatar;
+  };
 
   return (
     <>
@@ -534,59 +571,39 @@ const Header: React.FC<HeaderProps> = ({
                               <div key={day} className={day === 'Today' ? 'pt-3 pb-1' : 'pt-2 pb-2'}>
                                 <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
 
-                                {dayNotifs.map((notif) => (
-                                  <div key={notif.id} className="transition-colors cursor-pointer" style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}>
-                                    <div className="flex items-start space-x-2 py-2 px-6">
+                                {dayNotifs.map((notif, idx) => (
+                                  <div key={notif.id || idx} className="transition-colors cursor-pointer" style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}>
+                                    <div className="flex items-start space-x-4 py-3 px-6">
                                       <div className="relative flex-shrink-0">
-                                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: notif.type === 'message' ? '#E3F2FD' : '#F9A825', border: '2px solid white' }}>
+                                        <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
+                                          backgroundColor: (notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? '#E3F2FD' : '#F9A825',
+                                          border: '2px solid white'
+                                        }}>
                                           {notif.type === 'message' ? (
-                                            <img src={avatar} alt="Avatar" className="w-6 h-6 rounded-full object-cover" />
+                                            <img src={getNotificationAvatar(notif)} alt="Avatar" className="w-9 h-9 rounded-full object-cover" />
                                           ) : (
-                                            <img src={logoIcon} alt="Logo" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
+                                            <img src={logoIcon} alt="Logo" className="w-7 h-7" style={{ filter: 'brightness(0) invert(1)' }} />
                                           )}
-                                        </div>
-                                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
-                                          <img src={notif.type === 'message' ? messageAvatarIcon : appNotificationIcon} alt="Icon" className="w-3 h-3" />
                                         </div>
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between">
                                           <div className="flex-1 min-w-0">
-                                            {notif.sender ? (
-                                              <p style={{ fontSize: '11px' }}>
-                                                <span className="font-semibold" style={{ color: notif.isRead ? '#939393' : '#616161' }}>{notif.sender}</span> <span style={{ color: '#939393' }}>{notif.text}</span>
-                                              </p>
-                                            ) : (
-                                              <p className={notif.id === 2 && !notif.isRead ? 'font-semibold' : ''} style={{ color: notif.isRead ? '#939393' : '#616161', fontSize: '11px' }}>{notif.text}</p>
-                                            )}
-                                            {notif.subText && (
-                                              <p className={notif.id === 1 ? 'mt-0.5' : 'text-xs mt-0.5'} style={{ color: notif.id === 1 && !notif.isRead ? '#64B5F6' : '#9E9E9E', fontSize: notif.id === 1 ? '11px' : '10px' }}>{notif.subText}</p>
-                                            )}
-                                            {notif.subText2 && (
-                                              <p className="text-xs mt-0.5" style={{ color: '#9E9E9E', fontSize: '10px' }}>{notif.subText2}</p>
-                                            )}
+                                            <p style={{ fontSize: '14px' }}>
+                                              <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                {getNotificationSenderName(notif)}
+                                              </span>
+                                              <span style={{ color: '#939393' }}> {notif.body || notif.text || ''}</span>
+                                            </p>
                                           </div>
-                                          <div className="flex flex-col items-end ml-2 flex-shrink-0" style={{ gap: notif.isRead ? '2px' : '4px' }}>
-                                            <button className="text-gray-400 hover:text-gray-600">
-                                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                <circle cx="6" cy="12" r="1.5" />
-                                                <circle cx="12" cy="12" r="1.5" />
-                                                <circle cx="18" cy="12" r="1.5" />
-                                              </svg>
-                                            </button>
-                                            {notif.isRead ? (
-                                              <span className="text-xs" style={{ color: '#9E9E9E', fontSize: '10px' }}>{notif.time}</span>
-                                            ) : (
-                                              <div className="flex items-center space-x-1" style={{ marginTop: notif.id === 2 ? '16px' : '6px' }}>
-                                                <span style={{ color: '#9E9E9E', fontSize: '9px' }}>{notif.time}</span>
-                                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />
-                                              </div>
-                                            )}
+                                          <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
+                                            <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>
+                                            {!notif.isRead && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />}
                                           </div>
                                         </div>
                                       </div>
                                     </div>
-                                    {notif.id !== dayNotifs[dayNotifs.length - 1].id && <div className="border-b border-gray-100" />}
+                                    <div className="border-b border-gray-100" />
                                   </div>
                                 ))}
                               </div>
@@ -1152,14 +1169,14 @@ const Header: React.FC<HeaderProps> = ({
                   </div>
 
                   {/* Become a seller button - only for logged in users */}
-                  <Link
+                  {/* <Link
                     to="/register"
                     className="flex items-center space-x-1.5 px-2.5 py-2 rounded-lg transition-colors mr-1"
                     style={{ backgroundColor: '#FEF6E9' }}
                   >
                     <img src={basketIcon} alt="Basket" className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)' }} />
                     <span className="text-sm font-normal" style={{ color: '#F9A825' }}>Start selling</span>
-                  </Link>
+                  </Link> */}
 
                   {/* Notification Icon */}
                   <button
@@ -1727,7 +1744,7 @@ const Header: React.FC<HeaderProps> = ({
                       </Link>
 
                       {/* Become a seller */}
-                      <Link
+                      {/* <Link
                         to="/register"
                         className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsMobileMenuOpen(false)}
@@ -1744,7 +1761,7 @@ const Header: React.FC<HeaderProps> = ({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </div>
-                      </Link>
+                      </Link> */}
 
                       {/* Help Center */}
                       <Link

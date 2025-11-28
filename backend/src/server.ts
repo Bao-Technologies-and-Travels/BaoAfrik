@@ -23,12 +23,7 @@ import testRoutes from '@/routes/testRoutes';
 import chatRoutes from '@/routes/chatRoutes';
 import productRoutes from './routes/productRoutes';
 import uploadRoutes from './routes/uploadRoutes';
-
-// let WebSocketService: any;
-// (async () => {
-//   const module = await import('./socket/webSocketService');
-//   WebSocketService = module.WebSocketService;
-// })();
+import notificationRoutes from './routes/notificationRoutes';
 
 const app = express();
 const server = createServer(app);
@@ -169,6 +164,7 @@ app.use('/api/test', testRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // 404 handler
 app.use(notFound);

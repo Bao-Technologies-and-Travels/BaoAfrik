@@ -153,7 +153,7 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
     throw createUnauthorizedError('Invalid email');
   }
 
-  if(!user.passwordHash) {
+  if (!user.passwordHash) {
     throw createUnauthorizedError('This account uses social login. Please sign in with your provider.');
   }
 
@@ -355,7 +355,7 @@ export const verifyEmail = asyncHandler(async (req: Request<{}, {}, EmailVerific
 export const resendVerificationCode = asyncHandler(async (req: Request<{}, {}, ResendVerificationRequest>, res: Response) => {
   const { email } = req.body;
 
-  if(!email) {
+  if (!email) {
     throw createValidationError('Email is required');
   }
 
@@ -586,7 +586,7 @@ export const resetPassword = asyncHandler(async (req: Request<{}, {}, ResetPassw
   const user = await prisma.user.findFirst({
     where: {
       passwordResetToken: resetToken,
-      passwordResetTokenExpires: { 
+      passwordResetTokenExpires: {
         gt: new Date() // Token hasn't expired
       }
     },
@@ -674,7 +674,7 @@ export const verifyResetCode = asyncHandler(async (req: Request<{}, {}, VerifyRe
   const response: ApiResponse = {
     success: true,
     data: {
-      resetToken: resetToken 
+      resetToken: resetToken
     },
     message: 'Reset code verified successfully'
   };
@@ -743,22 +743,22 @@ export const changePassword = asyncHandler(async (req: Request<{}, {}, ChangePas
  * Delete user account
  */
 export const deleteUser = asyncHandler(async (req: Request<{}, {}, DeleteUserRequest>, res: Response) => {
-  if(!req.user) {
+  if (!req.user) {
     throw createUnauthorizedError('User not authenticated');
   }
 
   const { email } = req.body;
 
-  if(!email) {
+  if (!email) {
     throw createValidationError('Email is required');
   }
 
-  if(req.user.email != email) {
+  if (req.user.email != email) {
     throw createUnauthorizedError('You are not authorized to delete this email');
   }
 
   const user = await prisma.user.findUnique({
-    where:{
+    where: {
       email: email
     },
     select: {
@@ -767,7 +767,7 @@ export const deleteUser = asyncHandler(async (req: Request<{}, {}, DeleteUserReq
     }
   });
 
-  if(!user) {
+  if (!user) {
     throw createValidationError('User not found');
   }
 
@@ -787,7 +787,7 @@ export const deleteUser = asyncHandler(async (req: Request<{}, {}, DeleteUserReq
     success: true,
     message: 'User deleted successfully'
   };
-  
+
   res.json(response);
 })
 

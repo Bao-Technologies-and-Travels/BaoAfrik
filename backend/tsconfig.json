@@ -10,7 +10,9 @@
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
@@ -57,7 +59,9 @@
       "@/types/*": [
         "./types/*"
       ],
-      "@prisma/client": ["./src/generated/prisma-client"],
+      "@prisma/client": [
+        "./src/generated/prisma-client"
+      ],
     }
   },
   "ts-node": {

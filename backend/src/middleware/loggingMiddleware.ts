@@ -35,9 +35,9 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction): 
 
   // Override res.json to log response
   const originalJson = res.json;
-  res.json = function(body: any) {
+  res.json = function (body: any) {
     const duration = Date.now() - req.startTime;
-    
+
     requestLogger.info('Outgoing response', {
       statusCode: res.statusCode,
       duration: `${duration}ms`,
@@ -91,14 +91,14 @@ const sanitizeResponse = (response: any): any => {
           cleaned[field] = '[REDACTED]';
         }
       });
-      
+
       // Recursively clean nested objects
       Object.keys(cleaned).forEach(key => {
         if (cleaned[key] && typeof cleaned[key] === 'object') {
           cleaned[key] = removeSensitiveFields(cleaned[key]);
         }
       });
-      
+
       return cleaned;
     }
     return obj;

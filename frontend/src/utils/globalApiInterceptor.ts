@@ -37,6 +37,7 @@ const isPublicEndpoint = (url: string): boolean => {
     '/api/categories',
     '/api/chat',
     '/api/upload',
+    '/api/notifications',
   ];
 
   const urlObj = new URL (url);

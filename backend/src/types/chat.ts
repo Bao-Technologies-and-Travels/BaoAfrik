@@ -17,7 +17,7 @@ export interface Message {
   messageType: MessageType;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   sender?: User;
   receiver?: User;
@@ -35,7 +35,7 @@ export interface Conversation {
   lastMessageAt?: Date;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   product?: Product;
   lastMessage?: Message;
@@ -49,7 +49,7 @@ export interface ConversationParticipant {
   userId: string;
   joinedAt: Date;
   lastReadAt: Date;
-  
+
   // Relations
   conversation: Conversation;
   user: User;
@@ -61,7 +61,7 @@ export interface MessageStatus {
   userId: string;
   status: 'sent' | 'delivered' | 'read';
   updatedAt: Date;
-  
+
   // Relations
   message: Message;
   user: User;
@@ -85,15 +85,15 @@ export interface Product {
   sellerId: string;
 }
 
-export type MessageType = 
-  | 'INQUIRY' 
-  | 'NEGOTIATION' 
-  | 'ORDER' 
-  | 'COMPLAINT' 
-  | 'GENERAL' 
-  | 'TEXT' 
-  | 'IMAGE' 
-  | 'VOICE' 
+export type MessageType =
+  | 'INQUIRY'
+  | 'NEGOTIATION'
+  | 'ORDER'
+  | 'COMPLAINT'
+  | 'GENERAL'
+  | 'TEXT'
+  | 'IMAGE'
+  | 'VOICE'
   | 'FILE';
 
 export interface CreateMessageInput {
@@ -114,7 +114,7 @@ export interface CreateMessageInput {
 
 export interface CreateConversationInput {
   productId?: string;
-  participantIds: string[]; 
+  participantIds: string[];
 }
 
 export interface SocketMessageData {

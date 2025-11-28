@@ -72,3 +72,8 @@ export type Conversation = Prisma.ConversationModel
  * 
  */
 export type ConversationParticipant = Prisma.ConversationParticipantModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel

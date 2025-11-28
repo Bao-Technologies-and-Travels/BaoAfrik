@@ -7,7 +7,7 @@ const productService = new ProductService();
 
 export class ProductController {
   // Create new product
-   async createProduct(req: Request, res: Response) {
+  async createProduct(req: Request, res: Response) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -73,23 +73,23 @@ export class ProductController {
   }
 
   // Get all products
-     async getProducts(req: Request, res: Response) {
+  async getProducts(req: Request, res: Response) {
     try {
-      const { 
-        category, 
-        origin, 
-        saleType, 
-        minPrice, 
-        maxPrice, 
-        search, 
+      const {
+        category,
+        origin,
+        saleType,
+        minPrice,
+        maxPrice,
+        search,
         status,
-        page = '1', 
-        limit = '10' 
+        page = '1',
+        limit = '10'
       } = req.query;
 
       // Handle both GET query params and POST body for search
       const searchQuery = req.body.search || search;
-      
+
       const filters = {
         category: category as string,
         origin: origin as string,
@@ -101,8 +101,8 @@ export class ProductController {
       };
 
       const result = await productService.getProducts(
-        filters, 
-        parseInt(page as string), 
+        filters,
+        parseInt(page as string),
         parseInt(limit as string)
       );
 
@@ -119,10 +119,10 @@ export class ProductController {
   }
 
   // Get single product
-   async getProduct(req: Request, res: Response) {
+  async getProduct(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      
+
       if (!id) {
         return res.status(400).json({
           success: false,
@@ -152,7 +152,7 @@ export class ProductController {
   }
 
   // Update product
-    async updateProduct(req: Request, res: Response) {
+  async updateProduct(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const updateData = req.body;
@@ -421,9 +421,9 @@ export class ProductController {
       }
 
       const result = await productService.getUserProducts(
-        userId, 
-        status as any, 
-        parseInt(page as string), 
+        userId,
+        status as any,
+        parseInt(page as string),
         parseInt(limit as string)
       );
 
@@ -510,7 +510,7 @@ export class ProductController {
   async getUserProductsPublic(req: Request, res: Response) {
     try {
       const { userId } = req.params;
-      
+
       if (!userId) {
         return res.status(400).json({
           success: false,
@@ -521,9 +521,9 @@ export class ProductController {
       const { status, page = '1', limit = '10' } = req.query;
 
       const result = await productService.getUserProducts(
-        userId, 
-        status as any, 
-        parseInt(page as string), 
+        userId,
+        status as any,
+        parseInt(page as string),
         parseInt(limit as string)
       );
 

@@ -44,7 +44,7 @@ declare global {
 export const authenticateToken = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1]; 
+    const token = authHeader && authHeader.split(" ")[1];
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -110,7 +110,7 @@ export const authenticateToken = asyncHandler(
           success: false,
           error: "Invalid access token",
         });
-        
+
       } else if (error instanceof jwt.TokenExpiredError) {
         return res.status(401).json({
           success: false,
@@ -212,7 +212,7 @@ export const requireResourceOwnership = (resourceUserIdField: string = 'userId')
     }
 
     const resourceUserId = req.params[resourceUserIdField] || req.body[resourceUserIdField];
-    
+
     if (req.user.id !== resourceUserId) {
       res.status(403).json({
         success: false,

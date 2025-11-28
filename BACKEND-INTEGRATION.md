@@ -3,6 +3,7 @@
 ## 🚀 System Overview
 
 The BaoAfrik frontend is fully prepared for backend integration with:
+
 - Complete API service layer
 - JWT authentication system
 - Real-time notification capabilities
@@ -13,6 +14,7 @@ The BaoAfrik frontend is fully prepared for backend integration with:
 ## 📋 Database Models
 
 ### Users Table
+
 ```sql
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -35,6 +37,7 @@ CREATE TABLE users (
 ```
 
 ### Products Table
+
 ```sql
 CREATE TABLE products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -56,6 +59,7 @@ CREATE TABLE products (
 ```
 
 ### Bookmarks Table
+
 ```sql
 CREATE TABLE bookmarks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -69,6 +73,7 @@ CREATE TABLE bookmarks (
 ## 🔌 API Endpoints
 
 ### Authentication
+
 - POST /api/auth/register
 - POST /api/auth/login
 - POST /api/auth/verify-email
@@ -78,6 +83,7 @@ CREATE TABLE bookmarks (
 - POST /api/auth/logout
 
 ### Products
+
 - GET /api/products (with search, filter, pagination)
 - GET /api/products/:id
 - POST /api/products
@@ -86,11 +92,13 @@ CREATE TABLE bookmarks (
 - POST /api/products/:id/images
 
 ### Bookmarks
+
 - GET /api/bookmarks
 - POST /api/bookmarks
 - DELETE /api/bookmarks/:productId
 
 ### Notifications
+
 - GET /api/notifications
 - PUT /api/notifications/:id/read
 - DELETE /api/notifications/:id
@@ -98,12 +106,14 @@ CREATE TABLE bookmarks (
 ## 🔧 Environment Configuration
 
 ### Frontend (.env)
+
 ```env
 REACT_APP_API_URL=http://localhost:8000/api
 REACT_APP_WS_URL=ws://localhost:8000/ws
 ```
 
 ### Backend Environment
+
 ```env
 DATABASE_URL=postgresql://username:password@localhost:5432/baoafrik
 JWT_SECRET=your-super-secret-jwt-key
@@ -117,6 +127,7 @@ AWS_BUCKET_NAME=baoafrik-uploads
 ## 🚀 Key Features Ready for Integration
 
 ### 1. Authentication System
+
 - Complete user registration and login flow
 - Email verification with 6-digit codes
 - Password reset functionality
@@ -124,6 +135,7 @@ AWS_BUCKET_NAME=baoafrik-uploads
 - Social login integration points
 
 ### 2. Product Management
+
 - Product CRUD operations
 - Image upload and management
 - Search and filtering capabilities
@@ -131,12 +143,14 @@ AWS_BUCKET_NAME=baoafrik-uploads
 - Mobile-optimized product cards
 
 ### 3. Bookmark System
+
 - Real-time bookmarking with notifications
 - Success and error state handling
 - Auto-dismiss notifications after 5 seconds
 - Mobile-optimized popup sizing
 
 ### 4. User Interface
+
 - Mobile-first responsive design
 - Professional flag icons for language selection
 - Consistent product card layouts
@@ -144,6 +158,7 @@ AWS_BUCKET_NAME=baoafrik-uploads
 - Touch-optimized interactions
 
 ### 5. Search & Filtering
+
 - Advanced search with multiple criteria
 - Country-based product filtering
 - Category navigation with visual indicators
@@ -152,6 +167,7 @@ AWS_BUCKET_NAME=baoafrik-uploads
 ## 📱 Mobile Optimization
 
 The system is fully optimized for mobile devices with:
+
 - Transparent search backgrounds on mobile
 - Rectangular filter buttons with light gray backgrounds
 - Optimized product card sizing
@@ -161,6 +177,7 @@ The system is fully optimized for mobile devices with:
 ## 🔄 Integration Checklist
 
 ### Phase 1: Authentication
+
 - [ ] User registration endpoint
 - [ ] Email verification system
 - [ ] Login/logout functionality
@@ -168,12 +185,14 @@ The system is fully optimized for mobile devices with:
 - [ ] JWT token management
 
 ### Phase 2: Product Management
+
 - [ ] Product CRUD operations
 - [ ] Image upload and management
 - [ ] Search and filtering
 - [ ] Category management
 
 ### Phase 3: Advanced Features
+
 - [ ] Bookmark system
 - [ ] Real-time notifications
 - [ ] Messaging system

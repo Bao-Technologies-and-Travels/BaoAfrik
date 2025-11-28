@@ -2,19 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
 
 @layer base {
   html {
     font-family: Inter, system-ui, sans-serif;
   }
-  
+
   body {
     @apply bg-gray-50 text-gray-900;
     font-family: Inter, system-ui, sans-serif;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: Poppins, system-ui, sans-serif;
   }
 }
@@ -31,7 +36,7 @@
       transform: translateY(0);
     }
   }
-  
+
   @keyframes slideInRight {
     from {
       opacity: 0;
@@ -42,19 +47,19 @@
       transform: translateX(0);
     }
   }
-  
+
   .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
   }
-  
+
   .animate-slide-in-right {
     animation: slideInRight 0.7s ease-out forwards;
   }
-  
+
   .animation-delay-100 {
     animation-delay: 0.1s;
   }
-  
+
   /* Mobile responsive utilities */
   .line-clamp-2 {
     display: -webkit-box;
@@ -63,24 +68,24 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   /* Prevent layout shifts */
   .aspect-square {
     aspect-ratio: 1 / 1;
   }
-  
+
   /* Touch-friendly interactions */
   .touch-manipulation {
     touch-action: manipulation;
   }
-  
+
   /* Smooth scrolling for mobile */
   .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  
+
   .overflow-x-auto::-webkit-scrollbar {
     display: none;
   }
@@ -90,57 +95,57 @@
   .btn-primary {
     @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
-  
+
   .btn-secondary {
     @apply bg-white hover:bg-gray-50 text-gray-900 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-colors duration-200;
   }
-  
+
   .card {
     @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
   }
-  
+
   .input-field {
     @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
   }
-  
+
   /* Typography utilities */
   .text-heading {
     @apply font-heading font-semibold;
   }
-  
+
   .text-display {
     @apply font-display font-bold;
   }
-  
+
   .text-body {
     @apply font-body;
   }
-  
+
   /* African-themed components */
   .hero-gradient {
     @apply bg-gradient-to-r from-primary-600 to-primary-700;
   }
-  
+
   .african-accent {
     @apply text-primary-600 font-display font-semibold;
   }
-  
+
   /* Custom scrollbar for dropdown menus */
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-track {
     background: #f3f4f6;
     border-radius: 3px;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: white;
     border-radius: 3px;
     border: 1px solid #e5e7eb;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #f9fafb;
   }

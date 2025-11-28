@@ -1,4 +1,4 @@
-import prisma from '@/config/database';import { MessageType } from '../generated/client';
+import prisma from '@/config/database'; import { MessageType } from '../generated/client';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
@@ -167,10 +167,10 @@ export class ChatService {
         });
 
         const processedConversations = conversations.map((conv: any) => {
-            const otherParticipants = conv.participants.filter((p :any)=> p.userId !== userId);
+            const otherParticipants = conv.participants.filter((p: any) => p.userId !== userId);
 
             if (otherParticipants.length === 0) {
-                console.warn('Conversation has no other participant. Conversation:', conv.id, 'All Participants:', conv.participants.map((p: any)=> p.user?.email));
+                console.warn('Conversation has no other participant. Conversation:', conv.id, 'All Participants:', conv.participants.map((p: any) => p.user?.email));
                 return null;
             }
 
@@ -376,9 +376,9 @@ export class ChatService {
             const existingConv = possibleConvs.find((conv: any) => conv.participants.length === 2);
 
             if (existingConv) {
-                if(data.productData) {
+                if (data.productData) {
                     await tx.conversation.update({
-                        where: { id: existingConv.id},
+                        where: { id: existingConv.id },
                         data: {
                             productData: JSON.stringify(data.productData)
                         }

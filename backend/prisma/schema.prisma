@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output = "../src/generated/"
+  output   = "../src/generated/"
 }
 
 datasource db {
@@ -240,6 +240,21 @@ model ConversationParticipant {
 
   @@unique([conversationId, userId])
   @@map("conversation_participants")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  actorId   String?  @map("actor_id")
+  type      String
+  title     String
+  body      String?
+  meta      Json?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 enum MessageType {

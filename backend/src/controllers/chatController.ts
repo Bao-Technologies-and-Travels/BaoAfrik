@@ -240,9 +240,9 @@ export class ChatController {
             const userId = req.user!.id;
 
             if (!conversationId) {
-                return res.status(400).json({ 
+                return res.status(400).json({
                     success: false,
-                    error: 'Conversation ID is required' 
+                    error: 'Conversation ID is required'
                 });
             }
 
@@ -296,7 +296,7 @@ export class ChatController {
                 data: conversation
             });
         } catch (error: any) {
-            
+
             if (error.message.includes('Cannot create conversation with yourself')) {
                 return res.status(422).json({
                     success: false,
@@ -420,9 +420,9 @@ export class ChatController {
             const userId = req.user!.id;
 
             if (!conversationId) {
-                return res.status(400).json({ 
+                return res.status(400).json({
                     success: false,
-                    error: 'Conversation ID is required' 
+                    error: 'Conversation ID is required'
                 });
             }
 
@@ -498,7 +498,7 @@ export class ChatController {
                 data: result
             });
         } catch (error: any) {
-            
+
             if (error.message.includes('Conversation not found')) {
                 return res.status(404).json({
                     success: false,
