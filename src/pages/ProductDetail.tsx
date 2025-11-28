@@ -43,6 +43,8 @@ import availableIcon from '../assets/images/pre/av.svg';
 import trashIcon from '../assets/images/pre/trash.svg';
 import activeIcon from '../assets/images/pre/active.svg';
 import inactiveIcon from '../assets/images/pre/inactive.svg';
+import repostIcon from '../assets/images/pre/repost.svg';
+import renewIcon from '../assets/images/pre/renew.svg';
 // Import icons for reviews section
 import likeIcon from '../assets/images/pre/like.svg';
 import dislikeIcon from '../assets/images/pre/dislike.svg';
@@ -720,15 +722,30 @@ const ProductDetail: React.FC = () => {
                 >
                   <img src={trashIcon} alt="Delete listing" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
                 </button>
-                <button
-                  type="button"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-                  style={{ backgroundColor: '#F4F4F4', color: '#939393', fontSize: '13px' }}
-                  onClick={() => navigate('/create-listing', { state: { draft: ownerListing ?? null } })}
-                >
-                  <img src={pencilIcon} alt="Edit listing" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
-                  Edit listing
-                </button>
+                {ownerListing?.status === 'active' ? (
+                  <button
+                    type="button"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                    style={{ backgroundColor: '#F4F4F4', color: '#939393', fontSize: '13px' }}
+                    onClick={() => navigate('/create-listing', { state: { draft: ownerListing ?? null } })}
+                  >
+                    <img src={pencilIcon} alt="Edit listing" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
+                    Edit listing
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                    style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '13px' }}
+                    onClick={() => {
+                      // Handle repost functionality
+                      console.log('Repost listing');
+                    }}
+                  >
+                    <img src={repostIcon} alt="Repost" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' }} />
+                    Repost
+                  </button>
+                )}
               </div>
             ) : (
               <button
@@ -959,8 +976,8 @@ const ProductDetail: React.FC = () => {
                 Read more
               </button>
 
-              {/* Messages Received Component */}
-              {isOwnerView && ownerListing?.messages && ownerListing.messages > 0 && (
+              {/* Messages Received Component - Only show for active listings */}
+              {isOwnerView && ownerListing?.status === 'active' && ownerListing?.messages && ownerListing.messages > 0 && (
                 <div ref={messagesDropdownRef} className="relative">
                   <div 
                     className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mb-2"
@@ -1220,6 +1237,82 @@ const ProductDetail: React.FC = () => {
                   <img src={spIcon} alt="Arrow" className="w-4 h-4" />
               </button>
               </div>
+
+              {/* Warning Badge for Inactive Listings */}
+              {isOwnerView && ownerListing?.status === 'inactive' && (
+                <div
+                  className="flex items-start gap-3 p-2.5 mt-2"
+                  style={{
+                    backgroundColor: '#FFFAFA',
+                    border: '1px solid #FFE9E9',
+                    borderRadius: '14px'
+                  }}
+                >
+                  {/* Icon */}
+                  <div
+                    className="flex-shrink-0 rounded-full flex items-center justify-center"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      border: '2px solid #FFFFFF',
+                      backgroundColor: '#FFFAFA'
+                    }}
+                  >
+                    <img
+                      src={renewIcon}
+                      alt="Warning"
+                      className="w-6 h-6"
+                    />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    {/* Main Message */}
+                    <p
+                      className="font-medium mb-0.5"
+                      style={{
+                        color: '#FF6E6E',
+                        fontSize: '14px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}
+                    >
+                      Your listing has been removed from our marketplace.
+                    </p>
+
+                    {/* Description */}
+                    <p
+                      className="text-xs"
+                      style={{
+                        color: '#939393',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      The time for your product to appear on our marketplace has expired. You can{' '}
+                      <button
+                        onClick={() => {
+                          // Handle repost functionality
+                          console.log('Repost listing');
+                        }}
+                        className="underline"
+                        style={{ color: '#6A6A6A' }}
+                      >
+                        repost it
+                      </button>
+                      {' '}or{' '}
+                      <button
+                        onClick={() => {
+                          // Handle remove functionality
+                          console.log('Remove listing');
+                        }}
+                        className="underline"
+                        style={{ color: '#6A6A6A' }}
+                      >
+                        remove it.
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1325,8 +1418,8 @@ const ProductDetail: React.FC = () => {
             Read more
                 </button>
 
-                {/* Messages Received Component - Mobile */}
-                {isOwnerView && ownerListing?.messages && ownerListing.messages > 0 && (
+                {/* Messages Received Component - Mobile - Only show for active listings */}
+                {isOwnerView && ownerListing?.status === 'active' && ownerListing?.messages && ownerListing.messages > 0 && (
                   <div ref={messagesDropdownRef} className="relative">
                     <div 
                       className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mt-2"
@@ -1578,6 +1671,7 @@ const ProductDetail: React.FC = () => {
           </div>
                 </div>
               </div>
+
 
       {/* Mobile Sticky Action Bar */}
       <div
