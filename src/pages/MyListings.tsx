@@ -56,8 +56,51 @@ interface DraftListing {
   image: string;
   description: string;
   country: string;
-  countryColor: string;
+  flag: string;
 }
+
+const initialDraftListings: DraftListing[] = [
+  {
+    id: 'd1',
+    title: 'African Wristband',
+    price: '65.8',
+    currency: 'USD',
+    image: a1,
+    description: 'Warm pepper notes with a mellow finish, the kind of spice you sprinkle on everything once it hits your pantry.',
+    country: 'Cameroon',
+    flag: 'https://flagcdn.com/w20/cm.png'
+  },
+  {
+    id: 'd2',
+    title: 'African Comb',
+    price: '65.8',
+    currency: 'USD',
+    image: a2,
+    description: "Hand-carved teeth that glide through curls without tugging, and a handle that still feels like grandma's favorite comb.",
+    country: 'Ghana',
+    flag: 'https://flagcdn.com/w20/gh.png'
+  },
+  {
+    id: 'd3',
+    title: 'African Wristband',
+    price: '65.8',
+    currency: 'USD',
+    image: a3,
+    description: 'Layered beads that catch the light and instantly make any everyday outfit feel like market day back home.',
+    country: 'Benin',
+    flag: 'https://flagcdn.com/w20/bj.png'
+  },
+  {
+    id: 'd4',
+    title: 'Bitter Cola',
+    price: 'N/A',
+    currency: 'USD',
+    image: a4,
+    description: 'Earthy bitter kola with that citrusy snap—great for chewing, steeping, or tossing into house bitters.',
+    country: 'Nigeria',
+    flag: 'https://flagcdn.com/w20/ng.png'
+  }
+];
 
 const statusOptions = ['Active', 'Inactive', 'Days left'] as const;
 type StatusFilter = 'All Status' | (typeof statusOptions)[number];
@@ -205,31 +248,47 @@ const renderSortIcon = (option: SortOption, isSelected: boolean) => {
   return null;
 };
 
-const renderCountryBadge = (label: string, color: string) => (
+const renderCountryBadge = (label: string, flagUrl: string) => (
   <span
     style={{
       display: 'inline-flex',
       alignItems: 'center',
-      gap: '6px',
-      backgroundColor: '#F5F9FF',
-      color,
-      padding: '6px 10px',
+      gap: '8px',
+      backgroundColor: '#FFFFFF',
+      border: '1px solid #E1E1E1',
+      padding: '3px 12px',
       borderRadius: '999px',
       fontSize: '11px',
-      fontFamily: 'Poppins, sans-serif'
+      fontFamily: 'Poppins, sans-serif',
+      minHeight: '26px'
     }}
   >
-    <span
+    <img
+      src={flagUrl}
+      alt={`${label} flag`}
       style={{
-        width: '6px',
-        height: '6px',
+        width: '16px',
+        height: '16px',
         borderRadius: '50%',
-        backgroundColor: color
+        objectFit: 'cover'
       }}
     />
-    {label}
+    <span style={{ color: '#939393', fontWeight: 300 }}>{label}</span>
   </span>
 );
+
+const buildDraftPrefillPayload = (draft: DraftListing) => {
+  const payload: Record<string, string> = {};
+  if (draft.title) payload.title = draft.title;
+  if (draft.price && draft.price.toLowerCase() !== 'n/a') {
+    payload.price = draft.price;
+    if (draft.currency) payload.currency = draft.currency;
+  }
+  if (draft.description) payload.description = draft.description;
+  if (draft.country) payload.country = draft.country;
+  if (draft.image) payload.image = draft.image;
+  return payload;
+};
 
 const MyListings: React.FC = () => {
   const navigate = useNavigate();
@@ -245,6 +304,9 @@ const MyListings: React.FC = () => {
   const [selectedSort, setSelectedSort] = useState<{ label: string; value: SortValue } | null>(null);
   const sortDropdownRef = useRef<HTMLDivElement | null>(null);
   const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
+  const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
+  const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
+  const currentDraftSeed = JSON.stringify(initialDraftListings);
 
   // Mock data - replace with actual data from backend
   const listings = useMemo<Listing[]>(() => [
@@ -260,49 +322,6 @@ const MyListings: React.FC = () => {
     { id: '10', title: 'River pepper Addis', image: a10, status: 'active', rating: 4.7, reviews: 140, price: 'USD 72', currency: 'USD', createdAt: 1690600000000, priceValue: 72, messages: 31 },
     { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: 'USD 48', currency: 'USD', createdAt: 1689300000000, priceValue: 48, messages: 17 },
     { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: 'USD 35', currency: 'USD', createdAt: 1689700000000, priceValue: 35, messages: 14 },
-  ], []);
-
-  const draftListings = useMemo<DraftListing[]>(() => [
-    {
-      id: 'd1',
-      title: 'African Wristband',
-      price: '65.8',
-      currency: 'USD',
-      image: a1,
-      description: 'Premium white pepper sourced from the fertile soil of Africa.',
-      country: 'Cameroon',
-      countryColor: '#64B5F6'
-    },
-    {
-      id: 'd2',
-      title: 'African Comb',
-      price: '65.8',
-      currency: 'USD',
-      image: a2,
-      description: 'Adds an authentic touch of home to your dishes.',
-      country: 'Spice Coast',
-      countryColor: '#70E183'
-    },
-    {
-      id: 'd3',
-      title: 'African Wristband',
-      price: '65.8',
-      currency: 'USD',
-      image: a3,
-      description: 'Perfect for the diaspora seeking a taste of tradition.',
-      country: 'Benin',
-      countryColor: '#FAB951'
-    },
-    {
-      id: 'd4',
-      title: 'Bitter Cola',
-      price: 'N/A',
-      currency: 'USD',
-      image: a4,
-      description: 'Harvested from the lush regions of Lagos.',
-      country: 'Lagos',
-      countryColor: '#FF8A65'
-    }
   ], []);
 
   const trimmedSearchQuery = searchQuery.trim();
@@ -405,6 +424,16 @@ const MyListings: React.FC = () => {
     setHoveredSecondarySort(null);
   };
 
+  const handleDraftEdit = (draft: DraftListing) => {
+    const prefillData = buildDraftPrefillPayload(draft);
+    navigate('/create-listing', { state: { draft: prefillData } });
+    setIsDraftsModalOpen(false);
+  };
+
+  const handleDraftDelete = (draftId: string) => {
+    setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -420,6 +449,13 @@ const MyListings: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (draftSeedRef.current !== currentDraftSeed) {
+      draftSeedRef.current = currentDraftSeed;
+      setDraftListings(initialDraftListings);
+    }
+  }, [currentDraftSeed]);
 
   const getSecondaryKeyByValue = (value: SortValue): string | null => {
     for (const option of sortOptions) {
@@ -455,26 +491,34 @@ const MyListings: React.FC = () => {
   const renderDraftCard = (draft: DraftListing) => (
     <div
       key={draft.id}
-      className="flex items-center gap-3"
+      className="flex items-center gap-4"
       style={{
         border: '1px solid #E9E9E9',
         borderRadius: '14px',
-        padding: '12px',
-        backgroundColor: '#FFFFFF'
+        padding: '14px 18px',
+        backgroundColor: '#FFFFFF',
+        width: '100%'
       }}
     >
       <div
         style={{
-          width: '72px',
-          height: '72px',
-          borderRadius: '18px',
+          width: '100px',
+          height: '100px',
+          borderRadius: '12px',
           overflow: 'hidden',
           flexShrink: 0
         }}
       >
         <img src={draft.image} alt={draft.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       </div>
-      <div style={{ flex: 1 }}>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100px'
+        }}
+      >
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '15px' }}>
             <span>{draft.title}</span>
@@ -485,6 +529,7 @@ const MyListings: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               className="inline-flex items-center gap-1 px-2 py-1"
               style={{
                 backgroundColor: '#F4F4F4',
@@ -493,33 +538,44 @@ const MyListings: React.FC = () => {
                 fontSize: '11px',
                 fontFamily: 'Poppins, sans-serif'
               }}
+              onClick={() => handleDraftEdit(draft)}
             >
               <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
               Edit
             </button>
             <button
+              type="button"
               className="inline-flex items-center justify-center"
               style={{
-                width: '28px',
-                height: '28px',
+                width: '30px',
+                height: '30px',
                 borderRadius: '6px',
                 backgroundColor: '#FFE9E9'
               }}
+              onClick={() => handleDraftDelete(draft.id)}
             >
-              <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5" />
+              <img
+                src={trashIcon}
+                alt="Delete"
+                className="w-3.5 h-3.5"
+                style={{
+                  filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)'
+                }}
+              />
             </button>
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-between">
-          {renderCountryBadge(draft.country, draft.countryColor)}
+        <div style={{ alignSelf: 'flex-start', marginTop: '4px', marginBottom: '2px' }}>
+          {renderCountryBadge(draft.country, draft.flag)}
         </div>
         <p
-          className="mt-3 text-right"
           style={{
             color: '#B0B0B0',
             fontSize: '12px',
             fontFamily: 'Poppins, sans-serif',
-            fontWeight: 300
+            fontWeight: 300,
+            marginTop: '0',
+            textAlign: 'left'
           }}
         >
           {draft.description}
@@ -537,7 +593,7 @@ const MyListings: React.FC = () => {
         onClick={() => setIsDraftsModalOpen(false)}
       >
         <div
-          className="relative w-full max-w-xl"
+          className="relative w-full max-w-2xl"
           style={{
             backgroundColor: '#FFFFFF',
             borderRadius: '30px',
@@ -552,7 +608,7 @@ const MyListings: React.FC = () => {
                 style={{
                   fontFamily: 'Bricolage Grotesque, sans-serif',
                   color: '#1E1E1E',
-                  fontSize: '20px'
+                  fontSize: '18px'
                 }}
               >
                 Drafts ({draftListings.length})
@@ -563,7 +619,7 @@ const MyListings: React.FC = () => {
               onClick={() => setIsDraftsModalOpen(false)}
               style={{
                 color: '#BABABA',
-                fontSize: '20px',
+                fontSize: '26px',
                 lineHeight: 1
               }}
             >

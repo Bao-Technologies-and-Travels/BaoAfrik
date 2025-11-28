@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/images/pre/logo.png';
 import shippxIcon from '../assets/images/pre/shippx.svg';
 import locIcon from '../assets/images/pre/Loc.svg';
 import imageIcon from '../assets/images/pre/image.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
+import trashIcon from '../assets/images/pre/trash.svg';
 import draft2Icon from '../assets/images/pre/draft2.svg';
 import flyIcon from '../assets/images/pre/fly.svg';
 import basketIcon from '../assets/images/pre/basket.png';
@@ -21,9 +22,14 @@ import settingIcon from '../assets/images/pre/setting.svg';
 import pathIcon from '../assets/images/pre/Path.svg';
 import path2Icon from '../assets/images/pre/path2.svg';
 import loadIcon from '../assets/images/pre/load.svg';
+import a1 from '../assets/images/pre/a1.png';
+import a2 from '../assets/images/pre/a2.png';
+import a3 from '../assets/images/pre/a3.png';
+import a4 from '../assets/images/pre/a4.png';
 
 const CreateListing: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -38,7 +44,11 @@ const CreateListing: React.FC = () => {
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [isImageLoading, setIsImageLoading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
-    const [selectedLanguage, setSelectedLanguage] = useState('EN');
+  const [selectedLanguage, setSelectedLanguage] = useState('EN');
+  const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
+  const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
+  const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
+  const currentDraftSeed = JSON.stringify(initialDraftListings);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -135,6 +145,125 @@ const CreateListing: React.FC = () => {
     { value: 'zambia', label: 'Zambia', flagCode: 'zm' },
     { value: 'zimbabwe', label: 'Zimbabwe', flagCode: 'zw' }
   ];
+
+interface DraftListing {
+  id: string;
+  title: string;
+  price: string;
+  currency: string;
+  image: string;
+  description: string;
+  country: string;
+  flag: string;
+}
+
+const initialDraftListings: DraftListing[] = [
+  {
+    id: 'd1',
+    title: 'African Wristband',
+    price: '65.8',
+    currency: 'USD',
+    image: a1,
+    description: 'Warm pepper notes with a mellow finish, the kind of spice you sprinkle on everything once it hits your pantry.',
+    country: 'Cameroon',
+    flag: 'https://flagcdn.com/w20/cm.png'
+  },
+  {
+    id: 'd2',
+    title: 'African Comb',
+    price: '65.8',
+    currency: 'USD',
+    image: a2,
+    description: "Hand-carved teeth that glide through curls without tugging, and a handle that still feels like grandma's favorite comb.",
+    country: 'Ghana',
+    flag: 'https://flagcdn.com/w20/gh.png'
+  },
+  {
+    id: 'd3',
+    title: 'African Wristband',
+    price: '65.8',
+    currency: 'USD',
+    image: a3,
+    description: 'Layered beads that catch the light and instantly make any everyday outfit feel like market day back home.',
+    country: 'Benin',
+    flag: 'https://flagcdn.com/w20/bj.png'
+  },
+  {
+    id: 'd4',
+    title: 'Bitter Cola',
+    price: 'N/A',
+    currency: 'USD',
+    image: a4,
+    description: 'Earthy bitter kola with that citrusy snap—great for chewing, steeping, or tossing into house bitters.',
+    country: 'Nigeria',
+    flag: 'https://flagcdn.com/w20/ng.png'
+  }
+];
+
+const renderDraftCountryBadge = (label: string, flagUrl: string) => (
+  <span
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '8px',
+      backgroundColor: '#FFFFFF',
+      border: '1px solid #E1E1E1',
+      padding: '3px 12px',
+      borderRadius: '999px',
+      fontSize: '11px',
+      fontFamily: 'Poppins, sans-serif',
+      minHeight: '26px'
+    }}
+  >
+    <img
+      src={flagUrl}
+      alt={`${label} flag`}
+      style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover' }}
+    />
+    <span style={{ color: '#939393', fontWeight: 300 }}>{label}</span>
+  </span>
+);
+
+const buildDraftPrefillPayload = (draft: DraftListing) => {
+  const payload: Record<string, string> = {};
+  if (draft.title) payload.title = draft.title;
+  if (draft.description) payload.description = draft.description;
+  if (draft.price && draft.price.toLowerCase() !== 'n/a') {
+    payload.price = draft.price;
+    if (draft.currency) payload.currency = draft.currency;
+  }
+  if (draft.country) payload.country = draft.country;
+  if (draft.image) payload.image = draft.image;
+  return payload;
+};
+
+  const applyPrefillToForm = (prefill: Record<string, string>) => {
+    if (prefill.title) setTitle(prefill.title);
+    if (prefill.description) setDescription(prefill.description);
+    if (prefill.price) setPrice(prefill.price);
+    if (prefill.currency) setCurrency(prefill.currency);
+    if (prefill.country) {
+      const originOption = countries.find(
+        (country) => country.label.toLowerCase() === prefill.country.toLowerCase()
+      );
+      if (originOption) setOrigin(originOption.value);
+    }
+    if (prefill.image) {
+      setImageUrls([prefill.image]);
+      setImages([]);
+      setPrimaryImageIndex(0);
+    }
+  };
+
+  const handleDraftApply = (draft: DraftListing) => {
+    const prefillData = buildDraftPrefillPayload(draft);
+    applyPrefillToForm(prefillData);
+    setIsDraftsModalOpen(false);
+  };
+
+  const handleDraftDelete = (draftId: string) => {
+    setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -348,6 +477,176 @@ const CreateListing: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
     }, [isLanguageDropdownOpen, isMenuDropdownOpen, isCategoryDropdownOpen, isOriginDropdownOpen, isSaleTypeDropdownOpen, isCurrencyDropdownOpen]);
+
+  useEffect(() => {
+    if (draftSeedRef.current !== currentDraftSeed) {
+      draftSeedRef.current = currentDraftSeed;
+      setDraftListings(initialDraftListings);
+    }
+  }, [currentDraftSeed]);
+
+  useEffect(() => {
+    const stateDraft = (location.state as { draft?: Record<string, string> } | null)?.draft;
+    if (stateDraft) {
+      applyPrefillToForm(stateDraft);
+      setIsDraftsModalOpen(true);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]);
+
+  const renderDraftCard = (draft: DraftListing) => (
+    <div
+      key={draft.id}
+      className="flex items-center gap-4"
+      style={{
+        border: '1px solid #E9E9E9',
+        borderRadius: '14px',
+        padding: '16px 20px',
+        backgroundColor: '#FFFFFF',
+        width: '100%'
+      }}
+    >
+      <div
+        style={{
+          width: '100px',
+          height: '100px',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          flexShrink: 0
+        }}
+      >
+        <img src={draft.image} alt={draft.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      </div>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100px'
+        }}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '15px' }}>
+            <span>{draft.title}</span>
+            <span style={{ color: '#B0B0B0' }}>·</span>
+            <span style={{ color: '#B0B0B0' }}>
+              {draft.currency} {draft.price}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1 px-2 py-1"
+              style={{
+                backgroundColor: '#F4F4F4',
+                color: '#939393',
+                borderRadius: '6px',
+                fontSize: '11px',
+                fontFamily: 'Poppins, sans-serif'
+              }}
+              onClick={() => handleDraftApply(draft)}
+            >
+              <img src={draft2Icon} alt="Edit" className="w-3 h-3" />
+              Use
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center"
+              style={{
+                width: '30px',
+                height: '30px',
+                borderRadius: '6px',
+                backgroundColor: '#FFE9E9'
+              }}
+              onClick={() => handleDraftDelete(draft.id)}
+            >
+              <img
+                src={trashIcon}
+                alt="Delete"
+                className="w-3.5 h-3.5"
+                style={{
+                  filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)'
+                }}
+              />
+            </button>
+          </div>
+        </div>
+        <div style={{ alignSelf: 'flex-start', marginTop: '4px', marginBottom: '2px' }}>
+          {renderDraftCountryBadge(draft.country, draft.flag)}
+        </div>
+        <p
+          style={{
+            color: '#B0B0B0',
+            fontSize: '12px',
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 300,
+            marginTop: '0',
+            textAlign: 'left'
+          }}
+        >
+          {draft.description}
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderDraftsModal = () => {
+    if (!isDraftsModalOpen) return null;
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center"
+        style={{ backgroundColor: '#0000001A' }}
+        onClick={() => setIsDraftsModalOpen(false)}
+      >
+        <div
+          className="relative w-full max-w-2xl"
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '30px',
+            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+            padding: '28px'
+          }}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2
+              style={{
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                color: '#1E1E1E',
+                fontSize: '18px'
+              }}
+            >
+              Drafts ({draftListings.length})
+            </h2>
+            <button
+              aria-label="Close drafts"
+              onClick={() => setIsDraftsModalOpen(false)}
+              style={{
+                color: '#BABABA',
+                fontSize: '26px',
+                lineHeight: 1
+              }}
+            >
+              ×
+            </button>
+          </div>
+          <div
+            className="drafts-scroll"
+            style={{
+              maxHeight: '60vh',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+              paddingRight: '8px'
+            }}
+          >
+            {draftListings.map((draft) => renderDraftCard(draft))}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="h-screen overflow-hidden bg-gray-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -738,6 +1037,7 @@ const CreateListing: React.FC = () => {
             <button
               className="flex items-center space-x-2 px-3 py-1.5 rounded-lg"
               style={{ backgroundColor: '#F0F8FE' }}
+              onClick={() => setIsDraftsModalOpen(true)}
             >
               <img src={draftsIcon} alt="Drafts" className="w-4 h-4" />
               <span className="font-medium text-xs" style={{ color: '#64B5F6' }}>
@@ -747,7 +1047,7 @@ const CreateListing: React.FC = () => {
                 className="px-2.5 py-0.5 rounded-full font-medium"
                 style={{ backgroundColor: '#CFE8FC', color: '#64B5F6', fontSize: '0.72rem' }}
               >
-                3
+                {draftListings.length}
               </span>
             </button>
           </div>
@@ -956,6 +1256,13 @@ const CreateListing: React.FC = () => {
                         .image-preview-scroll::-webkit-scrollbar {
                           display: none;
                         }
+        .drafts-scroll {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .drafts-scroll::-webkit-scrollbar {
+          display: none;
+        }
                       `}</style>
                       
                       {/* Conditionally wrap in scrollable container when 4+ images */}
@@ -1844,6 +2151,7 @@ const CreateListing: React.FC = () => {
           </div>
         </div>
       </div>
+      {renderDraftsModal()}
     </div>
   );
 };
