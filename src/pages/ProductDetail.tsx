@@ -39,6 +39,9 @@ import pepperIcon from '../assets/images/pre/pepper.svg';
 import bookmarkIcon from '../assets/images/pre/bm.svg';
 import spIcon from '../assets/images/pre/sp.svg';
 import availableIcon from '../assets/images/pre/av.svg';
+import trashIcon from '../assets/images/pre/trash.svg';
+import activeIcon from '../assets/images/pre/active.svg';
+import inactiveIcon from '../assets/images/pre/inactive.svg';
 // Import icons for reviews section
 import likeIcon from '../assets/images/pre/like.svg';
 import dislikeIcon from '../assets/images/pre/dislike.svg';
@@ -74,6 +77,77 @@ const getProductCountry = (productId: number) => {
   return countryMap[productId] || { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' };
 };
 
+interface OwnerListingState {
+  fromMyListings?: boolean;
+  listing?: {
+    id: string;
+    title: string;
+    price: string;
+    currency: string;
+    status: 'active' | 'inactive';
+    daysLeft?: number;
+    createdAt: number;
+  };
+}
+
+const formatOwnerDate = (timestamp?: number) => {
+  if (!timestamp) return '';
+  return new Date(timestamp).toLocaleDateString('en-US', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+};
+
+const renderStatusBadge = (status?: 'active' | 'inactive', daysLeft?: number) => {
+  if (typeof daysLeft === 'number') {
+    return (
+      <div
+        style={{
+          backgroundColor: '#FEF6E9',
+          color: '#FAB951',
+          fontSize: '11px',
+          borderRadius: '999px',
+          padding: '4px 10px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          fontFamily: 'Poppins, sans-serif'
+        }}
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" fill="#FAB951" />
+          <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        {daysLeft} Day left
+      </div>
+    );
+  }
+
+  if (!status) return null;
+
+  const isActive = status === 'active';
+  return (
+    <div
+      style={{
+        backgroundColor: isActive ? '#EDFBF0' : '#FFF5F5',
+        color: isActive ? '#70E183' : '#FF5151',
+        fontSize: '11px',
+        borderRadius: '999px',
+        padding: '4px 10px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        fontFamily: 'Poppins, sans-serif'
+      }}
+    >
+      <img src={isActive ? activeIcon : inactiveIcon} alt={status} className="w-3 h-3" />
+      {isActive ? 'Active' : 'Inactive'}
+    </div>
+  );
+};
+
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const routerLocation = useLocation();
@@ -94,6 +168,9 @@ const ProductDetail: React.FC = () => {
   const [isContactingSeller, setIsContactingSeller] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showGiveOpinionModal, setShowGiveOpinionModal] = useState(false);
+  const ownerViewState = routerLocation.state as OwnerListingState | null;
+  const ownerListing = ownerViewState?.listing;
+  const isOwnerView = Boolean(ownerViewState?.fromMyListings && ownerListing);
   
   // Reviews section state
   const [activeTab, setActiveTab] = useState<'reviews' | 'items'>('reviews');
@@ -366,6 +443,11 @@ const ProductDetail: React.FC = () => {
     }
   };
 
+  const displayName = ownerListing?.title ?? product.name;
+  const displayPrice = ownerListing ? `${ownerListing.price} ${ownerListing.currency}` : `USD ${product.price}`;
+  const defaultDateLabel = product.publishedDate ?? 'Mon, 21 Dec 2024';
+  const displayDateLabel = ownerListing?.createdAt ? formatOwnerDate(ownerListing.createdAt) : defaultDateLabel;
+
   const reviewDiscussionData: {[key: string]: Array<{id: string; author: string; role?: string; date: string; text: string; isOwner?: boolean; avatar?: string}>} = {
     review1: [
       {
@@ -567,14 +649,36 @@ const ProductDetail: React.FC = () => {
               </span>
             </div>
             
-            {/* Right side - Share Button */}
-            <button
-              onClick={() => setShowShareModal(true)}
-              className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
-              style={{ backgroundColor: '#F4F4F4', marginRight: '20px' }}
-            >
-              <img src={shareIcon} alt="Share" className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%)' }} />
-            </button>
+            {/* Right side - Owner Actions / Share */}
+            {isOwnerView ? (
+              <div className="flex items-center gap-2" style={{ marginRight: '20px' }}>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                  style={{ backgroundColor: '#FFE9E9', color: '#FF5151', fontSize: '13px' }}
+                >
+                  <img src={trashIcon} alt="Delete listing" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                  Delete listing
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                  style={{ backgroundColor: '#F4F4F4', color: '#939393', fontSize: '13px' }}
+                  onClick={() => navigate('/create-listing', { state: { draft: ownerListing ?? null } })}
+                >
+                  <img src={pencilIcon} alt="Edit listing" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
+                  Edit listing
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowShareModal(true)}
+                className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+                style={{ backgroundColor: '#F4F4F4', marginRight: '20px' }}
+              >
+                <img src={shareIcon} alt="Share" className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%)' }} />
+              </button>
+            )}
           </nav>
         </div>
       </div>
@@ -701,19 +805,22 @@ const ProductDetail: React.FC = () => {
             {/* Right Side - Product Info */}
             <div className="flex-1 max-w-3xl">
               {/* Product Name and Posted Date */}
-              <div className="flex items-start mb-1.5">
-                <h1 className="font-normal" style={{ fontSize: '18px', color: '#939393', whiteSpace: 'nowrap' }}>
-                  poivre blanc
+              <div className="flex items-center justify-between mb-1.5">
+                <h1 className="font-normal" style={{ fontSize: '18px', color: '#939393' }}>
+                  {displayName}
                 </h1>
-                <span className="font-light" style={{ fontSize: '11px', color: '#6A6A6A', marginLeft: '480px', whiteSpace: 'nowrap' }}>
-                  Posted 2 days ago
-                </span>
+                {isOwnerView && renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
               </div>
               
-              {/* Price */}
-              <div className="mb-8" style={{ fontSize: '28px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                USD 31.7
+              {/* Price and posted date */}
+              <div className="flex items-center justify-between mb-8">
+                <div style={{ fontSize: '28px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  {displayPrice}
                 </div>
+                <span className="font-light" style={{ fontSize: '12px', color: '#6A6A6A', whiteSpace: 'nowrap' }}>
+                  {displayDateLabel}
+                </span>
+              </div>
 
               {/* Action Buttons */}
               <div className="flex gap-2.5 mb-10">

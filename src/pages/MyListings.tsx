@@ -443,6 +443,15 @@ const MyListings: React.FC = () => {
     setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
   };
 
+  const handleListingNavigation = (listing: Listing) => {
+    navigate(`/product/${listing.id}`, {
+      state: {
+        fromMyListings: true,
+        listing
+      }
+    });
+  };
+
   const handleDeleteClick = (listing: Listing) => {
     setListingToDelete(listing);
     setIsDeleteSuccess(false);
@@ -834,8 +843,10 @@ const MyListings: React.FC = () => {
               gridTemplateColumns: '2fr 1fr 1fr 1.2fr 1fr 1fr 1fr',
               gap: '16px',
               padding: '14px 20px',
-              alignItems: 'center'
+              alignItems: 'center',
+              cursor: 'pointer'
             }}
+            onClick={() => handleListingNavigation(listing)}
           >
             {/* Column 1: Product Name & Category */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -944,7 +955,7 @@ const MyListings: React.FC = () => {
             </div>
 
             {/* Column 7: Actions */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
               <button
                 style={{
                   width: '24px',
@@ -1089,7 +1100,12 @@ const MyListings: React.FC = () => {
   const renderListingsGrid = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 md:gap-8">
       {sortedListings.map((listing) => (
-        <div key={listing.id} className="bg-white rounded-lg overflow-hidden">
+        <div
+          key={listing.id}
+          className="bg-white rounded-lg overflow-hidden"
+          style={{ cursor: 'pointer' }}
+          onClick={() => handleListingNavigation(listing)}
+        >
           {/* Product Image */}
           <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
             <img
@@ -1103,7 +1119,7 @@ const MyListings: React.FC = () => {
           {/* Product Content */}
           <div className="px-2 sm:px-3 pb-2 sm:pb-3">
             {/* Status Badge and More Options */}
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
               {/* Status Badge */}
               <div>
                 {listing.daysLeft ? (
@@ -1290,6 +1306,7 @@ const MyListings: React.FC = () => {
                   fontSize: '10px',
                   fontFamily: 'Poppins, sans-serif'
                 }}
+                onClick={(e) => e.stopPropagation()}
               >
                 <img src={pencilIcon} alt="Edit" className="w-2.5 h-2.5" />
                 <span>Edit</span>
