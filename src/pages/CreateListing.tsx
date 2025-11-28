@@ -27,9 +27,63 @@ import a2 from '../assets/images/pre/a2.png';
 import a3 from '../assets/images/pre/a3.png';
 import a4 from '../assets/images/pre/a4.png';
 
+interface DraftListing {
+  id: string;
+  title: string;
+  price: string;
+  currency: string;
+  image: string;
+  description: string;
+  country: string;
+  flag: string;
+}
+
+const initialDraftListings: DraftListing[] = [
+  {
+    id: 'd1',
+    title: 'African Wristband',
+    price: '65.8',
+    currency: 'USD',
+    image: a1,
+    description: 'Warm pepper notes with a mellow finish, the kind of spice you sprinkle on everything once it hits your pantry.',
+    country: 'Cameroon',
+    flag: 'https://flagcdn.com/w20/cm.png'
+  },
+  {
+    id: 'd2',
+    title: 'African Comb',
+    price: '65.8',
+    currency: 'USD',
+    image: a2,
+    description: 'Hand-carved teeth that glide through coils without snagging. Feels like grandma\'s favorite comb, but made for modern curls.',
+    country: 'Ghana',
+    flag: 'https://flagcdn.com/w20/gh.png'
+  },
+  {
+    id: 'd3',
+    title: 'African Wristband',
+    price: '65.8',
+    currency: 'USD',
+    image: a3,
+    description: 'Layered beads in earthy tones. Wear it solo or stack it—makes any everyday outfit feel like market day.',
+    country: 'Benin',
+    flag: 'https://flagcdn.com/w20/bj.png'
+  },
+  {
+    id: 'd4',
+    title: 'Bitter Cola',
+    price: 'N/A',
+    currency: 'USD',
+    image: a4,
+    description: 'Earthy, slightly bitter with a citrusy snap. Great for chewing, steeping in tea, or making house bitters.',
+    country: 'Nigeria',
+    flag: 'https://flagcdn.com/w20/ng.png'
+  }
+];
+
 const CreateListing: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const routerLocation = useLocation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -145,60 +199,6 @@ const CreateListing: React.FC = () => {
     { value: 'zambia', label: 'Zambia', flagCode: 'zm' },
     { value: 'zimbabwe', label: 'Zimbabwe', flagCode: 'zw' }
   ];
-
-interface DraftListing {
-  id: string;
-  title: string;
-  price: string;
-  currency: string;
-  image: string;
-  description: string;
-  country: string;
-  flag: string;
-}
-
-const initialDraftListings: DraftListing[] = [
-  {
-    id: 'd1',
-    title: 'African Wristband',
-    price: '65.8',
-    currency: 'USD',
-    image: a1,
-    description: 'Warm pepper notes with a mellow finish, the kind of spice you sprinkle on everything once it hits your pantry.',
-    country: 'Cameroon',
-    flag: 'https://flagcdn.com/w20/cm.png'
-  },
-  {
-    id: 'd2',
-    title: 'African Comb',
-    price: '65.8',
-    currency: 'USD',
-    image: a2,
-    description: "Hand-carved teeth that glide through curls without tugging, and a handle that still feels like grandma's favorite comb.",
-    country: 'Ghana',
-    flag: 'https://flagcdn.com/w20/gh.png'
-  },
-  {
-    id: 'd3',
-    title: 'African Wristband',
-    price: '65.8',
-    currency: 'USD',
-    image: a3,
-    description: 'Layered beads that catch the light and instantly make any everyday outfit feel like market day back home.',
-    country: 'Benin',
-    flag: 'https://flagcdn.com/w20/bj.png'
-  },
-  {
-    id: 'd4',
-    title: 'Bitter Cola',
-    price: 'N/A',
-    currency: 'USD',
-    image: a4,
-    description: 'Earthy bitter kola with that citrusy snap—great for chewing, steeping, or tossing into house bitters.',
-    country: 'Nigeria',
-    flag: 'https://flagcdn.com/w20/ng.png'
-  }
-];
 
 const renderDraftCountryBadge = (label: string, flagUrl: string) => (
   <span
@@ -486,13 +486,13 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
   }, [currentDraftSeed]);
 
   useEffect(() => {
-    const stateDraft = (location.state as { draft?: Record<string, string> } | null)?.draft;
+    const stateDraft = (routerLocation.state as { draft?: Record<string, string> } | null)?.draft;
     if (stateDraft) {
       applyPrefillToForm(stateDraft);
       setIsDraftsModalOpen(true);
-      navigate(location.pathname, { replace: true, state: {} });
+      navigate(routerLocation.pathname, { replace: true, state: {} });
     }
-  }, [location.state, location.pathname, navigate]);
+  }, [routerLocation.state, routerLocation.pathname, navigate]);
 
   const renderDraftCard = (draft: DraftListing) => (
     <div
