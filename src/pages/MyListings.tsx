@@ -447,7 +447,8 @@ const MyListings: React.FC = () => {
     navigate(`/product/${listing.id}`, {
       state: {
         fromMyListings: true,
-        listing
+        listing,
+        sellerVerified: false
       }
     });
   };

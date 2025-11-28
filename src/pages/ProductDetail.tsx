@@ -654,11 +654,10 @@ const ProductDetail: React.FC = () => {
               <div className="flex items-center gap-2" style={{ marginRight: '20px' }}>
                 <button
                   type="button"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-                  style={{ backgroundColor: '#FFE9E9', color: '#FF5151', fontSize: '13px' }}
+                  className="flex items-center justify-center"
+                  style={{ backgroundColor: '#FFE9E9', width: '40px', height: '32px', borderRadius: '12px' }}
                 >
                   <img src={trashIcon} alt="Delete listing" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                  Delete listing
                 </button>
                 <button
                   type="button"
