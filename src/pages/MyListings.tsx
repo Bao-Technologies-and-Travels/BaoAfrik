@@ -309,6 +309,8 @@ const MyListings: React.FC = () => {
   const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
   const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
   const currentDraftSeed = JSON.stringify(initialDraftListings);
+  const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
+  const moreOptionsRef = useRef<HTMLDivElement | null>(null);
 
   // Mock data - replace with actual data from backend
   const listings = useMemo<Listing[]>(() => [
@@ -445,6 +447,9 @@ const MyListings: React.FC = () => {
       if (sortDropdownRef.current && !sortDropdownRef.current.contains(target)) {
         setIsSortDropdownOpen(false);
         setHoveredSecondarySort(null);
+      }
+      if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
+        setMoreOptionsOpenFor(null);
       }
     };
 
@@ -787,7 +792,7 @@ const MyListings: React.FC = () => {
           </div>
         </div>
         {/* Column 7: Actions */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Actions</span>
         </div>
       </div>
@@ -913,7 +918,7 @@ const MyListings: React.FC = () => {
             </div>
 
             {/* Column 7: Actions */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', position: 'relative' }}>
               <button
                 style={{
                   width: '24px',
@@ -947,28 +952,102 @@ const MyListings: React.FC = () => {
                   <circle cx="12" cy="12" r="3" />
                 </svg>
               </button>
-              <button
-                className="rounded-full border flex items-center justify-center"
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  borderColor: '#B0B0B0',
-                  borderWidth: '1.5px',
-                  backgroundColor: '#FFFFFF',
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-              >
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="3" cy="6" r="1" fill="#B0B0B0" />
-                  <circle cx="6" cy="6" r="1" fill="#B0B0B0" />
-                  <circle cx="9" cy="6" r="1" fill="#B0B0B0" />
-                </svg>
-              </button>
+              <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                <button
+                  type="button"
+                  className="w-5 h-5 rounded-full border flex items-center justify-center"
+                  style={{
+                    borderColor: '#B0B0B0',
+                    borderWidth: '1.5px',
+                    backgroundColor: '#FFFFFF',
+                    cursor: 'pointer',
+                    padding: 0
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMoreOptionsOpenFor(moreOptionsOpenFor === listing.id ? null : listing.id);
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                  </svg>
+                </button>
+                {moreOptionsOpenFor === listing.id && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '32px',
+                      right: '0',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '8px',
+                      minWidth: '180px',
+                      zIndex: 1000
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // TODO: Implement delete functionality
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        borderRadius: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#FFF5F5';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                      <span style={{ color: '#FF5151', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Delete the listing</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        border: 'none',
+                        background: '#FAFAFA',
+                        cursor: 'pointer',
+                        borderRadius: '8px',
+                        marginTop: '4px'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           {index < sortedListings.length - 1 && (
-            <div style={{ height: '1px', backgroundColor: '#E4E4E4', margin: '0 20px' }} />
+            <div style={{ height: '1px', backgroundColor: '#E4E4E4', margin: '0 20px', border: 'none' }} />
           )}
         </div>
       ))}
