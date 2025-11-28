@@ -170,6 +170,8 @@ const ProductDetail: React.FC = () => {
   const [isContactingSeller, setIsContactingSeller] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showGiveOpinionModal, setShowGiveOpinionModal] = useState(false);
+  const [showMessagesDropdown, setShowMessagesDropdown] = useState(false);
+  const messagesDropdownRef = useRef<HTMLDivElement>(null);
   const ownerViewState = routerLocation.state as OwnerListingState | null;
   const ownerListing = ownerViewState?.listing;
   const isOwnerView = Boolean(ownerViewState?.fromMyListings && ownerListing);
@@ -190,6 +192,63 @@ const ProductDetail: React.FC = () => {
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const [isReviewPosted, setIsReviewPosted] = useState(false);
   const [postedReview, setPostedReview] = useState<{rating: number; text: string; date: string} | null>(null);
+  
+  // Click outside handler for messages dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (messagesDropdownRef.current && !messagesDropdownRef.current.contains(event.target as Node)) {
+        setShowMessagesDropdown(false);
+      }
+    };
+
+    if (showMessagesDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMessagesDropdown]);
+
+  // Mock recent messages data
+  const recentMessages = ownerListing?.messages ? [
+    {
+      id: '1',
+      name: 'Nadine MABE',
+      avatar: sellerAvatar,
+      rating: 4.3,
+      messageState: 'new' as 'new' | 'read' | 'you',
+      messagePreview: 'New message',
+      timestamp: 'Today, 10:52'
+    },
+    {
+      id: '2',
+      name: 'Loïc ABENA',
+      avatar: sellerAvatar,
+      rating: 4.3,
+      messageState: 'read' as 'new' | 'read' | 'you',
+      messagePreview: 'Hello, I am interested by this item is...',
+      timestamp: 'Today, 10:52'
+    },
+    {
+      id: '3',
+      name: 'Ryan MUBOU',
+      avatar: sellerAvatar,
+      rating: 4.3,
+      messageState: 'you' as 'new' | 'read' | 'you',
+      messagePreview: 'Where should I deliver to please...',
+      timestamp: 'Today, 10:52'
+    },
+    {
+      id: '4',
+      name: 'Aïssatou WABE',
+      avatar: sellerAvatar,
+      rating: 4.3,
+      messageState: 'you' as 'new' | 'read' | 'you',
+      messagePreview: 'Where should I deliver to please...',
+      timestamp: 'Today, 10:52'
+    }
+  ].slice(0, Math.min(ownerListing.messages, 4)) : [];
   
   // Filter options
   const filterOptions = [
@@ -902,66 +961,197 @@ const ProductDetail: React.FC = () => {
 
               {/* Messages Received Component */}
               {isOwnerView && ownerListing?.messages && ownerListing.messages > 0 && (
-                <div 
-                  className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mb-2"
-                  style={{ 
-                    backgroundColor: '#F8FCFF', 
-                    border: '1px solid #F0F8FE',
-                    width: 'fit-content',
-                    paddingTop: '1px',
-                    paddingBottom: '1px'
-                  }}
-                  onClick={() => {
-                    // Navigate to messages page or open modal
-                    navigate(`/messages?productId=${ownerListing.id}`);
-                  }}
-                >
-                  {/* Avatars */}
-                  <div className="flex items-center" style={{ marginRight: '6px' }}>
-                    {[1, 2, 3, 4].slice(0, Math.min(ownerListing.messages, 4)).map((_, index) => {
-                      const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
-                      return (
-                        <div
-                          key={index}
-                          className="rounded-full overflow-hidden border-2 border-white flex items-center justify-center"
-                          style={{
-                            width: '24px',
-                            height: '24px',
-                            marginLeft: index > 0 ? '-6px' : '0',
-                            zIndex: 4 - index,
-                            backgroundColor: avatarColors[index % avatarColors.length]
-                          }}
-                        >
-                          <img
-                            src={sellerAvatar}
-                            alt={`Buyer ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                  
-                  {/* Text */}
-                  <span 
-                    className="text-xs font-normal"
-                    style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}
-                  >
-                    {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} received for this product
-                  </span>
-                  
-                  {/* Arrow Icon */}
-                  <img
-                    src={backArrowIcon}
-                    alt="Arrow"
-                    className="flex-shrink-0"
+                <div ref={messagesDropdownRef} className="relative">
+                  <div 
+                    className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mb-2"
                     style={{ 
-                      width: '14px', 
-                      height: '14px', 
-                      marginLeft: '6px',
-                      transform: 'scaleX(-1)'
+                      backgroundColor: showMessagesDropdown ? '#F0F8FE' : '#F8FCFF', 
+                      border: `1px solid #F0F8FE`,
+                      width: 'fit-content',
+                      paddingTop: '1px',
+                      paddingBottom: '1px'
                     }}
-                  />
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMessagesDropdown(!showMessagesDropdown);
+                    }}
+                  >
+                    {/* Avatars */}
+                    <div className="flex items-center" style={{ marginRight: '6px' }}>
+                      {[1, 2, 3, 4].slice(0, Math.min(ownerListing.messages, 4)).map((_, index) => {
+                        const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
+                        return (
+                          <div
+                            key={index}
+                            className="rounded-full overflow-hidden border-2 border-white flex items-center justify-center"
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              marginLeft: index > 0 ? '-6px' : '0',
+                              zIndex: 4 - index,
+                              backgroundColor: avatarColors[index % avatarColors.length]
+                            }}
+                          >
+                            <img
+                              src={sellerAvatar}
+                              alt={`Buyer ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Text */}
+                    <span 
+                      className="text-xs font-normal"
+                      style={{ 
+                        color: showMessagesDropdown ? '#64B5F6' : '#939393', 
+                        fontFamily: 'Poppins, sans-serif' 
+                      }}
+                    >
+                      {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} received for this product
+                    </span>
+                    
+                    {/* Arrow Icon */}
+                    <img
+                      src={backArrowIcon}
+                      alt="Arrow"
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: '14px', 
+                        height: '14px', 
+                        marginLeft: '6px',
+                        transform: 'scaleX(-1)',
+                        filter: showMessagesDropdown ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' : 'none'
+                      }}
+                    />
+                  </div>
+
+                  {/* Dropdown */}
+                  {showMessagesDropdown && recentMessages.length > 0 && (
+                    <div
+                      className="absolute top-full left-0 mt-2 z-50"
+                      style={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '20px',
+                        boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                        padding: '12px',
+                        minWidth: '400px',
+                        maxWidth: '500px'
+                      }}
+                    >
+                      {recentMessages.map((message, index) => {
+                        const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
+                        return (
+                          <div
+                            key={message.id}
+                            className="cursor-pointer mb-2 last:mb-0 hover:opacity-90 transition-opacity"
+                            style={{
+                              border: '1px solid #E9E9E9',
+                              borderRadius: '14px',
+                              padding: '12px'
+                            }}
+                            onClick={() => {
+                              navigate(`/messages?productId=${ownerListing.id}&conversationId=${message.id}`);
+                              setShowMessagesDropdown(false);
+                            }}
+                          >
+                            <div className="flex items-start gap-3">
+                              {/* Avatar */}
+                              <div
+                                className="rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
+                                style={{
+                                  width: '40px',
+                                  height: '40px',
+                                  border: '2px solid #939393',
+                                  backgroundColor: avatarColors[index % avatarColors.length]
+                                }}
+                              >
+                                <img
+                                  src={message.avatar}
+                                  alt={message.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+
+                              {/* Content */}
+                              <div className="flex-1 min-w-0">
+                                {/* Name and Rating */}
+                                <div className="flex items-center gap-2 mb-0.5">
+                                  <span
+                                    className="font-medium text-sm"
+                                    style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}
+                                  >
+                                    {message.name}
+                                  </span>
+                                  <div className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                      <svg
+                                        key={i}
+                                        className="w-3 h-3"
+                                        viewBox="0 0 24 24"
+                                        fill={i < Math.floor(message.rating) ? '#FBBC05' : 'none'}
+                                        stroke={i < Math.floor(message.rating) ? '#FBBC05' : '#E0E0E0'}
+                                        strokeWidth="1"
+                                      >
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                      </svg>
+                                    ))}
+                                    <span className="text-xs" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                                      {message.rating}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Message State with Timestamp */}
+                                <div className="flex items-center justify-between gap-2" style={{ marginTop: '2px' }}>
+                                  <div className="flex items-center gap-1 flex-1 min-w-0">
+                                    {message.messageState === 'new' ? (
+                                      <span style={{ color: '#64B5F6', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                                        {message.messagePreview}
+                                      </span>
+                                    ) : message.messageState === 'you' ? (
+                                      <>
+                                        <span
+                                          className="px-1.5 py-0.5 rounded text-xs font-medium flex-shrink-0"
+                                          style={{
+                                            backgroundColor: '#E3F2FD',
+                                            color: '#64B5F6',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '10px'
+                                          }}
+                                        >
+                                          You
+                                        </span>
+                                        <span style={{ color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                                          {message.messagePreview}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span style={{ color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                                        {message.messagePreview}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {/* Timestamp */}
+                                  <span
+                                    className="text-xs flex-shrink-0"
+                                    style={{ 
+                                      color: '#BBBBBB', 
+                                      fontFamily: 'Bricolage Grotesque, sans-serif' 
+                                    }}
+                                  >
+                                    {message.timestamp}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1137,66 +1327,197 @@ const ProductDetail: React.FC = () => {
 
                 {/* Messages Received Component - Mobile */}
                 {isOwnerView && ownerListing?.messages && ownerListing.messages > 0 && (
-                  <div 
-                    className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mt-2"
-                    style={{ 
-                      backgroundColor: '#F8FCFF', 
-                      border: '1px solid #F0F8FE',
-                      width: 'fit-content',
-                      paddingTop: '1px',
-                      paddingBottom: '1px'
-                    }}
-                    onClick={() => {
-                      // Navigate to messages page or open modal
-                      navigate(`/messages?productId=${ownerListing.id}`);
-                    }}
-                  >
-                    {/* Avatars */}
-                    <div className="flex items-center" style={{ marginRight: '6px' }}>
-                      {[1, 2, 3, 4].slice(0, Math.min(ownerListing.messages, 4)).map((_, index) => {
-                        const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
-                        return (
-                          <div
-                            key={index}
-                            className="rounded-full overflow-hidden border-2 border-white flex items-center justify-center"
-                            style={{
-                              width: '24px',
-                              height: '24px',
-                              marginLeft: index > 0 ? '-6px' : '0',
-                              zIndex: 4 - index,
-                              backgroundColor: avatarColors[index % avatarColors.length]
-                            }}
-                          >
-                            <img
-                              src={sellerAvatar}
-                              alt={`Buyer ${index + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                    
-                    {/* Text */}
-                    <span 
-                      className="text-xs font-normal"
-                      style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}
-                    >
-                      {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} received for this product
-                    </span>
-                    
-                    {/* Arrow Icon */}
-                    <img
-                      src={backArrowIcon}
-                      alt="Arrow"
-                      className="flex-shrink-0"
+                  <div ref={messagesDropdownRef} className="relative">
+                    <div 
+                      className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mt-2"
                       style={{ 
-                        width: '14px', 
-                        height: '14px', 
-                        marginLeft: '6px',
-                        transform: 'scaleX(-1)'
+                        backgroundColor: showMessagesDropdown ? '#F0F8FE' : '#F8FCFF', 
+                        border: `1px solid #F0F8FE`,
+                        width: 'fit-content',
+                        paddingTop: '1px',
+                        paddingBottom: '1px'
                       }}
-                    />
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMessagesDropdown(!showMessagesDropdown);
+                      }}
+                    >
+                      {/* Avatars */}
+                      <div className="flex items-center" style={{ marginRight: '6px' }}>
+                        {[1, 2, 3, 4].slice(0, Math.min(ownerListing.messages, 4)).map((_, index) => {
+                          const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
+                          return (
+                            <div
+                              key={index}
+                              className="rounded-full overflow-hidden border-2 border-white flex items-center justify-center"
+                              style={{
+                                width: '24px',
+                                height: '24px',
+                                marginLeft: index > 0 ? '-6px' : '0',
+                                zIndex: 4 - index,
+                                backgroundColor: avatarColors[index % avatarColors.length]
+                              }}
+                            >
+                              <img
+                                src={sellerAvatar}
+                                alt={`Buyer ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Text */}
+                      <span 
+                        className="text-xs font-normal"
+                        style={{ 
+                          color: showMessagesDropdown ? '#64B5F6' : '#939393', 
+                          fontFamily: 'Poppins, sans-serif' 
+                        }}
+                      >
+                        {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} received for this product
+                      </span>
+                      
+                      {/* Arrow Icon */}
+                      <img
+                        src={backArrowIcon}
+                        alt="Arrow"
+                        className="flex-shrink-0"
+                        style={{ 
+                          width: '14px', 
+                          height: '14px', 
+                          marginLeft: '6px',
+                          transform: 'scaleX(-1)',
+                          filter: showMessagesDropdown ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' : 'none'
+                        }}
+                      />
+                    </div>
+
+                    {/* Dropdown - Mobile */}
+                    {showMessagesDropdown && recentMessages.length > 0 && (
+                      <div
+                        className="absolute top-full left-0 mt-2 z-50"
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '20px',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          padding: '12px',
+                          minWidth: '300px',
+                          maxWidth: '90vw'
+                        }}
+                      >
+                         {recentMessages.map((message, index) => {
+                           const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
+                           return (
+                             <div
+                               key={message.id}
+                               className="cursor-pointer mb-2 last:mb-0 hover:opacity-90 transition-opacity"
+                               style={{
+                                 border: '1px solid #E9E9E9',
+                                 borderRadius: '14px',
+                                 padding: '12px'
+                               }}
+                               onClick={() => {
+                                 navigate(`/messages?productId=${ownerListing.id}&conversationId=${message.id}`);
+                                 setShowMessagesDropdown(false);
+                               }}
+                             >
+                               <div className="flex items-start gap-3">
+                                 {/* Avatar */}
+                                 <div
+                                   className="rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
+                                   style={{
+                                     width: '40px',
+                                     height: '40px',
+                                     border: '2px solid #939393',
+                                     backgroundColor: avatarColors[index % avatarColors.length]
+                                   }}
+                                 >
+                                   <img
+                                     src={message.avatar}
+                                     alt={message.name}
+                                     className="w-full h-full object-cover"
+                                   />
+                                 </div>
+
+                                 {/* Content */}
+                                 <div className="flex-1 min-w-0">
+                                   {/* Name and Rating */}
+                                   <div className="flex items-center gap-2 mb-0.5">
+                                     <span
+                                       className="font-medium text-sm"
+                                       style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}
+                                     >
+                                       {message.name}
+                                     </span>
+                                     <div className="flex items-center gap-1">
+                                       {[...Array(5)].map((_, i) => (
+                                         <svg
+                                           key={i}
+                                           className="w-3 h-3"
+                                           viewBox="0 0 24 24"
+                                           fill={i < Math.floor(message.rating) ? '#FBBC05' : 'none'}
+                                           stroke={i < Math.floor(message.rating) ? '#FBBC05' : '#E0E0E0'}
+                                           strokeWidth="1"
+                                         >
+                                           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                         </svg>
+                                       ))}
+                                       <span className="text-xs" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                                         {message.rating}
+                                       </span>
+                                     </div>
+                                   </div>
+
+                                   {/* Message State with Timestamp */}
+                                   <div className="flex items-center justify-between gap-2" style={{ marginTop: '2px' }}>
+                                     <div className="flex items-center gap-1 flex-1 min-w-0">
+                                       {message.messageState === 'new' ? (
+                                         <span style={{ color: '#64B5F6', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                                           {message.messagePreview}
+                                         </span>
+                                       ) : message.messageState === 'you' ? (
+                                         <>
+                                           <span
+                                             className="px-1.5 py-0.5 rounded text-xs font-medium flex-shrink-0"
+                                             style={{
+                                               backgroundColor: '#E3F2FD',
+                                               color: '#64B5F6',
+                                               fontFamily: 'Poppins, sans-serif',
+                                               fontSize: '10px'
+                                             }}
+                                           >
+                                             You
+                                           </span>
+                                           <span style={{ color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                                             {message.messagePreview}
+                                           </span>
+                                         </>
+                                       ) : (
+                                         <span style={{ color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                                           {message.messagePreview}
+                                         </span>
+                                       )}
+                                     </div>
+                                     {/* Timestamp */}
+                                     <span
+                                       className="text-xs flex-shrink-0"
+                                       style={{ 
+                                         color: '#BBBBBB', 
+                                         fontFamily: 'Bricolage Grotesque, sans-serif' 
+                                       }}
+                                     >
+                                       {message.timestamp}
+                                     </span>
+                                   </div>
+                                 </div>
+                               </div>
+                             </div>
+                           );
+                         })}
+                      </div>
+                    )}
                   </div>
                 )}
                 
