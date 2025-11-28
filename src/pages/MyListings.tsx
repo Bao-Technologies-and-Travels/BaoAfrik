@@ -711,87 +711,88 @@ const MyListings: React.FC = () => {
           display: 'grid',
           gridTemplateColumns: '2fr 1fr 1fr 1.2fr 1fr 1fr 1fr',
           gap: '16px',
-          padding: '16px 20px',
-          borderBottom: '1px solid #E4E4E4'
+          padding: '16px 20px'
         }}
       >
         {/* Column 1: Product Name */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Product Name</span>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Product Name</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
           </div>
         </div>
         {/* Column 2: Creation date */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Creation date</span>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Creation date</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
           </div>
         </div>
         {/* Column 3: Price */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Price</span>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Price</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
           </div>
         </div>
         {/* Column 4: Reviews & Rates */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Reviews & Rates</span>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Reviews & Rates</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
           </div>
         </div>
         {/* Column 5: Engagements */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Engagements</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Engagements</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
           </div>
         </div>
         {/* Column 6: Status */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Status</span>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Status</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" stroke="#939393" strokeWidth="1" fill="none" />
             </svg>
           </div>
         </div>
         {/* Column 7: Actions */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Actions</span>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Actions</span>
         </div>
       </div>
+      {/* Header Divider */}
+      <div style={{ height: '1px', backgroundColor: '#E4E4E4', margin: '0 20px' }} />
 
       {/* Table Rows */}
       {sortedListings.map((listing, index) => (
@@ -856,7 +857,7 @@ const MyListings: React.FC = () => {
             </div>
 
             {/* Column 5: Engagements */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
               <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 {listing.messages}
               </span>
@@ -958,10 +959,10 @@ const MyListings: React.FC = () => {
                   padding: 0
                 }}
               >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
-                  <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
-                  <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="3" cy="6" r="1" fill="#B0B0B0" />
+                  <circle cx="6" cy="6" r="1" fill="#B0B0B0" />
+                  <circle cx="9" cy="6" r="1" fill="#B0B0B0" />
                 </svg>
               </button>
             </div>
