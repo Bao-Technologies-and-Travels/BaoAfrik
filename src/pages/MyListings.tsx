@@ -16,6 +16,7 @@ import pencilIcon from '../assets/images/pre/pencil.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
 import bulletIcon from '../assets/images/pre/bullet.svg';
 import chartIcon from '../assets/images/pre/chart.svg';
+import mainieIcon from '../assets/images/pre/mainie.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -46,6 +47,7 @@ interface Listing {
   createdAt: number;
   priceValue: number;
   messages: number;
+  category?: string;
 }
 
 interface DraftListing {
@@ -310,18 +312,18 @@ const MyListings: React.FC = () => {
 
   // Mock data - replace with actual data from backend
   const listings = useMemo<Listing[]>(() => [
-    { id: '1', title: 'Bonga from Togo', image: a1, status: 'active', rating: 4.8, reviews: 88, price: 'USD 678', currency: 'USD', createdAt: 1690000000000, priceValue: 678, messages: 42 },
-    { id: '2', title: 'Coconut Oil Ghana', image: a2, status: 'active', rating: 4.5, reviews: 120, price: 'USD 45', currency: 'USD', createdAt: 1690500000000, priceValue: 45, messages: 27 },
-    { id: '3', title: 'Pepper from Benin', image: a3, status: 'inactive', rating: 4.2, reviews: 56, price: 'USD 32', currency: 'USD', createdAt: 1689500000000, priceValue: 32, messages: 12 },
-    { id: '4', title: 'Shrimps from Lome', image: a4, status: 'active', rating: 4.9, reviews: 200, price: 'USD 67.8', currency: 'USD', daysLeft: 12, createdAt: 1691000000000, priceValue: 67.8, messages: 51 },
-    { id: '5', title: 'Kinky hair Lagos', image: a5, status: 'active', rating: 4.7, reviews: 150, price: 'USD 25', currency: 'USD', createdAt: 1690800000000, priceValue: 25, messages: 19 },
-    { id: '6', title: 'Gold neck Accra', image: a6, status: 'active', rating: 4.6, reviews: 95, price: 'USD 38', currency: 'USD', daysLeft: 11, createdAt: 1690200000000, priceValue: 38, messages: 33 },
-    { id: '7', title: 'Baobab nuts Kano', image: a7, status: 'inactive', rating: 4.3, reviews: 78, price: 'USD 42', currency: 'USD', createdAt: 1689000000000, priceValue: 42, messages: 8 },
-    { id: '8', title: 'Cowrie bracelets', image: a8, status: 'active', rating: 4.8, reviews: 165, price: 'USD 55', currency: 'USD', createdAt: 1690400000000, priceValue: 55, messages: 23 },
-    { id: '9', title: 'Ebony tribal masks', image: a9, status: 'active', rating: 4.9, reviews: 210, price: 'USD 89', currency: 'USD', createdAt: 1689800000000, priceValue: 89, messages: 60 },
-    { id: '10', title: 'River pepper Addis', image: a10, status: 'active', rating: 4.7, reviews: 140, price: 'USD 72', currency: 'USD', createdAt: 1690600000000, priceValue: 72, messages: 31 },
-    { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: 'USD 48', currency: 'USD', createdAt: 1689300000000, priceValue: 48, messages: 17 },
-    { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: 'USD 35', currency: 'USD', createdAt: 1689700000000, priceValue: 35, messages: 14 },
+    { id: '1', title: 'Bonga from Togo', image: a1, status: 'active', rating: 4.8, reviews: 88, price: '678', currency: 'USD', createdAt: 1690000000000, priceValue: 678, messages: 42, category: 'Food & Spicy' },
+    { id: '2', title: 'Coconut Oil Ghana', image: a2, status: 'active', rating: 4.5, reviews: 120, price: '45', currency: 'USD', createdAt: 1690500000000, priceValue: 45, messages: 27, category: 'Food & Spicy' },
+    { id: '3', title: 'Pepper from Benin', image: a3, status: 'inactive', rating: 4.2, reviews: 56, price: '32', currency: 'USD', createdAt: 1689500000000, priceValue: 32, messages: 12, category: 'Food & Spicy' },
+    { id: '4', title: 'Shrimps from Lome', image: a4, status: 'active', rating: 4.9, reviews: 200, price: '67.8', currency: 'USD', daysLeft: 12, createdAt: 1691000000000, priceValue: 67.8, messages: 51, category: 'Food & Spicy' },
+    { id: '5', title: 'Kinky hair Lagos', image: a5, status: 'active', rating: 4.7, reviews: 150, price: '25', currency: 'USD', createdAt: 1690800000000, priceValue: 25, messages: 19, category: 'Beauty & Wellness' },
+    { id: '6', title: 'Gold neck Accra', image: a6, status: 'active', rating: 4.6, reviews: 95, price: '38', currency: 'USD', daysLeft: 11, createdAt: 1690200000000, priceValue: 38, messages: 33, category: 'Fashion & Textiles' },
+    { id: '7', title: 'Baobab nuts Kano', image: a7, status: 'inactive', rating: 4.3, reviews: 78, price: '42', currency: 'USD', createdAt: 1689000000000, priceValue: 42, messages: 8, category: 'Food & Spicy' },
+    { id: '8', title: 'Cowrie bracelets', image: a8, status: 'active', rating: 4.8, reviews: 165, price: '55', currency: 'USD', createdAt: 1690400000000, priceValue: 55, messages: 23, category: 'Fashion & Textiles' },
+    { id: '9', title: 'Ebony tribal masks', image: a9, status: 'active', rating: 4.9, reviews: 210, price: '89', currency: 'USD', createdAt: 1689800000000, priceValue: 89, messages: 60, category: 'Home & Decor' },
+    { id: '10', title: 'River pepper Addis', image: a10, status: 'active', rating: 4.7, reviews: 140, price: '72', currency: 'USD', createdAt: 1690600000000, priceValue: 72, messages: 31, category: 'Food & Spicy' },
+    { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: '48', currency: 'USD', createdAt: 1689300000000, priceValue: 48, messages: 17, category: 'Food & Spicy' },
+    { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: '35', currency: 'USD', createdAt: 1689700000000, priceValue: 35, messages: 14, category: 'Food & Spicy' },
   ], []);
 
   const trimmedSearchQuery = searchQuery.trim();
@@ -687,6 +689,291 @@ const MyListings: React.FC = () => {
     </div>
   );
 
+  const formatDate = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  };
+
+  const renderListingsList = () => (
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        border: '1px solid #E4E4E4',
+        borderRadius: '30px',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Table Header */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '2fr 1fr 1fr 1.2fr 1fr 1fr 1fr',
+          gap: '16px',
+          padding: '16px 20px',
+          borderBottom: '1px solid #E4E4E4'
+        }}
+      >
+        {/* Column 1: Product Name */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Product Name</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+            </svg>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+            </svg>
+          </div>
+        </div>
+        {/* Column 2: Creation date */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Creation date</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+            </svg>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+            </svg>
+          </div>
+        </div>
+        {/* Column 3: Price */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Price</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+            </svg>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+            </svg>
+          </div>
+        </div>
+        {/* Column 4: Reviews & Rates */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Reviews & Rates</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+            </svg>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+            </svg>
+          </div>
+        </div>
+        {/* Column 5: Engagements */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Engagements</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+            </svg>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+            </svg>
+          </div>
+        </div>
+        {/* Column 6: Status */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Status</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 0L7.4641 3.5H0.535898L4 0Z" fill="#939393" />
+            </svg>
+            <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4L0.535898 0.5H7.4641L4 4Z" fill="#939393" />
+            </svg>
+          </div>
+        </div>
+        {/* Column 7: Actions */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>Actions</span>
+        </div>
+      </div>
+
+      {/* Table Rows */}
+      {sortedListings.map((listing, index) => (
+        <div key={listing.id}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '2fr 1fr 1fr 1.2fr 1fr 1fr 1fr',
+              gap: '16px',
+              padding: '14px 20px',
+              alignItems: 'center'
+            }}
+          >
+            {/* Column 1: Product Name & Category */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img
+                src={listing.image}
+                alt={listing.title}
+                style={{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '6px',
+                  objectFit: 'cover',
+                  flexShrink: 0
+                }}
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ color: '#6A6A6A', fontSize: '13px', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                  {listing.title}
+                </span>
+                <span style={{ color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                  {listing.category || 'Food & Spicy'}
+                </span>
+              </div>
+            </div>
+
+            {/* Column 2: Creation date */}
+            <div>
+              <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
+                {formatDate(listing.createdAt)}
+              </span>
+            </div>
+
+            {/* Column 3: Price */}
+            <div>
+              <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                {listing.price} {listing.currency}
+              </span>
+            </div>
+
+            {/* Column 4: Reviews & Rates */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="#FBBC05" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <span style={{ color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                {listing.rating}
+              </span>
+              <span style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                ({listing.reviews} Reviews)
+              </span>
+            </div>
+
+            {/* Column 5: Engagements */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                {listing.messages}
+              </span>
+              <img src={mainieIcon} alt="Engagements" style={{ width: '14px', height: '14px' }} />
+            </div>
+
+            {/* Column 6: Status */}
+            <div>
+              {listing.daysLeft ? (
+                <div
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: '#FEF6E9',
+                    fontSize: '10px'
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#FAB951" />
+                    <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  <span
+                    style={{
+                      color: '#FAB951',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    {listing.daysLeft} Day left
+                  </span>
+                </div>
+              ) : (
+                <div
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: listing.status === 'active' ? '#EDFBF0' : '#FFF5F5',
+                    fontSize: '10px'
+                  }}
+                >
+                  <img
+                    src={listing.status === 'active' ? activeIcon : inactiveIcon}
+                    alt={listing.status}
+                    className="w-3 h-3"
+                  />
+                  <span
+                    style={{
+                      color: listing.status === 'active' ? '#70E183' : '#FF5151',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    {listing.status === 'active' ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Column 7: Actions */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  padding: 0
+                }}
+              >
+                <img src={pencilIcon} alt="Edit" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(70%)' }} />
+              </button>
+              <button
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  padding: 0
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+              <button
+                className="rounded-full border flex items-center justify-center"
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderColor: '#B0B0B0',
+                  borderWidth: '1.5px',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  padding: 0
+                }}
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                  <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                  <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          {index < sortedListings.length - 1 && (
+            <div style={{ height: '1px', backgroundColor: '#E4E4E4', margin: '0 20px' }} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
   const renderListingsGrid = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 md:gap-8">
       {sortedListings.map((listing) => (
@@ -804,7 +1091,7 @@ const MyListings: React.FC = () => {
                   fontFamily: 'Bricolage Grotesque, sans-serif'
                 }}
               >
-                {listing.currency} {listing.price}
+                {listing.price} {listing.currency}
               </span>
               <button
                 className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded"
@@ -1511,7 +1798,7 @@ const MyListings: React.FC = () => {
 
           <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-4 mb-6">
             <div className="pl-0 lg:pl-0 lg:-ml-16">
-              {shouldShowEmptyState ? renderEmptyState() : renderListingsGrid()}
+              {shouldShowEmptyState ? renderEmptyState() : viewMode === 'grid' ? renderListingsGrid() : renderListingsList()}
             </div>
           </div>
       {(!shouldShowEmptyState && !isSearchNoResultsState) && (
