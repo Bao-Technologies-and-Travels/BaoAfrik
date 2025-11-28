@@ -1072,20 +1072,13 @@ const MyListings: React.FC = () => {
             </div>
           </div>
           {index < sortedListings.length - 1 && (
-            <div style={{ 
+            <hr style={{ 
               height: '1px', 
               backgroundColor: '#E4E4E4', 
-              margin: '0 20px', 
-              border: 0,
-              borderTop: 0,
-              borderBottom: 0,
-              borderLeft: 0,
-              borderRight: 0,
-              borderWidth: 0,
-              outline: 'none',
-              boxSizing: 'border-box',
+              margin: '0 20px',
+              border: 'none',
               padding: 0,
-              lineHeight: 0
+              width: 'auto'
             }} />
           )}
         </div>
@@ -1159,21 +1152,98 @@ const MyListings: React.FC = () => {
                 )}
               </div>
 
-              {/* More Options Button */}
-              <button
-                className="w-5 h-5 rounded-full border flex items-center justify-center"
-                style={{
-                  borderColor: '#B0B0B0',
-                  borderWidth: '1.5px',
-                  backgroundColor: '#FFFFFF'
-                }}
-              >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
-                  <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
-                  <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
-                </svg>
-              </button>
+             {/* More Options Button */}
+             <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+               <button
+                 type="button"
+                 className="w-5 h-5 rounded-full border flex items-center justify-center"
+                 style={{
+                   borderColor: '#B0B0B0',
+                   borderWidth: '1.5px',
+                   backgroundColor: '#FFFFFF',
+                   cursor: 'pointer',
+                   padding: 0
+                 }}
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   setMoreOptionsOpenFor(moreOptionsOpenFor === listing.id ? null : listing.id);
+                 }}
+               >
+                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                   <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                   <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                 </svg>
+               </button>
+               {moreOptionsOpenFor === listing.id && (
+                 <div
+                   style={{
+                     position: 'absolute',
+                     top: '26px',
+                     right: 0,
+                     backgroundColor: '#FFFFFF',
+                     borderRadius: '12px',
+                     border: '1px solid #E9E9E9',
+                     boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                     padding: '6px',
+                     minWidth: '150px',
+                     zIndex: 1000
+                   }}
+                 >
+                   <button
+                     type="button"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       handleDeleteClick(listing);
+                     }}
+                     style={{
+                       width: '100%',
+                       display: 'flex',
+                       alignItems: 'center',
+                       gap: '8px',
+                       padding: '8px 10px',
+                       border: 'none',
+                       background: 'transparent',
+                       cursor: 'pointer',
+                       borderRadius: '6px'
+                     }}
+                     onMouseEnter={(e) => {
+                       e.currentTarget.style.backgroundColor = '#FFF5F5';
+                     }}
+                     onMouseLeave={(e) => {
+                       e.currentTarget.style.backgroundColor = 'transparent';
+                     }}
+                   >
+                     <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                     <span style={{ color: '#FF5151', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Delete the listing</span>
+                   </button>
+                   <button
+                     type="button"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setMoreOptionsOpenFor(null);
+                     }}
+                     style={{
+                       width: '100%',
+                       display: 'flex',
+                       alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 10px',
+                       border: 'none',
+                       background: '#FAFAFA',
+                       cursor: 'pointer',
+                      borderRadius: '6px',
+                       marginTop: '4px'
+                     }}
+                   >
+                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                       <path d="M18 6L6 18M6 6l12 12" />
+                     </svg>
+                     <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                   </button>
+                 </div>
+               )}
+             </div>
             </div>
 
             {/* Product Name */}

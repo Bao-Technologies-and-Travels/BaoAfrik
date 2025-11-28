@@ -98,7 +98,7 @@ const CreateListing: React.FC = () => {
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [isImageLoading, setIsImageLoading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
-  const [selectedLanguage, setSelectedLanguage] = useState('EN');
+    const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
   const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
   const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
@@ -1261,8 +1261,8 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
           scrollbar-width: none;
         }
         .drafts-scroll::-webkit-scrollbar {
-          display: none;
-        }
+                          display: none;
+                        }
                       `}</style>
                       
                       {/* Conditionally wrap in scrollable container when 4+ images */}
