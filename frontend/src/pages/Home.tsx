@@ -140,45 +140,6 @@ const Home: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const routerLocation = useLocation();
 
-  // useEffect for refreshing currrent user after navigating to homepage
-  useEffect(() => {
-    const refreshCurrentUser = async () => {
-      try {
-        const res = await apiClient.getCurrentUser();
-        if (res?.success) {
-          const latest = res.data;
-          if (latest) {
-            if (typeof (auth as any).setUser === 'function') {
-              (auth as any).setUser(latest);
-            }
-          }
-        }
-      } catch (err) {
-        console.debug('Failed to refresh current user', err);
-      }
-    };
-
-    const shouldForceRefresh = sessionStorage.getItem('forceRefreshUser');
-    if (shouldForceRefresh === 'true') {
-      refreshCurrentUser();
-    }
-
-    if (routerLocation.pathname === '/') {
-      refreshCurrentUser();
-    }
-
-    const onUserUpdated = (e: Event) => {
-      refreshCurrentUser();
-    };
-
-    window.addEventListener('userUpdated', onUserUpdated);
-
-    return () => {
-      window.removeEventListener('userUpdated', onUserUpdated);
-    };
-
-  }, [routerLocation.pathname, routerLocation.state, auth]);
-
   // UseEffect for fetching products
   useEffect(() => {
     const controller = new AbortController();

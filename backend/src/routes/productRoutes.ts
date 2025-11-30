@@ -15,6 +15,7 @@ router.post('/search', productController.getProducts);
 router.get('/:id', productController.getProduct);
 router.put('/:id', authenticateToken, validateUpdateProduct, productController.updateProduct);
 router.delete('/:id', authenticateToken, productController.deleteProduct);
+// router.put('/:id/save', authenticateToken, productController.saveProduct);
 
 // Status routes
 router.patch('/:id/status', authenticateToken, productController.updateProductStatus);

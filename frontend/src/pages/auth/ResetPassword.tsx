@@ -6,11 +6,16 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { authService } from '../../services/authService';
 import { useToast } from '../../contexts/ToastContext';
 
+import leftIcon from '../../assets/images/pre/left.png';
+import unlockIcon from '../../assets/images/pre/unlock.svg';
+import backArrowIcon from '../../assets/images/pre/back arrow.svg';
+
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || '';
   const { addToast } = useToast();
+  const fromProfileSettings = location.state?.fromProfileSettings || false;
 
   // State for the entire flow
   const [step, setStep] = useState<'code' | 'password'>('code');
@@ -26,6 +31,7 @@ const ResetPassword: React.FC = () => {
     password: false,
     confirmPassword: false
   });
+  const [isMobile, setIsMobile] = useState(false);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -33,6 +39,15 @@ const ResetPassword: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -586,10 +601,12 @@ const ResetPassword: React.FC = () => {
     );
   }
 
+  const isMobileFromProfile = isMobile && fromProfileSettings;
+
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Desktop Logo - Top Left with Background */}
-      <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8 border-b-2 border-orange-200">
+      <div className="hidden lg:block absolute top-0 left-0 right-0 py-4 px-8 border-b" style={{ backgroundColor: '#FEF6E9', borderColor: '#FCD79B' }}>
         <div className="flex items-center justify-between">
           <Link to="/">
             <img
@@ -598,22 +615,108 @@ const ResetPassword: React.FC = () => {
               className="h-8 object-contain cursor-pointer"
             />
           </Link>
+          <button className="p-2 rounded-lg transition-colors" style={{ color: '#F9A825' }}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
+          {/* Breadcrumbs - Only show when accessed from Profile Settings (desktop only) */}
+          {fromProfileSettings && !isMobile && (
+            <div className="mb-2 w-full mt-6" style={{ marginLeft: '-8px' }}>
+              <nav className="flex items-center flex-nowrap space-x-2" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                <img
+                  src={leftIcon}
+                  alt="Back"
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
+                  style={{ width: '14px', height: '14px' }}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                />
+                <Link
+                  to="/"
+                  className="hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0"
+                  style={{ color: '#BABABA' }}
+                >
+                  Homepage
+                </Link>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/', { state: { openMenu: true } })}
+                >
+                  Menu
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/', { state: { openMenu: true, highlightSettings: true } })}
+                >
+                  Settings
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                >
+                  Security & Privacy
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span className="font-medium whitespace-nowrap flex-shrink-0" style={{ color: '#212121' }}>
+                  Reset Password
+                </span>
+              </nav>
+            </div>
+          )}
           {/* Mobile Header */}
-          <div className="lg:hidden fixed top-5 right-5 z-50">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
-                <span className="text-sm font-medium text-gray-700">EN</span>
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          {isMobileFromProfile ? (
+            <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="Back to security"
+              >
+                <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+              </button>
+              <div className="w-10" />
+              <button
+                type="button"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="More options"
+              >
+                <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                  <circle cx="4" cy="2" r="2" fill="#171717" />
+                  <circle cx="12" cy="2" r="2" fill="#171717" />
+                  <circle cx="20" cy="2" r="2" fill="#171717" />
                 </svg>
+              </button>
+            </div>
+          ) : (
+            <div className="lg:hidden fixed top-5 right-5 z-50">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
+                  <span className="text-sm font-medium text-gray-700">EN</span>
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                <button className="p-2 rounded-lg transition-colors bg-white border border-gray-200" style={{ color: '#F9A825' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Main content */}
           <div className="bg-white border-0 lg:border border-gray-200 rounded-lg shadow-none lg:shadow-lg p-8 mt-0 lg:mt-16">
@@ -625,7 +728,7 @@ const ResetPassword: React.FC = () => {
       {/* Footer */}
       <div className="hidden lg:block py-6 px-4">
         <div className="border-t border-gray-200 pt-4">
-          <div className="flex items-center justify-between text-xs text-gray-400">
+          <div className="flex items-center justify-between text-xs" style={{ color: '#BABABA' }}>
             <div className="flex items-center space-x-1">
               <img src={lilLogo} alt="BaoAfrik" className="w-4 h-4" />
               <span>© All rights reserved</span>
@@ -642,6 +745,13 @@ const ResetPassword: React.FC = () => {
           </div>
         </div>
       </div>
+      <style>{`
+        .reset-password-input::placeholder {
+          color: #E9E9E9 !important;
+          font-size: 12px !important;
+          font-family: 'Poppins', sans-serif !important;
+        }
+      `}</style>
     </div>
   );
 };

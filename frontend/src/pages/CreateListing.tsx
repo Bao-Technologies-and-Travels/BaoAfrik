@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import logo from '../assets/images/pre/logo.png';
 import shippxIcon from '../assets/images/pre/shippx.svg';
 import locIcon from '../assets/images/pre/Loc.svg';
 import imageIcon from '../assets/images/pre/image.svg';
+import trashIcon from '../assets/images/pre/trash.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
 import draft2Icon from '../assets/images/pre/draft2.svg';
 import flyIcon from '../assets/images/pre/fly.svg';
@@ -21,13 +22,73 @@ import settingIcon from '../assets/images/pre/setting.svg';
 import pathIcon from '../assets/images/pre/Path.svg';
 import path2Icon from '../assets/images/pre/path2.svg';
 import loadIcon from '../assets/images/pre/load.svg';
+import a1 from '../assets/images/pre/a1.png';
+import a2 from '../assets/images/pre/a2.png';
+import a3 from '../assets/images/pre/a3.png';
+import a4 from '../assets/images/pre/a4.png';
+
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from '../contexts/ToastContext';
 import LoadingSpinner from "../components/ui/LoadingSpinner";
-import { add } from 'date-fns';
+import Header from '../components/layout/Header';
+
+interface DraftListing {
+  id: string;
+  title: string;
+  price: string;
+  currency: string;
+  image: string;
+  description: string;
+  country: string;
+  flag: string;
+}
+
+const initialDraftListings: DraftListing[] = [
+  {
+    id: 'd1',
+    title: 'African Wristband',
+    price: '65.8',
+    currency: 'USD',
+    image: a1,
+    description: 'Warm pepper notes with a mellow finish, the kind of spice you sprinkle on everything once it hits your pantry.',
+    country: 'Cameroon',
+    flag: 'https://flagcdn.com/w20/cm.png'
+  },
+  {
+    id: 'd2',
+    title: 'African Comb',
+    price: '65.8',
+    currency: 'USD',
+    image: a2,
+    description: 'Hand-carved teeth that glide through coils without snagging. Feels like grandma\'s favorite comb, but made for modern curls.',
+    country: 'Ghana',
+    flag: 'https://flagcdn.com/w20/gh.png'
+  },
+  {
+    id: 'd3',
+    title: 'African Wristband',
+    price: '65.8',
+    currency: 'USD',
+    image: a3,
+    description: 'Layered beads in earthy tones. Wear it solo or stack it—makes any everyday outfit feel like market day.',
+    country: 'Benin',
+    flag: 'https://flagcdn.com/w20/bj.png'
+  },
+  {
+    id: 'd4',
+    title: 'Bitter Cola',
+    price: 'N/A',
+    currency: 'USD',
+    image: a4,
+    description: 'Earthy, slightly bitter with a citrusy snap. Great for chewing, steeping in tea, or making house bitters.',
+    country: 'Nigeria',
+    flag: 'https://flagcdn.com/w20/ng.png'
+  }
+];
 
 const CreateListing: React.FC = () => {
   const navigate = useNavigate();
+  const routerLocation = useLocation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -43,6 +104,10 @@ const CreateListing: React.FC = () => {
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
+  const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
+  const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
+  const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
+  const currentDraftSeed = JSON.stringify(initialDraftListings);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -53,13 +118,14 @@ const CreateListing: React.FC = () => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [draggedImagesTotal, setDraggedImagesTotal] = useState(0);
   const [currentDraggedImageIndex, setCurrentDraggedImageIndex] = useState(0);
-  const { user, logout } = useAuth();
+
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams<{ id: string }>();
   const isEditMode = Boolean(id);
   const [productData, setProductData] = useState<any>(null);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const { addToast } = useToast();
+  const { user, logout } = useAuth();
 
   // Check if all required fields are filled
   const isFormComplete = title.trim() !== '' &&
@@ -70,6 +136,7 @@ const CreateListing: React.FC = () => {
     origin !== '' &&
     (isEditMode || imageUrls.length > 0);
 
+  // auto-fill product data for editing
   useEffect(() => {
     if (isEditMode && id) {
       fetchProductData(id);
@@ -222,6 +289,71 @@ const CreateListing: React.FC = () => {
     { value: 'zambia', label: 'Zambia', flagCode: 'zm' },
     { value: 'zimbabwe', label: 'Zimbabwe', flagCode: 'zw' }
   ];
+
+  const renderDraftCountryBadge = (label: string, flagUrl: string) => (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '8px',
+        backgroundColor: '#FFFFFF',
+        border: '1px solid #E1E1E1',
+        padding: '3px 12px',
+        borderRadius: '999px',
+        fontSize: '11px',
+        fontFamily: 'Poppins, sans-serif',
+        minHeight: '26px'
+      }}
+    >
+      <img
+        src={flagUrl}
+        alt={`${label} flag`}
+        style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover' }}
+      />
+      <span style={{ color: '#939393', fontWeight: 300 }}>{label}</span>
+    </span>
+  );
+
+  const buildDraftPrefillPayload = (draft: DraftListing) => {
+    const payload: Record<string, string> = {};
+    if (draft.title) payload.title = draft.title;
+    if (draft.description) payload.description = draft.description;
+    if (draft.price && draft.price.toLowerCase() !== 'n/a') {
+      payload.price = draft.price;
+      if (draft.currency) payload.currency = draft.currency;
+    }
+    if (draft.country) payload.country = draft.country;
+    if (draft.image) payload.image = draft.image;
+    return payload;
+  };
+
+  const applyPrefillToForm = (prefill: Record<string, string>) => {
+    if (prefill.title) setTitle(prefill.title);
+    if (prefill.description) setDescription(prefill.description);
+    if (prefill.price) setPrice(prefill.price);
+    if (prefill.currency) setCurrency(prefill.currency);
+    if (prefill.country) {
+      const originOption = countries.find(
+        (country) => country.label.toLowerCase() === prefill.country.toLowerCase()
+      );
+      if (originOption) setOrigin(originOption.value);
+    }
+    if (prefill.image) {
+      setImageUrls([prefill.image]);
+      setImages([]);
+      setPrimaryImageIndex(0);
+    }
+  };
+
+  const handleDraftApply = (draft: DraftListing) => {
+    const prefillData = buildDraftPrefillPayload(draft);
+    applyPrefillToForm(prefillData);
+    setIsDraftsModalOpen(false);
+  };
+
+  const handleDraftDelete = (draftId: string) => {
+    setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -522,7 +654,7 @@ const CreateListing: React.FC = () => {
         }
 
         // if editing a published product, set it to draft
-        if(isEditMode && productId && productData && (productData as any).status === 'PUBLISHED') {
+        if (isEditMode && productId && productData && (productData as any).status === 'PUBLISHED') {
           try {
             const statusRep = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}/status`, {
               method: 'PATCH',
@@ -530,10 +662,10 @@ const CreateListing: React.FC = () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
               },
-              body: JSON.stringify({ status: 'DRAFT'})
+              body: JSON.stringify({ status: 'DRAFT' })
             });
 
-            if(!statusRep.ok) {
+            if (!statusRep.ok) {
               const statusResult = await statusRep.json().catch(() => ({}));
               addToast({
                 type: 'error',
@@ -542,9 +674,9 @@ const CreateListing: React.FC = () => {
                 duration: 2000
               });
             } else {
-            setProductData((prev: any) => prev ? {...prev, status: 'DRAFT'} : prev);
+              setProductData((prev: any) => prev ? { ...prev, status: 'DRAFT' } : prev);
             }
-          } catch(err){
+          } catch (err) {
             addToast({
               type: 'error',
               title: 'Action failed',
@@ -574,7 +706,7 @@ const CreateListing: React.FC = () => {
   };
 
   const handlePostListing = async () => {
-    if(!validateRequiredFields()) return;
+    if (!validateRequiredFields()) return;
     setIsLoading(true);
 
     try {
@@ -714,6 +846,176 @@ const CreateListing: React.FC = () => {
     };
   }, [isLanguageDropdownOpen, isMenuDropdownOpen, isCategoryDropdownOpen, isOriginDropdownOpen, isSaleTypeDropdownOpen, isCurrencyDropdownOpen]);
 
+  useEffect(() => {
+    if (draftSeedRef.current !== currentDraftSeed) {
+      draftSeedRef.current = currentDraftSeed;
+      setDraftListings(initialDraftListings);
+    }
+  }, [currentDraftSeed]);
+
+  useEffect(() => {
+    const stateDraft = (routerLocation.state as { draft?: Record<string, string> } | null)?.draft;
+    if (stateDraft) {
+      applyPrefillToForm(stateDraft);
+      setIsDraftsModalOpen(true);
+      navigate(routerLocation.pathname, { replace: true, state: {} });
+    }
+  }, [routerLocation.state, routerLocation.pathname, navigate]);
+
+  const renderDraftCard = (draft: DraftListing) => (
+    <div
+      key={draft.id}
+      className="flex items-center gap-4"
+      style={{
+        border: '1px solid #E9E9E9',
+        borderRadius: '14px',
+        padding: '16px 20px',
+        backgroundColor: '#FFFFFF',
+        width: '100%'
+      }}
+    >
+      <div
+        style={{
+          width: '100px',
+          height: '100px',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          flexShrink: 0
+        }}
+      >
+        <img src={draft.image} alt={draft.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      </div>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100px'
+        }}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '15px' }}>
+            <span>{draft.title}</span>
+            <span style={{ color: '#B0B0B0' }}>·</span>
+            <span style={{ color: '#B0B0B0' }}>
+              {draft.currency} {draft.price}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1 px-2 py-1"
+              style={{
+                backgroundColor: '#F4F4F4',
+                color: '#939393',
+                borderRadius: '6px',
+                fontSize: '11px',
+                fontFamily: 'Poppins, sans-serif'
+              }}
+              onClick={() => handleDraftApply(draft)}
+            >
+              <img src={draft2Icon} alt="Edit" className="w-3 h-3" />
+              Use
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center"
+              style={{
+                width: '30px',
+                height: '30px',
+                borderRadius: '6px',
+                backgroundColor: '#FFE9E9'
+              }}
+              onClick={() => handleDraftDelete(draft.id)}
+            >
+              <img
+                src={trashIcon}
+                alt="Delete"
+                className="w-3.5 h-3.5"
+                style={{
+                  filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)'
+                }}
+              />
+            </button>
+          </div>
+        </div>
+        <div style={{ alignSelf: 'flex-start', marginTop: '4px', marginBottom: '2px' }}>
+          {renderDraftCountryBadge(draft.country, draft.flag)}
+        </div>
+        <p
+          style={{
+            color: '#B0B0B0',
+            fontSize: '12px',
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 300,
+            marginTop: '0',
+            textAlign: 'left'
+          }}
+        >
+          {draft.description}
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderDraftsModal = () => {
+    if (!isDraftsModalOpen) return null;
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center"
+        style={{ backgroundColor: '#0000001A' }}
+        onClick={() => setIsDraftsModalOpen(false)}
+      >
+        <div
+          className="relative w-full max-w-2xl"
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '30px',
+            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+            padding: '28px'
+          }}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2
+              style={{
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                color: '#1E1E1E',
+                fontSize: '18px'
+              }}
+            >
+              Drafts ({draftListings.length})
+            </h2>
+            <button
+              aria-label="Close drafts"
+              onClick={() => setIsDraftsModalOpen(false)}
+              style={{
+                color: '#BABABA',
+                fontSize: '26px',
+                lineHeight: 1
+              }}
+            >
+              ×
+            </button>
+          </div>
+          <div
+            className="drafts-scroll"
+            style={{
+              maxHeight: '60vh',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+              paddingRight: '8px'
+            }}
+          >
+            {draftListings.map((draft) => renderDraftCard(draft))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const pageTitle = isEditMode ? 'Edit listing' : 'Create a new listing';
   const postButtonText = isEditMode ? 'Update listing' : 'Post listing';
 
@@ -813,6 +1115,303 @@ const CreateListing: React.FC = () => {
         }
       `}</style>
 
+      {/* <Header /> */}
+      <header className="flex-shrink-0 rounded-t-2xl" style={{ backgroundColor: '#F5F5F5' }}>
+        <div className="max-w-7xl mx-auto px-1 sm:px-2 lg:px-3">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2 -ml-16">
+              <img src={logo} alt="bao'Afrik" className="h-8 w-auto" />
+            </Link>
+
+            {/* Right Side Navigation */}
+            <div className="flex items-center space-x-4 -mr-12">
+              {/* Language Selector */}
+              <div className="relative language-selector">
+                <button
+                  onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                  className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <span>{selectedLanguage}</span>
+                  <img src={translationToggleIcon} alt="Toggle" className="w-4 h-4" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isLanguageDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="py-1">
+                      <button
+                        onClick={() => handleLanguageSelect('EN')}
+                        className="w-full text-left px-4 py-2 text-sm transition-colors"
+                        style={{
+                          backgroundColor: selectedLanguage === 'EN' ? '#F0F8FE' : 'transparent',
+                          color: selectedLanguage === 'EN' ? '#64B5F6' : '#374151'
+                        }}
+                      >
+                        English
+                      </button>
+                      <button
+                        onClick={() => handleLanguageSelect('FR')}
+                        className="w-full text-left px-4 py-2 text-sm transition-colors"
+                        style={{
+                          backgroundColor: selectedLanguage === 'FR' ? '#F0F8FE' : 'transparent',
+                          color: selectedLanguage === 'FR' ? '#64B5F6' : '#374151'
+                        }}
+                      >
+                        French
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Start Selling Button */}
+              {/* <Link
+                to="/create-listing"
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
+                style={{ backgroundColor: '#FEF6E9' }}
+              >
+                <img src={basketIcon} alt="Basket" className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)' }} />
+                <span className="text-sm font-normal" style={{ color: '#F9A825' }}>
+                  Start Selling
+                </span>
+              </Link> */}
+
+              {/* Notification Icon */}
+              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <img src={notificationIcon} alt="Notifications" className="w-6 h-6" />
+              </button>
+
+              {/* Profile Picture */}
+              <div className="w-10 h-10 rounded-full overflow-hidden">
+                <img
+                  src={user?.profileImage || avatarIcon}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Menu Button */}
+              <div className="relative menu-dropdown">
+                <button
+                  onClick={() => setIsMenuDropdownOpen(!isMenuDropdownOpen)}
+                  className="p-2 text-gray-600 hover:text-gray-900"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isMenuDropdownOpen && (
+                  <div className="fixed right-8 top-0 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-screen overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
+                    {/* Start selling button with exit */}
+                    <div className="px-3 pb-3 flex items-center justify-between">
+                      <Link
+                        to="/register"
+                        className="inline-flex items-center px-3 py-1.5 rounded-lg font-normal text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                        style={{ backgroundColor: '#FFF8F0', color: '#F9A822' }}
+                        onMouseEnter={(e) => {
+                          (e.target as HTMLElement).style.backgroundColor = '#FFF0E6';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
+                        }}
+                        onClick={() => setIsMenuDropdownOpen(false)}
+                      >
+                        <svg className="w-3 h-3 mr-1.5 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#F9A822' }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
+                        </svg>
+                        Start selling
+                      </Link>
+                      <button
+                        onClick={() => setIsMenuDropdownOpen(false)}
+                        className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Profile Section */}
+                    <div className="flex items-center justify-around">
+                      <div className="flex justify-center items-center gap-2">
+                        <img
+                          src={user?.profileImage || avatarIcon}
+                          alt="User avatar"
+                          className="w-12 h-12 rounded-full object-cover"
+                          width="48"
+                          height="48"
+                        />
+                        <div className="flex-col">
+                          <p className="text-xs text-gray-500">My profile</p>
+                          <h3 className="text-sm font-bold text-gray-900">
+                            {user?.firstName && user?.lastName
+                              ? `${user.firstName} ${user.lastName}`
+                              : user?.firstName
+                                ? user.firstName
+                                : user?.lastName
+                                  ? user.lastName
+                                  : user?.email
+                                    ? user.email.split("@")[0]
+                                    : "User"}
+                          </h3>
+                        </div>
+                      </div>
+                      <div style={{ position: 'relative', zIndex: 999 }}>
+                        <Link to="/profile-setup"
+                        >
+                          <div className="w-10 h-10 rounded flex items-center justify-center"
+                            style={{ backgroundColor: "#E3F2FD" }}>
+                            <svg
+                              className="w-5 h-5 pointer-events-none"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              style={{ color: "#64B5F6" }}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
+                            </svg>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Create a new listing button */}
+                    <div className="px-3 py-3">
+                      <Link
+                        to="/create-listing"
+                        className="block w-full px-3 py-2 rounded-lg font-medium text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                        style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}
+                        onClick={() => setIsMenuDropdownOpen(false)}
+                      >
+                        <div className="flex items-center justify-center space-x-1.5">
+                          <span>Create a new listing</span>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                        </div>
+                      </Link>
+                    </div>
+
+                    {/* Navigation Menu Items */}
+                    <div className="space-y-0.5 px-2">
+                      {/* Chats */}
+                      <Link
+                        to="/messages"
+                        className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                        onClick={() => setIsMenuDropdownOpen(false)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <img src={messageIcon} alt="Message" className="w-4 h-4" style={{ color: '#64B5F6' }} />
+                          <div>
+                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Chats</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* My listings */}
+                      <Link
+                        to="/my-listings"
+                        className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                        onClick={() => setIsMenuDropdownOpen(false)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <img src={boxIcon} alt="Box" className="w-4 h-4" style={{ color: '#64B5F6' }} />
+                          <div>
+                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>My listings</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* My requests */}
+                      <Link
+                        to="/my-requests"
+                        className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                        onClick={() => setIsMenuDropdownOpen(false)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <img src={groupIcon} alt="Group" className="w-4 h-4" style={{ color: '#64B5F6' }} />
+                          <div>
+                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>My requests</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* Bookmarks */}
+                      <Link
+                        to="/bookmarks"
+                        className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                        onClick={() => setIsMenuDropdownOpen(false)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <img src={frameIcon} alt="Frame" className="w-4 h-4" style={{ color: '#64B5F6' }} />
+                          <div>
+                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Bookmarks</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* Help Center */}
+                      <Link
+                        to="/help"
+                        className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                        onClick={() => setIsMenuDropdownOpen(false)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <img src={podsIcon} alt="Pods" className="w-4 h-4" style={{ color: '#64B5F6' }} />
+                          <div>
+                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Help Center</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* Settings */}
+                      <Link
+                        to="/settings"
+                        className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                        onClick={() => setIsMenuDropdownOpen(false)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <img src={settingIcon} alt="Setting" className="w-4 h-4" style={{ color: '#64B5F6' }} />
+                          <div>
+                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Settings</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* Log Out */}
+                      <div className="px-3 pt-3 border-t border-gray-100">
+                        <button
+                          onClick={() => setIsMenuDropdownOpen(false)}
+                          className="w-full bg-gray-100 px-3 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#6A6A6A' }}>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <div className="text-left">
+                              <div className="font-medium text-xs" style={{ color: '#6A6A6A' }}>Log Out</div>
+                              <div className="text-xs" style={{ color: '#6A6A6A' }}>Log out of BAO Afrik</div>
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Page Content - Scrollable */}
       <div className="flex-1 overflow-y-auto py-6 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F5F5F5' }}>
         <div className="max-w-7xl mx-auto">
@@ -849,6 +1448,7 @@ const CreateListing: React.FC = () => {
             <button
               className="flex items-center space-x-2 px-3 py-1.5 rounded-lg"
               style={{ backgroundColor: '#F0F8FE' }}
+              onClick={() => setIsDraftsModalOpen(true)}
             >
               <img src={draftsIcon} alt="Drafts" className="w-4 h-4" />
               <span className="font-medium text-xs" style={{ color: '#64B5F6' }}>
@@ -858,7 +1458,7 @@ const CreateListing: React.FC = () => {
                 className="px-2.5 py-0.5 rounded-full font-medium"
                 style={{ backgroundColor: '#CFE8FC', color: '#64B5F6', fontSize: '0.72rem' }}
               >
-                3
+                {draftListings.length}
               </span>
             </button>
           </div>
@@ -1070,6 +1670,13 @@ const CreateListing: React.FC = () => {
                         .image-preview-scroll::-webkit-scrollbar {
                           display: none;
                         }
+                        .drafts-scroll {
+                          -ms-overflow-style: none;
+                          scrollbar-width: none;
+                        }
+                        .drafts-scroll::-webkit-scrollbar {
+                                          display: none;
+                                        }
                       `}</style>
 
                       {/* Conditionally wrap in scrollable container when 4+ images */}
@@ -1890,10 +2497,10 @@ const CreateListing: React.FC = () => {
                   <div className="flex items-center justify-between" style={{ maxWidth: '560px' }}>
                     <div>
                       <label className="block text-sm font-medium" style={{ color: '#6A6A6A' }}>
-                        Delivery available
+                        Delivery available?
                       </label>
                       <p className="text-xs text-gray-400 mt-1">
-                        Lorem ipsum dolor sit amet consectutor
+                        Can this product be delivered to the buyer's location?
                       </p>
                     </div>
                     <button
@@ -1961,6 +2568,7 @@ const CreateListing: React.FC = () => {
           </div>
         </div>
       </div>
+      {renderDraftsModal()}
     </div>
   );
 };

@@ -1,21 +1,45 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import profileIcon from '../../assets/images/pre/profile.svg';
+import leftIcon from '../../assets/images/pre/left.png';
+import backArrowIcon from '../../assets/images/pre/back arrow.svg';
+
 import { authService } from '../../services';
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [success, setSuccess] = useState(false);
+  const fromProfileSettings = location.state?.fromProfileSettings || false;
+  const [emailNotFound, setEmailNotFound] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // check if on mobile version
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  };
+
+  const checkEmailExists = (email: string): boolean => {
+    // Check if email exists in registered users (localStorage mock)
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    return registeredUsers.some((user: any) => user.email.toLowerCase() === email.toLowerCase());
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,6 +95,8 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
+  const isMobileFromProfile = isMobile && fromProfileSettings;
+
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Desktop Logo - Top Left with Background */}
@@ -93,50 +119,113 @@ const ForgotPassword: React.FC = () => {
 
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
+          {/* Breadcrumbs - Only show when accessed from Profile Settings (desktop only) */}
+          {fromProfileSettings && !isMobile && (
+            <div className="mb-0 -mt-4 w-full max-w-2xl" style={{ marginLeft: '-16px' }}>
+              <nav className="flex items-center flex-nowrap space-x-2" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                <img
+                  src={leftIcon}
+                  alt="Back"
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
+                  style={{ width: '14px', height: '14px' }}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                />
+                <Link
+                  to="/"
+                  className="hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0"
+                  style={{ color: '#BABABA' }}
+                >
+                  Homepage
+                </Link>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/', { state: { openMenu: true } })}
+                >
+                  Menu
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/', { state: { openMenu: true, highlightSettings: true } })}
+                >
+                  Settings
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                >
+                  Security & Privacy
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span className="font-medium whitespace-nowrap flex-shrink-0" style={{ color: '#212121' }}>
+                  Reset Password
+                </span>
+              </nav>
+            </div>
+          )}
+
           {/* Mobile Header - Fixed Position */}
-          <div className="lg:hidden fixed top-5 right-5 z-50">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
-                <span className="text-sm font-medium text-gray-700">EN</span>
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors bg-white border border-gray-200">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          {isMobileFromProfile ? (
+            <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="Back to security"
+              >
+                <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+              </button>
+              <div className="w-10" />
+              <button
+                type="button"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="More options"
+              >
+                <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                  <circle cx="4" cy="2" r="2" fill="#171717" />
+                  <circle cx="12" cy="2" r="2" fill="#171717" />
+                  <circle cx="20" cy="2" r="2" fill="#171717" />
                 </svg>
               </button>
             </div>
-          </div>
+          ) : (
+            <div className="lg:hidden fixed top-5 right-5 z-50">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
+                  <span className="text-sm font-medium text-gray-700">EN</span>
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                <button className="p-2 rounded-lg transition-colors bg-white border border-gray-200" style={{ color: '#F9A825' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Main content with border and shadow */}
-          <div className="bg-white border-0 lg:border border-gray-200 rounded-lg shadow-none lg:shadow-lg p-8 mt-0 lg:mt-16">
-            <div className="text-left lg:text-center mb-8">
-              {/* Profile Mail Icon - Hidden on mobile */}
-              <div className="flex items-center justify-center mx-auto w-20 h-20 bg-blue-50 rounded-full mb-6">
-                <svg
-                  className="w-10 h-10 text-blue-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
+          <div className={`bg-white rounded-[30px] p-8 lg:p-10 mt-0 lg:mt-16 ${isMobileFromProfile ? '' : 'shadow-lg'}`} style={isMobileFromProfile ? {} : { boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}>
+            <div className={`${isMobileFromProfile ? 'text-center' : 'text-left lg:text-center'} mb-6`} style={{ fontFamily: 'Poppins, sans-serif' }}>
+              {/* Profile Mail Icon */}
+              <div className={`${isMobileFromProfile ? 'flex' : 'hidden lg:flex'} mx-auto w-16 h-16 rounded-2xl items-center justify-center mb-6`} style={{ backgroundColor: '#F0F8FE' }}>
+                <img src={profileIcon} alt="Profile" className="w-8 h-8" style={{ filter: 'brightness(0) saturate(100%) invert(68%) sepia(34%) saturate(641%) hue-rotate(177deg) brightness(98%) contrast(96%)' }} />
               </div>
 
-              <h1 className="text-2xl font-medium text-gray-900 mb-3">
-                {success ? 'Check Your Email' : 'Forgot Password'}
+              <h1 className="text-lg font-semibold mb-1.5" style={{ color: '#212121', fontFamily: isMobileFromProfile ? 'Bricolage Grotesque, sans-serif' : 'Poppins, sans-serif' }}>
+                Profile Mail
               </h1>
-              <p className="text-gray-500 text-sm px-0 lg:px-4">
-                {success
-                  ? `We've sent a password reset code to ${email}. Please check your email and spam folder.`
-                  : 'Enter your email address and we\'ll send you a code to reset your password.'}
+              <p className="text-[11px] lg:text-xs px-0 lg:px-4" style={{ color: '#BABABA', fontFamily: 'Poppins, sans-serif' }}>
+                Please enter the email address associated with your BAO Afrik profile.
               </p>
             </div>
 
@@ -230,6 +319,30 @@ const ForgotPassword: React.FC = () => {
               </form>
             )}
 
+            {/* Email not found message and sign up link */}
+            {emailNotFound && (
+              <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center mb-2">
+                  <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <p className="text-red-800 font-medium">Account Not Found</p>
+                </div>
+                <p className="text-red-700 text-sm mb-3">
+                  We couldn't find an account associated with this email address.
+                </p>
+                <p className="text-red-700 text-sm mb-4">
+                  Would you like to create a new account instead?
+                </p>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors duration-200 text-sm"
+                >
+                  Create Account
+                </Link>
+              </div>
+            )}
+
             {/* Back to login link - Only show when not in success state */}
             {!success && (
               <div className="mt-6 text-center">
@@ -265,6 +378,14 @@ const ForgotPassword: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <style>{`
+        .forgot-password-input::placeholder {
+          color: #E9E9E9 !important;
+          font-size: 12px !important;
+          font-family: 'Poppins', sans-serif !important;
+        }
+      `}</style>
     </div>
   );
 };

@@ -5,16 +5,22 @@ import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.pn
 import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
+import updateIcon from '../../assets/images/pre/update.svg.svg';
+import leftIcon from '../../assets/images/pre/left.png';
+import backArrowIcon from '../../assets/images/pre/back arrow.svg';
+
 const ResetPasswordSent: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || '';
+  const fromProfileSettings = location.state?.fromProfileSettings || false;
   
   const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const [isMobile, setIsMobile] = useState(false);
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -27,6 +33,15 @@ const ResetPasswordSent: React.FC = () => {
       setCanResend(true);
     }
   }, [countdown]);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Mask email for display
   const maskEmail = (email: string) => {
@@ -114,10 +129,12 @@ const ResetPasswordSent: React.FC = () => {
     }
   };
 
+  const isMobileFromProfile = isMobile && fromProfileSettings;
+
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Desktop Logo - Top Left with Background */}
-      <div className="hidden lg:block absolute top-0 left-0 right-0 bg-orange-50 py-4 px-8 border-b-2 border-orange-200">
+      <div className="hidden lg:block absolute top-0 left-0 right-0 py-4 px-8 border-b" style={{ backgroundColor: '#FEF6E9', borderColor: '#FCD79B' }}>
         <div className="flex items-center justify-between">
           <Link to="/">
             <img 
@@ -126,8 +143,8 @@ const ResetPasswordSent: React.FC = () => {
               className="h-8 object-contain cursor-pointer"
             />
           </Link>
-          <button className="p-2 rounded-lg hover:bg-orange-100 transition-colors">
-            <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button className="p-2 rounded-lg transition-colors" style={{ color: '#F9A825' }}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -136,7 +153,82 @@ const ResetPasswordSent: React.FC = () => {
       
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
+          {/* Breadcrumbs - Only show when accessed from Profile Settings (desktop only) */}
+          {fromProfileSettings && !isMobile && (
+            <div className="mb-0 -mt-4 w-full max-w-2xl" style={{ marginLeft: '-16px' }}>
+              <nav className="flex items-center flex-nowrap space-x-2" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                <img 
+                  src={leftIcon} 
+                  alt="Back" 
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0" 
+                  style={{ width: '14px', height: '14px' }}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                />
+                <Link 
+                  to="/" 
+                  className="hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                >
+                  Homepage
+                </Link>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span 
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/', { state: { openMenu: true } })}
+                >
+                  Menu
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span 
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/', { state: { openMenu: true, highlightSettings: true } })}
+                >
+                  Settings
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span 
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                  style={{ color: '#BABABA' }}
+                  onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                >
+                  Security & Privacy
+                </span>
+                <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
+                <span className="font-medium whitespace-nowrap flex-shrink-0" style={{ color: '#212121' }}>
+                  Reset Password
+                </span>
+              </nav>
+            </div>
+          )}
           {/* Mobile Header - Fixed Position */}
+          {isMobileFromProfile ? (
+            <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="Back to security"
+              >
+                <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+              </button>
+              <div className="w-10" />
+              <button
+                type="button"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="More options"
+              >
+                <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                  <circle cx="4" cy="2" r="2" fill="#171717" />
+                  <circle cx="12" cy="2" r="2" fill="#171717" />
+                  <circle cx="20" cy="2" r="2" fill="#171717" />
+                </svg>
+              </button>
+            </div>
+          ) : (
           <div className="lg:hidden fixed top-5 right-5 z-50">
             <div className="flex items-center space-x-2">
               <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
@@ -145,33 +237,43 @@ const ResetPasswordSent: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors bg-white border border-gray-200">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button className="p-2 rounded-lg transition-colors bg-white border border-gray-200" style={{ color: '#F9A825' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
             </div>
           </div>
+          )}
 
           {/* Main content with border and shadow */}
-          <div className="bg-white border-0 lg:border border-gray-200 rounded-lg shadow-none lg:shadow-lg p-8 mt-0 lg:mt-16">
-            <div className="text-center mb-8">
+          <div className={`bg-white rounded-[30px] p-8 lg:p-10 mt-0 lg:mt-16 ${isMobileFromProfile ? '' : 'shadow-lg'}`} style={isMobileFromProfile ? {} : { boxShadow: '0 4px 30px 0 rgba(0,0,0,0.05)' }}>
+            <div className="text-center mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {/* Mail Verification Icon */}
-              <div className="mx-auto w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+              <div className="mx-auto w-16 h-16 flex items-center justify-center mb-5">
+                <img src={updateIcon} alt="Mail verification" className="w-14 h-14" />
               </div>
               
-              <h1 className="text-2xl font-medium text-gray-900 mb-3">
-                Email address verification
+              <h1 className="text-lg font-semibold mb-1.5" style={{ color: '#212121', fontFamily: isMobileFromProfile ? 'Bricolage Grotesque, sans-serif' : 'Poppins, sans-serif' }}>
+                Mail verification
               </h1>
-              <p className="text-gray-500 text-sm px-4 mb-2">
-                Please enter the 6-digit code received at the email address <span className="font-medium text-gray-700">{maskEmail(email)}</span>
+              <p className="text-xs px-4 mb-2" style={{ color: '#BABABA' }}>
+                Please enter the 6-digit code received at the email address {maskEmail(email)}
               </p>
-              <p className="text-red-500 text-xs">
+              {!canResend ? (
+                <p className="text-[11px] mt-1 mb-0" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
                 Request another code 0:{countdown.toString().padStart(2, '0')}
               </p>
+              ) : (
+                <button
+                  onClick={handleResendCode}
+                  disabled={isLoading}
+                  className="text-[11px] focus:outline-none"
+                  style={{ color: '#64B5F6', textDecoration: 'underline', fontFamily: 'Poppins, sans-serif' }}
+                >
+                  Request a new digital code
+                </button>
+              )}
             </div>
 
             {/* Error Message */}
@@ -183,7 +285,7 @@ const ResetPasswordSent: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* 6-Digit Code Input */}
-              <div className="flex justify-center space-x-3">
+              <div className="flex justify-center space-x-2">
                 {verificationCode.map((digit, index) => (
                   <input
                     key={index}
@@ -195,8 +297,14 @@ const ResetPasswordSent: React.FC = () => {
                     value={digit}
                     onChange={(e) => handleInputChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-12 h-12 text-center text-lg font-medium border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+                    className="verification-input w-12 h-12 text-center text-lg font-medium bg-white"
+                    style={{ border: `1px solid ${error ? '#EF4444' : '#E9E9E9'}`, borderRadius: '10px', color: '#212121' }}
                     disabled={isLoading}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#E0E0E0';
+                      e.currentTarget.style.borderWidth = '1px';
+                    }}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = error ? '#EF4444' : '#E9E9E9')}
                   />
                 ))}
               </div>
@@ -205,12 +313,11 @@ const ResetPasswordSent: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading || verificationCode.join('').length !== 6}
-                  className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 ${
-                    verificationCode.join('').length === 6 && !isLoading
-                      ? 'text-white'
-                      : 'bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-700'
-                  }`}
-                  style={verificationCode.join('').length === 6 && !isLoading ? { backgroundColor: '#F9A825' } : {}}
+                  className="w-full py-2.5 px-4 rounded-[10px] transition-all duration-200 text-sm font-medium"
+                  style={{
+                    backgroundColor: verificationCode.join('').length === 6 && !isLoading ? '#F9A825' : '#E9E9E9',
+                    color: verificationCode.join('').length === 6 && !isLoading ? '#FFFFFF' : '#6A6A6A'
+                  }}
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
@@ -225,21 +332,7 @@ const ResetPasswordSent: React.FC = () => {
             </form>
 
             {/* Resend Code */}
-            <div className="mt-6 text-center">
-              {canResend ? (
-                <button
-                  onClick={handleResendCode}
-                  disabled={isLoading}
-                  className="text-sm text-orange-600 hover:text-orange-500 focus:outline-none focus:underline disabled:opacity-50"
-                >
-                  Resend verification code
-                </button>
-              ) : (
-                <p className="text-sm text-gray-500">
-                  Resend code in {countdown} seconds
-                </p>
-              )}
-            </div>
+            <div className="mt-6 text-center"></div>
           </div>
 
         </div>
@@ -248,7 +341,7 @@ const ResetPasswordSent: React.FC = () => {
       {/* Footer - Hidden on mobile */}
       <div className="hidden lg:block py-6 px-4">
         <div className="border-t border-gray-200 pt-4">
-          <div className="flex items-center justify-between text-xs text-gray-400">
+          <div className="flex items-center justify-between text-xs" style={{ color: '#BABABA' }}>
             <div className="flex items-center space-x-1">
               <img src={lilLogo} alt="BaoAfrik" className="w-4 h-4" />
               <span>© All rights reserved</span>

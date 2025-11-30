@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationToastProvider } from './contexts/NotificationToastContext';
@@ -17,6 +16,10 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPasswordSent from './pages/auth/ResetPasswordSent';
 import ResetPassword from './pages/auth/ResetPassword';
 import PasswordResetSuccess from './pages/auth/PasswordResetSuccess';
+import TwoFactorEmail from './pages/auth/TwoFactorEmail';
+import TwoFactorPhone from './pages/auth/TwoFactorPhone';
+import TwoFactorCode from './pages/auth/TwoFactorCode';
+import TwoFactorSuccess from './pages/auth/TwoFactorSuccess';
 import Profile from './pages/Profile';
 import ProductDetail from './pages/ProductDetail';
 import SellerProfile from './pages/SellerProfile';
@@ -28,7 +31,9 @@ import CreateListing from './pages/CreateListing';
 import Notifications from './pages/Notifications';
 import NotificationDetail from './pages/NotificationDetail';
 import ArchivedChats from './pages/ArchivedChats';
+import ProfileSettings from './pages/ProfileSettings';
 import './App.css';
+
 import { ToastProvider } from './contexts/ToastContext';
 
 function AppContent() {
@@ -36,9 +41,9 @@ function AppContent() {
   const isProductDetailPage = location.pathname.startsWith('/product/');
   const isSellerProfilePage = location.pathname.startsWith('/seller/');
   const isUserAccountPage = location.pathname === '/account';
-  const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success'];
+  const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success', '/two-factor-email', '/two-factor-phone', '/two-factor-code', '/two-factor-success'];
   const isAuthPage = authPages.includes(location.pathname);
-  const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats'];
+  const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings', '/my-listings'];
   const isCustomLayoutPage = customLayoutPages.includes(location.pathname);
 
   // For auth pages, render without header/footer
@@ -58,6 +63,10 @@ function AppContent() {
           <Route path="/reset-password-sent" element={<ResetPasswordSent />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/password-reset-success" element={<PasswordResetSuccess />} />
+          <Route path="/two-factor-email" element={<TwoFactorEmail />} />
+          <Route path="/two-factor-phone" element={<TwoFactorPhone />} />
+          <Route path="/two-factor-code" element={<TwoFactorCode />} />
+          <Route path="/two-factor-success" element={<TwoFactorSuccess />} />
         </Routes>
       </div>
     );
@@ -73,6 +82,8 @@ function AppContent() {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/notification-detail" element={<NotificationDetail />} />
           <Route path="/archived-chats" element={<ArchivedChats />} />
+          <Route path="/settings" element={<ProfileSettings />} />
+          <Route path="/my-listings" element={<MyListings />} />
         </Routes>
       </div>
     );
@@ -109,14 +120,13 @@ function AppContent() {
   // For all other pages, render with header/footer
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header showSearchBar={isProductDetailPage} isProductDetailPage={isProductDetailPage} />
+      <Header />
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/my-listings" element={<MyListings />} />
           <Route path="/edit-listing/:id" element={<CreateListing />} />
         </Routes>
       </main>

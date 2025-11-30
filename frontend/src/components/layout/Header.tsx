@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const filteredNotifications = notifications.filter(notif => {
-    if (notificationTab === 'all') return true;
+    if (notificationTab === 'all') return notif;
     if (notificationTab === 'unread') return !notif.isRead;
     if (notificationTab === 'messages') return notif.type === 'message' || notif.type === 'NEW_MESSAGE';
     return true;
@@ -291,9 +291,7 @@ const Header: React.FC<HeaderProps> = ({
                   <select className="px-3 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm">
                     <option value="">All Categories</option>
                     <option value="Food & Spices">Food & Spices</option>
-                    <option value="Fashion & Textiles">
-                      Fashion & Textiles
-                    </option>
+                    <option value="Fashion & Textiles">Fashion & Textiles</option>
                     <option value="Beauty & Wellness">Beauty & Wellness</option>
                     <option value="Home & Decor">Home & Decor</option>
                     <option value="Books & Media">Books & Media</option>
@@ -584,6 +582,9 @@ const Header: React.FC<HeaderProps> = ({
                                           ) : (
                                             <img src={logoIcon} alt="Logo" className="w-7 h-7" style={{ filter: 'brightness(0) invert(1)' }} />
                                           )}
+                                        </div>
+                                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
+                                          <img src={notif.type === 'message' ? messageAvatarIcon : appNotificationIcon} alt="Icon" className="w-3 h-3" />
                                         </div>
                                       </div>
                                       <div className="flex-1 min-w-0">
