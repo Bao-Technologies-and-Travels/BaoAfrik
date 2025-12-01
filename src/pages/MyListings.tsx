@@ -19,6 +19,8 @@ import chartIcon from '../assets/images/pre/chart.svg';
 import mainieIcon from '../assets/images/pre/mainie.svg';
 import redtrashIcon from '../assets/images/pre/redtrash.svg';
 import verityIcon from '../assets/images/pre/verity.svg';
+import searchNormalIcon from '../assets/images/pre/search-normal.svg';
+import backArrowIcon from '../assets/images/pre/back arrow.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -296,6 +298,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
 
 const MyListings: React.FC = () => {
   const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All Status');
@@ -331,7 +334,9 @@ const MyListings: React.FC = () => {
     { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: '48', currency: 'USD', createdAt: 1689300000000, priceValue: 48, messages: 17, category: 'Food & Spicy' },
     { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: '35', currency: 'USD', createdAt: 1689700000000, priceValue: 35, messages: 14, category: 'Food & Spicy' },
   ];
-  const [listings, setListings] = useState<Listing[]>(initialListings);
+  // Temporarily set to empty array to test empty state - change back to initialListings when done testing
+  const [listings, setListings] = useState<Listing[]>([]);
+  // const [listings, setListings] = useState<Listing[]>(initialListings);
 
   const trimmedSearchQuery = searchQuery.trim();
 
@@ -510,6 +515,15 @@ const MyListings: React.FC = () => {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   useEffect(() => {
@@ -707,16 +721,16 @@ const MyListings: React.FC = () => {
   };
 
   const renderEmptyState = () => (
-    <div className="text-center py-6">
+    <div className={`text-center ${isMobile ? 'py-8 px-4' : 'py-6'}`}>
       <img
         src={bagIcon}
         alt="Empty listings"
         className="mx-auto mb-4"
-        style={{ width: '40px', height: '40px' }}
+        style={{ width: isMobile ? '32px' : '40px', height: isMobile ? '32px' : '40px' }}
       />
-      <div style={{ maxWidth: '360px' }} className="mx-auto space-y-3">
+      <div style={{ maxWidth: isMobile ? '100%' : '360px' }} className="mx-auto space-y-3">
         <p
-          className="text-xs sm:text-sm leading-relaxed"
+          className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} leading-relaxed`}
           style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}
         >
           {isSearchNoResultsState
@@ -725,7 +739,7 @@ const MyListings: React.FC = () => {
         </p>
         <button
           onClick={handlePrimaryCta}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-normal transition-colors text-sm"
+          className={`inline-flex items-center justify-center gap-2 ${isMobile ? 'px-4 py-2' : 'px-5 py-2.5'} rounded-lg font-normal transition-colors ${isMobile ? 'text-xs' : 'text-sm'}`}
           style={{
             backgroundColor: '#64B5F6',
             color: '#FFFFFF',
@@ -734,7 +748,7 @@ const MyListings: React.FC = () => {
         >
           {primaryButtonLabel}
           <svg
-            className="w-3.5 h-3.5"
+            className={isMobile ? 'w-3 h-3' : 'w-3.5 h-3.5'}
             viewBox="0 0 24 24"
             fill="none"
             stroke="#FFFFFF"
@@ -1469,12 +1483,51 @@ const MyListings: React.FC = () => {
 
   return (
     <>
-      <Header />
+      {/* Header - Hidden on mobile when empty state */}
+      {(!isMobile || !shouldShowEmptyState) && <Header />}
       <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        {/* Mobile Header - Only visible on mobile, always shown */}
+        {isMobile && (
+          <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between mb-16">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="Back"
+            >
+              <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="Search"
+              >
+                <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="More options"
+              >
+                <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                  <circle cx="4" cy="2" r="2" fill="#171717" />
+                  <circle cx="12" cy="2" r="2" fill="#171717" />
+                  <circle cx="20" cy="2" r="2" fill="#171717" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex-1">
           <div className="max-w-6xl mx-auto w-full pl-0 pr-0 py-8 flex flex-col lg:flex-row lg:justify-between gap-8">
             <div className="flex-1 lg:pl-0 lg:-ml-16">
-              <nav className="flex items-center space-x-2 text-xs sm:text-sm mb-8" style={breadcrumbStyle}>
+              {/* Desktop Breadcrumb - Hidden on mobile */}
+              <nav className="hidden lg:flex items-center space-x-2 text-xs sm:text-sm mb-8" style={breadcrumbStyle}>
                 <img
                   src={arrowLeftIcon}
                   alt="Back"
@@ -1493,7 +1546,20 @@ const MyListings: React.FC = () => {
                 <span style={{ color: '#4D4D4D' }}>My listings</span>
               </nav>
 
-              <div>
+              {/* Mobile Title - Only visible on mobile, below header */}
+              {isMobile && (
+                <div className="lg:hidden pt-12 px-4">
+                  <h1
+                    className="text-base font-semibold"
+                    style={{ color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  >
+                    Manage your listings
+                  </h1>
+                </div>
+              )}
+
+              {/* Desktop Title - Hidden on mobile */}
+              <div className="hidden lg:block">
                 <h1
                   className="text-base sm:text-lg font-semibold"
                   style={{ color: '#1E1E1E', fontFamily: 'Bricolage Grotesque, sans-serif' }}
@@ -1512,54 +1578,57 @@ const MyListings: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-0">
-              <div
-                className="inline-flex items-center border mb-4 overflow-hidden"
-                style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
-              >
-                {(['list', 'grid'] as ViewMode[]).map((mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    onClick={() => setViewMode(mode)}
-                    className="flex items-center justify-center px-3 py-2 transition-colors flex-1"
-                    style={{
-                      backgroundColor: viewMode === mode ? '#CFE8FC' : 'transparent'
-                    }}
-                  >
-                    <img
-                      src={mode === 'list' ? listIcon : gridIcon}
-                      alt={`${mode} view`}
+            {/* Search and View Toggle - Hidden on mobile when empty state */}
+            {(!shouldShowEmptyState || !isMobile) && (
+              <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-0">
+                <div
+                  className="inline-flex items-center border mb-4 overflow-hidden"
+                  style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
+                >
+                  {(['list', 'grid'] as ViewMode[]).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setViewMode(mode)}
+                      className="flex items-center justify-center px-3 py-2 transition-colors flex-1"
                       style={{
-                        filter: viewMode === mode ? toggleIconFilters.active : toggleIconFilters.inactive
+                        backgroundColor: viewMode === mode ? '#CFE8FC' : 'transparent'
                       }}
-                    />
-                  </button>
-                ))}
-              </div>
+                    >
+                      <img
+                        src={mode === 'list' ? listIcon : gridIcon}
+                        alt={`${mode} view`}
+                        style={{
+                          filter: viewMode === mode ? toggleIconFilters.active : toggleIconFilters.inactive
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
 
-              <div className="w-[90%]">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search a listing ?"
-                  style={{
-                    backgroundColor: isSearchFocused ? '#FFFFFF' : '#F1F1F1',
-                    color: '#1E1E1E',
-                    borderRadius: '8px',
-                    border: isSearchFocused ? '1px solid #CFE8FC' : '1px solid transparent',
-                    caretColor: '#64B5F6',
-                    fontFamily: 'Poppins, sans-serif',
-                    fontSize: '13px',
-                    transition: 'all 0.2s ease'
-                  }}
-                  className="w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CFE8FC] placeholder-[#B2B2B2]"
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setIsSearchFocused(false)}
-                />
+                <div className="w-[90%]">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Search a listing ?"
+                    style={{
+                      backgroundColor: isSearchFocused ? '#FFFFFF' : '#F1F1F1',
+                      color: '#1E1E1E',
+                      borderRadius: '8px',
+                      border: isSearchFocused ? '1px solid #CFE8FC' : '1px solid transparent',
+                      caretColor: '#64B5F6',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: '13px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    className="w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CFE8FC] placeholder-[#B2B2B2]"
+                    onFocus={() => setIsSearchFocused(true)}
+                    onBlur={() => setIsSearchFocused(false)}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
         {/* Filters and Action Buttons Bar */}
@@ -2043,7 +2112,8 @@ const MyListings: React.FC = () => {
         {/* Footer */}
         <footer className="bg-white">
           <div className="px-4 sm:px-6 lg:px-8 py-5">
-            <div className="flex flex-col sm:flex-row items-center justify-between text-xs space-y-3 sm:space-y-0" style={{ color: '#BABABA' }}>
+            {/* Desktop Footer - Hidden on mobile */}
+            <div className="hidden lg:flex flex-row items-center justify-between text-xs" style={{ color: '#BABABA' }}>
               <div className="flex items-center space-x-1.5">
                 <img src={lilLogo} alt="Bao Afrik" className="w-5 h-5" />
                 <span>©</span>
@@ -2057,6 +2127,24 @@ const MyListings: React.FC = () => {
                 <Link to="/privacy" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Privacy policies</Link>
                 <span style={{ color: '#BABABA' }}>|</span>
                 <Link to="/cookies" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Cookies</Link>
+              </div>
+            </div>
+
+            {/* Mobile Footer - Two lines, only visible on mobile, second line fits on one line */}
+            <div className="lg:hidden flex flex-col items-center text-xs space-y-2" style={{ color: '#BABABA' }}>
+              <div className="flex items-center space-x-1.5">
+                <img src={lilLogo} alt="Bao Afrik" className="w-5 h-5" />
+                <span>©</span>
+                <span className="text-[11px]">All rights reserved</span>
+              </div>
+              <div className="flex items-center space-x-1.5 text-[10px] flex-wrap justify-center">
+                <Link to="/contact" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Contact Us</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/terms" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/privacy" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Privacy policies</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/cookies" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Cookies</Link>
               </div>
             </div>
           </div>
