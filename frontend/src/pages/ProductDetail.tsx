@@ -1829,7 +1829,7 @@ const ProductDetail: React.FC = () => {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="font-normal capitalize" style={{ fontSize: '16px', color: '#939393' }}>
-               {product.title}
+                {product.title}
               </p>
               <div className="mt-1" style={{ fontSize: '26px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 USD {product.price}
@@ -3147,7 +3147,7 @@ const ProductDetail: React.FC = () => {
                 {/* Title with Navigation Arrows */}
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-medium text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                   ` {product.seller.firstName} ${product.seller.lastName}` items
+                    ` {product.seller.firstName} ${product.seller.lastName}` items
                   </h2>
                   <div className="hidden lg:flex items-center gap-3">
                     <button

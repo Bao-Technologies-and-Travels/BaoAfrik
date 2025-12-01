@@ -11,7 +11,6 @@ import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 
-// Types for better type safety
 interface FormData {
   firstName: string;
   lastName: string;
@@ -164,6 +163,13 @@ const ProfileSetup: React.FC = () => {
       }));
     }
   };
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+      if(user && (!user.firstName || !user.lastName)) {
+        e.preventDefault();
+        navigate('/profile-setup');
+      }
+    };
 
   const handleDateChange = (date: Date | null) => {
     if (date) {
@@ -345,14 +351,18 @@ const ProfileSetup: React.FC = () => {
 
     // If no changes, navigate away
     if (!hasChanges()) {
-      addToast({
-        type: 'info',
-        title: 'Profile unchanged',
-        message: 'No changes were made to your profile.',
-        duration: 2000
-      });
-      navigate('/');
-      return;
+      if (!user?.firstName || !user.lastName) {
+        return;
+      } else {
+        addToast({
+          type: 'info',
+          title: 'Profile unchanged',
+          message: 'No changes were made to your profile.',
+          duration: 2000
+        });
+        navigate('/');
+        return;
+      }
     }
 
     // Validate form
@@ -505,6 +515,7 @@ const ProfileSetup: React.FC = () => {
               src={logoFull}
               alt='BaoAfrik Logo'
               className='h-8 object-contain'
+              onClick={handleLogoClick}
             />
           </Link>
           <button

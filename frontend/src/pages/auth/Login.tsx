@@ -153,20 +153,20 @@ const Login: React.FC = () => {
           title: 'Action needed!',
           message: 'Please complete your profile',
           duration: 2500
-        })
+        });
       } else {
         navigate("/");
         addToast({
-        type: "success",
-        title: "Login successful",
-        message: `Welcome back, ${user?.firstName && user?.lastName
+          type: "success",
+          title: "Login successful",
+          message: `Welcome back, ${user?.firstName && user?.lastName
             ? `${user.firstName} ${user.lastName}`
             : user?.firstName
               ? user.firstName
               : user?.email?.split("@")[0] || "User"
-          }!`,
-        duration: 2000,
-      });
+            }!`,
+          duration: 2000,
+        });
       }
 
     };

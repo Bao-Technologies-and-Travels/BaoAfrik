@@ -184,7 +184,6 @@ const Messages: React.FC = () => {
   const [isProductInquiry, setIsProductInquiry] = useState(false);
   const { user, logout } = useAuth();
   const [connectionStatus, setConnectionStatus] = useState<"connecting" | "connected" | "disconnected">("connecting");
-  const socketRef = useRef<Socket | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [lastLoadedConversationId, setLastLoadedConversationId] = useState<string | null>(null);
   const [hasSentInitialProductMessage, setHasSentInitialProductMessage] = useState(false);
@@ -440,7 +439,16 @@ const Messages: React.FC = () => {
     };
 
     const handleUserTyping = (data: any) => {
-      if (data.conversatonId === activeConversationId && data.userId != currentUser?.id) {
+      console.log('📩 user_typing event received:', {
+        dataConversationId: data.conversationId,
+        activeConversationId,
+        dataUserId: data.userId,
+        currentUserId: currentUser?.id,
+        match: data.conversationId === activeConversationId,
+        notSelf: data.userId !== currentUser?.id
+      });
+      if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
+        console.log('✅ Showing typing indicator');
         setIsSellerTyping(true);
         setShowTypingIndicator(true);
         if (typingTimeout) {
@@ -720,13 +728,14 @@ const Messages: React.FC = () => {
         }
 
         // join socket room
-        if (socketRef.current?.connected) {
-          socketRef.current.emit("join_conversation", conversationId);
+        if (socket?.connected) {
+          socket.emit("join_conversation", conversationId);
+          console.log('🚪 Emitting join_conversation for:', conversationId);
         }
 
         // Mark as read when opening conversation
-        if (socketRef.current?.connected) {
-          socketRef.current.emit("mark_as_read", conversationId);
+        if (socket?.connected) {
+          socket.emit("mark_as_read", conversationId);
         }
 
         // Auto-scroll to bottom
@@ -750,7 +759,7 @@ const Messages: React.FC = () => {
         setIsLoadingMessages(false);
       }
     },
-    [isLoadingMessages, currentUser?.id, addToast, productData, conversations]
+    [isLoadingMessages, currentUser?.id, addToast, productData, conversations, socket]
   );
 
   const closeActiveConversation = () => {
@@ -929,8 +938,8 @@ const Messages: React.FC = () => {
     await fetchConversationMessages(conversationId);
 
     // Mark as read when opening conversation
-    if (socketRef.current?.connected) {
-      socketRef.current.emit("mark_as_read", conversationId);
+    if (socket?.connected) {
+      socket.emit("mark_as_read", conversationId);
     }
 
     if (isMobileViewport) {

@@ -13,15 +13,15 @@ export class ErrorHandler {
   // Convert API response errors to user-friendly messages
   static formatApiError(response: ApiResponse): AppError {
     const { message, errors } = response;
-    
+
     // Handle validation errors
     if (errors && Object.keys(errors).length > 0) {
       const firstField = Object.keys(errors)[0];
       const fieldErrors = errors[firstField];
-      const firstError = Array.isArray(fieldErrors) 
-        ? fieldErrors[0] 
+      const firstError = Array.isArray(fieldErrors)
+        ? fieldErrors[0]
         : fieldErrors as string;
-      
+
       return {
         code: API_ERROR_CODES.VALIDATION_ERROR,
         message: firstError,
@@ -29,7 +29,7 @@ export class ErrorHandler {
         statusCode: HTTP_STATUS.UNPROCESSABLE_ENTITY,
       };
     }
-    
+
     // Handle specific error codes
     return {
       code: 'UNKNOWN_ERROR',
@@ -43,40 +43,40 @@ export class ErrorHandler {
     switch (error.code) {
       case API_ERROR_CODES.UNAUTHORIZED:
         return 'Please sign in to continue';
-      
+
       case API_ERROR_CODES.TOKEN_EXPIRED:
         return 'Your session has expired. Please sign in again';
-      
+
       case API_ERROR_CODES.INVALID_CREDENTIALS:
         return 'Invalid email or password';
-      
+
       case API_ERROR_CODES.EMAIL_NOT_VERIFIED:
         return 'Please verify your email address before continuing';
-      
+
       case API_ERROR_CODES.DUPLICATE_EMAIL:
         return 'An account with this email already exists';
-      
+
       case API_ERROR_CODES.WEAK_PASSWORD:
         return 'Password must be at least 8 characters with letters and numbers';
-      
+
       case API_ERROR_CODES.NOT_FOUND:
         return 'The requested resource was not found';
-      
+
       case API_ERROR_CODES.FORBIDDEN:
         return 'You do not have permission to perform this action';
-      
+
       // case API_ERROR_CODES.RATE_LIMIT_EXCEEDED:
       //   return 'Too many requests. Please try again later';
-      
+
       case API_ERROR_CODES.FILE_TOO_LARGE:
         return 'File size is too large. Maximum size is 10MB';
-      
+
       case API_ERROR_CODES.INVALID_FILE_TYPE:
         return 'Invalid file type. Only images are allowed';
-      
+
       case API_ERROR_CODES.SERVICE_UNAVAILABLE:
         return 'Service is temporarily unavailable. Please try again later';
-      
+
       default:
         return error.message || 'An unexpected error occurred';
     }
@@ -105,7 +105,7 @@ export class ErrorHandler {
     if (process.env.NODE_ENV === 'development') {
       console.error(`[${context || 'API Error'}]:`, error);
     }
-    
+
     // In production, you might want to send errors to a logging service
     // Example: Sentry, LogRocket, etc.
   }
@@ -119,10 +119,10 @@ export const handleAsyncError = async <T>(
   try {
     return await asyncFn();
   } catch (error) {
-    const appError = error instanceof Error 
+    const appError = error instanceof Error
       ? { code: 'UNKNOWN_ERROR', message: error.message }
       : ErrorHandler.handleNetworkError();
-    
+
     ErrorHandler.logError(appError, context);
     return null;
   }

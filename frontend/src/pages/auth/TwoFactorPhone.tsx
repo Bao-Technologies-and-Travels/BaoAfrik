@@ -158,7 +158,7 @@ const TwoFactorPhone: React.FC = () => {
 
                       {/* Dropdown */}
                       {isPhoneCodeDropdownOpen && (
-                        <div 
+                        <div
                           className="absolute top-full left-0 mt-1 bg-white z-50 w-48"
                           style={{
                             borderRadius: '20px',
@@ -234,7 +234,7 @@ const TwoFactorPhone: React.FC = () => {
                   <button
                     type="submit"
                     className={`${isMobileFromProfile ? 'w-full' : 'flex-1'} py-2 px-4 rounded-[12px] text-sm font-light transition-colors`}
-                    style={{ 
+                    style={{
                       backgroundColor: '#F9A825',
                       color: '#FFFFFF',
                       fontFamily: 'Poppins, sans-serif'

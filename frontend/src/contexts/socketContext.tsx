@@ -1,19 +1,19 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
-import { io, Socket} from 'socket.io-client';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
 
 const SocketContext = createContext<Socket | null>(null);
 
-export const SocketProvider: React.FC<{ children: React.ReactNode}> = ({ children}) => {
+export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
-        if(!process.env.REACT_APP_WS_URL) {
+        if (!process.env.REACT_APP_WS_URL) {
             return;
         }
 
         const s = io(process.env.REACT_APP_WS_URL, {
-            auth: { token},
+            auth: { token },
             transports: ['webSocket', 'polling']
         });
 

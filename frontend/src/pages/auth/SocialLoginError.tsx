@@ -2,12 +2,12 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 
-interface SocialLoginErrorProps {}
+interface SocialLoginErrorProps { }
 
 const SocialLoginError: React.FC<SocialLoginErrorProps> = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Get provider from navigation state
   const provider = location.state?.provider || 'social media';
 
@@ -23,9 +23,9 @@ const SocialLoginError: React.FC<SocialLoginErrorProps> = () => {
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
       {/* BaoAfrik Logo */}
       <div className="w-12 h-12 sm:w-16 sm:h-16 mb-8 sm:mb-12">
-        <img 
-          src={logoSmall} 
-          alt="BaoAfrik Logo" 
+        <img
+          src={logoSmall}
+          alt="BaoAfrik Logo"
           className="w-full h-full object-contain"
         />
       </div>
@@ -58,7 +58,7 @@ const SocialLoginError: React.FC<SocialLoginErrorProps> = () => {
         >
           Create New Account
         </button>
-        
+
         <button
           onClick={handleBackToLogin}
           className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 sm:py-3 px-6 rounded-xl transition-colors duration-200 text-sm sm:text-base"

@@ -42,17 +42,43 @@ const Header: React.FC<HeaderProps> = ({
   const socket = useSocket();
   const [notifications, setNotifications] = useState<any[]>([]);
 
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })));
-    setNotificationCount(0);
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      await fetch(`${process.env.REACT_APP_API_URL}/notifications/mark-all-read`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })));
+      setNotificationCount(0);
+      setNotificationTab('all');
+    } catch (e) {
+      console.warn('Failed to mark all as read', e);
+    }
   };
 
   const filteredNotifications = notifications.filter(notif => {
-    if (notificationTab === 'all') return notif;
+    if (notificationTab === 'all') return true;
     if (notificationTab === 'unread') return !notif.isRead;
     if (notificationTab === 'messages') return notif.type === 'message' || notif.type === 'NEW_MESSAGE';
     return true;
   });
+
+  // prevent navigation if profile is incomplete
+  useEffect(() => {
+    const isProfileIncomplete = user && (!user.firstName || !user.lastName);
+    if (isProfileIncomplete && location.pathname !== '/profile-setup') {
+      // redirect to profile setup
+      navigate('/profile-setup', { replace: true });
+    }
+  }, [user, location.pathname, navigate]);
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (user && (!user.firstName || !user.lastName)) {
+      e.preventDefault();
+      navigate('/profile-setup');
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -120,15 +146,33 @@ const Header: React.FC<HeaderProps> = ({
 
     const onNotification = (payload: any) => {
       const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
-      const normalized = { ...payload, day: getDayLabel(created), time: payload.time || formatTime(created) };
-      setNotifications(prev => [normalized, ...prev]);
+      const normalized = {
+        ...payload,
+        day: getDayLabel(created),
+        time: payload.time || formatTime(created),
+        id: payload.id || `notif-${Date.now()}-${Math.random()}`
+      };
+
+      setNotifications(prev => {
+        const exists = prev.some(n => n.id === normalized.id);
+        return exists ? prev : [normalized, ...prev];
+      });
       setNotificationCount(prev => prev + 1);
     };
 
     const onNewMessageNotification = (payload: any) => {
       const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
-      const normalized = { ...payload, day: getDayLabel(created), time: payload.time || formatTime(created) };
-      setNotifications(prev => [normalized, ...prev]);
+      const normalized = {
+        ...payload,
+        day: getDayLabel(created),
+        time: payload.time || formatTime(created),
+        id: payload.id || `msg-${Date.now()}-${Math.random()}`
+      };
+
+      setNotifications(prev => {
+        const exists = prev.some(n => n.id === normalized.id);
+        return exists ? prev : [normalized, ...prev];
+      });
       setNotificationCount(prev => prev + 1);
     };
 
@@ -198,6 +242,18 @@ const Header: React.FC<HeaderProps> = ({
     navigate("/profile-setup");
   };
 
+  const handleNotificationClick = (notif: any) => {
+    setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+
+    if (notif.type === 'NEW_MESSAGE' && notif.meta?.conversationId) {
+      navigate('/messages', { state: { conversationId: notif.meta.conversationId } });
+      setIsNotificationOpen(false);
+    } else {
+      navigate('/notifications', { state: { notificationId: notif.id } });
+      setIsNotificationOpen(false);
+    }
+  }
+
   const getNotificationSenderName = (notif: any) => {
     if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title) {
       return notif.title;
@@ -206,8 +262,6 @@ const Header: React.FC<HeaderProps> = ({
     if (notif.title && notif.title !== 'Notification') {
       return notif.title
     }
-
-    return 'Someone';
   };
 
   const getNotificationAvatar = (notif: any) => {
@@ -238,6 +292,7 @@ const Header: React.FC<HeaderProps> = ({
             <div className="flex-shrink-0 ml-0 sm:-ml-6 md:-ml-12">
               <Link
                 to="/"
+                onClick={handleLogoClick}
                 className="flex items-center focus:outline-none rounded transition-all duration-200"
                 aria-label="BaoAfrik Home"
               >
@@ -559,7 +614,6 @@ const Header: React.FC<HeaderProps> = ({
                             }
                           `}
                           </style>
-
                           {/* Render notifications grouped by day */}
                           {['Today', 'Yesterday'].map(day => {
                             const dayNotifs = filteredNotifications.filter(n => n.day === day);
@@ -570,7 +624,12 @@ const Header: React.FC<HeaderProps> = ({
                                 <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
 
                                 {dayNotifs.map((notif, idx) => (
-                                  <div key={notif.id || idx} className="transition-colors cursor-pointer" style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}>
+                                  <div
+                                    key={notif.id || idx}
+                                    className="transition-colors cursor-pointer"
+                                    style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}
+                                    onClick={() => handleNotificationClick(notif)}
+                                  >
                                     <div className="flex items-start space-x-4 py-3 px-6">
                                       <div className="relative flex-shrink-0">
                                         <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
@@ -596,6 +655,11 @@ const Header: React.FC<HeaderProps> = ({
                                               </span>
                                               <span style={{ color: '#939393' }}> {notif.body || notif.text || ''}</span>
                                             </p>
+                                            {/* {(notif.type === 'NEW_MESSAGE' || notif.type === 'message') && (
+                                              <p className="mt-1.5 text-xs" style={{ color: !notif.isRead ? '#64B5F6' : '#9E9E9E' }}>
+                                                Click to view
+                                              </p>
+                                            )} */}
                                           </div>
                                           <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
                                             <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>

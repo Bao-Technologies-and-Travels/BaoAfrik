@@ -40,7 +40,7 @@ const isPublicEndpoint = (url: string): boolean => {
     '/api/notifications',
   ];
 
-  const urlObj = new URL (url);
+  const urlObj = new URL(url);
   const path = urlObj.pathname;
 
   const result = publicEndpoints.some(endpoint => path.startsWith(endpoint));
@@ -66,14 +66,14 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
 
   // check if user is in visitor mode
   const isVisitor = localStorage.getItem('isVisitor') === 'true';
-  if(isVisitor){
+  if (isVisitor) {
     return originalFetch(input, init)
   }
 
   // Check token
   let token = TokenManager.getAccessToken();
 
-  if(!token && !isVisitor) {
+  if (!token && !isVisitor) {
     redirectToLogin();
     return Promise.reject(new Error('Authentication required'));
   }
@@ -83,9 +83,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
     try {
       token = await TokenManager.refreshToken();
     } catch (error) {
-      if(!isVisitor) {
+      if (!isVisitor) {
         redirectToLogin();
-      return Promise.reject(new Error('Authentication failed'));
+        return Promise.reject(new Error('Authentication failed'));
       }
     }
   }
@@ -101,8 +101,8 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
   };
 
   // merge with existing headers
-  if(init?.headers) {
-    if(init.headers instanceof Headers) {
+  if (init?.headers) {
+    if (init.headers instanceof Headers) {
       init.headers.forEach((value, key) => {
         headers[key] = value;
       });
@@ -118,7 +118,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
   }
 
   // add Authorization header if there is an accessToken and not in visitor mode 
-  if(token && !isVisitor) {
+  if (token && !isVisitor) {
     headers.Authorization = `Bearer ${token}`;
   }
 

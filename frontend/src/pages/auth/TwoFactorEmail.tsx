@@ -145,7 +145,7 @@ const TwoFactorEmail: React.FC = () => {
                   <button
                     type="submit"
                     className={`${isMobileFromProfile ? 'w-full' : 'flex-1'} py-2 px-4 rounded-[12px] text-sm font-light transition-colors`}
-                    style={{ 
+                    style={{
                       backgroundColor: '#F9A825',
                       color: '#FFFFFF',
                       fontFamily: 'Poppins, sans-serif'

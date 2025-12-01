@@ -23,7 +23,7 @@ const TwoFactorSuccess: React.FC = () => {
 
   useEffect(() => {
     if (!fromProfileSettings) return;
-    
+
     if (countdown > 0) {
       const timer = setTimeout(() => {
         setCountdown(countdown - 1);
@@ -31,7 +31,7 @@ const TwoFactorSuccess: React.FC = () => {
       return () => clearTimeout(timer);
     } else if (countdown === 0) {
       // Auto-redirect to security view when countdown expires
-      navigate('/settings', { 
+      navigate('/settings', {
         state: { selectedSidebarOption: 'security', fromTwoFactorSuccess: true },
         replace: false
       });

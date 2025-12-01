@@ -12,10 +12,10 @@ export function useApi<T = any>() {
   ): Promise<R | null> => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await apiCall();
-      
+
       if (response.success && response.data) {
         setData(response.data as any);
         return response.data;

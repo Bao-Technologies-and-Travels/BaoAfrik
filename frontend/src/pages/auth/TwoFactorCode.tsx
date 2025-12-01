@@ -43,7 +43,7 @@ const TwoFactorCode: React.FC = () => {
 
   const handleCodeInputChange = (index: number, value: string) => {
     if (value.length > 1) return;
-    
+
     const newCode = [...verificationCode];
     newCode[index] = value;
     setVerificationCode(newCode);
@@ -186,7 +186,7 @@ const TwoFactorCode: React.FC = () => {
                     type="submit"
                     disabled={verificationCode.join('').length !== 6}
                     className={`${isMobileFromProfile ? 'w-full' : 'flex-1'} py-2 px-4 rounded-[12px] text-sm font-light transition-colors`}
-                    style={{ 
+                    style={{
                       backgroundColor: verificationCode.join('').length === 6 ? '#F9A825' : '#E9E9E9',
                       color: verificationCode.join('').length === 6 ? '#FFFFFF' : '#6A6A6A',
                       fontFamily: 'Poppins, sans-serif'

@@ -14,14 +14,14 @@ const ResetPasswordSent: React.FC = () => {
   const location = useLocation();
   const email = location.state?.email || '';
   const fromProfileSettings = location.state?.fromProfileSettings || false;
-  
+
   const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [isMobile, setIsMobile] = useState(false);
-  
+
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Countdown timer for resend functionality
@@ -48,14 +48,14 @@ const ResetPasswordSent: React.FC = () => {
     if (!email) return 'g***********@gmail.com';
     const [localPart, domain] = email.split('@');
     if (!localPart || !domain) return 'g***********@gmail.com';
-    
+
     const maskedLocal = localPart.charAt(0) + '*'.repeat(Math.max(0, localPart.length - 1));
     return `${maskedLocal}@${domain}`;
   };
 
   const handleInputChange = (index: number, value: string) => {
     if (value.length > 1) return; // Only allow single digit
-    
+
     const newCode = [...verificationCode];
     newCode[index] = value;
     setVerificationCode(newCode);
@@ -75,7 +75,7 @@ const ResetPasswordSent: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const code = verificationCode.join('');
     if (code.length !== 6) {
       setError('Please enter the complete 6-digit code');
@@ -89,14 +89,14 @@ const ResetPasswordSent: React.FC = () => {
       // TODO: Implement verification API call      
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       // Navigate to reset password page
-      navigate('/reset-password', { 
-        state: { 
-          email: email 
-        } 
+      navigate('/reset-password', {
+        state: {
+          email: email
+        }
       });
-      
+
     } catch (error) {
       setError('Invalid verification code. Please try again.');
     } finally {
@@ -106,20 +106,20 @@ const ResetPasswordSent: React.FC = () => {
 
   const handleResendCode = async () => {
     if (!canResend) return;
-    
+
     try {
       setIsLoading(true);
       setError('');
-      
+
       // TODO: Implement resend API call
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Reset countdown
       setCountdown(60);
       setCanResend(false);
-      
+
     } catch (error) {
       setError('Failed to resend code. Please try again.');
       setCanResend(true);
@@ -137,9 +137,9 @@ const ResetPasswordSent: React.FC = () => {
       <div className="hidden lg:block absolute top-0 left-0 right-0 py-4 px-8 border-b" style={{ backgroundColor: '#FEF6E9', borderColor: '#FCD79B' }}>
         <div className="flex items-center justify-between">
           <Link to="/">
-            <img 
-              src={logoFull} 
-              alt="BaoAfrik Logo" 
+            <img
+              src={logoFull}
+              alt="BaoAfrik Logo"
               className="h-8 object-contain cursor-pointer"
             />
           </Link>
@@ -150,46 +150,46 @@ const ResetPasswordSent: React.FC = () => {
           </button>
         </div>
       </div>
-      
+
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
           {/* Breadcrumbs - Only show when accessed from Profile Settings (desktop only) */}
           {fromProfileSettings && !isMobile && (
             <div className="mb-0 -mt-4 w-full max-w-2xl" style={{ marginLeft: '-16px' }}>
               <nav className="flex items-center flex-nowrap space-x-2" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                <img 
-                  src={leftIcon} 
-                  alt="Back" 
-                  className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0" 
+                <img
+                  src={leftIcon}
+                  alt="Back"
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
                   style={{ width: '14px', height: '14px' }}
                   onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
                 />
-                <Link 
-                  to="/" 
-                  className="hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0" 
+                <Link
+                  to="/"
+                  className="hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0"
                   style={{ color: '#BABABA' }}
                 >
                   Homepage
                 </Link>
                 <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
-                <span 
-                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
                   style={{ color: '#BABABA' }}
                   onClick={() => navigate('/', { state: { openMenu: true } })}
                 >
                   Menu
                 </span>
                 <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
-                <span 
-                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
                   style={{ color: '#BABABA' }}
                   onClick={() => navigate('/', { state: { openMenu: true, highlightSettings: true } })}
                 >
                   Settings
                 </span>
                 <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
-                <span 
-                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
                   style={{ color: '#BABABA' }}
                   onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
                 >
@@ -229,21 +229,21 @@ const ResetPasswordSent: React.FC = () => {
               </button>
             </div>
           ) : (
-          <div className="lg:hidden fixed top-5 right-5 z-50">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
-                <span className="text-sm font-medium text-gray-700">EN</span>
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
+            <div className="lg:hidden fixed top-5 right-5 z-50">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg bg-white">
+                  <span className="text-sm font-medium text-gray-700">EN</span>
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
                 <button className="p-2 rounded-lg transition-colors bg-white border border-gray-200" style={{ color: '#F9A825' }}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
           )}
 
           {/* Main content with border and shadow */}
@@ -253,7 +253,7 @@ const ResetPasswordSent: React.FC = () => {
               <div className="mx-auto w-16 h-16 flex items-center justify-center mb-5">
                 <img src={updateIcon} alt="Mail verification" className="w-14 h-14" />
               </div>
-              
+
               <h1 className="text-lg font-semibold mb-1.5" style={{ color: '#212121', fontFamily: isMobileFromProfile ? 'Bricolage Grotesque, sans-serif' : 'Poppins, sans-serif' }}>
                 Mail verification
               </h1>
@@ -262,8 +262,8 @@ const ResetPasswordSent: React.FC = () => {
               </p>
               {!canResend ? (
                 <p className="text-[11px] mt-1 mb-0" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
-                Request another code 0:{countdown.toString().padStart(2, '0')}
-              </p>
+                  Request another code 0:{countdown.toString().padStart(2, '0')}
+                </p>
               ) : (
                 <button
                   onClick={handleResendCode}

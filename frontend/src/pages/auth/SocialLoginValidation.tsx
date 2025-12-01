@@ -22,8 +22,8 @@ const SocialLoginValidation: React.FC<SocialLoginValidationProps> = () => {
 
       // Login the user with social data
       if (socialUserData.id) {
-        const accessToken = socialUserData.accessToken; 
-        const refreshToken = socialUserData.refreshToken; 
+        const accessToken = socialUserData.accessToken;
+        const refreshToken = socialUserData.refreshToken;
 
         if (!accessToken) {
           return;

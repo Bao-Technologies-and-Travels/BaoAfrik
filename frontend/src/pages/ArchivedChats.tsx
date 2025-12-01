@@ -27,7 +27,7 @@ const ArchivedChats: React.FC = () => {
 
     if (isOpening) {
       setActionsMenuOpen(chatId);
-      
+
       // Calculate dropdown position
       if (chatListRef.current) {
         const buttonElement = event.currentTarget as HTMLElement;
@@ -36,10 +36,10 @@ const ArchivedChats: React.FC = () => {
         const cardRect = cardElement.getBoundingClientRect();
         const containerRect = chatListRef.current.getBoundingClientRect();
         const scrollTop = chatListRef.current.scrollTop;
-        
+
         const top = cardRect.bottom - containerRect.top + scrollTop + 8;
         const right = 16; // 16px from right edge
-        
+
         setActionsMenuCoords({ top, right });
       }
     } else {
@@ -48,7 +48,7 @@ const ArchivedChats: React.FC = () => {
     }
   };
 
-  const handleActionSelect = (action: string, chatId: number) => {    
+  const handleActionSelect = (action: string, chatId: number) => {
     if (action === 'Pin the chat') {
       setPinnedChats(prev => new Set(prev).add(chatId));
     } else if (action === 'Unpin the chat') {
@@ -69,7 +69,7 @@ const ArchivedChats: React.FC = () => {
         navigate('/messages');
       }, 300);
     }
-    
+
     setActionsMenuOpen(null);
     setActionsMenuCoords(null);
   };
@@ -242,19 +242,19 @@ const ArchivedChats: React.FC = () => {
             ></div>
 
             {/* Actions Menu */}
-            <div 
-              className="actions-menu absolute bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48" 
+            <div
+              className="actions-menu absolute bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48"
               style={actionsMenuCoords
                 ? {
-                    borderRadius: '24px',
-                    top: `${actionsMenuCoords.top}px`,
-                    right: `${actionsMenuCoords.right}px`
-                  }
+                  borderRadius: '24px',
+                  top: `${actionsMenuCoords.top}px`,
+                  right: `${actionsMenuCoords.right}px`
+                }
                 : {
-                    borderRadius: '24px',
-                    top: '10rem',
-                    right: '16px'
-                  }
+                  borderRadius: '24px',
+                  top: '10rem',
+                  right: '16px'
+                }
               }
             >
               <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">

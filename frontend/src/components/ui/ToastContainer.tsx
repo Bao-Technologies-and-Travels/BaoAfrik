@@ -12,19 +12,19 @@ const ToastContainer: React.FC = () => {
                 <div
                     key={toast.id}
                     className={`p-4 rounded-lg shadow-lg border-l-4 transform transition-all duration-300 ease-in-out ${toast.type === 'success'
-                            ? 'bg-green-50 border-green-500 text-green-800'
-                            : toast.type === 'error'
-                                ? 'bg-red-50 border-red-500 text-red-800'
-                                : toast.type === 'warning'
-                                    ? 'bg-yellow-50 border-yellow-500 text-yellow-800'
-                                    : 'bg-blue-50 border-blue-500 text-blue-800'
+                        ? 'bg-green-50 border-green-500 text-green-800'
+                        : toast.type === 'error'
+                            ? 'bg-red-50 border-red-500 text-red-800'
+                            : toast.type === 'warning'
+                                ? 'bg-yellow-50 border-yellow-500 text-yellow-800'
+                                : 'bg-blue-50 border-blue-500 text-blue-800'
                         }`}
                 >
                     <div className="flex items-start justify-between">
                         <div className="flex items-start space-x-3">
                             <div className={`mt-0.5 flex-shrink-0 ${toast.type === 'success' ? 'text-green-500' :
-                                    toast.type === 'error' ? 'text-red-500' :
-                                        toast.type === 'warning' ? 'text-yellow-500' : 'text-blue-500'
+                                toast.type === 'error' ? 'text-red-500' :
+                                    toast.type === 'warning' ? 'text-yellow-500' : 'text-blue-500'
                                 }`}>
                                 {toast.type === 'success' && (
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

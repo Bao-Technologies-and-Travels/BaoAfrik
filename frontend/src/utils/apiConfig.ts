@@ -3,25 +3,25 @@ export const API_CONFIG = {
   // Base URLs
   BASE_URL: process.env.REACT_APP_API_URL || '/api',
   WS_URL: process.env.REACT_APP_WS_URL || 'http://localhost:3001',
-  
+
   // Authentication
   TOKEN_STORAGE_KEY: 'accessToken',
   REFRESH_TOKEN_KEY: 'refreshToken',
   USER_STORAGE_KEY: 'user',
-  
+
   // Request timeouts (in milliseconds)
   REQUEST_TIMEOUT: 30000,
   UPLOAD_TIMEOUT: 120000,
-  
+
   // File upload limits
   MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
   ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
   MAX_IMAGES_PER_PRODUCT: 10,
-  
+
   // Pagination defaults
   DEFAULT_PAGE_SIZE: 20,
   MAX_PAGE_SIZE: 100,
-  
+
   // Feature flags
   FEATURES: {
     SOCIAL_LOGIN: true,
@@ -31,7 +31,7 @@ export const API_CONFIG = {
     REAL_TIME_MESSAGING: true,
     PUSH_NOTIFICATIONS: false,
   },
-  
+
   // API Endpoints
   ENDPOINTS: {
     // Authentication
@@ -49,7 +49,7 @@ export const API_CONFIG = {
       PREFERENCES: '/auth/preferences',
       CHANGE_PASSWORD: '/auth/change-password',
     },
-    
+
     // Password Reset
     PASSWORD_RESET: {
       REQUEST: '/auth/forgot-password',
@@ -57,7 +57,7 @@ export const API_CONFIG = {
       RESET: '/auth/reset-password',
       RESEND_CODE: '/auth/resend-reset-code',
     },
-    
+
     // Products
     PRODUCTS: {
       LIST: '/products',
@@ -69,11 +69,11 @@ export const API_CONFIG = {
       MY_PRODUCTS: '/products/my-products',
       USER_PRODUCTS: '/products/user/:userId',
     },
-    
+
     // Categories & Locations
     CATEGORIES: '/categories',
     LOCATIONS: '/locations',
-    
+
     // Messaging
     MESSAGES: {
       CONVERSATIONS: '/messages/conversations',
@@ -82,14 +82,14 @@ export const API_CONFIG = {
       READ: '/messages/:id/read',
       CONVERSATION_READ: '/messages/conversations/:id/read',
     },
-    
+
     // Bookmarks
     BOOKMARKS: {
       LIST: '/bookmarks',
       ADD: '/bookmarks',
       REMOVE: '/bookmarks/:productId',
     },
-    
+
     // Requests
     REQUESTS: {
       LIST: '/requests',
@@ -98,7 +98,7 @@ export const API_CONFIG = {
       UPDATE: '/requests/:id',
       DELETE: '/requests/:id',
     },
-    
+
     // Notifications
     NOTIFICATIONS: {
       LIST: '/notifications',
@@ -120,22 +120,22 @@ export const API_ERROR_CODES = {
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
   ACCOUNT_LOCKED: 'ACCOUNT_LOCKED',
-  
+
   // Validation errors
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   DUPLICATE_EMAIL: 'DUPLICATE_EMAIL',
   WEAK_PASSWORD: 'WEAK_PASSWORD',
-  
+
   // Resource errors
   NOT_FOUND: 'NOT_FOUND',
   FORBIDDEN: 'FORBIDDEN',
   CONFLICT: 'CONFLICT',
-  
+
   // Server errors
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
-  
+
   // File upload errors
   FILE_TOO_LARGE: 'FILE_TOO_LARGE',
   INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',

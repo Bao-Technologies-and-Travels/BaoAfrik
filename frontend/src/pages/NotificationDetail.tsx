@@ -210,8 +210,8 @@ const NotificationDetail: React.FC = () => {
             <div className="px-8 pt-6">
               <div className="flex items-center space-x-2 mb-8" style={{ color: '#9E9E9E' }}>
                 <svg className="w-4 h-4" fill="white" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} style={{ color: '#9E9E9E' }}>
-                  <circle cx="12" cy="12" r="10" fill="white" stroke="#9E9E9E" strokeWidth="1.5"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" stroke="#9E9E9E" strokeWidth="1.5" fill="none"/>
+                  <circle cx="12" cy="12" r="10" fill="white" stroke="#9E9E9E" strokeWidth="1.5" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" stroke="#9E9E9E" strokeWidth="1.5" fill="none" />
                 </svg>
                 <span className="text-xs">{getTimeAgo(notification.createdAt)}</span>
               </div>
@@ -247,10 +247,10 @@ const NotificationDetail: React.FC = () => {
 
               {/* View Message Button */}
               {isMessageNotification && (
-                <button 
+                <button
                   onClick={handleViewMessage}
                   className="px-16 py-3 rounded-lg font-medium text-sm transition-colors hover:bg-blue-50"
-                  style={{ 
+                  style={{
                     border: '2px solid #64B5F6',
                     color: '#64B5F6',
                     backgroundColor: 'transparent'

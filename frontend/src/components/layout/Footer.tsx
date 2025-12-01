@@ -11,9 +11,9 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="mb-6">
               <Link to="/" className="inline-block focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded">
-                <img 
-                  src={footerLogo} 
-                  alt="BaoAfrik - African Marketplace Logo" 
+                <img
+                  src={footerLogo}
+                  alt="BaoAfrik - African Marketplace Logo"
                   className="h-8 mb-4"
                 />
               </Link>

@@ -204,6 +204,7 @@ export class WebSocketService {
 
       if (userHasAccess) {
         socket.join(`conversation:${conversationId}`);
+        console.log(`🚪 User ${socket.user!.id} joined room: conversation:${conversationId}`);
 
         socket.emit('conversation_joined', {
           conversationId,
@@ -449,11 +450,20 @@ export class WebSocketService {
     const { conversationId } = data;
     const userId = socket.user!.id;
 
+    console.log('⌨️ typing_start received:', {
+      conversationId,
+      userId,
+      room: `conversation:${conversationId}`,
+      socketRooms: Array.from(socket.rooms)
+    });
+
     socket.to(`conversation:${conversationId}`).emit('user_typing', {
       conversationId,
       userId,
       userName: `${socket.user!.firstName} ${socket.user!.lastName}`.trim() || socket.user!.email
     });
+
+    console.log('📤 user_typing emitted to room:', `conversation:${conversationId}`);
   }
 
   private handleTypingStop(socket: AuthenticatedSocket, data: any) {

@@ -26,19 +26,19 @@ const NotificationToast: React.FC<NotificationToastProps> = ({
   if (!isVisible) return null;
 
   return (
-    <div 
+    <div
       className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-slide-down"
       style={{ maxWidth: '350px' }}
     >
-      <div 
+      <div
         className="flex items-start space-x-3 p-3 rounded-xl shadow-lg"
         style={{ backgroundColor: '#F5FBFF', border: '1px solid #CFE8FC' }}
       >
         {/* Icon/Avatar */}
         <div className="relative flex-shrink-0">
-          <div 
-            className="w-10 h-10 rounded-full flex items-center justify-center" 
-            style={{ 
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{
               backgroundColor: type === 'message' ? '#E3F2FD' : '#F9A825',
               border: '2px solid white'
             }}
@@ -49,14 +49,14 @@ const NotificationToast: React.FC<NotificationToastProps> = ({
               <img src={logoIcon} alt="Logo" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
             )}
           </div>
-          <div 
-            className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" 
+          <div
+            className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
             style={{ backgroundColor: '#FFF' }}
           >
-            <img 
-              src={type === 'message' ? messageAvatarIcon : appNotificationIcon} 
-              alt="Badge" 
-              className="w-3 h-3" 
+            <img
+              src={type === 'message' ? messageAvatarIcon : appNotificationIcon}
+              alt="Badge"
+              className="w-3 h-3"
             />
           </div>
         </div>
@@ -84,7 +84,7 @@ const NotificationToast: React.FC<NotificationToastProps> = ({
         </div>
 
         {/* Close Button */}
-        <button 
+        <button
           onClick={onClose}
           className="flex-shrink-0 hover:opacity-70 transition-opacity"
         >

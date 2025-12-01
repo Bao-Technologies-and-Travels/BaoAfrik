@@ -119,11 +119,11 @@ export type ProductLikeAggregateArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 export type GetProductLikeAggregateType<T extends ProductLikeAggregateArgs> = {
-      [P in keyof T & keyof AggregateProductLike]: P extends '_count' | 'count'
-    ? T[P] extends true
-      ? number
-      : Prisma.GetScalarType<T[P], AggregateProductLike[P]>
-    : Prisma.GetScalarType<T[P], AggregateProductLike[P]>
+  [P in keyof T & keyof AggregateProductLike]: P extends '_count' | 'count'
+  ? T[P] extends true
+  ? number
+  : Prisma.GetScalarType<T[P], AggregateProductLike[P]>
+  : Prisma.GetScalarType<T[P], AggregateProductLike[P]>
 }
 
 
@@ -154,15 +154,15 @@ export type ProductLikeGroupByOutputType = {
 type GetProductLikeGroupByPayload<T extends ProductLikeGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ProductLikeGroupByOutputType, T['by']> &
-      {
-        [P in ((keyof T) & (keyof ProductLikeGroupByOutputType))]: P extends '_count'
-          ? T[P] extends boolean
-            ? number
-            : Prisma.GetScalarType<T[P], ProductLikeGroupByOutputType[P]>
-          : Prisma.GetScalarType<T[P], ProductLikeGroupByOutputType[P]>
-      }
-    >
+    {
+      [P in ((keyof T) & (keyof ProductLikeGroupByOutputType))]: P extends '_count'
+      ? T[P] extends boolean
+      ? number
+      : Prisma.GetScalarType<T[P], ProductLikeGroupByOutputType[P]>
+      : Prisma.GetScalarType<T[P], ProductLikeGroupByOutputType[P]>
+    }
   >
+>
 
 
 
@@ -854,10 +854,10 @@ export interface ProductLikeDelegate<ExtArgs extends runtime.Types.Extensions.In
     args?: Prisma.Subset<T, ProductLikeCountArgs>,
   ): Prisma.PrismaPromise<
     T extends runtime.Types.Utils.Record<'select', any>
-      ? T['select'] extends true
-        ? number
-        : Prisma.GetScalarType<T['select'], ProductLikeCountAggregateOutputType>
-      : number
+    ? T['select'] extends true
+    ? number
+    : Prisma.GetScalarType<T['select'], ProductLikeCountAggregateOutputType>
+    : number
   >
 
   /**
@@ -911,8 +911,8 @@ export interface ProductLikeDelegate<ExtArgs extends runtime.Types.Extensions.In
       Prisma.Extends<'take', Prisma.Keys<T>>
     >,
     OrderByArg extends Prisma.True extends HasSelectOrTake
-      ? { orderBy: ProductLikeGroupByArgs['orderBy'] }
-      : { orderBy?: ProductLikeGroupByArgs['orderBy'] },
+    ? { orderBy: ProductLikeGroupByArgs['orderBy'] }
+    : { orderBy?: ProductLikeGroupByArgs['orderBy'] },
     OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>,
     ByFields extends Prisma.MaybeTupleToUnion<T['by']>,
     ByValid extends Prisma.Has<ByFields, OrderFields>,
@@ -923,49 +923,49 @@ export interface ProductLikeDelegate<ExtArgs extends runtime.Types.Extensions.In
     ? `Error: "by" must not be empty.`
     : HavingValid extends Prisma.False
     ? {
-        [P in HavingFields]: P extends ByFields
-          ? never
-          : P extends string
-          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-          : [
-              Error,
-              'Field ',
-              P,
-              ` in "having" needs to be provided in "by"`,
-            ]
-      }[HavingFields]
+      [P in HavingFields]: P extends ByFields
+      ? never
+      : P extends string
+      ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+      : [
+        Error,
+        'Field ',
+        P,
+        ` in "having" needs to be provided in "by"`,
+      ]
+    }[HavingFields]
     : 'take' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-      ? ByValid extends Prisma.True
-        ? {}
-        : {
-            [P in OrderFields]: P extends ByFields
-              ? never
-              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-          }[OrderFields]
-      : 'Error: If you provide "take", you also need to provide "orderBy"'
+    ? ByValid extends Prisma.True
+    ? {}
+    : {
+      [P in OrderFields]: P extends ByFields
+      ? never
+      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+    }[OrderFields]
+    : 'Error: If you provide "take", you also need to provide "orderBy"'
     : 'skip' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-      ? ByValid extends Prisma.True
-        ? {}
-        : {
-            [P in OrderFields]: P extends ByFields
-              ? never
-              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-          }[OrderFields]
-      : 'Error: If you provide "skip", you also need to provide "orderBy"'
+    ? ByValid extends Prisma.True
+    ? {}
+    : {
+      [P in OrderFields]: P extends ByFields
+      ? never
+      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+    }[OrderFields]
+    : 'Error: If you provide "skip", you also need to provide "orderBy"'
     : ByValid extends Prisma.True
     ? {}
     : {
-        [P in OrderFields]: P extends ByFields
-          ? never
-          : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-      }[OrderFields]
+      [P in OrderFields]: P extends ByFields
+      ? never
+      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+    }[OrderFields]
   >(args: Prisma.SubsetIntersection<T, ProductLikeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProductLikeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-/**
- * Fields of the ProductLike model
- */
-readonly fields: ProductLikeFieldRefs;
+  /**
+   * Fields of the ProductLike model
+   */
+  readonly fields: ProductLikeFieldRefs;
 }
 
 /**
@@ -1012,7 +1012,7 @@ export interface ProductLikeFieldRefs {
   readonly productId: Prisma.FieldRef<"ProductLike", 'String'>
   readonly createdAt: Prisma.FieldRef<"ProductLike", 'DateTime'>
 }
-    
+
 
 // Custom InputTypes
 /**

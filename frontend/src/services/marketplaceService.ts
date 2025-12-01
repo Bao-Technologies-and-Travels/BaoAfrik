@@ -80,7 +80,7 @@ export class MarketplaceService {
         }
       });
     }
-    
+
     return apiClient.get(`/products?${queryParams.toString()}`);
   }
 
@@ -97,7 +97,7 @@ export class MarketplaceService {
     formData.append('currency', productData.currency);
     formData.append('category', productData.category);
     formData.append('location', productData.location);
-    
+
     productData.images.forEach((image, index) => {
       formData.append(`images`, image);
     });
@@ -225,7 +225,7 @@ export class MarketplaceService {
         }
       });
     }
-    
+
     return apiClient.get(`/requests?${queryParams.toString()}`);
   }
 

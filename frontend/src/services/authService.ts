@@ -119,11 +119,11 @@ export class AuthService {
         error.message ||
         'Token refresh failed';
 
-        return {
-          success: false,
-          message: errorMessage,
-          data: undefined
-        };
+      return {
+        success: false,
+        message: errorMessage,
+        data: undefined
+      };
     }
   }
 

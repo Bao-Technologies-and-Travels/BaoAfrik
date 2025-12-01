@@ -151,11 +151,11 @@ export type NotificationAggregateArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 export type GetNotificationAggregateType<T extends NotificationAggregateArgs> = {
-      [P in keyof T & keyof AggregateNotification]: P extends '_count' | 'count'
-    ? T[P] extends true
-      ? number
-      : Prisma.GetScalarType<T[P], AggregateNotification[P]>
-    : Prisma.GetScalarType<T[P], AggregateNotification[P]>
+  [P in keyof T & keyof AggregateNotification]: P extends '_count' | 'count'
+  ? T[P] extends true
+  ? number
+  : Prisma.GetScalarType<T[P], AggregateNotification[P]>
+  : Prisma.GetScalarType<T[P], AggregateNotification[P]>
 }
 
 
@@ -192,15 +192,15 @@ export type NotificationGroupByOutputType = {
 type GetNotificationGroupByPayload<T extends NotificationGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<NotificationGroupByOutputType, T['by']> &
-      {
-        [P in ((keyof T) & (keyof NotificationGroupByOutputType))]: P extends '_count'
-          ? T[P] extends boolean
-            ? number
-            : Prisma.GetScalarType<T[P], NotificationGroupByOutputType[P]>
-          : Prisma.GetScalarType<T[P], NotificationGroupByOutputType[P]>
-      }
-    >
+    {
+      [P in ((keyof T) & (keyof NotificationGroupByOutputType))]: P extends '_count'
+      ? T[P] extends boolean
+      ? number
+      : Prisma.GetScalarType<T[P], NotificationGroupByOutputType[P]>
+      : Prisma.GetScalarType<T[P], NotificationGroupByOutputType[P]>
+    }
   >
+>
 
 
 
@@ -751,10 +751,10 @@ export interface NotificationDelegate<ExtArgs extends runtime.Types.Extensions.I
     args?: Prisma.Subset<T, NotificationCountArgs>,
   ): Prisma.PrismaPromise<
     T extends runtime.Types.Utils.Record<'select', any>
-      ? T['select'] extends true
-        ? number
-        : Prisma.GetScalarType<T['select'], NotificationCountAggregateOutputType>
-      : number
+    ? T['select'] extends true
+    ? number
+    : Prisma.GetScalarType<T['select'], NotificationCountAggregateOutputType>
+    : number
   >
 
   /**
@@ -808,8 +808,8 @@ export interface NotificationDelegate<ExtArgs extends runtime.Types.Extensions.I
       Prisma.Extends<'take', Prisma.Keys<T>>
     >,
     OrderByArg extends Prisma.True extends HasSelectOrTake
-      ? { orderBy: NotificationGroupByArgs['orderBy'] }
-      : { orderBy?: NotificationGroupByArgs['orderBy'] },
+    ? { orderBy: NotificationGroupByArgs['orderBy'] }
+    : { orderBy?: NotificationGroupByArgs['orderBy'] },
     OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>,
     ByFields extends Prisma.MaybeTupleToUnion<T['by']>,
     ByValid extends Prisma.Has<ByFields, OrderFields>,
@@ -820,49 +820,49 @@ export interface NotificationDelegate<ExtArgs extends runtime.Types.Extensions.I
     ? `Error: "by" must not be empty.`
     : HavingValid extends Prisma.False
     ? {
-        [P in HavingFields]: P extends ByFields
-          ? never
-          : P extends string
-          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-          : [
-              Error,
-              'Field ',
-              P,
-              ` in "having" needs to be provided in "by"`,
-            ]
-      }[HavingFields]
+      [P in HavingFields]: P extends ByFields
+      ? never
+      : P extends string
+      ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+      : [
+        Error,
+        'Field ',
+        P,
+        ` in "having" needs to be provided in "by"`,
+      ]
+    }[HavingFields]
     : 'take' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-      ? ByValid extends Prisma.True
-        ? {}
-        : {
-            [P in OrderFields]: P extends ByFields
-              ? never
-              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-          }[OrderFields]
-      : 'Error: If you provide "take", you also need to provide "orderBy"'
+    ? ByValid extends Prisma.True
+    ? {}
+    : {
+      [P in OrderFields]: P extends ByFields
+      ? never
+      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+    }[OrderFields]
+    : 'Error: If you provide "take", you also need to provide "orderBy"'
     : 'skip' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-      ? ByValid extends Prisma.True
-        ? {}
-        : {
-            [P in OrderFields]: P extends ByFields
-              ? never
-              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-          }[OrderFields]
-      : 'Error: If you provide "skip", you also need to provide "orderBy"'
+    ? ByValid extends Prisma.True
+    ? {}
+    : {
+      [P in OrderFields]: P extends ByFields
+      ? never
+      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+    }[OrderFields]
+    : 'Error: If you provide "skip", you also need to provide "orderBy"'
     : ByValid extends Prisma.True
     ? {}
     : {
-        [P in OrderFields]: P extends ByFields
-          ? never
-          : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-      }[OrderFields]
+      [P in OrderFields]: P extends ByFields
+      ? never
+      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+    }[OrderFields]
   >(args: Prisma.SubsetIntersection<T, NotificationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetNotificationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-/**
- * Fields of the Notification model
- */
-readonly fields: NotificationFieldRefs;
+  /**
+   * Fields of the Notification model
+   */
+  readonly fields: NotificationFieldRefs;
 }
 
 /**
@@ -913,7 +913,7 @@ export interface NotificationFieldRefs {
   readonly createdAt: Prisma.FieldRef<"Notification", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Notification", 'DateTime'>
 }
-    
+
 
 // Custom InputTypes
 /**

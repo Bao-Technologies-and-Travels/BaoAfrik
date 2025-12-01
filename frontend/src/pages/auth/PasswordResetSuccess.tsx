@@ -1,5 +1,5 @@
-import React,{useState, useEffect} from 'react';
-import { Link, useLocation, useNavigate} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 import verifyIcon from '../../assets/images/pre/verify.png';
@@ -16,7 +16,7 @@ const PasswordResetSuccess: React.FC = () => {
 
   useEffect(() => {
     if (!fromProfileSettings) return;
-    
+
     if (countdown > 0) {
       const timer = setTimeout(() => {
         setCountdown(countdown - 1);
@@ -25,7 +25,7 @@ const PasswordResetSuccess: React.FC = () => {
     } else if (countdown === 0) {
       // Auto-redirect to security tab when countdown expires
       // Use window.location to ensure proper navigation
-      navigate('/settings', { 
+      navigate('/settings', {
         state: { selectedSidebarOption: 'security' },
         replace: false
       });
@@ -49,9 +49,9 @@ const PasswordResetSuccess: React.FC = () => {
       <div className="hidden lg:block absolute top-0 left-0 right-0 py-4 px-8 border-b" style={{ backgroundColor: '#FEF6E9', borderColor: '#FCD79B' }}>
         <div className="flex items-center justify-between">
           <Link to="/">
-            <img 
-              src={logoFull} 
-              alt="BaoAfrik Logo" 
+            <img
+              src={logoFull}
+              alt="BaoAfrik Logo"
               className="h-8 object-contain cursor-pointer"
             />
           </Link>
@@ -62,46 +62,46 @@ const PasswordResetSuccess: React.FC = () => {
           </button>
         </div>
       </div>
-      
+
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 lg:pt-16">
         <div className="w-full max-w-md">
           {/* Breadcrumbs - Only show when accessed from Profile Settings (desktop only) */}
           {fromProfileSettings && !isMobile && (
             <div className="mb-0 -mt-4 w-full max-w-2xl" style={{ marginLeft: '-16px' }}>
               <nav className="flex items-center flex-nowrap space-x-2" style={{ fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                <img 
-                  src={leftIcon} 
-                  alt="Back" 
-                  className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0" 
+                <img
+                  src={leftIcon}
+                  alt="Back"
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
                   style={{ width: '14px', height: '14px' }}
                   onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
                 />
-                <Link 
-                  to="/" 
-                  className="hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0" 
+                <Link
+                  to="/"
+                  className="hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0"
                   style={{ color: '#BABABA' }}
                 >
                   Homepage
                 </Link>
                 <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
-                <span 
-                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
                   style={{ color: '#BABABA' }}
                   onClick={() => navigate('/', { state: { openMenu: true } })}
                 >
                   Menu
                 </span>
                 <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
-                <span 
-                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
                   style={{ color: '#BABABA' }}
                   onClick={() => navigate('/', { state: { openMenu: true, highlightSettings: true } })}
                 >
                   Settings
                 </span>
                 <span className="flex-shrink-0" style={{ color: '#BABABA', fontSize: '17px', lineHeight: 1 }}>·</span>
-                <span 
-                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0" 
+                <span
+                  className="hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap flex-shrink-0"
                   style={{ color: '#BABABA' }}
                   onClick={() => navigate('/settings', { state: { selectedSidebarOption: 'security' } })}
                 >
@@ -154,7 +154,7 @@ const PasswordResetSuccess: React.FC = () => {
                   <img src={verifyIcon} alt="Success" className="w-full h-full object-contain" />
                 )}
               </div>
-              
+
               <h1 className="text-lg font-semibold mb-2" style={{ color: '#212121', fontFamily: isMobileFromProfile ? 'Bricolage Grotesque, sans-serif' : 'Poppins, sans-serif' }}>
                 Password reset successfully
               </h1>
@@ -172,13 +172,13 @@ const PasswordResetSuccess: React.FC = () => {
                   Back to setting page ({countdown}s)
                 </button>
               ) : (
-              <Link 
-                  to="/" 
+                <Link
+                  to="/"
                   className="inline-flex items-center justify-center w-full max-w-xs mx-auto px-6 py-2.5 text-sm font-normal rounded-[10px] transition-colors duration-200"
                   style={{ backgroundColor: '#F9A825', color: '#FFFFFF' }}
-              >
+                >
                   Back to home page
-              </Link>
+                </Link>
               )}
             </div>
           </div>

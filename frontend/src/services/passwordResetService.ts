@@ -3,8 +3,8 @@ import { apiClient, ApiResponse } from './api';
 // Password Reset Service
 export class PasswordResetService {
   // Request password reset (send email)
-  async requestPasswordReset(email: string): Promise<ApiResponse<{ 
-    message: string; 
+  async requestPasswordReset(email: string): Promise<ApiResponse<{
+    message: string;
     resetToken?: string; // For development/testing
   }>> {
     return apiClient.post('/auth/forgot-password', { email });
@@ -14,9 +14,9 @@ export class PasswordResetService {
   async verifyResetCode(data: {
     email: string;
     resetCode: string;
-  }): Promise<ApiResponse<{ 
-    message: string; 
-    resetToken: string; 
+  }): Promise<ApiResponse<{
+    message: string;
+    resetToken: string;
   }>> {
     return apiClient.post('/auth/verify-reset-code', data);
   }
