@@ -453,10 +453,15 @@ const MyListings: React.FC = () => {
     });
   };
 
-  const handleDeleteClick = (listing: Listing) => {
+  const handleDeleteClick = (listing: Listing, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    // Close dropdown and set delete state immediately
+    setMoreOptionsOpenFor(null);
     setListingToDelete(listing);
     setIsDeleteSuccess(false);
-    setMoreOptionsOpenFor(null);
   };
 
   const handleConfirmDelete = () => {
@@ -477,6 +482,20 @@ const MyListings: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
+      const element = target as Element;
+      
+      // Check if click is on a delete button - if so, don't close dropdown (let delete handler manage it)
+      const clickedButton = element.closest('button');
+      if (clickedButton) {
+        const deleteIcon = clickedButton.querySelector('img[alt="Delete"]');
+        const deleteText = Array.from(clickedButton.querySelectorAll('span')).find(
+          span => span.textContent?.includes('Delete the listing')
+        );
+        if (deleteIcon || deleteText) {
+          return; // Let the delete button's onClick handler manage the state
+        }
+      }
+      
       if (statusDropdownRef.current && !statusDropdownRef.current.contains(target)) {
         setIsStatusDropdownOpen(false);
       }
@@ -1030,8 +1049,10 @@ const MyListings: React.FC = () => {
                     <button
                       type="button"
                       onClick={(e) => {
+                        handleDeleteClick(listing, e);
+                      }}
+                      onMouseDown={(e) => {
                         e.stopPropagation();
-                        handleDeleteClick(listing);
                       }}
                       style={{
                         width: '100%',
@@ -1210,8 +1231,10 @@ const MyListings: React.FC = () => {
                    <button
                      type="button"
                      onClick={(e) => {
+                       handleDeleteClick(listing, e);
+                     }}
+                     onMouseDown={(e) => {
                        e.stopPropagation();
-                       handleDeleteClick(listing);
                      }}
                      style={{
                        width: '100%',
@@ -2068,9 +2091,13 @@ const MyListings: React.FC = () => {
               borderRadius: '30px',
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
               padding: '30px',
-              maxWidth: '500px',
+              paddingBottom: '15px',
+              maxWidth: '420px',
               width: '90%',
-              position: 'relative'
+              minHeight: '320px',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column'
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -2094,7 +2121,7 @@ const MyListings: React.FC = () => {
             </button>
 
             {/* Icon */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
               <img
                 src={isDeleteSuccess ? verityIcon : redtrashIcon}
                 alt={isDeleteSuccess ? 'Success' : 'Delete'}
@@ -2115,7 +2142,13 @@ const MyListings: React.FC = () => {
               >
                 {isDeleteSuccess
                   ? `The item "${listingToDelete.title}" has been successfully removed.`
-                  : `The item "${listingToDelete.title}" will be permanently deleted, do you wish to continue ?`}
+                  : (
+                    <>
+                      The item "{listingToDelete.title}" will be<br />
+                      permanently deleted, do you<br />
+                      wish to continue ?
+                    </>
+                  )}
               </p>
             </div>
 
@@ -2129,7 +2162,7 @@ const MyListings: React.FC = () => {
                     backgroundColor: '#F9A825',
                     borderRadius: '12px',
                     border: 'none',
-                    padding: '12px 32px',
+                    padding: '10px 140px',
                     cursor: 'pointer',
                     color: '#FFFFFF',
                     fontFamily: 'Poppins, sans-serif',
@@ -2149,7 +2182,7 @@ const MyListings: React.FC = () => {
                     backgroundColor: '#F1F1F1',
                     borderRadius: '12px',
                     border: 'none',
-                    padding: '12px 24px',
+                    padding: '10px 28px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -2168,7 +2201,7 @@ const MyListings: React.FC = () => {
                     backgroundColor: '#FF5151',
                     borderRadius: '12px',
                     border: 'none',
-                    padding: '12px 24px',
+                    padding: '10px 28px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
