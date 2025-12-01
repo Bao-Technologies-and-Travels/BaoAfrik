@@ -21,6 +21,7 @@ import redtrashIcon from '../assets/images/pre/redtrash.svg';
 import verityIcon from '../assets/images/pre/verity.svg';
 import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 import backArrowIcon from '../assets/images/pre/back arrow.svg';
+import statusIcon from '../assets/images/pre/status.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -318,6 +319,8 @@ const MyListings: React.FC = () => {
   const moreOptionsRef = useRef<HTMLDivElement | null>(null);
   const [listingToDelete, setListingToDelete] = useState<Listing | null>(null);
   const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
+  const [isMobilePlusModalOpen, setIsMobilePlusModalOpen] = useState(false);
+  const mobilePlusModalRef = useRef<HTMLDivElement | null>(null);
 
   // Mock data - replace with actual data from backend
   const initialListings: Listing[] = [
@@ -508,6 +511,9 @@ const MyListings: React.FC = () => {
       }
       if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
         setMoreOptionsOpenFor(null);
+      }
+      if (mobilePlusModalRef.current && !mobilePlusModalRef.current.contains(target)) {
+        setIsMobilePlusModalOpen(false);
       }
     };
 
@@ -1650,24 +1656,200 @@ const MyListings: React.FC = () => {
                   {totalListings}
                 </span>
               </div>
-              <button
-                type="button"
-                onClick={() => navigate('/create-listing')}
-                className="flex items-center justify-center"
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  backgroundColor: '#64B5F6',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer'
-                }}
-                aria-label="Add listing"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 5v14M5 12h14" stroke="#F0F8FE" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
+              <div ref={mobilePlusModalRef} className="relative">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMobilePlusModalOpen(!isMobilePlusModalOpen);
+                  }}
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    backgroundColor: '#64B5F6',
+                    borderRadius: '8px',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                  aria-label="Add listing"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 5v14M5 12h14" stroke="#F0F8FE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+
+                {/* Mobile Plus Modal */}
+                {isMobilePlusModalOpen && (
+                  <div
+                    className="absolute bottom-full right-0 mb-2 z-50"
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '8px',
+                      minWidth: '180px'
+                    }}
+                  >
+                    {/* Sort by option */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsSortDropdownOpen(true);
+                        setIsMobilePlusModalOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
+                      style={{ 
+                        color: isSortDropdownOpen ? '#64B5F6' : '#939393', 
+                        fontFamily: 'Poppins, sans-serif', 
+                        fontSize: '13px',
+                        backgroundColor: isSortDropdownOpen ? '#F0F8FE' : 'transparent',
+                        borderRadius: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSortDropdownOpen) {
+                          e.currentTarget.style.backgroundColor = '#FAFAFA';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSortDropdownOpen) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <img 
+                        src={filterIcon} 
+                        alt="Sort" 
+                        className="w-4 h-4" 
+                        style={{ 
+                          filter: isSortDropdownOpen 
+                            ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                            : 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
+                        }} 
+                      />
+                      <span>Sort by</span>
+                    </button>
+
+                    {/* All Status option */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsStatusDropdownOpen(true);
+                        setIsMobilePlusModalOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
+                      style={{ 
+                        color: isStatusDropdownOpen ? '#64B5F6' : '#939393', 
+                        fontFamily: 'Poppins, sans-serif', 
+                        fontSize: '13px',
+                        backgroundColor: isStatusDropdownOpen ? '#F0F8FE' : 'transparent',
+                        borderRadius: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isStatusDropdownOpen) {
+                          e.currentTarget.style.backgroundColor = '#FAFAFA';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isStatusDropdownOpen) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <img 
+                        src={statusIcon} 
+                        alt="Status" 
+                        className="w-4 h-4"
+                        style={{
+                          filter: isStatusDropdownOpen
+                            ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                            : 'none'
+                        }}
+                      />
+                      <span>All Status</span>
+                    </button>
+
+                    {/* Drafts option */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsDraftsModalOpen(true);
+                        setIsMobilePlusModalOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
+                      style={{ 
+                        color: isDraftsModalOpen ? '#64B5F6' : '#939393', 
+                        fontFamily: 'Poppins, sans-serif', 
+                        fontSize: '13px',
+                        backgroundColor: isDraftsModalOpen ? '#F0F8FE' : 'transparent',
+                        borderRadius: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isDraftsModalOpen) {
+                          e.currentTarget.style.backgroundColor = '#FAFAFA';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isDraftsModalOpen) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <img 
+                        src={draftsIcon} 
+                        alt="Drafts" 
+                        className="w-4 h-4" 
+                        style={{ 
+                          filter: isDraftsModalOpen
+                            ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                            : 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
+                        }} 
+                      />
+                      <span>Drafts</span>
+                      <span
+                        className="px-2 py-0.5 rounded-full font-medium ml-auto"
+                        style={{
+                          backgroundColor: '#F4F4F4',
+                          color: '#939393',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        {draftCount}
+                      </span>
+                    </button>
+
+                    {/* Divider */}
+                    <hr style={{ height: '1px', backgroundColor: '#E9E9E9', margin: '4px 0', border: 0 }} />
+
+                    {/* Close option */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsMobilePlusModalOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
+                      style={{ 
+                        backgroundColor: '#FAFAFA',
+                        color: '#B0B0B0', 
+                        fontFamily: 'Poppins, sans-serif', 
+                        fontSize: '13px',
+                        borderRadius: '8px'
+                      }}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="#B0B0B0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                      <span>Close</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
