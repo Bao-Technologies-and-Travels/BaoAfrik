@@ -334,9 +334,7 @@ const MyListings: React.FC = () => {
     { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: '48', currency: 'USD', createdAt: 1689300000000, priceValue: 48, messages: 17, category: 'Food & Spicy' },
     { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: '35', currency: 'USD', createdAt: 1689700000000, priceValue: 35, messages: 14, category: 'Food & Spicy' },
   ];
-  // Temporarily set to empty array to test empty state - change back to initialListings when done testing
-  const [listings, setListings] = useState<Listing[]>([]);
-  // const [listings, setListings] = useState<Listing[]>(initialListings);
+  const [listings, setListings] = useState<Listing[]>(initialListings);
 
   const trimmedSearchQuery = searchQuery.trim();
 
@@ -1134,7 +1132,7 @@ const MyListings: React.FC = () => {
   );
 
   const renderListingsGrid = () => (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 md:gap-8">
+    <div className={`grid ${isMobile ? 'grid-cols-2 px-4' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} ${isMobile ? 'gap-3' : 'gap-4 sm:gap-6 md:gap-8'}`}>
       {sortedListings.map((listing) => (
         <div
           key={listing.id}
@@ -1143,12 +1141,12 @@ const MyListings: React.FC = () => {
           onClick={() => handleListingNavigation(listing)}
         >
           {/* Product Image */}
-          <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+          <div className={`aspect-square relative overflow-hidden mb-1 sm:mb-2`} style={{ borderRadius: '12px', ...(isMobile ? { padding: '2px' } : {}) }}>
             <img
               src={listing.image}
               alt={listing.title}
               className="w-full h-full object-cover"
-              style={{ borderRadius: '12px' }}
+              style={{ borderRadius: '12px', ...(isMobile ? { transform: 'scaleX(1.0) scaleY(0.92)' } : {}) }}
             />
           </div>
 
@@ -1357,9 +1355,9 @@ const MyListings: React.FC = () => {
   );
 
   const renderPagination = () => (
-    <div className="flex flex-col lg:flex-row items-center gap-6 mt-12 mb-32 w-full">
-      <div className="flex-1 flex justify-center w-full">
-        <div className="flex items-center gap-4" style={{ marginLeft: '80px' }}>
+    <div className={`flex flex-col ${isMobile ? 'items-center gap-4' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-16' : 'mb-32'} w-full`}>
+      <div className={`flex-1 flex justify-center w-full ${isMobile ? '' : ''}`}>
+        <div className={`flex items-center gap-4 ${isMobile ? '' : ''}`} style={isMobile ? {} : { marginLeft: '80px' }}>
           <button
             aria-label="Previous page"
             style={{
@@ -1416,7 +1414,8 @@ const MyListings: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* Go to section - directly under pagination on mobile */}
+      <div className={`flex items-center gap-2 ${isMobile ? 'justify-center' : ''}`}>
         <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
         <input
           type="text"
@@ -1483,8 +1482,8 @@ const MyListings: React.FC = () => {
 
   return (
     <>
-      {/* Header - Hidden on mobile when empty state */}
-      {(!isMobile || !shouldShowEmptyState) && <Header />}
+      {/* Header - Hidden on mobile */}
+      {!isMobile && <Header />}
       <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
         {/* Mobile Header - Only visible on mobile, always shown */}
         {isMobile && (
@@ -1578,8 +1577,8 @@ const MyListings: React.FC = () => {
               </div>
             </div>
 
-            {/* Search and View Toggle - Hidden on mobile when empty state */}
-            {(!shouldShowEmptyState || !isMobile) && (
+            {/* Search and View Toggle - Hidden on mobile */}
+            {!isMobile && (
               <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-0">
                 <div
                   className="inline-flex items-center border mb-4 overflow-hidden"
@@ -1631,8 +1630,50 @@ const MyListings: React.FC = () => {
             )}
           </div>
 
-        {/* Filters and Action Buttons Bar */}
-        {(!shouldShowEmptyState && !isSearchNoResultsState) && (
+        {/* Mobile All Listings Bar - Only visible on mobile when listings exist */}
+        {isMobile && !shouldShowEmptyState && !isSearchNoResultsState && (
+          <div className="lg:hidden px-4 mt-2 mb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                  All listings
+                </span>
+                <span
+                  className="px-2 py-0.5 rounded-full font-medium"
+                  style={{
+                    backgroundColor: '#F1F1F1',
+                    color: '#939393',
+                    fontSize: '12px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  {totalListings}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate('/create-listing')}
+                className="flex items-center justify-center"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  backgroundColor: '#64B5F6',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+                aria-label="Add listing"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5v14M5 12h14" stroke="#F0F8FE" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Filters and Action Buttons Bar - Desktop only */}
+        {!isMobile && (!shouldShowEmptyState && !isSearchNoResultsState) && (
             <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-6 mb-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 w-full">
                 {/* Left Side - Filters */}
@@ -2097,7 +2138,7 @@ const MyListings: React.FC = () => {
 
           <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-4 mb-6">
             <div className="pl-0 lg:pl-0 lg:-ml-16">
-              {shouldShowEmptyState ? renderEmptyState() : viewMode === 'grid' ? renderListingsGrid() : renderListingsList()}
+              {shouldShowEmptyState ? renderEmptyState() : (isMobile ? renderListingsGrid() : (viewMode === 'grid' ? renderListingsGrid() : renderListingsList()))}
             </div>
           </div>
       {(!shouldShowEmptyState && !isSearchNoResultsState) && (
