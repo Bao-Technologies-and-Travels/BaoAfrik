@@ -137,11 +137,11 @@ export type ConversationAggregateArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 export type GetConversationAggregateType<T extends ConversationAggregateArgs> = {
-  [P in keyof T & keyof AggregateConversation]: P extends '_count' | 'count'
-  ? T[P] extends true
-  ? number
-  : Prisma.GetScalarType<T[P], AggregateConversation[P]>
-  : Prisma.GetScalarType<T[P], AggregateConversation[P]>
+      [P in keyof T & keyof AggregateConversation]: P extends '_count' | 'count'
+    ? T[P] extends true
+      ? number
+      : Prisma.GetScalarType<T[P], AggregateConversation[P]>
+    : Prisma.GetScalarType<T[P], AggregateConversation[P]>
 }
 
 
@@ -175,15 +175,15 @@ export type ConversationGroupByOutputType = {
 type GetConversationGroupByPayload<T extends ConversationGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ConversationGroupByOutputType, T['by']> &
-    {
-      [P in ((keyof T) & (keyof ConversationGroupByOutputType))]: P extends '_count'
-      ? T[P] extends boolean
-      ? number
-      : Prisma.GetScalarType<T[P], ConversationGroupByOutputType[P]>
-      : Prisma.GetScalarType<T[P], ConversationGroupByOutputType[P]>
-    }
+      {
+        [P in ((keyof T) & (keyof ConversationGroupByOutputType))]: P extends '_count'
+          ? T[P] extends boolean
+            ? number
+            : Prisma.GetScalarType<T[P], ConversationGroupByOutputType[P]>
+          : Prisma.GetScalarType<T[P], ConversationGroupByOutputType[P]>
+      }
+    >
   >
->
 
 
 
@@ -1204,10 +1204,10 @@ export interface ConversationDelegate<ExtArgs extends runtime.Types.Extensions.I
     args?: Prisma.Subset<T, ConversationCountArgs>,
   ): Prisma.PrismaPromise<
     T extends runtime.Types.Utils.Record<'select', any>
-    ? T['select'] extends true
-    ? number
-    : Prisma.GetScalarType<T['select'], ConversationCountAggregateOutputType>
-    : number
+      ? T['select'] extends true
+        ? number
+        : Prisma.GetScalarType<T['select'], ConversationCountAggregateOutputType>
+      : number
   >
 
   /**
@@ -1261,8 +1261,8 @@ export interface ConversationDelegate<ExtArgs extends runtime.Types.Extensions.I
       Prisma.Extends<'take', Prisma.Keys<T>>
     >,
     OrderByArg extends Prisma.True extends HasSelectOrTake
-    ? { orderBy: ConversationGroupByArgs['orderBy'] }
-    : { orderBy?: ConversationGroupByArgs['orderBy'] },
+      ? { orderBy: ConversationGroupByArgs['orderBy'] }
+      : { orderBy?: ConversationGroupByArgs['orderBy'] },
     OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>,
     ByFields extends Prisma.MaybeTupleToUnion<T['by']>,
     ByValid extends Prisma.Has<ByFields, OrderFields>,
@@ -1273,49 +1273,49 @@ export interface ConversationDelegate<ExtArgs extends runtime.Types.Extensions.I
     ? `Error: "by" must not be empty.`
     : HavingValid extends Prisma.False
     ? {
-      [P in HavingFields]: P extends ByFields
-      ? never
-      : P extends string
-      ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-      : [
-        Error,
-        'Field ',
-        P,
-        ` in "having" needs to be provided in "by"`,
-      ]
-    }[HavingFields]
+        [P in HavingFields]: P extends ByFields
+          ? never
+          : P extends string
+          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+          : [
+              Error,
+              'Field ',
+              P,
+              ` in "having" needs to be provided in "by"`,
+            ]
+      }[HavingFields]
     : 'take' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-    ? ByValid extends Prisma.True
-    ? {}
-    : {
-      [P in OrderFields]: P extends ByFields
-      ? never
-      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-    }[OrderFields]
-    : 'Error: If you provide "take", you also need to provide "orderBy"'
+      ? ByValid extends Prisma.True
+        ? {}
+        : {
+            [P in OrderFields]: P extends ByFields
+              ? never
+              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+          }[OrderFields]
+      : 'Error: If you provide "take", you also need to provide "orderBy"'
     : 'skip' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-    ? ByValid extends Prisma.True
-    ? {}
-    : {
-      [P in OrderFields]: P extends ByFields
-      ? never
-      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-    }[OrderFields]
-    : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      ? ByValid extends Prisma.True
+        ? {}
+        : {
+            [P in OrderFields]: P extends ByFields
+              ? never
+              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+          }[OrderFields]
+      : 'Error: If you provide "skip", you also need to provide "orderBy"'
     : ByValid extends Prisma.True
     ? {}
     : {
-      [P in OrderFields]: P extends ByFields
-      ? never
-      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-    }[OrderFields]
+        [P in OrderFields]: P extends ByFields
+          ? never
+          : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+      }[OrderFields]
   >(args: Prisma.SubsetIntersection<T, ConversationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetConversationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the Conversation model
-   */
-  readonly fields: ConversationFieldRefs;
+/**
+ * Fields of the Conversation model
+ */
+readonly fields: ConversationFieldRefs;
 }
 
 /**
@@ -1367,7 +1367,7 @@ export interface ConversationFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"Conversation", 'DateTime'>
   readonly productData: Prisma.FieldRef<"Conversation", 'String'>
 }
-
+    
 
 // Custom InputTypes
 /**

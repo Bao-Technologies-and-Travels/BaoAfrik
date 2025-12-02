@@ -334,8 +334,8 @@ const ProfileSetup: React.FC = () => {
 
       if (birthDate > today) {
         newErrors.birthDate = 'Birth date cannot be in the future';
-      } else if (age < 13) {
-        newErrors.birthDate = 'You must be at least 13 years old to use this platform';
+      } else if (age < 18) {
+        newErrors.birthDate = 'You must be at least 18 years old to use this platform';
       } else if (age > 120) {
         newErrors.birthDate = 'Please enter a valid birth date';
       }

@@ -18,9 +18,34 @@ export class NotificationService {
                 type: data.type,
                 title: data.title,
                 body: data.body ?? null,
-                meta: data.meta ?? null,
+                meta: data.meta ?? undefined
             },
+            include:{
+                actor: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        profileImage: true,
+                        email: true
+                    }
+                }
+            }
         });
+
+        // if(data.actorId) {
+        //     const actor = await prisma.user.findUnique({
+        //         where: { id: data.actorId },
+        //         select: {
+        //             id: true,
+        //             firstName: true,
+        //             lastName: true,
+        //             profileImage: true,
+        //             email: true
+        //         },
+        //     });
+        //     return { ...notif, actor };
+        // }
         return notif;
     }
 
@@ -30,8 +55,19 @@ export class NotificationService {
             await prisma.notification.findMany({
                 where: { userId },
                 orderBy: { createdAt: 'desc' },
-                skip,
-                take: limit
+                skip: (page -1) * limit,
+                take: limit,
+                include: {
+                  actor: {
+                    select: {
+                      id: true,
+                      firstName: true,
+                      lastName: true,
+                      profileImage: true,
+                      email: true
+                    }
+                  }
+                }
             }),
             await prisma.notification.count({ where: { userId } }),
         ]);

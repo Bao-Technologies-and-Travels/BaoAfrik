@@ -119,11 +119,11 @@ export type ProductSaveAggregateArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 export type GetProductSaveAggregateType<T extends ProductSaveAggregateArgs> = {
-  [P in keyof T & keyof AggregateProductSave]: P extends '_count' | 'count'
-  ? T[P] extends true
-  ? number
-  : Prisma.GetScalarType<T[P], AggregateProductSave[P]>
-  : Prisma.GetScalarType<T[P], AggregateProductSave[P]>
+      [P in keyof T & keyof AggregateProductSave]: P extends '_count' | 'count'
+    ? T[P] extends true
+      ? number
+      : Prisma.GetScalarType<T[P], AggregateProductSave[P]>
+    : Prisma.GetScalarType<T[P], AggregateProductSave[P]>
 }
 
 
@@ -154,15 +154,15 @@ export type ProductSaveGroupByOutputType = {
 type GetProductSaveGroupByPayload<T extends ProductSaveGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ProductSaveGroupByOutputType, T['by']> &
-    {
-      [P in ((keyof T) & (keyof ProductSaveGroupByOutputType))]: P extends '_count'
-      ? T[P] extends boolean
-      ? number
-      : Prisma.GetScalarType<T[P], ProductSaveGroupByOutputType[P]>
-      : Prisma.GetScalarType<T[P], ProductSaveGroupByOutputType[P]>
-    }
+      {
+        [P in ((keyof T) & (keyof ProductSaveGroupByOutputType))]: P extends '_count'
+          ? T[P] extends boolean
+            ? number
+            : Prisma.GetScalarType<T[P], ProductSaveGroupByOutputType[P]>
+          : Prisma.GetScalarType<T[P], ProductSaveGroupByOutputType[P]>
+      }
+    >
   >
->
 
 
 
@@ -854,10 +854,10 @@ export interface ProductSaveDelegate<ExtArgs extends runtime.Types.Extensions.In
     args?: Prisma.Subset<T, ProductSaveCountArgs>,
   ): Prisma.PrismaPromise<
     T extends runtime.Types.Utils.Record<'select', any>
-    ? T['select'] extends true
-    ? number
-    : Prisma.GetScalarType<T['select'], ProductSaveCountAggregateOutputType>
-    : number
+      ? T['select'] extends true
+        ? number
+        : Prisma.GetScalarType<T['select'], ProductSaveCountAggregateOutputType>
+      : number
   >
 
   /**
@@ -911,8 +911,8 @@ export interface ProductSaveDelegate<ExtArgs extends runtime.Types.Extensions.In
       Prisma.Extends<'take', Prisma.Keys<T>>
     >,
     OrderByArg extends Prisma.True extends HasSelectOrTake
-    ? { orderBy: ProductSaveGroupByArgs['orderBy'] }
-    : { orderBy?: ProductSaveGroupByArgs['orderBy'] },
+      ? { orderBy: ProductSaveGroupByArgs['orderBy'] }
+      : { orderBy?: ProductSaveGroupByArgs['orderBy'] },
     OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>,
     ByFields extends Prisma.MaybeTupleToUnion<T['by']>,
     ByValid extends Prisma.Has<ByFields, OrderFields>,
@@ -923,49 +923,49 @@ export interface ProductSaveDelegate<ExtArgs extends runtime.Types.Extensions.In
     ? `Error: "by" must not be empty.`
     : HavingValid extends Prisma.False
     ? {
-      [P in HavingFields]: P extends ByFields
-      ? never
-      : P extends string
-      ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-      : [
-        Error,
-        'Field ',
-        P,
-        ` in "having" needs to be provided in "by"`,
-      ]
-    }[HavingFields]
+        [P in HavingFields]: P extends ByFields
+          ? never
+          : P extends string
+          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+          : [
+              Error,
+              'Field ',
+              P,
+              ` in "having" needs to be provided in "by"`,
+            ]
+      }[HavingFields]
     : 'take' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-    ? ByValid extends Prisma.True
-    ? {}
-    : {
-      [P in OrderFields]: P extends ByFields
-      ? never
-      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-    }[OrderFields]
-    : 'Error: If you provide "take", you also need to provide "orderBy"'
+      ? ByValid extends Prisma.True
+        ? {}
+        : {
+            [P in OrderFields]: P extends ByFields
+              ? never
+              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+          }[OrderFields]
+      : 'Error: If you provide "take", you also need to provide "orderBy"'
     : 'skip' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-    ? ByValid extends Prisma.True
-    ? {}
-    : {
-      [P in OrderFields]: P extends ByFields
-      ? never
-      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-    }[OrderFields]
-    : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      ? ByValid extends Prisma.True
+        ? {}
+        : {
+            [P in OrderFields]: P extends ByFields
+              ? never
+              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+          }[OrderFields]
+      : 'Error: If you provide "skip", you also need to provide "orderBy"'
     : ByValid extends Prisma.True
     ? {}
     : {
-      [P in OrderFields]: P extends ByFields
-      ? never
-      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-    }[OrderFields]
+        [P in OrderFields]: P extends ByFields
+          ? never
+          : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+      }[OrderFields]
   >(args: Prisma.SubsetIntersection<T, ProductSaveGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProductSaveGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the ProductSave model
-   */
-  readonly fields: ProductSaveFieldRefs;
+/**
+ * Fields of the ProductSave model
+ */
+readonly fields: ProductSaveFieldRefs;
 }
 
 /**
@@ -1012,7 +1012,7 @@ export interface ProductSaveFieldRefs {
   readonly productId: Prisma.FieldRef<"ProductSave", 'String'>
   readonly createdAt: Prisma.FieldRef<"ProductSave", 'DateTime'>
 }
-
+    
 
 // Custom InputTypes
 /**

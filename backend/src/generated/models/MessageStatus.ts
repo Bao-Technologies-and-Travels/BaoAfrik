@@ -131,11 +131,11 @@ export type MessageStatusAggregateArgs<ExtArgs extends runtime.Types.Extensions.
 }
 
 export type GetMessageStatusAggregateType<T extends MessageStatusAggregateArgs> = {
-  [P in keyof T & keyof AggregateMessageStatus]: P extends '_count' | 'count'
-  ? T[P] extends true
-  ? number
-  : Prisma.GetScalarType<T[P], AggregateMessageStatus[P]>
-  : Prisma.GetScalarType<T[P], AggregateMessageStatus[P]>
+      [P in keyof T & keyof AggregateMessageStatus]: P extends '_count' | 'count'
+    ? T[P] extends true
+      ? number
+      : Prisma.GetScalarType<T[P], AggregateMessageStatus[P]>
+    : Prisma.GetScalarType<T[P], AggregateMessageStatus[P]>
 }
 
 
@@ -168,15 +168,15 @@ export type MessageStatusGroupByOutputType = {
 type GetMessageStatusGroupByPayload<T extends MessageStatusGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<MessageStatusGroupByOutputType, T['by']> &
-    {
-      [P in ((keyof T) & (keyof MessageStatusGroupByOutputType))]: P extends '_count'
-      ? T[P] extends boolean
-      ? number
-      : Prisma.GetScalarType<T[P], MessageStatusGroupByOutputType[P]>
-      : Prisma.GetScalarType<T[P], MessageStatusGroupByOutputType[P]>
-    }
+      {
+        [P in ((keyof T) & (keyof MessageStatusGroupByOutputType))]: P extends '_count'
+          ? T[P] extends boolean
+            ? number
+            : Prisma.GetScalarType<T[P], MessageStatusGroupByOutputType[P]>
+          : Prisma.GetScalarType<T[P], MessageStatusGroupByOutputType[P]>
+      }
+    >
   >
->
 
 
 
@@ -934,10 +934,10 @@ export interface MessageStatusDelegate<ExtArgs extends runtime.Types.Extensions.
     args?: Prisma.Subset<T, MessageStatusCountArgs>,
   ): Prisma.PrismaPromise<
     T extends runtime.Types.Utils.Record<'select', any>
-    ? T['select'] extends true
-    ? number
-    : Prisma.GetScalarType<T['select'], MessageStatusCountAggregateOutputType>
-    : number
+      ? T['select'] extends true
+        ? number
+        : Prisma.GetScalarType<T['select'], MessageStatusCountAggregateOutputType>
+      : number
   >
 
   /**
@@ -991,8 +991,8 @@ export interface MessageStatusDelegate<ExtArgs extends runtime.Types.Extensions.
       Prisma.Extends<'take', Prisma.Keys<T>>
     >,
     OrderByArg extends Prisma.True extends HasSelectOrTake
-    ? { orderBy: MessageStatusGroupByArgs['orderBy'] }
-    : { orderBy?: MessageStatusGroupByArgs['orderBy'] },
+      ? { orderBy: MessageStatusGroupByArgs['orderBy'] }
+      : { orderBy?: MessageStatusGroupByArgs['orderBy'] },
     OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>,
     ByFields extends Prisma.MaybeTupleToUnion<T['by']>,
     ByValid extends Prisma.Has<ByFields, OrderFields>,
@@ -1003,49 +1003,49 @@ export interface MessageStatusDelegate<ExtArgs extends runtime.Types.Extensions.
     ? `Error: "by" must not be empty.`
     : HavingValid extends Prisma.False
     ? {
-      [P in HavingFields]: P extends ByFields
-      ? never
-      : P extends string
-      ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-      : [
-        Error,
-        'Field ',
-        P,
-        ` in "having" needs to be provided in "by"`,
-      ]
-    }[HavingFields]
+        [P in HavingFields]: P extends ByFields
+          ? never
+          : P extends string
+          ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+          : [
+              Error,
+              'Field ',
+              P,
+              ` in "having" needs to be provided in "by"`,
+            ]
+      }[HavingFields]
     : 'take' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-    ? ByValid extends Prisma.True
-    ? {}
-    : {
-      [P in OrderFields]: P extends ByFields
-      ? never
-      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-    }[OrderFields]
-    : 'Error: If you provide "take", you also need to provide "orderBy"'
+      ? ByValid extends Prisma.True
+        ? {}
+        : {
+            [P in OrderFields]: P extends ByFields
+              ? never
+              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+          }[OrderFields]
+      : 'Error: If you provide "take", you also need to provide "orderBy"'
     : 'skip' extends Prisma.Keys<T>
     ? 'orderBy' extends Prisma.Keys<T>
-    ? ByValid extends Prisma.True
-    ? {}
-    : {
-      [P in OrderFields]: P extends ByFields
-      ? never
-      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-    }[OrderFields]
-    : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      ? ByValid extends Prisma.True
+        ? {}
+        : {
+            [P in OrderFields]: P extends ByFields
+              ? never
+              : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+          }[OrderFields]
+      : 'Error: If you provide "skip", you also need to provide "orderBy"'
     : ByValid extends Prisma.True
     ? {}
     : {
-      [P in OrderFields]: P extends ByFields
-      ? never
-      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-    }[OrderFields]
+        [P in OrderFields]: P extends ByFields
+          ? never
+          : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+      }[OrderFields]
   >(args: Prisma.SubsetIntersection<T, MessageStatusGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMessageStatusGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the MessageStatus model
-   */
-  readonly fields: MessageStatusFieldRefs;
+/**
+ * Fields of the MessageStatus model
+ */
+readonly fields: MessageStatusFieldRefs;
 }
 
 /**
@@ -1094,7 +1094,7 @@ export interface MessageStatusFieldRefs {
   readonly createdAt: Prisma.FieldRef<"MessageStatus", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"MessageStatus", 'DateTime'>
 }
-
+    
 
 // Custom InputTypes
 /**
