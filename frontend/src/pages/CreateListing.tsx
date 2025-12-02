@@ -8,7 +8,7 @@ import trashIcon from '../assets/images/pre/trash.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
 import draft2Icon from '../assets/images/pre/draft2.svg';
 import flyIcon from '../assets/images/pre/fly.svg';
-import basketIcon from '../assets/images/pre/basket.png';
+// import basketIcon from '../assets/images/pre/basket.png';
 import avatarIcon from '../assets/images/pre/avatar.png';
 import notificationIcon from '../assets/images/pre/notification.svg';
 import translationToggleIcon from '../assets/images/pre/tt.svg';
@@ -31,12 +31,10 @@ import logoIcon from "../assets/images/logos/ba-brand-icon-colored.png";
 import messageAvatarIcon from '../assets/images/pre/main.png';
 import appNotificationIcon from '../assets/images/pre/nof.svg';
 
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from '../contexts/ToastContext';
-import { useSocket } from '../contexts/socketContext'
 import LoadingSpinner from "../components/ui/LoadingSpinner";
-import Header from '../components/layout/Header';
 
 interface DraftListing {
   id: string;
@@ -125,9 +123,9 @@ const CreateListing: React.FC = () => {
   const [draggedImagesTotal, setDraggedImagesTotal] = useState(0);
   const [currentDraggedImageIndex, setCurrentDraggedImageIndex] = useState(0);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
-    const [notificationCount, setNotificationCount] = useState(0);
-    const [notifications, setNotifications] = useState<any[]>([]);
+  const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams<{ id: string }>();
@@ -135,12 +133,13 @@ const CreateListing: React.FC = () => {
   const [productData, setProductData] = useState<any>(null);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const { addToast } = useToast();
-  const { user, logout } = useAuth();
-    const [socket, setSocket] = useState<Socket | null>(null);
-  
+  const { user } = useAuth();
+  const [socket, setSocket] = useState<Socket | null>(null);
+
 
   // Check if all required fields are filled
-  const isFormComplete = title.trim() !== '' &&
+  const isFormComplete =
+    title.trim() !== '' &&
     description.trim() !== '' &&
     price.trim() !== '' &&
     quantity > 0 &&
@@ -156,219 +155,220 @@ const CreateListing: React.FC = () => {
   }, [isEditMode, id]);
 
   // fetch notifications on mount
-    useEffect(() => {
-      let mounted = true;
-  
-      const load = async () => {
-        try {
-          const token = localStorage.getItem('accessToken');
-          const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-  
-          if (!res.ok) return;
-  
-          const json = await res.json();
-          if (!mounted || !json.success) return;
-  
-          const items = (json.data.items || []).map((n: any) => {
-            const created = n.createdAt ? new Date(n.createdAt) : new Date();
-            const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-            const getDayLabel = (date: Date) => {
-              const d = new Date(date); const today = new Date();
-              if (d.toDateString() === today.toDateString()) return 'Today';
-              const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
-              if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
-              return d.toLocaleDateString();
-            };
-            return { ...n, day: getDayLabel(created), time: n.time || formatTime(created) };
-          });
-          setNotifications(items);
-          if (json.data.unreadCount !== undefined) setNotificationCount(json.data.unreadCount);
-        } catch (e) {
-          console.warn('Failed to load notifications', e);
-        }
-      };
-      load();
-      return () => { mounted = false; };
-    }, []);
-  
-    // fetch unread counts
-    useEffect(() => {
-      const fetchUnread = async () => {
-        try {
-          const token = localStorage.getItem('accessToken');
-          const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-  
-          if (!res.ok) return;
-          const json = await res.json();
-          if (json.success && json.data) {
-            setNotificationCount(json.data.unreadCount ?? 0);
-          }
-        } catch (e) {
-          // ignore
-        }
-      }
-      fetchUnread();
-    }, []);
-  
-    // socket events
-    useEffect(() => {
-      if (!socket) return;
-  
-      const formatTime = (date: Date) =>
-        date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-      const getDayLabel = (date: Date) => {
-        const d = new Date(date);
-        const today = new Date();
-        if (d.toDateString() === today.toDateString()) {
-          return 'Today';
-        };
-        const yesterday = new Date();
-        yesterday.setDate(today.getDate() - 1);
-        if (d.toDateString() === yesterday.toDateString()) {
-          return 'Yesterday';
-        };
-        return d.toLocaleDateString();
-      };
-  
-      const onNotification = (payload: any) => {
-        const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
-        const normalized = {
-          ...payload,
-          day: getDayLabel(created),
-          time: payload.time || formatTime(created),
-          id: payload.id || `notif-${Date.now()}-${Math.random()}`
-        };
-  
-        setNotifications(prev => {
-          const existsById = prev.some(n => n.id === normalized.id);
-          const existsByMeta = normalized.meta?.messageId ? prev.some(n => n.meta?.messageId === normalized.meta.messageId) : false;
-          if (existsById || existsByMeta) return prev;
-          return [normalized, ...prev];
-        });
-        setNotificationCount(prev => prev + 1);
-      };
-  
-      const onNewMessageNotification = (payload: any) => {
-        if (payload?.messageId) {
-          const has = notifications.some(n => n.meta?.messageId === payload.messageId);
-          if (has) return;
-        };
-  
-        const created = new Date();
-        const normalized = {
-          id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
-          day: getDayLabel(created),
-          time: payload.time || formatTime(created),
-          title: payload.senderName || payload.title || 'Someone',
-          body: payload.preview || payload.body || '',
-          meta: { conversationId: payload.conversationId, messageId: payload.messageId },
-          isRead: false,
-          actor: payload.actor ?? null
-        };
-  
-        setNotifications(prev => {
-          const existsByMeta = payload?.messageId ? prev.some(n => n.meta?.messageId === payload.messageId) : false;
-          if (existsByMeta) return prev;
-          return [normalized, ...prev];
-        });
-        setNotificationCount(prev => prev + 1);
-      };
-  
-      const onNotificationCount = (payload: any) => {
-        const count = (payload && (payload.totalUnread ?? payload.unreadCount ?? payload.total)) as number | undefined;
-        if (typeof count === 'number') {
-          setNotificationCount(count);
-        }
-      };
-  
-      socket.on('notification', onNotification);
-      socket.on('new_message_notification', onNewMessageNotification);
-      socket.on('notification_count', onNotificationCount);
-  
-      return () => {
-        socket.off('notification', onNotification);
-        socket.off('new_message_notification', onNewMessageNotification);
-        socket.off('notification_count', onNotificationCount);
-      };
-    }, [socket]);
-  
-    const markAllAsRead = async () => {
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        await fetch(`${process.env.REACT_APP_API_URL}/notifications/mark-all-read`, {
-          method: 'PUT',
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })));
-        setNotificationCount(0);
-        setNotificationTab('all');
+
+        if (!res.ok) return;
+
+        const json = await res.json();
+        if (!mounted || !json.success) return;
+
+        const items = (json.data.items || []).map((n: any) => {
+          const created = n.createdAt ? new Date(n.createdAt) : new Date();
+          const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+          const getDayLabel = (date: Date) => {
+            const d = new Date(date); const today = new Date();
+            if (d.toDateString() === today.toDateString()) return 'Today';
+            const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
+            if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+            return d.toLocaleDateString();
+          };
+          return { ...n, day: getDayLabel(created), time: n.time || formatTime(created) };
+        });
+        setNotifications(items);
+        if (json.data.unreadCount !== undefined) setNotificationCount(json.data.unreadCount);
       } catch (e) {
-        console.warn('Failed to mark all as read', e);
+        console.warn('Failed to load notifications', e);
       }
     };
-  
-    const filteredNotifications = notifications.filter(notif => {
-      if (notificationTab === 'all') return true;
-      if (notificationTab === 'unread') return !notif.isRead;
-      if (notificationTab === 'messages') return notif.type === 'message' || notif.type === 'NEW_MESSAGE';
-      return true;
-    });
-  
-    const handleNotificationClick = async (notif: any) => {
-      setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
-  
-      if (!notif.id) {
-        // nothing to persist
-      } else {
-        try {
-          const token = localStorage.getItem('accessToken');
-          await fetch(`${process.env.REACT_APP_API_URL}/notifications/${notif.id}/read`, {
-            method: 'PUT',
-            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-          });
-        } catch (e) {
-          console.warn('Failed to mark notification read', e);
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  // fetch unread counts
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.success && json.data) {
+          setNotificationCount(json.data.unreadCount ?? 0);
         }
+      } catch (e) {
+        // ignore
       }
-  
-      if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.meta?.conversationId) {
-        navigate('/messages', { state: { conversationId: notif.meta.conversationId } });
-        setIsNotificationOpen(false);
-      } else {
-        navigate('/notifications', { state: { notificationId: notif.id } });
-        setIsNotificationOpen(false);
-      }
-    };
-  
-    const getNotificationSenderName = (notif: any) => {
-      if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title) {
-        return notif.title;
-      }
-  
-      if (notif.title && notif.title !== 'Notification') {
-        return notif.title
-      }
-    };
-  
-    const getNotificationAvatar = (notif: any) => {
-      if (notif.actor?.profileImage) {
-        return notif.actor.profileImage
+    }
+    fetchUnread();
+  }, []);
+
+  // socket events
+  useEffect(() => {
+    if (!socket) return;
+
+    const formatTime = (date: Date) =>
+      date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const getDayLabel = (date: Date) => {
+      const d = new Date(date);
+      const today = new Date();
+      if (d.toDateString() === today.toDateString()) {
+        return 'Today';
       };
-  
-      if (notif.senderAvatar) {
-        return notif.senderAvatar
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+      if (d.toDateString() === yesterday.toDateString()) {
+        return 'Yesterday';
       };
-  
-      if (notif.meta?.senderImage) {
-        return notif.meta.senderImage;
-      }
-  
-      return avatar;
+      return d.toLocaleDateString();
     };
+
+    const onNotification = (payload: any) => {
+      const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
+      const normalized = {
+        ...payload,
+        day: getDayLabel(created),
+        time: payload.time || formatTime(created),
+        id: payload.id || `notif-${Date.now()}-${Math.random()}`
+      };
+
+      setNotifications(prev => {
+        const existsById = prev.some(n => n.id === normalized.id);
+        const existsByMeta = normalized.meta?.messageId ? prev.some(n => n.meta?.messageId === normalized.meta.messageId) : false;
+        if (existsById || existsByMeta) return prev;
+        return [normalized, ...prev];
+      });
+      setNotificationCount(prev => prev + 1);
+    };
+
+    const onNewMessageNotification = (payload: any) => {
+      if (payload?.messageId) {
+        const has = notifications.some(n => n.meta?.messageId === payload.messageId);
+        if (has) return;
+      };
+
+      const created = new Date();
+      const normalized = {
+        id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
+        day: getDayLabel(created),
+        time: payload.time || formatTime(created),
+        title: payload.senderName || payload.title || 'Someone',
+        body: payload.preview || payload.body || '',
+        meta: { conversationId: payload.conversationId, messageId: payload.messageId },
+        isRead: false,
+        actor: payload.actor ?? null
+      };
+
+      setNotifications(prev => {
+        const existsByMeta = payload?.messageId ? prev.some(n => n.meta?.messageId === payload.messageId) : false;
+        if (existsByMeta) return prev;
+        return [normalized, ...prev];
+      });
+      setNotificationCount(prev => prev + 1);
+    };
+
+    const onNotificationCount = (payload: any) => {
+      const count = (payload && (payload.totalUnread ?? payload.unreadCount ?? payload.total)) as number | undefined;
+      if (typeof count === 'number') {
+        setNotificationCount(count);
+      }
+    };
+
+    socket.on('notification', onNotification);
+    socket.on('new_message_notification', onNewMessageNotification);
+    socket.on('notification_count', onNotificationCount);
+
+    return () => {
+      socket.off('notification', onNotification);
+      socket.off('new_message_notification', onNewMessageNotification);
+      socket.off('notification_count', onNotificationCount);
+    };
+  }, [socket]);
+
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      await fetch(`${process.env.REACT_APP_API_URL}/notifications/mark-all-read`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })));
+      setNotificationCount(0);
+      setNotificationTab('all');
+    } catch (e) {
+      console.warn('Failed to mark all as read', e);
+    }
+  };
+
+  const filteredNotifications = notifications.filter(notif => {
+    if (notificationTab === 'all') return true;
+    if (notificationTab === 'unread') return !notif.isRead;
+    if (notificationTab === 'messages') return notif.type === 'message' || notif.type === 'NEW_MESSAGE';
+    return true;
+  });
+
+  // persist notification after marking as read
+  const handleNotificationClick = async (notif: any) => {
+    setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+
+    if (!notif.id) {
+      // nothing to persist
+    } else {
+      try {
+        const token = localStorage.getItem('accessToken');
+        await fetch(`${process.env.REACT_APP_API_URL}/notifications/${notif.id}/read`, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+        });
+      } catch (e) {
+        console.warn('Failed to mark notification read', e);
+      }
+    }
+
+    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.meta?.conversationId) {
+      navigate('/messages', { state: { conversationId: notif.meta.conversationId } });
+      setIsNotificationOpen(false);
+    } else {
+      navigate('/notifications', { state: { notificationId: notif.id } });
+      setIsNotificationOpen(false);
+    }
+  };
+
+  const getNotificationSenderName = (notif: any) => {
+    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title) {
+      return notif.title;
+    }
+
+    if (notif.title && notif.title !== 'Notification') {
+      return notif.title
+    }
+  };
+
+  const getNotificationAvatar = (notif: any) => {
+    if (notif.actor?.profileImage) {
+      return notif.actor.profileImage
+    };
+
+    if (notif.senderAvatar) {
+      return notif.senderAvatar
+    };
+
+    if (notif.meta?.senderImage) {
+      return notif.meta.senderImage;
+    }
+
+    return avatar;
+  };
 
   const validateRequiredFields = (): boolean => {
     const missing: string[] = [];
@@ -417,7 +417,7 @@ const CreateListing: React.FC = () => {
         setOrigin(product.origin || '');
         setSaleType(product.saleType || 'Default');
         setDeliveryAvailable(product.deliveryAvailable || false);
-        setLocation(product.location || 'London, United Kingdom');
+        setLocation(product.location || 'London | United Kingdom');
 
         if (product.images && product.images.length > 0) {
           const existingImageUrls = product.images.map((img: any) => img.url);
@@ -920,7 +920,7 @@ const CreateListing: React.FC = () => {
           message: `${isEditMode ? 'Draft updated' : 'Draft saved'} successfully!`,
           duration: 2000
         });
-        navigate('/my-listings?tab=drafts');
+        navigate('/my-listings');
       }
     } catch (error: any) {
       addToast({
@@ -1016,14 +1016,14 @@ const CreateListing: React.FC = () => {
             message: `Listing ${isEditMode ? 'updated' : 'posted'} successfully!`,
             duration: 2000
           });
-          navigate('/my-listings?tab=all');
+          navigate('/my-listings');
         }
       }
     } catch (error: any) {
       addToast({
         type: 'error',
         title: 'Action Failed',
-        message: "Failed to post listing. Please try again.",
+        message: error || "Failed to post listing. Please try again.",
         duration: 2000
       });
     } finally {
@@ -1342,7 +1342,6 @@ const CreateListing: React.FC = () => {
         }
       `}</style>
 
-      {/* <Header /> */}
       {/* <Header /> */}
       <header className="flex-shrink-0 rounded-t-2xl" style={{ backgroundColor: '#F5F5F5' }}>
         <div className="max-w-7xl mx-auto px-1 sm:px-2 lg:px-3">

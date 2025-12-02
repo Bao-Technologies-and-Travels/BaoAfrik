@@ -45,6 +45,8 @@ function AppContent() {
   const isAuthPage = authPages.includes(location.pathname);
   const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings', '/my-listings'];
   const isCustomLayoutPage = customLayoutPages.includes(location.pathname);
+  const editListingPage = ['/edit-listing'];
+  const isEditListingPage = location.pathname.match(/^\/edit-listing\/[^/]+$/);
 
   // For auth pages, render without header/footer
   if (isAuthPage) {
@@ -73,12 +75,13 @@ function AppContent() {
   }
 
   // For custom layout pages (like Messages), render without global header/footer
-  if (isCustomLayoutPage) {
+  if (isCustomLayoutPage || isEditListingPage) {
     return (
       <div className="min-h-screen">
         <Routes>
           <Route path="/messages" element={<Messages />} />
           <Route path="/create-listing" element={<CreateListing />} />
+          <Route path="/edit-listing/:id" element={<CreateListing />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/notification-detail" element={<NotificationDetail />} />
           <Route path="/archived-chats" element={<ArchivedChats />} />
@@ -127,7 +130,6 @@ function AppContent() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/edit-listing/:id" element={<CreateListing />} />
         </Routes>
       </main>
       <Footer />
