@@ -103,7 +103,7 @@ const Header: React.FC<HeaderProps> = ({
     setIsLanguageDropdownOpen(false);
   };
 
-  // fetcg recent notifications on mount
+  // fetch recent notifications on mount
   useEffect(() => {
     let mounted = true;
 
@@ -316,7 +316,7 @@ const Header: React.FC<HeaderProps> = ({
       navigate('/notifications', { state: { notificationId: notif.id } });
       setIsNotificationOpen(false);
     }
-  }
+  };
 
   const getNotificationSenderName = (notif: any) => {
     if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title) {
@@ -724,11 +724,6 @@ const Header: React.FC<HeaderProps> = ({
                                               </span>
                                               <span style={{ color: '#939393' }}> {notif.body || notif.text || ''}</span>
                                             </p>
-                                            {/* {(notif.type === 'NEW_MESSAGE' || notif.type === 'message') && (
-                                              <p className="mt-1.5 text-xs" style={{ color: !notif.isRead ? '#64B5F6' : '#9E9E9E' }}>
-                                                Click to view
-                                              </p>
-                                            )} */}
                                           </div>
                                           <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
                                             <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>

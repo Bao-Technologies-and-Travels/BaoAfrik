@@ -23,7 +23,7 @@ import mainieIcon from '../assets/images/pre/mainie.svg';
 import redtrashIcon from '../assets/images/pre/redtrash.svg';
 import verityIcon from '../assets/images/pre/verity.svg';
 
-// Import product images
+// Import product images 
 import a1 from '../assets/images/pre/a1.png';
 import a2 from '../assets/images/pre/a2.png';
 import a3 from '../assets/images/pre/a3.png';
@@ -476,41 +476,29 @@ const MyListings: React.FC = () => {
     const moreOptionsRef = useRef<HTMLDivElement | null>(null);
     const [listingToDelete, setListingToDelete] = useState<Listing | null>(null);
     const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
-
-    // Mock data - replace with actual data from backend
-    const initialListings: Listing[] = [
-        { id: '1', title: 'Bonga from Togo', image: a1, status: 'active', rating: 4.8, reviews: 88, price: '678', currency: 'USD', createdAt: 1690000000000, priceValue: 678, messages: 42, category: 'Food & Spicy' },
-        { id: '2', title: 'Coconut Oil Ghana', image: a2, status: 'active', rating: 4.5, reviews: 120, price: '45', currency: 'USD', createdAt: 1690500000000, priceValue: 45, messages: 27, category: 'Food & Spicy' },
-        { id: '3', title: 'Pepper from Benin', image: a3, status: 'inactive', rating: 4.2, reviews: 56, price: '32', currency: 'USD', createdAt: 1689500000000, priceValue: 32, messages: 12, category: 'Food & Spicy' },
-        { id: '4', title: 'Shrimps from Lome', image: a4, status: 'active', rating: 4.9, reviews: 200, price: '67.8', currency: 'USD', daysLeft: 12, createdAt: 1691000000000, priceValue: 67.8, messages: 51, category: 'Food & Spicy' },
-        { id: '5', title: 'Kinky hair Lagos', image: a5, status: 'active', rating: 4.7, reviews: 150, price: '25', currency: 'USD', createdAt: 1690800000000, priceValue: 25, messages: 19, category: 'Beauty & Wellness' },
-        { id: '6', title: 'Gold neck Accra', image: a6, status: 'active', rating: 4.6, reviews: 95, price: '38', currency: 'USD', daysLeft: 11, createdAt: 1690200000000, priceValue: 38, messages: 33, category: 'Fashion & Textiles' },
-        { id: '7', title: 'Baobab nuts Kano', image: a7, status: 'inactive', rating: 4.3, reviews: 78, price: '42', currency: 'USD', createdAt: 1689000000000, priceValue: 42, messages: 8, category: 'Food & Spicy' },
-        { id: '8', title: 'Cowrie bracelets', image: a8, status: 'active', rating: 4.8, reviews: 165, price: '55', currency: 'USD', createdAt: 1690400000000, priceValue: 55, messages: 23, category: 'Fashion & Textiles' },
-        { id: '9', title: 'Ebony tribal masks', image: a9, status: 'active', rating: 4.9, reviews: 210, price: '89', currency: 'USD', createdAt: 1689800000000, priceValue: 89, messages: 60, category: 'Home & Decor' },
-        { id: '10', title: 'River pepper Addis', image: a10, status: 'active', rating: 4.7, reviews: 140, price: '72', currency: 'USD', createdAt: 1690600000000, priceValue: 72, messages: 31, category: 'Food & Spicy' },
-        { id: '11', title: 'Desert salt Dakar', image: a11, status: 'active', rating: 4.6, reviews: 110, price: '48', currency: 'USD', createdAt: 1689300000000, priceValue: 48, messages: 17, category: 'Food & Spicy' },
-        { id: '12', title: 'Market mix Cairo', image: a12, status: 'inactive', rating: 4.4, reviews: 85, price: '35', currency: 'USD', createdAt: 1689700000000, priceValue: 35, messages: 14, category: 'Food & Spicy' },
-    ];
-    const [listings, setListings] = useState<Listing[]>(initialListings);
+    const [listings, setListings] = useState<Listing[]>([]);
 
     useEffect(() => {
         fetchMyListings();
-    }, [activeTab]);
+    }, [activeTab, user]);
 
     const fetchMyListings = async () => {
+        if (!user) return;
+        setLoading(true);
+
         try {
             setLoading(true);
             const token = localStorage.getItem('accessToken');
 
-            let status = undefined;
+            let status = '';
             if (activeTab === 'drafts') status = 'DRAFT';
             if (activeTab === 'published') status = 'PUBLISHED';
             if (activeTab === 'sold') status = 'SOLD';
 
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/products/my-products?status=${status || ''}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/products/my-products?status=${status ? `?status=${status}` : ''}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
 
@@ -520,9 +508,34 @@ const MyListings: React.FC = () => {
 
             const result = await response.json();
 
-            if (result.success) {
+            if (result.success && result.data) {
+                const mappedListings = result.data.products.map((product: any) => ({
+                    id: product.id,
+                    title: product.title,
+                    image: product.images?.[0].url || '',
+                    status: product.status === 'PUBLISHED' ? 'active' : 'inactive',
+                    rating: product.averageRating || 0,
+                    reviews: product.reviewCount || 0,
+                    price: product.price?.toString() || '0',
+                    currency: product.currency || 'USD',
+                    createdAt: new Date(product.createdAt).getTime(),
+                    priceValue: product.price || 0,
+                    messages: 0,
+                    category: product.category || 'Uncategorized',
+                    daysLeft: product.expiresAt
+                        ? Math.ceil((new Date(product.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                        : undefined
+                }));
+
+                setListings(mappedListings);
                 setProducts(result.data.products);
-                updateStats(result.data.products);
+
+                setStats({
+                    total: result.data.products.length,
+                    drafts: result.data.products.filter((p: Product) => p.status === 'DRAFT').length,
+                    published: result.data.products.filter((p: Product) => p.status === 'PUBLISHED').length,
+                    sold: result.data.products.filter((p: Product) => p.status === 'SOLD').length
+                });
             }
         } catch (error) {
             throw new Error('Error fetching listings');
@@ -675,8 +688,6 @@ const MyListings: React.FC = () => {
         }).format(price);
     };
 
-    // frontend
-
     const trimmedSearchQuery = searchQuery.trim();
 
     const filteredListings = useMemo(() => {
@@ -684,13 +695,13 @@ const MyListings: React.FC = () => {
 
         if (trimmedSearchQuery) {
             const query = trimmedSearchQuery.toLowerCase();
-            filtered = filtered.filter((listing) =>
+            filtered = filtered?.filter((listing) =>
                 listing.title.toLowerCase().includes(query)
             );
         }
 
         if (statusFilter !== 'All Status') {
-            filtered = filtered.filter((listing) => {
+            filtered = filtered?.filter((listing) => {
                 if (statusFilter === 'Active') return listing.status === 'active' && typeof listing.daysLeft !== 'number';
                 if (statusFilter === 'Inactive') return listing.status === 'inactive';
                 if (statusFilter === 'Days left') return typeof listing.daysLeft === 'number';
@@ -702,7 +713,7 @@ const MyListings: React.FC = () => {
     }, [listings, searchQuery, statusFilter]);
 
     const sortedListings = useMemo(() => {
-        const sorted = [...filteredListings];
+        const sorted = [...filteredListings || []];
         if (selectedSort) {
             switch (selectedSort.value) {
                 case 'date_recent':
@@ -746,7 +757,7 @@ const MyListings: React.FC = () => {
     const isSearchActive = trimmedSearchQuery.length > 0;
     const shouldShowEmptyState = !hasResults;
     const isSearchNoResultsState = shouldShowEmptyState && isSearchActive;
-    const totalListings = listings.length;
+    const totalListings = listings?.length;
     const draftCount = 3;
     const currentPage = 1;
     const totalPages = 48;
@@ -2518,7 +2529,7 @@ const MyListings: React.FC = () => {
                         </div>
                     )}
 
-                    {isSearchActive && filteredListings.length > 0 && (
+                    {isSearchActive && filteredListings?.length > 0 && (
                         <div className="max-w-6xl mx-auto w-full pl-0 pr-0">
                             <div className="pl-0 lg:pl-0 lg:-ml-16 mt-4 mb-2">
                                 <p
@@ -2528,8 +2539,8 @@ const MyListings: React.FC = () => {
                                         fontSize: '16px'
                                     }}
                                 >
-                                    Search results for “ {trimmedSearchQuery} “ ({filteredListings.length}{' '}
-                                    {filteredListings.length === 1 ? 'item' : 'items'})
+                                    Search results for “ {trimmedSearchQuery} “ ({filteredListings?.length}{' '}
+                                    {filteredListings?.length === 1 ? 'item' : 'items'})
                                 </p>
                             </div>
                         </div>

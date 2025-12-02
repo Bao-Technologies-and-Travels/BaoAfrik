@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from "../contexts/AuthContext";
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
 import lilLogo from '../assets/images/pre/lil.png';
@@ -53,6 +54,10 @@ import closeIcon from '../assets/images/pre/CLose.svg';
 import updateIcon from '../assets/images/pre/update.svg.svg';
 import keyIcon from '../assets/images/pre/key.svg';
 import backArrowIcon from '../assets/images/pre/back arrow.svg';
+
+import { io, Socket } from "socket.io-client";
+import { useSocket } from '../contexts/socketContext'
+import { useToast } from "../contexts/ToastContext";
 
 const currencyRates: Record<string, number> = {
   USD: 1,
@@ -164,8 +169,6 @@ const ProfileSettings: React.FC = () => {
     return (localStorage.getItem('currencyPreference') as 'USD' | 'EUR' | 'CAD' | 'GBP') || 'USD';
   });
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
   const [activeTab, setActiveTab] = useState('personal');
   const [searchQuery, setSearchQuery] = useState('');
   const [isGeolocationEnabled, setIsGeolocationEnabled] = useState(false);
@@ -197,12 +200,235 @@ const ProfileSettings: React.FC = () => {
   const [isBirthdayCalendarOpen, setIsBirthdayCalendarOpen] = useState(false);
   const birthdayCalendarRef = useRef<HTMLDivElement>(null);
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const { user } = useAuth();
+  const contextSocket = useSocket();
+  const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  // fetch notifications on mount
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) return;
+
+        const json = await res.json();
+        if (!mounted || !json.success) return;
+
+        const items = (json.data.items || []).map((n: any) => {
+          const created = n.createdAt ? new Date(n.createdAt) : new Date();
+          const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+          const getDayLabel = (date: Date) => {
+            const d = new Date(date); const today = new Date();
+            if (d.toDateString() === today.toDateString()) return 'Today';
+            const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
+            if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+            return d.toLocaleDateString();
+          };
+          return { ...n, day: getDayLabel(created), time: n.time || formatTime(created) };
+        });
+        setNotifications(items);
+        if (json.data.unreadCount !== undefined) setNotificationCount(json.data.unreadCount);
+      } catch (e) {
+        console.warn('Failed to load notifications', e);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  // fetch unread counts
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.success && json.data) {
+          setNotificationCount(json.data.unreadCount ?? 0);
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    fetchUnread();
+  }, []);
+
+  // socket events
+  useEffect(() => {
+    if (!socket) return;
+
+    const formatTime = (date: Date) =>
+      date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const getDayLabel = (date: Date) => {
+      const d = new Date(date);
+      const today = new Date();
+      if (d.toDateString() === today.toDateString()) {
+        return 'Today';
+      };
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+      if (d.toDateString() === yesterday.toDateString()) {
+        return 'Yesterday';
+      };
+      return d.toLocaleDateString();
+    };
+
+    const onNotification = (payload: any) => {
+      const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
+      const normalized = {
+        ...payload,
+        day: getDayLabel(created),
+        time: payload.time || formatTime(created),
+        id: payload.id || `notif-${Date.now()}-${Math.random()}`
+      };
+
+      setNotifications(prev => {
+        const existsById = prev.some(n => n.id === normalized.id);
+        const existsByMeta = normalized.meta?.messageId ? prev.some(n => n.meta?.messageId === normalized.meta.messageId) : false;
+        if (existsById || existsByMeta) return prev;
+        return [normalized, ...prev];
+      });
+      setNotificationCount(prev => prev + 1);
+    };
+
+    const onNewMessageNotification = (payload: any) => {
+      if (payload?.messageId) {
+        const has = notifications.some(n => n.meta?.messageId === payload.messageId);
+        if (has) return;
+      };
+
+      const created = new Date();
+      const normalized = {
+        id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
+        day: getDayLabel(created),
+        time: payload.time || formatTime(created),
+        title: payload.senderName || payload.title || 'Someone',
+        body: payload.preview || payload.body || '',
+        meta: { conversationId: payload.conversationId, messageId: payload.messageId },
+        isRead: false,
+        actor: payload.actor ?? null
+      };
+
+      setNotifications(prev => {
+        const existsByMeta = payload?.messageId ? prev.some(n => n.meta?.messageId === payload.messageId) : false;
+        if (existsByMeta) return prev;
+        return [normalized, ...prev];
+      });
+      setNotificationCount(prev => prev + 1);
+    };
+
+    const onNotificationCount = (payload: any) => {
+      const count = (payload && (payload.totalUnread ?? payload.unreadCount ?? payload.total)) as number | undefined;
+      if (typeof count === 'number') {
+        setNotificationCount(count);
+      }
+    };
+
+    socket.on('notification', onNotification);
+    socket.on('new_message_notification', onNewMessageNotification);
+    socket.on('notification_count', onNotificationCount);
+
+    return () => {
+      socket.off('notification', onNotification);
+      socket.off('new_message_notification', onNewMessageNotification);
+      socket.off('notification_count', onNotificationCount);
+    };
+  }, [socket]);
+
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      await fetch(`${process.env.REACT_APP_API_URL}/notifications/mark-all-read`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })));
+      setNotificationCount(0);
+      setNotificationTab('all');
+    } catch (e) {
+      console.warn('Failed to mark all as read', e);
+    }
+  };
+
+  const filteredNotifications = notifications.filter(notif => {
+    if (notificationTab === 'all') return true;
+    if (notificationTab === 'unread') return !notif.isRead;
+    if (notificationTab === 'messages') return notif.type === 'message' || notif.type === 'NEW_MESSAGE';
+    return true;
+  });
+
+  const handleNotificationClick = async (notif: any) => {
+    setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+
+    if (!notif.id) {
+      // nothing to persist
+    } else {
+      try {
+        const token = localStorage.getItem('accessToken');
+        await fetch(`${process.env.REACT_APP_API_URL}/notifications/${notif.id}/read`, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+        });
+      } catch (e) {
+        console.warn('Failed to mark notification read', e);
+      }
+    }
+
+    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.meta?.conversationId) {
+      navigate('/messages', { state: { conversationId: notif.meta.conversationId } });
+      setIsNotificationOpen(false);
+    } else {
+      navigate('/notifications', { state: { notificationId: notif.id } });
+      setIsNotificationOpen(false);
+    }
+  };
+
+  const getNotificationSenderName = (notif: any) => {
+    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title) {
+      return notif.title;
+    }
+
+    if (notif.title && notif.title !== 'Notification') {
+      return notif.title
+    }
+  };
+
+  const getNotificationAvatar = (notif: any) => {
+    if (notif.actor?.profileImage) {
+      return notif.actor.profileImage
+    };
+
+    if (notif.senderAvatar) {
+      return notif.senderAvatar
+    };
+
+    if (notif.meta?.senderImage) {
+      return notif.meta.senderImage;
+    }
+
+    return avatar;
+  };
 
   // Profile editing state
   const [profileData, setProfileData] = useState({
-    fullName: 'Jean Kameni',
-    gender: 'Male',
-    birthday: '13/09/2000'
+    fullName: `${user?.firstName} ${user?.lastName}`,
+    gender: user?.gender,
+    birthday: user?.birthDate,
+    profileImage: user?.profileImage
   });
 
   // Image upload state
@@ -214,7 +440,7 @@ const ProfileSettings: React.FC = () => {
   const phoneDropdownRef = useRef<HTMLDivElement>(null);
 
   const [verificationForm, setVerificationForm] = useState({
-    email: 'google.mail@gmail.com',
+    email: user?.email,
     phone: ''
   });
   // Notifications state
@@ -445,26 +671,6 @@ const ProfileSettings: React.FC = () => {
   const isMobileLanguageView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'language';
   const isMobileNotificationsView = isMobile && !isMobileSidebarVisible && selectedSidebarOption === 'notifications';
   const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistory;
-
-  // Mock notification data with read/unread status
-  const [notifications, setNotifications] = useState([
-    { id: 1, type: 'message', isRead: false, sender: 'Nadine Ngum', text: 'sent you a message', subText: 'Click to view', time: '19 min ago', day: 'Today' },
-    { id: 2, type: 'app', isRead: false, text: 'Your profile has been updated,', subText: 'you are now...', subText2: 'Invoice 6 August 2025 Sequence: 2-7480...', time: '2 hrs ago', day: 'Today' },
-    { id: 3, type: 'message', isRead: true, text: 'New Reviews and Rates from Nadine Ngum...', subText: '"I recently purchased a beautiful Kente...', time: '17:12', day: 'Yesterday' },
-    { id: 4, type: 'app', isRead: true, text: 'New post alert', subText: 'A new listing regarding your recent search...', time: '14:57', day: 'Yesterday' },
-    { id: 5, type: 'message', isRead: true, sender: 'Elidiana IKE', text: 'sent you a message', subText: 'See more details', time: '11:31', day: 'Yesterday' },
-  ]);
-
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(notif => ({ ...notif, isRead: true })));
-  };
-
-  const filteredNotifications = notifications.filter(notif => {
-    if (notificationTab === 'all') return true;
-    if (notificationTab === 'unread') return !notif.isRead;
-    if (notificationTab === 'messages') return notif.type === 'message';
-    return true;
-  });
 
   const unreadCount = notifications.filter(notif => !notif.isRead).length;
   const languageOptions = useMemo(
@@ -738,7 +944,8 @@ const ProfileSettings: React.FC = () => {
     return `${day}/${month}/${year}`;
   };
 
-  const parseBirthday = (value: string) => {
+  const parseBirthday = (value?: string | null) => {
+    if (!value) return null;
     const [day, month, year] = value.split('/');
     if (!day || !month || !year) return null;
     const parsedDate = new Date(Number(year), Number(month) - 1, Number(day));
@@ -1085,7 +1292,7 @@ const ProfileSettings: React.FC = () => {
         {(!isMobile || !isMobileSidebarVisible) && (
           <div className={`flex ${isMobile ? 'flex-col min-h-screen' : 'h-screen'}`}>
             {/* Left Sidebar - Full Height */}
-            <div className={`w-72 bg-white border-r-2 border-gray-300 flex-col h-screen sticky top-0 relative ${isMobile ? 'hidden' : 'flex'}`}>
+            <div className={`w-72 bg-white border-r-2 border-gray-300 flex-col h-screen top-0 relative ${isMobile ? 'hidden' : 'flex'}`}>
               {/* Header */}
               <header className={`bg-white ${isMobile ? 'hidden' : ''}`}>
                 <div className="w-full pl-6 pr-0 sm:pl-6 sm:pr-2 lg:pl-6 lg:pr-4">
@@ -1253,7 +1460,7 @@ const ProfileSettings: React.FC = () => {
                       </div>
 
                       {/* Become Seller Button */}
-                      <Link
+                      {/* <Link
                         to="/register"
                         className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
                         style={{ backgroundColor: '#FEF6E9' }}
@@ -1265,7 +1472,7 @@ const ProfileSettings: React.FC = () => {
                           style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)' }}
                         />
                         <span className="text-sm font-normal" style={{ color: '#F9A825' }}>Start Selling</span>
-                      </Link>
+                      </Link> */}
 
                       {/* Notification Button */}
                       <div className="relative notification-dropdown">
@@ -1369,12 +1576,11 @@ const ProfileSettings: React.FC = () => {
                             >
                               <style>
                                 {`
-                              .notification-dropdown::-webkit-scrollbar {
-                                display: none;
-                              }
-                            `}
+                                                    .notification-dropdown::-webkit-scrollbar {
+                                                      display: none;
+                                                    }
+                                                  `}
                               </style>
-
                               {/* Render notifications grouped by day */}
                               {['Today', 'Yesterday'].map(day => {
                                 const dayNotifs = filteredNotifications.filter(n => n.day === day);
@@ -1384,15 +1590,23 @@ const ProfileSettings: React.FC = () => {
                                   <div key={day} className={day === 'Today' ? 'pt-3 pb-1' : 'pt-2 pb-2'}>
                                     <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
 
-                                    {dayNotifs.map((notif) => (
-                                      <div key={notif.id} className="transition-colors cursor-pointer" style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}>
-                                        <div className="flex items-start space-x-2 py-2 px-6">
+                                    {dayNotifs.map((notif, idx) => (
+                                      <div
+                                        key={notif.id || idx}
+                                        className="transition-colors cursor-pointer"
+                                        style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}
+                                        onClick={() => handleNotificationClick(notif)}
+                                      >
+                                        <div className="flex items-start space-x-4 py-3 px-6">
                                           <div className="relative flex-shrink-0">
-                                            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: notif.type === 'message' ? '#E3F2FD' : '#F9A825', border: '2px solid white' }}>
+                                            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
+                                              backgroundColor: (notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? '#E3F2FD' : '#F9A825',
+                                              border: '2px solid white'
+                                            }}>
                                               {notif.type === 'message' ? (
-                                                <img src={avatar} alt="Avatar" className="w-6 h-6 rounded-full object-cover" />
+                                                <img src={getNotificationAvatar(notif)} alt="Avatar" className="w-9 h-9 rounded-full object-cover" />
                                               ) : (
-                                                <img src={logoIcon} alt="Logo" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
+                                                <img src={logoIcon} alt="Logo" className="w-7 h-7" style={{ filter: 'brightness(0) invert(1)' }} />
                                               )}
                                             </div>
                                             <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
@@ -1402,46 +1616,46 @@ const ProfileSettings: React.FC = () => {
                                           <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between">
                                               <div className="flex-1 min-w-0">
-                                                {notif.sender ? (
-                                                  <p style={{ fontSize: '11px' }}>
-                                                    <span className="font-semibold" style={{ color: notif.isRead ? '#939393' : '#616161' }}>{notif.sender}</span> <span style={{ color: '#939393' }}>{notif.text}</span>
-                                                  </p>
-                                                ) : (
-                                                  <p className={notif.id === 2 && !notif.isRead ? 'font-semibold' : ''} style={{ color: notif.isRead ? '#939393' : '#616161', fontSize: '11px' }}>{notif.text}</p>
-                                                )}
-                                                {notif.subText && (
-                                                  <p className={notif.id === 1 ? 'mt-0.5' : 'text-xs mt-0.5'} style={{ color: notif.id === 1 && !notif.isRead ? '#64B5F6' : '#9E9E9E', fontSize: notif.id === 1 ? '11px' : '10px' }}>{notif.subText}</p>
-                                                )}
-                                                {notif.subText2 && (
-                                                  <p className="text-xs mt-0.5" style={{ color: '#9E9E9E', fontSize: '10px' }}>{notif.subText2}</p>
-                                                )}
+                                                <p style={{ fontSize: '14px' }}>
+                                                  <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                    {getNotificationSenderName(notif)}
+                                                  </span>
+                                                  <span style={{ color: '#939393' }}> {notif.body || notif.text || ''}</span>
+                                                </p>
                                               </div>
-                                              <div className="flex flex-col items-end ml-2 flex-shrink-0" style={{ gap: notif.isRead ? '2px' : '4px' }}>
-                                                <button className="text-gray-400 hover:text-gray-600">
-                                                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <circle cx="6" cy="12" r="1.5" />
-                                                    <circle cx="12" cy="12" r="1.5" />
-                                                    <circle cx="18" cy="12" r="1.5" />
-                                                  </svg>
-                                                </button>
-                                                {notif.isRead ? (
-                                                  <span className="text-xs" style={{ color: '#9E9E9E', fontSize: '10px' }}>{notif.time}</span>
-                                                ) : (
-                                                  <div className="flex items-center space-x-1" style={{ marginTop: notif.id === 2 ? '16px' : '6px' }}>
-                                                    <span style={{ color: '#9E9E9E', fontSize: '9px' }}>{notif.time}</span>
-                                                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />
-                                                  </div>
-                                                )}
+                                              <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
+                                                <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>
+                                                {!notif.isRead && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />}
                                               </div>
                                             </div>
                                           </div>
                                         </div>
-                                        {notif.id !== dayNotifs[dayNotifs.length - 1].id && <div className="border-b border-gray-100" />}
+                                        <div className="border-b border-gray-100" />
                                       </div>
                                     ))}
                                   </div>
                                 );
                               })}
+                            </div>
+
+                            {/* Footer */}
+                            <div className="px-6 pt-5 pb-3 flex items-center justify-between">
+                              <button onClick={markAllAsRead} className="text-xs hover:opacity-70 transition-opacity" style={{ color: '#939393' }}>
+                                Mark all as read
+                              </button>
+                              <button
+                                onClick={() => {
+                                  navigate('/notifications');
+                                  setIsNotificationOpen(false);
+                                }}
+                                className="text-xs flex items-center space-x-1 hover:opacity-70 transition-opacity"
+                                style={{ color: '#64B5F6' }}
+                              >
+                                <span>See all notifications</span>
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </button>
                             </div>
                           </div>
                         )}
@@ -1450,7 +1664,7 @@ const ProfileSettings: React.FC = () => {
                       {/* Profile Picture */}
                       <div className="w-10 h-10 rounded-full overflow-hidden">
                         <img
-                          src={avatarIcon}
+                          src={user?.profileImage || avatar}
                           alt="Profile"
                           className="w-full h-full object-cover"
                         />
@@ -1472,7 +1686,7 @@ const ProfileSettings: React.FC = () => {
                           <div className="fixed right-8 top-0 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-screen overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
                             {/* Start selling button with exit */}
                             <div className="px-3 pb-3 flex items-center justify-between">
-                              <Link
+                              {/* <Link
                                 to="/register"
                                 className="inline-flex items-center px-3 py-1.5 rounded-lg font-normal text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
                                 style={{ backgroundColor: '#FFF8F0', color: '#F9A822' }}
@@ -1488,7 +1702,7 @@ const ProfileSettings: React.FC = () => {
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
                                 </svg>
                                 Start selling
-                              </Link>
+                              </Link> */}
                               <button
                                 onClick={() => setIsMenuDropdownOpen(false)}
                                 className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
@@ -1502,7 +1716,7 @@ const ProfileSettings: React.FC = () => {
                             {/* Profile Section */}
                             <div className="flex items-center space-x-2 px-3 py-3 border-b border-gray-100">
                               <img
-                                src={avatarIcon}
+                                src={user?.profileImage || avatar}
                                 alt="User avatar"
                                 className="w-12 h-12 rounded-full object-cover"
                                 width="48"
@@ -1511,7 +1725,17 @@ const ProfileSettings: React.FC = () => {
                               <div className="flex-1">
                                 <p className="text-xs text-gray-500">My profile</p>
                                 <div className="flex items-center justify-between">
-                                  <h3 className="text-sm font-bold text-gray-900">Jean Kameni</h3>
+                                  <h3 className="text-sm font-bold text-gray-900">
+                                    {user?.firstName && user?.lastName
+                                      ? `${user.firstName} ${user.lastName}`
+                                      : user?.firstName
+                                        ? user.firstName
+                                        : user?.lastName
+                                          ? user.lastName
+                                          : user?.email
+                                            ? user.email.split("@")[0]
+                                            : "User"}
+                                  </h3>
                                   <div className="w-6 h-6 rounded flex items-center justify-center" style={{ backgroundColor: '#E3F2FD' }}>
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
