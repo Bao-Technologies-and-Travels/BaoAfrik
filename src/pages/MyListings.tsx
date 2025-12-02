@@ -1638,7 +1638,7 @@ const MyListings: React.FC = () => {
 
         {/* Mobile All Listings Bar - Only visible on mobile when listings exist */}
         {isMobile && !shouldShowEmptyState && !isSearchNoResultsState && (
-          <div className="lg:hidden px-4 mt-2 mb-4">
+          <div className="lg:hidden px-4 mt-1 mb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
@@ -1682,14 +1682,15 @@ const MyListings: React.FC = () => {
                 {/* Mobile Plus Modal */}
                 {isMobilePlusModalOpen && (
                   <div
-                    className="absolute bottom-full right-0 mb-2 z-50"
+                    className="absolute bottom-0 right-0 z-50"
                     style={{
                       backgroundColor: '#FFFFFF',
                       borderRadius: '12px',
                       border: '1px solid #E9E9E9',
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                       padding: '8px',
-                      minWidth: '180px'
+                      minWidth: '180px',
+                      transform: 'translateY(4px)'
                     }}
                   >
                     {/* Sort by option */}
@@ -1706,7 +1707,8 @@ const MyListings: React.FC = () => {
                         fontFamily: 'Poppins, sans-serif', 
                         fontSize: '13px',
                         backgroundColor: isSortDropdownOpen ? '#F0F8FE' : 'transparent',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        paddingBottom: isSortDropdownOpen && isStatusDropdownOpen ? '6px' : '8px'
                       }}
                       onMouseEnter={(e) => {
                         if (!isSortDropdownOpen) {
@@ -1746,7 +1748,8 @@ const MyListings: React.FC = () => {
                         fontFamily: 'Poppins, sans-serif', 
                         fontSize: '13px',
                         backgroundColor: isStatusDropdownOpen ? '#F0F8FE' : 'transparent',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        paddingTop: isSortDropdownOpen && isStatusDropdownOpen ? '6px' : '8px'
                       }}
                       onMouseEnter={(e) => {
                         if (!isStatusDropdownOpen) {
@@ -1822,9 +1825,6 @@ const MyListings: React.FC = () => {
                         {draftCount}
                       </span>
                     </button>
-
-                    {/* Divider */}
-                    <hr style={{ height: '1px', backgroundColor: '#E9E9E9', margin: '4px 0', border: 0 }} />
 
                     {/* Close option */}
                     <button
