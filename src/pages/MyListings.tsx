@@ -1719,8 +1719,8 @@ const MyListings: React.FC = () => {
                   </svg>
                 </button>
 
-                {/* Mobile Plus Modal - Hidden when tertiary sort modal is open */}
-                {isMobilePlusModalOpen && !mobileSortTertiaryOpen && (
+                {/* Mobile Plus Modal - Hidden when tertiary or secondary sort modal is open */}
+                {isMobilePlusModalOpen && !mobileSortTertiaryOpen && !mobileSortSecondaryOpen && (
                   <div
                     className="absolute bottom-0 right-0 z-50"
                     style={{
@@ -1851,7 +1851,7 @@ const MyListings: React.FC = () => {
                     )}
 
                     {/* Tertiary Sort Modal - replaces primary modal position when secondary option clicked */}
-                    {mobileSortTertiaryOpen && mobileSelectedPrimaryKey && !isMobilePlusModalOpen && (
+                    {mobileSortTertiaryOpen && mobileSelectedPrimaryKey && (
                       <div
                         className="absolute bottom-0 right-0 z-50"
                         style={{
