@@ -60,32 +60,129 @@ import pencilIcon from '../assets/images/pre/pencil.svg';
 import { useToast } from "../contexts/ToastContext";
 
 // Country mapping for products
-const getProductCountry = (productId: number) => {
-  const countryMap: {
-    [key: number]: { name: string; code: string; flag: string; abbreviation: string; };
-  } = {
-    1: { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
-    2: { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
-    3: { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
-    4: { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' },
-    5: { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
-    6: { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
-    7: { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
-    8: { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
-    9: { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
-    10: { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
-    11: { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
-    12: { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
-    13: { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
-    14: { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
-    15: { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
-    16: { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
-    17: { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
-    18: { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
-    19: { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
-    20: { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' }
+const getProductCountry = (productOrigin?: string, productOriginCode?: string) => {
+  const countries = [
+    { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
+    { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },
+    { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png', abbreviation: 'BEN' },
+    { name: 'Botswana', code: 'bw', flag: 'https://flagcdn.com/w20/bw.png', abbreviation: 'BWA' },
+    { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
+    { name: 'Burundi', code: 'bi', flag: 'https://flagcdn.com/w20/bi.png', abbreviation: 'BDI' },
+    { name: 'Cabo Verde', code: 'cv', flag: 'https://flagcdn.com/w20/cv.png', abbreviation: 'CPV' },
+    { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
+    { name: 'Central African Republic', code: 'cf', flag: 'https://flagcdn.com/w20/cf.png', abbreviation: 'CAF' },
+    { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
+    { name: 'Comoros', code: 'km', flag: 'https://flagcdn.com/w20/km.png', abbreviation: 'COM' },
+    { name: 'Congo (Congo-Brazzaville)', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
+    { name: 'Côte d\'Ivoire', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
+    { name: 'Democratic Republic of the Congo', code: 'cd', flag: 'https://flagcdn.com/w20/cd.png', abbreviation: 'COD' },
+    { name: 'Djibouti', code: 'dj', flag: 'https://flagcdn.com/w20/dj.png', abbreviation: 'DJI' },
+    { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
+    { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png', abbreviation: 'GNQ' },
+    { name: 'Eritrea', code: 'er', flag: 'https://flagcdn.com/w20/er.png', abbreviation: 'ERI' },
+    { name: 'Eswatini', code: 'sz', flag: 'https://flagcdn.com/w20/sz.png', abbreviation: 'SWZ' },
+    { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
+    { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png', abbreviation: 'GAB' },
+    { name: 'Gambia', code: 'gm', flag: 'https://flagcdn.com/w20/gm.png', abbreviation: 'GMB' },
+    { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
+    { name: 'Guinea', code: 'gn', flag: 'https://flagcdn.com/w20/gn.png', abbreviation: 'GIN' },
+    { name: 'Guinea-Bissau', code: 'gw', flag: 'https://flagcdn.com/w20/gw.png', abbreviation: 'GNB' },
+    { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
+    { name: 'Lesotho', code: 'ls', flag: 'https://flagcdn.com/w20/ls.png', abbreviation: 'LSO' },
+    { name: 'Liberia', code: 'lr', flag: 'https://flagcdn.com/w20/lr.png', abbreviation: 'LBR' },
+    { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' },
+    { name: 'Madagascar', code: 'mg', flag: 'https://flagcdn.com/w20/mg.png', abbreviation: 'MDG' },
+    { name: 'Malawi', code: 'mw', flag: 'https://flagcdn.com/w20/mw.png', abbreviation: 'MWI' },
+    { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
+    { name: 'Mauritania', code: 'mr', flag: 'https://flagcdn.com/w20/mr.png', abbreviation: 'MRT' },
+    { name: 'Mauritius', code: 'mu', flag: 'https://flagcdn.com/w20/mu.png', abbreviation: 'MUS' },
+    { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
+    { name: 'Mozambique', code: 'mz', flag: 'https://flagcdn.com/w20/mz.png', abbreviation: 'MOZ' },
+    { name: 'Namibia', code: 'na', flag: 'https://flagcdn.com/w20/na.png', abbreviation: 'NAM' },
+    { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
+    { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGA' },
+    { name: 'Rwanda', code: 'rw', flag: 'https://flagcdn.com/w20/rw.png', abbreviation: 'RWA' },
+    { name: 'Sao Tome and Principe', code: 'st', flag: 'https://flagcdn.com/w20/st.png', abbreviation: 'STP' },
+    { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
+    { name: 'Seychelles', code: 'sc', flag: 'https://flagcdn.com/w20/sc.png', abbreviation: 'SYC' },
+    { name: 'Sierra Leone', code: 'sl', flag: 'https://flagcdn.com/w20/sl.png', abbreviation: 'SLE' },
+    { name: 'Somalia', code: 'so', flag: 'https://flagcdn.com/w20/so.png', abbreviation: 'SOM' },
+    { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
+    { name: 'South Sudan', code: 'ss', flag: 'https://flagcdn.com/w20/ss.png', abbreviation: 'SSD' },
+    { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
+    { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
+    { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png', abbreviation: 'TGO' },
+    { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
+    { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
+    { name: 'Zambia', code: 'zm', flag: 'https://flagcdn.com/w20/zm.png', abbreviation: 'ZMB' },
+    { name: 'Zimbabwe', code: 'zw', flag: 'https://flagcdn.com/w20/zw.png', abbreviation: 'ZWE' }
+  ];
+
+  // Common alternative names / spellings
+  const alternativeNames: Record<string, string> = {
+    'gambia': 'Gambia',
+    'ivory coast': 'Côte d\'Ivoire',
+    'cote divoire': 'Côte d\'Ivoire',
+    'côte d\'ivoire': 'Côte d\'Ivoire',
+    'swaziland': 'Eswatini',
+    'congo': 'Congo (Congo-Brazzaville)',
+    'congo brazzaville': 'Congo (Congo-Brazzaville)',
+    'dr congo': 'Democratic Republic of the Congo',
+    'drc': 'Democratic Republic of the Congo',
+    'congo kinshasa': 'Democratic Republic of the Congo',
+    'cape verde': 'Cabo Verde',
+    'sao tome': 'Sao Tome and Principe',
+    'são tomé': 'Sao Tome and Principe',
+    'são tomé and príncipe': 'Sao Tome and Principe',
+    'sao tome & principe': 'Sao Tome and Principe',
+    // Slight spelling variants
+    'cabo verde': 'Cabo Verde',
+    'democratic republic of congo': 'Democratic Republic of the Congo'
   };
-  return countryMap[productId] || { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' };
+
+  const defaultCountry =
+    countries.find(c => c.name === 'Nigeria') ||
+    countries[0];
+
+  // 1) Prefer explicit originCode if provided (handles 2‑ or 3‑letter codes)
+  if (productOriginCode && productOriginCode.trim()) {
+    const codeNorm = productOriginCode.trim().toLowerCase();
+
+    const byCode = countries.find(
+      c =>
+        c.code.toLowerCase() === codeNorm ||
+        c.abbreviation.toLowerCase() === codeNorm
+    );
+
+    if (byCode) return byCode;
+  }
+
+  // 2) Use origin string (name / code / abbreviation)
+  const rawOrigin = (productOrigin || '').trim();
+  if (rawOrigin) {
+    const normalizedOrigin = rawOrigin.toLowerCase();
+    const standardName = alternativeNames[normalizedOrigin] || normalizedOrigin;
+
+    // Exact match on name, code, or abbreviation
+    let country = countries.find(c =>
+      c.name.toLowerCase() === standardName ||
+      c.code.toLowerCase() === standardName ||
+      c.abbreviation.toLowerCase() === standardName.toUpperCase()
+    );
+
+    if (country) return country;
+
+    // Partial / contains match on name
+    country = countries.find(c =>
+      c.name.toLowerCase().includes(standardName) ||
+      standardName.includes(c.name.toLowerCase())
+    );
+
+    if (country) return country;
+  }
+
+  // 3) Last resort: default
+  return defaultCountry;
 };
 
 interface OwnerListingState {
@@ -101,7 +198,6 @@ interface OwnerListingState {
     messages?: number;
   };
 }
-
 
 interface Seller {
   id: string;
@@ -143,6 +239,13 @@ interface Product {
   updatedAt: string;
   images: ProductImage[] | string;
   seller: Seller;
+  imageUrls?: string[];
+  sellerId?: string;
+  sellerProfile?: {
+    firstName: string;
+    lastName: string;
+    profileImage?: string;
+  };
 }
 
 const formatOwnerDate = (timestamp?: number) => {
@@ -203,7 +306,30 @@ const renderStatusBadge = (status?: 'active' | 'inactive', daysLeft?: number) =>
   );
 };
 
+const capitalizeWords = (str: string): string => {
+  if (!str) return '';
+
+  return str
+    .toLowerCase()
+    .split(/(\s+|-+)/)
+    .map(part => {
+      if (part.trim() && part !== '-') {
+        return part.charAt(0).toUpperCase() + part.slice(1);
+      }
+      return part;
+    })
+    .join('')
+    .split(/(?=[A-Z])/)
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 const ProductDetail: React.FC = () => {
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [isDescriptionClamped, setIsDescriptionClamped] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+
   const { id } = useParams<{ id: string }>();
   const routerLocation = useLocation();
   const { user } = useAuth();
@@ -224,6 +350,8 @@ const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [isLoadingRelated, setIsLoadingRelated] = useState(false);
   const [conversations, setConversations] = useState<any[]>([]);
   const [locationFilter, setLocationFilter] = useState('');
   const [sellerProducts, setSellerProducts] = useState<Product[]>([]);
@@ -255,6 +383,19 @@ const ProductDetail: React.FC = () => {
   const [isReviewPosted, setIsReviewPosted] = useState(false);
   const [postedReview, setPostedReview] = useState<{ rating: number; text: string; date: string } | null>(null);
   const { addToast } = useToast();
+
+  // Check if text is clamped
+  useEffect(() => {
+    const element = descriptionRef.current;
+    if (element) {
+      const isClamped = element.scrollHeight > element.clientHeight;
+      setIsDescriptionClamped(isClamped);
+    }
+  }, [product?.description]);
+
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription);
+  };
 
   // Click outside handler for messages dropdown
   useEffect(() => {
@@ -583,6 +724,44 @@ const ProductDetail: React.FC = () => {
     }
   }, [product?.seller?.id, product?.id]);
 
+  // Fetch related products
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product?.category) return;
+
+      setIsLoadingRelated(true);
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/products?category=${encodeURIComponent(product.category)}&limit=12`,
+          {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch related products');
+        }
+
+        const responseData = await response.json();
+        const products = responseData?.data?.products || [];
+
+        // Filter out the current product from related products
+        const filteredProducts = products
+          .filter((p: any) => p && p.id && p.id !== product.id)
+          .slice(0, 12);
+
+        setRelatedProducts(filteredProducts);
+      } catch (err) {
+        console.error('Error fetching related products:', err);
+      } finally {
+        setIsLoadingRelated(false);
+      }
+    };
+
+    fetchRelatedProducts();
+  }, [product?.id, product?.category]);
+
   const images = getProductImages(product);
 
   // format published data
@@ -731,17 +910,6 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  const handleShare = async () => {
-    if (product) {
-      await handleShareProduct(product.id);
-      setIsShared(!isShared);
-    }
-  };
-
-  const toggleAdditionalInfo = () => {
-    setShowAdditionalInfo(!showAdditionalInfo);
-  };
-
   const handleContactSeller = async () => {
     if (!product || !product.seller) {
       addToast({
@@ -879,7 +1047,11 @@ const ProductDetail: React.FC = () => {
   };
 
   const displayName = ownerListing?.title ?? product?.title;
-  const displayPrice = ownerListing ? `${ownerListing.price} ${ownerListing.currency}` : `USD ${product?.price}`;
+  const displayPrice = ownerListing
+    ? `${ownerListing.price} ${ownerListing.currency}`
+    : (product?.currency && product?.price != null
+      ? `${product.currency} ${product.price}`
+      : (product?.price != null ? `${product.price}` : ''));
   const defaultDateLabel = product?.createdAt ?? 'Mon, 21 Dec 2024';
   const displayDateLabel = ownerListing?.createdAt ? formatOwnerDate(ownerListing.createdAt) : defaultDateLabel;
 
@@ -1378,40 +1550,94 @@ const ProductDetail: React.FC = () => {
               <div className="flex gap-2.5 mb-4">
                 {/* Country Badge */}
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
-                  <img
-                    src="https://flagcdn.com/w20/cm.png"
-                    alt="Cameroon flag"
-                    className="w-3.5 h-3.5 rounded-full object-cover"
-                  />
-                  <span className="font-light" style={{ color: '#939393' }}>Cameroun</span>
+                  {(() => {
+                    const country = getProductCountry(product.origin, product.originCode);
+                    return (
+                      <>
+                        <img
+                          src={country.flag}
+                          alt={country.name}
+                          className="w-3.5 h-3.5 rounded-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://flagcdn.com/w20/ng.png';
+                          }}
+                        />
+                        <span className="font-light" style={{ color: '#939393' }}>
+                          {country.name}
+                        </span>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 {/* Category Badge */}
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
-                  <img src={pepperIcon} alt="Pepper" className="w-3 h-3" />
-                  <span className="font-light" style={{ color: '#939393' }}>Spices</span>
+                  <img src={pepperIcon} alt="Category" className="w-3 h-3" />
+                  <span className="font-light" style={{ color: '#939393' }}>{product.category ? capitalizeWords(product.category) : 'Uncategorized'}</span>
                 </div>
 
                 {/* Availability Badge */}
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
                   <img src={availableIcon} alt="Available" className="w-3 h-3" />
-                  <span className="font-light" style={{ color: '#939393' }}>Available : 1</span>
+                  <span className="font-light" style={{ color: '#939393' }}>
+                    {product.quantity > 0
+                      ? `Available: ${product.quantity} ${product.quantity === 1 ? 'item' : 'items'}`
+                      : 'Out of Stock'}
+                  </span>
                 </div>
               </div>
 
-              {/* Description */}
-              <p className="font-light leading-relaxed text-sm" style={{ color: '#B0B0B0', marginBottom: '2px' }}>
-                {product.description}
-              </p>
+              {/* Description with Read More */}
+              <div className="mb-2">
+                <p
+                  ref={descriptionRef}
+                  className="font-light leading-relaxed text-sm"
+                  style={{
+                    color: '#B0B0B0',
+                    marginBottom: '2px',
+                    display: '-webkit-box',
+                    WebkitLineClamp: showFullDescription ? 'unset' : 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {product.description}
+                </p>
 
-              {/* Read More Link */}
-              <button
-                onClick={toggleAdditionalInfo}
-                className="font-medium mb-6 hover:underline text-sm"
-                style={{ color: '#64B5F6', textDecoration: 'none' }}
-              >
-                Read more
-              </button>
+                {isDescriptionClamped && (
+                  <button
+                    onClick={toggleDescription}
+                    className="font-medium text-sm hover:underline"
+                    style={{ color: '#64B5F6', textDecoration: 'none' }}
+                  >
+                    {showFullDescription ? 'Read less' : 'Read more'}
+                  </button>
+                )}
+              </div>
+
+              {/* Description Modal */}
+              {showFullDescription && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={toggleDescription}>
+                  <div
+                    className="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-medium">Product Description</h3>
+                      <button
+                        onClick={toggleDescription}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <p className="text-gray-700 whitespace-pre-line">
+                      {product.description}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Messages Received Component - Only show for active listings without daysLeft */}
               {isOwnerView && ownerListing?.status === 'active' && !ownerListing?.daysLeft && ownerListing?.messages && ownerListing.messages > 0 && (
@@ -1832,7 +2058,7 @@ const ProductDetail: React.FC = () => {
                 {product.title}
               </p>
               <div className="mt-1" style={{ fontSize: '26px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                USD {product.price}
+                {product.currency} {product.price}
               </div>
             </div>
             <div className="flex items-center space-x-2">
@@ -1891,13 +2117,13 @@ const ProductDetail: React.FC = () => {
                 alt={`${product.origin} flag`}
                 className="w-3.5 h-3.5 rounded-full object-cover"
               />
-              <span className="font-light" style={{ color: '#939393' }}>{product.origin}</span>
+              <span className="font-light" style={{ color: '#939393' }}>{capitalizeWords(product.origin)}</span>
             </div>
 
             {/* Category Badge */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border" style={{ borderColor: '#E1E1E1' }}>
               <img src={pepperIcon} alt="Pepper" className="w-3 h-3" />
-              <span className="font-light" style={{ color: '#939393' }}>{product.category}</span>
+              <span className="font-light" style={{ color: '#939393' }}>{capitalizeWords(product.category)}</span>
             </div>
 
             {/* Availability Badge */}
@@ -1914,7 +2140,7 @@ const ProductDetail: React.FC = () => {
 
           {/* Read More Link */}
           <button
-            onClick={toggleAdditionalInfo}
+            onClick={() => setShowAdditionalInfo(true)}
             className="font-medium mb-6 hover:underline text-sm"
             style={{ color: '#64B5F6', textDecoration: 'none' }}
           >
@@ -3035,106 +3261,139 @@ const ProductDetail: React.FC = () => {
 
               {/* Product Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-                {/* Product cards 1-12 */}
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((productNum) => (
-                  <Link key={productNum} to={`/product/${productNum}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                      <img
-                        src={[pre1, pre2, pre3, pre4, pre5, pre6][productNum % 6]}
-                        alt={`Product ${productNum}`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                        style={{ borderRadius: '12px' }}
-                      />
-                      <div className="absolute bg-white rounded-md shadow-sm" style={{
-                        display: 'flex',
-                        padding: '2px 6px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '4px',
-                        top: '8px',
-                        left: '8px'
-                      }}>
-                        <img
-                          src={getProductCountry(productNum).flag}
-                          alt={getProductCountry(productNum).name}
-                          style={{
-                            width: '14px',
-                            height: '14px',
-                            objectFit: 'cover',
-                            borderRadius: '50%'
-                          }}
-                        />
-                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                          {getProductCountry(productNum).abbreviation}
-                        </span>
+                {isLoadingRelated ? (
+                  // Show loading skeleton
+                  Array(6).fill(0).map((_, i) => (
+                    <div key={i} className="bg-white rounded-lg overflow-hidden">
+                      <div className="aspect-square bg-gray-200 animate-pulse rounded-lg mb-2"></div>
+                      <div className="p-2 sm:p-3">
+                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                       </div>
                     </div>
-                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          USD 31.7
-                        </div>
-                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                          display: 'flex',
-                          padding: '1px 3px',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: '1px',
-                          fontSize: '8px'
-                        }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                          <span>Verified seller</span>
-                        </div>
-                      </div>
-                      <h3 className="line-clamp-2 font-medium" style={{
-                        fontSize: '12px',
-                        color: '#212121',
-                        marginBottom: '3px',
-                        lineHeight: '1.3'
-                      }}>Product Name</h3>
-                      <div className="flex items-center justify-between gap-1">
-                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
-                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                            width: '9px',
-                            height: '9px',
-                            marginRight: '3px'
-                          }} />
-                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
-                        </div>
-                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              const newSet = new Set(wishlistProducts);
-                              if (newSet.has(`reviews-product-${productNum}`)) {
-                                newSet.delete(`reviews-product-${productNum}`);
-                              } else {
-                                newSet.add(`reviews-product-${productNum}`);
-                              }
-                              setWishlistProducts(newSet);
+                  ))
+                ) : relatedProducts.length > 0 ? (
+                  // Show related products
+                  relatedProducts.map((relatedProduct) => {
+                    const productImage = Array.isArray(relatedProduct.images) && relatedProduct.images.length > 0
+                      ? relatedProduct.images[0].url
+                      : typeof relatedProduct.images === 'string'
+                        ? relatedProduct.images
+                        : pre1;
+
+                    return (
+                      <Link
+                        key={relatedProduct.id}
+                        to={`/product/${relatedProduct.id}`}
+                        className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group"
+                      >
+                        <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                          <img
+                            src={productImage}
+                            alt={relatedProduct.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            style={{ borderRadius: '12px' }}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = pre1;
                             }}
-                            className="transition-colors touch-manipulation"
-                            style={{
-                              width: window.innerWidth < 1024 ? '18px' : '20px',
-                              height: window.innerWidth < 1024 ? '18px' : '20px',
+                          />
+                          {relatedProduct.origin && (
+                            <div className="absolute bg-white rounded-md shadow-sm" style={{
                               display: 'flex',
-                              alignItems: 'center',
+                              padding: '2px 6px',
                               justifyContent: 'center',
-                              padding: '2px'
-                            }}
-                          >
-                            <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: window.innerWidth < 1024 ? '16px' : '20px',
-                              height: window.innerWidth < 1024 ? '16px' : '20px',
-                              filter: wishlistProducts.has(`reviews-product-${productNum}`) ? 'none' : 'grayscale(100%) opacity(0.6)'
-                            }} />
-                          </button>
+                              alignItems: 'center',
+                              gap: '4px',
+                              top: '8px',
+                              left: '8px'
+                            }}>
+                              <img
+                                src={getProductCountry(relatedProduct.origin, relatedProduct.originCode).flag}
+                                alt={getProductCountry(relatedProduct.origin, relatedProduct.originCode).name}
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  objectFit: 'cover',
+                                  borderRadius: '50%'
+                                }}
+                              />
+                              <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                                {getProductCountry(relatedProduct.origin, relatedProduct.originCode).abbreviation}
+                              </span>
+                            </div>
+                          )}
+                          <div className="absolute top-0 right-0 p-2">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const newSet = new Set(wishlistProducts);
+                                if (newSet.has(`recommended-${relatedProduct.id}`)) {
+                                  newSet.delete(`recommended-${relatedProduct.id}`);
+                                } else {
+                                  newSet.add(`recommended-${relatedProduct.id}`);
+                                }
+                                setWishlistProducts(newSet);
+                              }}
+                              className="transition-colors touch-manipulation"
+                              style={{
+                                width: window.innerWidth < 1024 ? '18px' : '20px',
+                                height: window.innerWidth < 1024 ? '18px' : '20px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '2px'
+                              }}
+                            >
+                              <img
+                                src={bookmarkIcon}
+                                alt="Bookmark"
+                                style={{
+                                  width: window.innerWidth < 1024 ? '16px' : '20px',
+                                  height: window.innerWidth < 1024 ? '16px' : '20px',
+                                  filter: wishlistProducts.has(`recommended-${relatedProduct.id}`) ? 'none' : 'grayscale(100%) opacity(0.6)'
+                                }}
+                              />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                        <div className="p-2 sm:p-3">
+                          <div className="flex justify-between items-start mb-1">
+                            <div
+                              className="font-medium text-gray-900 text-sm sm:text-base line-clamp-2"
+                              style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            >
+                              {relatedProduct.title}
+                            </div>
+                          </div>
+                          <div className="text-sm font-semibold text-gray-900 mb-1">
+                            {relatedProduct.currency || '$'}{relatedProduct.price.toLocaleString()}
+                          </div>
+                          <div className="flex items-center text-xs text-gray-500">
+                            <img
+                              src={locIcon}
+                              alt="Location"
+                              style={{
+                                width: '9px',
+                                height: '9px',
+                                marginRight: '3px'
+                              }}
+                            />
+                            <span className="truncate font-normal" style={{ fontSize: '9px' }}>
+                              {relatedProduct.location || 'Location not specified'}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })
+                ) : (
+                  // Show message when no related products found
+                  <div className="col-span-full text-center py-8 text-gray-500">
+                    No related products found.
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -3187,8 +3446,8 @@ const ProductDetail: React.FC = () => {
                         left: '8px'
                       }}>
                         <img
-                          src={getProductCountry(1).flag}
-                          alt={getProductCountry(1).name}
+                          src={getProductCountry('1').flag}
+                          alt={getProductCountry('1').name}
                           style={{
                             width: '14px',
                             height: '14px',
@@ -3197,7 +3456,7 @@ const ProductDetail: React.FC = () => {
                           }}
                         />
                         <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                          {getProductCountry(1).abbreviation}
+                          {getProductCountry('1').abbreviation}
                         </span>
                       </div>
                     </div>
@@ -3231,7 +3490,7 @@ const ProductDetail: React.FC = () => {
                             height: '9px',
                             marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                         </div>
                         <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                           <button
@@ -3286,8 +3545,8 @@ const ProductDetail: React.FC = () => {
                         left: '8px'
                       }}>
                         <img
-                          src={getProductCountry(2).flag}
-                          alt={getProductCountry(2).name}
+                          src={getProductCountry('2').flag}
+                          alt={getProductCountry('2').name}
                           style={{
                             width: '14px',
                             height: '14px',
@@ -3296,7 +3555,7 @@ const ProductDetail: React.FC = () => {
                           }}
                         />
                         <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                          {getProductCountry(2).abbreviation}
+                          {getProductCountry('2').abbreviation}
                         </span>
                       </div>
                     </div>
@@ -3330,7 +3589,7 @@ const ProductDetail: React.FC = () => {
                             height: '9px',
                             marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                         </div>
                         <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                           <button
@@ -3385,8 +3644,8 @@ const ProductDetail: React.FC = () => {
                         left: '8px'
                       }}>
                         <img
-                          src={getProductCountry(3).flag}
-                          alt={getProductCountry(3).name}
+                          src={getProductCountry('3').flag}
+                          alt={getProductCountry('3').name}
                           style={{
                             width: '14px',
                             height: '14px',
@@ -3395,7 +3654,7 @@ const ProductDetail: React.FC = () => {
                           }}
                         />
                         <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                          {getProductCountry(3).abbreviation}
+                          {getProductCountry('3').abbreviation}
                         </span>
                       </div>
                     </div>
@@ -3429,7 +3688,7 @@ const ProductDetail: React.FC = () => {
                             height: '9px',
                             marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                         </div>
                         <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                           <button
@@ -3484,8 +3743,8 @@ const ProductDetail: React.FC = () => {
                         left: '8px'
                       }}>
                         <img
-                          src={getProductCountry(4).flag}
-                          alt={getProductCountry(4).name}
+                          src={getProductCountry('4').flag}
+                          alt={getProductCountry('4').name}
                           style={{
                             width: '14px',
                             height: '14px',
@@ -3494,7 +3753,7 @@ const ProductDetail: React.FC = () => {
                           }}
                         />
                         <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                          {getProductCountry(4).abbreviation}
+                          {getProductCountry('4').abbreviation}
                         </span>
                       </div>
                     </div>
@@ -3528,7 +3787,7 @@ const ProductDetail: React.FC = () => {
                             height: '9px',
                             marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                         </div>
                         <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                           <button
@@ -3583,8 +3842,8 @@ const ProductDetail: React.FC = () => {
                         left: '8px'
                       }}>
                         <img
-                          src={getProductCountry(5).flag}
-                          alt={getProductCountry(5).name}
+                          src={getProductCountry('5').flag}
+                          alt={getProductCountry('5').name}
                           style={{
                             width: '14px',
                             height: '14px',
@@ -3593,7 +3852,7 @@ const ProductDetail: React.FC = () => {
                           }}
                         />
                         <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                          {getProductCountry(5).abbreviation}
+                          {getProductCountry('5').abbreviation}
                         </span>
                       </div>
                     </div>
@@ -3627,7 +3886,7 @@ const ProductDetail: React.FC = () => {
                             height: '9px',
                             marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                         </div>
                         <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                           <button
@@ -3682,8 +3941,8 @@ const ProductDetail: React.FC = () => {
                         left: '8px'
                       }}>
                         <img
-                          src={getProductCountry(6).flag}
-                          alt={getProductCountry(6).name}
+                          src={getProductCountry('6').flag}
+                          alt={getProductCountry('6').name}
                           style={{
                             width: '14px',
                             height: '14px',
@@ -3692,7 +3951,7 @@ const ProductDetail: React.FC = () => {
                           }}
                         />
                         <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                          {getProductCountry(6).abbreviation}
+                          {getProductCountry('6').abbreviation}
                         </span>
                       </div>
                     </div>
@@ -3726,7 +3985,7 @@ const ProductDetail: React.FC = () => {
                             height: '9px',
                             marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                         </div>
                         <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                           <button
@@ -3791,8 +4050,8 @@ const ProductDetail: React.FC = () => {
                         left: '8px'
                       }}>
                         <img
-                          src={getProductCountry(1).flag}
-                          alt={getProductCountry(1).name}
+                          src={getProductCountry('1').flag}
+                          alt={getProductCountry('1').name}
                           style={{
                             width: '14px',
                             height: '14px',
@@ -3801,7 +4060,7 @@ const ProductDetail: React.FC = () => {
                           }}
                         />
                         <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                          {getProductCountry(1).abbreviation}
+                          {getProductCountry('1').abbreviation}
                         </span>
                       </div>
                     </div>
@@ -3835,7 +4094,7 @@ const ProductDetail: React.FC = () => {
                             height: '9px',
                             marginRight: '3px'
                           }} />
-                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
+                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                         </div>
                         <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
                           <button
@@ -3891,8 +4150,8 @@ const ProductDetail: React.FC = () => {
                           left: '8px'
                         }}>
                           <img
-                            src={getProductCountry(num).flag}
-                            alt={getProductCountry(num).name}
+                            src={getProductCountry(String(num)).flag}
+                            alt={getProductCountry(String(num)).name}
                             style={{
                               width: '14px',
                               height: '14px',
@@ -3901,7 +4160,7 @@ const ProductDetail: React.FC = () => {
                             }}
                           />
                           <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                            {getProductCountry(num).abbreviation}
+                            {getProductCountry(String(num)).abbreviation}
                           </span>
                         </div>
                       </div>
@@ -3935,7 +4194,7 @@ const ProductDetail: React.FC = () => {
                               height: '9px',
                               marginRight: '3px'
                             }} />
-                            <span className="truncate font-normal" style={{ fontSize: '9px' }}>London, United Kingdom</span>
+                            <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                           </div>
                           <div style={{ marginLeft: '4px' }}>
                             <button

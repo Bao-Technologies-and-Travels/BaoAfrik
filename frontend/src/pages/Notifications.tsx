@@ -64,10 +64,6 @@ const Notifications: React.FC = () => {
         return d.toLocaleDateString();
       };
 
-      console.log('Raw notification data:', n);
-      console.log('Notification type:', n.type);
-      console.log('Notification meta:', n.meta);
-
       // Parse meta if it's a string
       let meta = n.meta;
       if (typeof meta === 'string') {
@@ -146,9 +142,6 @@ const Notifications: React.FC = () => {
   }, [socket]);
 
   const handleViewMessage = (notif: Notification) => {
-    console.log('View message clicked for:', notif);
-    console.log('Conversation ID:', notif.meta?.conversationId);
-
     navigate('/notification-detail', {
       state: {
         notification: notif,
@@ -253,7 +246,6 @@ const Notifications: React.FC = () => {
 
   // Get display name for actor
   const getActorName = (notif: Notification) => {
-    console.log('Actor data for notification:', notif.actor, notif);
 
     if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title && notif.title !== 'Notification') {
       return notif.title;

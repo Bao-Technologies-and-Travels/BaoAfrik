@@ -551,7 +551,7 @@ const ProfileSettings: React.FC = () => {
       browser: 'Chrome Browser',
       icon: chromeIcon,
       device: 'DESKTOP-6R899ET',
-      location: 'London, United Kingdom',
+      location: 'London | United Kingdom',
       flag: 'gb',
       isCurrent: true
     }
@@ -563,7 +563,7 @@ const ProfileSettings: React.FC = () => {
       browser: 'Safari Browser',
       icon: safariIcon,
       device: 'iPhone 15 Pro',
-      location: 'London, United Kingdom',
+      location: 'London | United Kingdom',
       flag: 'gb',
       lastUsed: '1 month ago'
     },
@@ -2341,7 +2341,7 @@ const ProfileSettings: React.FC = () => {
                             <div className="relative">
                               <input
                                 type="text"
-                                value="London, United Kingdom"
+                                value="London | United Kingdom"
                                 readOnly
                                 className="w-full px-3 py-2 pl-8 rounded-xl text-xs focus:outline-none"
                                 style={{ backgroundColor: 'white', color: '#6A6A6A', border: '1px solid #E9E9E9', borderRadius: '12px' }}

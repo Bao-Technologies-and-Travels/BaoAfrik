@@ -102,7 +102,7 @@ const CreateListing: React.FC = () => {
   const [origin, setOrigin] = useState('');
   const [saleType, setSaleType] = useState('Default');
   const [deliveryAvailable, setDeliveryAvailable] = useState(false);
-  const [location, setLocation] = useState('London, United Kingdom');
+  const [location, setLocation] = useState('London |  United Kingdom');
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isImageLoading, setIsImageLoading] = useState(false);

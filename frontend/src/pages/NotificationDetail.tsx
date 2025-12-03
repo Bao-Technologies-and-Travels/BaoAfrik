@@ -22,7 +22,6 @@ const NotificationDetail: React.FC = () => {
     const state = location.state as any;
     if (state?.notification) {
       setNotification(state.notification)
-      console.log('Received notification data:', state.notification);
     } else {
       navigate('/notifications');
     }

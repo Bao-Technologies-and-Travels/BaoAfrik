@@ -784,11 +784,8 @@ const MyListings: React.FC = () => {
     };
 
     const handleDeleteClick = (listing: Listing) => {
-        console.log('Delete clicked for listing:', listing.id, listing.title);
-        alert('Delete clicked for: ' + listing.title);
         setListingToDelete(listing);
         setIsDeleteModalOpen(true);
-        console.log('Modal should be open now');
     };
 
     const handleDeleteClose = () => {

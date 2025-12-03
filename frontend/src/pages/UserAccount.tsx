@@ -170,7 +170,7 @@ const UserAccount: React.FC = () => {
     coverPhoto: defaultCoverImage, // Can be updated when seller uploads cover photo
     isVerified: true,
     bio: 'Passionate farmer and entrepreneur with over 15 years of experience in sustainable agriculture. Specializing in organic produce and traditional farming methods. Committed to providing fresh, high-quality products directly from farm to table.',
-    location: 'London, United Kingdom',
+    location: 'London | United Kingdom',
     memberSince: 'Depuis 2025',
     rating: 4.3,
     totalReviews: 456,
@@ -461,7 +461,7 @@ const UserAccount: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>London, United Kingdom</span>
+                  <span>London | United Kingdom</span>
                 </div>
 
                 {/* Member Info */}
@@ -525,7 +525,7 @@ const UserAccount: React.FC = () => {
                 <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Location</h4>
                 <div className="flex items-center space-x-2">
                   <img src={locationIcon} alt="Location" className="w-4 h-4" />
-                  <span className="text-sm" style={{ color: '#64B5F6' }}>London, United Kingdom</span>
+                  <span className="text-sm" style={{ color: '#64B5F6' }}>London | United Kingdom</span>
                 </div>
               </div>
 

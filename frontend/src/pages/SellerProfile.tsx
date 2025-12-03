@@ -174,10 +174,6 @@ const SellerProfile: React.FC = () => {
         const realSellerId = sessionStorage.getItem(`seller_${sellerId}_id`);
         const sellerData = sessionStorage.getItem(`seller_${sellerId}_data`);
 
-        console.log('Seller slug:', sellerId);
-        console.log('Real seller ID:', realSellerId);
-        console.log('Seller data:', sellerData);
-
         if (!realSellerId) {
           console.error('No real seller ID found in sessionStorage');
           setSellerProducts([]);
@@ -185,9 +181,6 @@ const SellerProfile: React.FC = () => {
         }
 
         const token = localStorage.getItem("accessToken");
-
-        console.log('Fetching products for realSellerID:', realSellerId);
-        console.log('API URL:', `${process.env.REACT_APP_API_URL}/products/user/${realSellerId}`);
 
         // Use the user products endpoint from your routes
         const response = await fetch(
@@ -199,16 +192,8 @@ const SellerProfile: React.FC = () => {
           }
         );
 
-        console.log('Response status:', response.status);
-
         if (response.ok) {
           const result = await response.json();
-
-          // debug log
-          console.log('Pure result as [result]:', result);
-          console.log('result.data type:', typeof result.data);
-          console.log('result.data keys:', result.data ? Object.keys(result.data) : 'null');
-          console.log('result.data:', result.data);
 
           if (result.success && result.data) {
             // Handle different possible response structures

@@ -576,7 +576,6 @@ const Messages: React.FC = () => {
     };
 
     const handleNewMessage = (serverMessage: any) => {
-      console.log('New message received (ctx):', serverMessage);
       setMessages((prev) => {
         const isOurMessage = serverMessage.senderId === currentUser?.id;
 
@@ -661,16 +660,7 @@ const Messages: React.FC = () => {
     };
 
     const handleUserTyping = (data: any) => {
-      console.log('📩 user_typing event received:', {
-        dataConversationId: data.conversationId,
-        activeConversationId,
-        dataUserId: data.userId,
-        currentUserId: currentUser?.id,
-        match: data.conversationId === activeConversationId,
-        notSelf: data.userId !== currentUser?.id
-      });
       if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
-        console.log('✅ Showing typing indicator');
         setIsSellerTyping(true);
         setShowTypingIndicator(true);
         if (typingTimeout) {
@@ -952,7 +942,6 @@ const Messages: React.FC = () => {
         // join socket room
         if (socket?.connected) {
           socket.emit("join_conversation", conversationId);
-          console.log('🚪 Emitting join_conversation for:', conversationId);
         }
 
         // Mark as read when opening conversation
@@ -1082,7 +1071,7 @@ const Messages: React.FC = () => {
           clearTimeout(timeout);
 
           if (response && response.success) {
-            console.log('Message send acknowledged:', response.data.id);
+            // do nothing
           } else {
             setMessages((prev) =>
               prev.map((msg) =>
@@ -1590,9 +1579,7 @@ const Messages: React.FC = () => {
       return;
     }
 
-    console.log('⌨️ Starting typing detection for conversation:', currentConversation.id);
-
-    // Send typing start event
+    // Send typing start eent
     socket.emit("typing_start", {
       conversationId: currentConversation.id,
       userId: currentUser?.id,
@@ -1607,7 +1594,6 @@ const Messages: React.FC = () => {
 
     // set new timer to stop typing indicator after 2 seconds of inactivity
     const timer = setTimeout(() => {
-      console.log('Stopping typing detection for conversation:', currentConversation.id);
       socket.emit("typing_stop", {
         conversationId: currentConversation.id,
         userId: currentUser?.id,
@@ -1775,8 +1761,6 @@ const Messages: React.FC = () => {
 
   // Handle message option selection
   const handleMessageOptionSelect = (action: string, messageId?: number) => {
-    console.log('Selected action:', action);
-
     if (action === 'reply' && messageId) {
       // Find the message to reply to
       const message = messages.find(m => m.id === messageId);
@@ -1941,8 +1925,6 @@ const Messages: React.FC = () => {
 
   // Handle incoming product data from Product Detail page
   useEffect(() => {
-    console.log('Location state changed:', location.state);
-
     if (location.state && Object.keys(location.state).length > 0 && !hasProcessedLocationState.current) {
       const {
         productData: stateProductData,
@@ -1950,14 +1932,8 @@ const Messages: React.FC = () => {
         conversationId,
         isProductInquiry,
       } = location.state;
-
-      console.log('Location state received:', location.state);
-      console.log('Received productData:', stateProductData);
-      console.log('Received preFilledMessage', statePreFilledMessage);
-      console.log('Received isProductInquiry:', isProductInquiry);
-
+      
       if (stateProductData) {
-        console.log('Setting product data and inquiry state');
         setProductData(stateProductData);
         setPreFilledMessage(statePreFilledMessage || '');
         if (!isMessageSent) {
@@ -1976,7 +1952,6 @@ const Messages: React.FC = () => {
       // Clear location state to prevent re-triggering on refresh
       setTimeout(() => {
         navigate(location.pathname, { replace: true, state: {} });
-        console.log('Location state cleared');
       }, 100);
     }
   }, [location.state]);
@@ -2700,8 +2675,6 @@ const Messages: React.FC = () => {
         } : null
       };
 
-      console.log('Sending voice note with waveformData:', recordedWaveforms.length, 'bars');
-
       setMessages(prev => [...prev, newMessage]);
       setRecordingTime(0);
       setIsMessageSent(true);
@@ -3165,7 +3138,7 @@ const Messages: React.FC = () => {
                       {/* Location */}
                       <div className="flex items-center space-x-0.5">
                         <img src={locIcon} alt="Location" className="w-3 h-3" />
-                        <span style={{ fontSize: '10px', color: '#64B5F6' }}>London, United Kingdom</span>
+                        <span style={{ fontSize: '10px', color: '#64B5F6' }}>London | United Kingdom</span>
                       </div>
                     </div>
 
@@ -5800,7 +5773,7 @@ const Messages: React.FC = () => {
                                 className="w-4 h-4"
                               />
                               <span style={{ color: "#64B5F6" }}>
-                                London, United Kingdom
+                                London | United Kingdom
                               </span>
                             </div>
                           </div>

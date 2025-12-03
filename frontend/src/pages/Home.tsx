@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { apiClient } from '../services/api';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -75,11 +74,13 @@ interface BaseProduct {
 interface FrontendProduct {
   id: number;
   name: string;
+  currency: string;
   price: string;
   image: any;
   location: string;
   verified: boolean;
   category?: string;
+  origin?: string;
 }
 
 interface CategoryProducts {
@@ -214,9 +215,11 @@ const Home: React.FC = () => {
         const productId = product.id;
         const productName = product.title || 'Unknown Product';
         const productPrice = product.price || '0';
+        const productCurrency = product.currency || 'USD';
         const productCategory = product.category || 'Other';
         const productLocation = product.location || 'Unknown Location';
         const isVerified = product.seller?.isVerifiedSeller || false;
+        const productOrigin = product.origin || product.placeOfOrigin || '';
 
         let productImage;
         if (product.images && Array.isArray(product.images) && product.images.length > 0) {
@@ -227,14 +230,16 @@ const Home: React.FC = () => {
           productImage = getDefaultProductImage(productCategory);
         }
 
-        const transformedProduct = {
+        const transformedProduct: FrontendProduct = {
           id: productId,
           name: productName,
           price: productPrice.toString(),
+          currency: productCurrency,
           image: productImage,
           location: productLocation,
           verified: isVerified,
-          category: productCategory
+          category: productCategory,
+          origin: productOrigin
         };
 
         return transformedProduct;
@@ -244,6 +249,7 @@ const Home: React.FC = () => {
           id: index + 1000,
           name: 'Invalid Product',
           price: '0',
+          currency: 'USD',
           image: getDefaultProductImage('Other'),
           location: 'Unknown',
           verified: false,
@@ -335,32 +341,134 @@ const Home: React.FC = () => {
   ].sort((a, b) => a.name.localeCompare(b.name));
 
   // Country mapping for products
-  const getProductCountry = (productId: number) => {
+  const getProductCountry = (productId: number, productOrigin?: string) => {
     const countries = [
-      { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
-      { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
-      { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
-      { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' },
-      { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
-      { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
-      { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
-      { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
-      { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
-      { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
-      { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
-      { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
-      { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
-      { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
-      { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
-      { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
-      { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
       { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
+      { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },
+      { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png', abbreviation: 'BEN' },
+      { name: 'Botswana', code: 'bw', flag: 'https://flagcdn.com/w20/bw.png', abbreviation: 'BWA' },
+      { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
+      { name: 'Burundi', code: 'bi', flag: 'https://flagcdn.com/w20/bi.png', abbreviation: 'BDI' },
+      { name: 'Cabo Verde', code: 'cv', flag: 'https://flagcdn.com/w20/cv.png', abbreviation: 'CPV' },
+      { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
+      { name: 'Central African Republic', code: 'cf', flag: 'https://flagcdn.com/w20/cf.png', abbreviation: 'CAF' },
+      { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
+      { name: 'Comoros', code: 'km', flag: 'https://flagcdn.com/w20/km.png', abbreviation: 'COM' },
+      { name: 'Congo (Congo-Brazzaville)', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
+      { name: 'Côte d\'Ivoire', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
+      { name: 'Democratic Republic of the Congo', code: 'cd', flag: 'https://flagcdn.com/w20/cd.png', abbreviation: 'COD' },
+      { name: 'Djibouti', code: 'dj', flag: 'https://flagcdn.com/w20/dj.png', abbreviation: 'DJI' },
+      { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
+      { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png', abbreviation: 'GNQ' },
+      { name: 'Eritrea', code: 'er', flag: 'https://flagcdn.com/w20/er.png', abbreviation: 'ERI' },
+      { name: 'Eswatini', code: 'sz', flag: 'https://flagcdn.com/w20/sz.png', abbreviation: 'SWZ' },
+      { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
+      { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png', abbreviation: 'GAB' },
+      { name: 'Gambia', code: 'gm', flag: 'https://flagcdn.com/w20/gm.png', abbreviation: 'GMB' },
+      { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
+      { name: 'Guinea', code: 'gn', flag: 'https://flagcdn.com/w20/gn.png', abbreviation: 'GIN' },
+      { name: 'Guinea-Bissau', code: 'gw', flag: 'https://flagcdn.com/w20/gw.png', abbreviation: 'GNB' },
+      { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
+      { name: 'Lesotho', code: 'ls', flag: 'https://flagcdn.com/w20/ls.png', abbreviation: 'LSO' },
+      { name: 'Liberia', code: 'lr', flag: 'https://flagcdn.com/w20/lr.png', abbreviation: 'LBR' },
+      { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' },
+      { name: 'Madagascar', code: 'mg', flag: 'https://flagcdn.com/w20/mg.png', abbreviation: 'MDG' },
+      { name: 'Malawi', code: 'mw', flag: 'https://flagcdn.com/w20/mw.png', abbreviation: 'MWI' },
+      { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
+      { name: 'Mauritania', code: 'mr', flag: 'https://flagcdn.com/w20/mr.png', abbreviation: 'MRT' },
+      { name: 'Mauritius', code: 'mu', flag: 'https://flagcdn.com/w20/mu.png', abbreviation: 'MUS' },
+      { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
+      { name: 'Mozambique', code: 'mz', flag: 'https://flagcdn.com/w20/mz.png', abbreviation: 'MOZ' },
+      { name: 'Namibia', code: 'na', flag: 'https://flagcdn.com/w20/na.png', abbreviation: 'NAM' },
+      { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
+      { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGA' },
+      { name: 'Rwanda', code: 'rw', flag: 'https://flagcdn.com/w20/rw.png', abbreviation: 'RWA' },
+      { name: 'Sao Tome and Principe', code: 'st', flag: 'https://flagcdn.com/w20/st.png', abbreviation: 'STP' },
+      { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
+      { name: 'Seychelles', code: 'sc', flag: 'https://flagcdn.com/w20/sc.png', abbreviation: 'SYC' },
+      { name: 'Sierra Leone', code: 'sl', flag: 'https://flagcdn.com/w20/sl.png', abbreviation: 'SLE' },
+      { name: 'Somalia', code: 'so', flag: 'https://flagcdn.com/w20/so.png', abbreviation: 'SOM' },
+      { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
+      { name: 'South Sudan', code: 'ss', flag: 'https://flagcdn.com/w20/ss.png', abbreviation: 'SSD' },
+      { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
+      { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
+      { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png', abbreviation: 'TGO' },
       { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
-      { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' }
+      { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
+      { name: 'Zambia', code: 'zm', flag: 'https://flagcdn.com/w20/zm.png', abbreviation: 'ZMB' },
+      { name: 'Zimbabwe', code: 'zw', flag: 'https://flagcdn.com/w20/zw.png', abbreviation: 'ZWE' }
     ];
-    const countryIndex = productId % countries.length;
-    return countries[countryIndex] || countries[0];
+
+    if (!productOrigin) {
+      const defaultCountryIndex = productId % countries.length;
+      return countries[defaultCountryIndex] || countries[0];
+    }
+
+    // normalize the input
+    const normalizedOrigin = productOrigin.trim().toLowerCase();
+
+    // Add common alternative names for some countries
+    const alternativeNames: Record<string, string> = {
+      'gambia': 'Gambia',
+      'ivory coast': 'Côte d\'Ivoire',
+      'cote divoire': 'Côte d\'Ivoire',
+      'côte d\'ivoire': 'Côte d\'Ivoire',
+      'swaziland': 'Eswatini',
+      'congo': 'Congo (Congo-Brazzaville)',
+      'congo brazzaville': 'Congo (Congo-Brazzaville)',
+      'dr congo': 'Democratic Republic of the Congo',
+      'drc': 'Democratic Republic of the Congo',
+      'congo kinshasa': 'Democratic Republic of the Congo',
+      'cape verde': 'Cabo Verde',
+      'sao tome': 'Sao Tome and Principe',
+      'são tomé': 'Sao Tome and Principe',
+      'são tomé and príncipe': 'Sao Tome and Principe',
+      'sao tome & principe': 'Sao Tome and Principe'
+    };
+
+    const standardName = alternativeNames[normalizedOrigin] || normalizedOrigin;
+
+    let country = countries.find(c =>
+      c.name.toLowerCase() === standardName.toLowerCase() ||
+      c.code.toLowerCase() === normalizedOrigin.toLowerCase() ||
+      c.abbreviation.toLowerCase() === normalizedOrigin.toLowerCase()
+    );
+
+    if (country) {
+      return country;
+    };
+
+    // Try partial matches
+    country = countries.find(c =>
+      c.name.toLowerCase().includes(standardName) ||
+      standardName.toLowerCase().includes(c.name.toLowerCase())
+    );
+
+    if (country) {
+      return country;
+    }
+
+    // Fallback to default based on productId
+    const defaultCountryIndex = productId % countries.length;
+    return countries[defaultCountryIndex] || countries[0];
   };
+
+ const formatPrice = (amount: number | string, currencyCode: string = 'USD'): string => {
+  const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
+  const currencyCode_ = (currencyCode || 'USD').toUpperCase();
+
+  // Currency symbol mapping
+  const currencySymbols: Record<string, string> = {
+    'USD': '$',
+    'GBP': '£',
+    'CAD': 'C$',
+    'EUR': '€',
+  };
+
+  const symbol = currencySymbols[currencyCode_] || currencyCode_;
+
+  return `${symbol} ${amountNum.toFixed(2)}`;
+};
 
   // All products data organized by category
   const allProducts: CategoryProducts = {
@@ -369,49 +477,61 @@ const Home: React.FC = () => {
         id: 1,
         name: "Poivre blanc",
         price: "31.7",
+        currency: "USD",
         image: pre1,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Cameroon"
       },
       {
         id: 2,
         name: "Gingembre",
         price: "13.9",
+        currency: "USD",
         image: pre2,
         location: "London | United Kingdom",
-        verified: false
+        verified: false,
+        origin: "Nigeria"
       },
       {
         id: 3,
         name: "Tomates",
         price: "45",
+        currency: "USD",
         image: pre3,
         location: "London | United Kingdom",
-        verified: false
+        verified: false,
+        origin: "Ghana"
       },
       {
         id: 4,
         name: "Crevettes",
         price: "8.09",
+        currency: "USD",
         image: pre4,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Senegal"
       },
       {
         id: 5,
         name: "Ndole",
         price: "11.5",
+        currency: "USD",
         image: pre5,
         location: "London | United Kingdom",
-        verified: false
+        verified: false,
+        origin: "Cameroon"
       },
       {
         id: 6,
         name: "Poivre blanc",
         price: "15.3",
+        currency: "USD",
         image: pre6,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Ivory Coast"
       }
     ],
     'Fashion & Textiles': [
@@ -419,49 +539,61 @@ const Home: React.FC = () => {
         id: 7,
         name: "Kente Fabric Roll",
         price: "232",
+        currency: "USD",
         image: pre7,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Ghana"
       },
       {
         id: 8,
         name: "Traditional Ankara",
         price: "34.7",
+        currency: "USD",
         image: pre8,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Nigeria"
       },
       {
         id: 9,
         name: "Wax Print Fabric",
         price: "90.1",
+        currency: "USD",
         image: pre9,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Senegal"
       },
       {
         id: 10,
         name: "Bogolan Mud Cloth",
         price: "245",
+        currency: "USD",
         image: pre10,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Mali"
       },
       {
         id: 11,
         name: "Dashiki Shirt",
         price: "110.9",
+        currency: "USD",
         image: pre11,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Nigeria"
       },
       {
         id: 12,
         name: "African Print Dress",
         price: "68.7",
+        currency: "USD",
         image: pre12,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Ghana"
       }
     ],
     'Beauty & Wellness': [
@@ -469,51 +601,63 @@ const Home: React.FC = () => {
         id: 13,
         name: "Shea Butter Cream",
         price: "31.7",
+        currency: "USD",
         image: pre13,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Ghana"
       },
       {
         id: 14,
         name: "African Black Soap",
         price: "31.7",
+        currency: "USD",
         image: pre14,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Nigeria"
       },
       {
         id: 15,
         name: "Baobab Oil Serum",
         price: "31.7",
+        currency: "USD",
         image: pre15,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Senegal"
       },
       {
         id: 16,
         name: "Moringa Face Mask",
         price: "31.7",
+        currency: "USD",
         image: pre16,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Kenya"
       },
       {
         id: 17,
-        name: "Argan Hair Oil",
+        name: "Hibiscus Shampoo",
         price: "31.7",
+        currency: "USD",
         image: pre17,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "Tanzania"
       },
       {
         id: 18,
-        name: "Poivre blanc",
+        name: "Neem Oil",
         price: "31.7",
+        currency: "USD",
         image: pre18,
         location: "London | United Kingdom",
-        verified: true
+        verified: true,
+        origin: "India"
       }
-    ]
+    ],
   };
 
   const getAllProducts = (): FrontendProduct[] => {
@@ -571,7 +715,7 @@ const Home: React.FC = () => {
     // Apply country filter if a specific country is selected
     if (selectedCountry) {
       productsToFilter = productsToFilter.filter((product: FrontendProduct) =>
-        getProductCountry(product.id).name === selectedCountry
+        getProductCountry(product.id, product.origin).name === selectedCountry
       );
     }
 
@@ -607,7 +751,7 @@ const Home: React.FC = () => {
     if (selectedCountry) {
       const beforeCount = displayProducts.length;
       displayProducts = displayProducts.filter((product: FrontendProduct) =>
-        getProductCountry(product.id).name === selectedCountry
+        getProductCountry(product.id, product.origin).name === selectedCountry
       );
     }
 
@@ -700,14 +844,14 @@ const Home: React.FC = () => {
 
       if (selectedPlaceOfOriginText) {
         products = products.filter(product => {
-          const country = getProductCountry(product.id).name;
+          const country = getProductCountry(product.id, product.origin).name;
           return country === selectedPlaceOfOriginText;
         });
       }
 
       if (selectedCountry) {
         products = products.filter(product =>
-          getProductCountry(product.id).name === selectedCountry
+          getProductCountry(product.id, product.origin).name === selectedCountry
         );
       }
 
@@ -747,7 +891,7 @@ const Home: React.FC = () => {
     if (selectedPlaceOfOriginText) {
       const beforeCount = productsToSearch.length;
       productsToSearch = productsToSearch.filter((product: FrontendProduct) => {
-        const country = getProductCountry(product.id).name;
+        const country = getProductCountry(product.id, product.origin).name;
         return country === selectedPlaceOfOriginText;
       });
     }
@@ -756,7 +900,7 @@ const Home: React.FC = () => {
     if (selectedCountry) {
       const beforeCount = productsToSearch.length;
       productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
-        getProductCountry(product.id).name === selectedCountry
+        getProductCountry(product.id, product.origin).name === selectedCountry
       );
     }
 
@@ -2062,13 +2206,17 @@ const Home: React.FC = () => {
             // Category Sections Layout
             (() => {
               // Check if any category has products after country filter
-              const hasAnyProducts = categories.filter(cat => cat !== 'All').some((category) => {
-                const categoryProducts = (allProductsComputed[category as keyof typeof allProducts] || []);
-                const filteredProducts = selectedCountry
-                  ? categoryProducts.filter(product => getProductCountry(product.id).name === selectedCountry)
-                  : categoryProducts;
-                return filteredProducts.length > 0;
-              });
+              const hasAnyProducts = categories
+                .filter(cat => cat !== 'All')
+                .some((category) => {
+                  const categoryProducts = (allProductsComputed[category as keyof typeof allProducts] || []);
+                  const filteredProducts = selectedCountry
+                    ? categoryProducts.filter(product =>
+                      getProductCountry(product.id, product.origin).name === selectedCountry
+                    )
+                    : categoryProducts;
+                  return filteredProducts.length > 0;
+                });
 
               // If no products found and country filter is active, show no results state
               if (!hasAnyProducts && selectedCountry) {
@@ -2169,8 +2317,8 @@ const Home: React.FC = () => {
                                 left: window.innerWidth < 640 ? '6px' : '8px'
                               }}>
                                 <img
-                                  src={`https://flagcdn.com/w20/${getProductCountry(product.id).code}.png`}
-                                  alt={getProductCountry(product.id).name}
+                                  src={`https://flagcdn.com/w20/${getProductCountry(product.id, product.origin).code}.png`}
+                                  alt={getProductCountry(product.id, product.origin).name}
                                   style={{
                                     width: window.innerWidth < 640 ? '10px' : '12px',
                                     height: window.innerWidth < 640 ? '7px' : '8px',
@@ -2179,7 +2327,7 @@ const Home: React.FC = () => {
                                   }}
                                 />
                                 <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
-                                  {getProductCountry(product.id).abbreviation}
+                                  {getProductCountry(product.id, product.origin).abbreviation}
                                 </span>
                               </div>
                             </div>
@@ -2189,7 +2337,7 @@ const Home: React.FC = () => {
                               {/* Price and Verified Badge Row */}
                               <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                 <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                  ${product.price}
+                                  {formatPrice(product.price, product.currency)}
                                 </div>
                                 {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -2280,7 +2428,9 @@ const Home: React.FC = () => {
                     const categoryProducts = (allProductsComputed[category as keyof typeof allProducts] || []);
                     // Filter products by selected country
                     const filteredProducts = selectedCountry
-                      ? categoryProducts.filter(product => getProductCountry(product.id).name === selectedCountry)
+                      ? categoryProducts.filter(product =>
+                        getProductCountry(product.id, product.origin).name === selectedCountry
+                      )
                       : categoryProducts;
                     if (filteredProducts.length === 0) return null;
 
@@ -2343,8 +2493,8 @@ const Home: React.FC = () => {
                                     left: window.innerWidth < 640 ? '6px' : '8px'
                                   }}>
                                     <img
-                                      src={getProductCountry(product.id).flag}
-                                      alt={getProductCountry(product.id).name}
+                                      src={getProductCountry(product.id, product.origin).flag}
+                                      alt={getProductCountry(product.id, product.origin).name}
                                       style={{
                                         width: window.innerWidth < 640 ? '10px' : '12px',
                                         height: window.innerWidth < 640 ? '7px' : '8px',
@@ -2353,7 +2503,7 @@ const Home: React.FC = () => {
                                       }}
                                     />
                                     <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
-                                      {getProductCountry(product.id).abbreviation}
+                                      {getProductCountry(product.id, product.origin).abbreviation}
                                     </span>
                                   </div>
                                 </div>
@@ -2363,7 +2513,7 @@ const Home: React.FC = () => {
                                   {/* Price and Verified Badge Row */}
                                   <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                     <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                      ${product.price}
+                                      {formatPrice(product.price, product.currency)}
                                     </div>
                                     {product.verified ? (
                                       <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -2581,8 +2731,8 @@ const Home: React.FC = () => {
                               left: window.innerWidth < 640 ? '6px' : '8px'
                             }}>
                               <img
-                                src={getProductCountry(product.id).flag}
-                                alt={getProductCountry(product.id).name}
+                                src={getProductCountry(product.id, product.origin).flag}
+                                alt={getProductCountry(product.id, product.origin).name}
                                 style={{
                                   width: window.innerWidth < 640 ? '10px' : '12px',
                                   height: window.innerWidth < 640 ? '7px' : '8px',
@@ -2591,7 +2741,7 @@ const Home: React.FC = () => {
                                 }}
                               />
                               <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
-                                {getProductCountry(product.id).abbreviation}
+                                {getProductCountry(product.id, product.origin).abbreviation}
                               </span>
                             </div>
                           </div>
@@ -2601,7 +2751,7 @@ const Home: React.FC = () => {
                             {/* Price and Verified Badge Row */}
                             <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                               <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                ${product.price}
+                                {formatPrice(product.price, product.currency)}
                               </div>
                               {product.verified ? (
                                 <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -2707,12 +2857,12 @@ const Home: React.FC = () => {
                         {/* Country Badge */}
                         <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
                           <img
-                            src={getProductCountry(product.id).flag}
-                            alt={getProductCountry(product.id).name}
+                            src={getProductCountry(product.id, product.origin).flag}
+                            alt={getProductCountry(product.id, product.origin).name}
                             className="w-3 h-2 object-cover rounded-sm"
                           />
                           <span className="text-xs font-medium text-gray-800">
-                            {getProductCountry(product.id).abbreviation}
+                            {getProductCountry(product.id, product.origin).abbreviation}
                           </span>
                         </div>
                       </div>
@@ -2722,7 +2872,7 @@ const Home: React.FC = () => {
                         {/* Price and Verified Badge Row */}
                         <div className="flex items-center justify-between mb-1">
                           <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
-                            ${product.price}
+                            {formatPrice(product.price, product.currency)}
                           </div>
                           {product.verified ? (
                             <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
@@ -3123,7 +3273,7 @@ const Home: React.FC = () => {
                             className="w-3 h-3"
                             style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                           />
-                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>London, United Kingdom</span>
+                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>London | United Kingdom</span>
                         </div>
 
                         {/* Second Row - Price and Country */}
@@ -3198,7 +3348,7 @@ const Home: React.FC = () => {
                             filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
                           }}
                         />
-                        <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>London, United Kingdom</span>
+                        <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>London | United Kingdom</span>
                       </div>
 
                       {/* Second Row - Price and Country */}
@@ -3472,7 +3622,7 @@ const Home: React.FC = () => {
               </label>
               <div className="flex items-center justify-between">
                 <span style={{ fontSize: window.innerWidth < 640 ? '10px' : '12px', color: '#64B5F6' }}>
-                  London, United Kingdom
+                  London | United Kingdom
                 </span>
                 <button
                   style={{
