@@ -182,7 +182,6 @@ const SellerProfile: React.FC = () => {
 
         const token = localStorage.getItem("accessToken");
 
-        // Use the user products endpoint from your routes
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/products/user/${sellerId}`,
           {
@@ -196,7 +195,6 @@ const SellerProfile: React.FC = () => {
           const result = await response.json();
 
           if (result.success && result.data) {
-            // Handle different possible response structures
             let products = [];
 
             if (result.data.products) {
@@ -207,9 +205,6 @@ const SellerProfile: React.FC = () => {
               const possibleArrays = Object.values(result.data).filter((item: unknown) => Array.isArray(item)) as any[][];
               products = possibleArrays.length > 0 ? possibleArrays[0] : [];
             }
-
-            //  debug log
-            console.log('Final products array:', products)
             setSellerProducts(products);
           } else {
             console.warn('No success or data in repsonse', result);

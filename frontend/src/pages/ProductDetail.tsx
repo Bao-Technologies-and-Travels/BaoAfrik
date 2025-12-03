@@ -48,6 +48,11 @@ import inactiveIcon from '../assets/images/pre/inactive.svg';
 import repostIcon from '../assets/images/pre/repost.svg';
 import renewIcon from '../assets/images/pre/renew.svg';
 import daysIcon from '../assets/images/pre/days.svg';
+import beauty from '../assets/images/pre/beauty.png';
+import books from '../assets/images/pre/books.png';
+import food from '../assets/images/pre/food.png';
+import home from '../assets/images/pre/home.png';
+import fashion from '../assets/images/pre/fashion.png';
 
 // Import icons for reviews section
 import likeIcon from '../assets/images/pre/like.svg';
@@ -135,7 +140,6 @@ const getProductCountry = (productOrigin?: string, productOriginCode?: string) =
     'são tomé': 'Sao Tome and Principe',
     'são tomé and príncipe': 'Sao Tome and Principe',
     'sao tome & principe': 'Sao Tome and Principe',
-    // Slight spelling variants
     'cabo verde': 'Cabo Verde',
     'democratic republic of congo': 'Democratic Republic of the Congo'
   };
@@ -144,7 +148,6 @@ const getProductCountry = (productOrigin?: string, productOriginCode?: string) =
     countries.find(c => c.name === 'Nigeria') ||
     countries[0];
 
-  // 1) Prefer explicit originCode if provided (handles 2‑ or 3‑letter codes)
   if (productOriginCode && productOriginCode.trim()) {
     const codeNorm = productOriginCode.trim().toLowerCase();
 
@@ -157,13 +160,11 @@ const getProductCountry = (productOrigin?: string, productOriginCode?: string) =
     if (byCode) return byCode;
   }
 
-  // 2) Use origin string (name / code / abbreviation)
   const rawOrigin = (productOrigin || '').trim();
   if (rawOrigin) {
     const normalizedOrigin = rawOrigin.toLowerCase();
     const standardName = alternativeNames[normalizedOrigin] || normalizedOrigin;
 
-    // Exact match on name, code, or abbreviation
     let country = countries.find(c =>
       c.name.toLowerCase() === standardName ||
       c.code.toLowerCase() === standardName ||
@@ -172,7 +173,6 @@ const getProductCountry = (productOrigin?: string, productOriginCode?: string) =
 
     if (country) return country;
 
-    // Partial / contains match on name
     country = countries.find(c =>
       c.name.toLowerCase().includes(standardName) ||
       standardName.includes(c.name.toLowerCase())
@@ -181,7 +181,6 @@ const getProductCountry = (productOrigin?: string, productOriginCode?: string) =
     if (country) return country;
   }
 
-  // 3) Last resort: default
   return defaultCountry;
 };
 

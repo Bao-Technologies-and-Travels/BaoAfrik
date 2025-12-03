@@ -4,23 +4,11 @@ import { useAuth } from '../contexts/AuthContext';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
-import pre2 from '../assets/images/pre/2.png';
 import pre3 from '../assets/images/pre/3.png';
-import pre4 from '../assets/images/pre/4.png';
-import pre5 from '../assets/images/pre/5.png';
-import pre6 from '../assets/images/pre/6.png';
 import pre7 from '../assets/images/pre/7.png';
-import pre8 from '../assets/images/pre/8.png';
-import pre9 from '../assets/images/pre/9.png';
 import pre10 from '../assets/images/pre/10.png';
-import pre11 from '../assets/images/pre/11.png';
-import pre12 from '../assets/images/pre/12.png';
 import pre13 from '../assets/images/pre/13.png';
-import pre14 from '../assets/images/pre/14.png';
-import pre15 from '../assets/images/pre/15.png';
-import pre16 from '../assets/images/pre/16.png';
-import pre17 from '../assets/images/pre/17.png';
-import pre18 from '../assets/images/pre/18.png';
+
 import earthIcon from '../assets/images/pre/earth.svg';
 import arrowDownIcon from '../assets/images/pre/arrow-down.svg';
 import grayArrowIcon from '../assets/images/pre/gray.svg';
@@ -32,10 +20,8 @@ import unverifyIcon from '../assets/images/pre/unverify.svg';
 import globyIcon from '../assets/images/pre/globy.svg';
 import buyerIcon from '../assets/images/pre/buyer.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
-import boxIcon from '../assets/images/pre/box.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
 import bagIcon from '../assets/images/pre/bag.svg';
-import settingIcon from '../assets/images/pre/setting.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -102,7 +88,6 @@ interface Notification {
 }
 
 const Home: React.FC = () => {
-  const auth = useAuth();
   const productGridRef = React.useRef<HTMLDivElement>(null);
   const categoryRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
   const [activeCategory, setActiveCategory] = useState('All');
@@ -259,6 +244,29 @@ const Home: React.FC = () => {
     });
   };
 
+  const getAllProducts = (): FrontendProduct[] => {
+    return transformToFrontendProducts(products);
+  };
+
+  const getAllProductsByCategory = (): CategoryProducts => {
+    const productsToUse = getAllProducts();
+
+    const categorized = productsToUse.reduce((acc: CategoryProducts, product: FrontendProduct) => {
+      const category = product.category || 'Other';
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(product);
+      return acc;
+    }, {} as CategoryProducts);
+
+    return categorized;
+  };
+
+  const allProductsComputed = React.useMemo(() => {
+    return getAllProductsByCategory();
+  }, [products]);
+
   const getDefaultProductImage = (category: string | undefined): any => {
     const categoryImages: { [key: string]: any } = {
       'Food & Spices': pre1,
@@ -310,7 +318,27 @@ const Home: React.FC = () => {
     }
   ];
 
-  const categories = ['All', 'Food & Spices', 'Fashion & Textiles', 'Beauty & Wellness', 'Home & Decor', 'Books & Media'];
+  const defaultCategories = [
+    'All',
+    'Food & Spices',
+    'Fashion & Textiles',
+    'Beauty & Wellness',
+    'Home & Decor',
+    'Books & Media'
+  ];
+
+  const categories = React.useMemo(() => {
+    const uniqueCategories = new Set<string>(defaultCategories);
+
+    const products = getAllProducts();
+    products.forEach(p => {
+      if (p.category && !defaultCategories.includes(p.category)) {
+        uniqueCategories.add(p.category);
+      }
+    });
+
+    return Array.from(uniqueCategories);
+  }, [products]);
 
   const africanCountries = [
     { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png' },
@@ -453,238 +481,22 @@ const Home: React.FC = () => {
     return countries[defaultCountryIndex] || countries[0];
   };
 
- const formatPrice = (amount: number | string, currencyCode: string = 'USD'): string => {
-  const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
-  const currencyCode_ = (currencyCode || 'USD').toUpperCase();
+  const formatPrice = (amount: number | string, currencyCode: string = 'USD'): string => {
+    const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
+    const currencyCode_ = (currencyCode || 'USD').toUpperCase();
 
-  // Currency symbol mapping
-  const currencySymbols: Record<string, string> = {
-    'USD': '$',
-    'GBP': '£',
-    'CAD': 'C$',
-    'EUR': '€',
+    // Currency symbol mapping
+    const currencySymbols: Record<string, string> = {
+      'USD': '$',
+      'GBP': '£',
+      'CAD': 'C$',
+      'EUR': '€',
+    };
+
+    const symbol = currencySymbols[currencyCode_] || currencyCode_;
+
+    return `${symbol} ${amountNum.toFixed(2)}`;
   };
-
-  const symbol = currencySymbols[currencyCode_] || currencyCode_;
-
-  return `${symbol} ${amountNum.toFixed(2)}`;
-};
-
-  // All products data organized by category
-  const allProducts: CategoryProducts = {
-    'Food & Spices': [
-      {
-        id: 1,
-        name: "Poivre blanc",
-        price: "31.7",
-        currency: "USD",
-        image: pre1,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Cameroon"
-      },
-      {
-        id: 2,
-        name: "Gingembre",
-        price: "13.9",
-        currency: "USD",
-        image: pre2,
-        location: "London | United Kingdom",
-        verified: false,
-        origin: "Nigeria"
-      },
-      {
-        id: 3,
-        name: "Tomates",
-        price: "45",
-        currency: "USD",
-        image: pre3,
-        location: "London | United Kingdom",
-        verified: false,
-        origin: "Ghana"
-      },
-      {
-        id: 4,
-        name: "Crevettes",
-        price: "8.09",
-        currency: "USD",
-        image: pre4,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Senegal"
-      },
-      {
-        id: 5,
-        name: "Ndole",
-        price: "11.5",
-        currency: "USD",
-        image: pre5,
-        location: "London | United Kingdom",
-        verified: false,
-        origin: "Cameroon"
-      },
-      {
-        id: 6,
-        name: "Poivre blanc",
-        price: "15.3",
-        currency: "USD",
-        image: pre6,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Ivory Coast"
-      }
-    ],
-    'Fashion & Textiles': [
-      {
-        id: 7,
-        name: "Kente Fabric Roll",
-        price: "232",
-        currency: "USD",
-        image: pre7,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Ghana"
-      },
-      {
-        id: 8,
-        name: "Traditional Ankara",
-        price: "34.7",
-        currency: "USD",
-        image: pre8,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Nigeria"
-      },
-      {
-        id: 9,
-        name: "Wax Print Fabric",
-        price: "90.1",
-        currency: "USD",
-        image: pre9,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Senegal"
-      },
-      {
-        id: 10,
-        name: "Bogolan Mud Cloth",
-        price: "245",
-        currency: "USD",
-        image: pre10,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Mali"
-      },
-      {
-        id: 11,
-        name: "Dashiki Shirt",
-        price: "110.9",
-        currency: "USD",
-        image: pre11,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Nigeria"
-      },
-      {
-        id: 12,
-        name: "African Print Dress",
-        price: "68.7",
-        currency: "USD",
-        image: pre12,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Ghana"
-      }
-    ],
-    'Beauty & Wellness': [
-      {
-        id: 13,
-        name: "Shea Butter Cream",
-        price: "31.7",
-        currency: "USD",
-        image: pre13,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Ghana"
-      },
-      {
-        id: 14,
-        name: "African Black Soap",
-        price: "31.7",
-        currency: "USD",
-        image: pre14,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Nigeria"
-      },
-      {
-        id: 15,
-        name: "Baobab Oil Serum",
-        price: "31.7",
-        currency: "USD",
-        image: pre15,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Senegal"
-      },
-      {
-        id: 16,
-        name: "Moringa Face Mask",
-        price: "31.7",
-        currency: "USD",
-        image: pre16,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Kenya"
-      },
-      {
-        id: 17,
-        name: "Hibiscus Shampoo",
-        price: "31.7",
-        currency: "USD",
-        image: pre17,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "Tanzania"
-      },
-      {
-        id: 18,
-        name: "Neem Oil",
-        price: "31.7",
-        currency: "USD",
-        image: pre18,
-        location: "London | United Kingdom",
-        verified: true,
-        origin: "India"
-      }
-    ],
-  };
-
-  const getAllProducts = (): FrontendProduct[] => {
-    if (products.length > 0) {
-      return transformToFrontendProducts(products);
-    }
-    return Object.values(allProducts).flat();
-  };
-
-  const getAllProductsByCategory = (): CategoryProducts => {
-    const productsToUse = getAllProducts();
-
-    const categorized = productsToUse.reduce((acc: CategoryProducts, product: FrontendProduct) => {
-      const category = product.category || 'Other';
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(product);
-      return acc;
-    }, {} as CategoryProducts);
-
-    return categorized;
-  };
-
-  const allProductsComputed = React.useMemo(() => {
-    return getAllProductsByCategory();
-  }, [products]);
 
   // Search functionality
   const filteredProducts = (): FrontendProduct[] => {
@@ -836,7 +648,7 @@ const Home: React.FC = () => {
 
       if (selectedCategoryText) {
         products = products.filter(product => {
-          return Object.entries(allProducts).some(([category, categoryProducts]) =>
+          return Object.entries(allProductsComputed).some(([category, categoryProducts]) =>
             category === selectedCategoryText && categoryProducts.some(p => p.id === product.id)
           );
         });
@@ -2209,7 +2021,7 @@ const Home: React.FC = () => {
               const hasAnyProducts = categories
                 .filter(cat => cat !== 'All')
                 .some((category) => {
-                  const categoryProducts = (allProductsComputed[category as keyof typeof allProducts] || []);
+                  const categoryProducts = (allProductsComputed[category] || []);
                   const filteredProducts = selectedCountry
                     ? categoryProducts.filter(product =>
                       getProductCountry(product.id, product.origin).name === selectedCountry
@@ -2337,7 +2149,8 @@ const Home: React.FC = () => {
                               {/* Price and Verified Badge Row */}
                               <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                 <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                  {formatPrice(product.price, product.currency)}
+                                  {/* {formatPrice(product.price, product.currency)} */}
+                                  {product.currency} {product.price}
                                 </div>
                                 {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -2425,7 +2238,7 @@ const Home: React.FC = () => {
               return (
                 <div className="space-y-8">
                   {categories.filter(cat => cat !== 'All').map((category) => {
-                    const categoryProducts = (allProductsComputed[category as keyof typeof allProducts] || []);
+                    const categoryProducts = (allProductsComputed[category] || []);
                     // Filter products by selected country
                     const filteredProducts = selectedCountry
                       ? categoryProducts.filter(product =>
@@ -2513,7 +2326,8 @@ const Home: React.FC = () => {
                                   {/* Price and Verified Badge Row */}
                                   <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                     <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                      {formatPrice(product.price, product.currency)}
+                                      {/* {formatPrice(product.price, product.currency)} */}
+                                      {product.currency} {product.price}
                                     </div>
                                     {product.verified ? (
                                       <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -2751,7 +2565,8 @@ const Home: React.FC = () => {
                             {/* Price and Verified Badge Row */}
                             <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                               <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                {formatPrice(product.price, product.currency)}
+                                {/* {formatPrice(product.price, product.currency)} */}
+                                {product.currency} {product.price}
                               </div>
                               {product.verified ? (
                                 <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -2872,7 +2687,8 @@ const Home: React.FC = () => {
                         {/* Price and Verified Badge Row */}
                         <div className="flex items-center justify-between mb-1">
                           <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
-                            {formatPrice(product.price, product.currency)}
+                            {/* {formatPrice(product.price, product.currency)} */}
+                            {product.currency} {product.price}
                           </div>
                           {product.verified ? (
                             <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
@@ -2943,7 +2759,6 @@ const Home: React.FC = () => {
                 </button>
                 <div className="flex space-x-0.5">
                   {(() => {
-                    const pages = [];
                     const showPages = [];
 
                     if (totalPages <= 5) {
@@ -3016,7 +2831,6 @@ const Home: React.FC = () => {
                 </button>
                 <div className="flex space-x-1">
                   {(() => {
-                    const pages = [];
                     const showPages = [];
 
                     if (totalPages <= 7) {

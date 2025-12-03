@@ -184,8 +184,10 @@ const Header: React.FC<HeaderProps> = ({
 
     const onNotification = (payload: any) => {
       const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
+      const actor = payload.actor ?? payload._actor ?? payload.meta?.actor ?? payload.user ?? null;
       const normalized = {
         ...payload,
+        actor,
         day: getDayLabel(created),
         time: payload.time || formatTime(created),
         id: payload.id || `notif-${Date.now()}-${Math.random()}`
@@ -207,6 +209,7 @@ const Header: React.FC<HeaderProps> = ({
       };
 
       const created = new Date();
+      const actor = payload.actor ?? payload._actor ?? payload.meta?.actor ?? null;
       const normalized = {
         id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
         day: getDayLabel(created),
@@ -215,7 +218,7 @@ const Header: React.FC<HeaderProps> = ({
         body: payload.preview || payload.body || '',
         meta: { conversationId: payload.conversationId, messageId: payload.messageId },
         isRead: false,
-        actor: payload.actor ?? null
+        actor
       };
 
       setNotifications(prev => {
@@ -329,18 +332,27 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const getNotificationAvatar = (notif: any) => {
-    if (notif.actor?.profileImage) {
-      return notif.actor.profileImage
+    const tryUrl = (u?: string | null) => {
+      if (!u) return null;
+      // if relative path, prefix with API url
+      if (!/^https?:\/\//i.test(u) && process.env.REACT_APP_API_URL) {
+        return `${process.env.REACT_APP_API_URL.replace(/\/$/, '')}/${u.replace(/^\//, '')}`;
+      }
+      return u;
     };
 
-    if (notif.senderAvatar) {
-      return notif.senderAvatar
-    };
+    const srcCandidates = [
+      notif.actor?.profileImage,
+      notif.actor?.avatar,
+      notif.senderAvatar,
+      notif.meta?.senderImage,
+      notif.meta?.actorImage
+    ];
 
-    if (notif.meta?.senderImage) {
-      return notif.meta.senderImage;
+    for (const c of srcCandidates) {
+      const resolved = tryUrl(c);
+      if (resolved) return resolved;
     }
-
     return avatar;
   };
 
@@ -706,7 +718,8 @@ const Header: React.FC<HeaderProps> = ({
                                           border: '2px solid white'
                                         }}>
                                           {notif.type === 'message' ? (
-                                            <img src={getNotificationAvatar(notif)} alt="Avatar" className="w-9 h-9 rounded-full object-cover" />
+                                            <img src={getNotificationAvatar(notif)} alt="Avatar" className="w-9 h-9 rounded-full object-cover"
+                                              onError={(e) => { (e.currentTarget as HTMLImageElement).src = avatar; }} />
                                           ) : (
                                             <img src={logoIcon} alt="Logo" className="w-7 h-7" style={{ filter: 'brightness(0) invert(1)' }} />
                                           )}
