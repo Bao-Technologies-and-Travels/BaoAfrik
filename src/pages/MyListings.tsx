@@ -300,6 +300,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
 const MyListings: React.FC = () => {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
+  const [showMobileDrafts, setShowMobileDrafts] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All Status');
@@ -1245,8 +1246,8 @@ const MyListings: React.FC = () => {
                      borderRadius: '12px',
                      border: '1px solid #E9E9E9',
                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                     padding: '6px',
-                     minWidth: '150px',
+                     padding: isMobile ? '4px' : '6px',
+                     minWidth: isMobile ? '130px' : '150px',
                      zIndex: 1000
                    }}
                  >
@@ -1262,8 +1263,8 @@ const MyListings: React.FC = () => {
                        width: '100%',
                        display: 'flex',
                        alignItems: 'center',
-                       gap: '8px',
-                       padding: '8px 10px',
+                       gap: isMobile ? '6px' : '8px',
+                       padding: isMobile ? '6px 8px' : '8px 10px',
                        border: 'none',
                        background: 'transparent',
                        cursor: 'pointer',
@@ -1276,8 +1277,8 @@ const MyListings: React.FC = () => {
                        e.currentTarget.style.backgroundColor = 'transparent';
                      }}
                    >
-                     <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                     <span style={{ color: '#FF5151', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Delete the listing</span>
+                     <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px', flexShrink: 0, filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                     <span style={{ color: '#FF5151', fontSize: isMobile ? '12px' : '13px', fontFamily: 'Poppins, sans-serif', lineHeight: 1, whiteSpace: 'nowrap' }}>Delete the listing</span>
                    </button>
                    <button
                      type="button"
@@ -1289,8 +1290,8 @@ const MyListings: React.FC = () => {
                        width: '100%',
                        display: 'flex',
                        alignItems: 'center',
-                      gap: '8px',
-                      padding: '8px 10px',
+                      gap: isMobile ? '6px' : '8px',
+                      padding: isMobile ? '6px 8px' : '8px 10px',
                        border: 'none',
                        background: '#FAFAFA',
                        cursor: 'pointer',
@@ -1298,10 +1299,10 @@ const MyListings: React.FC = () => {
                        marginTop: '4px'
                      }}
                    >
-                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                     <svg width={isMobile ? "14" : "16"} height={isMobile ? "14" : "16"} viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                        <path d="M18 6L6 18M6 6l12 12" />
                      </svg>
-                     <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                     <span style={{ color: '#B0B0B0', fontSize: isMobile ? '12px' : '13px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
                    </button>
                  </div>
                )}
@@ -1489,6 +1490,194 @@ const MyListings: React.FC = () => {
     active: 'brightness(0) saturate(100%) invert(64%) sepia(21%) saturate(900%) hue-rotate(173deg) brightness(96%) contrast(96%)',
     inactive: 'brightness(0) saturate(100%) invert(84%) sepia(9%) saturate(644%) hue-rotate(177deg) brightness(104%) contrast(91%)'
   };
+
+  // Mobile Drafts View
+  if (showMobileDrafts && isMobile) {
+    return (
+      <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        {/* Mobile Drafts Header */}
+        <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between mb-16">
+          <button
+            type="button"
+            onClick={() => setShowMobileDrafts(false)}
+            className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+            aria-label="Back"
+          >
+            <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="Search"
+            >
+              <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="More options"
+            >
+              <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                <circle cx="4" cy="2" r="2" fill="#171717" />
+                <circle cx="12" cy="2" r="2" fill="#171717" />
+                <circle cx="20" cy="2" r="2" fill="#171717" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="pt-20 px-4 mb-6">
+          <h1
+            className="text-lg font-semibold"
+            style={{ color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          >
+            Drafts ({draftCount})
+          </h1>
+        </div>
+
+        {/* Drafts List */}
+        <div className="px-4 pb-20 space-y-4">
+          {draftListings.map((draft) => (
+            <div
+              key={draft.id}
+              className="bg-white flex gap-3"
+            >
+              {/* Draft Image */}
+              <div
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  flexShrink: 0
+                }}
+              >
+                <img src={draft.image} alt={draft.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+
+              {/* Draft Info - Right of image */}
+              <div className="flex-1 flex flex-col justify-between">
+                {/* Title and Price */}
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '14px', fontWeight: 500 }}>
+                    {draft.title}
+                  </span>
+                  <span style={{ color: '#B0B0B0', fontSize: '14px' }}>·</span>
+                  <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    {draft.currency} {draft.price}
+                  </span>
+                </div>
+
+                {/* Country tag if exists */}
+                {draft.country && (
+                  <div className="inline-flex items-center gap-1 py-0.5 rounded-full mb-1" style={{ border: '1px solid #E1E1E1', paddingLeft: '6px', paddingRight: '8px', width: 'fit-content' }}>
+                    <img
+                      src={draft.flag}
+                      alt={draft.country}
+                      className="w-3 h-3 rounded-full object-cover"
+                    />
+                    <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                      {draft.country}
+                    </span>
+                  </div>
+                )}
+
+                {/* Description - smaller, center-right, 2 lines max */}
+                <p 
+                  style={{ 
+                    color: '#B0B0B0', 
+                    fontSize: '10px', 
+                    fontFamily: 'Poppins, sans-serif', 
+                    lineHeight: '1.4', 
+                    marginBottom: '6px',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {draft.description || '(Empty)'}
+                </p>
+
+                {/* Action Buttons - Bottom right */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5"
+                    style={{
+                      backgroundColor: '#F4F4F4',
+                      color: '#939393',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontFamily: 'Poppins, sans-serif',
+                      border: 'none',
+                      cursor: 'pointer',
+                      paddingLeft: '10px',
+                      paddingRight: '10px',
+                      paddingTop: '4px',
+                      paddingBottom: '4px'
+                    }}
+                    onClick={() => {
+                      navigate('/create-listing', { state: { prefill: buildDraftPrefillPayload(draft) } });
+                    }}
+                  >
+                    <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#FFE9E9',
+                      borderRadius: '6px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      paddingLeft: '8px',
+                      paddingRight: '8px',
+                      paddingTop: '4px',
+                      paddingBottom: '4px'
+                    }}
+                    onClick={() => {
+                      setDraftListings((prev) => prev.filter((d) => d.id !== draft.id));
+                    }}
+                  >
+                    <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <footer className="bg-white mt-auto">
+          <div className="px-4 py-5">
+            <div className="flex flex-col items-center text-xs space-y-2" style={{ color: '#BABABA' }}>
+              <div className="flex items-center space-x-1.5">
+                <img src={lilLogo} alt="Bao Afrik" className="w-5 h-5" />
+                <span>©</span>
+                <span className="text-[11px]">All rights reserved</span>
+              </div>
+              <div className="flex items-center space-x-1.5 text-[10px] flex-wrap justify-center">
+                <Link to="/contact" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Contact Us</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/terms" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/privacy" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Privacy policies</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/cookies" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Cookies</Link>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -1719,8 +1908,8 @@ const MyListings: React.FC = () => {
                   </svg>
                 </button>
 
-                {/* Mobile Plus Modal - Hidden when tertiary or secondary sort modal is open */}
-                {isMobilePlusModalOpen && !mobileSortTertiaryOpen && !mobileSortSecondaryOpen && (
+                {/* Mobile Plus Modal - Hidden only when tertiary sort modal is open */}
+                {isMobilePlusModalOpen && !mobileSortTertiaryOpen && (
                   <div
                     className="absolute bottom-0 right-0 z-50"
                     style={{
@@ -2114,10 +2303,15 @@ const MyListings: React.FC = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setIsDraftsModalOpen(!isDraftsModalOpen);
-                        if (!isDraftsModalOpen) {
-                          setIsSortDropdownOpen(false);
-                          setIsStatusDropdownOpen(false);
+                        if (isMobile) {
+                          setShowMobileDrafts(true);
+                          setIsMobilePlusModalOpen(false);
+                        } else {
+                          setIsDraftsModalOpen(!isDraftsModalOpen);
+                          if (!isDraftsModalOpen) {
+                            setIsSortDropdownOpen(false);
+                            setIsStatusDropdownOpen(false);
+                          }
                         }
                       }}
                       className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
@@ -2723,7 +2917,7 @@ const MyListings: React.FC = () => {
             bottom: 0,
             backgroundColor: '#0000001A',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: isMobile ? 'flex-end' : 'center',
             justifyContent: 'center',
             zIndex: 10000
           }}
@@ -2739,13 +2933,14 @@ const MyListings: React.FC = () => {
               borderRadius: '30px',
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
               padding: '30px',
-              paddingBottom: '15px',
+              paddingBottom: isMobile ? '8px' : '15px',
               maxWidth: '420px',
-              width: '90%',
+              width: isMobile ? '95%' : '90%',
               minHeight: '320px',
               position: 'relative',
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              marginBottom: isMobile ? '12px' : '0'
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -2810,11 +3005,11 @@ const MyListings: React.FC = () => {
                     backgroundColor: '#F9A825',
                     borderRadius: '12px',
                     border: 'none',
-                    padding: '10px 140px',
+                    padding: isMobile ? '8px 120px' : '10px 140px',
                     cursor: 'pointer',
                     color: '#FFFFFF',
                     fontFamily: 'Poppins, sans-serif',
-                    fontSize: '14px',
+                    fontSize: isMobile ? '13px' : '14px',
                     fontWeight: 300
                   }}
                 >
@@ -2830,17 +3025,17 @@ const MyListings: React.FC = () => {
                     backgroundColor: '#F1F1F1',
                     borderRadius: '12px',
                     border: 'none',
-                    padding: '10px 28px',
+                    padding: isMobile ? '8px 24px' : '10px 28px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px'
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width={isMobile ? "14" : "16"} height={isMobile ? "14" : "16"} viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
-                  <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
+                  <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '13px' : '14px' }}>Cancel</span>
                 </button>
                 <button
                   type="button"
@@ -2849,16 +3044,23 @@ const MyListings: React.FC = () => {
                     backgroundColor: '#FF5151',
                     borderRadius: '12px',
                     border: 'none',
-                    padding: '10px 28px',
+                    padding: isMobile ? '8px 24px' : '10px 28px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px'
                   }}
                 >
-                  <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) invert(1)' }} />
-                  <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Yes, Delete</span>
+                  <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px', filter: 'brightness(0) invert(1)' }} />
+                  <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '13px' : '14px' }}>Yes, Delete</span>
                 </button>
+              </div>
+            )}
+
+            {/* Drag Indicator - Mobile Only */}
+            {isMobile && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '44px', marginBottom: '12px' }}>
+                <div style={{ width: '100px', height: '4px', backgroundColor: '#E9E9E9', borderRadius: '2px' }}></div>
               </div>
             )}
           </div>
