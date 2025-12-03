@@ -22,6 +22,7 @@ import verityIcon from '../assets/images/pre/verity.svg';
 import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 import backArrowIcon from '../assets/images/pre/back arrow.svg';
 import statusIcon from '../assets/images/pre/status.svg';
+import SDicon from '../assets/images/pre/SDicon.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -301,6 +302,9 @@ const MyListings: React.FC = () => {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileDrafts, setShowMobileDrafts] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
+  const [mobileSearchSubmitted, setMobileSearchSubmitted] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All Status');
@@ -1213,14 +1217,14 @@ const MyListings: React.FC = () => {
                 )}
               </div>
 
-             {/* More Options Button */}
+              {/* More Options Button */}
              <div style={{ position: 'relative' }} ref={moreOptionsRef}>
-               <button
+              <button
                  type="button"
-                 className="w-5 h-5 rounded-full border flex items-center justify-center"
-                 style={{
-                   borderColor: '#B0B0B0',
-                   borderWidth: '1.5px',
+                className="w-5 h-5 rounded-full border flex items-center justify-center"
+                style={{
+                  borderColor: '#B0B0B0',
+                  borderWidth: '1.5px',
                    backgroundColor: '#FFFFFF',
                    cursor: 'pointer',
                    padding: 0
@@ -1228,13 +1232,13 @@ const MyListings: React.FC = () => {
                  onClick={(e) => {
                    e.stopPropagation();
                    setMoreOptionsOpenFor(moreOptionsOpenFor === listing.id ? null : listing.id);
-                 }}
-               >
-                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                   <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
-                   <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
-                   <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
-                 </svg>
+                }}
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                  <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                  <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                </svg>
                </button>
                {moreOptionsOpenFor === listing.id && (
                  <div
@@ -1303,7 +1307,7 @@ const MyListings: React.FC = () => {
                        <path d="M18 6L6 18M6 6l12 12" />
                      </svg>
                      <span style={{ color: '#B0B0B0', fontSize: isMobile ? '12px' : '13px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
-                   </button>
+              </button>
                  </div>
                )}
              </div>
@@ -1491,6 +1495,338 @@ const MyListings: React.FC = () => {
     inactive: 'brightness(0) saturate(100%) invert(84%) sepia(9%) saturate(644%) hue-rotate(177deg) brightness(104%) contrast(91%)'
   };
 
+  // Mobile Search View
+  if (showMobileSearch && isMobile) {
+    const mobileSearchFiltered = mobileSearchSubmitted ? listings.filter(listing => {
+      const query = mobileSearchQuery.toLowerCase().trim();
+      return (
+        listing.title.toLowerCase().includes(query) ||
+        listing.category?.toLowerCase().includes(query) ||
+        listing.price.includes(query)
+      );
+    }) : [];
+
+    const hasSearchResults = mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchFiltered.length > 0;
+    const isNoResults = mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchFiltered.length === 0;
+    const showSearchButton = !mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchFiltered.length === 0 && mobileSearchQuery.trim() === '');
+
+    return (
+      <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        {/* Search Bar at Top */}
+        <div className="px-4 pt-4 pb-3">
+          <div 
+            className="flex items-center gap-3 px-3 py-2 bg-white" 
+            style={{ 
+              border: `1px solid ${mobileSearchQuery ? '#97CDF9' : '#E4E4E4'}`, 
+              borderRadius: '12px' 
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setShowMobileSearch(false);
+                setMobileSearchQuery('');
+                setMobileSearchSubmitted(false);
+              }}
+              className="flex-shrink-0"
+            >
+              <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+            </button>
+            <input
+              type="text"
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
+              className="flex-1 outline-none"
+              style={{ fontFamily: 'Poppins, sans-serif', fontSize: '14px', color: '#212121' }}
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setMobileSearchQuery('');
+                setMobileSearchSubmitted(false);
+              }}
+              className="flex-shrink-0"
+            >
+              <img src={SDicon} alt="Clear" className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Search Results Title */}
+        {hasSearchResults && (
+          <div className="px-4 pb-3">
+            <h2 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', color: '#212121', fontWeight: 600 }}>
+              Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({mobileSearchFiltered.length} {mobileSearchFiltered.length === 1 ? 'item' : 'items'})</span>
+            </h2>
+          </div>
+        )}
+
+        {/* Search Results or Empty State */}
+        <div className="flex-1 overflow-y-auto px-4 pb-24">
+          {isNoResults && (
+            <div className="flex flex-col items-center justify-center" style={{ paddingTop: '140px' }}>
+              <img src={bagIcon} alt="No listings" style={{ width: '50px', height: '50px', marginBottom: '14px', opacity: 0.3 }} />
+              <p style={{ color: '#939393', fontSize: '11px', textAlign: 'center', marginBottom: '14px', lineHeight: '1.5' }}>
+                No listings found. Please try adjusting<br />your search criteria or adding a new listing.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/create-listing')}
+                style={{
+                  backgroundColor: '#64B5F6',
+                  color: '#FFFFFF',
+                  padding: '7px 18px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  fontSize: '11px',
+                  fontFamily: 'Poppins, sans-serif',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                Add listing
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {hasSearchResults && (
+            <div className="grid grid-cols-2 gap-3">
+              {mobileSearchFiltered.map((listing) => (
+                <div
+                  key={listing.id}
+                  className="bg-white rounded-lg overflow-hidden cursor-pointer"
+                  onClick={() => navigate(`/listing/${listing.id}`)}
+                >
+                  {/* Product Image */}
+                  <div className="aspect-square relative overflow-hidden mb-1" style={{ borderRadius: '12px', padding: '2px' }}>
+                    <img
+                      src={listing.image}
+                      alt={listing.title}
+                      className="w-full h-full object-cover"
+                      style={{ borderRadius: '12px', transform: 'scaleX(1.0) scaleY(0.92)' }}
+                    />
+                  </div>
+
+                  {/* Product Content */}
+                  <div className="px-2 pb-2">
+                    {/* Status Badge and More Options */}
+                    <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
+                      {/* Status Badge */}
+                      <div>
+                        <div
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full"
+                          style={{
+                            backgroundColor: listing.status === 'active' ? '#EDFBF0' : '#FFF5F5',
+                            fontSize: '10px'
+                          }}
+                        >
+                          <img
+                            src={listing.status === 'active' ? activeIcon : inactiveIcon}
+                            alt={listing.status}
+                            className="w-3 h-3"
+                          />
+                          <span
+                            style={{
+                              color: listing.status === 'active' ? '#70E183' : '#FF5151',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}
+                          >
+                            {listing.status === 'active' ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* More Options Button */}
+                      <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                        <button
+                          type="button"
+                          className="w-5 h-5 rounded-full border flex items-center justify-center"
+                          style={{
+                            borderColor: '#B0B0B0',
+                            borderWidth: '1.5px',
+                            backgroundColor: '#FFFFFF',
+                            cursor: 'pointer',
+                            padding: 0
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoreOptionsOpenFor(moreOptionsOpenFor === listing.id ? null : listing.id);
+                          }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                            <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                            <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                          </svg>
+                        </button>
+                        {moreOptionsOpenFor === listing.id && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '26px',
+                              right: 0,
+                              backgroundColor: '#FFFFFF',
+                              borderRadius: '12px',
+                              border: '1px solid #E9E9E9',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                              padding: '4px',
+                              minWidth: '130px',
+                              zIndex: 1000
+                            }}
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                handleDeleteClick(listing, e);
+                              }}
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '6px 8px',
+                                border: 'none',
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                borderRadius: '6px'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#FFF5F5';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
+                            >
+                              <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px', flexShrink: 0, filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                              <span style={{ color: '#FF5151', fontSize: '12px', fontFamily: 'Poppins, sans-serif', lineHeight: 1, whiteSpace: 'nowrap' }}>Delete the listing</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMoreOptionsOpenFor(null);
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                               gap: '6px',
+                               padding: '6px 8px',
+                                border: 'none',
+                                background: '#FAFAFA',
+                                cursor: 'pointer',
+                               borderRadius: '6px',
+                                marginTop: '4px'
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                              </svg>
+                              <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {/* Product Name */}
+                    <h3
+                      className="font-medium mb-1 text-[12px] truncate"
+                      style={{
+                        color: '#212121',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      {listing.title}
+                    </h3>
+
+                    {/* Ratings */}
+                    <div className="flex items-center gap-1 mb-2" style={{ alignItems: 'center' }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="#FBBC05" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, marginTop: '1px' }}>
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                      <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif', lineHeight: '1.2' }}>
+                        {listing.rating}
+                      </span>
+                      <span style={{ color: '#B0B0B0', fontSize: '10px', fontFamily: 'Poppins, sans-serif', lineHeight: '1.2' }}>
+                        ({listing.reviews} Reviews)
+                      </span>
+                    </div>
+
+                    {/* Price and Edit Button */}
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="font-semibold"
+                        style={{
+                          color: '#212121',
+                          fontSize: '14px',
+                          fontFamily: 'Bricolage Grotesque, sans-serif'
+                        }}
+                      >
+                        {listing.currency} {listing.price}
+                      </span>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md transition-colors hover:opacity-80"
+                        style={{
+                          backgroundColor: '#F4F4F4',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/edit-listing/${listing.id}`);
+                        }}
+                      >
+                        <img src={pencilIcon} alt="Edit" style={{ width: '11px', height: '11px' }} />
+                        <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>Edit</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Search Button */}
+        {showSearchButton && (
+          <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 bg-white" style={{ boxShadow: 'none', border: 'none', borderTop: 'none' }}>
+            <button
+              type="button"
+              className="w-full py-3 rounded-xl"
+              style={{
+                backgroundColor: mobileSearchQuery.trim() ? '#F9A825' : '#D9D9D9',
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: '14px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 500,
+                cursor: 'pointer',
+                boxShadow: 'none'
+              }}
+              onClick={() => {
+                if (mobileSearchQuery.trim()) {
+                  setMobileSearchSubmitted(true);
+                }
+              }}
+            >
+              Search
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   // Mobile Drafts View
   if (showMobileDrafts && isMobile) {
     return (
@@ -1512,6 +1848,7 @@ const MyListings: React.FC = () => {
               className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
               style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
               aria-label="Search"
+              onClick={() => setShowMobileSearch(true)}
             >
               <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
             </button>
@@ -1702,6 +2039,7 @@ const MyListings: React.FC = () => {
                 className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
                 style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
                 aria-label="Search"
+                onClick={() => setShowMobileSearch(true)}
               >
                 <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
               </button>
@@ -1778,54 +2116,54 @@ const MyListings: React.FC = () => {
 
             {/* Search and View Toggle - Hidden on mobile */}
             {!isMobile && (
-              <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-0">
-                <div
-                  className="inline-flex items-center border mb-4 overflow-hidden"
-                  style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
-                >
-                  {(['list', 'grid'] as ViewMode[]).map((mode) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => setViewMode(mode)}
-                      className="flex items-center justify-center px-3 py-2 transition-colors flex-1"
-                      style={{
-                        backgroundColor: viewMode === mode ? '#CFE8FC' : 'transparent'
-                      }}
-                    >
-                      <img
-                        src={mode === 'list' ? listIcon : gridIcon}
-                        alt={`${mode} view`}
-                        style={{
-                          filter: viewMode === mode ? toggleIconFilters.active : toggleIconFilters.inactive
-                        }}
-                      />
-                    </button>
-                  ))}
-                </div>
-
-                <div className="w-[90%]">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="Search a listing ?"
+            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-0">
+              <div
+                className="inline-flex items-center border mb-4 overflow-hidden"
+                style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
+              >
+                {(['list', 'grid'] as ViewMode[]).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setViewMode(mode)}
+                    className="flex items-center justify-center px-3 py-2 transition-colors flex-1"
                     style={{
-                      backgroundColor: isSearchFocused ? '#FFFFFF' : '#F1F1F1',
-                      color: '#1E1E1E',
-                      borderRadius: '8px',
-                      border: isSearchFocused ? '1px solid #CFE8FC' : '1px solid transparent',
-                      caretColor: '#64B5F6',
-                      fontFamily: 'Poppins, sans-serif',
-                      fontSize: '13px',
-                      transition: 'all 0.2s ease'
+                      backgroundColor: viewMode === mode ? '#CFE8FC' : 'transparent'
                     }}
-                    className="w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CFE8FC] placeholder-[#B2B2B2]"
-                    onFocus={() => setIsSearchFocused(true)}
-                    onBlur={() => setIsSearchFocused(false)}
-                  />
-                </div>
+                  >
+                    <img
+                      src={mode === 'list' ? listIcon : gridIcon}
+                      alt={`${mode} view`}
+                      style={{
+                        filter: viewMode === mode ? toggleIconFilters.active : toggleIconFilters.inactive
+                      }}
+                    />
+                  </button>
+                ))}
               </div>
+
+              <div className="w-[90%]">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search a listing ?"
+                  style={{
+                    backgroundColor: isSearchFocused ? '#FFFFFF' : '#F1F1F1',
+                    color: '#1E1E1E',
+                    borderRadius: '8px',
+                    border: isSearchFocused ? '1px solid #CFE8FC' : '1px solid transparent',
+                    caretColor: '#64B5F6',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '13px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  className="w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CFE8FC] placeholder-[#B2B2B2]"
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setIsSearchFocused(false)}
+                />
+              </div>
+            </div>
             )}
           </div>
 
@@ -2450,40 +2788,40 @@ const MyListings: React.FC = () => {
                       </span>
                     </button>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => setIsSortDropdownOpen((prev) => !prev)}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                  <button
+                    type="button"
+                    onClick={() => setIsSortDropdownOpen((prev) => !prev)}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                    style={{
+                      backgroundColor: isSortDropdownOpen ? '#F0F8FE' : '#FAFAFA',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    <img
+                      src={filterIcon}
+                      alt="Filter"
+                      className="w-4 h-4"
                       style={{
-                        backgroundColor: isSortDropdownOpen ? '#F0F8FE' : '#FAFAFA',
-                        fontFamily: 'Poppins, sans-serif'
+                          filter: 'brightness(0) saturate(100%) invert(70%)'
+                      }}
+                    />
+                    <span
+                      style={{
+                          color: '#939393',
+                        fontSize: '13px'
                       }}
                     >
-                      <img
-                        src={filterIcon}
-                        alt="Filter"
-                        className="w-4 h-4"
-                        style={{
-                          filter: 'brightness(0) saturate(100%) invert(70%)'
-                        }}
-                      />
-                      <span
-                        style={{
-                          color: '#939393',
-                          fontSize: '13px'
-                        }}
-                      >
                         Sort by
-                      </span>
-                      <img
-                        src={arrowDownIcon}
-                        alt="Arrow"
-                        className="w-3 h-3"
-                        style={{
+                    </span>
+                    <img
+                      src={arrowDownIcon}
+                      alt="Arrow"
+                      className="w-3 h-3"
+                      style={{
                           filter: 'brightness(0) saturate(100%) invert(40%)'
-                        }}
-                      />
-                    </button>
+                      }}
+                    />
+                  </button>
                   )}
 
                   {isSortDropdownOpen && (
