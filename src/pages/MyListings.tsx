@@ -2180,24 +2180,29 @@ const MyListings: React.FC = () => {
                 <button
                   type="button"
                   onClick={clearSelectedSort}
-                  className="inline-flex items-center justify-between gap-2 px-3 py-1 rounded-full"
+                  className="inline-flex items-center justify-between gap-1.5 px-2.5 py-0.5 rounded-full"
                   style={{
                     backgroundColor: '#F0F8FE',
                     fontFamily: 'Poppins, sans-serif',
                     color: '#64B5F6',
-                    fontSize: '12px',
-                    minHeight: '28px'
+                    fontSize: '11px',
+                    minHeight: '24px',
+                    whiteSpace: 'nowrap'
                   }}
                 >
-                  <span className="flex items-center gap-1.5">
-                    {selectedSortDetails?.primary && renderSortIcon(selectedSortDetails.primary, true)}
-                    <span>{selectedSort.label}</span>
+                  <span className="flex items-center gap-1" style={{ whiteSpace: 'nowrap' }}>
+                    {selectedSortDetails?.primary && (
+                      <span style={{ display: 'flex', alignItems: 'center', transform: 'scale(0.85)' }}>
+                        {renderSortIcon(selectedSortDetails.primary, true)}
+                      </span>
+                    )}
+                    <span style={{ whiteSpace: 'nowrap' }}>{selectedSort.label}</span>
                   </span>
                   <span
                     role="button"
                     aria-label="Clear sort selection"
-                    className="text-base leading-none cursor-pointer"
-                    style={{ lineHeight: 1, color: '#64B5F6' }}
+                    className="leading-none cursor-pointer"
+                    style={{ lineHeight: 1, color: '#64B5F6', fontSize: '14px' }}
                   >
                     ×
                   </span>
@@ -2632,8 +2637,8 @@ const MyListings: React.FC = () => {
                       border: '1px solid #E9E9E9',
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                       padding: '8px',
-                      minWidth: '140px',
-                      right: mobileSelectedSecondaryKey ? '0' : (mobileSelectedPrimaryKey === 'commitments' ? '160px' : '100px'),
+                      minWidth: mobileSelectedPrimaryKey === 'commitments' ? '140px' : (mobileSelectedPrimaryKey === 'price' ? '120px' : '100px'),
+                      right: mobileSelectedSecondaryKey ? '0' : '160px',
                       transform: 'translateY(68px)'
                     }}
                   >
@@ -2764,8 +2769,8 @@ const MyListings: React.FC = () => {
                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                             padding: '6px',
                             minWidth: '120px',
-                            right: '148px',
-                            bottom: '4px',
+                            right: '156px',
+                            top: '0',
                             transform: 'translateY(68px)'
                           }}
                         >
