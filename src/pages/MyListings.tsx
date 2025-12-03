@@ -2175,8 +2175,34 @@ const MyListings: React.FC = () => {
         {isMobile && !shouldShowEmptyState && !isSearchNoResultsState && (
           <div className="lg:hidden px-4 mt-0 mb-4">
             <div className="flex items-center justify-between">
-              {/* All listings text or status filter badge */}
-              {statusFilter === 'All Status' ? (
+              {/* All listings text or sort/status filter badge */}
+              {selectedSort ? (
+                <button
+                  type="button"
+                  onClick={clearSelectedSort}
+                  className="inline-flex items-center justify-between gap-2 px-3 py-1 rounded-full"
+                  style={{
+                    backgroundColor: '#F0F8FE',
+                    fontFamily: 'Poppins, sans-serif',
+                    color: '#64B5F6',
+                    fontSize: '12px',
+                    minHeight: '28px'
+                  }}
+                >
+                  <span className="flex items-center gap-1.5">
+                    {selectedSortDetails?.primary && renderSortIcon(selectedSortDetails.primary, true)}
+                    <span>{selectedSort.label}</span>
+                  </span>
+                  <span
+                    role="button"
+                    aria-label="Clear sort selection"
+                    className="text-base leading-none cursor-pointer"
+                    style={{ lineHeight: 1, color: '#64B5F6' }}
+                  >
+                    ×
+                  </span>
+                </button>
+              ) : statusFilter === 'All Status' ? (
                 <div className="flex items-center gap-2">
                   <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
                     All listings
@@ -2491,8 +2517,8 @@ const MyListings: React.FC = () => {
                   </div>
                 )}
 
-                {/* Sort Secondary Dropdown - OUTSIDE primary, appears to the left of primary modal, moves to primary position when tertiary opens */}
-                {mobileSortSecondaryOpen && (
+                {/* Sort Secondary Dropdown - OUTSIDE primary, appears to the left of primary modal, moves to primary position when tertiary opens, hides when fourth level opens */}
+                {mobileSortSecondaryOpen && !mobileSelectedSecondaryKey && (
                   <div
                     className="absolute z-50"
                     style={{
@@ -2607,7 +2633,7 @@ const MyListings: React.FC = () => {
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                       padding: '8px',
                       minWidth: '140px',
-                      right: '160px',
+                      right: mobileSelectedSecondaryKey ? '0' : (mobileSelectedPrimaryKey === 'commitments' ? '160px' : '100px'),
                       transform: 'translateY(68px)'
                     }}
                   >
@@ -2621,8 +2647,8 @@ const MyListings: React.FC = () => {
 
                       return (
                         <>
-                          {/* Back button - only for complex tertiary modals (Commitments) */}
-                          {hasComplexChildren && (
+                          {/* Back button - only when fourth level is open */}
+                          {hasComplexChildren && mobileSelectedSecondaryKey && (
                             <div className="flex items-center justify-end mb-1">
                               <button
                                 type="button"
@@ -2701,7 +2727,8 @@ const MyListings: React.FC = () => {
                                 fontFamily: 'Poppins, sans-serif',
                                 fontSize: '12px',
                                 backgroundColor: 'transparent',
-                                borderRadius: '8px'
+                                borderRadius: '8px',
+                                whiteSpace: 'nowrap'
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.backgroundColor = '#FAFAFA';
@@ -2729,7 +2756,7 @@ const MyListings: React.FC = () => {
                       const secondaryOption = primaryOption?.children.find(c => c.key === mobileSelectedSecondaryKey);
                       return secondaryOption?.subChildren ? (
                         <div
-                          className="absolute bottom-0 right-full mr-2 z-50"
+                          className="absolute z-50"
                           style={{
                             backgroundColor: '#FFFFFF',
                             borderRadius: '12px',
@@ -2737,6 +2764,8 @@ const MyListings: React.FC = () => {
                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                             padding: '6px',
                             minWidth: '120px',
+                            right: '148px',
+                            bottom: '4px',
                             transform: 'translateY(68px)'
                           }}
                         >
@@ -2764,7 +2793,8 @@ const MyListings: React.FC = () => {
                                 fontFamily: 'Poppins, sans-serif',
                                 fontSize: '12px',
                                 backgroundColor: 'transparent',
-                                borderRadius: '8px'
+                                borderRadius: '8px',
+                                whiteSpace: 'nowrap'
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.backgroundColor = '#FAFAFA';
