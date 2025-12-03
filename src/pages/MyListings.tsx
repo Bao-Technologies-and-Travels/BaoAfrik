@@ -523,6 +523,10 @@ const MyListings: React.FC = () => {
       }
       if (mobilePlusModalRef.current && !mobilePlusModalRef.current.contains(target)) {
         setIsMobilePlusModalOpen(false);
+        setMobileSortSecondaryOpen(false);
+        setMobileSortTertiaryOpen(false);
+        setMobileSelectedPrimaryKey(null);
+        setMobileSelectedSecondaryKey(null);
       }
     };
 
@@ -2312,8 +2316,8 @@ const MyListings: React.FC = () => {
                           borderRadius: '12px',
                           border: '1px solid #E9E9E9',
                           boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                          padding: '6px',
-                          minWidth: '140px',
+                          padding: '5px',
+                          minWidth: '148px',
                           ...(mobileSortTertiaryOpen ? {
                             bottom: '0',
                             right: '0',
@@ -2328,14 +2332,14 @@ const MyListings: React.FC = () => {
                           const renderIcon = () => {
                             if (option.key === 'date') {
                               return (
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2">
                                   <circle cx="12" cy="12" r="10" />
                                   <path d="M12 6v6l4 2" />
                                 </svg>
                               );
                             }
                             if (option.icon) {
-                              return <img src={option.icon} alt={option.label} className="w-3.5 h-3.5" />;
+                              return <img src={option.icon} alt={option.label} className="w-3 h-3" style={{ filter: option.key === 'price' ? 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' : undefined }} />;
                             }
                             return null;
                           };
@@ -2346,16 +2350,19 @@ const MyListings: React.FC = () => {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setMobileSelectedPrimaryKey(option.key);
-                                setMobileSortTertiaryOpen(true);
+                                if (!mobileSortTertiaryOpen) {
+                                  setMobileSelectedPrimaryKey(option.key);
+                                  setMobileSortTertiaryOpen(true);
+                                }
                               }}
-                              className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded transition-colors"
+                              className="w-full flex items-center justify-between gap-1.5 px-2 py-1.5 rounded transition-colors"
                               style={{
                                 color: '#939393',
                                 fontFamily: 'Poppins, sans-serif',
-                                fontSize: '12px',
+                                fontSize: '11px',
                                 backgroundColor: 'transparent',
-                                borderRadius: '8px'
+                                borderRadius: '8px',
+                                whiteSpace: 'nowrap'
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.backgroundColor = '#FAFAFA';
@@ -2364,11 +2371,11 @@ const MyListings: React.FC = () => {
                                 e.currentTarget.style.backgroundColor = 'transparent';
                               }}
                             >
-                              <span className="flex items-center gap-2">
+                              <span className="flex items-center gap-1.5">
                                 {renderIcon()}
                                 <span>{option.label}</span>
                               </span>
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                               </svg>
                             </button>
