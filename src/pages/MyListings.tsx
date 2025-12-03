@@ -2269,27 +2269,28 @@ const MyListings: React.FC = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setMobileSortSecondaryOpen(!mobileSortSecondaryOpen);
-                        if (!mobileSortSecondaryOpen) {
+                        const newState = !mobileSortSecondaryOpen;
+                        setMobileSortSecondaryOpen(newState);
+                        if (newState) {
                           setIsStatusDropdownOpen(false);
                           setIsDraftsModalOpen(false);
                         }
                       }}
                       className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
                       style={{ 
-                        color: mobileSortSecondaryOpen ? '#64B5F6' : '#939393', 
+                        color: (mobileSortSecondaryOpen || mobileSortTertiaryOpen) ? '#64B5F6' : '#939393', 
                         fontFamily: 'Poppins, sans-serif', 
                         fontSize: '13px',
-                        backgroundColor: mobileSortSecondaryOpen ? '#F0F8FE' : 'transparent',
+                        backgroundColor: (mobileSortSecondaryOpen || mobileSortTertiaryOpen) ? '#F0F8FE' : 'transparent',
                         borderRadius: '8px'
                       }}
                       onMouseEnter={(e) => {
-                        if (!mobileSortSecondaryOpen) {
+                        if (!mobileSortSecondaryOpen && !mobileSortTertiaryOpen) {
                           e.currentTarget.style.backgroundColor = '#FAFAFA';
                         }
                       }}
                       onMouseLeave={(e) => {
-                        if (!mobileSortSecondaryOpen) {
+                        if (!mobileSortSecondaryOpen && !mobileSortTertiaryOpen) {
                           e.currentTarget.style.backgroundColor = 'transparent';
                         }
                       }}
@@ -2299,7 +2300,7 @@ const MyListings: React.FC = () => {
                         alt="Sort" 
                         className="w-4 h-4" 
                         style={{ 
-                          filter: mobileSortSecondaryOpen 
+                          filter: (mobileSortSecondaryOpen || mobileSortTertiaryOpen)
                             ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
                             : 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
                         }} 
@@ -2557,10 +2558,15 @@ const MyListings: React.FC = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setIsStatusDropdownOpen(!isStatusDropdownOpen);
-                        if (!isStatusDropdownOpen) {
+                        const newState = !isStatusDropdownOpen;
+                        setIsStatusDropdownOpen(newState);
+                        if (newState) {
                           setIsSortDropdownOpen(false);
                           setIsDraftsModalOpen(false);
+                          setMobileSortSecondaryOpen(false);
+                          setMobileSortTertiaryOpen(false);
+                          setMobileSelectedPrimaryKey(null);
+                          setMobileSelectedSecondaryKey(null);
                         }
                       }}
                       className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
@@ -2651,6 +2657,10 @@ const MyListings: React.FC = () => {
                         if (isMobile) {
                           setShowMobileDrafts(true);
                           setIsMobilePlusModalOpen(false);
+                          setMobileSortSecondaryOpen(false);
+                          setMobileSortTertiaryOpen(false);
+                          setMobileSelectedPrimaryKey(null);
+                          setMobileSelectedSecondaryKey(null);
                         } else {
                           setIsDraftsModalOpen(!isDraftsModalOpen);
                           if (!isDraftsModalOpen) {
