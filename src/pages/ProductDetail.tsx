@@ -1482,11 +1482,15 @@ const ProductDetail: React.FC = () => {
           <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-1 rounded-full" style={{ backgroundColor: '#E1E1E1' }}></div>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-2">
                 <p className="font-normal capitalize" style={{ fontSize: '16px', color: '#939393' }}>
                   {isOwnerView ? displayName : 'poivre blanc'}
                 </p>
-                {isMobile && isOwnerView && renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
+                {isMobile && isOwnerView && (
+                  <div className="flex-shrink-0">
+                    {renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
+                  </div>
+                )}
               </div>
               <div className="mt-1" style={{ fontSize: '26px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 {isOwnerView ? displayPrice : `USD ${product.price}`}
@@ -1517,7 +1521,7 @@ const ProductDetail: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center justify-between text-xs mt-4">
+          <div className="flex items-center justify-between text-xs" style={{ marginTop: isMobile && isOwnerView ? '0px' : '16px' }}>
             <div className="flex items-center gap-1.5" style={{ color: '#939393' }}>
               <img
                 src={locIcon}
@@ -1529,21 +1533,140 @@ const ProductDetail: React.FC = () => {
             </div>
             {isMobile && isOwnerView ? (
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: '#F4F4F4' }}
-                  onClick={() => navigate('/create-listing', { state: { draft: ownerListing ?? null } })}
-                >
-                  <img src={pencilIcon} alt="Edit" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
-                </button>
-                <button
-                  type="button"
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: '#FFE9E9' }}
-                >
-                  <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                </button>
+                {(ownerListing?.status === 'inactive' || ownerListing?.daysLeft) ? (
+                  <>
+                    <button
+                      type="button"
+                      className="flex items-center justify-center"
+                      style={{ 
+                        width: '36px', 
+                        height: '36px', 
+                        backgroundColor: '#FFE9E9',
+                        borderRadius: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                    </button>
+                    <div ref={repostModalRef} style={{ position: 'relative' }}>
+                      <button
+                        type="button"
+                        className="flex items-center justify-center"
+                        style={{ 
+                          width: '36px', 
+                          height: '36px', 
+                          backgroundColor: '#F0F8FE',
+                          borderRadius: '12px',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowRepostModal(!showRepostModal);
+                        }}
+                      >
+                        <img src={repostIcon} alt="Repost" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' }} />
+                      </button>
+
+                      {/* Repost Modal - Mobile */}
+                      {showRepostModal && (
+                        <div
+                          className="absolute top-full right-0 mt-2 z-50"
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #E9E9E9',
+                            borderRadius: '12px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '6px',
+                            minWidth: '160px'
+                          }}
+                        >
+                          {/* Option 1: Edit and repost */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate('/create-listing', { state: { draft: ownerListing ?? null } });
+                              setShowRepostModal(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-gray-50 rounded transition-colors"
+                            style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
+                          >
+                            <img src={pencilIcon} alt="Edit" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
+                            <span>Edit and repost</span>
+                          </button>
+
+                          {/* Option 2: Repost the listing */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('Repost the listing');
+                              setShowRepostModal(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-gray-50 rounded transition-colors"
+                            style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
+                          >
+                            <img src={repostIcon} alt="Repost" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
+                            <span>Repost the listing</span>
+                          </button>
+
+                          {/* Option 3: Close */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowRepostModal(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-2.5 py-2 rounded transition-colors mt-1"
+                            style={{ 
+                              backgroundColor: '#FAFAFA',
+                              color: '#939393', 
+                              fontFamily: 'Poppins, sans-serif', 
+                              fontSize: '12px',
+                              borderRadius: '8px'
+                            }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span>Close</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="flex items-center justify-center"
+                      style={{ 
+                        width: '36px', 
+                        height: '36px', 
+                        backgroundColor: '#F4F4F4',
+                        borderRadius: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => navigate('/create-listing', { state: { draft: ownerListing ?? null } })}
+                    >
+                      <img src={pencilIcon} alt="Edit" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
+                    </button>
+                    <button
+                      type="button"
+                      className="flex items-center justify-center"
+                      style={{ 
+                        width: '36px', 
+                        height: '36px', 
+                        backgroundColor: '#FFE9E9',
+                        borderRadius: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                    </button>
+                  </>
+                )}
               </div>
             ) : (
               <div className="flex items-center gap-1" style={{ color: '#B0B0B0' }}>
@@ -1561,8 +1684,106 @@ const ProductDetail: React.FC = () => {
             )}
           </div>
 
+          {/* Warning Badge for Inactive Listings - Mobile - Above badges */}
+          {isMobile && isOwnerView && ownerListing?.status === 'inactive' && (
+            <div
+              className="flex items-start gap-3 p-2.5 mt-5 mb-3"
+              style={{
+                backgroundColor: '#FFFAFA',
+                border: '1px solid #FFE9E9',
+                borderRadius: '14px'
+              }}
+            >
+              <div
+                className="flex-shrink-0 rounded-full flex items-center justify-center"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  border: '2px solid #FFFFFF',
+                  backgroundColor: '#FFFFFF'
+                }}
+              >
+                <img src={renewIcon} alt="Warning" style={{ width: '20px', height: '20px' }} />
+              </div>
+              <div className="flex-1">
+                <p
+                  className="font-medium mb-1"
+                  style={{
+                    color: '#FF6E6E',
+                    fontSize: '13px',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}
+                >
+                  Your listing has been removed from our marketplace
+                </p>
+                <p
+                  className="text-xs"
+                  style={{
+                    color: '#939393',
+                    fontSize: '11px',
+                    lineHeight: '1.5',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  The time for your product to appear on our marketplace has expired. You can{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => setShowRepostModal(true)}>repost it</span> or{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }}>remove it</span>.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Days Left Badge - Mobile - Above badges */}
+          {isMobile && isOwnerView && ownerListing?.daysLeft && (
+            <div
+              className="flex items-start gap-3 p-2.5 mt-5 mb-3"
+              style={{
+                backgroundColor: '#FFFCF7',
+                border: '1px solid #FCD79B',
+                borderRadius: '14px'
+              }}
+            >
+              <div
+                className="flex-shrink-0 rounded-full flex items-center justify-center"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  border: '2px solid #FFFFFF',
+                  backgroundColor: '#FFFFFF'
+                }}
+              >
+                <img src={daysIcon} alt="Days left" style={{ width: '20px', height: '20px' }} />
+              </div>
+              <div className="flex-1">
+                <p
+                  className="font-medium mb-1"
+                  style={{
+                    color: '#F9A825',
+                    fontSize: '13px',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}
+                >
+                  {ownerListing.daysLeft} day{ownerListing.daysLeft !== 1 ? 's' : ''} left for your listing on our marketplace.
+                </p>
+                <p
+                  className="text-xs"
+                  style={{
+                    color: '#939393',
+                    fontSize: '11px',
+                    lineHeight: '1.5',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  Your item will soon be removed from our marketplace. You can{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => setShowRepostModal(true)}>repost it</span> or{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }}>remove it</span>.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Badges */}
-          <div className="flex flex-wrap items-center gap-2 mt-5 mb-4 text-xs">
+          <div className="flex flex-wrap items-center gap-2 mb-4 text-xs" style={{ marginTop: isMobile && isOwnerView ? '0' : '20px' }}>
             {/* Country Badge */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border" style={{ borderColor: '#E1E1E1' }}>
               <img
@@ -1587,10 +1808,10 @@ const ProductDetail: React.FC = () => {
               </div>
             )}
             
-            {/* Posted Date for mobile owner view */}
+            {/* Posted Date for mobile owner view - at far right of badges */}
             {isMobile && isOwnerView && (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border" style={{ borderColor: '#E1E1E1', color: '#B0B0B0', marginLeft: 'auto' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <div className="flex items-center gap-1" style={{ color: '#B0B0B0', marginLeft: 'auto' }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M12 7v5l3 1.5M12 21a9 9 0 100-18 9 9 0 000 18z"
                     stroke="#B0B0B0"
@@ -1599,7 +1820,7 @@ const ProductDetail: React.FC = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span className="font-light" style={{ fontSize: '11px' }}>{displayDateLabel}</span>
+                <span className="font-light" style={{ fontSize: '10px' }}>{displayDateLabel}</span>
               </div>
             )}
           </div>
@@ -1620,13 +1841,15 @@ const ProductDetail: React.FC = () => {
 
                 {/* Messages Received Component - Mobile - Only show for active listings without daysLeft */}
                 {isOwnerView && ownerListing?.status === 'active' && !ownerListing?.daysLeft && ownerListing?.messages && ownerListing.messages > 0 && (
-                  <div className="relative mb-4">
+                  <div className="relative" style={{ marginBottom: isMobile ? '28px' : '16px' }}>
                     <div 
-                      className="flex items-center gap-2 px-3 py-2 rounded-full cursor-pointer hover:opacity-90 transition-opacity"
+                      className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity"
                       style={{ 
-                        backgroundColor: showMobileMessagesModal ? '#F0F8FE' : '#F8FCFF', 
+                        backgroundColor: (isMobile ? showMobileMessagesModal : showMessagesDropdown) ? '#F0F8FE' : '#F8FCFF', 
                         border: `1px solid #F0F8FE`,
-                        width: 'fit-content'
+                        width: 'fit-content',
+                        paddingTop: isMobile ? '4px' : '8px',
+                        paddingBottom: isMobile ? '4px' : '8px'
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1834,7 +2057,7 @@ const ProductDetail: React.FC = () => {
                 )}
 
           {/* Seller Profile Section - Mobile */}
-          <div className="mt-1 mb-0">
+          <div className="mt-1" style={{ marginBottom: isMobile && isOwnerView ? '12px' : '0' }}>
                 <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-gray-100 border overflow-hidden flex-shrink-0" style={{ borderColor: '#E0E0E0' }}>
@@ -1872,8 +2095,8 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
 
-          {/* Days Left Badge - Mobile */}
-          {isOwnerView && ownerListing?.daysLeft && (
+          {/* Days Left Badge - Mobile - Hidden, now shown above badges */}
+          {!isMobile && isOwnerView && ownerListing?.daysLeft && (
             <div
               className="flex items-start gap-3 p-2.5 mt-2"
               style={{
@@ -1938,8 +2161,8 @@ const ProductDetail: React.FC = () => {
             </div>
           )}
 
-          {/* Warning Badge for Inactive Listings - Mobile */}
-          {isOwnerView && ownerListing?.status === 'inactive' && (
+          {/* Warning Badge for Inactive Listings - Mobile - Hidden, now shown above badges */}
+          {!isMobile && isOwnerView && ownerListing?.status === 'inactive' && (
             <div
               className="flex items-start gap-3 p-2.5 mt-2"
               style={{
@@ -2433,7 +2656,7 @@ const ProductDetail: React.FC = () => {
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                     </svg>
                   </div>
-                  {!isReviewPosted && (
+                  {!isReviewPosted && !(isMobile && isOwnerView) && (
                     <div className="lg:hidden">
               <button 
                         onClick={() => setShowGiveOpinionModal(true)}
@@ -4047,24 +4270,25 @@ const ProductDetail: React.FC = () => {
           {/* Modal */}
           <div
             ref={mobileMessagesModalRef}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white"
+            className="fixed bottom-0 z-50 bg-white"
             style={{
-              borderTopLeftRadius: '30px',
-              borderTopRightRadius: '30px',
+              borderRadius: '30px',
               maxHeight: '70vh',
-              overflowY: 'auto'
+              overflowY: 'auto',
+              left: '12px',
+              right: '12px',
+              marginBottom: '12px'
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: '#E9E9E9' }}>
+            <div className="flex items-center justify-between p-4">
               <h3 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', fontWeight: 600, color: '#212121' }}>
                 {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} for this product
               </h3>
               <button
                 onClick={() => setShowMobileMessagesModal(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: '#F4F4F4' }}
+                className="flex items-center justify-center"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 6L6 18M6 6l12 12" />
@@ -4073,7 +4297,7 @@ const ProductDetail: React.FC = () => {
             </div>
 
             {/* Messages List */}
-            <div className="p-4">
+            <div className="px-4 pb-4">
               {recentMessages.map((message, index) => {
                 const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
                 return (
@@ -4119,18 +4343,13 @@ const ProductDetail: React.FC = () => {
                             {message.name}
                           </span>
                           <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <svg
-                                key={i}
-                                className="w-3 h-3"
-                                viewBox="0 0 24 24"
-                                fill={i < Math.floor(message.rating) ? '#FBBC05' : 'none'}
-                                stroke={i < Math.floor(message.rating) ? '#FBBC05' : '#E0E0E0'}
-                                strokeWidth="1"
-                              >
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                              </svg>
-                            ))}
+                            <svg
+                              className="w-3 h-3"
+                              viewBox="0 0 24 24"
+                              fill="#FBBC05"
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
                             <span className="text-xs" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
                               {message.rating}
                             </span>
@@ -4141,7 +4360,7 @@ const ProductDetail: React.FC = () => {
                         <div className="flex items-center justify-between gap-2" style={{ marginTop: '2px' }}>
                           <div className="flex items-center gap-2">
                             {message.messageState === 'new' ? (
-                              <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: '#E3F2FD', color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>
+                              <span className="text-xs" style={{ color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>
                                 New message
                               </span>
                             ) : message.messageState === 'you' ? (
@@ -4159,7 +4378,7 @@ const ProductDetail: React.FC = () => {
                               </span>
                             )}
                           </div>
-                          <span className="text-xs flex-shrink-0" style={{ color: '#BBBBBB', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <span className="flex-shrink-0" style={{ color: '#BBBBBB', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '10px' }}>
                             {message.timestamp}
                           </span>
                         </div>
