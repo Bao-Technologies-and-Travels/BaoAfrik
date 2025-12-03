@@ -2308,251 +2308,6 @@ const MyListings: React.FC = () => {
                       <span>Sort by</span>
                     </button>
 
-                    {/* Sort Secondary Dropdown - appears to the left when Sort by is clicked, moves to primary position when tertiary opens */}
-                    {mobileSortSecondaryOpen && (
-                      <div
-                        className="absolute z-50"
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          borderRadius: '12px',
-                          border: '1px solid #E9E9E9',
-                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                          padding: '5px',
-                          minWidth: '148px',
-                          ...(mobileSortTertiaryOpen ? {
-                            bottom: '0',
-                            right: '0',
-                            transform: 'translateY(68px)'
-                          } : {
-                            top: '0',
-                            right: 'calc(100% + 8px)'
-                          })
-                        }}
-                      >
-                        {sortOptions.map((option) => {
-                          const renderIcon = () => {
-                            if (option.key === 'date') {
-                              return (
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2">
-                                  <circle cx="12" cy="12" r="10" />
-                                  <path d="M12 6v6l4 2" />
-                                </svg>
-                              );
-                            }
-                            if (option.icon) {
-                              return <img src={option.icon} alt={option.label} className="w-3 h-3" style={{ filter: option.key === 'price' ? 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' : undefined }} />;
-                            }
-                            return null;
-                          };
-
-                          return (
-                            <button
-                              key={option.key}
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (!mobileSortTertiaryOpen) {
-                                  setMobileSelectedPrimaryKey(option.key);
-                                  setMobileSortTertiaryOpen(true);
-                                }
-                              }}
-                              className="w-full flex items-center justify-between gap-1.5 px-2 py-1.5 rounded transition-colors"
-                              style={{
-                                color: '#939393',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '11px',
-                                backgroundColor: 'transparent',
-                                borderRadius: '8px',
-                                whiteSpace: 'nowrap'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#FAFAFA';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }}
-                            >
-                              <span className="flex items-center gap-1.5">
-                                {renderIcon()}
-                                <span>{option.label}</span>
-                              </span>
-                              <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {/* Tertiary Sort Modal - replaces primary modal position when secondary option clicked */}
-                    {mobileSortTertiaryOpen && mobileSelectedPrimaryKey && (
-                      <div
-                        className="absolute bottom-0 right-0 z-50"
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          borderRadius: '12px',
-                          border: '1px solid #E9E9E9',
-                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                          padding: '8px',
-                          minWidth: '160px',
-                          transform: 'translateY(68px)'
-                        }}
-                      >
-                        {/* Back button at top right */}
-                        <div className="flex items-center justify-end mb-1">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setMobileSortTertiaryOpen(false);
-                              setMobileSelectedPrimaryKey(null);
-                              setMobileSelectedSecondaryKey(null);
-                            }}
-                            className="flex items-center gap-1 px-2 py-1"
-                            style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
-                          >
-                            <span>Back</span>
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </button>
-                        </div>
-
-                        {/* Tertiary options */}
-                        {(() => {
-                          const primaryOption = sortOptions.find(opt => opt.key === mobileSelectedPrimaryKey);
-                          if (!primaryOption) return null;
-
-                          return primaryOption.children.map((child) => {
-                            if (child.value) {
-                              // Simple option - applies sort directly
-                              return (
-                                <button
-                                  key={child.key}
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (child.value) {
-                                      setSelectedSort({ label: `${primaryOption.label}: ${child.label}`, value: child.value });
-                                      setMobileSortTertiaryOpen(false);
-                                      setMobileSortSecondaryOpen(false);
-                                      setIsMobilePlusModalOpen(false);
-                                      setMobileSelectedPrimaryKey(null);
-                                    }
-                                  }}
-                                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors"
-                                  style={{
-                                    color: '#939393',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    fontSize: '12px',
-                                    backgroundColor: 'transparent',
-                                    borderRadius: '8px'
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#FAFAFA';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                  }}
-                                >
-                                  <span>{child.label}</span>
-                                </button>
-                              );
-                            } else if (child.subChildren) {
-                              // Has sub-children - opens another level
-                              return (
-                                <button
-                                  key={child.key}
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setMobileSelectedSecondaryKey(child.key);
-                                  }}
-                                  className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded transition-colors"
-                                  style={{
-                                    color: '#939393',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    fontSize: '12px',
-                                    backgroundColor: 'transparent',
-                                    borderRadius: '8px'
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#FAFAFA';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                  }}
-                                >
-                                  <span>{child.label}</span>
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                  </svg>
-                                </button>
-                              );
-                            }
-                            return null;
-                          });
-                        })()}
-
-                        {/* Fourth level dropdown for Reviews/Messages - appears to the left */}
-                        {mobileSelectedSecondaryKey && (() => {
-                          const primaryOption = sortOptions.find(opt => opt.key === mobileSelectedPrimaryKey);
-                          const secondaryOption = primaryOption?.children.find(c => c.key === mobileSelectedSecondaryKey);
-                          return secondaryOption?.subChildren ? (
-                            <div
-                              className="absolute top-0 right-full mr-2 z-50"
-                              style={{
-                                backgroundColor: '#FFFFFF',
-                                borderRadius: '12px',
-                                border: '1px solid #E9E9E9',
-                                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                                padding: '6px',
-                                minWidth: '120px'
-                              }}
-                            >
-                              {secondaryOption.subChildren.map((subChild) => (
-                                <button
-                                  key={subChild.key}
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (subChild.value && primaryOption) {
-                                      setSelectedSort({ 
-                                        label: `${primaryOption.label}: ${secondaryOption.label}: ${subChild.label}`, 
-                                        value: subChild.value 
-                                      });
-                                      setMobileSortTertiaryOpen(false);
-                                      setMobileSortSecondaryOpen(false);
-                                      setIsMobilePlusModalOpen(false);
-                                      setMobileSelectedPrimaryKey(null);
-                                      setMobileSelectedSecondaryKey(null);
-                                    }
-                                  }}
-                                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors"
-                                  style={{
-                                    color: '#939393',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    fontSize: '12px',
-                                    backgroundColor: 'transparent',
-                                    borderRadius: '8px'
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#FAFAFA';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                  }}
-                                >
-                                  <span>{subChild.label}</span>
-                                </button>
-                              ))}
-                            </div>
-                          ) : null;
-                        })()}
-                      </div>
-                    )}
-
                     {/* All Status option */}
                     <button
                       type="button"
@@ -2733,6 +2488,297 @@ const MyListings: React.FC = () => {
                       </svg>
                       <span>Close</span>
                     </button>
+                  </div>
+                )}
+
+                {/* Sort Secondary Dropdown - OUTSIDE primary, appears to the left of primary modal, moves to primary position when tertiary opens */}
+                {mobileSortSecondaryOpen && (
+                  <div
+                    className="absolute z-50"
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: mobileSortTertiaryOpen ? '8px' : '5px',
+                      paddingTop: mobileSortTertiaryOpen ? '6px' : '5px',
+                      minWidth: '148px',
+                      ...(mobileSortTertiaryOpen ? {
+                        bottom: '0',
+                        right: '0',
+                        transform: 'translateY(68px)'
+                      } : {
+                        bottom: '0',
+                        right: '168px',
+                        transform: 'translateY(68px)'
+                      })
+                    }}
+                  >
+                    {/* Back button at top right - only when tertiary is open */}
+                    {mobileSortTertiaryOpen && (
+                      <div className="flex items-center justify-end mb-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMobileSortTertiaryOpen(false);
+                            setMobileSelectedPrimaryKey(null);
+                            setMobileSelectedSecondaryKey(null);
+                          }}
+                          className="flex items-center gap-1 px-2 py-1"
+                          style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
+                        >
+                          <span>Back</span>
+                          <img
+                            src={backArrowIcon}
+                            alt="Back"
+                            className="w-3 h-3"
+                            style={{
+                              transform: 'scaleX(-1)',
+                              filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
+                            }}
+                          />
+                        </button>
+                      </div>
+                    )}
+
+                    {sortOptions.map((option) => {
+                      const renderIcon = () => {
+                        if (option.key === 'date') {
+                          return (
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2">
+                              <circle cx="12" cy="12" r="10" />
+                              <path d="M12 6v6l4 2" />
+                            </svg>
+                          );
+                        }
+                        if (option.icon) {
+                          return <img src={option.icon} alt={option.label} className="w-3 h-3" style={{ filter: option.key === 'price' ? 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' : undefined }} />;
+                        }
+                        return null;
+                      };
+
+                      return (
+                        <button
+                          key={option.key}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMobileSelectedPrimaryKey(option.key);
+                            setMobileSortTertiaryOpen(true);
+                          }}
+                          className="w-full flex items-center justify-between gap-1.5 px-2 py-1.5 rounded transition-colors"
+                          style={{
+                            color: '#939393',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '11px',
+                            backgroundColor: 'transparent',
+                            borderRadius: '8px',
+                            whiteSpace: 'nowrap'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#FAFAFA';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
+                        >
+                          <span className="flex items-center gap-1.5">
+                            {renderIcon()}
+                            <span>{option.label}</span>
+                          </span>
+                          <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Tertiary Sort Modal - OUTSIDE primary, appears to LEFT of secondary when it moves to primary position */}
+                {mobileSortTertiaryOpen && mobileSelectedPrimaryKey && (
+                  <div
+                    className="absolute bottom-0 z-50"
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '8px',
+                      minWidth: '140px',
+                      right: '160px',
+                      transform: 'translateY(68px)'
+                    }}
+                  >
+                    {/* Tertiary options */}
+                    {(() => {
+                      const primaryOption = sortOptions.find(opt => opt.key === mobileSelectedPrimaryKey);
+                      if (!primaryOption) return null;
+
+                      // Check if ANY child has subChildren to determine if we need back button
+                      const hasComplexChildren = primaryOption.children.some(c => c.subChildren);
+
+                      return (
+                        <>
+                          {/* Back button - only for complex tertiary modals (Commitments) */}
+                          {hasComplexChildren && (
+                            <div className="flex items-center justify-end mb-1">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setMobileSortTertiaryOpen(false);
+                                  setMobileSelectedPrimaryKey(null);
+                                  setMobileSelectedSecondaryKey(null);
+                                }}
+                                className="flex items-center gap-1 px-2 py-1"
+                                style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
+                              >
+                                <span>Back</span>
+                                <img
+                                  src={backArrowIcon}
+                                  alt="Back"
+                                  className="w-3 h-3"
+                                  style={{
+                                    transform: 'scaleX(-1)',
+                                    filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
+                                  }}
+                                />
+                              </button>
+                            </div>
+                          )}
+
+                          {primaryOption.children.map((child) => {
+                        if (child.value) {
+                          // Simple option - applies sort directly
+                          return (
+                            <button
+                              key={child.key}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (child.value) {
+                                  setSelectedSort({ label: `${primaryOption.label}: ${child.label}`, value: child.value });
+                                  setMobileSortTertiaryOpen(false);
+                                  setMobileSortSecondaryOpen(false);
+                                  setIsMobilePlusModalOpen(false);
+                                  setMobileSelectedPrimaryKey(null);
+                                  setMobileSelectedSecondaryKey(null);
+                                }
+                              }}
+                              className="w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors"
+                              style={{
+                                color: '#939393',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '12px',
+                                backgroundColor: 'transparent',
+                                borderRadius: '8px'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#FAFAFA';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
+                            >
+                              <span>{child.label}</span>
+                            </button>
+                          );
+                        } else if (child.subChildren) {
+                          // Has sub-children - opens another level
+                          return (
+                            <button
+                              key={child.key}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMobileSelectedSecondaryKey(child.key);
+                              }}
+                              className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded transition-colors"
+                              style={{
+                                color: '#939393',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '12px',
+                                backgroundColor: 'transparent',
+                                borderRadius: '8px'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#FAFAFA';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
+                            >
+                              <span>{child.label}</span>
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          );
+                        }
+                        return null;
+                      })}
+                    </>
+                    );
+                    })()}
+
+                    {/* Fourth level dropdown for Reviews/Messages - appears to the left of tertiary */}
+                    {mobileSelectedSecondaryKey && (() => {
+                      const primaryOption = sortOptions.find(opt => opt.key === mobileSelectedPrimaryKey);
+                      const secondaryOption = primaryOption?.children.find(c => c.key === mobileSelectedSecondaryKey);
+                      return secondaryOption?.subChildren ? (
+                        <div
+                          className="absolute bottom-0 right-full mr-2 z-50"
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #E9E9E9',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '6px',
+                            minWidth: '120px',
+                            transform: 'translateY(68px)'
+                          }}
+                        >
+                          {secondaryOption.subChildren.map((subChild) => (
+                            <button
+                              key={subChild.key}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (subChild.value && primaryOption) {
+                                  setSelectedSort({ 
+                                    label: `${primaryOption.label}: ${secondaryOption.label}: ${subChild.label}`, 
+                                    value: subChild.value 
+                                  });
+                                  setMobileSortTertiaryOpen(false);
+                                  setMobileSortSecondaryOpen(false);
+                                  setIsMobilePlusModalOpen(false);
+                                  setMobileSelectedPrimaryKey(null);
+                                  setMobileSelectedSecondaryKey(null);
+                                }
+                              }}
+                              className="w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors"
+                              style={{
+                                color: '#939393',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '12px',
+                                backgroundColor: 'transparent',
+                                borderRadius: '8px'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#FAFAFA';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
+                            >
+                              <span>{subChild.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
                 )}
               </div>
