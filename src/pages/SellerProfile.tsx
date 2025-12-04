@@ -27,6 +27,7 @@ import igIcon from '../assets/images/pre/IG1.svg';
 import xIcon from '../assets/images/pre/x.svg';
 import tgIcon from '../assets/images/pre/tg.svg';
 import zapIcon from '../assets/images/pre/zap1.svg';
+import contactIcon from '../assets/images/pre/contact.svg';
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
 import pre2 from '../assets/images/pre/2.png';
@@ -628,8 +629,8 @@ const SellerProfile: React.FC = () => {
             </div>
             
             {/* Member Info and Location with Rating */}
-            <div className="flex items-start justify-between" style={{ marginBottom: '16px' }}>
-              <div className="flex flex-col" style={{ gap: '6px' }}>
+            <div className="flex items-start justify-between" style={{ marginBottom: '16px', marginTop: '6px' }}>
+              <div className="flex flex-col" style={{ gap: '8px' }}>
                 {/* Member Info */}
                 <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
                   <img src={profileIcon} alt="Profile" className="w-3.5 h-3.5" />
@@ -637,7 +638,7 @@ const SellerProfile: React.FC = () => {
                 </div>
                 
                 {/* Location */}
-                <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A', marginTop: '4px' }}>
+                <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
                   <img src={locationIcon} alt="Location" className="w-3.5 h-3.5" />
                   <span style={{ color: '#64B5F6' }}>London, United Kingdom</span>
                 </div>
@@ -722,7 +723,7 @@ const SellerProfile: React.FC = () => {
       </div>
 
       {/* Mobile and Tablet Bio Section */}
-      <div className="lg:hidden bg-white px-4 md:px-6 pb-3 md:pb-4" style={{ paddingTop: '0' }}>
+      <div className="lg:hidden bg-white px-4 md:px-6 pb-3 md:pb-4" style={{ paddingTop: '0', marginTop: '-8px' }}>
         <h3 className="text-base font-semibold mb-1" style={{ color: '#6A6A6A' }}>Bio</h3>
         <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
           Passionate farmer and entrepreneur specializing in organic produce and traditional farming methods.
@@ -765,7 +766,7 @@ const SellerProfile: React.FC = () => {
 
         {/* Mobile Rating Summary - Right after tabs */}
         {activeTab === 'reviews' && (
-        <div className="lg:hidden px-4 md:px-6 bg-white" style={{ paddingTop: '20px', paddingBottom: '16px' }}>
+        <div className="lg:hidden px-4 md:px-6 bg-white" style={{ paddingTop: '20px', paddingBottom: '12px' }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
@@ -1048,58 +1049,58 @@ const SellerProfile: React.FC = () => {
                   </div>
 
                   {/* Review 3 - Alex Johnson */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="pb-4">
+                    <div className="flex items-start mb-2" style={{ gap: '10px' }}>
+                      <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center" style={{ flexShrink: 0 }}>
+                        <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
                       </div>
-                <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2">Alex Johnson</h4>
-                    <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
+                <div className="flex-1" style={{ minWidth: 0 }}>
+                        <h4 className="text-gray-900 mb-1" style={{ fontSize: '13px', fontWeight: '600' }}>Alex Johnson</h4>
+                    <div className="flex items-center justify-between" style={{ gap: '8px' }}>
+                          <div className="flex items-center" style={{ gap: '6px' }}>
                       <div className="flex items-center">
                               {[1,2].map((star) => (
-                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                                <svg key={star} className="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 24 24">
                                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                                 </svg>
                               ))}
                               {[1,2,3].map((star) => (
-                                <svg key={`empty-${star}`} className="w-3.5 h-3.5 text-gray-300 fill-current" viewBox="0 0 24 24">
+                                <svg key={`empty-${star}`} className="w-3 h-3 text-gray-300 fill-current" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                           </svg>
                         ))}
                       </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>2.1</span>
+                            <span style={{ fontSize: '12px', fontWeight: '500', color: '#939393' }}>2.1</span>
                     </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 8 Nov 2024</span>
+                          <span style={{ fontSize: '10px', color: '#939393', whiteSpace: 'nowrap' }}>Posted on 8 Nov 2024</span>
                   </div>
                 </div>
               </div>
-                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                    <p className="leading-relaxed mb-3" style={{ fontSize: '12px', color: '#B0B0B0' }}>
                       The product was okay, but not exactly what I expected. Shipping took longer than anticipated. Communication could have been better.
               </p>
                     
                     {/* Helpfulness Section */}
-              <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center justify-between flex-wrap" style={{ gap: '10px' }}>
                       {renderHelpfulnessControls('review3')}
                     <button 
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
+                        className="hover:underline"
+                        style={{ fontSize: '11px', color: '#64B5F6' }}
                         onClick={() => handleDiscussionToggle('review3')}
                       >
                         {expandedDiscussions.review3 ? 'View less' : `View the discussion (${reviewDiscussionData.review3?.length || 0})`}
                     </button>
                   </div>
                     {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
-                      <div className="mt-4 space-y-4">
+                      <div className="mt-3" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {reviewDiscussionData.review3.map((comment) => (
-                          <div key={comment.id} className="flex space-x-3">
+                          <div key={comment.id} className="flex" style={{ gap: '10px' }}>
                             <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                            <div className="flex-1 pl-4">
-                      <div className="flex items-start space-x-3">
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                            <div className="flex-1" style={{ paddingLeft: '12px' }}>
+                      <div className="flex items-start" style={{ gap: '10px' }}>
+                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden" style={{ flexShrink: 0 }}>
                                   {comment.avatar ? (
                                     <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
                                   ) : (
@@ -1108,22 +1109,22 @@ const SellerProfile: React.FC = () => {
                                     </svg>
                                   )}
                                 </div>
-                        <div className="flex-1">
-                                  <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
+                        <div className="flex-1" style={{ minWidth: 0 }}>
+                                  <div className="flex items-center justify-between" style={{ gap: '8px', marginBottom: '4px' }}>
+                          <div className="flex items-center" style={{ gap: '6px' }}>
+                                      <span className="text-gray-900" style={{ fontSize: '12px', fontWeight: '600' }}>{comment.author}</span>
                                       {comment.isOwner && (
-                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
+                                        <span style={{ fontSize: '9px', fontWeight: '500', padding: '2px 6px', backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
                                           {comment.role || 'Product Owner'}
                                         </span>
                                       )}
                           </div>
-                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                    <span style={{ fontSize: '10px', color: '#939393', whiteSpace: 'nowrap' }}>{comment.date}</span>
                         </div>
-                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
+                                  <p className="leading-relaxed" style={{ fontSize: '11px', color: '#939393' }}>{comment.text}</p>
                       </div>
                           </div>
-                              <div className="mt-3 pl-12">
+                              <div style={{ marginTop: '10px', paddingLeft: '38px' }}>
                                 {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
                         </div>
                       </div>
@@ -1415,9 +1416,9 @@ const SellerProfile: React.FC = () => {
                       alt={getProductCountry(1).name}
                       style={{ 
                         width: '11px',
-                        height: '7px',
+                        height: '11px',
                         objectFit: 'cover',
-                        borderRadius: '2px'
+                        borderRadius: '50%'
                       }}
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '10px' }}>
@@ -2337,7 +2338,7 @@ const SellerProfile: React.FC = () => {
       </div>
       
       {/* Spacer before footer */}
-      <div className="pb-16"></div>
+      <div className="pb-8 lg:pb-16"></div>
 
       {/* Mobile Sticky Bottom Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50">
@@ -2359,12 +2360,7 @@ const SellerProfile: React.FC = () => {
             onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#F9A825'}
           >
             <span>Contact Joaquin</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              <circle cx="9" cy="10" r="0.5" fill="white" />
-              <circle cx="12" cy="10" r="0.5" fill="white" />
-              <circle cx="15" cy="10" r="0.5" fill="white" />
-            </svg>
+            <img src={contactIcon} alt="Contact" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} />
           </button>
         </div>
       </div>
