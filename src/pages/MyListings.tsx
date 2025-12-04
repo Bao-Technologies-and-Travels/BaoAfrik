@@ -413,6 +413,52 @@ const MyListings: React.FC = () => {
     return sorted;
   }, [filteredListings, selectedSort]);
 
+  // Group listings by date or alphabetically based on sort
+  const groupedListings = useMemo(() => {
+    if (!selectedSort || !isMobile) return null;
+
+    if (selectedSort.value === 'date_recent' || selectedSort.value === 'date_older') {
+      // Group by date
+      const groups: { [key: string]: Listing[] } = {};
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      sortedListings.forEach(listing => {
+        const listingDate = new Date(listing.createdAt);
+        const listingDay = new Date(listingDate.getFullYear(), listingDate.getMonth(), listingDate.getDate());
+        
+        let groupKey: string;
+        if (listingDay.getTime() === today.getTime()) {
+          groupKey = 'Today';
+        } else if (listingDay.getTime() === yesterday.getTime()) {
+          groupKey = 'Yesterday';
+        } else {
+          groupKey = listingDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+        
+        if (!groups[groupKey]) groups[groupKey] = [];
+        groups[groupKey].push(listing);
+      });
+
+      return groups;
+    } else if (selectedSort.value === 'name_az' || selectedSort.value === 'name_za') {
+      // Group by first letter
+      const groups: { [key: string]: Listing[] } = {};
+      
+      sortedListings.forEach(listing => {
+        const firstLetter = listing.title.charAt(0).toUpperCase();
+        if (!groups[firstLetter]) groups[firstLetter] = [];
+        groups[firstLetter].push(listing);
+      });
+
+      return groups;
+    }
+
+    return null;
+  }, [sortedListings, selectedSort, isMobile]);
+
   const hasResults = sortedListings.length > 0;
   const isSearchActive = trimmedSearchQuery.length > 0;
   const shouldShowEmptyState = !hasResults;
@@ -1150,24 +1196,18 @@ const MyListings: React.FC = () => {
     </div>
   );
 
-  const renderListingsGrid = () => (
-    <div className={`grid ${isMobile ? 'grid-cols-2 px-4' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} ${isMobile ? 'gap-3' : 'gap-4 sm:gap-6 md:gap-8'}`}>
-      {sortedListings.map((listing) => (
-        <div
-          key={listing.id}
-          className="bg-white rounded-lg overflow-hidden"
-          style={{ cursor: 'pointer' }}
-          onClick={() => handleListingNavigation(listing)}
-        >
-          {/* Product Image */}
-          <div className={`aspect-square relative overflow-hidden mb-1 sm:mb-2`} style={{ borderRadius: '12px', ...(isMobile ? { padding: '2px' } : {}) }}>
-            <img
-              src={listing.image}
-              alt={listing.title}
-              className="w-full h-full object-cover"
-              style={{ borderRadius: '12px', ...(isMobile ? { transform: 'scaleX(1.0) scaleY(0.92)' } : {}) }}
-            />
-          </div>
+  // Render individual listing card content
+  const renderListingCard = (listing: Listing) => (
+    <>
+      {/* Product Image */}
+      <div className={`aspect-square relative overflow-hidden mb-1 sm:mb-2`} style={{ borderRadius: '12px', ...(isMobile ? { padding: '2px' } : {}) }}>
+        <img
+          src={listing.image}
+          alt={listing.title}
+          className="w-full h-full object-cover"
+          style={{ borderRadius: '12px', ...(isMobile ? { transform: 'scaleX(1.0) scaleY(0.92)' } : {}) }}
+        />
+      </div>
 
           {/* Product Content */}
           <div className="px-2 sm:px-3 pb-2 sm:pb-3">
@@ -1368,10 +1408,55 @@ const MyListings: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
+    </>
   );
+
+  const renderListingsGrid = () => {
+    // If mobile and has grouped listings, render with headers
+    if (isMobile && groupedListings) {
+      return (
+        <div className="px-4">
+          {Object.entries(groupedListings).map(([groupKey, listings]) => (
+            <div key={groupKey} className="mb-6">
+              {/* Group Header */}
+              <h3 style={{ color: '#939393', fontSize: '14px', fontFamily: 'Poppins, sans-serif', fontWeight: 500, marginBottom: '12px' }}>
+                {groupKey}
+              </h3>
+              {/* Group Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                {listings.map((listing) => (
+                  <div
+                    key={listing.id}
+                    className="bg-white rounded-lg overflow-hidden"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleListingNavigation(listing)}
+                  >
+                    {renderListingCard(listing)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Default grid without grouping
+    return (
+      <div className={`grid ${isMobile ? 'grid-cols-2 px-4' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} ${isMobile ? 'gap-3' : 'gap-4 sm:gap-6 md:gap-8'}`}>
+        {sortedListings.map((listing) => (
+          <div
+            key={listing.id}
+            className="bg-white rounded-lg overflow-hidden"
+            style={{ cursor: 'pointer' }}
+            onClick={() => handleListingNavigation(listing)}
+          >
+            {renderListingCard(listing)}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   const renderPagination = () => (
     <div className={`flex flex-col ${isMobile ? 'items-center gap-4' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-16' : 'mb-32'} w-full`}>
@@ -2698,13 +2783,20 @@ const MyListings: React.FC = () => {
                                   setMobileSelectedSecondaryKey(null);
                                 }
                               }}
-                              className="w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors"
                               style={{
                                 color: '#939393',
                                 fontFamily: 'Poppins, sans-serif',
                                 fontSize: '12px',
                                 backgroundColor: 'transparent',
-                                borderRadius: '8px'
+                                borderRadius: '8px',
+                                whiteSpace: 'nowrap',
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '6px 8px',
+                                border: 'none',
+                                cursor: 'pointer'
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.backgroundColor = '#FAFAFA';
@@ -2713,7 +2805,7 @@ const MyListings: React.FC = () => {
                                 e.currentTarget.style.backgroundColor = 'transparent';
                               }}
                             >
-                              <span>{child.label}</span>
+                              <span style={{ whiteSpace: 'nowrap' }}>{child.label}</span>
                             </button>
                           );
                         } else if (child.subChildren) {
@@ -2769,9 +2861,9 @@ const MyListings: React.FC = () => {
                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                             padding: '6px',
                             minWidth: '120px',
-                            right: '156px',
-                            top: '0',
-                            transform: 'translateY(68px)'
+                            right: '164px',
+                            top: '50%',
+                            transform: 'translate(0, calc(68px - 50%))'
                           }}
                         >
                           {secondaryOption.subChildren.map((subChild) => (
