@@ -5,6 +5,7 @@ import Footer from '../components/layout/Footer';
 import sellerAvatar from '../assets/images/logos/avatar.png';
 import defaultCoverImage from '../assets/images/logos/8.png';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
+import backArrowIcon from '../assets/images/pre/back arrow.svg';
 import verifyIcon from '../assets/images/pre/verify.svg';
 import basketIcon from '../assets/images/pre/basket.png';
 import logoIcon from '../assets/images/logos/ba-brand-icon-colored.png';
@@ -371,7 +372,9 @@ const SellerProfile: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
-      <Header />
+      <div className="hidden lg:block">
+        <Header />
+      </div>
 
       {/* Gray Divider below Header */}
       <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9' }}></div>
@@ -576,10 +579,24 @@ const SellerProfile: React.FC = () => {
           {/* Back Button - Top Left */}
           <button 
             onClick={() => navigate(-1)}
-            className="absolute top-4 left-4 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full border border-gray-300 flex items-center justify-center shadow-sm hover:bg-gray-50 transition-colors"
+            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white flex items-center justify-center"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+            aria-label="Back"
           >
-            <svg className="w-5 h-5 md:w-6 md:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+          </button>
+
+          {/* More Options Button - Top Right */}
+          <button 
+            onClick={() => setShowOptionsModal(true)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white flex items-center justify-center"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+            aria-label="More options"
+          >
+            <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+              <circle cx="4" cy="2" r="2" fill="#171717" />
+              <circle cx="12" cy="2" r="2" fill="#171717" />
+              <circle cx="20" cy="2" r="2" fill="#171717" />
             </svg>
           </button>
         </div>
@@ -597,19 +614,17 @@ const SellerProfile: React.FC = () => {
             </div>
           </div>
           
-          {/* Verified Badge - Moved Down */}
-          <div className="absolute right-4 md:right-6 top-2">
-            {seller.isVerified && (
-              <div className="inline-flex items-center space-x-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg text-xs md:text-sm whitespace-nowrap" style={{ backgroundColor: '#EDFBF0' }}>
-                <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                <span className="font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
-              </div>
-            )}
-          </div>
-          
           {/* Name and Info - Below Avatar */}
           <div className="pt-10 md:pt-12">
-            <h1 className="text-base md:text-lg font-semibold text-gray-900 mb-2">{seller.name}</h1>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-base md:text-lg font-semibold text-gray-900">{seller.name}</h1>
+              {seller.isVerified && (
+                <div className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded-md text-xs whitespace-nowrap" style={{ backgroundColor: '#EDFBF0' }}>
+                  <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
+                  <span className="font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
+                </div>
+              )}
+            </div>
             
             {/* Location, Member Info, and Rating */}
             <div className="flex items-start justify-between mb-3">
@@ -711,24 +726,11 @@ const SellerProfile: React.FC = () => {
       </div>
 
       {/* Mobile and Tablet Bio Section */}
-      <div className="lg:hidden bg-white px-4 md:px-6 py-6 md:py-8">
+      <div className="lg:hidden bg-white px-4 md:px-6 py-4 md:py-5">
         <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#6A6A6A' }}>Bio</h3>
         <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
           {seller.bio}
         </p>
-        
-        {/* Social Media Icons */}
-        <div className="flex items-center space-x-8 mt-6">
-          <a href="#" className="hover:opacity-80 transition-opacity">
-            <img src={whatsappIcon} alt="WhatsApp" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
-          </a>
-          <a href="#" className="hover:opacity-80 transition-opacity">
-            <img src={instagramIcon} alt="Instagram" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
-          </a>
-          <a href="#" className="hover:opacity-80 transition-opacity">
-            <img src={facebookIcon} alt="Facebook" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
-          </a>
-        </div>
 
         {/* Location, Useful Link, and Member Since */}
         <div className="space-y-4 mt-6">
@@ -790,6 +792,44 @@ const SellerProfile: React.FC = () => {
             </div>
             </div>
           </div>
+
+        {/* Mobile Rating Summary - Right after tabs */}
+        <div className="lg:hidden px-4 md:px-6 py-6 bg-white">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
+              <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </div>
+            <button 
+              className="px-4 py-2 rounded-md text-xs font-medium"
+              style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+            >
+              Give feedback
+            </button>
+          </div>
+          <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
+          
+          {/* Rating Bars */}
+          <div className="space-y-2">
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '70%'}}></div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '60%'}}></div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '40%'}}></div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '20%'}}></div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '10%'}}></div>
+            </div>
+          </div>
+        </div>
         
         <div className="max-w-7xl mx-auto px-6 py-4 mt-8">
 
