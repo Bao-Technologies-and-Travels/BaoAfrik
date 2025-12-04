@@ -612,7 +612,7 @@ const SellerProfile: React.FC = () => {
         <div className="px-4 md:px-6 pb-6 relative">
           {/* Profile Avatar - Positioned like desktop */}
           <div className="absolute left-4 md:left-6 -top-8">
-            <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-2 border-white lg:border-4">
               <img
                 src={seller.avatar}
                 alt={seller.name}
@@ -634,16 +634,16 @@ const SellerProfile: React.FC = () => {
             </div>
             
             {/* Member Info and Location with Rating */}
-            <div className="flex items-start justify-between" style={{ marginBottom: '16px', marginTop: '12px' }}>
-              <div className="flex flex-col" style={{ gap: '10px' }}>
+            <div className="flex items-start justify-between" style={{ marginBottom: '16px', marginTop: '14px' }}>
+              <div className="flex flex-col" style={{ gap: '12px' }}>
                 {/* Member Info */}
-                <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
+                <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#B0B0B0' }}>
                   <img src={profileIcon} alt="Profile" className="w-3.5 h-3.5" />
                   <span>Member since 2025</span>
                 </div>
                 
                 {/* Location */}
-                <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
+                <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#B0B0B0' }}>
                   <img src={locationIcon} alt="Location" className="w-3.5 h-3.5" />
                   <span style={{ color: '#64B5F6' }}>London, United Kingdom</span>
                 </div>
@@ -657,7 +657,7 @@ const SellerProfile: React.FC = () => {
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 </div>
-                <span className="text-sm text-gray-500">Reviews (456)</span>
+                <span className="text-sm" style={{ color: '#B0B0B0' }}>Reviews (456)</span>
               </div>
             </div>
           </div>
@@ -728,7 +728,7 @@ const SellerProfile: React.FC = () => {
       </div>
 
       {/* Mobile and Tablet Bio Section */}
-      <div className="lg:hidden bg-white px-4 md:px-6 pb-3 md:pb-4" style={{ paddingTop: '0', marginTop: '-8px' }}>
+      <div className="lg:hidden bg-white px-4 md:px-6 pb-3 md:pb-4" style={{ paddingTop: '0', marginTop: '-16px' }}>
         <h3 className="text-base font-semibold mb-1" style={{ color: '#6A6A6A' }}>Bio</h3>
         <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
           Passionate farmer and entrepreneur specializing in organic produce and traditional farming methods.
@@ -771,46 +771,46 @@ const SellerProfile: React.FC = () => {
 
         {/* Mobile Rating Summary - Right after tabs */}
         {activeTab === 'reviews' && (
-        <div className="lg:hidden px-4 md:px-6 bg-white" style={{ paddingTop: '20px', paddingBottom: '12px' }}>
-          {!isReviewPosted ? (
-            <>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
-                  <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                </div>
-                <button 
-                  onClick={() => setShowGiveOpinionModal(true)}
-                  className="px-4 py-2 rounded-md text-xs font-medium"
-                  style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                >
-                  Give feedback
-                </button>
-              </div>
-              <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
-              
-              {/* Rating Bars */}
-              <div className="space-y-2">
-                <div className="w-full bg-gray-200 rounded-full h-1">
-                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '70%'}}></div>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1">
-                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '60%'}}></div>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1">
-                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '40%'}}></div>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1">
-                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '20%'}}></div>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1">
-                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '10%'}}></div>
-                </div>
-              </div>
-            </>
-          ) : (
+        <div className="lg:hidden px-4 md:px-6 bg-white" style={{ paddingTop: '20px', paddingBottom: '4px' }}>
+          {/* Always show ratings */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
+              <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </div>
+            <button 
+              onClick={() => setShowGiveOpinionModal(true)}
+              className="px-4 py-2 rounded-md text-xs font-medium"
+              style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+            >
+              Give feedback
+            </button>
+          </div>
+          <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
+          
+          {/* Rating Bars */}
+          <div className="space-y-2" style={{ marginBottom: isReviewPosted ? '16px' : '0' }}>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '70%'}}></div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '60%'}}></div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '40%'}}></div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '20%'}}></div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '10%'}}></div>
+            </div>
+          </div>
+          
+          {/* Thank you message and posted review - shown below ratings when posted */}
+          {isReviewPosted && (
             <>
               {/* Thank You Message */}
               <div className="text-center mb-4">
@@ -887,7 +887,7 @@ const SellerProfile: React.FC = () => {
               {/* LEFT COLUMN - Reviews List */}
               <div className="lg:col-span-2">
           {/* Filter Dropdown */}
-                <div className="relative pb-3" style={{ marginBottom: '12px' }} ref={filterDropdownRef}>
+                <div className="relative pb-3 lg:mb-3" style={{ marginBottom: '8px' }} ref={filterDropdownRef}>
             <button 
               onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
                     className="flex items-center hover:opacity-80 transition-opacity"
@@ -895,11 +895,11 @@ const SellerProfile: React.FC = () => {
                   >
                     {/* Filter Icon - Same as mobile search bar */}
                     <svg 
-                      width="20" 
-                      height="20" 
+                      width="16" 
+                      height="16" 
                       viewBox="0 0 20 20" 
                       fill="none"
-                      className="mr-2"
+                      className="mr-1.5 lg:mr-2 lg:w-5 lg:h-5"
                     >
                       {/* Top line with circle */}
                       <line x1="3" y1="6" x2="17" y2="6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
@@ -909,12 +909,12 @@ const SellerProfile: React.FC = () => {
                       <line x1="3" y1="14" x2="17" y2="14" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
                       <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
               </svg>
-                    <span className="text-sm">{selectedFilter}</span>
+                    <span className="text-xs lg:text-sm">{selectedFilter}</span>
             </button>
             
             {/* Dropdown Menu */}
             {filterDropdownOpen && (
-              <div className="absolute top-8 left-0 bg-white border border-gray-200 shadow-lg z-10 p-2" style={{ borderRadius: '12px', minWidth: '280px' }}>
+              <div className="absolute top-8 left-0 bg-white border border-gray-200 shadow-lg z-10 p-2 lg:p-2" style={{ borderRadius: '12px', minWidth: '240px', width: 'calc(100vw - 32px)', maxWidth: '280px' }}>
                 {filterOptions.map((option, index) => {
                   const isSelected = selectedFilter === option.label;
                   return (
@@ -1460,7 +1460,7 @@ const SellerProfile: React.FC = () => {
           {activeTab === 'items' && (
             <>
               {/* Title */}
-              <h2 className="font-medium text-gray-900 mb-4 lg:text-2xl lg:mb-6" style={{ fontSize: '16px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{seller.name} items</h2>
+              <h2 className="font-medium text-gray-900 mb-4 lg:text-2xl lg:mb-6" style={{ fontSize: '16px', fontFamily: 'Bricolage Grotesque, sans-serif', marginTop: '-16px' }}>{seller.name} items</h2>
               
               {/* Product Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
@@ -1502,30 +1502,30 @@ const SellerProfile: React.FC = () => {
                   </div>
                 
                 {/* Product Content */}
-                <div className="flex flex-col" style={{ padding: '0 8px 8px 8px' }}>
+                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
-                    <div className="font-semibold text-gray-900" style={{ fontSize: '14px' }}>
+                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
                       $13.9
                     </div>
                     <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
                       display: 'flex', 
-                      padding: '1px 3px', 
+                      padding: '1px 4px', 
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: '1px', 
-                      fontSize: '8px' 
+                      fontSize: '9px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
+                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
                       <span>Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
                   <h3 className="line-clamp-2 font-medium" style={{ 
-                    fontSize: '11px', 
+                    fontSize: '13px', 
                     color: '#212121',
-                    marginBottom: '3px'
+                    marginBottom: '4px'
                   }}>African Textiles</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
@@ -1533,9 +1533,9 @@ const SellerProfile: React.FC = () => {
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
                       <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                        width: '9px',
-                        height: '9px',
-                        marginRight: '3px'
+                        width: '10px',
+                        height: '10px',
+                        marginRight: '4px'
                       }} />
                       <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                     </div>
@@ -2399,7 +2399,7 @@ const SellerProfile: React.FC = () => {
                   
                   <div className="flex-1 flex justify-end">
                     <div className="flex items-center space-x-1">
-                      <div className="rounded border px-2 py-0.5 lg:px-3 lg:py-1" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9' }}>
+                      <div className="rounded border lg:px-3 lg:py-1" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9', padding: '0 4px' }}>
                         <span className="font-normal text-xs lg:text-base" style={{ color: '#212121' }}>1</span>
                       </div>
                       <span className="font-normal text-xs lg:text-base" style={{ color: '#BABABA' }}>/ 2</span>
