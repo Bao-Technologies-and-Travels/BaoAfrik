@@ -2722,7 +2722,7 @@ const MyListings: React.FC = () => {
                       border: '1px solid #E9E9E9',
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                       padding: '8px',
-                      minWidth: mobileSelectedPrimaryKey === 'commitments' ? '140px' : (mobileSelectedPrimaryKey === 'price' ? '120px' : '100px'),
+                      minWidth: mobileSelectedPrimaryKey === 'commitments' ? '140px' : (mobileSelectedPrimaryKey === 'price' ? '135px' : '100px'),
                       right: mobileSelectedSecondaryKey ? '0' : '160px',
                       transform: 'translateY(68px)'
                     }}

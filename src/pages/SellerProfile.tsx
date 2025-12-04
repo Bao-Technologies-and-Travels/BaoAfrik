@@ -711,11 +711,54 @@ const SellerProfile: React.FC = () => {
       </div>
 
       {/* Mobile and Tablet Bio Section */}
-      <div className="lg:hidden bg-white px-4 md:px-6 py-3 md:py-4">
-        <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Bio</h3>
-        <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+      <div className="lg:hidden bg-white px-4 md:px-6 py-6 md:py-8">
+        <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#6A6A6A' }}>Bio</h3>
+        <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
           {seller.bio}
         </p>
+        
+        {/* Social Media Icons */}
+        <div className="flex items-center space-x-8 mt-6">
+          <a href="#" className="hover:opacity-80 transition-opacity">
+            <img src={whatsappIcon} alt="WhatsApp" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
+          </a>
+          <a href="#" className="hover:opacity-80 transition-opacity">
+            <img src={instagramIcon} alt="Instagram" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
+          </a>
+          <a href="#" className="hover:opacity-80 transition-opacity">
+            <img src={facebookIcon} alt="Facebook" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
+          </a>
+        </div>
+
+        {/* Location, Useful Link, and Member Since */}
+        <div className="space-y-4 mt-6">
+          {/* Location */}
+          <div>
+            <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Location</h4>
+            <div className="flex items-center space-x-2">
+              <img src={locationIcon} alt="Location" className="w-4 h-4" />
+              <span className="text-sm" style={{ color: '#64B5F6' }}>London, United Kingdom</span>
+            </div>
+          </div>
+
+          {/* Useful link */}
+          <div>
+            <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Useful link</h4>
+            <div className="flex items-center space-x-2">
+              <img src={locationIcon} alt="Link" className="w-4 h-4" />
+              <span className="text-sm" style={{ color: '#64B5F6' }}>user-randomlink.com</span>
+            </div>
+          </div>
+
+          {/* Member Since */}
+          <div>
+            <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Member Since</h4>
+            <div className="flex items-center space-x-2">
+              <img src={profileIcon} alt="Profile" className="w-4 h-4" />
+              <span className="text-sm" style={{ color: '#6A6A6A' }}>May 2025</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Reviews and Ratings Section */}
