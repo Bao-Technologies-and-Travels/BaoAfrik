@@ -1299,11 +1299,14 @@ const ProfileSettings: React.FC = () => {
                   <div className="flex items-center justify-between h-16">
                     {/* Desktop - Logo and sidebar button */}
                     <div className="flex items-center justify-between w-full">
-                      <img
-                        src={logo}
-                        alt="bao'Afrik"
-                        className="h-8 w-auto"
-                      />
+                      <Link to='/'>
+                        <img
+                          src={logo}
+                          alt="bao'Afrik"
+                          className="h-8 w-auto"
+                        />
+                      </Link>
+
                       <button className="bg-white hover:bg-gray-50 rounded-lg transition-colors w-10 h-10 flex items-center justify-center ml-auto">
                         <img
                           src={sideIcon}

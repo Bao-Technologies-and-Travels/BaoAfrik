@@ -332,7 +332,7 @@ const Home: React.FC = () => {
 
     const products = getAllProducts();
     products.forEach(p => {
-      if (p.category && !defaultCategories.includes(p.category)) {
+      if (p.category) {
         uniqueCategories.add(p.category);
       }
     });

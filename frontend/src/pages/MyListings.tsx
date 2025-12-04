@@ -20,22 +20,12 @@ import moneyIcon from '../assets/images/pre/money.svg';
 import bulletIcon from '../assets/images/pre/bullet.svg';
 import chartIcon from '../assets/images/pre/chart.svg';
 import mainieIcon from '../assets/images/pre/mainie.svg';
-import redtrashIcon from '../assets/images/pre/redtrash.svg';
-import verityIcon from '../assets/images/pre/verity.svg';
 
 // Import product images 
 import a1 from '../assets/images/pre/a1.png';
 import a2 from '../assets/images/pre/a2.png';
 import a3 from '../assets/images/pre/a3.png';
 import a4 from '../assets/images/pre/a4.png';
-import a5 from '../assets/images/pre/a5.png';
-import a6 from '../assets/images/pre/a6.png';
-import a7 from '../assets/images/pre/a7.png';
-import a8 from '../assets/images/pre/a8.png';
-import a9 from '../assets/images/pre/a9.png';
-import a10 from '../assets/images/pre/a10.png';
-import a11 from '../assets/images/pre/a11.png';
-import a12 from '../assets/images/pre/a12.png';
 
 type ViewMode = 'list' | 'grid';
 type ListingStatus = 'DRAFT' | 'PUBLISHED' | 'SOLD' | 'active' | 'inactive';
@@ -113,48 +103,48 @@ interface DraftListing {
     flag: string;
 }
 
-const initialDraftListings: DraftListing[] = [
-    {
-        id: 'd1',
-        title: 'African Wristband',
-        price: '65.8',
-        currency: 'USD',
-        image: a1,
-        description: 'Warm pepper notes with a mellow finish, the kind of spice you sprinkle on everything once it hits your pantry.',
-        country: 'Cameroon',
-        flag: 'https://flagcdn.com/w20/cm.png'
-    },
-    {
-        id: 'd2',
-        title: 'African Comb',
-        price: '65.8',
-        currency: 'USD',
-        image: a2,
-        description: "Hand-carved teeth that glide through curls without tugging, and a handle that still feels like grandma's favorite comb.",
-        country: 'Ghana',
-        flag: 'https://flagcdn.com/w20/gh.png'
-    },
-    {
-        id: 'd3',
-        title: 'African Wristband',
-        price: '65.8',
-        currency: 'USD',
-        image: a3,
-        description: 'Layered beads that catch the light and instantly make any everyday outfit feel like market day back home.',
-        country: 'Benin',
-        flag: 'https://flagcdn.com/w20/bj.png'
-    },
-    {
-        id: 'd4',
-        title: 'Bitter Cola',
-        price: 'N/A',
-        currency: 'USD',
-        image: a4,
-        description: 'Earthy bitter kola with that citrusy snap—great for chewing, steeping, or tossing into house bitters.',
-        country: 'Nigeria',
-        flag: 'https://flagcdn.com/w20/ng.png'
-    }
-];
+// const initialDraftListings: DraftListing[] = [
+//     {
+//         id: 'd1',
+//         title: 'African Wristband',
+//         price: '65.8',
+//         currency: 'USD',
+//         image: a1,
+//         description: 'Warm pepper notes with a mellow finish, the kind of spice you sprinkle on everything once it hits your pantry.',
+//         country: 'Cameroon',
+//         flag: 'https://flagcdn.com/w20/cm.png'
+//     },
+//     {
+//         id: 'd2',
+//         title: 'African Comb',
+//         price: '65.8',
+//         currency: 'USD',
+//         image: a2,
+//         description: "Hand-carved teeth that glide through curls without tugging, and a handle that still feels like grandma's favorite comb.",
+//         country: 'Ghana',
+//         flag: 'https://flagcdn.com/w20/gh.png'
+//     },
+//     {
+//         id: 'd3',
+//         title: 'African Wristband',
+//         price: '65.8',
+//         currency: 'USD',
+//         image: a3,
+//         description: 'Layered beads that catch the light and instantly make any everyday outfit feel like market day back home.',
+//         country: 'Benin',
+//         flag: 'https://flagcdn.com/w20/bj.png'
+//     },
+//     {
+//         id: 'd4',
+//         title: 'Bitter Cola',
+//         price: 'N/A',
+//         currency: 'USD',
+//         image: a4,
+//         description: 'Earthy bitter kola with that citrusy snap—great for chewing, steeping, or tossing into house bitters.',
+//         country: 'Nigeria',
+//         flag: 'https://flagcdn.com/w20/ng.png'
+//     }
+// ];
 
 const statusOptions = ['Active', 'Inactive', 'Days left'] as const;
 type StatusFilter = 'All Status' | (typeof statusOptions)[number];
@@ -385,9 +375,9 @@ const MyListings: React.FC = () => {
     const [selectedSort, setSelectedSort] = useState<{ label: string; value: SortValue } | null>(null);
     const sortDropdownRef = useRef<HTMLDivElement | null>(null);
     const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
-    const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
-    const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
-    const currentDraftSeed = JSON.stringify(initialDraftListings);
+    const [draftListings, setDraftListings] = useState<DraftListing[]>([]);
+    // const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
+    // const currentDraftSeed = JSON.stringify(initialDraftListings);
     const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
     const moreOptionsRef = useRef<HTMLDivElement | null>(null);
     const [listingToDelete, setListingToDelete] = useState<Listing | null>(null);
@@ -485,6 +475,62 @@ const MyListings: React.FC = () => {
             setLoading(false);
         }
     };
+
+    // fetch drafts on mount
+      useEffect(() => {
+        let mounted = true;
+    
+        const fetchDrafts = async () => {
+          try {
+            const token = localStorage.getItem('accessToken');
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+    
+            if (!res.ok) return;
+    
+            const json = await res.json();
+            if (!mounted || !json.success) return;
+    
+            // trasform API products to DraftListing format
+            const drafts: DraftListing[] = (json.data.products || []).map((product: any) => ({
+              id: product.id,
+              title: product.title || 'Undefined',
+              price: product.price?.toString() || 'N/A',
+              currency: product.currency || 'USD',
+              image: product.images?.[0]?.url || a1,
+              description: product.description || '',
+              country: product.origin || 'Cameroon',
+              flag: `https://flagcdn.com/w20/${getCountryFlagCode(product.origin)}.png`
+            }));
+    
+            setDraftListings(drafts);
+          } catch (e) {
+            console.warn('Failed to load drafts', e);
+          }
+        };
+    
+        fetchDrafts();
+        return () => { mounted = false; };
+      }, []);
+    
+      const getCountryFlagCode = (countryName?: string): string => {
+        if (!countryName) return 'cm';
+        const countryMap: Record<string, string> = {
+          'cameroon': 'cm',
+          'nigeria': 'ng',
+          'ghana': 'gh',
+          'kenya': 'ke',
+          'benin': 'bj',
+          'egypt': 'eg',
+          'morocco': 'ma',
+          'ethiopia': 'et',
+          'south africa': 'za',
+          'tunisia': 'tn',
+          'algeria': 'dz',
+        };
+        return countryMap[countryName.toLowerCase()] || 'cm';
+      };
 
     const processApiResponse = (data: PaginatedProducts) => {
         const mappedListings: Listing[] = data.products.map((product: Product) => ({
@@ -735,7 +781,6 @@ const MyListings: React.FC = () => {
     const shouldShowEmptyState = !hasResults;
     const isSearchNoResultsState = shouldShowEmptyState && isSearchActive;
     const totalListings = listings?.length;
-    const draftCount = 3;
     const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     const handlePrimaryCta = () => {
@@ -868,12 +913,12 @@ const MyListings: React.FC = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    useEffect(() => {
-        if (draftSeedRef.current !== currentDraftSeed) {
-            draftSeedRef.current = currentDraftSeed;
-            setDraftListings(initialDraftListings);
-        }
-    }, [currentDraftSeed]);
+    // useEffect(() => {
+    //     if (draftSeedRef.current !== currentDraftSeed) {
+    //         draftSeedRef.current = currentDraftSeed;
+    //         setDraftListings(initialDraftListings);
+    //     }
+    // }, [currentDraftSeed]);
 
     const getSecondaryKeyByValue = (value: SortValue): string | null => {
         for (const option of sortOptions) {
@@ -934,27 +979,29 @@ const MyListings: React.FC = () => {
                     flex: 1,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: '100px'
+                    height: '100px',
+                    minWidth: 0
                 }}
             >
                 <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '15px' }}>
-                        <span>{draft.title}</span>
-                        <span style={{ color: '#B0B0B0' }}>·</span>
-                        <span style={{ color: '#B0B0B0' }}>
+                    <div className="flex items-center gap-2 min-w-0" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '15px' }}>
+                        <span className="truncate">{draft.title}</span>
+                        <span style={{ color: '#B0B0B0', flexShrink: 0 }}>·</span>
+                        <span style={{ color: '#B0B0B0', flexShrink: 0 }}>
                             {draft.currency} {draft.price}
                         </span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flexShrink: 0">
                         <button
                             type="button"
-                            className="inline-flex items-center gap-1 px-2 py-1"
+                            className="inline-flex items-center gap-1 px-2 py-1 whitespace-nowrap"
                             style={{
                                 backgroundColor: '#F4F4F4',
                                 color: '#939393',
                                 borderRadius: '6px',
                                 fontSize: '11px',
-                                fontFamily: 'Poppins, sans-serif'
+                                fontFamily: 'Poppins, sans-serif',
+                                flexShrink: 0
                             }}
                             onClick={() => handleDraftEdit(draft)}
                         >
@@ -968,7 +1015,8 @@ const MyListings: React.FC = () => {
                                 width: '30px',
                                 height: '30px',
                                 borderRadius: '6px',
-                                backgroundColor: '#FFE9E9'
+                                backgroundColor: '#FFE9E9',
+                                flexShrink: 0
                             }}
                             onClick={() => handleDraftDelete(draft.id)}
                         >
@@ -993,7 +1041,13 @@ const MyListings: React.FC = () => {
                         fontFamily: 'Poppins, sans-serif',
                         fontWeight: 300,
                         marginTop: '0',
-                        textAlign: 'left'
+                        textAlign: 'left',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        wordBreak: 'break-word'
                     }}
                 >
                     {draft.description}
@@ -1055,7 +1109,29 @@ const MyListings: React.FC = () => {
                             paddingRight: '8px'
                         }}
                     >
-                        {draftListings.map((draft) => renderDraftCard(draft))}
+                        {draftListings.length === 0 ? (
+                            // Empty state
+                            <div className="flex flex-col items-center justify-center py-12" style={{ color: '#BABABA' }}>
+                                <svg className="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <p style={{ fontSize: '14px' }}>No drafts yet. Start creating a new listing!</p>
+                            </div>
+                        ) : (
+                            // Drafts list
+                            <div
+                                className="drafts-scroll flex-1"
+                                style={{
+                                    overflowY: 'auto',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '14px',
+                                    paddingRight: '8px'
+                                }}
+                            >
+                                {draftListings.map((draft) => renderDraftCard(draft))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -2359,7 +2435,7 @@ const MyListings: React.FC = () => {
                                                 className="px-2.5 py-0.5 rounded-full font-medium"
                                                 style={{ backgroundColor: '#CFE8FC', color: '#64B5F6', fontSize: '0.72rem' }}
                                             >
-                                                {draftCount}
+                                                {draftListings.length}
                                             </span>
                                         </button>
 

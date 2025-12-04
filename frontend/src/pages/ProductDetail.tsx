@@ -324,6 +324,18 @@ const capitalizeWords = (str: string): string => {
     .trim();
 };
 
+const getCategoryIcon = (category?: string) => {
+  if(!category) return pepperIcon;
+
+  const k = category.toLowerCase();
+  if(k.includes('food') || k.includes('spice')) return pepperIcon;
+  if(k.includes('home') || k.includes('decor')) return home;
+  if(k.includes('fashion') || k.includes('textile')) return fashion;
+  if(k.includes('beauty') || k.includes('wellness')) return beauty;
+  if(k.includes('book') || k.includes('media')) return books;
+  return pepperIcon;
+};
+
 const ProductDetail: React.FC = () => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionClamped, setIsDescriptionClamped] = useState(false);
@@ -1571,7 +1583,7 @@ const ProductDetail: React.FC = () => {
 
                 {/* Category Badge */}
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border text-xs" style={{ borderColor: '#E1E1E1' }}>
-                  <img src={pepperIcon} alt="Category" className="w-3 h-3" />
+                  <img src={getCategoryIcon(product.category)} alt="Category" className="w-3 h-3" />
                   <span className="font-light" style={{ color: '#939393' }}>{product.category ? capitalizeWords(product.category) : 'Uncategorized'}</span>
                 </div>
 
@@ -2121,7 +2133,7 @@ const ProductDetail: React.FC = () => {
 
             {/* Category Badge */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border" style={{ borderColor: '#E1E1E1' }}>
-              <img src={pepperIcon} alt="Pepper" className="w-3 h-3" />
+              <img src={getCategoryIcon(product.category)} alt="Pepper" className="w-3 h-3" />
               <span className="font-light" style={{ color: '#939393' }}>{capitalizeWords(product.category)}</span>
             </div>
 

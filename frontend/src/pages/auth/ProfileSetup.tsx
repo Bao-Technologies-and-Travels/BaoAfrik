@@ -165,11 +165,11 @@ const ProfileSetup: React.FC = () => {
   };
 
   const handleLogoClick = (e: React.MouseEvent) => {
-      if(user && (!user.firstName || !user.lastName)) {
-        e.preventDefault();
-        navigate('/profile-setup');
-      }
-    };
+    if (user && (!user.firstName || !user.lastName)) {
+      e.preventDefault();
+      navigate('/profile-setup');
+    }
+  };
 
   const handleDateChange = (date: Date | null) => {
     if (date) {
@@ -536,11 +536,14 @@ const ProfileSetup: React.FC = () => {
           <div className='lg:hidden bg-white -mx-4 px-4 py-6 mb-8'>
             <div className='text-center'>
               <div className='mx-auto w-16 h-16 mb-6'>
-                <img
-                  src={logoSmall}
-                  alt='BaoAfrik Logo'
-                  className='w-full h-full object-contain'
-                />
+                <Link to='/' aria-label='Go to homepage'>
+                  <img
+                    src={logoSmall}
+                    alt='BaoAfrik Logo'
+                    className='w-full h-full object-contain'
+                    onClick={handleLogoClick}
+                  />
+                </Link>
               </div>
             </div>
           </div>

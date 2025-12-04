@@ -3,25 +3,35 @@ import { body, param, query, validationResult } from 'express-validator';
 import { CustomError } from '@/utils/errorUtils';
 
 // Handle validation results
-export const handleValidationErrors = (req: Request, res: Response, next: NextFunction): void => {
+export const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    const errorMessages: { [key: string]: string } = {};
+  // if (!errors.isEmpty()) {
+  //   const errorMessages: { [key: string]: string } = {};
 
-    errors.array().forEach(error => {
-      if (error.type === 'field') {
-        errorMessages[error.path] = error.msg;
-      }
-    });
+  //   errors.array().forEach(error => {
+  //     if (error.type === 'field') {
+  //       errorMessages[error.path] = error.msg;
+  //     }
+  //   });
 
-    const validationError = new CustomError('Validation failed.Please check your input and try again.', 400);
-    (validationError as any).errors = errorMessages;
-    next(validationError);
-    return;
+  //   const validationError = new CustomError('Validation failed. Please check your input and try again.', 400);
+  //   (validationError as any).errors = errorMessages;
+  //   next(validationError);
+  //   return;
+  // }
+
+  // next();
+  if (errors.isEmpty()) {
+    return next();
   }
 
-  next();
+  return res.status(400).json({
+    success: false,
+    message: 'Validation failed. Please check your input and try again.',
+    errors: errors.array()
+  });
+
 };
 
 // Auth validation rules
@@ -157,9 +167,8 @@ export const validateRefreshToken = [
 // Product validation rules
 export const validateCreateProduct = [
   body('title')
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage('Product name is required')
     .isLength({ min: 3, max: 200 })
     .withMessage('Product name must be between 3 and 200 characters'),
 
@@ -170,7 +179,11 @@ export const validateCreateProduct = [
     .withMessage('Description must not exceed 2000 characters'),
 
   body('price')
+    .optional()
     .isFloat({ min: 0.01 })
+    .if(() => {
+      return true;
+    })
     .withMessage('Price must be a positive number'),
 
   body('currency')
@@ -179,23 +192,23 @@ export const validateCreateProduct = [
     .withMessage('Invalid currency code'),
 
   body('category')
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage('Category is required')
-    .isIn(['beauty', 'books', 'fashion', 'food', 'home'])
+    .isIn([
+      'beauty', 'books', 'fashion', 'food', 'home',
+      'Beauty & Wellness', 'Books & Media', 'Fashion & Textiles', 'Food & Spices', 'Home & Decor'
+    ])
     .withMessage('Invalid category'),
 
   body('location')
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage('Location is required')
     .isLength({ max: 255 })
     .withMessage('Location must not exceed 255 characters'),
 
   body('origin')
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage('Country is required')
     .isLength({ max: 100 })
     .withMessage('Country must not exceed 100 characters'),
 
@@ -203,6 +216,11 @@ export const validateCreateProduct = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Stock must be a non-negative integer'),
+
+  body('status')
+    .optional()
+    .isIn(['DRAFT', 'PUBLISHED', 'SOLD'])
+    .withMessage('Invalid status'),
 
   handleValidationErrors,
 ];
@@ -210,8 +228,7 @@ export const validateCreateProduct = [
 export const validateUpdateProduct = [
   body('title')
     .trim()
-    .notEmpty()
-    .withMessage('Product name is required')
+    .optional()
     .isLength({ min: 3, max: 200 })
     .withMessage('Product name must be between 3 and 200 characters'),
 
@@ -222,6 +239,8 @@ export const validateUpdateProduct = [
     .withMessage('Description must not exceed 2000 characters'),
 
   body('price')
+    .optional()
+    .if(() => true)
     .isFloat({ min: 0.01 })
     .withMessage('Price must be a positive number'),
 
@@ -231,23 +250,23 @@ export const validateUpdateProduct = [
     .withMessage('Invalid currency code'),
 
   body('category')
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage('Category is required')
-    .isIn(['beauty', 'books', 'fashion', 'food', 'home'])
+    .isIn([
+      'beauty', 'books', 'fashion', 'food', 'home',
+      'Beauty & Wellness', 'Books & Media', 'Fashion & Textiles', 'Food & Spices', 'Home & Decor'
+    ])
     .withMessage('Invalid category'),
 
   body('location')
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage('Location is required')
     .isLength({ max: 255 })
     .withMessage('Location must not exceed 255 characters'),
 
   body('origin')
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage('Country is required')
     .isLength({ max: 100 })
     .withMessage('Country must not exceed 100 characters'),
 
@@ -255,6 +274,11 @@ export const validateUpdateProduct = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Stock must be a non-negative integer'),
+
+  body('status')
+    .optional()
+    .isIn(['DRAFT', 'PUBLISHED', 'SOLD'])
+    .withMessage('Invalid status'),
 
   handleValidationErrors,
 ];

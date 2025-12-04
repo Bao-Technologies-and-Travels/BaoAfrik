@@ -8,6 +8,7 @@ import trashIcon from '../assets/images/pre/trash.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
 import draft2Icon from '../assets/images/pre/draft2.svg';
 import flyIcon from '../assets/images/pre/fly.svg';
+
 // import basketIcon from '../assets/images/pre/basket.png';
 import avatarIcon from '../assets/images/pre/avatar.png';
 import notificationIcon from '../assets/images/pre/notification.svg';
@@ -23,9 +24,7 @@ import pathIcon from '../assets/images/pre/Path.svg';
 import path2Icon from '../assets/images/pre/path2.svg';
 import loadIcon from '../assets/images/pre/load.svg';
 import a1 from '../assets/images/pre/a1.png';
-import a2 from '../assets/images/pre/a2.png';
-import a3 from '../assets/images/pre/a3.png';
-import a4 from '../assets/images/pre/a4.png';
+
 import avatar from "../assets/images/logos/avatar.png";
 import logoIcon from "../assets/images/logos/ba-brand-icon-colored.png";
 import messageAvatarIcon from '../assets/images/pre/main.png';
@@ -47,49 +46,6 @@ interface DraftListing {
   flag: string;
 }
 
-const initialDraftListings: DraftListing[] = [
-  {
-    id: 'd1',
-    title: 'African Wristband',
-    price: '65.8',
-    currency: 'USD',
-    image: a1,
-    description: 'Warm pepper notes with a mellow finish, the kind of spice you sprinkle on everything once it hits your pantry.',
-    country: 'Cameroon',
-    flag: 'https://flagcdn.com/w20/cm.png'
-  },
-  {
-    id: 'd2',
-    title: 'African Comb',
-    price: '65.8',
-    currency: 'USD',
-    image: a2,
-    description: 'Hand-carved teeth that glide through coils without snagging. Feels like grandma\'s favorite comb, but made for modern curls.',
-    country: 'Ghana',
-    flag: 'https://flagcdn.com/w20/gh.png'
-  },
-  {
-    id: 'd3',
-    title: 'African Wristband',
-    price: '65.8',
-    currency: 'USD',
-    image: a3,
-    description: 'Layered beads in earthy tones. Wear it solo or stack it—makes any everyday outfit feel like market day.',
-    country: 'Benin',
-    flag: 'https://flagcdn.com/w20/bj.png'
-  },
-  {
-    id: 'd4',
-    title: 'Bitter Cola',
-    price: 'N/A',
-    currency: 'USD',
-    image: a4,
-    description: 'Earthy, slightly bitter with a citrusy snap. Great for chewing, steeping in tea, or making house bitters.',
-    country: 'Nigeria',
-    flag: 'https://flagcdn.com/w20/ng.png'
-  }
-];
-
 const CreateListing: React.FC = () => {
   const navigate = useNavigate();
   const routerLocation = useLocation();
@@ -109,9 +65,8 @@ const CreateListing: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
-  const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
-  const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
-  const currentDraftSeed = JSON.stringify(initialDraftListings);
+  const [draftListings, setDraftListings] = useState<DraftListing[]>([]);
+  const [editingDraftId, setEditingDraftId] = useState<string | null>(null);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -370,6 +325,62 @@ const CreateListing: React.FC = () => {
     return avatar;
   };
 
+  // fetch drafts on mount
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchDrafts = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) return;
+
+        const json = await res.json();
+        if (!mounted || !json.success) return;
+
+        // trasform API products to DraftListing format
+        const drafts: DraftListing[] = (json.data.products || []).map((product: any) => ({
+          id: product.id,
+          title: product.title || 'Undefined',
+          price: product.price?.toString() || 'N/A',
+          currency: product.currency || 'USD',
+          image: product.images?.[0]?.url || a1,
+          description: product.description || '',
+          country: product.origin || 'Cameroon',
+          flag: `https://flagcdn.com/w20/${getCountryFlagCode(product.origin)}.png`
+        }));
+
+        setDraftListings(drafts);
+      } catch (e) {
+        console.warn('Failed to load drafts', e);
+      }
+    };
+
+    fetchDrafts();
+    return () => { mounted = false; };
+  }, []);
+
+  const getCountryFlagCode = (countryName?: string): string => {
+    if (!countryName) return 'cm';
+    const countryMap: Record<string, string> = {
+      'cameroon': 'cm',
+      'nigeria': 'ng',
+      'ghana': 'gh',
+      'kenya': 'ke',
+      'benin': 'bj',
+      'egypt': 'eg',
+      'morocco': 'ma',
+      'ethiopia': 'et',
+      'south africa': 'za',
+      'tunisia': 'tn',
+      'algeria': 'dz',
+    };
+    return countryMap[countryName.toLowerCase()] || 'cm';
+  };
+
   const validateRequiredFields = (): boolean => {
     const missing: string[] = [];
     if (!category || category.trim() === '') missing.push('Category');
@@ -441,11 +452,11 @@ const CreateListing: React.FC = () => {
   };
 
   const categories = [
-    { value: 'beauty', label: 'Beauty & Wellness' },
-    { value: 'books', label: 'Books & Media' },
-    { value: 'fashion', label: 'Fashion & Textiles' },
-    { value: 'food', label: 'Foods & Spices' },
-    { value: 'home', label: 'Home & Decor' }
+    { value: 'Beauty & Wellness', label: 'Beauty & Wellness' },
+    { value: 'Books & Media', label: 'Books & Media' },
+    { value: 'Fashion & Textiles', label: 'Fashion & Textiles' },
+    { value: 'Food & Spices', label: 'Food & Spices' },
+    { value: 'Home & Decor', label: 'Home & Decor' }
   ];
 
   const saleTypes = [
@@ -578,8 +589,25 @@ const CreateListing: React.FC = () => {
     setIsDraftsModalOpen(false);
   };
 
-  const handleDraftDelete = (draftId: string) => {
-    setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
+  const handleDraftDelete = async (draftId: string) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${draftId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        addToast({ type: 'error', title: 'Delete failed', message: 'Failed to delete draft', duration: 2000 });
+        return;
+      }
+
+      setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
+      addToast({ type: 'success', title: 'Deleted', message: 'Draft deleted successfully', duration: 2000 });
+    } catch (e) {
+      console.error('Delete draft error', e);
+      addToast({ type: 'error', title: 'Error', message: 'Failed to delete draft', duration: 2000 });
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -827,90 +855,84 @@ const CreateListing: React.FC = () => {
   };
 
   const handleSaveDraft = async () => {
+    setIsLoading(true);
+
     try {
       const token = localStorage.getItem('accessToken');
 
-      const payload = {
-        title,
-        description,
-        price: price,
+      const priceClean = typeof price === 'string' ? price.trim() : String(price);
+      const priceNum = priceClean === '' || priceClean.toLowerCase() === 'n/a' ? null : Number(priceClean.replace(/,/g, ''));
+      const qty = quantity ? Number(quantity) : 0;
+
+      const payload: any = {
+        title: title?.trim() || '',
+        description: description?.trim() || '',
+        price: priceNum,
         currency,
-        quantity,
-        category,
-        origin,
-        location,
+        quantity: qty,
+        category: category || '',
+        origin: origin || '',
+        location: location || '',
         saleType,
-        deliveryAvailable
+        deliveryAvailable: Boolean(deliveryAvailable),
+        status: 'DRAFT'
       };
 
-      let response;
-      if (isEditMode && id) {
-        // Update existing product
-        response = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(payload)
-        });
-      } else {
-        // Create new product
-        response = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(payload)
-        });
-      }
+      const url = isEditMode && id ? `${process.env.REACT_APP_API_URL}/products/${id}` : `${process.env.REACT_APP_API_URL}/products`;
+      const method = isEditMode && id ? 'PUT' : 'POST';
 
-      const result = await response.json();
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json().catch(() => ({ success: false, message: 'Invalid server response' }));
 
       if (!response.ok) {
-        throw new Error(result.message || `Failed to ${isEditMode ? 'update' : 'save'} draft`);
+        const serverMsg = result.message || 'Failed to save draft';
+        const serverErrors = result.errors || result.validation || result.details;
+        addToast({
+          type: 'error',
+          title: 'Failed to save draft',
+          message: serverErrors ? `${serverMsg}: ${JSON.stringify(serverErrors)}` : serverMsg,
+          duration: 2000
+        });
+        setIsLoading(false);
+        return;
       }
 
       if (result.success) {
         const productId = result.data.id || id;
+        const savedProduct = result.data;
 
         // Upload new images if any
         if (images.length > 0 && productId) {
-          await uploadProductImages(productId, images);
+          try {
+            await uploadProductImages(productId, images)
+          } catch (imgErr) {
+            console.warn('Image upload failed but draft was saved', imgErr);
+          }
         }
 
-        // if editing a published product, set it to draft
-        if (isEditMode && productId && productData && (productData as any).status === 'PUBLISHED') {
-          try {
-            const statusRep = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}/status`, {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify({ status: 'DRAFT' })
-            });
+        const newDraft: DraftListing = {
+          id: productId,
+          title: savedProduct.title || title || 'Untitled',
+          price: savedProduct.price?.toString() || price || 'N/A',
+          currency: savedProduct.currency || currency,
+          image: savedProduct.images?.[0]?.url || (imageUrls.length > 0 ? imageUrls[0] : a1),
+          description: savedProduct.description || description,
+          country: savedProduct.origin || origin || 'Cameroon',
+          flag: `https://flagcdn.com/w20/${getCountryFlagCode(savedProduct.origin || origin)}.png`
+        };
 
-            if (!statusRep.ok) {
-              const statusResult = await statusRep.json().catch(() => ({}));
-              addToast({
-                type: 'error',
-                title: 'Action failed',
-                message: 'Failed to save product as draft',
-                duration: 2000
-              });
-            } else {
-              setProductData((prev: any) => prev ? { ...prev, status: 'DRAFT' } : prev);
-            }
-          } catch (err) {
-            addToast({
-              type: 'error',
-              title: 'Action failed',
-              message: 'Unable to save product as draft',
-              duration: 2000
-            });
-          }
+        if (isEditMode && id) {
+          setDraftListings(prev => prev.map(d => d.id === id ? newDraft : d));
+        } else {
+          setDraftListings(prev => [newDraft, ...prev]);
         }
 
         // Show success message
@@ -926,7 +948,7 @@ const CreateListing: React.FC = () => {
       addToast({
         type: 'error',
         title: 'Action Failed',
-        message: `Failed to ${isEditMode ? 'update' : 'save'} draft: ${error.message}`,
+        message: (error && (error.message || String(error))) || `Failed to ${isEditMode ? 'update' : 'save'} draft`,
         duration: 2000
       });
     }
@@ -939,57 +961,84 @@ const CreateListing: React.FC = () => {
     try {
       const token = localStorage.getItem('accessToken');
 
-      // First create the product as draft
-      const productData = {
-        title,
-        description,
-        price: price,
-        currency,
-        quantity,
-        category,
-        origin,
-        location,
-        saleType,
-        deliveryAvailable
-      };
-
-      let createResponse: Response;
-      let productId: string | undefined = isEditMode ? id : undefined;
-
-      if (isEditMode && id) {
-        // Update existing product
-        createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(productData)
-        });
-        productId = id;
-      } else {
-        // Create new product
-        createResponse = await fetch(`${process.env.REACT_APP_API_URL}/products`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(productData)
-        });
+      // Coerce types / sanitize fields to match backend validation
+      const priceClean = typeof price === 'string' ? price.trim() : String(price);
+      const priceNum = priceClean === '' || priceClean.toLowerCase() === 'n/a' ? null : Number(priceClean.replace(/,/g, ''));
+      if (priceNum !== null && Number.isNaN(priceNum)) {
+        addToast({ type: 'error', title: 'Invalid price', message: 'Please enter a valid numeric price or leave blank for N/A', duration: 2000 });
+        setIsLoading(false);
+        return;
+      }
+      const qty = Number(quantity) || 0;
+      if (!Number.isFinite(qty) || qty < 0) {
+        addToast({ type: 'error', title: 'Invalid quantity', message: 'Please enter a valid quantity', duration: 2000 });
+        setIsLoading(false);
+        return;
       }
 
-      const createResult = await createResponse.json();
+      // Ensure category is one of allowed values
+      const allowedCategories = categories.map(c => c.value);
+      if (!category || !allowedCategories.includes(category)) {
+        addToast({ type: 'error', title: 'Invalid category', message: 'Please choose a valid category', duration: 2000 });
+        setIsLoading(false);
+        return;
+      }
+
+      // Ensure origin is valid (optional)
+      if (origin && !countries.some(c => c.value === origin)) {
+        addToast({ type: 'error', title: 'Invalid origin', message: 'Please choose a valid origin country', duration: 2000 });
+        setIsLoading(false);
+        return;
+      }
+
+      // Build payload with correct types (omit undefined/null if required)
+      const payload: any = {
+        title: title?.trim() || '',
+        description: description?.trim() || '',
+        price: priceNum,
+        currency,
+        quantity: qty,
+        category,
+        origin: origin || undefined,
+        location: location || undefined,
+        saleType,
+        deliveryAvailable: Boolean(deliveryAvailable)
+      };
+
+      const url = isEditMode && id ? `${process.env.REACT_APP_API_URL}/products/${id}` : `${process.env.REACT_APP_API_URL}/products`;
+      const method = isEditMode && id ? 'PUT' : 'POST';
+
+      const createResponse = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const createResult = await createResponse.json().catch(() => ({ success: false, message: 'Invalid server response' }));
+      console.debug('Create product response', createResponse.status, createResult);
 
       if (!createResponse.ok) {
-        throw new Error(createResult.message || `Failed to ${isEditMode ? 'update' : 'create'} product`);
+        // Show validation errors if provided
+        const serverMsg = createResult.message || 'Failed to create product';
+        const serverErrors = createResult.errors || createResult.validation || createResult.details;
+        addToast({
+          type: 'error',
+          title: 'Failed to post listing',
+          message: serverErrors ? `${serverMsg}: ${JSON.stringify(serverErrors)}` : serverMsg,
+          duration: 2000
+        });
+        setIsLoading(false);
+        return;
       }
 
       if (createResult.success) {
-        const productId = createResult.data.id;
+        const productId = createResult.data?.id || id;
 
-        // Upload images
-        if (images.length > 0) {
+        // Upload images if present
+        if (images.length > 0 && productId) {
           await uploadProductImages(productId, images);
         }
 
@@ -1003,27 +1052,27 @@ const CreateListing: React.FC = () => {
           body: JSON.stringify({ status: 'PUBLISHED' })
         });
 
-        const publishResult = await publishResponse.json();
-
+        const publishResult = await publishResponse.json().catch(() => ({ success: false, message: 'Invalid publish response' }));
         if (!publishResponse.ok) {
-          throw new Error(publishResult.message || 'Failed to publish product');
+          addToast({ type: 'error', title: 'Publish failed', message: publishResult.message || 'Failed to publish product', duration: 2000 });
+          setIsLoading(false);
+          return;
         }
 
-        if (publishResult.success) {
-          addToast({
-            type: "success",
-            title: 'Action Completed',
-            message: `Listing ${isEditMode ? 'updated' : 'posted'} successfully!`,
-            duration: 2000
-          });
-          navigate('/my-listings');
-        }
+        addToast({
+          type: "success",
+          title: 'Action Completed',
+          message: `Listing ${isEditMode ? 'updated' : 'posted'} successfully!`,
+          duration: 2000
+        });
+        navigate('/my-listings');
       }
     } catch (error: any) {
+      console.error('Post listing error', error);
       addToast({
         type: 'error',
         title: 'Action Failed',
-        message: error || "Failed to post listing. Please try again.",
+        message: (error && (error.message || String(error))) || 'Failed to post listing. Please try again.',
         duration: 2000
       });
     } finally {
@@ -1074,13 +1123,6 @@ const CreateListing: React.FC = () => {
   }, [isLanguageDropdownOpen, isMenuDropdownOpen, isCategoryDropdownOpen, isOriginDropdownOpen, isSaleTypeDropdownOpen, isCurrencyDropdownOpen]);
 
   useEffect(() => {
-    if (draftSeedRef.current !== currentDraftSeed) {
-      draftSeedRef.current = currentDraftSeed;
-      setDraftListings(initialDraftListings);
-    }
-  }, [currentDraftSeed]);
-
-  useEffect(() => {
     const stateDraft = (routerLocation.state as { draft?: Record<string, string> } | null)?.draft;
     if (stateDraft) {
       applyPrefillToForm(stateDraft);
@@ -1117,27 +1159,29 @@ const CreateListing: React.FC = () => {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          height: '100px'
+          height: '100px',
+          minWidth: 0
         }}
       >
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '15px' }}>
+          <div className="flex items-center gap- 2 min-w-0" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '15px' }}>
             <span>{draft.title}</span>
-            <span style={{ color: '#B0B0B0' }}>·</span>
-            <span style={{ color: '#B0B0B0' }}>
+            <span style={{ color: '#B0B0B0', flexShrink: 0 }}>·</span>
+            <span style={{ color: '#B0B0B0', flexShrink: 0 }}>
               {draft.currency} {draft.price}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flexShrink: 0">
             <button
               type="button"
-              className="inline-flex items-center gap-1 px-2 py-1"
+              className="inline-flex items-center gap-1 px-2 py-1 whitespace-nowrap"
               style={{
                 backgroundColor: '#F4F4F4',
                 color: '#939393',
                 borderRadius: '6px',
                 fontSize: '11px',
-                fontFamily: 'Poppins, sans-serif'
+                fontFamily: 'Poppins, sans-serif',
+                flexShrink: 0
               }}
               onClick={() => handleDraftApply(draft)}
             >
@@ -1151,7 +1195,8 @@ const CreateListing: React.FC = () => {
                 width: '30px',
                 height: '30px',
                 borderRadius: '6px',
-                backgroundColor: '#FFE9E9'
+                backgroundColor: '#FFE9E9',
+                flexShrink: 0
               }}
               onClick={() => handleDraftDelete(draft.id)}
             >
@@ -1176,7 +1221,13 @@ const CreateListing: React.FC = () => {
             fontFamily: 'Poppins, sans-serif',
             fontWeight: 300,
             marginTop: '0',
-            textAlign: 'left'
+            textAlign: 'left',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            wordBreak: 'break-word'
           }}
         >
           {draft.description}
@@ -1219,12 +1270,17 @@ const CreateListing: React.FC = () => {
               style={{
                 color: '#BABABA',
                 fontSize: '26px',
-                lineHeight: 1
+                lineHeight: 1,
+                cursor: 'pointer',
+                background: 'none',
+                border: 'none',
+                padding: 0
               }}
             >
               ×
             </button>
           </div>
+
           <div
             className="drafts-scroll"
             style={{
@@ -1236,7 +1292,29 @@ const CreateListing: React.FC = () => {
               paddingRight: '8px'
             }}
           >
-            {draftListings.map((draft) => renderDraftCard(draft))}
+            {draftListings.length === 0 ? (
+              // Empty state
+              <div className="flex flex-col items-center justify-center py-12" style={{ color: '#BABABA' }}>
+                <svg className="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p style={{ fontSize: '14px' }}>No drafts yet. Start creating a new listing!</p>
+              </div>
+            ) : (
+              // Drafts list
+              <div
+                className="drafts-scroll flex-1"
+                style={{
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
+                  paddingRight: '8px'
+                }}
+              >
+                {draftListings.map((draft) => renderDraftCard(draft))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -2618,7 +2696,7 @@ const CreateListing: React.FC = () => {
                                     bottom: '4px',
                                     backgroundColor: '#F0F8FE',
                                     borderRadius: '8px',
-                                    zIndex: -1
+                                    zIndex: 0
                                   }}
                                 />
                               )}
