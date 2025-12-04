@@ -1199,15 +1199,15 @@ const MyListings: React.FC = () => {
   // Render individual listing card content
   const renderListingCard = (listing: Listing) => (
     <>
-      {/* Product Image */}
+          {/* Product Image */}
       <div className={`aspect-square relative overflow-hidden mb-1 sm:mb-2`} style={{ borderRadius: '12px', ...(isMobile ? { padding: '2px' } : {}) }}>
-        <img
-          src={listing.image}
-          alt={listing.title}
-          className="w-full h-full object-cover"
+            <img
+              src={listing.image}
+              alt={listing.title}
+              className="w-full h-full object-cover"
           style={{ borderRadius: '12px', ...(isMobile ? { transform: 'scaleX(1.0) scaleY(0.92)' } : {}) }}
-        />
-      </div>
+            />
+          </div>
 
           {/* Product Content */}
           <div className="px-2 sm:px-3 pb-2 sm:pb-3">
@@ -1434,11 +1434,11 @@ const MyListings: React.FC = () => {
                     {renderListingCard(listing)}
                   </div>
                 ))}
-              </div>
-            </div>
-          ))}
+          </div>
         </div>
-      );
+      ))}
+    </div>
+  );
     }
 
     // Default grid without grouping

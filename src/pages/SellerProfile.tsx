@@ -75,6 +75,7 @@ const SellerProfile: React.FC = () => {
   const [userReviewText, setUserReviewText] = useState('');
   const [isReviewPosted, setIsReviewPosted] = useState(false);
   const [postedReview, setPostedReview] = useState<{rating: number; text: string; date: string} | null>(null);
+  const [showGiveOpinionModal, setShowGiveOpinionModal] = useState(false);
 
   // Update active tab when URL parameter changes
   useEffect(() => {
@@ -576,24 +577,29 @@ const SellerProfile: React.FC = () => {
             className="w-full h-full object-cover"
           />
           
+          {/* Logo Icon - Center */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/4">
+            <img src={logoIcon} alt="Logo" className="w-12 h-12 opacity-20" />
+          </div>
+          
           {/* Back Button - Top Left */}
           <button 
             onClick={() => navigate(-1)}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white flex items-center justify-center"
+            className="absolute top-4 left-4 w-8 h-8 rounded-full bg-white flex items-center justify-center"
             style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
             aria-label="Back"
           >
-            <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+            <img src={backArrowIcon} alt="Back" className="w-3.5 h-3.5" />
           </button>
 
           {/* More Options Button - Top Right */}
           <button 
             onClick={() => setShowOptionsModal(true)}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white flex items-center justify-center"
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white flex items-center justify-center"
             style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
             aria-label="More options"
           >
-            <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+            <svg width="14" height="4" viewBox="0 0 24 4" fill="none">
               <circle cx="4" cy="2" r="2" fill="#171717" />
               <circle cx="12" cy="2" r="2" fill="#171717" />
               <circle cx="20" cy="2" r="2" fill="#171717" />
@@ -616,47 +622,38 @@ const SellerProfile: React.FC = () => {
           
           {/* Name and Info - Below Avatar */}
           <div className="pt-10 md:pt-12">
-            <div className="flex items-center gap-2 mb-2">
-              <h1 className="text-base md:text-lg font-semibold text-gray-900">{seller.name}</h1>
+            <div className="flex items-center gap-1.5 mb-2">
+              <h1 className="text-sm md:text-base font-semibold text-gray-900">{seller.name}</h1>
               {seller.isVerified && (
-                <div className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded-md text-xs whitespace-nowrap" style={{ backgroundColor: '#EDFBF0' }}>
-                  <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
+                <div className="inline-flex items-center space-x-0.5 px-1 py-0.5 rounded-md whitespace-nowrap" style={{ backgroundColor: '#EDFBF0', fontSize: '10px' }}>
+                  <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
                   <span className="font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
                 </div>
               )}
             </div>
             
-            {/* Location, Member Info, and Rating */}
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex flex-col space-y-1">
-                {/* Location */}
-                <div className="flex items-center space-x-1 text-sm text-gray-600">
-                  <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span>London, United Kingdom</span>
-                </div>
-                
-                {/* Member Info */}
-                <div className="flex items-center space-x-1 text-sm text-gray-600">
-                  <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Member since 2025</span>
-                </div>
+            {/* Location and Member Info - Inline without subtitles */}
+            <div className="flex flex-col space-y-1 mb-3">
+              {/* Location */}
+              <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
+                <img src={locationIcon} alt="Location" className="w-3.5 h-3.5" />
+                <span style={{ color: '#64B5F6' }}>London, United Kingdom</span>
               </div>
               
-              {/* Rating - Right Side */}
-              <div className="flex flex-col items-end">
-                <div className="flex items-center space-x-1 mb-1">
-                  <span className="text-lg font-semibold text-gray-900">4.3</span>
-                  <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                </div>
-                <span className="text-sm text-gray-500">Reviews (456)</span>
+              {/* Member Info */}
+              <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
+                <img src={profileIcon} alt="Profile" className="w-3.5 h-3.5" />
+                <span>Member since 2025</span>
               </div>
+            </div>
+
+            {/* Rating - Right Side */}
+            <div className="flex items-center space-x-1 mb-3">
+              <span className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</span>
+              <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <span className="text-sm text-gray-500">Reviews (456)</span>
             </div>
           </div>
         </div>
@@ -726,41 +723,11 @@ const SellerProfile: React.FC = () => {
       </div>
 
       {/* Mobile and Tablet Bio Section */}
-      <div className="lg:hidden bg-white px-4 md:px-6 py-4 md:py-5">
-        <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#6A6A6A' }}>Bio</h3>
+      <div className="lg:hidden bg-white px-4 md:px-6 py-3 md:py-4">
+        <h3 className="text-lg font-semibold mb-1" style={{ color: '#6A6A6A' }}>Bio</h3>
         <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
-          {seller.bio}
+          Passionate farmer and entrepreneur specializing in organic produce and traditional farming methods.
         </p>
-
-        {/* Location, Useful Link, and Member Since */}
-        <div className="space-y-4 mt-6">
-          {/* Location */}
-          <div>
-            <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Location</h4>
-            <div className="flex items-center space-x-2">
-              <img src={locationIcon} alt="Location" className="w-4 h-4" />
-              <span className="text-sm" style={{ color: '#64B5F6' }}>London, United Kingdom</span>
-            </div>
-          </div>
-
-          {/* Useful link */}
-          <div>
-            <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Useful link</h4>
-            <div className="flex items-center space-x-2">
-              <img src={locationIcon} alt="Link" className="w-4 h-4" />
-              <span className="text-sm" style={{ color: '#64B5F6' }}>user-randomlink.com</span>
-            </div>
-          </div>
-
-          {/* Member Since */}
-          <div>
-            <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Member Since</h4>
-            <div className="flex items-center space-x-2">
-              <img src={profileIcon} alt="Profile" className="w-4 h-4" />
-              <span className="text-sm" style={{ color: '#6A6A6A' }}>May 2025</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Reviews and Ratings Section */}
@@ -803,6 +770,7 @@ const SellerProfile: React.FC = () => {
               </svg>
             </div>
             <button 
+              onClick={() => setShowGiveOpinionModal(true)}
               className="px-4 py-2 rounded-md text-xs font-medium"
               style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
             >
@@ -839,7 +807,7 @@ const SellerProfile: React.FC = () => {
               {/* LEFT COLUMN - Reviews List */}
               <div className="lg:col-span-2">
           {/* Filter Dropdown */}
-                <div className="relative mb-6 pb-3" ref={filterDropdownRef}>
+                <div className="relative pb-3" style={{ marginBottom: '20px' }} ref={filterDropdownRef}>
             <button 
               onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
                     className="flex items-center hover:opacity-80 transition-opacity"
