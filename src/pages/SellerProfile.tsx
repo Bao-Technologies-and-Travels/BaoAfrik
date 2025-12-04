@@ -632,28 +632,32 @@ const SellerProfile: React.FC = () => {
               )}
             </div>
             
-            {/* Location and Member Info - Inline without subtitles */}
-            <div className="flex flex-col space-y-1 mb-3">
-              {/* Location */}
-              <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
-                <img src={locationIcon} alt="Location" className="w-3.5 h-3.5" />
-                <span style={{ color: '#64B5F6' }}>London, United Kingdom</span>
+            {/* Member Info and Location with Rating */}
+            <div className="flex items-start justify-between" style={{ marginBottom: '16px' }}>
+              <div className="flex flex-col" style={{ gap: '6px' }}>
+                {/* Member Info */}
+                <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
+                  <img src={profileIcon} alt="Profile" className="w-3.5 h-3.5" />
+                  <span>Member since 2025</span>
+                </div>
+                
+                {/* Location */}
+                <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A', marginTop: '4px' }}>
+                  <img src={locationIcon} alt="Location" className="w-3.5 h-3.5" />
+                  <span style={{ color: '#64B5F6' }}>London, United Kingdom</span>
+                </div>
               </div>
-              
-              {/* Member Info */}
-              <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
-                <img src={profileIcon} alt="Profile" className="w-3.5 h-3.5" />
-                <span>Member since 2025</span>
-              </div>
-            </div>
 
-            {/* Rating - Right Side */}
-            <div className="flex items-center space-x-1 mb-3">
-              <span className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</span>
-              <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              <span className="text-sm text-gray-500">Reviews (456)</span>
+              {/* Rating - Far Right */}
+              <div className="flex flex-col items-end">
+                <div className="flex items-center space-x-1 mb-1">
+                  <span className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</span>
+                  <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </div>
+                <span className="text-sm text-gray-500">Reviews (456)</span>
+              </div>
             </div>
           </div>
         </div>
@@ -723,8 +727,8 @@ const SellerProfile: React.FC = () => {
       </div>
 
       {/* Mobile and Tablet Bio Section */}
-      <div className="lg:hidden bg-white px-4 md:px-6 py-3 md:py-4">
-        <h3 className="text-lg font-semibold mb-1" style={{ color: '#6A6A6A' }}>Bio</h3>
+      <div className="lg:hidden bg-white px-4 md:px-6 pb-3 md:pb-4">
+        <h3 className="text-base font-semibold mb-1" style={{ color: '#6A6A6A' }}>Bio</h3>
         <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
           Passionate farmer and entrepreneur specializing in organic produce and traditional farming methods.
         </p>
@@ -807,7 +811,7 @@ const SellerProfile: React.FC = () => {
               {/* LEFT COLUMN - Reviews List */}
               <div className="lg:col-span-2">
           {/* Filter Dropdown */}
-                <div className="relative pb-3" style={{ marginBottom: '20px' }} ref={filterDropdownRef}>
+                <div className="relative pb-3" style={{ marginBottom: '12px' }} ref={filterDropdownRef}>
             <button 
               onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
                     className="flex items-center hover:opacity-80 transition-opacity"
@@ -2363,6 +2367,89 @@ const SellerProfile: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Mobile Give Opinion Modal */}
+      {showGiveOpinionModal && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="lg:hidden fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={() => setShowGiveOpinionModal(false)}
+          />
+          
+          {/* Modal */}
+          <div className="lg:hidden fixed inset-x-0 z-50 flex items-end justify-center" style={{ top: '15%', bottom: '0' }}>
+            <div 
+              className="bg-white w-full max-w-full relative"
+              style={{ borderRadius: '30px', maxHeight: '90vh', overflowY: 'auto' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Handle */}
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full" style={{ backgroundColor: '#E1E1E1' }}></div>
+              
+              {/* Content */}
+              <div className="px-5 pb-8 pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Give your opinion</h3>
+                <p className="text-xs mb-6 text-center" style={{ color: '#B0B0B0' }}>Share your opinion about this user and help others learn a bit more about them.</p>
+                
+                {/* Star Rating */}
+                <div className="flex items-center justify-center space-x-1 mb-2">
+                  {[1,2,3,4,5].map((star) => (
+                    <button 
+                      key={star}
+                      onClick={() => setUserRating(star)}
+                      className="focus:outline-none hover:scale-110 transition-transform"
+                    >
+                      <svg 
+                        className="w-7 h-7" 
+                        viewBox="0 0 24 24"
+                        fill={userRating >= star ? '#FBBC05' : 'none'}
+                        stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
+                        strokeWidth="1.5"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="text-center mb-6" style={{ color: userRating > 0 ? '#64B5F6' : '#D9D9D9', fontSize: '10px' }}>
+                  {userRating > 0 ? `${userRating}.0` : 'give a note'}
+                </div>
+                
+                {/* Review Text Input */}
+                <textarea
+                  value={userReviewText}
+                  onChange={(e) => setUserReviewText(e.target.value)}
+                  placeholder="What do you think about this seller?"
+                  className="w-full border rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-1"
+                  style={{ borderColor: '#E1E1E1', minHeight: '120px', color: '#212121' }}
+                />
+                
+                {/* Submit Button */}
+                <button 
+                  onClick={() => {
+                    if (userRating > 0 && userReviewText.trim()) {
+                      setPostedReview({
+                        rating: userRating,
+                        text: userReviewText,
+                        date: new Date().toLocaleDateString()
+                      });
+                      setIsReviewPosted(true);
+                      setShowGiveOpinionModal(false);
+                    }
+                  }}
+                  className="w-full py-3 mt-4 font-normal text-white transition-colors"
+                  style={{ backgroundColor: '#F9A825', borderRadius: '12px' }}
+                >
+                  Submit Review
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Share Profile Modal */}
       {showShareModal && (
