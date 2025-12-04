@@ -197,64 +197,69 @@ const SellerProfile: React.FC = () => {
     const selection = reviewHelpfulness[itemId];
     const counts = reviewHelpfulCounts[itemId] || { yes: 0, no: 0 };
 
-    return (
-      <div
-        className={`flex items-center space-x-3 ${fullWidth ? 'w-full' : ''} ${alignment === 'right' ? 'justify-end' : 'justify-start'}`}
-      >
-        {!selection && (
-          <span className="text-xs" style={{ color: '#212121' }}>
-            {questionText}
-          </span>
-        )}
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => handleHelpfulnessClick(itemId, 'yes')}
-            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-            style={{
-              border: `1px solid ${selection === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-              backgroundColor: selection === 'yes' ? '#F0F8FE' : 'white'
-            }}
-          >
-            <span className="text-xs" style={{ color: selection === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-              {selection ? counts.yes : 'Yes'}
+      return (
+        <div
+          className={`flex items-center ${fullWidth ? 'w-full' : ''} ${alignment === 'right' ? 'justify-end' : 'justify-start'}`}
+          style={{ gap: '10px' }}
+        >
+          {!selection && (
+            <span style={{ fontSize: '10px', color: '#212121' }}>
+              {questionText}
             </span>
-            <img
-              src={likeIcon}
-              alt="Like"
-              className="w-3.5 h-3.5"
+          )}
+          <div className="flex items-center" style={{ gap: '6px' }}>
+            <button
+              onClick={() => handleHelpfulnessClick(itemId, 'yes')}
+              className="flex items-center rounded-full transition-colors"
               style={{
-                filter: selection === 'yes'
-                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                  : 'none'
+                border: `1px solid ${selection === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
+                backgroundColor: selection === 'yes' ? '#F0F8FE' : 'white',
+                padding: '3px 8px',
+                gap: '4px'
               }}
-            />
-          </button>
-          <button
-            onClick={() => handleHelpfulnessClick(itemId, 'no')}
-            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-            style={{
-              border: `1px solid ${selection === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-              backgroundColor: selection === 'no' ? '#F0F8FE' : 'white'
-            }}
-          >
-            <span className="text-xs" style={{ color: selection === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-              {selection ? counts.no : 'No'}
-            </span>
-            <img
-              src={dislikeIcon}
-              alt="Dislike"
-              className="w-3.5 h-3.5"
+            >
+              <span style={{ fontSize: '10px', color: selection === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
+                {selection ? counts.yes : 'Yes'}
+              </span>
+              <img
+                src={likeIcon}
+                alt="Like"
+                className="w-2.5 h-2.5"
+                style={{
+                  filter: selection === 'yes'
+                    ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                    : 'none'
+                }}
+              />
+            </button>
+            <button
+              onClick={() => handleHelpfulnessClick(itemId, 'no')}
+              className="flex items-center rounded-full transition-colors"
               style={{
-                filter: selection === 'no'
-                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                  : 'none'
+                border: `1px solid ${selection === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
+                backgroundColor: selection === 'no' ? '#F0F8FE' : 'white',
+                padding: '3px 8px',
+                gap: '4px'
               }}
-            />
-          </button>
+            >
+              <span style={{ fontSize: '10px', color: selection === 'no' ? '#64B5F6' : '#6A6A6A' }}>
+                {selection ? counts.no : 'No'}
+              </span>
+              <img
+                src={dislikeIcon}
+                alt="Dislike"
+                className="w-2.5 h-2.5"
+                style={{
+                  filter: selection === 'no'
+                    ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                    : 'none'
+                }}
+              />
+            </button>
+          </div>
         </div>
-      </div>
-    );
-  };
+      );
+    };
 
   // Mock seller data - in real app this would come from API
   const seller = {
@@ -415,7 +420,7 @@ const SellerProfile: React.FC = () => {
           <div className="relative">
             <div className="h-64 rounded-2xl relative overflow-hidden" style={{ backgroundColor: '#FEF6E9' }}>
               {/* Decorative Logo Watermark */}
-              <div className="absolute" style={{ left: '50%', top: '15%', transform: 'translate(-50%, -50%)', width: '150%', height: '170%' }}>
+              <div className="absolute" style={{ left: '50%', top: '35%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%' }}>
                 <div 
                   style={{
                     position: 'absolute',
@@ -629,8 +634,8 @@ const SellerProfile: React.FC = () => {
             </div>
             
             {/* Member Info and Location with Rating */}
-            <div className="flex items-start justify-between" style={{ marginBottom: '16px', marginTop: '6px' }}>
-              <div className="flex flex-col" style={{ gap: '8px' }}>
+            <div className="flex items-start justify-between" style={{ marginBottom: '16px', marginTop: '12px' }}>
+              <div className="flex flex-col" style={{ gap: '10px' }}>
                 {/* Member Info */}
                 <div className="flex items-center space-x-1.5" style={{ fontSize: '12px', color: '#6A6A6A' }}>
                   <img src={profileIcon} alt="Profile" className="w-3.5 h-3.5" />
@@ -767,41 +772,110 @@ const SellerProfile: React.FC = () => {
         {/* Mobile Rating Summary - Right after tabs */}
         {activeTab === 'reviews' && (
         <div className="lg:hidden px-4 md:px-6 bg-white" style={{ paddingTop: '20px', paddingBottom: '12px' }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
-              <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-            </div>
-            <button 
-              onClick={() => setShowGiveOpinionModal(true)}
-              className="px-4 py-2 rounded-md text-xs font-medium"
-              style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-            >
-              Give feedback
-            </button>
-          </div>
-          <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
-          
-          {/* Rating Bars */}
-          <div className="space-y-2">
-            <div className="w-full bg-gray-200 rounded-full h-1">
-              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '70%'}}></div>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-1">
-              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '60%'}}></div>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-1">
-              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '40%'}}></div>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-1">
-              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '20%'}}></div>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-1">
-              <div className="bg-yellow-400 h-1 rounded-full" style={{width: '10%'}}></div>
-            </div>
-          </div>
+          {!isReviewPosted ? (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
+                  <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                </div>
+                <button 
+                  onClick={() => setShowGiveOpinionModal(true)}
+                  className="px-4 py-2 rounded-md text-xs font-medium"
+                  style={{ color: '#64B5F6', backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                >
+                  Give feedback
+                </button>
+              </div>
+              <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
+              
+              {/* Rating Bars */}
+              <div className="space-y-2">
+                <div className="w-full bg-gray-200 rounded-full h-1">
+                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '70%'}}></div>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1">
+                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '60%'}}></div>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1">
+                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '40%'}}></div>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1">
+                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '20%'}}></div>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1">
+                  <div className="bg-yellow-400 h-1 rounded-full" style={{width: '10%'}}></div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Thank You Message */}
+              <div className="text-center mb-4">
+                <p className="text-lg font-medium" style={{ color: '#939393' }}>
+                  Thank you for your feedback. 😊
+                </p>
+              </div>
+              
+              {/* Posted Review Card */}
+              <div className="border rounded-2xl p-4" style={{ borderColor: '#E1E1E1' }}>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start" style={{ gap: '10px' }}>
+                    {/* Avatar */}
+                    <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center" style={{ flexShrink: 0 }}>
+                      <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    
+                    <div>
+                      {/* Name */}
+                      <h4 className="font-semibold mb-1" style={{ color: '#0E0E0E', fontSize: '13px' }}>You</h4>
+                      
+                      {/* Star Rating */}
+                      <div className="flex items-center" style={{ gap: '6px' }}>
+                        <div className="flex items-center">
+                          {[1,2,3,4,5].map((star) => (
+                            <svg 
+                              key={star} 
+                              className="w-3 h-3 fill-current" 
+                              style={{ color: star <= (postedReview?.rating || 0) ? '#FBBC05' : '#E9E9E9' }}
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                          ))}
+                        </div>
+                        <span style={{ fontSize: '11px', color: '#939393' }}>{postedReview?.rating}.0</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Edit Button and Date */}
+                  <div className="flex flex-col items-end" style={{ gap: '4px' }}>
+                    <button 
+                      onClick={() => {
+                        setIsReviewPosted(false);
+                      }}
+                      className="flex items-center border rounded-lg transition-colors hover:bg-gray-50"
+                      style={{ padding: '3px 8px', borderColor: '#D9D9D9', gap: '4px' }}
+                    >
+                      <img src={pencilIcon} alt="Edit" className="w-2.5 h-2.5" />
+                      <span style={{ fontSize: '10px', color: '#6A6A6A' }}>Edit</span>
+                    </button>
+                    <span style={{ fontSize: '9px', color: '#B0B0B0' }}>{postedReview?.date}</span>
+                  </div>
+                </div>
+                
+                {/* Review Text */}
+                <p className="leading-relaxed" style={{ fontSize: '11px', color: '#939393' }}>
+                  {postedReview?.text}
+                </p>
+              </div>
+            </>
+          )}
         </div>
         )}
         
@@ -1463,7 +1537,7 @@ const SellerProfile: React.FC = () => {
                         height: '9px',
                         marginRight: '3px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1527,9 +1601,9 @@ const SellerProfile: React.FC = () => {
                       alt={getProductCountry(2).name}
                       style={{ 
                         width: '12px',
-                        height: '8px',
+                        height: '12px',
                         objectFit: 'cover',
-                        borderRadius: '2px'
+                        borderRadius: '50%'
                       }}
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
@@ -1574,7 +1648,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1638,9 +1712,9 @@ const SellerProfile: React.FC = () => {
                       alt={getProductCountry(3).name}
                       style={{ 
                         width: '12px',
-                        height: '8px',
+                        height: '12px',
                         objectFit: 'cover',
-                        borderRadius: '2px'
+                        borderRadius: '50%'
                       }}
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
@@ -1685,7 +1759,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1749,9 +1823,9 @@ const SellerProfile: React.FC = () => {
                       alt={getProductCountry(4).name}
                       style={{ 
                         width: '12px',
-                        height: '8px',
+                        height: '12px',
                         objectFit: 'cover',
-                        borderRadius: '2px'
+                        borderRadius: '50%'
                       }}
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
@@ -1796,7 +1870,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1860,9 +1934,9 @@ const SellerProfile: React.FC = () => {
                       alt={getProductCountry(5).name}
                       style={{ 
                         width: '12px',
-                        height: '8px',
+                        height: '12px',
                         objectFit: 'cover',
-                        borderRadius: '2px'
+                        borderRadius: '50%'
                       }}
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
@@ -1907,7 +1981,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1971,9 +2045,9 @@ const SellerProfile: React.FC = () => {
                       alt={getProductCountry(6).name}
                       style={{ 
                         width: '12px',
-                        height: '8px',
+                        height: '12px',
                         objectFit: 'cover',
-                        borderRadius: '2px'
+                        borderRadius: '50%'
                       }}
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
@@ -2018,7 +2092,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2082,9 +2156,9 @@ const SellerProfile: React.FC = () => {
                       alt={getProductCountry(7).name}
                       style={{ 
                         width: '12px',
-                        height: '8px',
+                        height: '12px',
                         objectFit: 'cover',
-                        borderRadius: '2px'
+                        borderRadius: '50%'
                       }}
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
@@ -2129,7 +2203,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2193,9 +2267,9 @@ const SellerProfile: React.FC = () => {
                       alt={getProductCountry(8).name}
                       style={{ 
                         width: '12px',
-                        height: '8px',
+                        height: '12px',
                         objectFit: 'cover',
-                        borderRadius: '2px'
+                        borderRadius: '50%'
                       }}
                     />
                     <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
@@ -2240,7 +2314,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '10px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2279,59 +2353,59 @@ const SellerProfile: React.FC = () => {
               </Link>
               </div>
               
-              {/* Pagination */}
-              <div className="flex items-center justify-between mt-8">
-                <div className="flex-1"></div>
-                
-                <div className="flex items-center space-x-12">
-                  <button
-                    disabled={true}
-                    className="font-normal transition-colors disabled:cursor-not-allowed"
-                    style={{ fontSize: '16px', color: '#BABABA' }}
-                  >
-                    Previous
-                  </button>
+                {/* Pagination */}
+                <div className="flex items-center justify-between mt-6 lg:mt-8">
+                  <div className="flex-1"></div>
                   
-                  <div className="flex items-baseline space-x-6">
+                  <div className="flex items-center lg:space-x-12" style={{ gap: '20px' }}>
                     <button
-                      className="font-normal transition-colors relative pb-1"
-                      style={{ fontSize: '16px', color: '#212121' }}
+                      disabled={true}
+                      className="font-normal transition-colors disabled:cursor-not-allowed text-xs lg:text-base"
+                      style={{ color: '#BABABA' }}
                     >
-                      <span>1</span>
-                      <div 
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2"
-                        style={{
-                          width: '200%',
-                          height: '2px',
-                          backgroundColor: '#212121'
-                        }}
-                      />
+                      Previous
                     </button>
-                    <button
-                      className="font-normal transition-colors hover:text-gray-900"
-                      style={{ fontSize: '16px', color: '#BABABA' }}
-                    >
-                      2
-                    </button>
-            </div>
-                  
-                  <button
-                    className="font-normal transition-colors"
-                    style={{ fontSize: '16px', color: '#212121' }}
-                  >
-                    Next
-                  </button>
+                    
+                    <div className="flex items-baseline lg:space-x-6" style={{ gap: '12px' }}>
+                      <button
+                        className="font-normal transition-colors relative pb-1 text-xs lg:text-base"
+                        style={{ color: '#212121' }}
+                      >
+                        <span>1</span>
+                        <div 
+                          className="absolute bottom-0 left-1/2 -translate-x-1/2"
+                          style={{
+                            width: '200%',
+                            height: '2px',
+                            backgroundColor: '#212121'
+                          }}
+                        />
+                      </button>
+                      <button
+                        className="font-normal transition-colors hover:text-gray-900 text-xs lg:text-base"
+                        style={{ color: '#BABABA' }}
+                      >
+                        2
+                      </button>
                 </div>
-                
-                <div className="flex-1 flex justify-end">
-                  <div className="flex items-center space-x-1">
-                    <div className="px-3 py-1 rounded border" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9' }}>
-                      <span className="font-normal" style={{ fontSize: '16px', color: '#212121' }}>1</span>
+                    
+                    <button
+                      className="font-normal transition-colors text-xs lg:text-base"
+                      style={{ color: '#212121' }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                  
+                  <div className="flex-1 flex justify-end">
+                    <div className="flex items-center space-x-1">
+                      <div className="rounded border px-2 py-0.5 lg:px-3 lg:py-1" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9' }}>
+                        <span className="font-normal text-xs lg:text-base" style={{ color: '#212121' }}>1</span>
+                      </div>
+                      <span className="font-normal text-xs lg:text-base" style={{ color: '#BABABA' }}>/ 2</span>
                     </div>
-                    <span className="font-normal" style={{ fontSize: '16px', color: '#BABABA' }}>/ 2</span>
                   </div>
                 </div>
-              </div>
             </>
           )}
         </div>
