@@ -514,7 +514,7 @@ const SellerProfile: React.FC = () => {
                     </div>
                   </button>
                   
-                  {/* Options Modal - Desktop */}
+                  {/* Options Modal */}
                   {showOptionsModal && (
                     <div 
                       className="absolute z-10"
@@ -594,63 +594,61 @@ const SellerProfile: React.FC = () => {
           </button>
 
           {/* More Options Button - Top Right */}
-          <div className="relative">
-            <button 
-              onClick={() => setShowOptionsModal(true)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white flex items-center justify-center"
-              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)', zIndex: 10 }}
-              aria-label="More options"
-            >
-              <svg width="14" height="4" viewBox="0 0 24 4" fill="none">
-                <circle cx="4" cy="2" r="2" fill="#171717" />
-                <circle cx="12" cy="2" r="2" fill="#171717" />
-                <circle cx="20" cy="2" r="2" fill="#171717" />
-              </svg>
-            </button>
+          <button 
+            onClick={() => setShowOptionsModal(true)}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white flex items-center justify-center"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)', zIndex: 10 }}
+            aria-label="More options"
+          >
+            <svg width="14" height="4" viewBox="0 0 24 4" fill="none">
+              <circle cx="4" cy="2" r="2" fill="#171717" />
+              <circle cx="12" cy="2" r="2" fill="#171717" />
+              <circle cx="20" cy="2" r="2" fill="#171717" />
+            </svg>
+          </button>
 
-            {/* Mobile Options Modal */}
-            {showOptionsModal && (
-              <div 
-                ref={optionsModalRef}
-                className="absolute z-20"
-                style={{
-                  display: 'inline-flex',
-                  padding: '8px 6px',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'flex-start',
-                  gap: '6px',
-                  borderRadius: '12px',
-                  background: '#FFF',
-                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                  top: '48px',
-                  right: '16px',
-                  minWidth: '200px'
+          {/* Mobile Options Modal */}
+          {showOptionsModal && (
+            <div 
+              ref={optionsModalRef}
+              className="absolute z-20"
+              style={{
+                display: 'inline-flex',
+                padding: '8px 6px',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                gap: '6px',
+                borderRadius: '12px',
+                background: '#FFF',
+                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                top: '56px',
+                right: '16px',
+                minWidth: '200px'
+              }}
+            >
+              <button 
+                className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
+                onClick={() => {
+                  setShowOptionsModal(false);
+                  setShowShareModal(true);
                 }}
               >
-                <button 
-                  className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
-                  onClick={() => {
-                    setShowOptionsModal(false);
-                    setShowShareModal(true);
-                  }}
-                >
-                  <img src={shareIcon} alt="Share" className="w-4 h-4" />
-                  <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Share the profile</span>
-                </button>
-                <button 
-                  className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
-                  onClick={() => {
-                    // Handle report action
-                    setShowOptionsModal(false);
-                  }}
-                >
-                  <img src={warningIcon} alt="Report" className="w-4 h-4" />
-                  <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Report the profile</span>
-                </button>
-              </div>
-            )}
-          </div>
+                <img src={shareIcon} alt="Share" className="w-4 h-4" />
+                <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Share the profile</span>
+              </button>
+              <button 
+                className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
+                onClick={() => {
+                  // Handle report action
+                  setShowOptionsModal(false);
+                }}
+              >
+                <img src={warningIcon} alt="Report" className="w-4 h-4" />
+                <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Report the profile</span>
+              </button>
+            </div>
+          )}
         </div>
         
         {/* Profile Content Overlay */}
