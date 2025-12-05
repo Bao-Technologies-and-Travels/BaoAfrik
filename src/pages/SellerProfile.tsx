@@ -609,45 +609,47 @@ const SellerProfile: React.FC = () => {
 
           {/* Mobile Options Modal */}
           {showOptionsModal && (
-            <div 
-              ref={optionsModalRef}
-              className="absolute z-20"
-              style={{
-                display: 'inline-flex',
-                padding: '8px 6px',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                gap: '6px',
-                borderRadius: '12px',
-                background: '#FFF',
-                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                top: '56px',
-                right: '16px',
-                minWidth: '200px'
-              }}
-            >
-              <button 
-                className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
-                onClick={() => {
-                  setShowOptionsModal(false);
-                  setShowShareModal(true);
+              <div 
+                ref={optionsModalRef}
+                className="absolute z-20"
+                style={{
+                  display: 'inline-flex',
+                  padding: '6px 4px',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  gap: '4px',
+                  borderRadius: '10px',
+                  background: '#FFF',
+                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                  top: '56px',
+                  right: '16px',
+                  minWidth: '180px'
                 }}
               >
-                <img src={shareIcon} alt="Share" className="w-4 h-4" />
-                <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Share the profile</span>
-              </button>
-              <button 
-                className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
-                onClick={() => {
-                  // Handle report action
-                  setShowOptionsModal(false);
-                }}
-              >
-                <img src={warningIcon} alt="Report" className="w-4 h-4" />
-                <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Report the profile</span>
-              </button>
-            </div>
+                <button 
+                  className="flex items-center w-full hover:bg-gray-50 rounded transition-colors"
+                  style={{ gap: '6px', padding: '6px 10px' }}
+                  onClick={() => {
+                    setShowOptionsModal(false);
+                    setShowShareModal(true);
+                  }}
+                >
+                  <img src={shareIcon} alt="Share" className="w-3.5 h-3.5" />
+                  <span className="whitespace-nowrap" style={{ fontSize: '11px', color: '#939393' }}>Share the profile</span>
+                </button>
+                <button 
+                  className="flex items-center w-full hover:bg-gray-50 rounded transition-colors"
+                  style={{ gap: '6px', padding: '6px 10px' }}
+                  onClick={() => {
+                    // Handle report action
+                    setShowOptionsModal(false);
+                  }}
+                >
+                  <img src={warningIcon} alt="Report" className="w-3.5 h-3.5" />
+                  <span className="whitespace-nowrap" style={{ fontSize: '11px', color: '#939393' }}>Report the profile</span>
+                </button>
+              </div>
           )}
         </div>
         
@@ -2663,15 +2665,15 @@ const SellerProfile: React.FC = () => {
       {/* Share Profile Modal */}
       {showShareModal && (
         <>
-          {/* Focused Overlay */}
+          {/* Overlay */}
           <div 
             className="fixed inset-0 z-50"
             style={{ backgroundColor: '#0000001A' }}
             onClick={() => setShowShareModal(false)}
           />
           
-          {/* Share Modal */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          {/* Desktop Share Modal */}
+          <div className="hidden lg:flex fixed inset-0 z-50 items-center justify-center px-4">
             <div 
               className="bg-white rounded-2xl shadow-xl relative max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
@@ -2754,6 +2756,99 @@ const SellerProfile: React.FC = () => {
                     <img src={zapIcon} alt="WhatsApp" className="w-10 h-10" />
                     <span className="text-xs" style={{ color: '#B0B0B0' }}>Whatsapp</span>
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Bottom Sheet */}
+          <div className="lg:hidden fixed inset-x-0 z-50 flex items-end justify-center" style={{ top: '10%', bottom: '0' }}>
+            <div 
+              className="bg-white w-full max-w-full relative"
+              style={{ borderRadius: '30px 30px 0 0', maxHeight: '90vh', overflowY: 'auto' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Handle */}
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full" style={{ backgroundColor: '#E1E1E1' }}></div>
+              
+              {/* Content */}
+              <div className="px-4 pb-6 pt-6">
+                {/* Profile Picture */}
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                    <img
+                      src={seller.avatar}
+                      alt={seller.name}
+                      className="w-14 h-14 rounded-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* Heading */}
+                <h3 className="font-semibold text-center mb-2" style={{ fontSize: '17px', color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  Share this profile with your network
+                </h3>
+
+                {/* Description */}
+                <p className="text-center mb-5" style={{ fontSize: '11px', color: '#B0B0B0' }}>
+                  Increase visibility by showcasing this profile to connect with more buyers or potential clients.
+                </p>
+
+                {/* Link Field with Copy Button */}
+                <div className="flex items-center mb-5" style={{ gap: '6px' }}>
+                  <input
+                    type="text"
+                    value={`baoafrik.com/user-profil`}
+                    readOnly
+                    className="flex-1 rounded-lg"
+                    style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', border: 'none', padding: '8px 10px', fontSize: '11px' }}
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                    }}
+                    className="rounded-lg font-medium text-white transition-colors hover:opacity-90"
+                    style={{ backgroundColor: '#000000', padding: '8px 12px', fontSize: '11px' }}
+                  >
+                    Copy link
+                  </button>
+                </div>
+
+                {/* Share To Section */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3" style={{ fontSize: '12px' }}>Share to</h4>
+                  <div className="flex items-center justify-center" style={{ gap: '16px' }}>
+                    <button className="flex flex-col items-center" style={{ gap: '6px' }}>
+                      <img src={fbIcon} alt="Facebook" className="w-9 h-9" />
+                      <span style={{ fontSize: '10px', color: '#B0B0B0' }}>Facebook</span>
+                    </button>
+                    <button className="flex flex-col items-center" style={{ gap: '6px' }}>
+                      <img src={igIcon} alt="Instagram" className="w-9 h-9" />
+                      <span style={{ fontSize: '10px', color: '#B0B0B0' }}>Instagram</span>
+                    </button>
+                    <button className="flex flex-col items-center" style={{ gap: '6px' }}>
+                      <img src={xIcon} alt="X" className="w-9 h-9" />
+                      <span style={{ fontSize: '10px', color: '#B0B0B0' }}>X</span>
+                    </button>
+                    <button className="flex flex-col items-center" style={{ gap: '6px' }}>
+                      <img src={tgIcon} alt="Telegram" className="w-9 h-9" />
+                      <span style={{ fontSize: '10px', color: '#B0B0B0' }}>Telegram</span>
+                    </button>
+                    <button className="flex flex-col items-center" style={{ gap: '6px' }}>
+                      <img src={zapIcon} alt="WhatsApp" className="w-9 h-9" />
+                      <span style={{ fontSize: '10px', color: '#B0B0B0' }}>Whatsapp</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
