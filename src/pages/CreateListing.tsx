@@ -26,6 +26,8 @@ import a1 from '../assets/images/pre/a1.png';
 import a2 from '../assets/images/pre/a2.png';
 import a3 from '../assets/images/pre/a3.png';
 import a4 from '../assets/images/pre/a4.png';
+import verifyIcon from '../assets/images/pre/verify.svg';
+import avatar from '../assets/images/logos/avatar.png';
 
 interface DraftListing {
   id: string;
@@ -113,6 +115,9 @@ const CreateListing: React.FC = () => {
     const [isDraggingOver, setIsDraggingOver] = useState(false);
     const [draggedImagesTotal, setDraggedImagesTotal] = useState(0);
     const [currentDraggedImageIndex, setCurrentDraggedImageIndex] = useState(0);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [countdown, setCountdown] = useState(10);
+    const [showNotification, setShowNotification] = useState(false);
 
   // Check if all required fields are filled
   const isFormComplete = title.trim() !== '' && 
@@ -432,8 +437,53 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
   };
 
   const handlePostListing = () => {
+    if (!isFormComplete) return;
+    
     console.log('Posting listing...');
-    // TODO: Implement post listing functionality
+    // Show success modal
+    setShowSuccessModal(true);
+    setCountdown(10);
+    
+    // Show notification after a few seconds delay
+    setTimeout(() => {
+      setShowNotification(true);
+    }, 2000);
+  };
+
+  // Countdown effect
+  useEffect(() => {
+    if (showSuccessModal && countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (showSuccessModal && countdown === 0) {
+      navigate('/');
+    }
+  }, [showSuccessModal, countdown, navigate]);
+
+  const handleBackToHomepage = () => {
+    navigate('/');
+  };
+
+  const handleAddNewListing = () => {
+    // Reset form
+    setTitle('');
+    setDescription('');
+    setPrice('');
+    setCurrency('USD');
+    setQuantity(1);
+    setCategory('');
+    setOrigin('');
+    setSaleType('Default');
+    setDeliveryAvailable(false);
+    setLocation('London, United Kingdom');
+    setImages([]);
+    setImageUrls([]);
+    setPrimaryImageIndex(0);
+    setShowSuccessModal(false);
+    setShowNotification(false);
+    setCountdown(10);
   };
 
   // Handle clicks outside dropdowns
@@ -1003,6 +1053,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
 
       {/* Page Content - Scrollable */}
       <div className="flex-1 overflow-y-auto py-6 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F5F5F5' }}>
+        {!showSuccessModal ? (
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumbs and Drafts Button */}
           <div className="flex items-center justify-between mb-4">
@@ -2150,7 +2201,155 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
         </div>
           </div>
         </div>
+        ) : null}
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={(e) => e.stopPropagation()}
+          />
+          
+          {/* Notification - Far Above Modal */}
+          {showNotification && (
+            <div 
+              className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] animate-slide-down"
+              style={{ maxWidth: '350px' }}
+            >
+              <div 
+                className="flex items-start space-x-3 p-3 rounded-xl shadow-lg"
+                style={{ backgroundColor: '#F5FBFF', border: '1px solid #CFE8FC' }}
+              >
+                {/* Profile Picture */}
+                <div className="relative flex-shrink-0">
+                  <div 
+                    className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden" 
+                    style={{ 
+                      backgroundColor: '#E3F2FD',
+                      border: '2px solid white'
+                    }}
+                  >
+                    <img src={avatar} alt="Avatar" className="w-6 h-6 rounded-full object-cover" />
+                  </div>
+                </div>
+
+                {/* Text Content */}
+                <div className="flex-1 min-w-0">
+                  <p style={{ fontSize: '12px' }}>
+                    <span style={{ color: '#616161' }}>Your listing is </span>
+                    <span className="font-semibold" style={{ color: '#212121' }}>under review</span>
+                    <span style={{ color: '#616161' }}> We analyze your listing, Please wait a f.</span>
+                  </p>
+                </div>
+
+                {/* Close Button */}
+                <button 
+                  onClick={() => setShowNotification(false)}
+                  className="flex-shrink-0 hover:opacity-70 transition-opacity"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#6A6A6A' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <style>
+                {`
+                  @keyframes slide-down {
+                    from {
+                      transform: translate(-50%, -20px);
+                      opacity: 0;
+                    }
+                    to {
+                      transform: translate(-50%, 0);
+                      opacity: 1;
+                    }
+                  }
+                  .animate-slide-down {
+                    animation: slide-down 0.3s ease-out;
+                  }
+                `}
+              </style>
+            </div>
+          )}
+
+          {/* Success Modal - Centered */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div 
+              className="bg-white relative"
+              style={{ borderRadius: '30px', padding: '48px 40px', maxWidth: '500px', width: '100%' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Verify Icon - Top Center */}
+              <div className="flex justify-center mb-6">
+                <img src={verifyIcon} alt="Success" className="w-16 h-16" />
+              </div>
+
+              {/* Title */}
+              <h2 
+                className="text-center mb-3"
+                style={{ 
+                  color: '#212121', 
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontSize: '24px',
+                  fontWeight: '600'
+                }}
+              >
+                Your listing has been registered
+              </h2>
+
+              {/* Description */}
+              <p 
+                className="text-center mb-8"
+                style={{ 
+                  color: '#B0B0B0',
+                  fontSize: '14px',
+                  lineHeight: '1.5'
+                }}
+              >
+                Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing.
+              </p>
+
+              {/* Buttons */}
+              <div className="flex items-center gap-4">
+                {/* Back to Homepage Button */}
+                <button
+                  onClick={handleBackToHomepage}
+                  className="flex-1 py-3 rounded-xl font-medium transition-colors"
+                  style={{ 
+                    backgroundColor: '#F1F1F1',
+                    color: '#6A6A6A',
+                    borderRadius: '12px',
+                    fontSize: '14px'
+                  }}
+                >
+                  Back to homepage ({countdown}s)
+                </button>
+
+                {/* Add New Listing Button */}
+                <button
+                  onClick={handleAddNewListing}
+                  className="flex-1 py-3 rounded-xl font-medium transition-colors"
+                  style={{ 
+                    backgroundColor: 'white',
+                    color: '#F9A825',
+                    border: '1px solid #F9A825',
+                    borderRadius: '12px',
+                    fontSize: '14px'
+                  }}
+                >
+                  Add new listing
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {renderDraftsModal()}
     </div>
   );
