@@ -420,7 +420,7 @@ const SellerProfile: React.FC = () => {
           <div className="relative">
             <div className="h-64 rounded-2xl relative overflow-hidden" style={{ backgroundColor: '#FEF6E9' }}>
               {/* Decorative Logo Watermark */}
-              <div className="absolute" style={{ left: '50%', top: '35%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%' }}>
+              <div className="absolute" style={{ left: '50%', top: '15%', transform: 'translate(-50%, -50%)', width: '150%', height: '170%' }}>
                 <div 
                   style={{
                     position: 'absolute',
@@ -1008,31 +1008,31 @@ const SellerProfile: React.FC = () => {
           {/* Review Cards */}
                 <div className="space-y-4">
                   {/* Review 1 - Samine Herald */}
-                  <div className="pb-4">
-                    <div className="flex items-start mb-2" style={{ gap: '10px' }}>
-                      <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center" style={{ flexShrink: 0 }}>
-                        <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="pb-4 lg:pb-6">
+                    <div className="flex items-start mb-2 lg:mb-3 lg:space-x-3" style={{ gap: '10px' }}>
+                      <div className="w-9 h-9 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center" style={{ flexShrink: 0 }}>
+                        <svg className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
                       </div>
                 <div className="flex-1" style={{ minWidth: 0 }}>
-                        <h4 className="text-gray-900 mb-1" style={{ fontSize: '13px', fontWeight: '600' }}>Samine Herald</h4>
+                        <h4 className="text-gray-900 mb-1 lg:mb-2 lg:font-semibold" style={{ fontSize: '13px', fontWeight: '600' }}>Samine Herald</h4>
                     <div className="flex items-center justify-between" style={{ gap: '8px' }}>
-                  <div className="flex items-center" style={{ gap: '6px' }}>
+                  <div className="flex items-center lg:space-x-2" style={{ gap: '6px' }}>
                       <div className="flex items-center">
                               {[1,2,3,4,5].map((star) => (
-                                <svg key={star} className="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                                <svg key={star} className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                           </svg>
                         ))}
                     </div>
-                            <span style={{ fontSize: '12px', fontWeight: '500', color: '#939393' }}>5.0</span>
+                            <span className="text-xs lg:text-sm lg:font-medium" style={{ fontWeight: '500', color: '#939393' }}>5.0</span>
                   </div>
-                          <span style={{ fontSize: '10px', color: '#939393', whiteSpace: 'nowrap' }}>Posted on 2 Jan 2025</span>
+                          <span className="text-[10px] lg:text-xs" style={{ color: '#939393', whiteSpace: 'nowrap' }}>Posted on 2 Jan 2025</span>
                     </div>
                   </div>
               </div>
-                    <p className="leading-relaxed mb-3" style={{ fontSize: '12px', color: '#B0B0B0' }}>
+                    <p className="leading-relaxed mb-3 lg:mb-4 text-xs lg:text-sm" style={{ color: '#B0B0B0' }}>
                       Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages.
               </p>
                     
@@ -1089,31 +1089,31 @@ const SellerProfile: React.FC = () => {
           </div>
 
                   {/* Review 2 - Kael Otto */}
-                  <div className="pb-4">
-                    <div className="flex items-start mb-2" style={{ gap: '10px' }}>
-                      <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center" style={{ flexShrink: 0 }}>
-                        <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="pb-4 lg:pb-6">
+                    <div className="flex items-start mb-2 lg:mb-3 lg:space-x-3" style={{ gap: '10px' }}>
+                      <div className="w-9 h-9 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center" style={{ flexShrink: 0 }}>
+                        <svg className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
                       </div>
                 <div className="flex-1" style={{ minWidth: 0 }}>
-                        <h4 className="text-gray-900 mb-1" style={{ fontSize: '13px', fontWeight: '600' }}>Kael Otto</h4>
+                        <h4 className="text-gray-900 mb-1 lg:mb-2 lg:font-semibold" style={{ fontSize: '13px', fontWeight: '600' }}>Kael Otto</h4>
                     <div className="flex items-center justify-between" style={{ gap: '8px' }}>
-                          <div className="flex items-center" style={{ gap: '6px' }}>
+                          <div className="flex items-center lg:space-x-2" style={{ gap: '6px' }}>
                       <div className="flex items-center">
                               {[1,2,3,4,5].map((star) => (
-                                <svg key={star} className="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                                <svg key={star} className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                           </svg>
                         ))}
                       </div>
-                            <span style={{ fontSize: '12px', fontWeight: '500', color: '#939393' }}>5.0</span>
+                            <span className="text-xs lg:text-sm lg:font-medium" style={{ fontWeight: '500', color: '#939393' }}>5.0</span>
                     </div>
-                          <span style={{ fontSize: '10px', color: '#939393', whiteSpace: 'nowrap' }}>Posted on 12 Dec 2024</span>
+                          <span className="text-[10px] lg:text-xs" style={{ color: '#939393', whiteSpace: 'nowrap' }}>Posted on 12 Dec 2024</span>
                   </div>
                 </div>
               </div>
-                    <p className="leading-relaxed mb-3" style={{ fontSize: '12px', color: '#B0B0B0' }}>
+                    <p className="leading-relaxed mb-3 lg:mb-4 text-xs lg:text-sm" style={{ color: '#B0B0B0' }}>
                       Amazing seller! The product quality exceeded my expectations. Fast shipping and excellent communication throughout the process. The item was exactly as described and arrived in perfect condition.
               </p>
                     
@@ -1170,36 +1170,36 @@ const SellerProfile: React.FC = () => {
                   </div>
 
                   {/* Review 3 - Alex Johnson */}
-                  <div className="pb-4">
-                    <div className="flex items-start mb-2" style={{ gap: '10px' }}>
-                      <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center" style={{ flexShrink: 0 }}>
-                        <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="pb-4 lg:pb-6">
+                    <div className="flex items-start mb-2 lg:mb-3 lg:space-x-3" style={{ gap: '10px' }}>
+                      <div className="w-9 h-9 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center" style={{ flexShrink: 0 }}>
+                        <svg className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
                       </div>
                 <div className="flex-1" style={{ minWidth: 0 }}>
-                        <h4 className="text-gray-900 mb-1" style={{ fontSize: '13px', fontWeight: '600' }}>Alex Johnson</h4>
+                        <h4 className="text-gray-900 mb-1 lg:mb-2 lg:font-semibold" style={{ fontSize: '13px', fontWeight: '600' }}>Alex Johnson</h4>
                     <div className="flex items-center justify-between" style={{ gap: '8px' }}>
-                          <div className="flex items-center" style={{ gap: '6px' }}>
+                          <div className="flex items-center lg:space-x-2" style={{ gap: '6px' }}>
                       <div className="flex items-center">
                               {[1,2].map((star) => (
-                                <svg key={star} className="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                                <svg key={star} className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
                                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                                 </svg>
                               ))}
                               {[1,2,3].map((star) => (
-                                <svg key={`empty-${star}`} className="w-3 h-3 text-gray-300 fill-current" viewBox="0 0 24 24">
+                                <svg key={`empty-${star}`} className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-gray-300 fill-current" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                           </svg>
                         ))}
                       </div>
-                            <span style={{ fontSize: '12px', fontWeight: '500', color: '#939393' }}>2.1</span>
+                            <span className="text-xs lg:text-sm lg:font-medium" style={{ fontWeight: '500', color: '#939393' }}>2.1</span>
                     </div>
-                          <span style={{ fontSize: '10px', color: '#939393', whiteSpace: 'nowrap' }}>Posted on 8 Nov 2024</span>
+                          <span className="text-[10px] lg:text-xs" style={{ color: '#939393', whiteSpace: 'nowrap' }}>Posted on 8 Nov 2024</span>
                   </div>
                 </div>
               </div>
-                    <p className="leading-relaxed mb-3" style={{ fontSize: '12px', color: '#B0B0B0' }}>
+                    <p className="leading-relaxed mb-3 lg:mb-4 text-xs lg:text-sm" style={{ color: '#B0B0B0' }}>
                       The product was okay, but not exactly what I expected. Shipping took longer than anticipated. Communication could have been better.
               </p>
                     
@@ -1507,7 +1507,7 @@ const SellerProfile: React.FC = () => {
           {activeTab === 'items' && (
             <>
               {/* Title */}
-              <h2 className="font-medium text-gray-900 mb-4 lg:text-2xl lg:mb-6" style={{ fontSize: '16px', fontFamily: 'Bricolage Grotesque, sans-serif', marginTop: '-16px' }}>{seller.name} items</h2>
+              <h2 className="font-medium text-gray-900 text-base lg:text-2xl mb-4 lg:mb-6" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', marginTop: '-16px' }}>{seller.name} items</h2>
               
               {/* Product Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
@@ -1549,10 +1549,10 @@ const SellerProfile: React.FC = () => {
                   </div>
                 
                 {/* Product Content */}
-                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                <div className="flex flex-col p-2 lg:p-3">
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-gray-900 text-sm lg:text-base">
                       $13.9
                     </div>
                     <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
@@ -1563,32 +1563,24 @@ const SellerProfile: React.FC = () => {
                       gap: '1px', 
                       fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                      <span>Verified seller</span>
+                      <img src={verifyIcon} alt="Verified" className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
+                      <span className="text-[8px] lg:text-[9px]">Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="line-clamp-2 font-medium" style={{ 
-                    fontSize: '13px', 
-                    color: '#212121',
-                    marginBottom: '4px'
-                  }}>African Textiles</h3>
+                  <h3 className="line-clamp-2 font-medium text-xs lg:text-sm text-gray-900 mb-1">African Textiles</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
                   <div className="flex items-center justify-between">
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
-                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                        width: '10px',
-                        height: '10px',
-                        marginRight: '4px'
-                      }} />
-                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
+                      <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                      <span className="text-[8px] lg:text-[10px] truncate font-normal">London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
-                    <div style={{ marginLeft: '8px' }}>
+                    <div className="ml-2">
                       <button 
                         onClick={(e) => {
                           e.preventDefault();
@@ -1601,21 +1593,16 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className="transition-colors touch-manipulation"
-                        title={wishlistProducts.has('textiles-1') ? 'Remove from saved' : 'Save product'}
-                        style={{ 
-                          width: '20px', 
-                          height: '20px', 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center' 
-                        }}
+                        className="w-3.5 h-3.5 lg:w-4 lg:h-4"
                       >
-                        <img src={bookmarkIcon} alt="Bookmark" style={{
-                          width: '20px',
-                          height: '20px',
-                          filter: wishlistProducts.has('textiles-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                        }} />
+                        <img 
+                          src={bookmarkIcon} 
+                          alt="Bookmark" 
+                          className="w-full h-full"
+                          style={{
+                              filter: wishlistProducts.has('textiles-1') ? 'brightness(0) saturate(100%) invert(75%) sepia(20%) saturate(1800%) hue-rotate(175deg) brightness(97%) contrast(92%)' : 'grayscale(100%) opacity(0.5)'
+                          }}
+                        />
                       </button>
                     </div>
                   </div>
@@ -1660,10 +1647,10 @@ const SellerProfile: React.FC = () => {
                   </div>
                 
                 {/* Product Content */}
-                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                <div className="flex flex-col p-2 lg:p-3">
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-gray-900 text-sm lg:text-base">
                       $45
                     </div>
                     <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
@@ -1674,28 +1661,20 @@ const SellerProfile: React.FC = () => {
                       gap: '1px', 
                       fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                      <span>Verified seller</span>
+                      <img src={verifyIcon} alt="Verified" className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
+                      <span className="text-[8px] lg:text-[9px]">Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="line-clamp-2 font-medium" style={{ 
-                    fontSize: '13px', 
-                    color: '#212121',
-                    marginBottom: '4px'
-                  }}>Fresh Tomatoes</h3>
+                  <h3 className="line-clamp-2 font-medium text-xs lg:text-sm text-gray-900 mb-1">Fresh Tomatoes</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
                   <div className="flex items-center justify-between">
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
-                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                        width: '10px',
-                        height: '10px',
-                        marginRight: '4px'
-                      }} />
-                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
+                      <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                      <span className="text-[8px] lg:text-[10px] truncate font-normal">London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1712,21 +1691,16 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className="transition-colors touch-manipulation"
-                        title={wishlistProducts.has('tomatoes-1') ? 'Remove from saved' : 'Save product'}
-                        style={{ 
-                          width: '20px', 
-                          height: '20px', 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center' 
-                        }}
+                        className="w-3.5 h-3.5 lg:w-4 lg:h-4"
                       >
-                        <img src={bookmarkIcon} alt="Bookmark" style={{
-                          width: '20px',
-                          height: '20px',
-                          filter: wishlistProducts.has('tomatoes-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
-                        }} />
+                        <img 
+                          src={bookmarkIcon} 
+                          alt="Bookmark" 
+                          className="w-full h-full"
+                          style={{
+                              filter: wishlistProducts.has('tomatoes-1') ? 'brightness(0) saturate(100%) invert(75%) sepia(20%) saturate(1800%) hue-rotate(175deg) brightness(97%) contrast(92%)' : 'none'
+                          }}
+                        />
                       </button>
                     </div>
                   </div>
@@ -1771,10 +1745,10 @@ const SellerProfile: React.FC = () => {
                   </div>
                 
                 {/* Product Content */}
-                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                <div className="flex flex-col p-2 lg:p-3">
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-gray-900 text-sm lg:text-base">
                       $8.09
                     </div>
                     <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
@@ -1785,28 +1759,20 @@ const SellerProfile: React.FC = () => {
                       gap: '1px', 
                       fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                      <span>Verified seller</span>
+                      <img src={verifyIcon} alt="Verified" className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
+                      <span className="text-[8px] lg:text-[9px]">Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="line-clamp-2 font-medium" style={{ 
-                    fontSize: '13px', 
-                    color: '#212121',
-                    marginBottom: '4px'
-                  }}>Dried Shrimp</h3>
+                  <h3 className="line-clamp-2 font-medium text-xs lg:text-sm text-gray-900 mb-1">Dried Shrimp</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
                   <div className="flex items-center justify-between">
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
-                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                        width: '10px',
-                        height: '10px',
-                        marginRight: '4px'
-                      }} />
-                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
+                      <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                      <span className="text-[8px] lg:text-[10px] truncate font-normal">London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1823,7 +1789,7 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className="transition-colors touch-manipulation"
+                        className="w-3.5 h-3.5 lg:w-4 lg:h-4"
                         title={wishlistProducts.has('shrimp-1') ? 'Remove from saved' : 'Save product'}
                         style={{ 
                           width: '20px', 
@@ -1833,10 +1799,12 @@ const SellerProfile: React.FC = () => {
                           justifyContent: 'center' 
                         }}
                       >
-                        <img src={bookmarkIcon} alt="Bookmark" style={{
-                          width: '20px',
-                          height: '20px',
-                          filter: wishlistProducts.has('shrimp-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        <img 
+                          src={bookmarkIcon} 
+                          alt="Bookmark" 
+                          className="w-full h-full"
+                          style={{
+                              filter: wishlistProducts.has('shrimp-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
                         }} />
                       </button>
                     </div>
@@ -1882,10 +1850,10 @@ const SellerProfile: React.FC = () => {
                   </div>
                 
                 {/* Product Content */}
-                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                <div className="flex flex-col p-2 lg:p-3">
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-gray-900 text-sm lg:text-base">
                       $11.5
                     </div>
                     <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
@@ -1896,28 +1864,20 @@ const SellerProfile: React.FC = () => {
                       gap: '1px', 
                       fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                      <span>Verified seller</span>
+                      <img src={verifyIcon} alt="Verified" className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
+                      <span className="text-[8px] lg:text-[9px]">Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="line-clamp-2 font-medium" style={{ 
-                    fontSize: '13px', 
-                    color: '#212121',
-                    marginBottom: '4px'
-                  }}>Ndolé Leaves</h3>
+                  <h3 className="line-clamp-2 font-medium text-xs lg:text-sm text-gray-900 mb-1">Ndolé Leaves</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
                   <div className="flex items-center justify-between">
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
-                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                        width: '10px',
-                        height: '10px',
-                        marginRight: '4px'
-                      }} />
-                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
+                      <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                      <span className="text-[8px] lg:text-[10px] truncate font-normal">London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1934,7 +1894,7 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className="transition-colors touch-manipulation"
+                        className="w-3.5 h-3.5 lg:w-4 lg:h-4"
                         title={wishlistProducts.has('ndole-1') ? 'Remove from saved' : 'Save product'}
                         style={{ 
                           width: '20px', 
@@ -1944,10 +1904,12 @@ const SellerProfile: React.FC = () => {
                           justifyContent: 'center' 
                         }}
                       >
-                        <img src={bookmarkIcon} alt="Bookmark" style={{
-                          width: '20px',
-                          height: '20px',
-                          filter: wishlistProducts.has('ndole-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        <img 
+                          src={bookmarkIcon} 
+                          alt="Bookmark" 
+                          className="w-full h-full"
+                          style={{
+                              filter: wishlistProducts.has('ndole-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
                         }} />
                       </button>
                     </div>
@@ -1993,10 +1955,10 @@ const SellerProfile: React.FC = () => {
                   </div>
                 
                 {/* Product Content */}
-                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                <div className="flex flex-col p-2 lg:p-3">
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-gray-900 text-sm lg:text-base">
                       $6.50
                     </div>
                     <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
@@ -2007,28 +1969,20 @@ const SellerProfile: React.FC = () => {
                       gap: '1px', 
                       fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                      <span>Verified seller</span>
+                      <img src={verifyIcon} alt="Verified" className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
+                      <span className="text-[8px] lg:text-[9px]">Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="line-clamp-2 font-medium" style={{ 
-                    fontSize: '13px', 
-                    color: '#212121',
-                    marginBottom: '4px'
-                  }}>Plantain Chips</h3>
+                  <h3 className="line-clamp-2 font-medium text-xs lg:text-sm text-gray-900 mb-1">Plantain Chips</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
                   <div className="flex items-center justify-between">
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
-                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                        width: '10px',
-                        height: '10px',
-                        marginRight: '4px'
-                      }} />
-                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
+                      <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                      <span className="text-[8px] lg:text-[10px] truncate font-normal">London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2045,7 +1999,7 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className="transition-colors touch-manipulation"
+                        className="w-3.5 h-3.5 lg:w-4 lg:h-4"
                         title={wishlistProducts.has('plantain-1') ? 'Remove from saved' : 'Save product'}
                         style={{ 
                           width: '20px', 
@@ -2055,10 +2009,12 @@ const SellerProfile: React.FC = () => {
                           justifyContent: 'center' 
                         }}
                       >
-                        <img src={bookmarkIcon} alt="Bookmark" style={{
-                          width: '20px',
-                          height: '20px',
-                          filter: wishlistProducts.has('plantain-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        <img 
+                          src={bookmarkIcon} 
+                          alt="Bookmark" 
+                          className="w-full h-full"
+                          style={{
+                              filter: wishlistProducts.has('plantain-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
                         }} />
                       </button>
                     </div>
@@ -2104,10 +2060,10 @@ const SellerProfile: React.FC = () => {
                   </div>
                 
                 {/* Product Content */}
-                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                <div className="flex flex-col p-2 lg:p-3">
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-gray-900 text-sm lg:text-base">
                       $9.75
                     </div>
                     <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
@@ -2118,28 +2074,20 @@ const SellerProfile: React.FC = () => {
                       gap: '1px', 
                       fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                      <span>Verified seller</span>
+                      <img src={verifyIcon} alt="Verified" className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
+                      <span className="text-[8px] lg:text-[9px]">Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="line-clamp-2 font-medium" style={{ 
-                    fontSize: '13px', 
-                    color: '#212121',
-                    marginBottom: '4px'
-                  }}>Yam Flour</h3>
+                  <h3 className="line-clamp-2 font-medium text-xs lg:text-sm text-gray-900 mb-1">Yam Flour</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
                   <div className="flex items-center justify-between">
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
-                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                        width: '10px',
-                        height: '10px',
-                        marginRight: '4px'
-                      }} />
-                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
+                      <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                      <span className="text-[8px] lg:text-[10px] truncate font-normal">London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2156,7 +2104,7 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className="transition-colors touch-manipulation"
+                        className="w-3.5 h-3.5 lg:w-4 lg:h-4"
                         title={wishlistProducts.has('yam-1') ? 'Remove from saved' : 'Save product'}
                         style={{ 
                           width: '20px', 
@@ -2166,10 +2114,12 @@ const SellerProfile: React.FC = () => {
                           justifyContent: 'center' 
                         }}
                       >
-                        <img src={bookmarkIcon} alt="Bookmark" style={{
-                          width: '20px',
-                          height: '20px',
-                          filter: wishlistProducts.has('yam-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        <img 
+                          src={bookmarkIcon} 
+                          alt="Bookmark" 
+                          className="w-full h-full"
+                          style={{
+                              filter: wishlistProducts.has('yam-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
                         }} />
                       </button>
                     </div>
@@ -2215,10 +2165,10 @@ const SellerProfile: React.FC = () => {
                   </div>
                 
                 {/* Product Content */}
-                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                <div className="flex flex-col p-2 lg:p-3">
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-gray-900 text-sm lg:text-base">
                       $15.20
                     </div>
                     <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
@@ -2229,28 +2179,20 @@ const SellerProfile: React.FC = () => {
                       gap: '1px', 
                       fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                      <span>Verified seller</span>
+                      <img src={verifyIcon} alt="Verified" className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
+                      <span className="text-[8px] lg:text-[9px]">Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="line-clamp-2 font-medium" style={{ 
-                    fontSize: '13px', 
-                    color: '#212121',
-                    marginBottom: '4px'
-                  }}>Palm Oil</h3>
+                  <h3 className="line-clamp-2 font-medium text-xs lg:text-sm text-gray-900 mb-1">Palm Oil</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
                   <div className="flex items-center justify-between">
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
-                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                        width: '10px',
-                        height: '10px',
-                        marginRight: '4px'
-                      }} />
-                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
+                      <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                      <span className="text-[8px] lg:text-[10px] truncate font-normal">London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2267,7 +2209,7 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className="transition-colors touch-manipulation"
+                        className="w-3.5 h-3.5 lg:w-4 lg:h-4"
                         title={wishlistProducts.has('palm-1') ? 'Remove from saved' : 'Save product'}
                         style={{ 
                           width: '20px', 
@@ -2277,10 +2219,12 @@ const SellerProfile: React.FC = () => {
                           justifyContent: 'center' 
                         }}
                       >
-                        <img src={bookmarkIcon} alt="Bookmark" style={{
-                          width: '20px',
-                          height: '20px',
-                          filter: wishlistProducts.has('palm-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        <img 
+                          src={bookmarkIcon} 
+                          alt="Bookmark" 
+                          className="w-full h-full"
+                          style={{
+                              filter: wishlistProducts.has('palm-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
                         }} />
                       </button>
                     </div>
@@ -2326,10 +2270,10 @@ const SellerProfile: React.FC = () => {
                   </div>
                 
                 {/* Product Content */}
-                <div className="flex flex-col" style={{ padding: '0 12px 12px 12px' }}>
+                <div className="flex flex-col p-2 lg:p-3">
                   {/* Price and Verified Badge Row */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                    <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-gray-900 text-sm lg:text-base">
                       $22.00
                     </div>
                     <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
@@ -2340,28 +2284,20 @@ const SellerProfile: React.FC = () => {
                       gap: '1px', 
                       fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                      <span>Verified seller</span>
+                      <img src={verifyIcon} alt="Verified" className="w-2 h-2 lg:w-2.5 lg:h-2.5" />
+                      <span className="text-[8px] lg:text-[9px]">Verified seller</span>
                     </div>
                   </div>
                   
                   {/* Product Name */}
-                  <h3 className="line-clamp-2 font-medium" style={{ 
-                    fontSize: '13px', 
-                    color: '#212121',
-                    marginBottom: '4px'
-                  }}>African Spices</h3>
+                  <h3 className="line-clamp-2 font-medium text-xs lg:text-sm text-gray-900 mb-1">African Spices</h3>
                   
                   {/* Location and Bookmark Row - Below Product Name */}
                   <div className="flex items-center justify-between">
                     {/* Location */}
                     <div className="flex items-center text-gray-500 flex-1">
-                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
-                        width: '10px',
-                        height: '10px',
-                        marginRight: '4px'
-                      }} />
-                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
+                      <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                      <span className="text-[8px] lg:text-[10px] truncate font-normal">London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2378,7 +2314,7 @@ const SellerProfile: React.FC = () => {
                           }
                           setWishlistProducts(newSet);
                         }}
-                        className="transition-colors touch-manipulation"
+                        className="w-3.5 h-3.5 lg:w-4 lg:h-4"
                         title={wishlistProducts.has('spices-1') ? 'Remove from saved' : 'Save product'}
                         style={{ 
                           width: '20px', 
@@ -2388,10 +2324,12 @@ const SellerProfile: React.FC = () => {
                           justifyContent: 'center' 
                         }}
                       >
-                        <img src={bookmarkIcon} alt="Bookmark" style={{
-                          width: '20px',
-                          height: '20px',
-                          filter: wishlistProducts.has('spices-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
+                        <img 
+                          src={bookmarkIcon} 
+                          alt="Bookmark" 
+                          className="w-full h-full"
+                          style={{
+                              filter: wishlistProducts.has('spices-1') ? 'none' : 'grayscale(100%) opacity(0.5)'
                         }} />
                       </button>
                     </div>
@@ -2673,12 +2611,13 @@ const SellerProfile: React.FC = () => {
           />
           
           {/* Desktop Share Modal */}
-          <div className="hidden lg:flex fixed inset-0 z-50 items-center justify-center px-4">
-            <div 
-              className="bg-white rounded-2xl shadow-xl relative max-w-md w-full"
-              onClick={(e) => e.stopPropagation()}
-              style={{ padding: '32px 24px', marginTop: '40px' }}
-            >
+          <div className="hidden lg:block fixed inset-0 z-50">
+            <div className="flex items-center justify-center h-full px-4">
+              <div 
+                className="bg-white rounded-2xl shadow-xl relative max-w-md w-full"
+                onClick={(e) => e.stopPropagation()}
+                style={{ padding: '32px 24px', marginTop: '40px' }}
+              >
               {/* Profile Picture - Half Outside Modal */}
               <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '-40px' }}>
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
@@ -2758,18 +2697,17 @@ const SellerProfile: React.FC = () => {
                   </button>
                 </div>
               </div>
+              </div>
             </div>
           </div>
 
           {/* Mobile Bottom Sheet */}
-          <div className="lg:hidden fixed inset-x-0 z-50 flex items-end justify-center" style={{ top: '10%', bottom: '0' }}>
+          <div className="lg:hidden fixed inset-x-0 z-50 flex items-end justify-center px-4" style={{ top: '10%', bottom: '0' }}>
             <div 
               className="bg-white w-full max-w-full relative"
-              style={{ borderRadius: '30px 30px 0 0', maxHeight: '90vh', overflowY: 'auto' }}
+              style={{ borderRadius: '30px', maxHeight: '90vh', overflowY: 'auto', marginBottom: '16px' }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Drag Handle */}
-              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full" style={{ backgroundColor: '#E1E1E1' }}></div>
               
               {/* Content */}
               <div className="px-4 pb-6 pt-6">
@@ -2841,7 +2779,9 @@ const SellerProfile: React.FC = () => {
                       <span style={{ fontSize: '10px', color: '#B0B0B0' }}>X</span>
                     </button>
                     <button className="flex flex-col items-center" style={{ gap: '6px' }}>
-                      <img src={tgIcon} alt="Telegram" className="w-9 h-9" />
+                      <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: '#0088cc' }}>
+                        <img src={tgIcon} alt="Telegram" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} />
+                      </div>
                       <span style={{ fontSize: '10px', color: '#B0B0B0' }}>Telegram</span>
                     </button>
                     <button className="flex flex-col items-center" style={{ gap: '6px' }}>
@@ -2850,6 +2790,11 @@ const SellerProfile: React.FC = () => {
                     </button>
                   </div>
                 </div>
+              </div>
+              
+              {/* Drag Handle - Bottom */}
+              <div className="flex justify-center py-4">
+                <div className="w-20 rounded-full" style={{ backgroundColor: '#E1E1E1', height: '3px' }}></div>
               </div>
             </div>
           </div>
