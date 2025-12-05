@@ -28,6 +28,7 @@ import a3 from '../assets/images/pre/a3.png';
 import a4 from '../assets/images/pre/a4.png';
 import verifyIcon from '../assets/images/pre/verify.svg';
 import avatar from '../assets/images/logos/avatar.png';
+import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
 
 interface DraftListing {
   id: string;
@@ -458,12 +459,56 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
       }, 1000);
       return () => clearTimeout(timer);
     } else if (showSuccessModal && countdown === 0) {
-      navigate('/');
+      // Navigate to owner view state (product detail with fromMyListings state)
+      const newListingId = `new-${Date.now()}`;
+      navigate(`/product/${newListingId}`, {
+        state: {
+          fromMyListings: true,
+          listing: {
+            id: newListingId,
+            title,
+            price,
+            currency,
+            image: imageUrls[primaryImageIndex] || imageUrls[0] || '',
+            status: 'inactive' as const,
+            rating: 0,
+            reviews: 0,
+            createdAt: Date.now(),
+            priceValue: parseFloat(price) || 0,
+            messages: 0,
+            category: category || '',
+            reviewStatus: 'success' as const
+          },
+          sellerVerified: false
+        }
+      });
     }
-  }, [showSuccessModal, countdown, navigate]);
+  }, [showSuccessModal, countdown, navigate, title, price, currency, imageUrls, primaryImageIndex, category]);
 
   const handleBackToHomepage = () => {
-    navigate('/');
+    // Navigate to owner view state (product detail with fromMyListings state)
+    const newListingId = `new-${Date.now()}`;
+    navigate(`/product/${newListingId}`, {
+      state: {
+        fromMyListings: true,
+        listing: {
+          id: newListingId,
+          title,
+          price,
+          currency,
+          image: imageUrls[primaryImageIndex] || imageUrls[0] || '',
+          status: 'inactive' as const,
+          rating: 0,
+          reviews: 0,
+          createdAt: Date.now(),
+          priceValue: parseFloat(price) || 0,
+          messages: 0,
+          category: category || '',
+          reviewStatus: 'pending' as const
+        },
+        sellerVerified: false
+      }
+    });
   };
 
   const handleAddNewListing = () => {
@@ -2217,14 +2262,14 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
           {/* Notification - Far Above Modal */}
           {showNotification && (
             <div 
-              className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] animate-slide-down"
+              className="fixed top-16 left-1/2 -translate-x-1/2 z-[60] animate-slide-down"
               style={{ maxWidth: '350px' }}
             >
               <div 
                 className="flex items-start space-x-3 p-3 rounded-xl shadow-lg"
                 style={{ backgroundColor: '#F5FBFF', border: '1px solid #CFE8FC' }}
               >
-                {/* Profile Picture */}
+                {/* Listing Image */}
                 <div className="relative flex-shrink-0">
                   <div 
                     className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden" 
@@ -2233,16 +2278,37 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                       border: '2px solid white'
                     }}
                   >
-                    <img src={avatar} alt="Avatar" className="w-6 h-6 rounded-full object-cover" />
+                    {imageUrls[primaryImageIndex] || imageUrls[0] ? (
+                      <img 
+                        src={imageUrls[primaryImageIndex] || imageUrls[0]} 
+                        alt="Listing" 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <img src={avatar} alt="Listing" className="w-6 h-6 rounded-full object-cover" />
+                    )}
+                  </div>
+                  {/* Listingtoast Icon Badge - Bottom Right */}
+                  <div 
+                    className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: '#FFF' }}
+                  >
+                    <img 
+                      src={listingtoastIcon} 
+                      alt="Listing" 
+                      className="w-3 h-3" 
+                    />
                   </div>
                 </div>
 
                 {/* Text Content */}
                 <div className="flex-1 min-w-0">
                   <p style={{ fontSize: '12px' }}>
-                    <span style={{ color: '#616161' }}>Your listing is </span>
+                    <span style={{ color: '#939393' }}>Your listing is </span>
                     <span className="font-semibold" style={{ color: '#212121' }}>under review</span>
-                    <span style={{ color: '#616161' }}> We analyze your listing, Please wait a f.</span>
+                  </p>
+                  <p style={{ fontSize: '12px', marginTop: '2px', color: '#939393' }}>
+                    We analyze your listing, Please wait a f.
                   </p>
                 </div>
 
@@ -2281,7 +2347,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
           <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div 
               className="bg-white relative"
-              style={{ borderRadius: '30px', padding: '48px 40px', maxWidth: '500px', width: '100%' }}
+              style={{ borderRadius: '30px', padding: '48px 40px', maxWidth: '420px', width: '100%' }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Verify Icon - Top Center */}
@@ -2315,31 +2381,31 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
               </p>
 
               {/* Buttons */}
-              <div className="flex items-center gap-4">
-                {/* Back to Homepage Button */}
+              <div className="flex items-center gap-3">
+                {/* Back to Listing Page Button */}
                 <button
                   onClick={handleBackToHomepage}
-                  className="flex-1 py-3 rounded-xl font-medium transition-colors"
+                  className="flex-1 py-2.5 rounded-xl font-medium transition-colors"
                   style={{ 
                     backgroundColor: '#F1F1F1',
                     color: '#6A6A6A',
                     borderRadius: '12px',
-                    fontSize: '14px'
+                    fontSize: '12px'
                   }}
                 >
-                  Back to homepage ({countdown}s)
+                  Back to listing page ({countdown}s)
                 </button>
 
                 {/* Add New Listing Button */}
                 <button
                   onClick={handleAddNewListing}
-                  className="flex-1 py-3 rounded-xl font-medium transition-colors"
+                  className="flex-1 py-2.5 rounded-xl font-medium transition-colors"
                   style={{ 
                     backgroundColor: 'white',
                     color: '#F9A825',
                     border: '1px solid #F9A825',
                     borderRadius: '12px',
-                    fontSize: '14px'
+                    fontSize: '13px'
                   }}
                 >
                   Add new listing

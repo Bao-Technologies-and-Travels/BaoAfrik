@@ -46,6 +46,8 @@ import inactiveIcon from '../assets/images/pre/inactive.svg';
 import repostIcon from '../assets/images/pre/repost.svg';
 import renewIcon from '../assets/images/pre/renew.svg';
 import daysIcon from '../assets/images/pre/days.svg';
+import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
+import warningIcon from '../assets/images/pre/warning.svg';
 // Import icons for reviews section
 import likeIcon from '../assets/images/pre/like.svg';
 import dislikeIcon from '../assets/images/pre/dislike.svg';
@@ -92,6 +94,8 @@ interface OwnerListingState {
     daysLeft?: number;
     createdAt: number;
     messages?: number;
+    reviewStatus?: 'pending' | 'success' | 'failed';
+    reviewFailureReason?: string;
   };
 }
 
@@ -977,7 +981,7 @@ const ProductDetail: React.FC = () => {
                 <h1 className="font-normal" style={{ fontSize: '18px', color: '#939393' }}>
                   {displayName}
                 </h1>
-                {isOwnerView && renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
+                {isOwnerView && !ownerListing?.reviewStatus && renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
               </div>
               
               {/* Price and posted date */}
@@ -1329,8 +1333,140 @@ const ProductDetail: React.FC = () => {
               </button>
               </div>
 
+              {/* Review Status Badge - Success State */}
+              {isOwnerView && ownerListing?.reviewStatus === 'success' && (
+                <div
+                  className="flex items-start gap-3 p-2.5 mt-2"
+                  style={{
+                    backgroundColor: '#F5FBFF',
+                    border: '1px solid #B8DDFB',
+                    borderRadius: '14px'
+                  }}
+                >
+                  {/* Icon with white circular bg */}
+                  <div
+                    className="flex-shrink-0 rounded-full flex items-center justify-center"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: '#FFFFFF',
+                      border: '2px solid #FFFFFF'
+                    }}
+                  >
+                    <img
+                      src={listingtoastIcon}
+                      alt="Listing"
+                      className="w-6 h-6"
+                    />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    {/* Title */}
+                    <p
+                      className="font-medium mb-0.5"
+                      style={{
+                        color: '#64B5F6',
+                        fontSize: '14px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}
+                    >
+                      Your listing is under review
+                    </p>
+
+                    {/* Description */}
+                    <p
+                      className="text-xs"
+                      style={{
+                        color: '#B0B0B0',
+                        fontSize: '12px'
+                      }}
+                    >
+                      We analyze your listing, please wait a few minutes.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Review Status Badge - Failed State */}
+              {isOwnerView && ownerListing?.reviewStatus === 'failed' && (
+                <div
+                  className="flex items-start gap-3 p-2.5 mt-2"
+                  style={{
+                    backgroundColor: '#FFFCF7',
+                    border: '1px solid #FFE0B2',
+                    borderRadius: '14px'
+                  }}
+                >
+                  {/* Warning Icon */}
+                  <div
+                    className="flex-shrink-0 rounded-full flex items-center justify-center"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: '#FFFCF7'
+                    }}
+                  >
+                    <img
+                      src={warningIcon}
+                      alt="Warning"
+                      className="w-6 h-6"
+                    />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    {/* Title */}
+                    <p
+                      className="font-medium mb-0.5"
+                      style={{
+                        color: '#F9A825',
+                        fontSize: '14px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}
+                    >
+                      Your listing failed review
+                    </p>
+
+                    {/* Description */}
+                    <p
+                      className="text-xs mb-1"
+                      style={{
+                        color: '#939393',
+                        fontSize: '12px'
+                      }}
+                    >
+                      Sorry we can't post your listing on our marketplace
+                    </p>
+
+                    {/* Why Section */}
+                    <p
+                      className="font-semibold mb-0.5"
+                      style={{
+                        color: '#212121',
+                        fontSize: '12px'
+                      }}
+                    >
+                      Why ? :
+                    </p>
+
+                    {/* Reason */}
+                    <p
+                      className="text-xs"
+                      style={{
+                        color: '#939393',
+                        fontSize: '12px',
+                        paddingLeft: '8px'
+                      }}
+                    >
+                      • {ownerListing.reviewFailureReason || 'Your product is not authentic'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Days Left Badge */}
-              {isOwnerView && ownerListing?.daysLeft && (
+              {isOwnerView && ownerListing?.daysLeft && !ownerListing?.reviewStatus && (
                 <div
                   className="flex items-start gap-3 p-2.5 mt-2"
                   style={{
@@ -1486,7 +1622,7 @@ const ProductDetail: React.FC = () => {
                 <p className="font-normal capitalize" style={{ fontSize: '16px', color: '#939393' }}>
                   {isOwnerView ? displayName : 'poivre blanc'}
                 </p>
-                {isMobile && isOwnerView && (
+                {isMobile && isOwnerView && !ownerListing?.reviewStatus && (
                   <div className="flex-shrink-0">
                     {renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
                   </div>
@@ -1685,7 +1821,7 @@ const ProductDetail: React.FC = () => {
           </div>
 
           {/* Warning Badge for Inactive Listings - Mobile - Above badges */}
-          {isMobile && isOwnerView && ownerListing?.status === 'inactive' && (
+          {isMobile && isOwnerView && ownerListing?.status === 'inactive' && !ownerListing?.reviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-5 mb-3"
               style={{
@@ -1734,7 +1870,7 @@ const ProductDetail: React.FC = () => {
           )}
 
           {/* Days Left Badge - Mobile - Above badges */}
-          {isMobile && isOwnerView && ownerListing?.daysLeft && (
+          {isMobile && isOwnerView && ownerListing?.daysLeft && !ownerListing?.reviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-5 mb-3"
               style={{
@@ -2096,7 +2232,7 @@ const ProductDetail: React.FC = () => {
           </div>
 
           {/* Days Left Badge - Mobile - Hidden, now shown above badges */}
-          {!isMobile && isOwnerView && ownerListing?.daysLeft && (
+          {!isMobile && isOwnerView && ownerListing?.daysLeft && !ownerListing?.reviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-2"
               style={{
@@ -2162,7 +2298,7 @@ const ProductDetail: React.FC = () => {
           )}
 
           {/* Warning Badge for Inactive Listings - Mobile - Hidden, now shown above badges */}
-          {!isMobile && isOwnerView && ownerListing?.status === 'inactive' && (
+          {!isMobile && isOwnerView && ownerListing?.status === 'inactive' && !ownerListing?.reviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-2"
               style={{
