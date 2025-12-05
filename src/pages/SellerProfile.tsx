@@ -514,7 +514,7 @@ const SellerProfile: React.FC = () => {
                     </div>
                   </button>
                   
-                  {/* Options Modal */}
+                  {/* Options Modal - Desktop */}
                   {showOptionsModal && (
                     <div 
                       className="absolute z-10"
@@ -594,18 +594,63 @@ const SellerProfile: React.FC = () => {
           </button>
 
           {/* More Options Button - Top Right */}
-          <button 
-            onClick={() => setShowOptionsModal(true)}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white flex items-center justify-center"
-            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
-            aria-label="More options"
-          >
-            <svg width="14" height="4" viewBox="0 0 24 4" fill="none">
-              <circle cx="4" cy="2" r="2" fill="#171717" />
-              <circle cx="12" cy="2" r="2" fill="#171717" />
-              <circle cx="20" cy="2" r="2" fill="#171717" />
-            </svg>
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setShowOptionsModal(true)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)', zIndex: 10 }}
+              aria-label="More options"
+            >
+              <svg width="14" height="4" viewBox="0 0 24 4" fill="none">
+                <circle cx="4" cy="2" r="2" fill="#171717" />
+                <circle cx="12" cy="2" r="2" fill="#171717" />
+                <circle cx="20" cy="2" r="2" fill="#171717" />
+              </svg>
+            </button>
+
+            {/* Mobile Options Modal */}
+            {showOptionsModal && (
+              <div 
+                ref={optionsModalRef}
+                className="absolute z-20"
+                style={{
+                  display: 'inline-flex',
+                  padding: '8px 6px',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  gap: '6px',
+                  borderRadius: '12px',
+                  background: '#FFF',
+                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                  top: '48px',
+                  right: '16px',
+                  minWidth: '200px'
+                }}
+              >
+                <button 
+                  className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
+                  onClick={() => {
+                    setShowOptionsModal(false);
+                    setShowShareModal(true);
+                  }}
+                >
+                  <img src={shareIcon} alt="Share" className="w-4 h-4" />
+                  <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Share the profile</span>
+                </button>
+                <button 
+                  className="flex items-center space-x-2 w-full px-3 py-1.5 hover:bg-gray-50 rounded transition-colors"
+                  onClick={() => {
+                    // Handle report action
+                    setShowOptionsModal(false);
+                  }}
+                >
+                  <img src={warningIcon} alt="Report" className="w-4 h-4" />
+                  <span className="text-xs whitespace-nowrap" style={{ color: '#939393' }}>Report the profile</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Profile Content Overlay */}
@@ -887,7 +932,7 @@ const SellerProfile: React.FC = () => {
               {/* LEFT COLUMN - Reviews List */}
               <div className="lg:col-span-2">
           {/* Filter Dropdown */}
-                <div className="relative pb-3 lg:mb-3" style={{ marginBottom: '8px' }} ref={filterDropdownRef}>
+                <div className="relative pb-3 lg:mb-3" style={{ marginBottom: '2px' }} ref={filterDropdownRef}>
             <button 
               onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
                     className="flex items-center hover:opacity-80 transition-opacity"
@@ -914,28 +959,30 @@ const SellerProfile: React.FC = () => {
             
             {/* Dropdown Menu */}
             {filterDropdownOpen && (
-              <div className="absolute top-8 left-0 bg-white border border-gray-200 shadow-lg z-10 p-2 lg:p-2" style={{ borderRadius: '12px', minWidth: '240px', width: 'calc(100vw - 32px)', maxWidth: '280px' }}>
+              <div className="absolute top-8 left-0 bg-white border border-gray-200 shadow-lg z-10 lg:p-2" style={{ borderRadius: '8px', padding: '4px', minWidth: '200px', width: 'calc(100vw - 32px)', maxWidth: '240px' }}>
                 {filterOptions.map((option, index) => {
                   const isSelected = selectedFilter === option.label;
                   return (
                     <button
                       key={option.id}
                       onClick={() => handleFilterSelect(option.id)}
-                      className="w-full text-left px-3 py-3 transition-colors flex items-start space-x-3"
+                      className="w-full text-left transition-colors flex items-start lg:px-3 lg:py-3 lg:space-x-3"
                       style={{
                         backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
-                        borderRadius: isSelected ? '10px' : '0',
-                        marginBottom: index < filterOptions.length - 1 ? '4px' : '0'
+                        borderRadius: isSelected ? '6px' : '0',
+                        marginBottom: index < filterOptions.length - 1 ? '2px' : '0',
+                        padding: '6px 8px',
+                        gap: '8px'
                       }}
                     >
                       {/* Icon */}
-                      <div className="flex-shrink-0 mt-0.5">
+                      <div className="flex-shrink-0" style={{ marginTop: '1px' }}>
                         {option.icon === 'star' ? (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2" className="lg:w-[18px] lg:h-[18px]">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                   </svg>
                         ) : (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2" className="lg:w-[18px] lg:h-[18px]">
                             <circle cx="12" cy="12" r="10"/>
                             <path d="M12 6v6l4 2"/>
                           </svg>
@@ -944,10 +991,10 @@ const SellerProfile: React.FC = () => {
                       
                       {/* Text */}
                       <div className="flex-1">
-                        <div className="text-sm font-medium mb-0.5" style={{ color: isSelected ? '#64B5F6' : '#212121' }}>
+                        <div className="font-medium lg:text-sm lg:mb-0.5" style={{ fontSize: '11px', marginBottom: '1px', color: isSelected ? '#64B5F6' : '#212121' }}>
                           {option.label}
               </div>
-                        <div className="text-xs" style={{ color: '#939393' }}>
+                        <div className="lg:text-xs" style={{ fontSize: '9px', color: '#939393' }}>
                           {option.description}
                     </div>
                   </div>
@@ -1514,9 +1561,9 @@ const SellerProfile: React.FC = () => {
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: '1px', 
-                      fontSize: '9px' 
+                      fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                       <span>Verified seller</span>
                     </div>
                   </div>
@@ -1537,7 +1584,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1625,9 +1672,9 @@ const SellerProfile: React.FC = () => {
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: '1px', 
-                      fontSize: '9px' 
+                      fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                       <span>Verified seller</span>
                     </div>
                   </div>
@@ -1648,7 +1695,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1736,9 +1783,9 @@ const SellerProfile: React.FC = () => {
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: '1px', 
-                      fontSize: '9px' 
+                      fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                       <span>Verified seller</span>
                     </div>
                   </div>
@@ -1759,7 +1806,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1847,9 +1894,9 @@ const SellerProfile: React.FC = () => {
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: '1px', 
-                      fontSize: '9px' 
+                      fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                       <span>Verified seller</span>
                     </div>
                   </div>
@@ -1870,7 +1917,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -1958,9 +2005,9 @@ const SellerProfile: React.FC = () => {
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: '1px', 
-                      fontSize: '9px' 
+                      fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                       <span>Verified seller</span>
                     </div>
                   </div>
@@ -1981,7 +2028,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2069,9 +2116,9 @@ const SellerProfile: React.FC = () => {
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: '1px', 
-                      fontSize: '9px' 
+                      fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                       <span>Verified seller</span>
                     </div>
                   </div>
@@ -2092,7 +2139,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2180,9 +2227,9 @@ const SellerProfile: React.FC = () => {
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: '1px', 
-                      fontSize: '9px' 
+                      fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                       <span>Verified seller</span>
                     </div>
                   </div>
@@ -2203,7 +2250,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2291,9 +2338,9 @@ const SellerProfile: React.FC = () => {
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: '1px', 
-                      fontSize: '9px' 
+                      fontSize: '8px' 
                     }}>
-                      <img src={verifyIcon} alt="Verified" style={{ width: '8px', height: '8px' }} />
+                      <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
                       <span>Verified seller</span>
                     </div>
                   </div>
@@ -2314,7 +2361,7 @@ const SellerProfile: React.FC = () => {
                         height: '10px',
                         marginRight: '4px'
                       }} />
-                      <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
+                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>London | United Kingdom</span>
                     </div>
                     
                     {/* Bookmark Button */}
@@ -2354,55 +2401,148 @@ const SellerProfile: React.FC = () => {
               </div>
               
                 {/* Pagination */}
-                <div className="flex items-center justify-between mt-6 lg:mt-8">
-                  <div className="flex-1"></div>
-                  
-                  <div className="flex items-center lg:space-x-12" style={{ gap: '20px' }}>
-                    <button
-                      disabled={true}
-                      className="font-normal transition-colors disabled:cursor-not-allowed text-xs lg:text-base"
-                      style={{ color: '#BABABA' }}
-                    >
-                      Previous
-                    </button>
+                <div className="mt-6 lg:mt-8">
+                  {/* Desktop/Tablet Pagination */}
+                  <div className="hidden lg:flex items-center justify-between">
+                    <div className="flex-1"></div>
                     
-                    <div className="flex items-baseline lg:space-x-6" style={{ gap: '12px' }}>
+                    <div className="flex items-center space-x-12">
                       <button
-                        className="font-normal transition-colors relative pb-1 text-xs lg:text-base"
-                        style={{ color: '#212121' }}
-                      >
-                        <span>1</span>
-                        <div 
-                          className="absolute bottom-0 left-1/2 -translate-x-1/2"
-                          style={{
-                            width: '200%',
-                            height: '2px',
-                            backgroundColor: '#212121'
-                          }}
-                        />
-                      </button>
-                      <button
-                        className="font-normal transition-colors hover:text-gray-900 text-xs lg:text-base"
+                        disabled={true}
+                        className="font-normal transition-colors disabled:cursor-not-allowed text-base"
                         style={{ color: '#BABABA' }}
                       >
-                        2
+                        Previous
                       </button>
-                </div>
-                    
-                    <button
-                      className="font-normal transition-colors text-xs lg:text-base"
-                      style={{ color: '#212121' }}
-                    >
-                      Next
-                    </button>
-                  </div>
-                  
-                  <div className="flex-1 flex justify-end">
-                    <div className="flex items-center space-x-1">
-                      <div className="rounded border lg:px-3 lg:py-1" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9', padding: '0 4px' }}>
-                        <span className="font-normal text-xs lg:text-base" style={{ color: '#212121' }}>1</span>
+                      
+                      <div className="flex items-baseline space-x-6">
+                        <button
+                          className="font-normal transition-colors relative pb-1 text-base"
+                          style={{ color: '#212121' }}
+                        >
+                          <span>1</span>
+                          <div 
+                            className="absolute bottom-0 left-1/2 -translate-x-1/2"
+                            style={{
+                              width: '200%',
+                              height: '2px',
+                              backgroundColor: '#212121'
+                            }}
+                          />
+                        </button>
+                        <button
+                          className="font-normal transition-colors hover:text-gray-900 text-base"
+                          style={{ color: '#BABABA' }}
+                        >
+                          2
+                        </button>
                       </div>
-                      <span className="font-normal text-xs lg:text-base" style={{ color: '#BABABA' }}>/ 2</span>
+                      
+                      <button
+                        className="font-normal transition-colors text-base"
+                        style={{ color: '#212121' }}
+                      >
+                        Next
+                      </button>
+                    </div>
+                    
+                    <div className="flex-1 flex justify-end">
+                      <div className="flex items-center space-x-1">
+                        <div className="rounded border px-3 py-1" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9' }}>
+                          <span className="font-normal text-base" style={{ color: '#212121' }}>1</span>
+                        </div>
+                        <span className="font-normal text-base" style={{ color: '#BABABA' }}>/ 2</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile Pagination */}
+                  <div className="lg:hidden space-y-4">
+                    {/* Page navigation */}
+                    <div className="flex items-center justify-center gap-4">
+                      <button
+                        aria-label="Previous page"
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '8px',
+                          backgroundColor: '#F0F0F0',
+                          border: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M15 18l-6-6 6-6" />
+                        </svg>
+                      </button>
+
+                      <div className="flex items-center" style={{ gap: '24px' }}>
+                        <span
+                          style={{
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            fontSize: '14px',
+                            color: '#212121'
+                          }}
+                        >
+                          1
+                        </span>
+                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>2</span>
+                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>3</span>
+                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>…</span>
+                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>48</span>
+                      </div>
+
+                      <button
+                        aria-label="Next page"
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '8px',
+                          backgroundColor: '#F0F0F0',
+                          border: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M9 6l6 6-6 6" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Go to section */}
+                    <div className="flex items-center gap-2 justify-center">
+                      <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
+                      <input
+                        type="text"
+                        placeholder="e.g 40"
+                        style={{
+                          border: '1px solid #BABABA',
+                          borderRadius: '8px',
+                          padding: '6px 10px',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '12px',
+                          color: '#D9D9D9',
+                          width: '64px',
+                          textAlign: 'center'
+                        }}
+                      />
+                      <button
+                        style={{
+                          backgroundColor: '#212121',
+                          color: '#FFFFFF',
+                          borderRadius: '8px',
+                          padding: '6px 14px',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '12px',
+                          border: 'none'
+                        }}
+                      >
+                        Go
+                      </button>
                     </div>
                   </div>
                 </div>
