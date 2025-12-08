@@ -828,7 +828,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
         }
       `}</style>
       {/* Navigation Bar - Fixed at top */}
-      <header className="flex-shrink-0 rounded-t-2xl" style={{ backgroundColor: '#F5F5F5' }}>
+      <header className="hidden lg:block flex-shrink-0 rounded-t-2xl" style={{ backgroundColor: '#F5F5F5' }}>
         <div className="max-w-7xl mx-auto px-1 sm:px-2 lg:px-3">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -1097,11 +1097,39 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
       </header>
 
       {/* Page Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto py-6 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F5F5F5' }}>
+      <div className="flex-1 overflow-y-auto py-3 px-4 lg:py-6 sm:px-6 lg:px-8 bg-white lg:bg-[#F5F5F5]">
         {!showSuccessModal ? (
         <div className="max-w-7xl mx-auto">
-          {/* Breadcrumbs and Drafts Button */}
-          <div className="flex items-center justify-between mb-4">
+          {/* Mobile Top Bar - Back Arrow and Drafts Button */}
+          <div className="flex items-center justify-between mb-3 lg:hidden">
+            {/* Back Arrow */}
+            <img 
+              src={arrowLeftIcon} 
+              alt="Back" 
+              className="w-5 h-5 cursor-pointer" 
+              onClick={handleHomepageClick}
+            />
+            {/* Drafts Button */}
+            <button
+              className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg"
+              style={{ backgroundColor: '#F0F8FE' }}
+              onClick={() => setIsDraftsModalOpen(true)}
+            >
+              <img src={draftsIcon} alt="Drafts" className="w-3.5 h-3.5" />
+              <span className="font-medium text-xs" style={{ color: '#64B5F6' }}>
+                Drafts
+              </span>
+              <span
+                className="px-2 py-0.5 rounded-full font-medium"
+                style={{ backgroundColor: '#CFE8FC', color: '#64B5F6', fontSize: '0.7rem' }}
+              >
+                {draftListings.length}
+              </span>
+            </button>
+          </div>
+
+          {/* Desktop Breadcrumbs and Drafts Button */}
+          <div className="hidden lg:flex items-center justify-between mb-4">
             {/* Breadcrumbs */}
             <nav className="flex items-center space-x-2 text-xs">
               <img 
@@ -1149,9 +1177,9 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
           </div>
 
           {/* Main Form Container */}
-          <div className="bg-white rounded-2xl border border-gray-300 shadow-sm pt-10 px-6 pb-16">
-            {/* Form Header */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="bg-white rounded-2xl lg:border lg:border-gray-300 lg:shadow-sm pt-4 lg:pt-10 px-4 lg:px-6 pb-6 lg:pb-16">
+            {/* Desktop Form Header */}
+            <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               {/* Title Section */}
               <div className="flex items-start space-x-3 pl-8">
                 <div
@@ -1192,8 +1220,906 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
               </div>
             </div>
 
-            {/* Form Columns */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Mobile Title Section */}
+            <div className="lg:hidden mb-3">
+              <h1 className="text-lg font-medium text-gray-900">
+                Create a new listing
+              </h1>
+              <p className="mt-0.5 text-xs" style={{ color: '#BABABA' }}>Add a new product</p>
+            </div>
+
+            {/* Mobile Form Layout */}
+            <div className="lg:hidden space-y-3">
+              {/* Image Upload Box - Mobile */}
+              <div>
+                      <div
+                        onDragOver={handleDragOver}
+                        onDragEnter={handleDragEnter}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={`rounded-2xl text-center relative image-upload-area ${isDraggingOver ? 'dragging-over' : ''}`}
+                        style={{
+                          backgroundColor: isImageLoading ? 'transparent' : (isDraggingOver ? 'transparent' : (imageUrls.length > 0 ? 'transparent' : '#F5F5F5')),
+                          background: (isImageLoading || isDraggingOver)
+                            ? 'repeating-linear-gradient(-45deg, #F5FBFF, #F5FBFF 18px, #F8FCFF 18px, #F8FCFF 36px)'
+                            : (imageUrls.length > 0 ? 'transparent' : '#F5F5F5'),
+                          border: (isImageLoading || isDraggingOver) ? '2px dashed #83C4F8' : 'none',
+                          borderRadius: '12px',
+                          height: imageUrls.length > 0 ? '180px' : 'auto',
+                          display: imageUrls.length > 0 ? 'flex' : 'block',
+                          justifyContent: imageUrls.length > 0 ? 'center' : 'normal',
+                          alignItems: imageUrls.length > 0 ? 'center' : 'normal',
+                          padding: imageUrls.length > 0 ? '0' : '40px 16px'
+                        }}
+                      >
+                     {isImageLoading ? (
+                       <div className="flex flex-col items-center justify-center">
+                         <p className="text-xs mb-6" style={{ color: '#83C4F8', fontWeight: 500 }}>
+                           Image loading
+                         </p>
+                         <div className="relative mb-4">
+                           {/* Gray base circle */}
+                           <svg width="78" height="78" className="transform -rotate-90">
+                             <circle
+                               cx="39"
+                               cy="39"
+                               r="36"
+                               fill="none"
+                               stroke="#E9E9E9"
+                               strokeWidth="3"
+                             />
+                             {/* Blue progress arc */}
+                             <circle
+                               cx="39"
+                               cy="39"
+                               r="36"
+                               fill="none"
+                               stroke="#83C4F8"
+                               strokeWidth="3"
+                               strokeDasharray={`${(uploadProgress / 100) * 226} 226`}
+                               strokeLinecap="round"
+                             />
+                           </svg>
+                           {/* Icon in center */}
+                           <div className="absolute inset-0 flex items-center justify-center">
+                             <img 
+                               src={loadIcon} 
+                               alt="Loading" 
+                               style={{ 
+                                 width: '32px', 
+                                 height: '32px',
+                                 filter: 'brightness(0) saturate(100%) invert(70%) sepia(36%) saturate(624%) hue-rotate(172deg) brightness(100%) contrast(96%)'
+                               }}
+                             />
+                           </div>
+                         </div>
+                         <div className="flex items-center gap-2">
+                           <p className="text-base font-normal" style={{ color: '#83C4F8' }}>
+                             {uploadProgress}%
+                           </p>
+                           {draggedImagesTotal >= 2 && (
+                             <p className="text-base font-normal" style={{ color: '#83C4F8' }}>
+                               {currentDraggedImageIndex}/{draggedImagesTotal}
+                             </p>
+                           )}
+                         </div>
+                       </div>
+                    ) : imageUrls.length > 0 ? (
+                       <div className="absolute inset-0 flex items-center justify-center" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+                         <img
+                           src={imageUrls[primaryImageIndex]}
+                           alt="Upload"
+                           className="w-full h-full object-cover"
+                         />
+                       </div>
+                      ) : (
+                       <>
+                         <img
+                           src={imageIcon}
+                           alt="Upload"
+                           className="mx-auto mb-4 opacity-60"
+                           style={{ width: '24px', height: '24px' }}
+                         />
+                         <p className="text-xs mb-2" style={{ color: '#2D2D2D' }}>
+                           Drag and drop product images here
+                         </p>
+                         <div className="flex items-center justify-center mb-4">
+                           <div className="w-8 border-t border-gray-300"></div>
+                           <p className="text-gray-400 text-sm px-3">OR</p>
+                           <div className="w-8 border-t border-gray-300"></div>
+                         </div>
+                         <label className="inline-block">
+                           <input
+                             type="file"
+                             multiple
+                             accept="image/*"
+                             onChange={handleImageUpload}
+                             className="hidden"
+                           />
+                           <span
+                             className="px-6 py-2.5 rounded-lg font-medium cursor-pointer inline-block"
+                             style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                           >
+                             Upload Photos
+                           </span>
+                         </label>
+                       </>
+                    )}
+                   </div>
+                 <div className="flex items-center justify-between mt-2">
+                   <p className="text-gray-400 text-xs">
+                     You can add up to 10 photos (JPEG, JPG, PNG)
+                   </p>
+                   {imageUrls.length > 0 && (
+                     <div 
+                       className="px-3 py-1 rounded-md"
+                       style={{ 
+                         backgroundColor: '#F0F8FE', 
+                         color: '#64B5F6',
+                         fontSize: '0.75rem',
+                         fontWeight: 500
+                       }}
+                     >
+                       {imageUrls.length}/10
+                     </div>
+                   )}
+                 </div>
+
+                 {/* Image Preview Section - Mobile */}
+                 {imageUrls.length > 0 && (
+                    <div className="flex gap-3 mt-4 overflow-x-auto" style={{ paddingTop: '15px', paddingBottom: '15px', WebkitOverflowScrolling: 'touch' }}>
+                      {imageUrls.map((url, index) => (
+                        <div 
+                          key={index}
+                          className="relative flex-shrink-0"
+                          style={{ 
+                            width: '70px', 
+                            height: '70px',
+                            borderRadius: '10px',
+                            overflow: 'visible'
+                          }}
+                        >
+                          <img 
+                            src={url} 
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            style={{ borderRadius: '12px' }}
+                          />
+                          
+                          {/* Light gray smoky overlay - only on primary image */}
+                          {index === primaryImageIndex && (
+                            <div 
+                              className="absolute inset-0"
+                              style={{ 
+                                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                                borderRadius: '12px'
+                              }}
+                            />
+                          )}
+                          
+                          {/* Remove button (X) */}
+                          <button
+                            onClick={() => handleRemoveImage(index)}
+                            className="absolute flex items-center justify-center"
+                            style={{
+                              width: '18px',
+                              height: '18px',
+                              backgroundColor: '#4D4D4D',
+                              borderRadius: '50%',
+                              border: '2px solid white',
+                              top: '-9px',
+                              right: '-9px',
+                              zIndex: 20
+                            }}
+                          >
+                            <svg 
+                              width="6" 
+                              height="6" 
+                              viewBox="0 0 10 10"
+                              fill="none"
+                              stroke="white"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            >
+                              <path d="M1 1L9 9M9 1L1 9" />
+                            </svg>
+                          </button>
+
+                          {/* Primary/Checkmark button - only show on primary image */}
+                          {index === primaryImageIndex && (
+                            <button
+                              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                backgroundColor: '#F9A825',
+                                borderRadius: '50%',
+                                border: '2px solid white',
+                                zIndex: 10
+                              }}
+                            >
+                              <svg 
+                                width="10" 
+                                height="8" 
+                                viewBox="0 0 12 10"
+                                fill="none"
+                                stroke="white"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M1 5L4 8L11 1" />
+                              </svg>
+                            </button>
+                          )}
+                          
+                          {/* Clickable overlay to set as primary - only show on non-primary images */}
+                          {index !== primaryImageIndex && (
+                            <div
+                              onClick={() => handleSetPrimaryImage(index)}
+                              className="absolute inset-0 cursor-pointer"
+                              style={{
+                                borderRadius: '12px',
+                                zIndex: 5
+                              }}
+                            />
+                          )}
+                        </div>
+                      ))}
+                      
+                      {/* Upload Next Images Interface - Mobile */}
+                      {imageUrls.length < 10 && (
+                        <div className="flex flex-col items-center flex-shrink-0">
+                          <label 
+                            className="flex items-center justify-center cursor-pointer"
+                            style={{
+                              width: '70px',
+                              height: '70px',
+                              backgroundColor: '#F0F8FE',
+                              border: '2px dashed #64B5F6',
+                              borderRadius: '10px'
+                            }}
+                          >
+                            <input
+                              type="file"
+                              multiple
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                              className="hidden"
+                            />
+                            <svg 
+                              width="24" 
+                              height="24" 
+                              viewBox="0 0 32 32"
+                              fill="none"
+                              stroke="#64B5F6"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            >
+                              <path d="M16 8V24M8 16H24" />
+                            </svg>
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                 )}
+               </div>
+
+              {/* Mobile Location Section */}
+              <div className="flex items-start justify-between">
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-1 mb-0.5">
+                    <img src={locIcon} alt="Location" className="w-3.5 h-3.5" />
+                    <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="text-xs font-medium border-none focus:outline-none ml-5"
+                    style={{ color: '#64B5F6' }}
+                  />
+                </div>
+                <button
+                  className="px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap"
+                  style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                >
+                  Change location
+                </button>
+              </div>
+
+              {/* Mobile Title Input */}
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter product name"
+                  className="create-listing-input w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+              </div>
+
+              {/* Mobile Description */}
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
+                  Description
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="... Describe your product"
+                  rows={3}
+                  className="create-listing-textarea w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                />
+              </div>
+
+              {/* Mobile Price Section */}
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
+                  Price
+                </label>
+                <div className="relative w-full">
+                  <div className="price-input-container flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:border-transparent">
+                    {/* Currency Dropdown */}
+                    <div className="relative currency-dropdown" style={{ position: 'static' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          console.log('Currency button clicked, current state:', isCurrencyDropdownOpen);
+                          setIsCurrencyDropdownOpen(!isCurrencyDropdownOpen);
+                        }}
+                        className="pl-3 pr-1 py-2.5 border-none focus:outline-none bg-white flex items-center"
+                        style={{ color: '#E4E4E4', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        <span>{currency}</span>
+                        <svg
+                          className="w-4 h-4 ml-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          style={{ color: '#6B7280' }}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      {isCurrencyDropdownOpen && (
+                        <div
+                          className="absolute z-50 bg-white border border-gray-200 shadow-lg overflow-hidden"
+                          style={{ borderRadius: '12px', minWidth: '250px', left: '0', top: 'calc(100% + 8px)' }}
+                        >
+                          {currencies.map((curr, index) => (
+                            <div
+                              key={curr.value}
+                              className={`w-full ${
+                                index === 0 ? 'rounded-t-xl' : ''
+                              } ${
+                                index === currencies.length - 1 ? 'rounded-b-xl' : ''
+                              }`}
+                              style={{
+                                backgroundColor: 'transparent'
+                              }}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCurrency(curr.value);
+                                  setIsCurrencyDropdownOpen(false);
+                                }}
+                                className="w-full text-left transition-colors relative flex items-center"
+                                style={{
+                                  color: '#6A6A6A',
+                                  cursor: 'pointer',
+                                  fontSize: '0.8rem',
+                                  padding: '10px 16px',
+                                  fontWeight: 500
+                                }}
+                              >
+                                {currency === curr.value && (
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      left: '8px',
+                                      right: '8px',
+                                      top: '4px',
+                                      bottom: '4px',
+                                      backgroundColor: '#F0F8FE',
+                                      borderRadius: '8px',
+                                      zIndex: 0
+                                    }}
+                                  />
+                                )}
+                                <img
+                                  src={`https://flagcdn.com/w40/${curr.flagCode}.png`}
+                                  alt=""
+                                  style={{
+                                    width: '24px',
+                                    height: '18px',
+                                    marginRight: '12px',
+                                    position: 'relative',
+                                    zIndex: 1
+                                  }}
+                                />
+                                <span style={{ position: 'relative', zIndex: 1 }}>
+                                  {curr.label} · {curr.value}
+                                </span>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ width: '1px', height: '32px', backgroundColor: '#D1D5DB', marginLeft: '12px', marginRight: '12px', flexShrink: 0 }}></div>
+                    <input
+                      type="text"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="Insert Pricing"
+                      className="create-listing-input flex-1 pl-4 pr-4 py-3 border-none focus:outline-none focus:ring-0"
+                      style={{ borderLeft: 'none', boxShadow: 'none' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Quantity */}
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
+                  Quantity
+                </label>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-10 rounded-lg font-medium text-base flex-shrink-0"
+                    style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    style={{ width: '120px' }}
+                  />
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-10 h-10 rounded-lg font-medium text-base flex-shrink-0"
+                    style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Mobile Categories */}
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
+                  Categories
+                </label>
+                <div className="relative category-dropdown w-full">
+                  {/* Dropdown Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none text-left flex items-center justify-between"
+                    style={{ 
+                      borderColor: isCategoryDropdownOpen ? '#97CDF9' : '#D1D5DB',
+                      boxShadow: isCategoryDropdownOpen ? '0 0 0 2px #97CDF9' : 'none'
+                    }}
+                  >
+                    <span style={{ color: category ? '#6A6A6A' : '#D9D9D9', fontSize: '0.8rem' }}>
+                      {category ? categories.find(c => c.value === category)?.label : 'Choose category'}
+                    </span>
+                    <svg 
+                      className="w-4 h-4" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                      style={{ color: '#6B7280' }}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isCategoryDropdownOpen && (
+                    <div 
+                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg overflow-hidden"
+                      style={{ borderRadius: '12px' }}
+                    >
+                      {categories.map((cat, index) => (
+                        <div
+                          key={cat.value}
+                          className={`w-full ${
+                            index === 0 ? 'rounded-t-xl' : ''
+                          } ${
+                            index === categories.length - 1 ? 'rounded-b-xl' : ''
+                          }`}
+                          style={{
+                            backgroundColor: 'transparent'
+                          }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCategory(cat.value);
+                              setIsCategoryDropdownOpen(false);
+                            }}
+                            className="w-full text-left transition-colors relative"
+                            style={{
+                              color: '#6A6A6A',
+                              cursor: 'pointer',
+                              fontSize: '0.8rem',
+                              padding: '10px 16px',
+                              fontWeight: 500
+                            }}
+                          >
+                            {category === cat.value && (
+                              <div 
+                                style={{
+                                  position: 'absolute',
+                                  left: '8px',
+                                  right: '8px',
+                                  top: '4px',
+                                  bottom: '4px',
+                                  backgroundColor: '#F0F8FE',
+                                  borderRadius: '8px',
+                                  zIndex: -1
+                                }}
+                              />
+                            )}
+                            <span style={{ position: 'relative', zIndex: 1 }}>{cat.label}</span>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Mobile Origin of product */}
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
+                  Origin of product
+                </label>
+                <div className="relative origin-dropdown w-full">
+                  {/* Dropdown Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsOriginDropdownOpen(!isOriginDropdownOpen)}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none text-left flex items-center justify-between"
+                    style={{ 
+                      borderColor: isOriginDropdownOpen ? '#97CDF9' : '#D1D5DB',
+                      boxShadow: isOriginDropdownOpen ? '0 0 0 2px #97CDF9' : 'none'
+                    }}
+                  >
+                     {origin ? (
+                       <div className="flex items-center">
+                         <img
+                           src={`https://flagcdn.com/w40/${countries.find(c => c.value === origin)?.flagCode}.png`}
+                           srcSet={`https://flagcdn.com/w80/${countries.find(c => c.value === origin)?.flagCode}.png 2x`}
+                           alt={`${countries.find(c => c.value === origin)?.label} flag`}
+                           style={{ 
+                             width: '20px',
+                             height: '15px',
+                             marginRight: '10px',
+                             borderRadius: '4px',
+                             objectFit: 'cover'
+                           }}
+                         />
+                         <span style={{ color: '#6A6A6A', fontSize: '0.8rem', fontWeight: 500 }}>
+                           {countries.find(c => c.value === origin)?.label}
+                         </span>
+                       </div>
+                     ) : (
+                       <span style={{ color: '#D9D9D9', fontSize: '0.8rem' }}>
+                         Choose origin of product
+                       </span>
+                     )}
+                    <svg 
+                      className="w-4 h-4" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                      style={{ color: '#6B7280' }}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isOriginDropdownOpen && (
+                    <div 
+                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg overflow-y-auto origin-dropdown-scroll"
+                      style={{ 
+                        borderRadius: '12px',
+                        maxHeight: '250px'
+                      }}
+                    >
+                      <style>{`
+                        .origin-dropdown-scroll::-webkit-scrollbar {
+                          width: 16px;
+                        }
+                        .origin-dropdown-scroll::-webkit-scrollbar-track {
+                          background: transparent;
+                        }
+                        .origin-dropdown-scroll::-webkit-scrollbar-thumb {
+                          background: #E4E4E4;
+                          border-radius: 10px;
+                          border: 6px solid white;
+                          background-clip: padding-box;
+                        }
+                        .origin-dropdown-scroll::-webkit-scrollbar-thumb:hover {
+                          background: #D1D5DB;
+                          border: 6px solid white;
+                          background-clip: padding-box;
+                        }
+                        .flag-emoji {
+                          font-family: "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Apple Color Emoji", "Twemoji Mozilla", sans-serif;
+                        }
+                      `}</style>
+                      {countries.map((country, index) => (
+                        <div
+                          key={country.value}
+                          className={`w-full ${
+                            index === 0 ? 'rounded-t-xl' : ''
+                          } ${
+                            index === countries.length - 1 ? 'rounded-b-xl' : ''
+                          }`}
+                          style={{
+                            backgroundColor: 'transparent'
+                          }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOrigin(country.value);
+                              setIsOriginDropdownOpen(false);
+                            }}
+                            className="w-full text-left transition-colors relative flex items-center"
+                            style={{
+                              color: '#6A6A6A',
+                              cursor: 'pointer',
+                              fontSize: '0.8rem',
+                              padding: '8px 16px',
+                              fontWeight: 500
+                            }}
+                          >
+                            {origin === country.value && (
+                              <div 
+                                style={{
+                                  position: 'absolute',
+                                  left: '8px',
+                                  right: '8px',
+                                  top: '4px',
+                                  bottom: '4px',
+                                  backgroundColor: '#F0F8FE',
+                                  borderRadius: '8px',
+                                  zIndex: 0
+                                }}
+                              />
+                            )}
+                            <img
+                              src={`https://flagcdn.com/w40/${country.flagCode}.png`}
+                              srcSet={`https://flagcdn.com/w80/${country.flagCode}.png 2x`}
+                              alt={`${country.label} flag`}
+                              style={{ 
+                                width: '24px',
+                                height: '18px',
+                                marginRight: '12px', 
+                                position: 'relative', 
+                                zIndex: 1,
+                                objectFit: 'cover',
+                                borderRadius: '2px'
+                              }}
+                            />
+                            <span style={{ position: 'relative', zIndex: 1 }}>{country.label}</span>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Mobile Type of sale */}
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
+                  Type of sale
+                </label>
+                <div className="relative sale-type-dropdown w-full">
+                  {/* Dropdown Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsSaleTypeDropdownOpen(!isSaleTypeDropdownOpen)}
+                    className="w-full px-3 border border-gray-300 rounded-lg focus:outline-none text-left flex items-center justify-between"
+                    style={{
+                      borderColor: isSaleTypeDropdownOpen ? '#97CDF9' : '#D1D5DB',
+                      boxShadow: isSaleTypeDropdownOpen ? '0 0 0 2px #97CDF9' : 'none',
+                      paddingTop: saleType === 'Urgent' ? '5px' : '10px',
+                      paddingBottom: saleType === 'Urgent' ? '5px' : '10px'
+                    }}
+                  >
+                    <div className="flex items-center">
+                      {saleType === 'Urgent' ? (
+                        <div 
+                          className="flex items-center"
+                          style={{
+                            backgroundColor: '#FEF6E9',
+                            color: '#F9A825',
+                            padding: '5px 12px',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
+                            fontWeight: 500
+                          }}
+                        >
+                          <span>Urgent</span>
+                          <img 
+                            src={path2Icon} 
+                            alt=""
+                            style={{ 
+                              width: '12px',
+                              height: '12px',
+                              marginLeft: '6px'
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <span style={{ color: saleType ? '#6A6A6A' : '#D9D9D9', fontSize: '0.8rem' }}>
+                          {saleType ? saleTypes.find(s => s.value === saleType)?.label : 'Choose type of sale'}
+                        </span>
+                      )}
+                    </div>
+                    <svg 
+                      className="w-4 h-4" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                      style={{ color: '#6B7280' }}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isSaleTypeDropdownOpen && (
+                    <div 
+                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg overflow-hidden"
+                      style={{ borderRadius: '12px' }}
+                    >
+                      {saleTypes.map((type, index) => (
+                        <div
+                          key={type.value}
+                          className={`w-full ${
+                            index === 0 ? 'rounded-t-xl' : ''
+                          } ${
+                            index === saleTypes.length - 1 ? 'rounded-b-xl' : ''
+                          }`}
+                          style={{
+                            backgroundColor: 'transparent'
+                          }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSaleType(type.value);
+                              setIsSaleTypeDropdownOpen(false);
+                            }}
+                            className="w-full text-left transition-colors relative flex items-center"
+                            style={{
+                              color: type.value === 'Default' ? '#6A6A6A' : '#999999',
+                              cursor: 'pointer',
+                              fontSize: '0.8rem',
+                              padding: '16px 16px',
+                              fontWeight: 500
+                            }}
+                          >
+                            {saleType === type.value && (
+                              <div 
+                                style={{
+                                  position: 'absolute',
+                                  left: '8px',
+                                  right: '8px',
+                                  top: '4px',
+                                  bottom: '4px',
+                                  backgroundColor: '#F0F8FE',
+                                  borderRadius: '8px',
+                                  zIndex: 0
+                                }}
+                              />
+                            )}
+                            <span style={{ position: 'relative', zIndex: 1 }}>{type.label}</span>
+                            {type.icon && (
+                              <img 
+                                src={type.icon} 
+                                alt=""
+                                style={{ 
+                                  width: '14px',
+                                  height: '14px',
+                                  position: 'relative',
+                                  zIndex: 1,
+                                  opacity: 0.7,
+                                  marginLeft: '8px'
+                                }}
+                              />
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Mobile Delivery available */}
+              <div className="py-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                      Delivery available
+                    </label>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      Lorem ipsum dolor sit amet consectutor
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setDeliveryAvailable(!deliveryAvailable)}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                      deliveryAvailable ? '' : 'bg-gray-300'
+                    }`}
+                    style={deliveryAvailable ? { backgroundColor: '#4CD964' } : {}}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        deliveryAvailable ? 'translate-x-4' : 'translate-x-0.5'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Mobile Buttons */}
+              <div className="flex flex-col items-center space-y-2.5 mt-4">
+                <button
+                  onClick={handlePostListing}
+                  className="flex items-center justify-center space-x-2 w-full py-2 rounded-xl font-medium transition-colors text-sm"
+                  style={{ 
+                    backgroundColor: isFormComplete ? '#F9A825' : '#E9E9E9', 
+                    color: isFormComplete ? '#FFFFFF' : '#6A6A6A',
+                    cursor: isFormComplete ? 'pointer' : 'not-allowed'
+                  }}
+                >
+                  <span>Post listing</span>
+                  <img 
+                    src={flyIcon} 
+                    alt="Post" 
+                    className="w-4 h-4" 
+                    style={{ 
+                      filter: isFormComplete 
+                        ? 'brightness(0) invert(1)' 
+                        : 'none'
+                    }}
+                  />
+                </button>
+                <button
+                  onClick={handleSaveDraft}
+                  className="flex items-center justify-center space-x-2 w-full py-2 rounded-xl border-2 font-medium transition-colors text-sm"
+                  style={{ borderColor: '#F9A825', color: '#F9A825' }}
+                >
+                  <span>Save as draft</span>
+                  <img src={draft2Icon} alt="Save" className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Desktop Form Columns */}
+            <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left Column */}
               <div className="space-y-4 pl-8">
                 {/* Title Input */}
@@ -1779,13 +2705,13 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                         )}
                       </div>
 
-                      <div style={{ width: '1px', height: '32px', backgroundColor: '#D1D5DB', marginLeft: '12px', marginRight: '12px', flexShrink: 0 }}></div>
+                      <div style={{ width: '1px', height: '28px', backgroundColor: '#D1D5DB', marginLeft: '10px', marginRight: '10px', flexShrink: 0 }}></div>
                       <input
                         type="text"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         placeholder="Insert Pricing"
-                        className="create-listing-input flex-1 pl-4 pr-4 py-3 border-none focus:outline-none focus:ring-0"
+                        className="create-listing-input flex-1 pl-3 pr-3 py-2.5 border-none focus:outline-none focus:ring-0 text-sm"
                         style={{ borderLeft: 'none', boxShadow: 'none' }}
                       />
                       </div>
