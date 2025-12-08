@@ -26,7 +26,7 @@ import a1 from '../assets/images/pre/a1.png';
 import a2 from '../assets/images/pre/a2.png';
 import a3 from '../assets/images/pre/a3.png';
 import a4 from '../assets/images/pre/a4.png';
-import verifyIcon from '../assets/images/pre/verify.svg';
+import verityIcon from '../assets/images/pre/verity.svg';
 import avatar from '../assets/images/logos/avatar.png';
 import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
 
@@ -2350,9 +2350,9 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
               style={{ borderRadius: '30px', padding: '48px 40px', maxWidth: '420px', width: '100%' }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Verify Icon - Top Center */}
+              {/* Verity Icon - Top Center */}
               <div className="flex justify-center mb-6">
-                <img src={verifyIcon} alt="Success" className="w-16 h-16" />
+                <img src={verityIcon} alt="Success" className="w-16 h-16" />
               </div>
 
               {/* Title */}
@@ -2361,7 +2361,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                 style={{ 
                   color: '#212121', 
                   fontFamily: 'Bricolage Grotesque, sans-serif',
-                  fontSize: '24px',
+                  fontSize: '22px',
                   fontWeight: '600'
                 }}
               >
@@ -2390,7 +2390,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                     backgroundColor: '#F1F1F1',
                     color: '#6A6A6A',
                     borderRadius: '12px',
-                    fontSize: '12px'
+                    fontSize: '10px'
                   }}
                 >
                   Back to listing page ({countdown}s)
@@ -2405,7 +2405,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                     color: '#F9A825',
                     border: '1px solid #F9A825',
                     borderRadius: '12px',
-                    fontSize: '13px'
+                    fontSize: '11px'
                   }}
                 >
                   Add new listing

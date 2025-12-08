@@ -188,6 +188,23 @@ const ProductDetail: React.FC = () => {
   const ownerListing = ownerViewState?.listing;
   const isOwnerView = Boolean(ownerViewState?.fromMyListings && ownerListing);
   
+  // TODO: Frontend Testing Only - Remove this toggle functionality when implementing backend
+  // This toggle is for testing purposes only. Backend developer fonsah should remove this
+  // and implement proper review status handling from the backend API.
+  const [toggledReviewStatus, setToggledReviewStatus] = useState<'success' | 'failed' | null>(null);
+  
+  // Get the actual review status (use toggled state if available, otherwise use from listing)
+  const currentReviewStatus = toggledReviewStatus || ownerListing?.reviewStatus;
+  
+  // Toggle review status handler
+  const handleToggleReviewStatus = () => {
+    if (currentReviewStatus === 'success') {
+      setToggledReviewStatus('failed');
+    } else if (currentReviewStatus === 'failed') {
+      setToggledReviewStatus('success');
+    }
+  };
+  
   // Reviews section state
   const [activeTab, setActiveTab] = useState<'reviews' | 'items'>('reviews');
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
@@ -981,7 +998,7 @@ const ProductDetail: React.FC = () => {
                 <h1 className="font-normal" style={{ fontSize: '18px', color: '#939393' }}>
                   {displayName}
                 </h1>
-                {isOwnerView && !ownerListing?.reviewStatus && renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
+                {isOwnerView && !currentReviewStatus && renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
               </div>
               
               {/* Price and posted date */}
@@ -1334,9 +1351,11 @@ const ProductDetail: React.FC = () => {
               </div>
 
               {/* Review Status Badge - Success State */}
-              {isOwnerView && ownerListing?.reviewStatus === 'success' && (
+              {/* TODO: Frontend Testing Only - Remove toggle functionality when implementing backend */}
+              {isOwnerView && currentReviewStatus === 'success' && (
                 <div
-                  className="flex items-start gap-3 p-2.5 mt-2"
+                  onClick={handleToggleReviewStatus}
+                  className="flex items-start gap-3 p-2.5 mt-2 cursor-pointer"
                   style={{
                     backgroundColor: '#F5FBFF',
                     border: '1px solid #B8DDFB',
@@ -1389,9 +1408,11 @@ const ProductDetail: React.FC = () => {
               )}
 
               {/* Review Status Badge - Failed State */}
-              {isOwnerView && ownerListing?.reviewStatus === 'failed' && (
+              {/* TODO: Frontend Testing Only - Remove toggle functionality when implementing backend */}
+              {isOwnerView && currentReviewStatus === 'failed' && (
                 <div
-                  className="flex items-start gap-3 p-2.5 mt-2"
+                  onClick={handleToggleReviewStatus}
+                  className="flex items-start gap-3 p-2.5 mt-2 cursor-pointer"
                   style={{
                     backgroundColor: '#FFFCF7',
                     border: '1px solid #FFE0B2',
@@ -1404,11 +1425,12 @@ const ProductDetail: React.FC = () => {
                     style={{
                       width: '40px',
                       height: '40px',
+                      border: '2px solid #FFFFFF',
                       backgroundColor: '#FFFCF7'
                     }}
                   >
                     <img
-                      src={warningIcon}
+                      src={daysIcon}
                       alt="Warning"
                       className="w-6 h-6"
                     />
@@ -1459,7 +1481,7 @@ const ProductDetail: React.FC = () => {
                         paddingLeft: '8px'
                       }}
                     >
-                      • {ownerListing.reviewFailureReason || 'Your product is not authentic'}
+                      <span style={{ color: '#B0B0B0' }}>•</span> {ownerListing?.reviewFailureReason || 'Your product is not authentic'}
                     </p>
                   </div>
                 </div>
@@ -1532,7 +1554,7 @@ const ProductDetail: React.FC = () => {
               )}
 
               {/* Warning Badge for Inactive Listings */}
-              {isOwnerView && ownerListing?.status === 'inactive' && (
+              {isOwnerView && ownerListing?.status === 'inactive' && !currentReviewStatus && (
                 <div
                   className="flex items-start gap-3 p-2.5 mt-2"
                   style={{
@@ -1622,7 +1644,7 @@ const ProductDetail: React.FC = () => {
                 <p className="font-normal capitalize" style={{ fontSize: '16px', color: '#939393' }}>
                   {isOwnerView ? displayName : 'poivre blanc'}
                 </p>
-                {isMobile && isOwnerView && !ownerListing?.reviewStatus && (
+                {isMobile && isOwnerView && !currentReviewStatus && (
                   <div className="flex-shrink-0">
                     {renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
                   </div>
@@ -1821,7 +1843,7 @@ const ProductDetail: React.FC = () => {
           </div>
 
           {/* Warning Badge for Inactive Listings - Mobile - Above badges */}
-          {isMobile && isOwnerView && ownerListing?.status === 'inactive' && !ownerListing?.reviewStatus && (
+          {isMobile && isOwnerView && ownerListing?.status === 'inactive' && !currentReviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-5 mb-3"
               style={{
@@ -1870,7 +1892,7 @@ const ProductDetail: React.FC = () => {
           )}
 
           {/* Days Left Badge - Mobile - Above badges */}
-          {isMobile && isOwnerView && ownerListing?.daysLeft && !ownerListing?.reviewStatus && (
+          {isMobile && isOwnerView && ownerListing?.daysLeft && !currentReviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-5 mb-3"
               style={{
@@ -2232,7 +2254,7 @@ const ProductDetail: React.FC = () => {
           </div>
 
           {/* Days Left Badge - Mobile - Hidden, now shown above badges */}
-          {!isMobile && isOwnerView && ownerListing?.daysLeft && !ownerListing?.reviewStatus && (
+          {!isMobile && isOwnerView && ownerListing?.daysLeft && !currentReviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-2"
               style={{
@@ -2298,7 +2320,7 @@ const ProductDetail: React.FC = () => {
           )}
 
           {/* Warning Badge for Inactive Listings - Mobile - Hidden, now shown above badges */}
-          {!isMobile && isOwnerView && ownerListing?.status === 'inactive' && !ownerListing?.reviewStatus && (
+          {!isMobile && isOwnerView && ownerListing?.status === 'inactive' && !currentReviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-2"
               style={{
