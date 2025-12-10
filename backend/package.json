@@ -27,6 +27,7 @@
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/s3-request-presigner": "^3.916.0",
+    "@google-cloud/storage": "^7.18.0",
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^7.0.1",
     "@prisma/client-runtime-utils": "^7.0.1",
@@ -65,7 +66,7 @@
     "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
-    "uuid": "^9.0.1",
+    "uuid": "^13.0.0",
     "validator": "^13.11.0",
     "winston": "^3.11.0"
   },

@@ -1,0 +1,16 @@
+[
+  {
+    "origin": ["http://localhost:3000", "https://staging.baoafrik.com"],
+    "method": ["GET", "PUT", "POST", "DELETE", "OPTIONS", "HEAD"],
+    "responseHeader": [
+      "Content-Type",
+      "Content-MD5",
+      "Content-Disposition",
+      "ETag",
+      "x-goog-request-id",
+      "x-goog-content-length-range",
+      "x-goog-meta-*"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

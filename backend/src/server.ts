@@ -24,6 +24,9 @@ import chatRoutes from '@/routes/chatRoutes';
 import productRoutes from './routes/productRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 import notificationRoutes from './routes/notificationRoutes';
+import countryRoutes from '@/routes/countryRoutes';
+
+import { gcpStorageService } from './services/gcpStorageService';
 
 const app = express();
 const server = createServer(app);
@@ -45,6 +48,8 @@ const io = new Server(server, {
 });
 
 new WebSocketService(io);
+
+gcpStorageService.configureCors().catch(console.error);
 
 // Swagger configuration
 const swaggerOptions = {
@@ -99,16 +104,30 @@ app.use(helmet({
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CORS_ORIGINS?.split(',') || [
+  origin: process.env.CORS_ORIGINS?.split(',').map(origin => origin.trim()) || [
     'http://localhost:3000',
-    'http://localhost:3001',
-    'https://staging.baoafrik.com/*',
-    'https://www.staging.baoafrik.com/*'
+    'http://localhost:3001'
   ],
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Content-MD5',
+    'Content-Disposition',
+    'ETag',
+    'x-goog-request-id',
+    'x-goog-content-length-range'
+  ],
+  exposedHeaders: [
+    'Content-Type',
+    'Content-MD5',
+    'Content-Disposition',
+    'ETag',
+    'x-goog-request-id'
+  ]
 };
 
 app.use(cors(corsOptions));
@@ -165,6 +184,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/countries', countryRoutes);
 
 // 404 handler
 app.use(notFound);

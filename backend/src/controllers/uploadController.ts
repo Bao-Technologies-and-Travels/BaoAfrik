@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { s3Service } from '../services/s3Service';
+// import { s3Service } from '@/services/s3Service';
+import { gcpStorageService } from '../services/gcpStorageService';
 import { validationResult } from 'express-validator';
 
 export class UploadController {
@@ -17,7 +18,7 @@ export class UploadController {
         });
       }
 
-      const presignedData = await s3Service.generatePresignedUrl(
+      const presignedData = await gcpStorageService.generateSignedUrl(
         fileName,
         fileType,
         'profile',
@@ -38,7 +39,6 @@ export class UploadController {
     }
   }
 
-  // For chat files (matches your Messages.tsx usage)
   async getPresignedUrlForChat(req: Request, res: Response) {
     try {
       const { fileName, fileType, userId } = req.body;
@@ -52,7 +52,7 @@ export class UploadController {
         });
       }
 
-      const presignedData = await s3Service.generatePresignedUrl(
+      const presignedData = await gcpStorageService.generateSignedUrl(
         fileName,
         fileType,
         'chat',
@@ -93,7 +93,7 @@ export class UploadController {
         });
       }
 
-      const presignedData = await s3Service.generatePresignedUrl(
+      const presignedData = await gcpStorageService.generateSignedUrl(
         fileName,
         fileType,
         'product',
@@ -124,7 +124,7 @@ export class UploadController {
         });
       }
 
-      const viewUrl = await s3Service.generateViewUrl(key);
+      const viewUrl = await gcpStorageService.generateViewUrl(key);
 
       return res.json({
         success: true,
@@ -138,7 +138,7 @@ export class UploadController {
     }
   }
 
-  // Delete file from S3
+  // Delete file
   async deleteFile(req: Request, res: Response) {
     try {
       const { key } = req.body;
@@ -151,7 +151,7 @@ export class UploadController {
         });
       }
 
-      await s3Service.deleteFile(key);
+      await gcpStorageService.deleteFile(key);
 
       return res.json({
         success: true,
@@ -190,7 +190,7 @@ export class UploadController {
         fileType: file.fileType
       }));
 
-      const presignedData = await s3Service.generateBatchPresignedUrls(
+      const presignedData = await gcpStorageService.generateBatchSignedUrls(
         fileData,
         uploadType,
         userId

@@ -12,6 +12,8 @@ interface User {
   gender?: string;
   birthDate?: string;
   phoneNumber?: string;
+  location?: string;
+  bio?: string;
   emailVerified?: boolean;
   isVerifiedSeller?: boolean;
   provider?: string;

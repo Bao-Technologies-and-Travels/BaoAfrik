@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from '../contexts/AuthContext';
+import {apiClient} from '../services/api';
+
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
 import lilLogo from '../assets/images/pre/lil.png';
-import avatarIcon from '../assets/images/pre/avatar.png';
-import basketIcon from '../assets/images/pre/basket.png';
 import leftIcon from '../assets/images/pre/left.png';
 import notificationIcon from '../assets/images/pre/notification.svg';
 import settingIcon from '../assets/images/pre/setting.svg';
@@ -54,10 +54,13 @@ import closeIcon from '../assets/images/pre/CLose.svg';
 import updateIcon from '../assets/images/pre/update.svg.svg';
 import keyIcon from '../assets/images/pre/key.svg';
 import backArrowIcon from '../assets/images/pre/back arrow.svg';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import { io, Socket } from "socket.io-client";
 import { useSocket } from '../contexts/socketContext'
 import { useToast } from "../contexts/ToastContext";
+import { countries } from '../utils/countries';
 
 const currencyRates: Record<string, number> = {
   USD: 1,
@@ -65,6 +68,24 @@ const currencyRates: Record<string, number> = {
   CAD: 1.34,
   GBP: 0.81
 };
+
+interface ProfileData {
+  fullName: string;
+  gender: string;
+  birthDate: string;
+  profileImage: string;
+  phoneNumber: string;
+  location: string;
+  bio: string;
+}
+
+interface FormErrors {
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  birthDate?: string;
+  general?: string;
+}
 
 const translationDictionary: Record<string, Record<string, string>> = {
   fr: {
@@ -129,7 +150,7 @@ const translationDictionary: Record<string, Record<string, string>> = {
     "Enter your phone number": "Entrez votre numéro de téléphone",
     "Change mail address": "Changer l'adresse e-mail",
     "Can you tell us more about yourself ?": "Pouvez-vous nous en dire plus sur vous ?",
-    "Save biographie": "Enregistrer la biographie",
+    "Save bio": "Enregistrer la biographie",
     "Geolocation": "Géolocalisation",
     "English": "Anglais",
     "French": "Français",
@@ -160,6 +181,7 @@ declare global {
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { addToast } = useToast();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [languagePreference, setLanguagePreference] = useState<'en' | 'fr' | 'de' | 'es'>(() => {
@@ -171,7 +193,6 @@ const ProfileSettings: React.FC = () => {
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('personal');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isGeolocationEnabled, setIsGeolocationEnabled] = useState(false);
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
   const [isTwoFactorModalOpen, setIsTwoFactorModalOpen] = useState(false);
   const [twoFactorModalStep, setTwoFactorModalStep] = useState<'email' | 'phone' | 'code' | 'success'>('email');
@@ -207,6 +228,14 @@ const ProfileSettings: React.FC = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const [countries, setCountries] = useState<{ id: string; name: string; code: string; flag?: string }[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<{ code: string, name: string } | null>(null);
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string | ''>('');
+  const [isFetchingCountries, setIsFetchingCountries] = useState(false);
+  const [isGeolocationEnabled, setIsGeolocationEnabled] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   // fetch notifications on mount
   useEffect(() => {
@@ -423,16 +452,242 @@ const ProfileSettings: React.FC = () => {
     return avatar;
   };
 
-  // Profile editing state
-  const [profileData, setProfileData] = useState({
-    fullName: `${user?.firstName} ${user?.lastName}`,
-    gender: user?.gender,
-    birthday: user?.birthDate,
-    profileImage: user?.profileImage
-  });
+  // load user and countries on mount
+  useEffect(() => {
+    let mounted = true;
+    const token = localStorage.getItem('accessToken');
 
-  // Image upload state
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+    const loadProfile = async () => {
+      try {
+        if (!token) return;
+
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) return;
+
+        const json = await res.json();
+        if (!mounted || !json.success) return;
+
+        const u = json.data;
+        setProfileData({
+          fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+          gender: u.gender || '',
+          birthDate: u.birthDate ? (u.birthDate.split?.('T')?.[0] ?? new Date(u.birthDate).toISOString().slice(0, 10)) : '',
+          profileImage: u.profileImage || '',
+          phoneNumber: u.phoneNumber || '',
+          location: u.location || '',
+          bio: u.bio || ''
+        });
+
+        setProfileImage(u.profileImage || null);
+        if (u.location) setSelectedCountryCode(u.location);
+      } catch (e) {
+        console.warn('Failed to load profile', e);
+      }
+    };
+
+    const loadCountries = async () => {
+      setIsFetchingCountries(true);
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/countries`);
+        if (!res.ok) return;
+
+        const json = await res.json();
+        if (!mounted || !json.success) return;
+
+        const list = (json.data || []).map((c: any) => ({ id: c.id, name: c.name, code: (c.code || c.iso2 || c.alpha2 || '').toString().toUpperCase(), flag: c.flag }));
+        setCountries(list);
+
+      } catch (e) {
+        console.warn('Failed to load countries', e);
+      } finally {
+        setIsFetchingCountries(false);
+      }
+    };
+
+    loadProfile();
+    loadCountries();
+
+    return () => { mounted = false; };
+  }, []);
+
+  // Load countries on component mount
+  useEffect(() => {
+    const loadCountries = async () => {
+      try {
+        setIsFetchingCountries(true);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/countries`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setCountries(data.data || []);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load countries:', error);
+      } finally {
+        setIsFetchingCountries(false);
+      }
+    };
+
+    loadCountries();
+  }, []);
+
+  // Geolocation toggle
+  useEffect(() => {
+    if (!isGeolocationEnabled) {
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      addToast({
+        type: 'error',
+        title: 'error',
+        message: 'Geolocation not supported by your browser',
+        duration: 2000
+      });
+      setIsGeolocationEnabled(false);
+      return;
+    }
+
+    setIsFetchingCountries(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+
+          if (!response.ok) throw new Error('Reverse geocoding failed');
+
+          const data = await response.json();
+
+          if (data && data.countryName) {
+            const foundCountry = countries.find(
+              (c) => c.name.toLowerCase() === data.countryName.toLowerCase()
+            );
+
+            if (foundCountry) {
+              setSelectedCountryCode(foundCountry.code);
+              setSelectedCountry(foundCountry);
+              setFormData(prev => ({
+                ...prev,
+                location: foundCountry.name
+              }));
+
+              addToast({
+                type: 'success',
+                title: 'Location updated',
+                message: 'Location updated successfully',
+                duration: 2000
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Geolocation error:', error);
+          addToast({
+            type: 'error',
+            title: 'Cannot update location',
+            message: 'Could not determine your location. Please select a country manually.',
+            duration: 2000
+          });
+        } finally {
+          setIsFetchingCountries(false);
+        }
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        addToast({
+          type: 'error',
+          title: 'Cannot access location',
+          message: 'Unable to access your location. Please enable location services or select a country manually.',
+          duration: 2000
+        });
+
+        setIsGeolocationEnabled(false);
+        setIsFetchingCountries(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  }, [isGeolocationEnabled, countries, addToast]);
+
+  const handleCountrySelect = (country: { code: string, name: string }) => {
+    setSelectedCountry(country);
+    setFormData(prev => ({
+      ...prev,
+      location: country.name
+    }));
+    setIsCountryDropdownOpen(false);
+  };
+
+  const handleDateChange = (date: Date | null) => {
+    if (date) {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+
+      setFormData(prev => ({
+        ...prev,
+        birthDate: dateString,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        birthDate: '',
+      }));
+    }
+
+    if (errors.birthDate) {
+      setErrors(prev => ({
+        ...prev,
+        birthDate: '',
+      }));
+    }
+  };
+
+  // Profile editing state
+  const formatUserData = () => {
+    if (!user) {
+      return {
+        fullName: '',
+        gender: '',
+        birthDate: '',
+        profileImage: '',
+        phoneNumber: '',
+        location: '',
+        bio: ''
+      };
+    }
+
+    return {
+      fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || '',
+      gender: user.gender || '',
+      birthDate: user.birthDate || '',
+      profileImage: user.profileImage || '',
+      phoneNumber: user.phoneNumber || '',
+      location: user.location || '',
+      bio: user.bio || ''
+    };
+  };
+
+  const [profileData, setProfileData] = useState<ProfileData>(formatUserData());
+  const [formData, setFormData] = useState<ProfileData>(formatUserData());
+  const [isEditing, setIsEditing] = useState(false);
+
+
+  // Image upload state - use the user's profile image if available
+  const [profileImage, setProfileImage] = useState<string | null>(user?.profileImage || null);
+
+  // Update profile image when user data changes
+  useEffect(() => {
+    if (user?.profileImage) {
+      setProfileImage(user.profileImage);
+    }
+  }, [user]);
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -472,14 +727,23 @@ const ProfileSettings: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileSidebarVisible, setIsMobileSidebarVisible] = useState(false);
 
+  // Update profile data when user changes
+  useEffect(() => {
+    if (user) {
+      setProfileData(formatUserData());
+    }
+  }, [user]);
+
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
+
   // Calculate profile completion progress
   const calculateProfileProgress = () => {
+    if (!user) return 0;
+
     let progress = 10; // Setup account (always complete when logged in)
 
     // Personal information (10%) - check if fullName, gender, and birthday are filled
-    if (profileData.fullName && profileData.fullName.trim() !== '' &&
-      profileData.gender && profileData.gender.trim() !== '' &&
-      profileData.birthday && profileData.birthday.trim() !== '') {
+    if (user.firstName && user.lastName && user.gender && user.birthDate) {
       progress += 10;
     }
 
@@ -514,7 +778,7 @@ const ProfileSettings: React.FC = () => {
   const isPersonalInfoComplete = useMemo(() =>
     profileData.fullName && profileData.fullName.trim() !== '' &&
     profileData.gender && profileData.gender.trim() !== '' &&
-    profileData.birthday && profileData.birthday.trim() !== '',
+    profileData.birthDate && profileData.birthDate.trim() !== '',
     [profileData]
   );
   const isPhotoUploaded = useMemo(() => !!profileImage, [profileImage]);
@@ -808,11 +1072,99 @@ const ProfileSettings: React.FC = () => {
   };
 
   // Handle profile save
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     setIsEditingProfile(false);
     setIsGenderDropdownOpen(false);
     setIsBirthdayCalendarOpen(false);
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+      const nameParts = (profileData.fullName || '').trim().split(/\s+/);
+      const payload: any = {
+        firstName: nameParts.shift() || '',
+        lastName: nameParts.join(' ') || undefined,
+        gender: profileData.gender || undefined,
+        birthDate: profileData.birthDate || undefined,
+        bio: biography || undefined,
+        location: selectedCountryCode || profileData.location || undefined
+      };
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/profile`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json().catch(() => ({ success: false }));
+      if (!res.ok) {
+        console.error('Save profile failed', json);
+        addToast && addToast({ type: 'error', title: 'Save failed', message: json.message || 'Could not save profile' });
+        return;
+      }
+      if (json.success && json.data) {
+        // update local state
+        setProfileData(prev => ({ ...prev, profileImage: json.data.profileImage || prev.profileImage }));
+      }
+    } catch (e) {
+      console.error('Save profile error', e);
+    }
   };
+
+  const handleSaveBio = async () => {
+  if (!biography.trim()) {
+    addToast({message: 'Please enter a bio', type: 'error', title: 'Action failed', duration: 2000});
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/profile/bio`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ bio: biography })
+    });
+    
+    if (!response.ok) throw new Error('Failed to save bio');
+    
+    addToast({message: 'Bio updated successfully', type: 'success', title: 'Action completed', duration: 2000});
+    setProfileData(prev => ({ ...prev, bio: biography }));
+  } catch (error) {
+    console.error('Error saving bio:', error);
+    addToast({message: 'Failed to save bio', type: 'error', title: 'Action failed', duration: 2000});
+  }
+};
+
+const handleUpdateProfile = async () => {
+  try {
+    setIsSaving(true);
+    
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({
+        ...formData,
+        // Split full name into first and last name
+        firstName: formData.fullName.split(' ')[0],
+        lastName: formData.fullName.split(' ').slice(1).join(' ') || ''
+      })
+    });
+    
+    if (!response.ok) throw new Error('Failed to update profile');
+    
+    const data = await response.json();
+    addToast({message: 'Profile updated successfully', type: 'success', title: 'Profile updated', duration: 2000});
+    setProfileData(formData);
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    addToast({message: 'Failed to update profile', type: 'error', title: 'Action failed', duration: 2000});
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const handleVerificationInput = (field: 'email' | 'phone', value: string) => {
     setVerificationForm(prev => ({ ...prev, [field]: value }));
@@ -953,7 +1305,13 @@ const ProfileSettings: React.FC = () => {
   };
 
   const handleGenderSelect = (gender: string) => {
-    setProfileData(prev => ({ ...prev, gender }));
+    setProfileData(prev => ({
+      ...prev,
+      gender,
+      fullName: prev.fullName || '',
+      birthDate: prev.birthDate || '',
+      profileImage: prev.profileImage || ''
+    }));
     setIsGenderDropdownOpen(false);
   };
 
@@ -966,7 +1324,7 @@ const ProfileSettings: React.FC = () => {
   };
 
   const openBirthdayCalendar = () => {
-    const parsed = parseBirthday(profileData.birthday);
+    const parsed = parseBirthday(profileData.birthDate);
     if (parsed) {
       setCalendarDate(parsed);
     }
@@ -1049,13 +1407,17 @@ const ProfileSettings: React.FC = () => {
       if (twoFactorPhoneCodeDropdownRef.current && !twoFactorPhoneCodeDropdownRef.current.contains(target) && isTwoFactorPhoneCodeDropdownOpen) {
         setIsTwoFactorPhoneCodeDropdownOpen(false);
       }
+
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
+        setIsCountryDropdownOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen, isTwoFactorModalOpen, isTwoFactorPhoneCodeDropdownOpen]);
+  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen, isTwoFactorModalOpen, isTwoFactorPhoneCodeDropdownOpen, countryDropdownRef]);
 
   // Handle navigation state to set selected sidebar option
   useEffect(() => {
@@ -2130,7 +2492,7 @@ const ProfileSettings: React.FC = () => {
                                       </div>
                                       <div className="text-right">
                                         <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Birthday</label>
-                                        <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthday}</p>
+                                        <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthDate}</p>
                                       </div>
                                     </div>
                                   </div>
@@ -2146,7 +2508,7 @@ const ProfileSettings: React.FC = () => {
                                     </div>
                                     <div style={{ marginLeft: '4px' }}>
                                       <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Birthday</label>
-                                      <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthday}</p>
+                                      <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthDate}</p>
                                     </div>
                                   </div>
                                 )}
@@ -2228,7 +2590,7 @@ const ProfileSettings: React.FC = () => {
                                       )}
                                     </div>
                                   </div>
-                                  <div className="flex-1" ref={birthdayCalendarRef}>
+                                  {/* <div className="flex-1" ref={birthdayCalendarRef}>
                                     <label className="text-[10px] mb-1 block" style={{ color: '#6A6A6A' }}>Birthday</label>
                                     <div className="relative birthday-calendar">
                                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -2240,14 +2602,14 @@ const ProfileSettings: React.FC = () => {
                                       </span>
                                       <input
                                         type="text"
-                                        value={profileData.birthday}
-                                        onChange={(e) => setProfileData({ ...profileData, birthday: e.target.value })}
+                                        value={profileData.birthDate}
+                                        onChange={(e) => setProfileData({ ...profileData, birthDate: e.target.value })}
                                         placeholder="13/09/2000"
                                         className="w-full px-3 py-2 pl-9 rounded-lg text-xs focus:outline-none profile-edit-input-birthday"
                                         style={{
                                           backgroundColor: 'white',
                                           border: '1px solid #E9E9E9',
-                                          color: profileData.birthday ? '#212121' : '#BABABA'
+                                          color: profileData.birthDate ? '#212121' : '#BABABA'
                                         }}
                                         onFocus={(e) => {
                                           e.target.style.borderColor = '#64B5F6';
@@ -2294,7 +2656,7 @@ const ProfileSettings: React.FC = () => {
                                                 return <span key={index} className="h-7 flex items-center justify-center text-gray-300 text-[10px]"> </span>;
                                               }
                                               const value = formatDate(day);
-                                              const isSelected = profileData.birthday === value;
+                                              const isSelected = profileData.birthDate === value;
                                               return (
                                                 <button
                                                   type="button"
@@ -2317,6 +2679,31 @@ const ProfileSettings: React.FC = () => {
                                         </div>
                                       )}
                                     </div>
+                                  </div> */}
+                                  <div className="mt-4">
+                                    <label htmlFor="birthday" className="text-[10px] mb-1 block" style={{ color: '#6A6A6A' }}>
+                                      Birthday
+                                    </label>
+                                    <div className="relative">
+                                      <DatePicker
+                                        selected={formData.birthDate ? new Date(formData.birthDate) : null}
+                                        onChange={handleDateChange}
+                                        dateFormat="MMMM d, yyyy"
+                                        className="w-full rounded-md border border-gray-300 bg-white py-2 pl-2 pr-6 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-sm"
+                                        placeholderText="Select your birthday"
+                                        showYearDropdown
+                                        dropdownMode="select"
+                                        yearDropdownItemNumber={100}
+                                        scrollableYearDropdown
+                                        maxDate={new Date()}
+                                        showMonthDropdown
+                                      />
+                                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                          <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                                        </svg>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
@@ -2324,7 +2711,7 @@ const ProfileSettings: React.FC = () => {
                           </div>
 
                           {/* Location Section */}
-                          <div className={`bg-white p-3 ${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'}`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
+                          {/* <div className={`bg-white p-3 ${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'}`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
                             <div className="flex items-center justify-between mb-2">
                               <h3 className={`text-xs ${isMobileProfileView ? 'font-medium' : 'font-normal'}`} style={{ color: '#6A6A6A' }}>Location</h3>
                               <div className="flex items-center space-x-2">
@@ -2334,27 +2721,90 @@ const ProfileSettings: React.FC = () => {
                                   className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
                                   style={{ backgroundColor: isGeolocationEnabled ? '#4CD964' : '#D1D5DB' }}
                                 >
-                                  <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0.5'
-                                      }`}
-                                  />
+                                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
                                 </button>
                               </div>
                             </div>
+                          </div> */}
+
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium text-gray-700">Use my current location</p>
+                              <button
+                                type="button"
+                                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${isGeolocationEnabled ? 'bg-primary-600' : 'bg-gray-200'}`}
+                                role="switch"
+                                aria-checked={isGeolocationEnabled}
+                                onClick={() => setIsGeolocationEnabled(!isGeolocationEnabled)}
+                                disabled={isFetchingCountries}
+                              >
+                                <span className="sr-only">Use current location</span>
+                                <span
+                                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0'}`}
+                                >
+                                  {isFetchingCountries && (
+                                    <div className="flex h-full items-center justify-center">
+                                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
+                                    </div>
+                                  )}
+                                </span>
+                              </button>
+                            </div>
+
                             <div className="relative">
-                              <input
-                                type="text"
-                                value="London | United Kingdom"
-                                readOnly
-                                className="w-full px-3 py-2 pl-8 rounded-xl text-xs focus:outline-none"
-                                style={{ backgroundColor: 'white', color: '#6A6A6A', border: '1px solid #E9E9E9', borderRadius: '12px' }}
-                              />
-                              <img
-                                src={locationIcon}
-                                alt="Location"
-                                className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4"
-                                style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
-                              />
+                              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                                Country
+                              </label>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  id="location"
+                                  name="location"
+                                  value={formData.location}
+                                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                                  onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                                  className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-sm"
+                                  placeholder="Select a country"
+                                  readOnly
+                                />
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                  <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                              </div>
+
+                              {isCountryDropdownOpen && (
+                                <div
+                                  ref={countryDropdownRef}
+                                  className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+                                >
+                                  {countries.length > 0 ? (
+                                    countries.map((country) => (
+                                      <div
+                                        key={country.code}
+                                        className={`cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 ${selectedCountry?.code === country.code ? 'bg-primary-50 text-primary-900' : 'text-gray-900'}`}
+                                        onClick={() => handleCountrySelect(country)}
+                                      >
+                                        <div className="flex items-center">
+                                          <span className="ml-3 block font-normal truncate">
+                                            {country.name}
+                                          </span>
+                                        </div>
+                                        {selectedCountry?.code === country.code && (
+                                          <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
+                                            <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                            </svg>
+                                          </span>
+                                        )}
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <div className="text-gray-500 py-2 px-3">No countries found</div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
 
@@ -2395,10 +2845,19 @@ const ProfileSettings: React.FC = () => {
                                   {biography.length}/500
                                 </span>
                                 <button
-                                  className="px-3 py-1.5 rounded-lg text-[10px] font-medium transition-colors"
-                                  style={{ backgroundColor: '#E9E9E9', color: '#6A6A6A' }}
+                                  type="button"
+                                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                  onClick={handleSaveBio}
                                 >
-                                  Save biographie
+                                  Save Bio
+                                </button>
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                  onClick={handleUpdateProfile}
+                                  disabled={isSaving}
+                                >
+                                  {isSaving ? 'Saving...' : 'Update Profile'}
                                 </button>
                               </div>
                             </div>

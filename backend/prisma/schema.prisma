@@ -16,6 +16,8 @@ model User {
   passwordHash             String?   @map("password_hash")
   profileImage             String?   @map("profile_image")
   gender                   String?
+  bio                      String?   @map("bio")
+  location                 String?   @map("location")
   birthDate                DateTime? @map("birth_date")
   emailVerified            Boolean   @default(false) @map("email_verified")
   emailVerificationCode    String?   @map("email_verification_code")

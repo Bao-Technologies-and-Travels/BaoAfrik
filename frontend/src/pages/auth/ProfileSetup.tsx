@@ -3,7 +3,8 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { UpdateProfileData, apiClient } from '../../services/api';
-import { s3Service } from '../../services/s3Service';
+// import { s3Service } from '../../services/s3Service';
+import { gcpStorageService } from '../../services/gcpStorageService';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -28,8 +29,7 @@ interface FormErrors {
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const auth = useAuth();
   const { addToast } = useToast();
 
@@ -254,9 +254,9 @@ const ProfileSetup: React.FC = () => {
       setSelectedFile(null);
       setImageRemoved(true);
 
-      // Only delete from S3 if we have an existing URL
+      // Only delete if we have an existing URL
       if (existingImageUrl && existingImageUrl.includes('amazonaws.com')) {
-        await s3Service.deleteFile(existingImageUrl);
+        await gcpStorageService.deleteFile(existingImageUrl);
       }
 
       setExistingImageUrl(null);
@@ -272,18 +272,18 @@ const ProfileSetup: React.FC = () => {
     }
   };
 
-  // Image upload to S3
-  const uploadImageToS3 = async (): Promise<string | null> => {
+  // Image upload  
+  const uploadImage = async (): Promise<string | null> => {
     if (!selectedFile || !user) return null;
 
     setIsUploadingImage(true);
     try {
-      const { uploadUrl, fileUrl } = await s3Service.getPresignedUrlForProfile(
+      const { uploadUrl, fileUrl } = await gcpStorageService.getPresignedUrlForProfile(
         selectedFile,
         user.id
       );
 
-      await s3Service.uploadFile(selectedFile, uploadUrl);
+      await gcpStorageService.uploadFile(selectedFile, uploadUrl);
       return fileUrl;
     } catch (error) {
       throw new Error('Failed to upload image to storage');
@@ -385,17 +385,17 @@ const ProfileSetup: React.FC = () => {
       // Handle image upload/removal
       if (selectedFile) {
         // Upload new image
-        imageUrl = await uploadImageToS3();
+        imageUrl = await uploadImage();
 
         // Delete old image if it exists and is different from new one
         if (existingImageUrl && existingImageUrl !== imageUrl) {
-          await s3Service.deleteFile(existingImageUrl);
+          await gcpStorageService.deleteFile(existingImageUrl);
         }
       } else if (imageRemoved) {
         // Image was removed
         imageUrl = null;
         if (existingImageUrl) {
-          await s3Service.deleteFile(existingImageUrl);
+          await gcpStorageService.deleteFile(existingImageUrl);
         }
       } else {
         // Keep existing image

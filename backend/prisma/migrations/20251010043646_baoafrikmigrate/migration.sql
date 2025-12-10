@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS "users" (
     "profile_image" TEXT,
     "gender" TEXT,
     "birth_date" TIMESTAMP(3),
+    "bio" TEXT,
+    "location" TEXT,
     "email_verified" BOOLEAN NOT NULL DEFAULT false,
     "email_verification_code" TEXT,
     "email_verification_expires" TIMESTAMP(3),

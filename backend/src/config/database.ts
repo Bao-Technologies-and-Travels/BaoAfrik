@@ -16,10 +16,18 @@ declare global {
   var __prisma: PrismaClient | undefined;
 }
 
+// Prisma logging: keep errors/warnings, make SQL query logging opt-in to reduce noise
+const prismaLogLevels: ('query' | 'error' | 'info' | 'warn')[] = ['error', 'warn'];
+
+// Enable detailed query logging only when explicitly requested
+if (process.env.PRISMA_LOG_QUERIES === 'true') {
+  prismaLogLevels.push('query');
+}
+
 // Prevent multiple instances of Prisma Client in development
 const prisma = new PrismaClient({
   adapter: adapter,
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
+  log: prismaLogLevels
 });
 
 if (process.env.NODE_ENV === 'development') {

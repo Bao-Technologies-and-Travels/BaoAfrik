@@ -1,11 +1,11 @@
-/* groovylint-disable CompileStatic, DuplicateStringLiteral, LineLength, NestedBlockDepth */
+/* groovylint-disable CompileStatic, DuplicateMapLiteral, DuplicateStringLiteral, LineLength, NestedBlockDepth */
 pipeline {
     agent any
 
     environment {
         NODE_ENV = 'staging'
         SSH_KEY_ID = 'baoafrik-key'
-        SSH_HOST = 'ubuntu@54.80.42.46'
+        SSH_HOST = 'ashprincepageo@gmailcom@34.51.243.86'
         FRONTEND_DIR = '~/BaoAfrik/frontend'
         BACKEND_DIR = '~/BaoAfrik/backend'
         APP_NAME_FRONTEND = 'frontend'
@@ -98,8 +98,10 @@ pipeline {
         stage('Setup frontend Environment') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'aws_region', variable: 'REACT_APP_AWS_REGION'),
-                    string(credentialsId: 'aws_bucket', variable: 'REACT_APP_S3_BUCKET_NAME'),
+                    string(credentialsId: 'gcp_project_id',      variable: 'GCP_PROJECT_ID'),
+                    string(credentialsId: 'gcp_client_email',    variable: 'GCP_CLIENT_EMAIL'),
+                    string(credentialsId: 'gcp_private_key',     variable: 'GCP_PRIVATE_KEY'),
+                    string(credentialsId: 'gcp_storage_bucket',  variable: 'GCP_STORAGE_BUCKET'),
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
                         sh """
@@ -114,10 +116,15 @@ pipeline {
                             cat > .env << EOF
                             REACT_APP_API_URL=https://${DOMAIN}/api
                             REACT_APP_WS_URL=wss://${DOMAIN}
-                            REACT_APP_AWS_REGION="${REACT_APP_AWS_REGION}"
-                            REACT_APP_S3_BUCKET_NAME="${REACT_APP_S3_BUCKET_NAME}"
-                            S3_PROFILE_PREFIX=profile-images
-                            S3_ATTACHMENTS_PREFIX=attachments
+                            GCP_PROJECT_ID="${GCP_PROJECT_ID}"
+                           GCP_CLIENT_EMAIL="${GCP_CLIENT_EMAIL}"
+                           GCP_PRIVATE_KEY="${GCP_PRIVATE_KEY}"
+                           GCP_STORAGE_BUCKET="${GCP_STORAGE_BUCKET}"
+                           STORAGE_PROFILE_PREFIX=profile-images
+                           STORAGE_ATTACHMENTS_PREFIX=chat-attachments
+                           STORAGE_PRODUCT_PREFIX=product-images
+                           APP_ENCRYPTION_KEY="fonsahappencrypt"
+                           DB_ENCRYPTION_KEY="fonsahdbencrypt"
                             EOF
 
                             chmod 600 .env
@@ -135,8 +142,10 @@ pipeline {
                     string(credentialsId: 'jwt_secret', variable: 'JWT_SECRET'),
                     string(credentialsId: 'jwt_refresh_secret', variable: 'JWT_REFRESH_SECRET'),
                     string(credentialsId: 'resend_api_key', variable: 'RESEND_API_KEY'),
-                    string(credentialsId: 'aws_region', variable: 'AWS_REGION'),
-                    string(credentialsId: 'aws_bucket', variable: 'AWS_S3_BUCKET'),
+                    string(credentialsId: 'gcp_project_id',      variable: 'GCP_PROJECT_ID'),
+                    string(credentialsId: 'gcp_client_email',    variable: 'GCP_CLIENT_EMAIL'),
+                    string(credentialsId: 'gcp_private_key',     variable: 'GCP_PRIVATE_KEY'),
+                    string(credentialsId: 'gcp_storage_bucket',  variable: 'GCP_STORAGE_BUCKET'),
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
                         sh """
@@ -161,14 +170,15 @@ pipeline {
                             EMAIL_FROM_ADDRESS=noreply@baoafrik.com
                             EMAIL_FROM_NAME="BaoAfrik Team"
 
-                            AWS_REGION="${AWS_REGION}"
-                            AWS_S3_BUCKET="${AWS_S3_BUCKET}"
-                            S3_PROFILE_PREFIX=profile-images
-                            S3_ATTACHMENTS_PREFIX=chat-attachments
-                            S3_PRODUCT_PREFIX=product-images
-
-                            APP_ENCRYPTION_KEY="fonsahappencrypt"
-                            DB_ENCRYPTION_KEY="fonsahdbencrypt"
+                           GCP_PROJECT_ID="${GCP_PROJECT_ID}"
+                           GCP_CLIENT_EMAIL="${GCP_CLIENT_EMAIL}"
+                           GCP_PRIVATE_KEY="${GCP_PRIVATE_KEY}"
+                           GCP_STORAGE_BUCKET="${GCP_STORAGE_BUCKET}"
+                           STORAGE_PROFILE_PREFIX=profile-images
+                           STORAGE_ATTACHMENTS_PREFIX=chat-attachments
+                           STORAGE_PRODUCT_PREFIX=product-images
+                           APP_ENCRYPTION_KEY="fonsahappencrypt"
+                           DB_ENCRYPTION_KEY="fonsahdbencrypt"
 
                             FRONTEND_URL="https://${DOMAIN}"
                             CORS_ORIGINS="https://${DOMAIN}"
@@ -275,7 +285,7 @@ pipeline {
                             <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>Handle Save draft when creating a listing, store to  backend and render in modal</p>
+                            <p><strong>Changes made:</strong>Completed migration from AWS to GCP</p>
                             <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

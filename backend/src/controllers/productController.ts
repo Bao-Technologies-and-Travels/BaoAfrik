@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ProductService, CreateProductData, UpdateProductData } from '../services/productService';
-import { s3Service } from '../services/s3Service';
+import { gcpStorageService } from '../services/gcpStorageService';
 import { validationResult } from 'express-validator';
 
 const productService = new ProductService();
@@ -250,7 +250,7 @@ export class ProductController {
         });
       }
 
-      const presignedData = await s3Service.generatePresignedUrl(
+      const presignedData = await gcpStorageService.generateSignedUrl(
         fileName,
         fileType,
         'product',

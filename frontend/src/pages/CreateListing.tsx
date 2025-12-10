@@ -91,6 +91,18 @@ const CreateListing: React.FC = () => {
   const { user } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  const clearListingsCache = () => {
+    try {
+      const keys = Object.keys(sessionStorage);
+      keys.forEach(key => {
+        if (key.startsWith('listings-')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+    } catch {
+      // Ignore cache clear errors
+    }
+  };
 
   // Check if all required fields are filled
   const isFormComplete =
@@ -381,21 +393,21 @@ const CreateListing: React.FC = () => {
     return countryMap[countryName.toLowerCase()] || 'cm';
   };
 
-  const validateRequiredFields = (): boolean => {
-    const missing: string[] = [];
-    if (!category || category.trim() === '') missing.push('Category');
+  // const validateRequiredFields = (): boolean => {
+  //   const missing: string[] = [];
+  //   if (!category || category.trim() === '') missing.push('Category');
 
-    if (missing.length > 0) {
-      addToast({
-        type: 'error',
-        title: 'Please complete required fields',
-        message: `Please select: ${missing.join(', ')}`,
-        duration: 2000
-      });
-      return false;
-    }
-    return true;
-  };
+  //   if (missing.length > 0) {
+  //     addToast({
+  //       type: 'error',
+  //       title: 'Please complete required fields',
+  //       message: `Please select: ${missing.join(', ')}`,
+  //       duration: 2000
+  //     });
+  //     return false;
+  //   }
+  //   return true;
+  // };
 
   const fetchProductData = async (productId: string) => {
     setIsLoadingProduct(true);
@@ -586,6 +598,7 @@ const CreateListing: React.FC = () => {
   const handleDraftApply = (draft: DraftListing) => {
     const prefillData = buildDraftPrefillPayload(draft);
     applyPrefillToForm(prefillData);
+    setEditingDraftId(draft.id);
     setIsDraftsModalOpen(false);
   };
 
@@ -598,7 +611,7 @@ const CreateListing: React.FC = () => {
       });
 
       if (!res.ok) {
-        addToast({ type: 'error', title: 'Delete failed', message: 'Failed to delete draft', duration: 2000 });
+        addToast({ type: 'error', title: 'Delete failed', message: 'Failed to delete draft. Please try again', duration: 2000 });
         return;
       }
 
@@ -654,7 +667,7 @@ const CreateListing: React.FC = () => {
           type: 'error',
           title: "Upload limit",
           message: "You can only upload up to 10 images at a time",
-          duration: 2000
+          duration: 2500
         });
       }
     }
@@ -755,7 +768,7 @@ const CreateListing: React.FC = () => {
         type: 'error',
         title: "Upload limit",
         message: "You can only upload up to 10 images at a time",
-        duration: 2000
+        duration: 2500
       });
     }
   };
@@ -819,7 +832,7 @@ const CreateListing: React.FC = () => {
         });
 
         if (!uploadResponse.ok) {
-          throw new Error('Failed to upload image to S3');
+          throw new Error('Failed to upload image');
         }
 
         const addImageResponse = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}/images`, {
@@ -899,7 +912,7 @@ const CreateListing: React.FC = () => {
           type: 'error',
           title: 'Failed to save draft',
           message: serverErrors ? `${serverMsg}: ${JSON.stringify(serverErrors)}` : serverMsg,
-          duration: 2000
+          duration: 2500
         });
         setIsLoading(false);
         return;
@@ -935,9 +948,16 @@ const CreateListing: React.FC = () => {
           setDraftListings(prev => [newDraft, ...prev]);
         }
 
-        // Show success message
+        if (isEditMode && id && productId) {
+          sessionStorage.setItem(`draft-status-change-${productId}`, JSON.stringify({
+            productId,
+            newStatus: 'DRAFT',
+            timestamp: Date.now()
+          }));
+        }
+
         addToast({
-          type: "success",
+          type: 'success',
           title: 'Action Completed',
           message: `${isEditMode ? 'Draft updated' : 'Draft saved'} successfully!`,
           duration: 2000
@@ -951,11 +971,14 @@ const CreateListing: React.FC = () => {
         message: (error && (error.message || String(error))) || `Failed to ${isEditMode ? 'update' : 'save'} draft`,
         duration: 2000
       });
+    } finally {
+      // Ensure MyListings uses fresh data next time
+      clearListingsCache();
     }
   };
 
   const handlePostListing = async () => {
-    if (!validateRequiredFields()) return;
+    // if (!validateRequiredFields()) return;
     setIsLoading(true);
 
     try {
@@ -1005,8 +1028,9 @@ const CreateListing: React.FC = () => {
         deliveryAvailable: Boolean(deliveryAvailable)
       };
 
-      const url = isEditMode && id ? `${process.env.REACT_APP_API_URL}/products/${id}` : `${process.env.REACT_APP_API_URL}/products`;
-      const method = isEditMode && id ? 'PUT' : 'POST';
+      const productId = editingDraftId || id;
+      const url = productId ? `${process.env.REACT_APP_API_URL}/products/${productId}` : `${process.env.REACT_APP_API_URL}/products`;
+      const method = productId ? 'PUT' : 'POST';
 
       const createResponse = await fetch(url, {
         method,
@@ -1018,10 +1042,8 @@ const CreateListing: React.FC = () => {
       });
 
       const createResult = await createResponse.json().catch(() => ({ success: false, message: 'Invalid server response' }));
-      console.debug('Create product response', createResponse.status, createResult);
 
       if (!createResponse.ok) {
-        // Show validation errors if provided
         const serverMsg = createResult.message || 'Failed to create product';
         const serverErrors = createResult.errors || createResult.validation || createResult.details;
         addToast({
@@ -1059,12 +1081,20 @@ const CreateListing: React.FC = () => {
           return;
         }
 
+        if (editingDraftId) {
+          setDraftListings(prev => prev.filter(d => d.id !== editingDraftId));
+          setEditingDraftId(null);
+        }
+
         addToast({
           type: "success",
           title: 'Action Completed',
           message: `Listing ${isEditMode ? 'updated' : 'posted'} successfully!`,
           duration: 2000
         });
+
+        // Ensure MyListings uses fresh data for the newly created/updated product
+        clearListingsCache();
         navigate('/my-listings');
       }
     } catch (error: any) {
@@ -1321,8 +1351,8 @@ const CreateListing: React.FC = () => {
     );
   };
 
-  const pageTitle = isEditMode ? 'Edit listing' : 'Create a new listing';
-  const postButtonText = isEditMode ? 'Update listing' : 'Post listing';
+  const pageTitle = editingDraftId ? 'Complete & publish' : (isEditMode ? 'Edit listing' : 'Create a new listing');
+  const postButtonText = editingDraftId ? 'Publish draft' : (isEditMode ? 'Update listing' : 'Post listing');
 
   if (isLoadingProduct) {
     return (

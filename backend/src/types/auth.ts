@@ -5,6 +5,8 @@ export interface User {
   lastName?: string;
   phoneNumber?: string;
   profileImage?: string;
+  location?: string;
+  bio?: string;
   emailVerified: boolean;
   isVerifiedSeller: boolean;
   provider?: string;
@@ -35,6 +37,8 @@ export interface PublicUser {
   lastName?: string;
   phoneNumber?: string;
   profileImage?: string;
+  location?: string;
+  bio?: string;
   emailVerified: boolean;
   isVerifiedSeller: boolean;
   provider?: string;
@@ -79,6 +83,8 @@ export interface UpdateProfileRequest {
   profileImage?: string;
   gender?: string;
   birthDate?: string;
+  bio?: string;
+  location?: string;
 }
 
 export interface ChangePasswordRequest {

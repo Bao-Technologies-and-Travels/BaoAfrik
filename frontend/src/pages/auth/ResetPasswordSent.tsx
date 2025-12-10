@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logoSmall from '../../assets/images/logos/ba-brand-icon-colored.png';
 import logoFull from '../../assets/images/logos/ba-Primary-brand-logo-colored.png';
 import lilLogo from '../../assets/images/pre/lil.png';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';

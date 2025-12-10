@@ -6,31 +6,31 @@ import { CustomError } from '@/utils/errorUtils';
 export const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
 
-  // if (!errors.isEmpty()) {
-  //   const errorMessages: { [key: string]: string } = {};
+  if (!errors.isEmpty()) {
+    const errorMessages: { [key: string]: string } = {};
 
-  //   errors.array().forEach(error => {
-  //     if (error.type === 'field') {
-  //       errorMessages[error.path] = error.msg;
-  //     }
-  //   });
+    errors.array().forEach(error => {
+      if (error.type === 'field') {
+        errorMessages[error.path] = error.msg;
+      }
+    });
 
-  //   const validationError = new CustomError('Validation failed. Please check your input and try again.', 400);
-  //   (validationError as any).errors = errorMessages;
-  //   next(validationError);
-  //   return;
-  // }
-
-  // next();
-  if (errors.isEmpty()) {
-    return next();
+    const validationError = new CustomError('Validation failed. Please check your input and try again.', 400);
+    (validationError as any).errors = errorMessages;
+    next(validationError);
+    return;
   }
 
-  return res.status(400).json({
-    success: false,
-    message: 'Validation failed. Please check your input and try again.',
-    errors: errors.array()
-  });
+  next();
+  // if (errors.isEmpty()) {
+  //   return next();
+  // }
+
+  // return res.status(400).json({
+  //   success: false,
+  //   message: 'Validation failed. Please check your input and try again.',
+  //   errors: errors.array()
+  // });
 
 };
 

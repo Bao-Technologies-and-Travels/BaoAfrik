@@ -23,9 +23,6 @@ import mainieIcon from '../assets/images/pre/mainie.svg';
 
 // Import product images 
 import a1 from '../assets/images/pre/a1.png';
-import a2 from '../assets/images/pre/a2.png';
-import a3 from '../assets/images/pre/a3.png';
-import a4 from '../assets/images/pre/a4.png';
 
 type ViewMode = 'list' | 'grid';
 type ListingStatus = 'DRAFT' | 'PUBLISHED' | 'SOLD' | 'active' | 'inactive';
@@ -102,49 +99,6 @@ interface DraftListing {
     country: string;
     flag: string;
 }
-
-// const initialDraftListings: DraftListing[] = [
-//     {
-//         id: 'd1',
-//         title: 'African Wristband',
-//         price: '65.8',
-//         currency: 'USD',
-//         image: a1,
-//         description: 'Warm pepper notes with a mellow finish, the kind of spice you sprinkle on everything once it hits your pantry.',
-//         country: 'Cameroon',
-//         flag: 'https://flagcdn.com/w20/cm.png'
-//     },
-//     {
-//         id: 'd2',
-//         title: 'African Comb',
-//         price: '65.8',
-//         currency: 'USD',
-//         image: a2,
-//         description: "Hand-carved teeth that glide through curls without tugging, and a handle that still feels like grandma's favorite comb.",
-//         country: 'Ghana',
-//         flag: 'https://flagcdn.com/w20/gh.png'
-//     },
-//     {
-//         id: 'd3',
-//         title: 'African Wristband',
-//         price: '65.8',
-//         currency: 'USD',
-//         image: a3,
-//         description: 'Layered beads that catch the light and instantly make any everyday outfit feel like market day back home.',
-//         country: 'Benin',
-//         flag: 'https://flagcdn.com/w20/bj.png'
-//     },
-//     {
-//         id: 'd4',
-//         title: 'Bitter Cola',
-//         price: 'N/A',
-//         currency: 'USD',
-//         image: a4,
-//         description: 'Earthy bitter kola with that citrusy snap—great for chewing, steeping, or tossing into house bitters.',
-//         country: 'Nigeria',
-//         flag: 'https://flagcdn.com/w20/ng.png'
-//     }
-// ];
 
 const statusOptions = ['Active', 'Inactive', 'Days left'] as const;
 type StatusFilter = 'All Status' | (typeof statusOptions)[number];
@@ -376,11 +330,10 @@ const MyListings: React.FC = () => {
     const sortDropdownRef = useRef<HTMLDivElement | null>(null);
     const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
     const [draftListings, setDraftListings] = useState<DraftListing[]>([]);
-    // const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
-    // const currentDraftSeed = JSON.stringify(initialDraftListings);
     const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
-    const moreOptionsRef = useRef<HTMLDivElement | null>(null);
+    const moreOptionsRefs = useRef<Map<string, HTMLDivElement>>(new Map());
     const [listingToDelete, setListingToDelete] = useState<Listing | null>(null);
+    const [listingToDeleteId, setListingToDeleteId] = useState<string | null>(null);
     const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -477,60 +430,112 @@ const MyListings: React.FC = () => {
     };
 
     // fetch drafts on mount
-      useEffect(() => {
+    useEffect(() => {
         let mounted = true;
-    
+
         const fetchDrafts = async () => {
-          try {
-            const token = localStorage.getItem('accessToken');
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-    
-            if (!res.ok) return;
-    
-            const json = await res.json();
-            if (!mounted || !json.success) return;
-    
-            // trasform API products to DraftListing format
-            const drafts: DraftListing[] = (json.data.products || []).map((product: any) => ({
-              id: product.id,
-              title: product.title || 'Undefined',
-              price: product.price?.toString() || 'N/A',
-              currency: product.currency || 'USD',
-              image: product.images?.[0]?.url || a1,
-              description: product.description || '',
-              country: product.origin || 'Cameroon',
-              flag: `https://flagcdn.com/w20/${getCountryFlagCode(product.origin)}.png`
-            }));
-    
-            setDraftListings(drafts);
-          } catch (e) {
-            console.warn('Failed to load drafts', e);
-          }
+            try {
+                const token = localStorage.getItem('accessToken');
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (!res.ok) return;
+
+                const json = await res.json();
+                if (!mounted || !json.success) return;
+
+                // trasform API products to DraftListing format
+                const drafts: DraftListing[] = (json.data.products || []).map((product: any) => ({
+                    id: product.id,
+                    title: product.title || 'Undefined',
+                    price: product.price?.toString() || 'N/A',
+                    currency: product.currency || 'USD',
+                    image: product.images?.[0]?.url || a1,
+                    description: product.description || '',
+                    country: product.origin || 'Cameroon',
+                    flag: `https://flagcdn.com/w20/${getCountryFlagCode(product.origin)}.png`
+                }));
+
+                setDraftListings(drafts);
+            } catch (e) {
+                console.warn('Failed to load drafts', e);
+            }
         };
-    
+
         fetchDrafts();
         return () => { mounted = false; };
-      }, []);
-    
-      const getCountryFlagCode = (countryName?: string): string => {
+    }, []);
+
+    const getCountryFlagCode = (countryName?: string): string => {
         if (!countryName) return 'cm';
         const countryMap: Record<string, string> = {
-          'cameroon': 'cm',
-          'nigeria': 'ng',
-          'ghana': 'gh',
-          'kenya': 'ke',
-          'benin': 'bj',
-          'egypt': 'eg',
-          'morocco': 'ma',
-          'ethiopia': 'et',
-          'south africa': 'za',
-          'tunisia': 'tn',
-          'algeria': 'dz',
+            'cameroon': 'cm',
+            'nigeria': 'ng',
+            'ghana': 'gh',
+            'kenya': 'ke',
+            'benin': 'bj',
+            'egypt': 'eg',
+            'morocco': 'ma',
+            'ethiopia': 'et',
+            'south africa': 'za',
+            'tunisia': 'tn',
+            'algeria': 'dz',
         };
         return countryMap[countryName.toLowerCase()] || 'cm';
-      };
+    };
+
+    // listen for draft status changes from CreateListing
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                // Check for any draft status changes
+                const keys = Object.keys(sessionStorage);
+                keys.forEach(key => {
+                    if (key.startsWith('draft-status-change-')) {
+                        const productId = key.replace('draft-status-change-', '');
+                        const data = JSON.parse(sessionStorage.getItem(key) || '{}');
+
+                        // Update local state: move product from published to draft
+                        setProducts(prev => prev.map(p =>
+                            p.id === productId ? { ...p, status: 'DRAFT' } : p
+                        ));
+
+                        setListings(prev => prev.map(l =>
+                            l.id === productId ? { ...l, status: 'inactive' as const, daysLeft: undefined } : l
+                        ));
+
+                        // Add to drafts list if not already there
+                        setDraftListings(prev => {
+                            const exists = prev.some(d => d.id === productId);
+                            if (!exists && products.some(p => p.id === productId)) {
+                                const product = products.find(p => p.id === productId);
+                                if (product) {
+                                    return [...prev, {
+                                        id: product.id,
+                                        title: product.title,
+                                        price: product.price?.toString() || 'N/A',
+                                        currency: product.currency,
+                                        image: product.images?.[0]?.url || a1,
+                                        description: product.description,
+                                        country: product.origin || 'Cameroon',
+                                        flag: `https://flagcdn.com/w20/${getCountryFlagCode(product.origin)}.png`
+                                    }];
+                                }
+                            }
+                            return prev;
+                        });
+
+                        // Clean up
+                        sessionStorage.removeItem(key);
+                    }
+                });
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, [products]);
 
     const processApiResponse = (data: PaginatedProducts) => {
         const mappedListings: Listing[] = data.products.map((product: Product) => ({
@@ -569,55 +574,6 @@ const MyListings: React.FC = () => {
         navigate(`/edit-listing/${productId}`);
     };
 
-    const showDeleteConfirmation = (productId: string, productTitle: string) => {
-        setConfirmationDialog({
-            isOpen: true,
-            title: 'Delete Listing',
-            message: `Are you sure you want to delete "${productTitle}"? This action cannot be undone.`,
-            onConfirm: () => {
-                handleDeleteProduct(productId);
-                closeConfirmationDialog()
-            },
-            confirmText: 'Delete'
-        });
-    };
-
-    const handleDeleteProduct = async (productId: string) => {
-        try {
-            const token = localStorage.getItem('accessToken');
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                // Remove from local state
-                setProducts(prev => prev.filter(p => p.id !== productId));
-                // Close confirmation dialog
-                setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
-
-                // Show success message
-                addToast({
-                    type: "success",
-                    title: 'Action Completed',
-                    message: "Listing deleted successfully",
-                    duration: 2000
-                });
-            } else {
-                throw new Error('Failed to delete listing');
-            }
-        } catch (error) {
-            addToast({
-                type: 'error',
-                title: 'Action Failed',
-                message: "Failed to delete listing. Please try again",
-                duration: 2000
-            });
-        }
-    };
-
     const handlePublishProduct = async (productId: string) => {
         try {
             const token = localStorage.getItem('accessToken');
@@ -635,15 +591,32 @@ const MyListings: React.FC = () => {
                 setProducts(prev => prev.map(p =>
                     p.id === productId ? { ...p, status: 'PUBLISHED' } : p
                 ));
+
+                // update listing UI
+                setListings(prev => prev.map(l =>
+                    l.id === productId
+                        ? { ...l, status: 'active' as const, daysLeft: undefined }
+                        : l
+                ));
+
+                // Remove from draft listings
+                setDraftListings(prev => prev.filter(d => d.id !== productId));
+
+                // Clear cache
+                const cacheKey = `listings-${activeTab}-${currentPage}`;
+                sessionStorage.removeItem(cacheKey);
+
                 addToast({
                     type: "success",
                     title: 'Action Completed',
                     message: "Listing published successfully",
                     duration: 2000
                 });
+
             } else {
                 throw new Error('Failed to publish listing');
             }
+
         } catch (error) {
             addToast({
                 type: 'error',
@@ -781,7 +754,6 @@ const MyListings: React.FC = () => {
     const shouldShowEmptyState = !hasResults;
     const isSearchNoResultsState = shouldShowEmptyState && isSearchActive;
     const totalListings = listings?.length;
-    const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     const handlePrimaryCta = () => {
         if (isSearchNoResultsState) {
@@ -830,68 +802,62 @@ const MyListings: React.FC = () => {
 
     const handleDeleteClick = (listing: Listing) => {
         setListingToDelete(listing);
+        setListingToDeleteId(listing.id);
         setIsDeleteModalOpen(true);
     };
 
     const handleDeleteClose = () => {
         setIsDeleteModalOpen(false);
         setListingToDelete(null);
+        setListingToDeleteId(null);
         setIsDeleting(false);
     };
 
-    const handleConfirmDelete = async () => {
-        if (!listingToDelete) return;
-
+    const deleteListingById = async (productId: string) => {
         setIsDeleting(true);
-
         try {
             const token = localStorage.getItem('accessToken');
-            if (!token) {
-                throw new Error('No authentication token found');
-            }
 
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${listingToDelete.id}`, {
+            // Remove from UI state collections
+            setListings(prev => prev.filter(l => l.id !== productId));
+            setProducts(prev => prev.filter(p => p.id !== productId));
+            setDraftListings(prev => prev.filter(d => d.id !== productId));
+
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`, {
                 method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to delete product');
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err?.message || 'Failed to delete product');
             }
 
-            setListings(prev => prev.filter(item => item.id !== listingToDelete.id));
+            // Clear cache for current page
+            const cacheKey = `listings-${activeTab}-${currentPage}`;
+            sessionStorage.removeItem(cacheKey);
 
-            setStats(prev => ({
-                ...prev,
-                total: prev.total - 1,
-                [listingToDelete.status === 'DRAFT' ? 'drafts' :
-                    listingToDelete.status === 'PUBLISHED' ? 'published' : 'sold']:
-                    Math.max(0, prev[listingToDelete.status === 'DRAFT' ? 'drafts' :
-                        listingToDelete.status === 'PUBLISHED' ? 'published' : 'sold'] - 1)
-            }));
+            // refresh server-side page to keep pagination/stats accurate
+            await fetchMyListings(currentPage, itemsPerPage);
 
-            addToast({
-                type: 'success',
-                title: 'Success',
-                message: 'Listing deleted successfully',
-                duration: 2000
-            });
-
-            handleDeleteClose();
-
-        } catch (error) {
-            addToast({
-                type: 'error',
-                title: 'Error',
-                message: 'Failed to delete product. Please try again',
-                duration: 2000
-            });
+            addToast({ type: 'success', title: 'Success', message: 'Listing deleted successfully', duration: 2000 });
+        } catch (e: any) {
+            console.error('Delete product error', e);
+            await fetchMyListings(currentPage, itemsPerPage);
+            addToast({ type: 'error', title: 'Error', message: (e && e.message) || 'Failed to delete product', duration: 3000 });
         } finally {
             setIsDeleting(false);
+            setIsDeleteModalOpen(false);
+            setListingToDelete(null);
+            setListingToDeleteId(null);
+            setMoreOptionsOpenFor(null);
         }
+    };
+
+    const handleConfirmDelete = async () => {
+        const id = listingToDeleteId ?? listingToDelete?.id;
+        if (!id) return;
+        await deleteListingById(id);
     };
 
     useEffect(() => {
@@ -904,7 +870,14 @@ const MyListings: React.FC = () => {
                 setIsSortDropdownOpen(false);
                 setHoveredSecondarySort(null);
             }
-            if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
+            let isOutside = true;
+            for (const ref of Array.from(moreOptionsRefs.current.values())) {
+                if (ref && ref.contains(target)) {
+                    isOutside = false;
+                    break;
+                }
+            }
+            if (isOutside) {
                 setMoreOptionsOpenFor(null);
             }
         };
@@ -912,13 +885,6 @@ const MyListings: React.FC = () => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-
-    // useEffect(() => {
-    //     if (draftSeedRef.current !== currentDraftSeed) {
-    //         draftSeedRef.current = currentDraftSeed;
-    //         setDraftListings(initialDraftListings);
-    //     }
-    // }, [currentDraftSeed]);
 
     const getSecondaryKeyByValue = (value: SortValue): string | null => {
         for (const option of sortOptions) {
@@ -1442,7 +1408,13 @@ const MyListings: React.FC = () => {
                                     <circle cx="12" cy="12" r="3" />
                                 </svg>
                             </button>
-                            <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                            <div
+                                style={{ position: 'relative' }}
+                                ref={(el) => {
+                                    if (el) moreOptionsRefs.current.set(listing.id, el);
+                                    else moreOptionsRefs.current.delete(listing.id);
+                                }}
+                            >
                                 <button
                                     type="button"
                                     className="w-5 h-5 rounded-full border flex items-center justify-center"
@@ -1483,8 +1455,7 @@ const MyListings: React.FC = () => {
                                             type="button"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                setListingToDelete(listing);
-                                                setIsDeleteModalOpen(true);
+                                                handleDeleteClick(listing);
                                                 setMoreOptionsOpenFor(null);
                                             }}
                                             style={{
@@ -1639,7 +1610,13 @@ const MyListings: React.FC = () => {
                             </div>
 
                             {/* More Options Button */}
-                            <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                            <div
+                                style={{ position: 'relative' }}
+                                ref={(el) => {
+                                    if (el) moreOptionsRefs.current.set(listing.id, el);
+                                    else moreOptionsRefs.current.delete(listing.id);
+                                }}
+                            >
                                 <button
                                     type="button"
                                     className="w-5 h-5 rounded-full border flex items-center justify-center"

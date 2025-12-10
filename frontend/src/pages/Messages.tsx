@@ -69,7 +69,7 @@ import { io, Socket } from "socket.io-client";
 import { useSocket } from '../contexts/socketContext'
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
-import { s3Service } from "../services/s3Service";
+import { gcpStorageService } from "../services/gcpStorageService";
 import Header from '../components/layout/Header';
 
 // PDF Icon Component
@@ -2082,13 +2082,13 @@ const Messages: React.FC = () => {
             }
           );
 
-          const { uploadUrl, fileUrl } = await s3Service.getPresignedUrlForChat(
+          const { uploadUrl, fileUrl } = await gcpStorageService.getPresignedUrlForChat(
             voiceFile,
             user!.id
           );
 
           // Upload voice file
-          await s3Service.uploadFile(voiceFile, uploadUrl);
+          await gcpStorageService.uploadFile(voiceFile, uploadUrl);
 
           // Send voice message
           sendMessageViaSocket(currentConversation.id, {
@@ -2131,9 +2131,9 @@ const Messages: React.FC = () => {
               return;
             }
             const { uploadUrl, fileUrl } =
-              await s3Service.getPresignedUrlForChat(file, user!.id);
+              await gcpStorageService.getPresignedUrlForChat(file, user!.id);
 
-            await s3Service.uploadFile(file, uploadUrl);
+            await gcpStorageService.uploadFile(file, uploadUrl);
 
             let messageType = "FILE";
             if (file.type.startsWith("image/")) messageType = "IMAGE";

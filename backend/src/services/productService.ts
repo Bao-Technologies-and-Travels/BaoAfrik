@@ -2,6 +2,7 @@ import prisma from '../config/database';
 import { Product, ProductStatus, SaleType, Prisma } from '../generated/client';
 import { v4 as uuidv4 } from 'uuid';
 import { s3Service } from './s3Service';
+import { gcpStorageService } from './gcpStorageService';
 
 
 export interface CreateProductData {
@@ -395,8 +396,17 @@ export class ProductService {
                 throw new Error('Image not found');
             }
 
-            // Delete from S3
-            await s3Service.deleteFile(imageToRemove.key);
+            // Delete from storage (support both legacy S3 and current GCS)
+            try {
+                await gcpStorageService.deleteFile(imageToRemove.key);
+            } catch (err) {
+                // Fallback for legacy objects that might still be in S3
+                try {
+                    await s3Service.deleteFile(imageToRemove.key);
+                } catch {
+                    // Swallow secondary delete errors to avoid breaking UX
+                }
+            }
 
             // Remove from array
             const updatedImages = images.filter((_, index) => index !== imageIndex);

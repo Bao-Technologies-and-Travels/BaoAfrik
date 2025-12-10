@@ -189,6 +189,24 @@ const Home: React.FC = () => {
     }
   };
 
+  const getDefaultProductImage = (category: string | undefined): any => {
+    const categoryImages: { [key: string]: any } = {
+      'Food & Spices': pre1,
+      'Fashion & Textiles': pre7,
+      'Beauty & Wellness': pre13,
+      'Home & Decor': pre10,
+      'Books & Media': pre3,
+      'food': pre1,
+      'fashion': pre7,
+      'beauty': pre13,
+      'home': pre10,
+      'books': pre3
+    };
+
+    const categoryKey = category || 'Other';
+    return categoryImages[categoryKey] || pre1;
+  };
+
   const transformToFrontendProducts = (apiProducts: any[]): FrontendProduct[] => {
     if (!apiProducts || !Array.isArray(apiProducts)) {
       console.warn('Invalid products data for transformation:', apiProducts);
@@ -266,25 +284,6 @@ const Home: React.FC = () => {
   const allProductsComputed = React.useMemo(() => {
     return getAllProductsByCategory();
   }, [products]);
-
-  const getDefaultProductImage = (category: string | undefined): any => {
-    const categoryImages: { [key: string]: any } = {
-      'Food & Spices': pre1,
-      'Fashion & Textiles': pre7,
-      'Beauty & Wellness': pre13,
-      'Home & Decor': pre10,
-      'Books & Media': pre3,
-      'food': pre1,
-      'fashion': pre7,
-      'beauty': pre13,
-      'home': pre10,
-      'books': pre3
-    };
-
-    // Handle undefined or unknown categories
-    const categoryKey = category || 'Other';
-    return categoryImages[categoryKey] || pre1;
-  };
 
   // Banner slides data
   const bannerSlides = [

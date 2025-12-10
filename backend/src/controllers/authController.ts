@@ -426,6 +426,8 @@ export const getCurrentUser = asyncHandler(async (req: Request, res: Response) =
       profileImage: true,
       gender: true,
       birthDate: true,
+      location: true,
+      bio: true,
       emailVerified: true,
       isVerifiedSeller: true,
       provider: true,
@@ -461,6 +463,9 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
     gender,
     birthDate,
     profileImage,
+    phoneNumber,
+    bio,
+    location
   } = req.body;
 
   const updateData: any = {};
@@ -470,6 +475,9 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
   if (profileImage !== undefined) updateData.profileImage = profileImage;
   if (gender !== undefined) updateData.gender = gender;
   if (birthDate !== undefined) updateData.birthDate = new Date(birthDate);
+  if (phoneNumber !== undefined) updateData.phoneNumber = new Date(phoneNumber);
+  if (bio !== undefined) updateData.bio = bio;
+  if (location !== undefined) updateData.location = location;
 
   const updatedUser = await prisma.user.update({
     where: { id: req.user.id },

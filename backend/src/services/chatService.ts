@@ -1,6 +1,6 @@
 import prisma from '@/config/database'; import { MessageType } from '../generated/client';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+// import { s3Service } from './s3Service';
+import { gcpStorageService } from './gcpStorageService';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 
@@ -30,20 +30,11 @@ export interface MessageData {
 }
 
 export class ChatService {
-    private s3Client: S3Client;
     private algorithm = 'aes-256-gcm';
     private encryptionKey: Buffer;
     private dbEncryptionEnabled: boolean = false
 
     constructor() {
-        this.s3Client = new S3Client({
-            region: process.env.AWS_REGION!,
-            credentials: {
-                accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-            },
-        });
-
         this.encryptionKey = crypto.scryptSync(
             process.env.APP_ENCRYPTION_KEY!,
             'app-salt',
@@ -634,30 +625,21 @@ export class ChatService {
             'application/pdf'
         ];
 
-        const maxSize = 50 * 1024 * 1024; // 50MB
-
         if (!allowedMimeTypes.includes(fileType)) {
             throw new Error('File type not allowed');
         }
 
-        const fileExtension = fileName.split('.').pop();
-        const key = `chat-attachments/${userId}/${uuidv4()}.${fileExtension}`;
-
-        const command = new PutObjectCommand({
-            Bucket: process.env.AWS_S3_BUCKET!,
-            Key: key,
-            ContentType: fileType,
-            ServerSideEncryption: 'AES256',
-        });
-
-        const presignedUrl = await getSignedUrl(this.s3Client, command, {
-            expiresIn: 3600
-        });
+        const presigned = await gcpStorageService.generateSignedUrl(
+            fileName,
+            fileType,
+            'chat',
+            userId
+        );
 
         return {
-            presignedUrl,
-            key,
-            url: `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
+            presignedUrl: (presigned as any).uploadUrl,
+            key: presigned.key,
+            url: presigned.viewUrl,
             generatedAt: this.formatTo12HourTime(new Date())
         };
     }
