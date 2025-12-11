@@ -27,7 +27,7 @@ pipeline {
                 sshagent([env.SSH_KEY_ID]) {
                     // step 1: system updates
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    ssh -A -o StrictHostKeyChecking=no ${SSH_HOST} '
                     set -e
                         # Update and upgrade server packages
                         sudo apt update && sudo apt upgrade -y
@@ -36,7 +36,7 @@ pipeline {
 
                     // step 2: install Nodejs
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    ssh -A -o StrictHostKeyChecking=no ${SSH_HOST} '
                         # Install Node.js and npm if not already installed
                         curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
                         sudo apt install -y nodejs
@@ -51,7 +51,7 @@ pipeline {
 
                     // step 3: install pm2
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    ssh -A -o StrictHostKeyChecking=no ${SSH_HOST} '
                         # Install PM2 globally
                         sudo npm install -g pm2@latest
                         pm2 --version
@@ -60,7 +60,7 @@ pipeline {
 
                     // step 4: install other dependencies
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    ssh -A -o StrictHostKeyChecking=no ${SSH_HOST} '
                         # Setup PM2
                         pm2 startup systemd
 
@@ -82,7 +82,7 @@ pipeline {
                 echo 'Cloning repository...'
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    ssh -A -o StrictHostKeyChecking=no ${SSH_HOST} '
                         set -e
                         if [ ! -d ~/BaoAfrik ]; then
                             git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
@@ -105,7 +105,7 @@ pipeline {
                 echo 'Setting up environment variables securely...'
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    ssh -A -o StrictHostKeyChecking=no ${SSH_HOST} '
                         set -e
                         cd ${APP_DIR}
 
@@ -141,7 +141,7 @@ pipeline {
                 echo 'Deploying backend API...'
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    ssh -A -o StrictHostKeyChecking=no ${SSH_HOST} '
                         set -e
                         cd ${APP_DIR}/backend
 
@@ -169,7 +169,7 @@ pipeline {
 
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
+                    ssh -A -o StrictHostKeyChecking=no ${SSH_HOST} '
                         set -e
 
                         cd ${APP_DIR}
