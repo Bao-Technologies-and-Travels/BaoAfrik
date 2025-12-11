@@ -5,7 +5,7 @@ pipeline {
     environment {
         NODE_ENV = 'production'
         SSH_KEY_ID = 'baoafrik-key'
-        SSH_HOST = 'ubuntu@3.81.142.143'
+        SSH_HOST = 'ashprincepageo@34.51.195.222'
         REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
         BRANCH = 'coming-soon'
         APP_DIR = '~/BaoAfrik'
@@ -68,7 +68,7 @@ pipeline {
                         sudo npm install -g serve
 
                         # install PostgreSQL client
-                        sudo apt install -y postgresql-client
+                        sudo apt install -y postgresql postgresql-client
 
                         echo "System dependencies installed successfully."
                     '
@@ -218,28 +218,28 @@ pipeline {
                     )
             }
         }
-        // success {
-        //     script {
-        //         emailext(
-        //         subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
-        //         to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
-        //         from: 'jenkins.baoafrik.com',
-        //         replyTo: 'no-reply@baotechnologiesandtravels.com',
-        //         body: """
-        //             <html>
-        //                 <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-        //                     <h2 style="color: #2E86C1;">BaoAfrik Production Notification</h2>
-        //                     <p><strong>Job:</strong> ${env.JOB_NAME}</p>
-        //                     <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-        //                     <p>Bao'Afrik coming soon page deployed. Check it out at <a href="${env.DOMAIN}"></a>.</p>
-        //                     <hr>
-        //                     <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
-        //                 </body>
-        //             </html>
-        //         """,
-        //         mimeType: 'text/html'
-        //         )
-        //     }
-        // }
+        success {
+            script {
+                emailext(
+                subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
+                to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
+                from: 'jenkins.baoafrik.com',
+                replyTo: 'no-reply@baotechnologiesandtravels.com',
+                body: """
+                    <html>
+                        <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+                            <h2 style="color: #2E86C1;">BaoAfrik Production Notification</h2>
+                            <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+                            <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
+                            <p>Bao'Afrik coming soon page deployed. Check it out at <a href="${env.DOMAIN}"></a>.</p>
+                            <hr>
+                            <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
+                        </body>
+                    </html>
+                """,
+                mimeType: 'text/html'
+                )
+            }
+        }
     }
 }
