@@ -11,17 +11,17 @@ app.use(express.json());
 
 // PostgreSQL connection based on the environment
 const getDatabaseConfig = () => {
-  const isProduction = process.env.NODE_ENV === 'production';
-    
+  const isProduction = process.env.NODE_ENV === "production";
+
   if (isProduction) {
     // Production - Use DATABASE_URL from environment variables
     if (!process.env.DATABASE_URL) {
-      console.error('❌ DATABASE_URL is required in production environment');
+      console.error("❌ DATABASE_URL is required in production environment");
       process.exit(1);
     }
-    
-    const maskedUrl = process.env.DATABASE_URL.replace(/:([^:@]+)@/, ':****@');
-    
+
+    const maskedUrl = process.env.DATABASE_URL.replace(/:([^:@]+)@/, ":****@");
+
     return {
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
@@ -31,15 +31,15 @@ const getDatabaseConfig = () => {
   } else {
     // Development - Use local PostgreSQL
     const localConfig = {
-      user: process.env.DB_USER || 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      database: process.env.DB_NAME || 'baoafrik_dev',
-      password: process.env.DB_PASSWORD || 'password',
+      user: process.env.DB_USER || "postgres",
+      host: process.env.DB_HOST || "localhost",
+      database: process.env.DB_NAME || "baoafrik_dev",
+      password: process.env.DB_PASSWORD || "password",
       port: process.env.DB_PORT || 5432,
       connectionTimeoutMillis: 5000,
       idleTimeoutMillis: 30000,
     };
-    
+
     return localConfig;
   }
 };
@@ -67,7 +67,7 @@ const createTable = async () => {
   await pool.query(query);
 };
 
-createTable();
+// createTable();
 
 // Submit to waitlist
 app.post("/api/waitlist", async (req, res) => {
@@ -160,7 +160,7 @@ const exportAndEmailData = async () => {
         row.email,
         row.user_type,
         row.submission_date,
-        row.submission_time
+        row.submission_time,
       ].join(",")
     );
 
@@ -176,9 +176,22 @@ const exportAndEmailData = async () => {
     });
 
     const weekEnding = new Date().toISOString().split("T")[0];
-    const exportEmails = process.env.EXPORT_EMAIL.split(",").map((email) =>
-      email.trim()
-    );
+
+    if (!process.env.EXPORT_EMAIL) {
+      console.warn("EXPORT_EMAIL is not set; skipping weekly export email.");
+      return;
+    }
+
+    const exportEmails = process.env.EXPORT_EMAIL.split(",")
+      .map((email) => email.trim())
+      .filter(Boolean);
+
+    if (exportEmails.length === 0) {
+      console.warn(
+        "EXPORT_EMAIL is empty after parsing; skipping weekly export email."
+      );
+      return;
+    }
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -187,7 +200,7 @@ const exportAndEmailData = async () => {
       text: `Attached is the weekly waitlist export with ${result.rows.length} leads.\n\nNew leads this week: ${result.rows.length}`,
       attachments: [
         {
-          filename: `bao'afrik-weekly-leads-${weekEnding}.csv`,
+          filename: `bao-afrik-weekly-leads-${weekEnding}.csv`,
           content: csvContent,
           contentType: "text/csv",
         },
@@ -262,3 +275,19 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+const startServer = async () => {
+  try {
+    await createTable();
+
+    const PORT = process.env.PORT || 3001;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to initialize database:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
