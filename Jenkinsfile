@@ -40,8 +40,9 @@ pipeline {
                         # Install Node.js and npm if not already installed
                         curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
                         sudo apt install -y nodejs
+                        sudo npm install -g npm
 
-                        # Verify Node.js installation
+                        # Verify Node.js and npm installation
                         echo "Node.js version:"
                         node --version
                         echo "npm version:"
@@ -126,10 +127,6 @@ pipeline {
                         # CORS Configuration
                         FRONTEND_URL=${DOMAIN}
                         EOF
-
-                        # Set secure permissions
-                        chmod 600 backend/.env
-                        echo "Environment variables configured securely."
                     '
                     """
                 }

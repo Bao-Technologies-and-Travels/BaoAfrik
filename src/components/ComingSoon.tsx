@@ -662,7 +662,8 @@ const ComingSoon: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
-                type="text"
+                type="name"
+                id="fullName"
                 placeholder="Full Name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -670,6 +671,7 @@ const ComingSoon: React.FC = () => {
               />
               <input
                 type="email"
+                id="email"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -697,17 +699,34 @@ const ComingSoon: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={!isFormComplete}
-                className={`w-full flex items-center justify-center gap-1.5 rounded-xl transition-all py-3 ${isFormComplete
+                disabled={!isFormComplete || isSubmitting}
+                className={`w-full flex items-center justify-center gap-1.5 rounded-xl transition-all py-3 ${isFormComplete && !isSubmitting
                   ? 'text-white cursor-pointer'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 style={{
-                  ...(isFormComplete && { backgroundColor: '#F9A825' })
+                  ...(isFormComplete && !isSubmitting && { backgroundColor: '#F9A825' })
                 }}
               >
-                <img src={NotifyIcon} alt="Notify" className="w-5 h-5" style={{ filter: isFormComplete ? 'brightness(0) invert(1)' : 'none' }} />
-                <span className="font-medium text-sm">Notify me</span>
+                {isSubmitting ? (
+                  <>
+                    <span
+                      className="inline-block h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"
+                      aria-hidden="true"
+                    />
+                    <span className="font-medium text-sm">Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <img
+                      src={NotifyIcon}
+                      alt="Notify"
+                      className="w-5 h-5"
+                      style={{ filter: isFormComplete ? 'brightness(0) invert(1)' : 'none' }}
+                    />
+                    <span className="font-medium text-sm">Notify me</span>
+                  </>
+                )}
               </button>
             </form>
 
