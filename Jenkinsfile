@@ -66,6 +66,12 @@ pipeline {
                         # Setup PM2
                         pm2 startup systemd
 
+                        # Install serve
+                        sudo npm install -g serve
+
+                        # Install postgres
+                        sudo apt install -y postgresql postgresql-client-common -y
+
                         echo "System dependencies installed successfully."
                     '
                     """
@@ -114,18 +120,18 @@ pipeline {
 
                             # Create .env file with actual secrets
                             cat > .env << EOF
-                            REACT_APP_API_URL=https://${DOMAIN}/api
-                            REACT_APP_WS_URL=wss://${DOMAIN}
-                            GCP_PROJECT_ID="${GCP_PROJECT_ID}"
-                           GCP_CLIENT_EMAIL="${GCP_CLIENT_EMAIL}"
-                           GCP_PRIVATE_KEY="${GCP_PRIVATE_KEY}"
-                           GCP_STORAGE_BUCKET="${GCP_STORAGE_BUCKET}"
-                           STORAGE_PROFILE_PREFIX=profile-images
-                           STORAGE_ATTACHMENTS_PREFIX=chat-attachments
-                           STORAGE_PRODUCT_PREFIX=product-images
-                           APP_ENCRYPTION_KEY="fonsahappencrypt"
-                           DB_ENCRYPTION_KEY="fonsahdbencrypt"
-                            EOF
+REACT_APP_API_URL=https://${DOMAIN}/api
+REACT_APP_WS_URL=wss://${DOMAIN}
+GCP_PROJECT_ID="${GCP_PROJECT_ID}"
+GCP_CLIENT_EMAIL="${GCP_CLIENT_EMAIL}"
+GCP_PRIVATE_KEY="${GCP_PRIVATE_KEY}"
+GCP_STORAGE_BUCKET="${GCP_STORAGE_BUCKET}"
+STORAGE_PROFILE_PREFIX=profile-images
+STORAGE_ATTACHMENTS_PREFIX=chat-attachments
+STORAGE_PRODUCT_PREFIX=product-images
+APP_ENCRYPTION_KEY="fonsahappencrypt"
+DB_ENCRYPTION_KEY="fonsahdbencrypt"
+EOF
 
                             chmod 600 .env
                         '
@@ -158,34 +164,33 @@ pipeline {
 
                             # Create .env file with actual secrets
                             cat > .env << EOF
-                            NODE_ENV=staging
-                            PORT=3001
-                            DATABASE_URL="${DATABASE_URL}"
-                            JWT_SECRET="${JWT_SECRET}"
-                            JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}"
-                            JWT_EXPIRE_TIME=30m
-                            JWT_REFRESH_EXPIRE_TIME=7d
-                            EMAIL_SERVICE=resend
-                            RESEND_API_KEY="${RESEND_API_KEY}"
-                            EMAIL_FROM_ADDRESS=noreply@baoafrik.com
-                            EMAIL_FROM_NAME="BaoAfrik Team"
+NODE_ENV=staging
+PORT=3001
+DATABASE_URL="${DATABASE_URL}"
+JWT_SECRET="${JWT_SECRET}"
+="${JWT_REFRESH_SECRET}"
+JWT_EXPIRE_TIME=30m
+JWT_REFRESH_EXPIRE_TIME=7d
+EMAIL_SERVICE=resend
+RESEND_API_KEY="${RESEND_API_KEY}"
+EMAIL_FROM_NAME="BaoAfrik Team"
 
-                           GCP_PROJECT_ID="${GCP_PROJECT_ID}"
-                           GCP_CLIENT_EMAIL="${GCP_CLIENT_EMAIL}"
-                           GCP_PRIVATE_KEY="${GCP_PRIVATE_KEY}"
-                           GCP_STORAGE_BUCKET="${GCP_STORAGE_BUCKET}"
-                           STORAGE_PROFILE_PREFIX=profile-images
-                           STORAGE_ATTACHMENTS_PREFIX=chat-attachments
-                           STORAGE_PRODUCT_PREFIX=product-images
-                           APP_ENCRYPTION_KEY="fonsahappencrypt"
-                           DB_ENCRYPTION_KEY="fonsahdbencrypt"
+GCP_PROJECT_ID="${GCP_PROJECT_ID}"
+GCP_CLIENT_EMAIL="${GCP_CLIENT_EMAIL}"
+GCP_PRIVATE_KEY="${GCP_PRIVATE_KEY}"
+GCP_STORAGE_BUCKET="${GCP_STORAGE_BUCKET}"
+STORAGE_PROFILE_PREFIX=profile-images
+STORAGE_ATTACHMENTS_PREFIX=chat-attachments
+STORAGE_PRODUCT_PREFIX=product-images
+APP_ENCRYPTION_KEY="fonsahappencrypt"
+DB_ENCRYPTION_KEY="fonsahdbencrypt"
 
-                            FRONTEND_URL="https://${DOMAIN}"
-                            CORS_ORIGINS="https://${DOMAIN}"
-                            BCRYPT_ROUNDS=12
-                            RATE_LIMIT_WINDOW_MS=900000
-                            RATE_LIMIT_MAX_REQUESTS=100
-                            EOF
+FRONTEND_URL="https://${DOMAIN}"
+CORS_ORIGINS="https://${DOMAIN}"
+BCRYPT_ROUNDS=12
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+EOF
 
                             chmod 600 .env
                         '
@@ -285,7 +290,7 @@ pipeline {
                             <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>Completed migration from AWS to GCP</p>
+                            <p><strong>Changes made:</strong>revert back to auto-logout after access token expires</p>
                             <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

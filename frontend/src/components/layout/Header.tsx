@@ -108,8 +108,14 @@ const Header: React.FC<HeaderProps> = ({
     let mounted = true;
 
     const load = async () => {
+      // Skip if in visitor mode
+      const isVisitor = localStorage.getItem('isVisitor') === 'true';
+      if (isVisitor) return;
+
       try {
         const token = localStorage.getItem('accessToken');
+        if (!token) return;
+
         const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -144,8 +150,14 @@ const Header: React.FC<HeaderProps> = ({
   // fetch unread counts
   useEffect(() => {
     const fetchUnread = async () => {
+      // Skip if in visitor mode
+      const isVisitor = localStorage.getItem('isVisitor') === 'true';
+      if (isVisitor) return;
+
       try {
         const token = localStorage.getItem('accessToken');
+        if (!token) return;
+
         const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
           headers: { Authorization: `Bearer ${token}` }
         });

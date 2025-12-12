@@ -1,7 +1,10 @@
 import { TokenManager } from "./tokenManager";
 
-// Store original fetch
-const originalFetch = window.fetch;
+declare global {
+  interface Window {
+    __originalFetch?: typeof fetch;
+  }
+}
 
 const isAuthEndpoint = (url: string): boolean => {
   const authEndpoints = [
@@ -17,138 +20,128 @@ const isAuthEndpoint = (url: string): boolean => {
     '/api/auth/change-password'
   ];
 
-  const urlObj = new URL(url);
-  const path = urlObj.pathname;
-
-  const result = authEndpoints.some(endpoint => path === endpoint);
-  return result;
+  try {
+    const urlObj = new URL(url, window.location.origin);
+    return authEndpoints.some(endpoint => urlObj.pathname === endpoint);
+  } catch (e) {
+    console.error('Error checking auth endpoint:', e);
+    return false;
+  }
 };
-
-const isRefreshEndpoint = (url: string): boolean => {
-  const urlObj = new URL(url);
-  const path = urlObj.pathname;
-  const isRefresh = path === '/api/auth/refresh' || path === '/api/auth/refresh';
-  return isRefresh;
-}
 
 const isPublicEndpoint = (url: string): boolean => {
   const publicEndpoints = [
     '/api/products',
     '/api/categories',
     '/api/chat',
-    '/api/upload',
-    '/api/notifications',
+    '/api/upload'
   ];
 
-  const urlObj = new URL(url);
-  const path = urlObj.pathname;
+  try {
+    const urlObj = new URL(url, window.location.origin);
+    const path = urlObj.pathname;
 
-  const result = publicEndpoints.some(endpoint => path.startsWith(endpoint));
-  return result;
-}
+    return publicEndpoints.some(endpoint =>
+      path === endpoint ||
+      (path.startsWith(endpoint + '/') && endpoint !== '/')
+    );
+  } catch (e) {
+    console.error('Error checking public endpoint:', e);
+    return false;
+  }
+};
 
-const redirectToLogin = (): void => {
+const redirectToLogin = (): Promise<never> => {
+  // Clear tokens and user data
   TokenManager.clearTokens();
   localStorage.removeItem('user');
-  window.location.href = '/login?message=session_expired';
+
+  // Store current path for post-login redirect
+  const currentPath = window.location.pathname + window.location.search;
+  if (!currentPath.includes('/login')) {
+    localStorage.setItem('redirectAfterLogin', currentPath);
+  }
+
+  // Redirect to login with session expired message
+  window.location.href = `/login?message=session_expired&redirect=${encodeURIComponent(currentPath)}`;
+
+  // Return a never-resolving promise to block further processing
+  return new Promise(() => { });
 };
 
-// Override fetch
-window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-  const url = input.toString();
-
-  // Skip if not our API or is an auth endpoint or is a public endpoint
-  const shouldSkip = !url.includes(process.env.REACT_APP_API_URL!) || isAuthEndpoint(url) || isPublicEndpoint(url);
-
-  if (shouldSkip) {
-    return originalFetch(input, init);
+const getUrlString = (input: RequestInfo | URL): string => {
+  try {
+    if (typeof input === 'string') return input;
+    if (input instanceof URL) return input.toString();
+    if (input && typeof input === 'object' && 'url' in input) return input.url;
+    return '';
+  } catch (e) {
+    console.error('Error parsing URL:', e);
+    return '';
   }
+};
 
-  // check if user is in visitor mode
-  const isVisitor = localStorage.getItem('isVisitor') === 'true';
-  if (isVisitor) {
-    return originalFetch(input, init)
-  }
+// Only initialize once
+if (!window.__originalFetch) {
+  // Store original fetch
+  window.__originalFetch = window.fetch;
 
-  // Check token
-  let token = TokenManager.getAccessToken();
+  // Override global fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const urlString = getUrlString(input);
 
-  if (!token && !isVisitor) {
-    redirectToLogin();
-    return Promise.reject(new Error('Authentication required'));
-  }
+    // Skip non-API and public/auth endpoints
+    const isOurApi = urlString.includes(process.env.REACT_APP_API_URL || '');
+    const isAuth = isAuthEndpoint(urlString);
+    const isPublic = isPublicEndpoint(urlString);
+    const shouldSkip = !isOurApi || isAuth || isPublic;
 
-  // try to refresh if there is no token or token is expired
-  if ((!token || TokenManager.isTokenExpired(token)) && !isRefreshEndpoint(url)) {
+    if (shouldSkip) {
+      return window.__originalFetch!.call(window, input, init);
+    }
+
+    // Skip for visitor mode
+    if (localStorage.getItem('isVisitor') === 'true') {
+      return window.__originalFetch!.call(window, input, init);
+    }
+
+    // Check token
+    const token = TokenManager.getAccessToken();
+    const isExpired = token ? TokenManager.isTokenExpired(token) : true;
+
+    // Handle missing/expired token
+    if (!token || isExpired) {
+      console.log('Token missing or expired, redirecting to login');
+      return redirectToLogin();
+    }
+
+    // Add auth header
+    const headers = new Headers(init?.headers);
+    headers.set('Authorization', `Bearer ${token}`);
+
     try {
-      token = await TokenManager.refreshToken();
-    } catch (error) {
-      if (!isVisitor) {
-        redirectToLogin();
-        return Promise.reject(new Error('Authentication failed'));
+      const response = await window.__originalFetch!.call(window, input, {
+        ...init,
+        headers,
+        credentials: 'include'
+      });
+
+      // Handle 401 responses
+      if (response.status === 401) {
+        console.log('Received 401, redirecting to login');
+        return redirectToLogin();
       }
-    }
-  }
 
-  if (!token && !isVisitor) {
-    redirectToLogin();
-    return Promise.reject(new Error('No token'));
-  }
-
-  // create headers
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json'
-  };
-
-  // merge with existing headers
-  if (init?.headers) {
-    if (init.headers instanceof Headers) {
-      init.headers.forEach((value, key) => {
-        headers[key] = value;
-      });
-    } else if (Array.isArray(init.headers)) {
-      init.headers.forEach(([key, value]) => {
-        headers[key] = value;
-      });
-    } else {
-      Object.entries(init.headers).forEach(([key, value]) => {
-        headers[key] = value as string;
-      });
-    }
-  }
-
-  // add Authorization header if there is an accessToken and not in visitor mode 
-  if (token && !isVisitor) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  // create new init object with merged headers
-  const newInit: RequestInit = {
-    ...init,
-    headers
-  };
-
-  let response = await originalFetch(input, newInit);
-
-  // Handle 401 responses by trying to refresh token
-  if (response.status === 401 && !isRefreshEndpoint(url) && !isVisitor) {
-    try {
-      const newToken = await TokenManager.refreshToken();
-
-      // retry the original request with new token
-      const retryHeaders = {
-        ...headers,
-        Authorization: `Bearer ${newToken}`,
-      };
-
-      response = await originalFetch(input, { ...init, headers: retryHeaders });
+      return response;
     } catch (error) {
-      redirectToLogin();
-      return Promise.reject(new Error('Authentication failed'));
+      console.error('Fetch error:', error);
+      if (error instanceof Error &&
+        (error.message.includes('401') || error.message.includes('Unauthorized'))) {
+        return redirectToLogin();
+      }
+      throw error;
     }
-  }
-
-  return response;
-};
+  };
+}
 
 export { };
