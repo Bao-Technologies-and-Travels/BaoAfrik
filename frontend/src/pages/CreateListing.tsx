@@ -623,54 +623,117 @@ const CreateListing: React.FC = () => {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files || []);
-      if (images.length + files.length <= 10) {
-        files.forEach((file) => {
-          setIsImageLoading(true);
-          setUploadProgress(0);
-
-          // Simulate realistic loading progress
-          const reader = new FileReader();
-
-          // Simulate progress updates with realistic timing
-          let progress = 0;
-          const progressInterval = setInterval(() => {
-            progress += Math.random() * 15 + 5; // Random increment between 5-20
-            if (progress > 100) progress = 100;
-            setUploadProgress(Math.floor(progress));
-
-            if (progress >= 100) {
-              clearInterval(progressInterval);
-            }
-          }, 200); // Update every 200ms
-
-          reader.onload = (event) => {
-            setTimeout(() => {
-              setImages(prev => [...prev, file]);
-              setImageUrls(prev => {
-                const newUrls = [...prev, event.target?.result as string];
-                // Set the newly uploaded image as primary
-                setPrimaryImageIndex(newUrls.length - 1);
-                return newUrls;
-              });
-              setIsImageLoading(false);
-              setUploadProgress(0);
-            }, 2000); // Total loading time ~2 seconds
-          };
-
-          reader.readAsDataURL(file);
-        });
-      } else {
-        addToast({
-          type: 'error',
-          title: "Upload limit",
-          message: "You can only upload up to 10 images at a time",
-          duration: 2500
-        });
-      }
+  const validateImageFile = (file: File): { valid: boolean; message?: string } => {
+    // Check file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      return {
+        valid: false,
+        message: `Invalid file type: Only JPG/JPEG, PNG, and WebP images are allowed.`
+      };
     }
+
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB 
+    if (file.size > maxSize) {
+      return {
+        valid: false,
+        message: `File too large: (${(file.size / (1024 * 1024)).toFixed(2)}MB). Maximum size is 5MB.`
+      };
+    }
+
+    return { valid: true };
+  };
+
+  const processImageFile = (file: File, index: number, totalFiles: number) => {
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      addToast({
+        type: 'error',
+        title: 'Invalid file',
+        message: validation.message || 'Invalid file',
+        duration: 3000
+      });
+      return;
+    }
+
+    setIsImageLoading(true);
+    setUploadProgress(0);
+    setCurrentDraggedImageIndex(index + 1);
+    setDraggedImagesTotal(totalFiles);
+
+    // Simulate progress updates with realistic timing
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+      progress += Math.random() * 15 + 5; // Random increment between 5-20
+      if (progress > 100) progress = 100;
+      setUploadProgress(Math.floor(progress));
+
+      if (progress >= 100) {
+        clearInterval(progressInterval);
+      }
+    }, 200); // Update every 200ms
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setTimeout(() => {
+        setImages(prev => [...prev, file]);
+        setImageUrls(prev => {
+          const newUrls = [...prev, event.target?.result as string];
+          // Set the newly uploaded image as primary if it's the first one
+          if (prev.length === 0) {
+            setPrimaryImageIndex(0);
+          }
+          return newUrls;
+        });
+
+        // Reset counters when all images are done
+        if (index === totalFiles - 1) {
+          setIsImageLoading(false);
+          setUploadProgress(0);
+          setDraggedImagesTotal(0);
+          setCurrentDraggedImageIndex(0);
+        }
+      }, 1000); 
+    };
+
+    reader.onerror = () => {
+      addToast({
+        type: 'error',
+        title: 'Error reading file',
+        message: `Could not read file: ${file.name}`,
+        duration: 3000
+      });
+      clearInterval(progressInterval);
+      setIsImageLoading(false);
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    const files = Array.from(e.target.files);
+
+    // Check total number of images won't exceed 10
+    if (images.length + files.length > 10) {
+      addToast({
+        type: 'error',
+        title: 'Upload limit',
+        message: 'You can only upload up to 10 images in total',
+        duration: 3000
+      });
+      return;
+    }
+
+    // Process each file
+    files.forEach((file, index) => {
+      processImageFile(file, index, files.length);
+    });
+
+    // Reset the input value to allow re-uploading the same file
+    e.target.value = '';
   };
 
   const handleRemoveImage = (index: number) => {
@@ -715,62 +778,33 @@ const CreateListing: React.FC = () => {
     e.preventDefault();
     setIsDraggingOver(false);
 
-    const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+    const files = Array.from(e.dataTransfer.files);
 
-    if (images.length + files.length <= 10) {
-      // Set total dragged images count
-      setDraggedImagesTotal(files.length);
-
-      files.forEach((file, index) => {
-        setIsImageLoading(true);
-        setUploadProgress(0);
-        setCurrentDraggedImageIndex(index + 1); // Start from 1
-
-        // Simulate realistic loading progress
-        const reader = new FileReader();
-
-        // Simulate progress updates with realistic timing
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-          progress += Math.random() * 15 + 5; // Random increment between 5-20
-          if (progress > 100) progress = 100;
-          setUploadProgress(Math.floor(progress));
-
-          if (progress >= 100) {
-            clearInterval(progressInterval);
-          }
-        }, 200); // Update every 200ms
-
-        reader.onload = (event) => {
-          setTimeout(() => {
-            setImages(prev => [...prev, file]);
-            setImageUrls(prev => {
-              const newUrls = [...prev, event.target?.result as string];
-              // Set the newly uploaded image as primary
-              setPrimaryImageIndex(newUrls.length - 1);
-              return newUrls;
-            });
-
-            // Reset counters when all images are done
-            if (index === files.length - 1) {
-              setIsImageLoading(false);
-              setUploadProgress(0);
-              setDraggedImagesTotal(0);
-              setCurrentDraggedImageIndex(0);
-            }
-          }, 2000); // Total loading time ~2 seconds
-        };
-
-        reader.readAsDataURL(file);
-      });
-    } else {
+    // Check total number of images won't exceed 10
+    if (images.length + files.length > 10) {
       addToast({
         type: 'error',
-        title: "Upload limit",
-        message: "You can only upload up to 10 images at a time",
-        duration: 2500
+        title: 'Upload limit',
+        message: 'You can only upload up to 10 images in total',
+        duration: 3000
       });
+      return;
     }
+
+    // Process each file
+    files.forEach((file, index) => {
+      // Only process image files
+      if (file.type.startsWith('image/')) {
+        processImageFile(file, index, files.length);
+      } else {
+        addToast({
+          type: 'error',
+          title: 'Invalid file type',
+          message: `Only images (JPG, PNG, and WebP) are supported.`,
+          duration: 3000
+        });
+      }
+    });
   };
 
   const handleLanguageSelect = (language: string) => {
