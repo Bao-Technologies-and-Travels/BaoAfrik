@@ -1221,7 +1221,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
             </div>
 
             {/* Mobile Title Section */}
-            <div className="lg:hidden mb-3">
+            <div className="lg:hidden mb-6">
               <h1 className="text-lg font-medium text-gray-900">
                 Create a new listing
               </h1>
@@ -1237,19 +1237,19 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                         onDragEnter={handleDragEnter}
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
-                        className={`rounded-2xl text-center relative image-upload-area ${isDraggingOver ? 'dragging-over' : ''}`}
+                        className={`text-center relative image-upload-area ${isDraggingOver ? 'dragging-over' : ''}`}
                         style={{
-                          backgroundColor: isImageLoading ? 'transparent' : (isDraggingOver ? 'transparent' : (imageUrls.length > 0 ? 'transparent' : '#F5F5F5')),
+                          backgroundColor: isImageLoading ? 'transparent' : (isDraggingOver ? 'transparent' : (imageUrls.length > 0 ? 'transparent' : 'white')),
                           background: (isImageLoading || isDraggingOver)
                             ? 'repeating-linear-gradient(-45deg, #F5FBFF, #F5FBFF 18px, #F8FCFF 18px, #F8FCFF 36px)'
-                            : (imageUrls.length > 0 ? 'transparent' : '#F5F5F5'),
-                          border: (isImageLoading || isDraggingOver) ? '2px dashed #83C4F8' : 'none',
-                          borderRadius: '12px',
-                          height: imageUrls.length > 0 ? '180px' : 'auto',
-                          display: imageUrls.length > 0 ? 'flex' : 'block',
-                          justifyContent: imageUrls.length > 0 ? 'center' : 'normal',
-                          alignItems: imageUrls.length > 0 ? 'center' : 'normal',
-                          padding: imageUrls.length > 0 ? '0' : '40px 16px'
+                            : (imageUrls.length > 0 ? 'transparent' : 'white'),
+                          border: (isImageLoading || isDraggingOver) ? '2px dashed #83C4F8' : '1px solid #E9E9E9',
+                          borderRadius: '20px',
+                          height: imageUrls.length > 0 ? '220px' : '200px',
+                          display: imageUrls.length > 0 ? 'flex' : 'flex',
+                          justifyContent: imageUrls.length > 0 ? 'center' : 'center',
+                          alignItems: imageUrls.length > 0 ? 'center' : 'center',
+                          padding: imageUrls.length > 0 ? '0' : '60px 16px'
                         }}
                       >
                      {isImageLoading ? (
@@ -1305,7 +1305,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                          </div>
                        </div>
                     ) : imageUrls.length > 0 ? (
-                       <div className="absolute inset-0 flex items-center justify-center" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+                       <div className="absolute inset-0 flex items-center justify-center" style={{ borderRadius: '20px', overflow: 'hidden' }}>
                          <img
                            src={imageUrls[primaryImageIndex]}
                            alt="Upload"
@@ -1318,16 +1318,8 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                            src={imageIcon}
                            alt="Upload"
                            className="mx-auto mb-4 opacity-60"
-                           style={{ width: '24px', height: '24px' }}
+                           style={{ width: '48px', height: '48px' }}
                          />
-                         <p className="text-xs mb-2" style={{ color: '#2D2D2D' }}>
-                           Drag and drop product images here
-                         </p>
-                         <div className="flex items-center justify-center mb-4">
-                           <div className="w-8 border-t border-gray-300"></div>
-                           <p className="text-gray-400 text-sm px-3">OR</p>
-                           <div className="w-8 border-t border-gray-300"></div>
-                         </div>
                          <label className="inline-block">
                            <input
                              type="file"
@@ -1337,7 +1329,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                              className="hidden"
                            />
                            <span
-                             className="px-6 py-2.5 rounded-lg font-medium cursor-pointer inline-block"
+                             className="px-4 py-1.5 rounded-lg font-medium cursor-pointer inline-block text-xs"
                              style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
                            >
                              Upload Photos
@@ -1506,23 +1498,23 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                </div>
 
               {/* Mobile Location Section */}
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between mt-4 mb-4">
                 <div className="flex flex-col">
                   <div className="flex items-center space-x-1 mb-0.5">
-                    <img src={locIcon} alt="Location" className="w-3.5 h-3.5" />
-                    <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
+                    <img src={locIcon} alt="Location" className="w-3 h-3" />
+                    <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontSize: '0.7rem' }}>Your location</span>
                   </div>
                   <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="text-xs font-medium border-none focus:outline-none ml-5"
-                    style={{ color: '#64B5F6' }}
+                    className="text-xs font-medium border-none focus:outline-none ml-4"
+                    style={{ color: '#64B5F6', fontSize: '0.7rem' }}
                   />
                 </div>
                 <button
-                  className="px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap"
-                  style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                  className="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
+                  style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '0.7rem' }}
                 >
                   Change location
                 </button>
@@ -1556,144 +1548,147 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                 />
               </div>
 
-              {/* Mobile Price Section */}
-              <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
-                  Price
-                </label>
-                <div className="relative w-full">
-                  <div className="price-input-container flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:border-transparent">
-                    {/* Currency Dropdown */}
-                    <div className="relative currency-dropdown" style={{ position: 'static' }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          console.log('Currency button clicked, current state:', isCurrencyDropdownOpen);
-                          setIsCurrencyDropdownOpen(!isCurrencyDropdownOpen);
-                        }}
-                        className="pl-3 pr-1 py-2.5 border-none focus:outline-none bg-white flex items-center"
-                        style={{ color: '#E4E4E4', fontSize: '0.8rem', cursor: 'pointer' }}
-                      >
-                        <span>{currency}</span>
-                        <svg
-                          className="w-4 h-4 ml-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          style={{ color: '#6B7280' }}
+              {/* Mobile Price and Quantity Section - Side by Side */}
+              <div className="flex items-start gap-3">
+                {/* Mobile Price Section */}
+                <div className="flex-1" style={{ minWidth: '0' }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
+                    Price
+                  </label>
+                  <div className="relative w-full">
+                    <div className="price-input-container flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:border-transparent">
+                      {/* Currency Dropdown */}
+                      <div className="relative currency-dropdown" style={{ position: 'static' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            console.log('Currency button clicked, current state:', isCurrencyDropdownOpen);
+                            setIsCurrencyDropdownOpen(!isCurrencyDropdownOpen);
+                          }}
+                          className="pl-2 pr-1 py-2 border-none focus:outline-none bg-white flex items-center"
+                          style={{ color: '#E4E4E4', fontSize: '0.75rem', cursor: 'pointer' }}
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
+                          <span>{currency}</span>
+                          <svg
+                            className="w-3 h-3 ml-0.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            style={{ color: '#6B7280' }}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
 
-                      {/* Dropdown Menu */}
-                      {isCurrencyDropdownOpen && (
-                        <div
-                          className="absolute z-50 bg-white border border-gray-200 shadow-lg overflow-hidden"
-                          style={{ borderRadius: '12px', minWidth: '250px', left: '0', top: 'calc(100% + 8px)' }}
-                        >
-                          {currencies.map((curr, index) => (
-                            <div
-                              key={curr.value}
-                              className={`w-full ${
-                                index === 0 ? 'rounded-t-xl' : ''
-                              } ${
-                                index === currencies.length - 1 ? 'rounded-b-xl' : ''
-                              }`}
-                              style={{
-                                backgroundColor: 'transparent'
-                              }}
-                            >
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setCurrency(curr.value);
-                                  setIsCurrencyDropdownOpen(false);
-                                }}
-                                className="w-full text-left transition-colors relative flex items-center"
+                        {/* Dropdown Menu */}
+                        {isCurrencyDropdownOpen && (
+                          <div
+                            className="absolute z-50 bg-white border border-gray-200 shadow-lg overflow-hidden"
+                            style={{ borderRadius: '12px', minWidth: '250px', left: '0', top: 'calc(100% + 8px)' }}
+                          >
+                            {currencies.map((curr, index) => (
+                              <div
+                                key={curr.value}
+                                className={`w-full ${
+                                  index === 0 ? 'rounded-t-xl' : ''
+                                } ${
+                                  index === currencies.length - 1 ? 'rounded-b-xl' : ''
+                                }`}
                                 style={{
-                                  color: '#6A6A6A',
-                                  cursor: 'pointer',
-                                  fontSize: '0.8rem',
-                                  padding: '10px 16px',
-                                  fontWeight: 500
+                                  backgroundColor: 'transparent'
                                 }}
                               >
-                                {currency === curr.value && (
-                                  <div
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setCurrency(curr.value);
+                                    setIsCurrencyDropdownOpen(false);
+                                  }}
+                                  className="w-full text-left transition-colors relative flex items-center"
+                                  style={{
+                                    color: '#6A6A6A',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    padding: '10px 16px',
+                                    fontWeight: 500
+                                  }}
+                                >
+                                  {currency === curr.value && (
+                                    <div
+                                      style={{
+                                        position: 'absolute',
+                                        left: '8px',
+                                        right: '8px',
+                                        top: '4px',
+                                        bottom: '4px',
+                                        backgroundColor: '#F0F8FE',
+                                        borderRadius: '8px',
+                                        zIndex: 0
+                                      }}
+                                    />
+                                  )}
+                                  <img
+                                    src={`https://flagcdn.com/w40/${curr.flagCode}.png`}
+                                    alt=""
                                     style={{
-                                      position: 'absolute',
-                                      left: '8px',
-                                      right: '8px',
-                                      top: '4px',
-                                      bottom: '4px',
-                                      backgroundColor: '#F0F8FE',
-                                      borderRadius: '8px',
-                                      zIndex: 0
+                                      width: '24px',
+                                      height: '18px',
+                                      marginRight: '12px',
+                                      position: 'relative',
+                                      zIndex: 1
                                     }}
                                   />
-                                )}
-                                <img
-                                  src={`https://flagcdn.com/w40/${curr.flagCode}.png`}
-                                  alt=""
-                                  style={{
-                                    width: '24px',
-                                    height: '18px',
-                                    marginRight: '12px',
-                                    position: 'relative',
-                                    zIndex: 1
-                                  }}
-                                />
-                                <span style={{ position: 'relative', zIndex: 1 }}>
-                                  {curr.label} · {curr.value}
-                                </span>
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                                  <span style={{ position: 'relative', zIndex: 1 }}>
+                                    {curr.label} · {curr.value}
+                                  </span>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-                    <div style={{ width: '1px', height: '32px', backgroundColor: '#D1D5DB', marginLeft: '12px', marginRight: '12px', flexShrink: 0 }}></div>
-                    <input
-                      type="text"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      placeholder="Insert Pricing"
-                      className="create-listing-input flex-1 pl-4 pr-4 py-3 border-none focus:outline-none focus:ring-0"
-                      style={{ borderLeft: 'none', boxShadow: 'none' }}
-                    />
+                      <div style={{ width: '1px', height: '26px', backgroundColor: '#D1D5DB', marginLeft: '8px', marginRight: '8px', flexShrink: 0 }}></div>
+                      <input
+                        type="text"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                        placeholder="Insert Pricing"
+                        className="create-listing-input flex-1 pl-2 pr-2 py-2 border-none focus:outline-none focus:ring-0 text-xs"
+                        style={{ borderLeft: 'none', boxShadow: 'none' }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Mobile Quantity */}
-              <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
-                  Quantity
-                </label>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-10 rounded-lg font-medium text-base flex-shrink-0"
-                    style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    value={quantity}
-                    onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    style={{ width: '120px' }}
-                  />
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-10 h-10 rounded-lg font-medium text-base flex-shrink-0"
-                    style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}
-                  >
-                    +
-                  </button>
+                {/* Mobile Quantity */}
+                <div className="flex-1">
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
+                    Quantity
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-10 h-10 rounded-lg font-medium text-base flex-shrink-0"
+                      style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      value={quantity}
+                      onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      style={{ width: '100%' }}
+                    />
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-10 h-10 rounded-lg font-medium text-base flex-shrink-0"
+                      style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -2058,7 +2053,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
               </div>
 
               {/* Mobile Delivery available */}
-              <div className="py-3">
+              <div className="py-3 mb-12">
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="block text-xs font-medium" style={{ color: '#6A6A6A' }}>
@@ -2109,11 +2104,10 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                 </button>
                 <button
                   onClick={handleSaveDraft}
-                  className="flex items-center justify-center space-x-2 w-full py-2 rounded-xl border-2 font-medium transition-colors text-sm"
-                  style={{ borderColor: '#F9A825', color: '#F9A825' }}
+                  className="flex items-center justify-center w-full py-2 rounded-xl font-medium transition-colors text-sm"
+                  style={{ color: '#939393' }}
                 >
                   <span>Save as draft</span>
-                  <img src={draft2Icon} alt="Save" className="w-4 h-4" />
                 </button>
               </div>
             </div>
