@@ -8,6 +8,7 @@ import locationIcon from '../assets/images/pre/PL.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
 import bellIcon from '../assets/images/pre/bm.svg';
 import shareIcon from '../assets/images/pre/Share.svg';
+import requestIcon from '../assets/images/pre/request.svg';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -152,15 +153,26 @@ const Requests: React.FC = () => {
     </div>
   );
 
-  const renderRequestCard = (isPending: boolean = false, cardId: string = '') => (
+  const renderRequestCard = (isPending: boolean = false, cardId: string = '', productData?: { title: string; country: string; flag: string; location: string; isPending?: boolean }) => {
+    const defaultProduct = {
+      title: 'Snails from South Africa',
+      country: 'South Africa',
+      flag: 'https://flagcdn.com/w20/za.png',
+      location: 'London, United Kingdom'
+    };
+    const product = productData || defaultProduct;
+    const cardIsPending = productData?.isPending !== undefined ? productData.isPending : isPending;
+    
+    return (
     <div 
-      className="bg-white rounded-xl hover:shadow-md transition-shadow"
+      className="bg-white hover:shadow-md transition-shadow"
       style={{ 
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
         height: 'auto',
         width: isMobile ? '260px' : 'auto',
         flexShrink: isMobile ? 0 : 'initial',
-        padding: isMobile ? '10px' : '16px'
+        padding: isMobile ? '10px' : '16px',
+        borderRadius: '16px'
       }}
     >
       {/* Product Name Label and Button - Desktop only */}
@@ -178,13 +190,13 @@ const Requests: React.FC = () => {
           >
             Request
           </span>
-          {isPending ? (
+          {cardIsPending ? (
             <div className="flex items-center gap-2">
               <div 
-                className="px-2.5 py-1 rounded-lg"
+                className="px-2 py-0.5 rounded-lg"
                 style={{ 
                   backgroundColor: '#F4F4F4',
-                  fontSize: '11px',
+                  fontSize: '10px',
                   color: '#6A6A6A',
                   fontWeight: 'normal',
                   fontFamily: 'Poppins, sans-serif'
@@ -269,9 +281,7 @@ const Requests: React.FC = () => {
                   width: 'auto'
                 }}
               >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 2H10V10H2V2ZM3 3V9H9V3H3ZM4 4H8V5H4V4ZM4 6H8V7H4V6Z" fill="#F9A825"/>
-                </svg>
+                <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
                 Manage request
               </button>
               <button
@@ -317,7 +327,7 @@ const Requests: React.FC = () => {
 
       {/* Product Title */}
       <h3 className="mb-2 sm:mb-3" style={{ fontSize: isMobile ? '11px' : '14px', fontWeight: '500', color: '#212121' }}>
-        Snails from South Africa
+        {product.title}
       </h3>
 
       {/* Description */}
@@ -332,7 +342,7 @@ const Requests: React.FC = () => {
           <div className="flex flex-col gap-2">
             {/* First Row - Location */}
             <div 
-              className="flex items-center gap-1.5 px-2.5 py-1.5"
+              className="flex items-center gap-1.5 px-2.5 py-1"
               style={{ 
                 backgroundColor: '#FFFFFF', 
                 borderRadius: '999px', 
@@ -346,14 +356,14 @@ const Requests: React.FC = () => {
                 className="w-3 h-3"
                 style={{ filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)' }}
               />
-              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>London, United Kingdom</span>
+              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.location}</span>
             </div>
 
             {/* Second Row - Price and Country */}
             <div className="flex gap-2">
               {/* Price Tag */}
               <div 
-                className="flex items-center gap-1.5 px-2.5 py-1.5"
+                className="flex items-center gap-1.5 px-2.5 py-1"
                 style={{ 
                   backgroundColor: '#FFFFFF', 
                   borderRadius: '999px',
@@ -371,7 +381,7 @@ const Requests: React.FC = () => {
 
               {/* Country Tag */}
               <div 
-                className="flex items-center gap-1.5 px-2.5 py-1.5"
+                className="flex items-center gap-1.5 px-2.5 py-1"
                 style={{ 
                   backgroundColor: '#FFFFFF', 
                   borderRadius: '999px',
@@ -379,11 +389,11 @@ const Requests: React.FC = () => {
                 }}
               >
                 <img 
-                  src="https://flagcdn.com/w20/za.png" 
-                  alt="South Africa"
+                  src={product.flag} 
+                  alt={product.country}
                   className="w-4 h-4 object-cover rounded-full"
                 />
-                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>South Africa</span>
+                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.country}</span>
               </div>
             </div>
           </div>
@@ -420,7 +430,7 @@ const Requests: React.FC = () => {
         <div className="flex flex-col gap-2 mb-3">
           {/* First Row - Location */}
           <div 
-            className="flex items-center gap-1.5 px-2 py-1"
+            className="flex items-center gap-1.5 px-2 py-0.5"
             style={{ 
               backgroundColor: '#FFFFFF', 
               borderRadius: '999px', 
@@ -437,14 +447,14 @@ const Requests: React.FC = () => {
                 filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)'
               }}
             />
-            <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>London, United Kingdom</span>
+            <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.location}</span>
           </div>
 
           {/* Second Row - Price and Country */}
           <div className="flex gap-2">
             {/* Price Tag */}
             <div 
-              className="flex items-center gap-1.5 px-2 py-1"
+              className="flex items-center gap-1.5 px-2 py-0.5"
               style={{ 
                 backgroundColor: '#FFFFFF', 
                 borderRadius: '999px',
@@ -465,7 +475,7 @@ const Requests: React.FC = () => {
 
             {/* Country Tag */}
             <div 
-              className="flex items-center gap-1.5 px-2 py-1"
+              className="flex items-center gap-1.5 px-2 py-0.5"
               style={{ 
                 backgroundColor: '#FFFFFF', 
                 borderRadius: '999px',
@@ -473,8 +483,8 @@ const Requests: React.FC = () => {
               }}
             >
               <img 
-                src="https://flagcdn.com/w20/za.png" 
-                alt="South Africa"
+                src={product.flag} 
+                alt={product.country}
                 style={{ 
                   width: '11px',
                   height: '11px',
@@ -482,7 +492,7 @@ const Requests: React.FC = () => {
                   borderRadius: '50%'
                 }}
               />
-              <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>South Africa</span>
+              <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.country}</span>
             </div>
           </div>
         </div>
@@ -556,14 +566,15 @@ const Requests: React.FC = () => {
         </button>
       )}
     </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Breadcrumbs */}
-      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '12px' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ marginLeft: '-8px' }}>
-          <nav className="flex items-center" style={{ fontSize: '13px', gap: '8px' }}>
+      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '8px' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav className="flex items-center space-x-2" style={{ fontSize: '13px' }}>
             <img 
               src={arrowLeftIcon} 
               alt="Back" 
@@ -658,7 +669,7 @@ const Requests: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 style={{ 
                 fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: isMobile ? '16px' : '20px',
+                fontSize: isMobile ? '14px' : '18px',
                 fontWeight: '500',
                 color: '#000000'
               }}>
@@ -716,9 +727,13 @@ const Requests: React.FC = () => {
                   WebkitOverflowScrolling: 'touch'
                 } : {}}
               >
-                {[1, 2, 3].map((index) => (
+                {[
+                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA' },
+                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France' },
+                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada' }
+                ].map((product, index) => (
                   <React.Fragment key={index}>
-                    {renderRequestCard(false, `near-${index}`)}
+                    {renderRequestCard(false, `near-${index}`, product)}
                   </React.Fragment>
                 ))}
               </div>
@@ -730,7 +745,7 @@ const Requests: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 style={{ 
                 fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: isMobile ? '16px' : '20px',
+                fontSize: isMobile ? '14px' : '18px',
                 fontWeight: '500',
                 color: '#000000'
               }}>
@@ -788,9 +803,13 @@ const Requests: React.FC = () => {
                   WebkitOverflowScrolling: 'touch'
                 } : {}}
               >
-                {[1, 2, 3].map((index) => (
+                {[
+                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany' },
+                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia' },
+                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE' }
+                ].map((product, index) => (
                   <React.Fragment key={index}>
-                    {renderRequestCard(true, `pending-${index}`)}
+                    {renderRequestCard(true, `pending-${index}`, product)}
                   </React.Fragment>
                 ))}
               </div>
@@ -802,7 +821,7 @@ const Requests: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 style={{ 
                 fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: isMobile ? '16px' : '20px',
+                fontSize: isMobile ? '14px' : '18px',
                 fontWeight: '500',
                 color: '#000000'
               }}>
@@ -860,9 +879,16 @@ const Requests: React.FC = () => {
                   WebkitOverflowScrolling: 'touch'
                 } : {}}
               >
-                {[1, 2, 3, 4, 5, 6].map((index) => (
+                {[
+                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', isPending: false },
+                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', isPending: true },
+                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', isPending: false },
+                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', isPending: true },
+                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', isPending: false },
+                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', isPending: true }
+                ].map((product, index) => (
                   <React.Fragment key={index}>
-                    {renderRequestCard(false, `all-${index}`)}
+                    {renderRequestCard(product.isPending || false, `all-${index}`, { ...product, isPending: product.isPending })}
                   </React.Fragment>
                 ))}
               </div>
