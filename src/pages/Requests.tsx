@@ -253,7 +253,7 @@ const Requests: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '10px',
-                        padding: '10px 12px',
+                        padding: '8px 12px',
                         borderRadius: '8px',
                         border: 'none',
                         backgroundColor: 'transparent',
@@ -289,7 +289,7 @@ const Requests: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '10px',
-                        padding: '10px 12px',
+                        padding: '8px 12px',
                         borderRadius: '8px',
                         border: 'none',
                         backgroundColor: 'transparent',
@@ -326,7 +326,7 @@ const Requests: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '10px',
-                        padding: '10px 12px',
+                        padding: '8px 12px',
                         borderRadius: '8px',
                         border: 'none',
                         backgroundColor: '#FAFAFA',
@@ -651,8 +651,8 @@ const Requests: React.FC = () => {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Breadcrumbs */}
-      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '0px', marginBottom: '-16px' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '0px', marginBottom: '-24px' }}>
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
           <nav className="flex items-center space-x-2" style={{ fontSize: '13px' }}>
             <img 
               src={arrowLeftIcon} 
