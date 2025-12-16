@@ -36,6 +36,7 @@ import boxIcon from '../assets/images/pre/box.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
 import bagIcon from '../assets/images/pre/bag.svg';
 import settingIcon from '../assets/images/pre/setting.svg';
+import requestArrowIcon from '../assets/images/pre/requestarrow.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -3089,19 +3090,53 @@ const Home: React.FC = () => {
             </div>
 
             {/* Navigation Arrows */}
-            <div className="flex items-center justify-end gap-3 mt-6">
-              <button 
-                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                aria-label="Previous"
+            <div className="flex items-center justify-between gap-3 mt-6">
+              {/* See all requests link */}
+              <Link 
+                to="/requests"
+                className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
+                style={{ 
+                  color: '#64B5F6',
+                  fontSize: window.innerWidth < 640 ? '12px' : '16px',
+                  textDecoration: 'none',
+                  marginLeft: '8px'
+                }}
               >
-                <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-              </button>
-              <button 
-                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                aria-label="Next"
-              >
-                <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-              </button>
+                <span>See all requests</span>
+                <img 
+                  src={requestArrowIcon} 
+                  alt="Arrow" 
+                  style={{ 
+                    width: window.innerWidth < 640 ? '12px' : '16px',
+                    height: window.innerWidth < 640 ? '12px' : '16px',
+                    filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)',
+                    transform: 'scaleX(1.3)',
+                    transformOrigin: 'center'
+                  }}
+                />
+              </Link>
+              <div className="flex items-center gap-3">
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: window.innerWidth < 640 ? '20px' : '24px',
+                    height: window.innerWidth < 640 ? '20px' : '24px'
+                  }}
+                  aria-label="Previous"
+                >
+                  <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                </button>
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: window.innerWidth < 640 ? '20px' : '24px',
+                    height: window.innerWidth < 640 ? '20px' : '24px'
+                  }}
+                  aria-label="Next"
+                >
+                  <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
