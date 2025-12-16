@@ -1,4 +1,3 @@
-import { error } from 'console';
 import { authService } from '../services';
 import { API_CONFIG } from './apiConfig';
 

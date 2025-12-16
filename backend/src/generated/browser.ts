@@ -73,6 +73,11 @@ export type Conversation = Prisma.ConversationModel
  */
 export type ConversationParticipant = Prisma.ConversationParticipantModel
 /**
+ * Model ProductRequest
+ * 
+ */
+export type ProductRequest = Prisma.ProductRequestModel
+/**
  * Model Notification
  * 
  */

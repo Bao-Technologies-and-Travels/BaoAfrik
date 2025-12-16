@@ -62,6 +62,7 @@ export const ModelName = {
   Country: 'Country',
   Conversation: 'Conversation',
   ConversationParticipant: 'ConversationParticipant',
+  ProductRequest: 'ProductRequest',
   Notification: 'Notification'
 } as const
 
@@ -268,15 +269,32 @@ export const ConversationParticipantScalarFieldEnum = {
 export type ConversationParticipantScalarFieldEnum = (typeof ConversationParticipantScalarFieldEnum)[keyof typeof ConversationParticipantScalarFieldEnum]
 
 
+export const ProductRequestScalarFieldEnum = {
+  id: 'id',
+  productName: 'productName',
+  description: 'description',
+  origin: 'origin',
+  sellerLocation: 'sellerLocation',
+  minPrice: 'minPrice',
+  maxPrice: 'maxPrice',
+  currency: 'currency',
+  status: 'status',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductRequestScalarFieldEnum = (typeof ProductRequestScalarFieldEnum)[keyof typeof ProductRequestScalarFieldEnum]
+
+
 export const NotificationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   actorId: 'actorId',
   type: 'type',
-  title: 'title',
-  body: 'body',
-  meta: 'meta',
+  message: 'message',
   isRead: 'isRead',
+  metadata: 'metadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

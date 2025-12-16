@@ -32,6 +32,7 @@ import Notifications from './pages/Notifications';
 import NotificationDetail from './pages/NotificationDetail';
 import ArchivedChats from './pages/ArchivedChats';
 import ProfileSettings from './pages/ProfileSettings';
+import MyRequests from './pages/MyRequests';
 import './App.css';
 
 import { ToastProvider } from './contexts/ToastContext';
@@ -130,6 +131,8 @@ function AppContent() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/my-requests" element={<MyRequests />} />
+          <Route path="/requests/:id" element={<MyRequests />} />
         </Routes>
       </main>
       <Footer />

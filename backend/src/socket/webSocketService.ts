@@ -3,7 +3,6 @@ import { ChatService } from '../services/chatService';
 import jwt from 'jsonwebtoken';
 import prisma from '@/config/database';
 import { notificationService } from '@/services/notificationService';
-import { create } from 'node:domain';
 
 interface AuthenticatedSocket extends Socket {
   user?: {
@@ -386,9 +385,12 @@ export class WebSocketService {
                 userId: participant.id,
                 actorId: socket.user!.id,
                 type: 'NEW_MESSAGE',
-                title: `${socket.user!.firstName || ''} ${socket.user!.lastName || ''}`.trim() || 'New message',
-                body: content?.substring(0, 100) || 'Sent a file',
-                meta: { conversationId, messageId: message.id}
+                message: `${socket.user!.firstName || ''} ${socket.user!.lastName || ''}`.trim() + ': ' + (content?.substring(0, 100) || 'Sent a file'),
+                metadata: {
+                  conversationId,
+                  messageId: message.id,
+                  type: 'NEW_MESSAGE'
+                }
               });
 
               this.io.to(participant.id).emit('notification', createdNotif);
@@ -396,7 +398,7 @@ export class WebSocketService {
               console.warn('Failed to persist  or emit persisted notification', e);
               this.io.to(participant.id).emit('notification', notifPayload);
             }
-            
+
             this.io.to(participant.id).emit('notification_count', { totalUnread: await this.chatService.getUnreadCounts(participant.id).then(c => c.reduce((s: any, v: any) => s + v.unreadCount, 0)) });
 
             try {

@@ -4,9 +4,8 @@ export interface CreateNotificationData {
     userId: string;
     actorId?: string | null;
     type: string;
-    title: string;
-    body?: string;
-    meta?: any;
+    message?: string;
+    metadata?: any;
 }
 
 export class NotificationService {
@@ -16,11 +15,10 @@ export class NotificationService {
                 userId: data.userId,
                 actorId: data.actorId ?? null,
                 type: data.type,
-                title: data.title,
-                body: data.body ?? null,
-                meta: data.meta ?? undefined
+                message: data.message ?? null,
+                metadata: data.metadata ?? null
             },
-            include:{
+            include: {
                 actor: {
                     select: {
                         id: true,
@@ -55,18 +53,18 @@ export class NotificationService {
             await prisma.notification.findMany({
                 where: { userId },
                 orderBy: { createdAt: 'desc' },
-                skip: (page -1) * limit,
+                skip: (page - 1) * limit,
                 take: limit,
                 include: {
-                  actor: {
-                    select: {
-                      id: true,
-                      firstName: true,
-                      lastName: true,
-                      profileImage: true,
-                      email: true
+                    actor: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true,
+                            email: true
+                        }
                     }
-                  }
                 }
             }),
             await prisma.notification.count({ where: { userId } }),

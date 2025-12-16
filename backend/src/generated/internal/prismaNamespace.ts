@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.0.1
- * Query Engine version: f09f2815f091dbba658cdcd2264306d88bb5bda6
+ * Prisma Client JS version: 7.1.0
+ * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.0.1",
-  engine: "f09f2815f091dbba658cdcd2264306d88bb5bda6"
+  client: "7.1.0",
+  engine: "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba"
 }
 
 /**
@@ -395,6 +395,7 @@ export const ModelName = {
   Country: 'Country',
   Conversation: 'Conversation',
   ConversationParticipant: 'ConversationParticipant',
+  ProductRequest: 'ProductRequest',
   Notification: 'Notification'
 } as const
 
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "product" | "productLike" | "productSave" | "message" | "messageStatus" | "category" | "country" | "conversation" | "conversationParticipant" | "notification"
+    modelProps: "user" | "refreshToken" | "product" | "productLike" | "productSave" | "message" | "messageStatus" | "category" | "country" | "conversation" | "conversationParticipant" | "productRequest" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1229,6 +1230,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ProductRequest: {
+      payload: Prisma.$ProductRequestPayload<ExtArgs>
+      fields: Prisma.ProductRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProductRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProductRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.ProductRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProductRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload>
+        }
+        findMany: {
+          args: Prisma.ProductRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload>[]
+        }
+        create: {
+          args: Prisma.ProductRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload>
+        }
+        createMany: {
+          args: Prisma.ProductRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProductRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.ProductRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload>
+        }
+        update: {
+          args: Prisma.ProductRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProductRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProductRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProductRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProductRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.ProductRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProductRequest>
+        }
+        groupBy: {
+          args: Prisma.ProductRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProductRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductRequestCountAggregateOutputType> | number
+        }
+      }
+    }
     Notification: {
       payload: Prisma.$NotificationPayload<ExtArgs>
       fields: Prisma.NotificationFieldRefs
@@ -1529,15 +1604,32 @@ export const ConversationParticipantScalarFieldEnum = {
 export type ConversationParticipantScalarFieldEnum = (typeof ConversationParticipantScalarFieldEnum)[keyof typeof ConversationParticipantScalarFieldEnum]
 
 
+export const ProductRequestScalarFieldEnum = {
+  id: 'id',
+  productName: 'productName',
+  description: 'description',
+  origin: 'origin',
+  sellerLocation: 'sellerLocation',
+  minPrice: 'minPrice',
+  maxPrice: 'maxPrice',
+  currency: 'currency',
+  status: 'status',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductRequestScalarFieldEnum = (typeof ProductRequestScalarFieldEnum)[keyof typeof ProductRequestScalarFieldEnum]
+
+
 export const NotificationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   actorId: 'actorId',
   type: 'type',
-  title: 'title',
-  body: 'body',
-  meta: 'meta',
+  message: 'message',
   isRead: 'isRead',
+  metadata: 'metadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1773,7 +1865,7 @@ export type PrismaClientOptions = ({
    *  { emit: 'stdout', level: 'error' }
    * 
    * ```
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
+   * Read more in our [docs](https://pris.ly/d/logging).
    */
   log?: (LogLevel | LogDefinition)[]
   /**
@@ -1801,6 +1893,22 @@ export type PrismaClientOptions = ({
    * ```
    */
   omit?: GlobalOmitConfig
+  /**
+   * SQL commenter plugins that add metadata to SQL queries as comments.
+   * Comments follow the sqlcommenter format: https://google.github.io/sqlcommenter/
+   * 
+   * @example
+   * ```
+   * const prisma = new PrismaClient({
+   *   adapter,
+   *   comments: [
+   *     traceContext(),
+   *     queryInsights(),
+   *   ],
+   * })
+   * ```
+   */
+  comments?: runtime.SqlCommenterPlugin[]
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
@@ -1814,6 +1922,7 @@ export type GlobalOmitConfig = {
   country?: Prisma.CountryOmit
   conversation?: Prisma.ConversationOmit
   conversationParticipant?: Prisma.ConversationParticipantOmit
+  productRequest?: Prisma.ProductRequestOmit
   notification?: Prisma.NotificationOmit
 }
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -30,6 +29,7 @@ import cameroonianCulture from '../assets/images/logos/culture.png'; // Traditio
 
 // Import scan icon
 import scanIcon from '../assets/images/logos/scanner (1).png';
+import { apiClient } from '../services';
 
 interface BaseProduct {
   id: string;
@@ -87,6 +87,17 @@ interface Notification {
   type: 'success' | 'error';
 }
 
+interface Request {
+  id: string;
+  productName: string;
+  description: string;
+  minPrice?: number;
+  maxPrice?: number;
+  currency?: string;
+  origin?: string;
+
+}
+
 const Home: React.FC = () => {
   const productGridRef = React.useRef<HTMLDivElement>(null);
   const categoryRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
@@ -124,7 +135,12 @@ const Home: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<FrontendProduct[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const routerLocation = useLocation();
+  const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const [requests, setRequests] = useState<any[]>([]);
+  const [isLoadingRequests, setIsLoadingRequests] = useState(true);
+  const [requestsError, setRequestsError] = useState<string | null>(null);
 
   // UseEffect for fetching products
   useEffect(() => {
@@ -188,6 +204,41 @@ const Home: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // useEffect for fetching requess from API
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        setIsLoadingRequests(true);
+        setRequestsError(null);
+
+        const token = localStorage.getItem('accessToken');
+
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/request`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch requests');
+        }
+
+        const result = await response.json();
+        console.log('Response data:', result);
+        setRequests(Array.isArray(result.data) ? result.data : []);
+
+      } catch (error) {
+        console.error('Error fetching requests:', error);
+        setRequestsError('Failed to load requests. Please try again later.');
+      } finally {
+        setIsLoadingRequests(false);
+      }
+    };
+    fetchRequests();
+  }, []);
 
   const getDefaultProductImage = (category: string | undefined): any => {
     const categoryImages: { [key: string]: any } = {
@@ -935,6 +986,110 @@ const Home: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isFilterDropdownOpen]);
+
+  const handleRequestSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const validateForm = () => {
+      if (!requestProductName.trim()) {
+        alert('Product name is required');
+        return false;
+      }
+      if (!requestDescription.trim()) {
+        alert('Description is required');
+        return false;
+      }
+      if (!requestProductOrigin) {
+        alert('Please select a product origin');
+        return false;
+      }
+      return true;
+    };
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const token = localStorage.getItem('accessToken');
+
+    try {
+      setIsSubmitting(true);
+
+      let minPrice = 0;
+      let maxPrice = 1000;
+      let currency = 'USD';
+
+      if (requestPriceRange) {
+        const range = requestPriceRange.toLowerCase();
+
+        if (range.includes('less than')) {
+          const match = requestPriceRange.match(/less than (\d+)/i);
+          if (match) {
+            minPrice = 0;
+            maxPrice = Number(match[1]);
+          }
+        } else if (range.includes('more than')) {
+          const match = requestPriceRange.match(/more than (\d+)/i);
+          if (match) {
+            minPrice = Number(match[1]);
+            maxPrice = 1000000; // Or whatever your maximum should be
+          }
+        } else {
+          // Handle ranges like "10 - 50 USD"
+          const match = requestPriceRange.match(/(\d+)\s*-\s*(\d+)\s*(\w{3})?/i);
+          if (match) {
+            minPrice = Number(match[1]);
+            maxPrice = Number(match[2]);
+            if (match[3]) currency = match[3].toUpperCase();
+          }
+        }
+      }
+
+      const formData = {
+        productName: requestProductName.trim(),
+        description: requestDescription.trim(),
+        origin: requestProductOrigin,
+        sellerLocation: requestProductOrigin,
+        minPrice,
+        maxPrice,
+        currency,
+        status: 'PENDING'
+      };
+
+      console.log('Sending request with data:', formData);
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit request');
+      }
+      const responseData = await response.json();
+      console.log('Request submitted successfully:', responseData);
+
+      // Reset form
+      setRequestProductName('');
+      setRequestProductOrigin('');
+      setRequestDescription('');
+      setRequestPriceRange('');
+
+      setShowRequestModal(false);
+      navigate('/my-requests');
+
+    } catch (error: any) {
+      console.error('Error submitting request:', error);
+      alert(error.message || 'Failed to submit request. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
@@ -3028,53 +3183,163 @@ const Home: React.FC = () => {
                 WebkitOverflowScrolling: 'touch'
               } : {}}
             >
-              {[1, 2, 3].map((index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-xl hover:shadow-md transition-shadow"
-                  style={{
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                    height: 'auto',
-                    width: window.innerWidth < 640 ? '260px' : 'auto',
-                    flexShrink: window.innerWidth < 640 ? 0 : 'initial',
-                    padding: window.innerWidth < 640 ? '10px' : '16px'
-                  }}
-                >
-                  {/* Product Name Label and Button - Desktop only */}
-                  {window.innerWidth >= 640 && (
-                    <div className="flex items-center justify-between mb-0">
-                      <span style={{ fontSize: '12px', color: '#9C9C9C' }}>Product name</span>
-                      <button
-                        className="px-3 py-1 rounded-lg text-white"
-                        style={{ backgroundColor: '#F9A825', fontWeight: 'normal', fontSize: '12px' }}
-                      >
-                        Manage request
-                      </button>
-                    </div>
-                  )}
+              {isLoadingRequests ? (
+                <div className="col-span-full flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                </div>
+              ) : requestsError ? (
+                <div className="col-span-full text-center py-12 text-red-500">
+                  {requestsError}
+                </div>
+              ) : requests.length === 0 ? (
+                <div className="col-span-full text-center py-12 text-gray-500">
+                  No requests found
+                </div>
+              ) : (
+                requests.map((request) => (
+                  <div
+                    key={request.id}
+                    className="bg-white rounded-xl hover:shadow-md transition-shadow"
+                    style={{
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                      height: 'auto',
+                      width: window.innerWidth < 640 ? '260px' : 'auto',
+                      flexShrink: window.innerWidth < 640 ? 0 : 'initial',
+                      padding: window.innerWidth < 640 ? '10px' : '16px'
+                    }}
+                  >
+                    {/* Product Name Label and Button - Desktop only */}
+                    {window.innerWidth >= 640 && (
+                      <div className="flex items-center justify-between mb-0">
+                        <span style={{ fontSize: '12px', color: '#9C9C9C' }}>Product name</span>
+                        <button
+                          className="px-3 py-1 rounded-lg text-white"
+                          style={{ backgroundColor: '#F9A825', fontWeight: 'normal', fontSize: '12px' }}
+                          onClick={() => {
+                            navigate('/my-requests')
+                          }}
+                        >
+                          Manage request
+                        </button>
+                      </div>
+                    )}
 
-                  {/* Product Name Label Only - Mobile */}
-                  {window.innerWidth < 640 && (
-                    <div className="mb-1">
-                      <span style={{ fontSize: '9px', color: '#9C9C9C' }}>Product name</span>
-                    </div>
-                  )}
+                    {/* Product Name Label Only - Mobile */}
+                    {window.innerWidth < 640 && (
+                      <div className="mb-1">
+                        <span style={{ fontSize: '9px', color: '#9C9C9C' }}>Product name</span>
+                      </div>
+                    )}
 
-                  {/* Product Title */}
-                  <h3 className="mb-2 sm:mb-3" style={{ fontSize: window.innerWidth < 640 ? '11px' : '14px', fontWeight: '500', color: '#212121' }}>
-                    Snails from South Africa
-                  </h3>
+                    {/* Product Title */}
+                    <h3 className="mb-2 sm:mb-3" style={{
+                      fontSize: window.innerWidth < 640 ? '11px' : '14px',
+                      fontWeight: '500',
+                      color: '#212121'
+                    }}>
+                      {request.productName || 'No title provided'}
+                    </h3>
 
-                  {/* Description */}
-                  <p className="mb-3 sm:mb-4" style={{ fontSize: window.innerWidth < 640 ? '7px' : '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  </p>
+                    {/* Description */}
+                    <p className="mb-3 sm:mb-4" style={{
+                      fontSize: window.innerWidth < 640 ? '7px' : '10px',
+                      color: '#6A6A6A',
+                      lineHeight: '1.5',
+                      fontWeight: 'normal'
+                    }}>
+                      {request.description || 'No description available'}
+                    </p>
 
-                  {/* Tags and User Info Row - Desktop/Tablet */}
-                  {window.innerWidth >= 640 && (
-                    <div className="flex items-end justify-between">
-                      {/* Tags - Stacked Layout */}
-                      <div className="flex flex-col gap-2">
+                    {/* Price Range */}
+                    {request.minPrice && request.maxPrice && (
+                      <div className="mb-2">
+                        <span style={{
+                          fontSize: window.innerWidth < 640 ? '9px' : '12px',
+                          color: '#333',
+                          fontWeight: '500'
+                        }}>
+                          {request.currency || 'USD'} {request.minPrice} - {request.maxPrice}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Tags and User Info Row - Desktop/Tablet */}
+                    {window.innerWidth >= 640 && (
+                      <div className="flex items-end justify-between">
+                        {/* Tags - Stacked Layout */}
+                        <div className="flex flex-col gap-2">
+                          {/* First Row - Location */}
+                          <div
+                            className="flex items-center gap-1 px-2 py-1"
+                            style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                          >
+                            <img
+                              src={locationIcon}
+                              alt="Location"
+                              className="w-3 h-3"
+                              style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                            />
+                            <span style={{ fontSize: '12px', color: '#64B5F6' }}>London | United Kingdom</span>
+                          </div>
+
+                          {/* Second Row - Price and Country */}
+                          <div className="flex gap-2">
+                            {/* Price Tag */}
+                            <div
+                              className="flex items-center gap-1.5 px-3 py-1.5"
+                              style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                            >
+                              <img
+                                src={moneyIcon}
+                                alt="Money"
+                                className="w-3 h-3"
+                                style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                              />
+                              <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                            </div>
+
+                            {/* Country Tag */}
+                            <div
+                              className="flex items-center gap-1.5 px-3 py-1.5"
+                              style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                            >
+                              <img
+                                src="https://flagcdn.com/w20/za.png"
+                                alt="South Africa"
+                                className="w-4 h-3 object-cover rounded-sm"
+                              />
+                              <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* User Info */}
+                        <div className="flex flex-col items-center mt-2">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
+                            style={{ backgroundColor: '#F7C9B0' }}
+                          >
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C" />
+                              <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C" />
+                            </svg>
+                          </div>
+                          <div
+                            className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 border -mt-2"
+                            style={{ borderColor: '#F4F4F4', backgroundColor: '#FFFFFF', borderRadius: '12px' }}
+                          >
+                            <svg className="w-2.5 h-2.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <span style={{ fontSize: '10px', color: '#212121', fontWeight: '500' }}>4.3</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tags - Mobile Only */}
+                    {window.innerWidth < 640 && (
+                      <div className="flex flex-col gap-2 mb-3">
                         {/* First Row - Location */}
                         <div
                           className="flex items-center gap-1 px-2 py-1"
@@ -3083,10 +3348,13 @@ const Home: React.FC = () => {
                           <img
                             src={locationIcon}
                             alt="Location"
-                            className="w-3 h-3"
-                            style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                            style={{
+                              width: '9px',
+                              height: '9px',
+                              filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                            }}
                           />
-                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>London | United Kingdom</span>
+                          <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>London | United Kingdom</span>
                         </div>
 
                         {/* Second Row - Price and Country */}
@@ -3099,10 +3367,13 @@ const Home: React.FC = () => {
                             <img
                               src={moneyIcon}
                               alt="Money"
-                              className="w-3 h-3"
-                              style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                              style={{
+                                width: '9px',
+                                height: '9px',
+                                filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                              }}
                             />
-                            <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                            <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>50 ~ 100 USD</span>
                           </div>
 
                           {/* Country Tag */}
@@ -3113,163 +3384,86 @@ const Home: React.FC = () => {
                             <img
                               src="https://flagcdn.com/w20/za.png"
                               alt="South Africa"
-                              className="w-4 h-3 object-cover rounded-sm"
+                              style={{
+                                width: '11px',
+                                height: '8px',
+                                objectFit: 'cover',
+                                borderRadius: '2px'
+                              }}
                             />
-                            <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
+                            <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>South Africa</span>
                           </div>
                         </div>
                       </div>
+                    )}
 
-                      {/* User Info */}
-                      <div className="flex flex-col items-center mt-2">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
-                          style={{ backgroundColor: '#F7C9B0' }}
-                        >
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C" />
-                            <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C" />
-                          </svg>
-                        </div>
-                        <div
-                          className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 border -mt-2"
-                          style={{ borderColor: '#F4F4F4', backgroundColor: '#FFFFFF', borderRadius: '12px' }}
-                        >
-                          <svg className="w-2.5 h-2.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <span style={{ fontSize: '10px', color: '#212121', fontWeight: '500' }}>4.3</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                    {/* User Profile Section - Mobile (New Layout) */}
+                    {window.innerWidth < 640 && (
+                      <>
+                        {/* Gray Divider */}
+                        <div style={{ width: '100%', height: '0.5px', backgroundColor: '#E4E4E4', marginBottom: '8px' }}></div>
 
-                  {/* Tags - Mobile Only */}
-                  {window.innerWidth < 640 && (
-                    <div className="flex flex-col gap-2 mb-3">
-                      {/* First Row - Location */}
-                      <div
-                        className="flex items-center gap-1 px-2 py-1"
-                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
-                      >
-                        <img
-                          src={locationIcon}
-                          alt="Location"
-                          style={{
-                            width: '9px',
-                            height: '9px',
-                            filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
-                          }}
-                        />
-                        <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>London | United Kingdom</span>
-                      </div>
-
-                      {/* Second Row - Price and Country */}
-                      <div className="flex gap-2">
-                        {/* Price Tag */}
-                        <div
-                          className="flex items-center gap-1.5 px-3 py-1.5"
-                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                        >
-                          <img
-                            src={moneyIcon}
-                            alt="Money"
-                            style={{
-                              width: '9px',
-                              height: '9px',
-                              filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
-                            }}
-                          />
-                          <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>50 ~ 100 USD</span>
-                        </div>
-
-                        {/* Country Tag */}
-                        <div
-                          className="flex items-center gap-1.5 px-3 py-1.5"
-                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                        >
-                          <img
-                            src="https://flagcdn.com/w20/za.png"
-                            alt="South Africa"
-                            style={{
-                              width: '11px',
-                              height: '8px',
-                              objectFit: 'cover',
-                              borderRadius: '2px'
-                            }}
-                          />
-                          <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>South Africa</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* User Profile Section - Mobile (New Layout) */}
-                  {window.innerWidth < 640 && (
-                    <>
-                      {/* Gray Divider */}
-                      <div style={{ width: '100%', height: '0.5px', backgroundColor: '#E4E4E4', marginBottom: '8px' }}></div>
-
-                      <div className="flex items-center justify-between">
-                        {/* Left: Avatar and User Info */}
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="rounded-full flex items-center justify-center overflow-hidden"
-                            style={{
-                              backgroundColor: '#F7C9B0',
-                              width: '24px',
-                              height: '24px'
-                            }}
-                          >
-                            <svg
-                              style={{ width: '14px', height: '14px' }}
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
+                        <div className="flex items-center justify-between">
+                          {/* Left: Avatar and User Info */}
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="rounded-full flex items-center justify-center overflow-hidden"
+                              style={{
+                                backgroundColor: '#F7C9B0',
+                                width: '24px',
+                                height: '24px'
+                              }}
                             >
-                              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C" />
-                              <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C" />
+                              <svg
+                                style={{ width: '14px', height: '14px' }}
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C" />
+                                <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C" />
+                              </svg>
+                            </div>
+                            <div className="flex flex-col">
+                              <span style={{ fontSize: '7px', color: '#BABABA', fontWeight: 'normal' }}>User profile</span>
+                              <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>Seraphin DIKOUM</span>
+                            </div>
+                          </div>
+
+                          {/* Right: Rating */}
+                          <div className="flex items-center gap-0.5">
+                            <svg
+                              className="text-yellow-500"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              style={{ width: '8px', height: '8px' }}
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
-                          </div>
-                          <div className="flex flex-col">
-                            <span style={{ fontSize: '7px', color: '#BABABA', fontWeight: 'normal' }}>User profile</span>
-                            <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>Seraphin DIKOUM</span>
+                            <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>4.3</span>
                           </div>
                         </div>
+                      </>
+                    )}
 
-                        {/* Right: Rating */}
-                        <div className="flex items-center gap-0.5">
-                          <svg
-                            className="text-yellow-500"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            style={{ width: '8px', height: '8px' }}
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>4.3</span>
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {/* Respond to the request button - Mobile only */}
-                  {window.innerWidth < 640 && (
-                    <button
-                      className="w-full mt-3 text-white"
-                      style={{
-                        backgroundColor: '#F9A825',
-                        fontWeight: 'normal',
-                        fontSize: '9px',
-                        padding: '6px 10px',
-                        borderRadius: '6px'
-                      }}
-                    >
-                      Respond to the request
-                    </button>
-                  )}
-                </div>
-              ))}
+                    {/* Respond to the request button - Mobile only */}
+                    {window.innerWidth < 640 && (
+                      <button
+                        className="w-full mt-3 text-white"
+                        style={{
+                          backgroundColor: '#F9A825',
+                          fontWeight: 'normal',
+                          fontSize: '9px',
+                          padding: '6px 10px',
+                          borderRadius: '6px'
+                        }}
+                      >
+                        Respond to the request
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
 
             {/* Navigation Arrows */}
@@ -3349,6 +3543,13 @@ const Home: React.FC = () => {
               </button>
             </div>
 
+            {/* error div */}
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
             {/* Product Name Input */}
             <div style={{ marginBottom: window.innerWidth < 640 ? '10px' : '12px' }}>
               <label style={{ fontSize: window.innerWidth < 640 ? '10px' : '12px', color: '#6A6A6A', display: 'block', marginBottom: window.innerWidth < 640 ? '4px' : '6px' }}>
@@ -3377,11 +3578,9 @@ const Home: React.FC = () => {
                 Product Origin
               </label>
               <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
+                <select
                   value={requestProductOrigin}
                   onChange={(e) => setRequestProductOrigin(e.target.value)}
-                  placeholder="Choose a location"
                   style={{
                     width: '100%',
                     padding: window.innerWidth < 640 ? '6px 10px' : '8px 12px',
@@ -3390,11 +3589,22 @@ const Home: React.FC = () => {
                     fontSize: window.innerWidth < 640 ? '10px' : '12px',
                     fontFamily: 'Poppins, sans-serif',
                     outline: 'none',
-                    color: requestProductOrigin ? '#212121' : '#D9D9D9'
+                    color: requestProductOrigin ? '#212121' : '#D9D9D9',
+                    backgroundColor: '#FFFFFF',
+                    appearance: 'none',
                   }}
-                />
+                >
+                  <option value="" disabled>
+                    Choose a location
+                  </option>
+                  {africanCountries.map((country) => (
+                    <option value={country.name} key={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
                 <svg
-                  style={{ position: 'absolute', right: window.innerWidth < 640 ? '10px' : '12px', top: '50%', transform: 'translateY(-50%)', width: window.innerWidth < 640 ? '12px' : '14px', height: window.innerWidth < 640 ? '12px' : '14px' }}
+                  style={{ position: 'absolute', pointerEvents: 'none', right: window.innerWidth < 640 ? '10px' : '12px', top: '50%', transform: 'translateY(-50%)', width: window.innerWidth < 640 ? '12px' : '14px', height: window.innerWidth < 640 ? '12px' : '14px' }}
                   fill="none"
                   stroke="#6A6A6A"
                   viewBox="0 0 24 24"
@@ -3503,6 +3713,13 @@ const Home: React.FC = () => {
 
             {/* Create Request Button */}
             <button
+              type="submit"
+              disabled={isSubmittingRequest}
+              className={`submit-button ${isSubmittingRequest ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleRequestSubmit(e);
+              }}
               style={{
                 display: 'flex',
                 width: window.innerWidth < 640 ? '100%' : '480px',
@@ -3522,31 +3739,15 @@ const Home: React.FC = () => {
                 fontWeight: '400',
                 margin: '0 auto'
               }}
-              onClick={async () => {
-                // Validate form
-                if (!requestProductName || !requestProductOrigin || !requestDescription || !requestPriceRange) {
-                  alert('Please fill all fields');
-                  return;
-                }
-
-                setIsSubmittingRequest(true);
-
-                // Simulate API call with loading state
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                setIsSubmittingRequest(false);
-                setShowRequestModal(false);
-                setShowConfirmationModal(true);
-
-                // Reset form
-                setRequestProductName('');
-                setRequestProductOrigin('');
-                setRequestDescription('');
-                setRequestPriceRange('');
-              }}
-              disabled={isSubmittingRequest}
             >
-              {isSubmittingRequest ? 'Submitting...' : 'Create the request'}
+              {isSubmittingRequest ? (
+                <>
+                  <span className="animate-spin mr-2">↻</span>
+                  Submitting...
+                </>
+              ) : (
+                'Submit Request'
+              )}
             </button>
           </div>
         </div>
@@ -3596,7 +3797,7 @@ const Home: React.FC = () => {
 
             {/* Description */}
             <p style={{ fontSize: window.innerWidth < 640 ? '10px' : '13px', color: '#6A6A6A', marginBottom: window.innerWidth < 640 ? '16px' : '24px', lineHeight: '1.6' }}>
-              Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing
+              A seller will reach out to you if they have what you're looking for.
             </p>
 
             {/* Close Button */}

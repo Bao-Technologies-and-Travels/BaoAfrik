@@ -25,6 +25,7 @@ import productRoutes from './routes/productRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import countryRoutes from '@/routes/countryRoutes';
+import requestRoutes from '@/routes/requestRoutes';
 
 import { gcpStorageService } from './services/gcpStorageService';
 
@@ -185,6 +186,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/countries', countryRoutes);
+app.use('/api/request', requestRoutes);
 
 // 404 handler
 app.use(notFound);

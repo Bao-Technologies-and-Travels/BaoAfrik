@@ -42,7 +42,6 @@ export class AuthService {
   async logout(): Promise<ApiResponse<{ message: string }>> {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
-      const accessToken = localStorage.getItem('accessToken');
 
       const response = await apiClient.post<{ message: string }>('/auth/logout', {
         refreshToken: refreshToken || undefined

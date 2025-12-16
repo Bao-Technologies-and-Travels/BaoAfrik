@@ -2,6 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { CustomError } from '@/utils/errorUtils';
 
+export const validate = (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  return next();
+};
+
 // Handle validation results
 export const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -414,3 +422,25 @@ export const validateUUIDParam = (paramName: string = 'id') => [
   handleValidationErrors,
 ];
 
+export const createRequestValidation = [
+  body('productName').trim().notEmpty().withMessage('Product name is required'),
+  body('description').trim().notEmpty().withMessage('Description is required'),
+  body('origin').trim().notEmpty().withMessage('Origin is required'),
+  body('sellerLocation').trim().notEmpty().withMessage('Seller location is required'),
+  body('minPrice').optional().isFloat({ min: 0 }).withMessage('Minimum price must be a positive number'),
+  body('maxPrice').optional().isFloat({ min: 0 }).withMessage('Maximum price must be a positive number'),
+  body('currency').optional().isString().isLength({ min: 3, max: 3 }).withMessage('Currency must be a 3-letter code')
+];
+export const updateRequestValidation = [
+  param('id').isUUID().withMessage('Invalid request ID'),
+  body('status').optional().isIn(['PENDING', 'FULFILLED', 'REJECTED']).withMessage('Invalid status'),
+  ...createRequestValidation
+];
+export const requestIdValidation = [
+  param('id').isUUID().withMessage('Invalid request ID')
+];
+export const getRequestsValidation = [
+  query('status').optional().isIn(['PENDING', 'FULFILLED', 'REJECTED']).withMessage('Invalid status'),
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100')
+];

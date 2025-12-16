@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ProductService, CreateProductData, UpdateProductData } from '../services/productService';
+import { ProductService } from '../services/productService';
 import { gcpStorageService } from '../services/gcpStorageService';
 import { validationResult } from 'express-validator';
 
@@ -52,7 +52,7 @@ export class ProductController {
         category,
         origin,
         location,
-        saleType: backendSaleType, // Now properly typed
+        saleType: backendSaleType, 
         deliveryAvailable: Boolean(deliveryAvailable),
         status: 'DRAFT' as const // Use const assertion
       };

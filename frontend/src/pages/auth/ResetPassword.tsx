@@ -7,7 +7,6 @@ import { authService } from '../../services/authService';
 import { useToast } from '../../contexts/ToastContext';
 
 import leftIcon from '../../assets/images/pre/left.png';
-import unlockIcon from '../../assets/images/pre/unlock.svg';
 import backArrowIcon from '../../assets/images/pre/back arrow.svg';
 
 const ResetPassword: React.FC = () => {

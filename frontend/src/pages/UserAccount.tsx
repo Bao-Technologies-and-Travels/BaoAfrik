@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate} from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -7,7 +7,6 @@ import sellerAvatar from '../assets/images/logos/avatar.png';
 import defaultCoverImage from '../assets/images/logos/8.png';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
 import verifyIcon from '../assets/images/pre/verify.svg';
-import basketIcon from '../assets/images/pre/basket.png';
 import logoIcon from '../assets/images/logos/ba-brand-icon-colored.png';
 import whatsappIcon from '../assets/images/pre/zap.svg';
 import instagramIcon from '../assets/images/pre/ig.svg';
