@@ -1879,9 +1879,9 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                </div>
 
               {/* Mobile Location Section */}
-              <div className="flex items-start justify-between mt-16 mb-16">
+              <div className="flex items-start justify-between mt-24 mb-24">
                 <div className="flex flex-col">
-                  <div className="flex items-center space-x-1 mb-0.5">
+                  <div className="flex items-center mb-0.5" style={{ marginLeft: '-2px' }}>
                     <img src={locIcon} alt="Location" className="w-3 h-3 hidden" />
                     <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontSize: '0.7rem' }}>Your location</span>
                   </div>
