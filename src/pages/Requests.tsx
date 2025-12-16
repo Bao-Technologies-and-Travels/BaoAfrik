@@ -172,7 +172,7 @@ const Requests: React.FC = () => {
         width: isMobile ? '260px' : 'auto',
         flexShrink: isMobile ? 0 : 'initial',
         padding: isMobile ? '10px' : '16px',
-        borderRadius: '20px'
+        borderRadius: '24px'
       }}
     >
       {/* Product Name Label and Button - Desktop only */}
@@ -234,33 +234,106 @@ const Requests: React.FC = () => {
                       right: 0,
                       backgroundColor: '#FFFFFF',
                       borderRadius: '12px',
-                      border: '1px solid #E9E9E9',
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                      padding: '6px',
-                      minWidth: '150px',
+                      padding: '8px',
+                      minWidth: '180px',
                       zIndex: 1000
                     }}
                   >
+                    {/* Manage request */}
                     <button
                       type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
                       style={{
                         width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        padding: '8px 12px',
+                        gap: '10px',
+                        padding: '10px 12px',
                         borderRadius: '8px',
                         border: 'none',
                         backgroundColor: 'transparent',
                         cursor: 'pointer',
                         fontFamily: 'Poppins, sans-serif',
-                        fontSize: '12px',
-                        color: '#212121'
+                        fontSize: '13px',
+                        color: '#939393'
                       }}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                      Delete
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 2H10L12 4V12H4V2Z" stroke="#939393" strokeWidth="1.2" fill="none"/>
+                        <path d="M10 2V4H12" stroke="#939393" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M6 8L7.5 9.5L10 7" stroke="#939393" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Manage request</span>
+                    </button>
+                    
+                    {/* Share the request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '13px',
+                        color: '#939393'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={shareIcon} 
+                        alt="Share" 
+                        style={{ 
+                          width: '16px', 
+                          height: '16px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span>Share the request</span>
+                    </button>
+                    
+                    {/* Close */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: '#FAFAFA',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '13px',
+                        color: '#939393'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Close</span>
                     </button>
                   </div>
                 )}
@@ -572,8 +645,8 @@ const Requests: React.FC = () => {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Breadcrumbs */}
-      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '4px' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ marginLeft: '-4px' }}>
+      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '2px' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center space-x-2" style={{ fontSize: '13px' }}>
             <img 
               src={arrowLeftIcon} 
@@ -716,7 +789,7 @@ const Requests: React.FC = () => {
                   className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
                   style={{
                     background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
-                    height: 'calc(100% - 4rem)'
+                    height: '100%'
                   }}
                 />
               )}
@@ -793,7 +866,7 @@ const Requests: React.FC = () => {
                   className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
                   style={{
                     background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
-                    height: 'calc(100% - 4rem)'
+                    height: '100%'
                   }}
                 />
               )}
@@ -870,7 +943,7 @@ const Requests: React.FC = () => {
                   className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
                   style={{
                     background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
-                    height: 'calc(100% - 4rem)'
+                    height: '100%'
                   }}
                 />
               )}
