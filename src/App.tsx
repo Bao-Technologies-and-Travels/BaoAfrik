@@ -33,6 +33,7 @@ import NotificationDetail from './pages/NotificationDetail';
 import ArchivedChats from './pages/ArchivedChats';
 import ProfileSettings from './pages/ProfileSettings';
 import MyListings from './pages/MyListings';
+import Requests from './pages/Requests';
 import './App.css';
 
 function AppContent() {
@@ -125,6 +126,7 @@ const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/n
           <Route path="/profile" element={<Profile />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/requests" element={<Requests />} />
         </Routes>
       </main>
       <Footer />
