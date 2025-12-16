@@ -1355,7 +1355,7 @@ const ProductDetail: React.FC = () => {
               {isOwnerView && currentReviewStatus === 'success' && (
                 <div
                   onClick={handleToggleReviewStatus}
-                  className="flex items-start gap-3 p-2.5 mt-2 cursor-pointer"
+                  className="flex items-start gap-2 lg:gap-3 p-2 lg:p-2.5 mt-2 cursor-pointer"
                   style={{
                     backgroundColor: '#F5FBFF',
                     border: '1px solid #B8DDFB',
@@ -1364,10 +1364,8 @@ const ProductDetail: React.FC = () => {
                 >
                   {/* Icon with white circular bg */}
                   <div
-                    className="flex-shrink-0 rounded-full flex items-center justify-center"
+                    className="flex-shrink-0 rounded-full flex items-center justify-center w-8 h-8 lg:w-10 lg:h-10"
                     style={{
-                      width: '40px',
-                      height: '40px',
                       backgroundColor: '#FFFFFF',
                       border: '2px solid #FFFFFF'
                     }}
@@ -1375,7 +1373,7 @@ const ProductDetail: React.FC = () => {
                     <img
                       src={listingtoastIcon}
                       alt="Listing"
-                      className="w-6 h-6"
+                      className="w-5 h-5 lg:w-6 lg:h-6"
                     />
                   </div>
 
@@ -1383,10 +1381,9 @@ const ProductDetail: React.FC = () => {
                   <div className="flex-1">
                     {/* Title */}
                     <p
-                      className="font-medium mb-0.5"
+                      className="font-medium mb-0.5 text-xs lg:text-sm"
                       style={{
                         color: '#64B5F6',
-                        fontSize: '14px',
                         fontFamily: 'Bricolage Grotesque, sans-serif'
                       }}
                     >
@@ -1395,10 +1392,9 @@ const ProductDetail: React.FC = () => {
 
                     {/* Description */}
                     <p
-                      className="text-xs"
+                      className="text-[10px] lg:text-xs"
                       style={{
-                        color: '#B0B0B0',
-                        fontSize: '12px'
+                        color: '#B0B0B0'
                       }}
                     >
                       We analyze your listing, please wait a few minutes.
@@ -1412,7 +1408,7 @@ const ProductDetail: React.FC = () => {
               {isOwnerView && currentReviewStatus === 'failed' && (
                 <div
                   onClick={handleToggleReviewStatus}
-                  className="flex items-start gap-3 p-2.5 mt-2 cursor-pointer"
+                  className="flex items-start gap-2 lg:gap-3 p-2 lg:p-2.5 mt-2 cursor-pointer"
                   style={{
                     backgroundColor: '#FFFCF7',
                     border: '1px solid #FFE0B2',
@@ -1421,10 +1417,8 @@ const ProductDetail: React.FC = () => {
                 >
                   {/* Warning Icon */}
                   <div
-                    className="flex-shrink-0 rounded-full flex items-center justify-center"
+                    className="flex-shrink-0 rounded-full flex items-center justify-center w-8 h-8 lg:w-10 lg:h-10"
                     style={{
-                      width: '40px',
-                      height: '40px',
                       border: '2px solid #FFFFFF',
                       backgroundColor: '#FFFCF7'
                     }}
@@ -1432,7 +1426,7 @@ const ProductDetail: React.FC = () => {
                     <img
                       src={daysIcon}
                       alt="Warning"
-                      className="w-6 h-6"
+                      className="w-5 h-5 lg:w-6 lg:h-6"
                     />
                   </div>
 
@@ -1440,10 +1434,9 @@ const ProductDetail: React.FC = () => {
                   <div className="flex-1">
                     {/* Title */}
                     <p
-                      className="font-medium mb-0.5"
+                      className="font-medium mb-0.5 text-xs lg:text-sm"
                       style={{
                         color: '#F9A825',
-                        fontSize: '14px',
                         fontFamily: 'Bricolage Grotesque, sans-serif'
                       }}
                     >
@@ -1452,10 +1445,9 @@ const ProductDetail: React.FC = () => {
 
                     {/* Description */}
                     <p
-                      className="text-xs mb-1"
+                      className="text-[10px] lg:text-xs mb-1"
                       style={{
-                        color: '#939393',
-                        fontSize: '12px'
+                        color: '#939393'
                       }}
                     >
                       Sorry we can't post your listing on our marketplace
@@ -1463,10 +1455,9 @@ const ProductDetail: React.FC = () => {
 
                     {/* Why Section */}
                     <p
-                      className="font-semibold mb-0.5"
+                      className="font-semibold mb-0.5 text-[10px] lg:text-xs"
                       style={{
-                        color: '#212121',
-                        fontSize: '12px'
+                        color: '#212121'
                       }}
                     >
                       Why ? :
@@ -1474,10 +1465,9 @@ const ProductDetail: React.FC = () => {
 
                     {/* Reason */}
                     <p
-                      className="text-xs"
+                      className="text-[10px] lg:text-xs"
                       style={{
                         color: '#939393',
-                        fontSize: '12px',
                         paddingLeft: '8px'
                       }}
                     >
@@ -1841,6 +1831,136 @@ const ProductDetail: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Review Status Badge - Success State - Mobile */}
+          {isMobile && isOwnerView && currentReviewStatus === 'success' && (
+            <div
+              onClick={handleToggleReviewStatus}
+              className="flex items-start gap-2 p-2 mt-4 cursor-pointer"
+              style={{
+                backgroundColor: '#F5FBFF',
+                border: '1px solid #B8DDFB',
+                borderRadius: '14px'
+              }}
+            >
+              {/* Icon with white circular bg */}
+              <div
+                className="flex-shrink-0 rounded-full flex items-center justify-center w-8 h-8"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  border: '2px solid #FFFFFF'
+                }}
+              >
+                <img
+                  src={listingtoastIcon}
+                  alt="Listing"
+                  className="w-5 h-5"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="flex-1">
+                {/* Title */}
+                <p
+                  className="font-medium mb-0.5 text-xs"
+                  style={{
+                    color: '#64B5F6',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}
+                >
+                  Your listing is under review
+                </p>
+
+                {/* Description */}
+                <p
+                  className="text-[10px]"
+                  style={{
+                    color: '#B0B0B0'
+                  }}
+                >
+                  We analyze your listing, please wait a few minutes.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Review Status Badge - Failed State - Mobile */}
+          {isMobile && isOwnerView && currentReviewStatus === 'failed' && (
+            <div
+              onClick={handleToggleReviewStatus}
+              className="flex items-start gap-2 p-2 mt-4 cursor-pointer"
+              style={{
+                backgroundColor: '#FFFCF7',
+                border: '1px solid #FFE0B2',
+                borderRadius: '14px'
+              }}
+            >
+              {/* Warning Icon */}
+              <div
+                className="flex-shrink-0 rounded-full flex items-center justify-center w-8 h-8"
+                style={{
+                  border: '2px solid #FFFFFF',
+                  backgroundColor: '#FFFCF7'
+                }}
+              >
+                <img
+                  src={daysIcon}
+                  alt="Warning"
+                  className="w-5 h-5"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="flex-1">
+                {/* Title */}
+                <p
+                  className="font-medium mb-0.5 text-xs"
+                  style={{
+                    color: '#F9A825',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}
+                >
+                  Your listing failed review
+                </p>
+
+                {/* Description */}
+                <p
+                  className="text-[10px] mb-1"
+                  style={{
+                    color: '#939393'
+                  }}
+                >
+                  Sorry we can't post your listing on our marketplace
+                </p>
+
+                {/* Why Section */}
+                <p
+                  className="font-semibold mb-0.5 text-[10px]"
+                  style={{
+                    color: '#212121'
+                  }}
+                >
+                  Why ? :
+                </p>
+
+                {/* Reason */}
+                <p
+                  className="text-[10px]"
+                  style={{
+                    color: '#939393',
+                    paddingLeft: '8px'
+                  }}
+                >
+                  <span style={{ color: '#B0B0B0' }}>•</span> {ownerListing?.reviewFailureReason || 'Your product is not authentic'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Spacing below success/failure badges - Mobile */}
+          {(isMobile && isOwnerView && currentReviewStatus) && (
+            <div className="mb-4"></div>
+          )}
 
           {/* Warning Badge for Inactive Listings - Mobile - Above badges */}
           {isMobile && isOwnerView && ownerListing?.status === 'inactive' && !currentReviewStatus && (

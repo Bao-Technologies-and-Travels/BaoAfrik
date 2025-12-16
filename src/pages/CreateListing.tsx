@@ -13,6 +13,10 @@ import avatarIcon from '../assets/images/pre/avatar.png';
 import notificationIcon from '../assets/images/pre/notification.svg';
 import translationToggleIcon from '../assets/images/pre/tt.svg';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
+import backArrowIcon from '../assets/images/pre/back arrow.svg';
+import pencilIcon from '../assets/images/pre/pencil.svg';
+import lilLogo from '../assets/images/pre/lil.png';
+import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 import messageIcon from '../assets/images/pre/message.svg';
 import boxIcon from '../assets/images/pre/box.svg';
 import groupIcon from '../assets/images/pre/group.svg';
@@ -87,6 +91,7 @@ const initialDraftListings: DraftListing[] = [
 const CreateListing: React.FC = () => {
   const navigate = useNavigate();
   const routerLocation = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -103,6 +108,7 @@ const CreateListing: React.FC = () => {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
+  const [showMobileDrafts, setShowMobileDrafts] = useState(false);
   const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
   const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
   const currentDraftSeed = JSON.stringify(initialDraftListings);
@@ -574,6 +580,15 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
     }, [isLanguageDropdownOpen, isMenuDropdownOpen, isCategoryDropdownOpen, isOriginDropdownOpen, isSaleTypeDropdownOpen, isCurrencyDropdownOpen]);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
     if (draftSeedRef.current !== currentDraftSeed) {
       draftSeedRef.current = currentDraftSeed;
       setDraftListings(initialDraftListings);
@@ -685,11 +700,202 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
     </div>
   );
 
+  // Mobile Drafts View - Exact copy from MyListings
+  if (showMobileDrafts && isMobile) {
+    return (
+      <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        {/* Mobile Drafts Header */}
+        <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between mb-16">
+          <button
+            type="button"
+            onClick={() => setShowMobileDrafts(false)}
+            className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+            aria-label="Back"
+          >
+            <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="Search"
+            >
+              <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="More options"
+            >
+              <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                <circle cx="4" cy="2" r="2" fill="#171717" />
+                <circle cx="12" cy="2" r="2" fill="#171717" />
+                <circle cx="20" cy="2" r="2" fill="#171717" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="pt-20 px-4 mb-6">
+          <h1
+            className="text-lg font-semibold"
+            style={{ color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          >
+            Drafts ({draftListings.length})
+          </h1>
+        </div>
+
+        {/* Drafts List */}
+        <div className="px-4 pb-20 space-y-4">
+          {draftListings.map((draft) => (
+            <div
+              key={draft.id}
+              className="bg-white flex gap-3"
+            >
+              {/* Draft Image */}
+              <div
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  flexShrink: 0
+                }}
+              >
+                <img src={draft.image} alt={draft.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+
+              {/* Draft Info - Right of image */}
+              <div className="flex-1 flex flex-col justify-between">
+                {/* Title and Price */}
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '14px', fontWeight: 500 }}>
+                    {draft.title}
+                  </span>
+                  <span style={{ color: '#B0B0B0', fontSize: '14px' }}>·</span>
+                  <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    {draft.currency} {draft.price}
+                  </span>
+                </div>
+
+                {/* Country tag if exists */}
+                {draft.country && (
+                  <div className="inline-flex items-center gap-1 py-0.5 rounded-full mb-1" style={{ border: '1px solid #E1E1E1', paddingLeft: '6px', paddingRight: '8px', width: 'fit-content' }}>
+                    <img
+                      src={draft.flag}
+                      alt={draft.country}
+                      className="w-3 h-3 rounded-full object-cover"
+                    />
+                    <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                      {draft.country}
+                    </span>
+                  </div>
+                )}
+
+                {/* Description - smaller, center-right, 2 lines max */}
+                <p 
+                  style={{ 
+                    color: '#B0B0B0', 
+                    fontSize: '10px', 
+                    fontFamily: 'Poppins, sans-serif', 
+                    lineHeight: '1.4', 
+                    marginBottom: '6px',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {draft.description || '(Empty)'}
+                </p>
+
+                {/* Action Buttons - Bottom right */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5"
+                    style={{
+                      backgroundColor: '#F4F4F4',
+                      color: '#939393',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontFamily: 'Poppins, sans-serif',
+                      border: 'none',
+                      cursor: 'pointer',
+                      paddingLeft: '10px',
+                      paddingRight: '10px',
+                      paddingTop: '4px',
+                      paddingBottom: '4px'
+                    }}
+                    onClick={() => {
+                      handleDraftApply(draft);
+                      setShowMobileDrafts(false);
+                    }}
+                  >
+                    <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#FFE9E9',
+                      borderRadius: '6px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      paddingLeft: '8px',
+                      paddingRight: '8px',
+                      paddingTop: '4px',
+                      paddingBottom: '4px'
+                    }}
+                    onClick={() => {
+                      setDraftListings((prev) => prev.filter((d) => d.id !== draft.id));
+                    }}
+                  >
+                    <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <footer className="bg-white mt-auto">
+          <div className="px-4 py-5">
+            <div className="flex flex-col items-center text-xs space-y-2" style={{ color: '#BABABA' }}>
+              <div className="flex items-center space-x-1.5">
+                <img src={lilLogo} alt="Bao Afrik" className="w-5 h-5" />
+                <span>©</span>
+                <span className="text-[11px]">All rights reserved</span>
+              </div>
+              <div className="flex items-center space-x-1.5 text-[10px] flex-wrap justify-center">
+                <Link to="/contact" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Contact Us</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/terms" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/privacy" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Privacy policies</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/cookies" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Cookies</Link>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
   const renderDraftsModal = () => {
     if (!isDraftsModalOpen) return null;
+    
+    // Desktop modal view
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center"
+        className="fixed inset-0 z-50 flex items-center justify-center hidden lg:flex"
         style={{ backgroundColor: '#0000001A' }}
         onClick={() => setIsDraftsModalOpen(false)}
       >
@@ -749,6 +955,11 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
         .create-listing-input::placeholder {
           color: #D9D9D9;
           font-size: 0.85rem;
+        }
+        @media (max-width: 1023px) {
+          .create-listing-input::placeholder {
+            font-size: 0.7rem;
+          }
         }
         .create-listing-textarea::placeholder {
           color: #D9D9D9;
@@ -1101,19 +1312,25 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
         {!showSuccessModal ? (
         <div className="max-w-7xl mx-auto">
           {/* Mobile Top Bar - Back Arrow and Drafts Button */}
-          <div className="flex items-center justify-between mb-3 lg:hidden">
+          <div className="flex items-center justify-between mb-3 lg:hidden px-2">
             {/* Back Arrow */}
             <img 
               src={arrowLeftIcon} 
               alt="Back" 
-              className="w-5 h-5 cursor-pointer" 
+              className="w-5 h-5 cursor-pointer ml-2" 
               onClick={handleHomepageClick}
             />
             {/* Drafts Button */}
             <button
-              className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg"
+              className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg mr-2"
               style={{ backgroundColor: '#F0F8FE' }}
-              onClick={() => setIsDraftsModalOpen(true)}
+              onClick={() => {
+                if (isMobile) {
+                  setShowMobileDrafts(true);
+                } else {
+                  setIsDraftsModalOpen(true);
+                }
+              }}
             >
               <img src={draftsIcon} alt="Drafts" className="w-3.5 h-3.5" />
               <span className="font-medium text-xs" style={{ color: '#64B5F6' }}>
@@ -1222,7 +1439,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
 
             {/* Mobile Title Section */}
             <div className="lg:hidden mb-6">
-              <h1 className="text-lg font-medium text-gray-900">
+              <h1 className="text-lg font-semibold text-gray-900">
                 Create a new listing
               </h1>
               <p className="mt-0.5 text-xs" style={{ color: '#BABABA' }}>Add a new product</p>
@@ -1245,7 +1462,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                             : (imageUrls.length > 0 ? 'transparent' : 'white'),
                           border: (isImageLoading || isDraggingOver) ? '2px dashed #83C4F8' : '1px solid #E9E9E9',
                           borderRadius: '20px',
-                          height: imageUrls.length > 0 ? '220px' : '200px',
+                          height: imageUrls.length > 0 ? '260px' : '240px',
                           display: imageUrls.length > 0 ? 'flex' : 'flex',
                           justifyContent: imageUrls.length > 0 ? 'center' : 'center',
                           alignItems: imageUrls.length > 0 ? 'center' : 'center',
@@ -1313,12 +1530,12 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                          />
                        </div>
                       ) : (
-                       <>
+                       <div className="flex flex-col items-center justify-center">
                          <img
                            src={imageIcon}
                            alt="Upload"
-                           className="mx-auto mb-4 opacity-60"
-                           style={{ width: '48px', height: '48px' }}
+                           className="mb-4 opacity-60"
+                           style={{ width: '64px', height: '64px' }}
                          />
                          <label className="inline-block">
                            <input
@@ -1335,7 +1552,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                              Upload Photos
                            </span>
                          </label>
-                       </>
+                       </div>
                     )}
                    </div>
                  <div className="flex items-center justify-between mt-2">
@@ -1357,111 +1574,310 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                    )}
                  </div>
 
-                 {/* Image Preview Section - Mobile */}
+                 {/* Image Preview Section - Mobile - Exactly like desktop structure */}
                  {imageUrls.length > 0 && (
-                    <div className="flex gap-3 mt-4 overflow-x-auto" style={{ paddingTop: '15px', paddingBottom: '15px', WebkitOverflowScrolling: 'touch' }}>
-                      {imageUrls.map((url, index) => (
+                    <div className="flex gap-3 mt-4" style={{ paddingTop: '25px', paddingBottom: '15px' }}>
+                      <style>{`
+                        .mobile-image-preview-scroll::-webkit-scrollbar {
+                          display: none;
+                        }
+                      `}</style>
+                      
+                      {/* Conditionally wrap in scrollable container when 4+ images */}
+                      {imageUrls.length >= 4 ? (
                         <div 
-                          key={index}
-                          className="relative flex-shrink-0"
+                          className="relative"
                           style={{ 
-                            width: '70px', 
-                            height: '70px',
-                            borderRadius: '10px',
-                            overflow: 'visible'
+                            width: imageUrls.length >= 10 ? '378px' : '294px',
+                            height: '100px',
+                            paddingTop: '15px',
+                            paddingBottom: '15px',
+                            marginTop: '-15px',
+                            marginBottom: '-15px',
+                            overflow: 'hidden'
                           }}
                         >
-                          <img 
-                            src={url} 
-                            alt={`Preview ${index + 1}`}
-                            className="w-full h-full object-cover"
-                            style={{ borderRadius: '12px' }}
-                          />
-                          
-                          {/* Light gray smoky overlay - only on primary image */}
-                          {index === primaryImageIndex && (
-                            <div 
-                              className="absolute inset-0"
-                              style={{ 
-                                backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                                borderRadius: '12px'
-                              }}
-                            />
-                          )}
-                          
-                          {/* Remove button (X) */}
-                          <button
-                            onClick={() => handleRemoveImage(index)}
-                            className="absolute flex items-center justify-center"
-                            style={{
-                              width: '18px',
-                              height: '18px',
-                              backgroundColor: '#4D4D4D',
-                              borderRadius: '50%',
-                              border: '2px solid white',
-                              top: '-9px',
-                              right: '-9px',
-                              zIndex: 20
+                          <div 
+                            className="mobile-image-preview-scroll flex gap-3"
+                            style={{ 
+                              overflowX: 'auto',
+                              overflowY: 'visible',
+                              scrollbarWidth: 'none',
+                              msOverflowStyle: 'none',
+                              WebkitOverflowScrolling: 'touch',
+                              height: '70px',
+                              paddingLeft: '15px',
+                              paddingRight: '15px',
+                              marginLeft: '-15px',
+                              marginRight: '-15px'
                             }}
                           >
-                            <svg 
-                              width="6" 
-                              height="6" 
-                              viewBox="0 0 10 10"
-                              fill="none"
-                              stroke="white"
-                              strokeWidth="2"
-                              strokeLinecap="round"
+                            {imageUrls.map((url, index) => (
+                            <div 
+                              key={index}
+                              className="relative"
+                              style={{ 
+                                width: '70px', 
+                                height: '70px',
+                                flexShrink: 0,
+                                borderRadius: '12px',
+                                overflow: 'visible'
+                              }}
                             >
-                              <path d="M1 1L9 9M9 1L1 9" />
-                            </svg>
-                          </button>
+                              <img 
+                                src={url} 
+                                alt={`Preview ${index + 1}`}
+                                className="w-full h-full object-cover"
+                                style={{ borderRadius: '12px' }}
+                              />
+                              
+                              {/* Light gray smoky overlay - only on primary image */}
+                              {index === primaryImageIndex && (
+                                <div 
+                                  className="absolute inset-0"
+                                  style={{ 
+                                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                                    borderRadius: '12px'
+                                  }}
+                                />
+                              )}
+                              
+                              {/* Remove button (X) */}
+                              <button
+                                onClick={() => handleRemoveImage(index)}
+                                className="absolute flex items-center justify-center"
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  backgroundColor: '#4D4D4D',
+                                  borderRadius: '50%',
+                                  border: '2px solid white',
+                                  top: '-9px',
+                                  right: '-9px',
+                                  zIndex: 20
+                                }}
+                              >
+                                <svg 
+                                  width="6" 
+                                  height="6" 
+                                  viewBox="0 0 10 10"
+                                  fill="none"
+                                  stroke="white"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                >
+                                  <path d="M1 1L9 9M9 1L1 9" />
+                                </svg>
+                              </button>
 
-                          {/* Primary/Checkmark button - only show on primary image */}
-                          {index === primaryImageIndex && (
+                              {/* Primary/Checkmark button - only show on primary image */}
+                              {index === primaryImageIndex && (
+                                <button
+                                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+                                  style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    backgroundColor: '#F9A825',
+                                    borderRadius: '50%',
+                                    border: '2px solid white',
+                                    zIndex: 10
+                                  }}
+                                >
+                                  <svg 
+                                    width="10" 
+                                    height="8" 
+                                    viewBox="0 0 12 10"
+                                    fill="none"
+                                    stroke="white"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <path d="M1 5L4 8L11 1" />
+                                  </svg>
+                                </button>
+                              )}
+                              
+                              {/* Clickable overlay to set as primary - only show on non-primary images */}
+                              {index !== primaryImageIndex && (
+                                <div
+                                  onClick={() => handleSetPrimaryImage(index)}
+                                  className="absolute inset-0 cursor-pointer"
+                                  style={{
+                                    borderRadius: '12px',
+                                    zIndex: 5
+                                  }}
+                                />
+                              )}
+                            </div>
+                          ))}
+                            
+                            {/* Upload Next Images Interface - Mobile */}
+                            {imageUrls.length < 10 && (
+                              <div className="flex flex-col items-center" style={{ flexShrink: 0 }}>
+                                <label 
+                                  className="flex items-center justify-center cursor-pointer"
+                                  style={{
+                                    width: '70px',
+                                    height: '70px',
+                                    backgroundColor: '#F0F8FE',
+                                    border: '2px dashed #64B5F6',
+                                    borderRadius: '12px'
+                                  }}
+                                >
+                                  <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                  />
+                                  <svg 
+                                    width="24" 
+                                    height="24" 
+                                    viewBox="0 0 32 32"
+                                    fill="none"
+                                    stroke="#64B5F6"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                  >
+                                    <path d="M16 8V24M8 16H24" />
+                                  </svg>
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Fade effect on left - Mobile - exactly like desktop */}
+                          <div 
+                            className="absolute left-0 pointer-events-none"
+                            style={{
+                              width: '40px',
+                              height: '100px',
+                              top: '0',
+                              background: 'linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))',
+                              zIndex: 15
+                            }}
+                          />
+                          
+                          {/* Fade effect on right - Mobile - exactly like desktop */}
+                          <div 
+                            className="absolute right-0 pointer-events-none"
+                            style={{
+                              width: '40px',
+                              height: '100px',
+                              top: '0',
+                              background: 'linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))',
+                              zIndex: 15
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        // Show images without scrollable container when 1-3 images - Mobile
+                        imageUrls.map((url, index) => (
+                          <div 
+                            key={index}
+                            className="relative"
+                            style={{ 
+                              width: '70px', 
+                              height: '70px',
+                              flexShrink: 0,
+                              borderRadius: '12px',
+                              overflow: 'visible'
+                            }}
+                          >
+                            <img 
+                              src={url} 
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-full object-cover"
+                              style={{ borderRadius: '12px' }}
+                            />
+                            
+                            {/* Light gray smoky overlay - only on primary image */}
+                            {index === primaryImageIndex && (
+                              <div 
+                                className="absolute inset-0"
+                                style={{ 
+                                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                                  borderRadius: '12px'
+                                }}
+                              />
+                            )}
+                            
+                            {/* Remove button (X) */}
                             <button
-                              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+                              onClick={() => handleRemoveImage(index)}
+                              className="absolute flex items-center justify-center"
                               style={{
-                                width: '20px',
-                                height: '20px',
-                                backgroundColor: '#F9A825',
+                                width: '18px',
+                                height: '18px',
+                                backgroundColor: '#4D4D4D',
                                 borderRadius: '50%',
                                 border: '2px solid white',
-                                zIndex: 10
+                                top: '-9px',
+                                right: '-9px',
+                                zIndex: 20
                               }}
                             >
                               <svg 
-                                width="10" 
-                                height="8" 
-                                viewBox="0 0 12 10"
+                                width="6" 
+                                height="6" 
+                                viewBox="0 0 10 10"
                                 fill="none"
                                 stroke="white"
                                 strokeWidth="2"
                                 strokeLinecap="round"
-                                strokeLinejoin="round"
                               >
-                                <path d="M1 5L4 8L11 1" />
+                                <path d="M1 1L9 9M9 1L1 9" />
                               </svg>
                             </button>
-                          )}
-                          
-                          {/* Clickable overlay to set as primary - only show on non-primary images */}
-                          {index !== primaryImageIndex && (
-                            <div
-                              onClick={() => handleSetPrimaryImage(index)}
-                              className="absolute inset-0 cursor-pointer"
-                              style={{
-                                borderRadius: '12px',
-                                zIndex: 5
-                              }}
-                            />
-                          )}
-                        </div>
-                      ))}
+
+                            {/* Primary/Checkmark button - only show on primary image */}
+                            {index === primaryImageIndex && (
+                              <button
+                                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+                                style={{
+                                  width: '20px',
+                                  height: '20px',
+                                  backgroundColor: '#F9A825',
+                                  borderRadius: '50%',
+                                  border: '2px solid white',
+                                  zIndex: 10
+                                }}
+                              >
+                                <svg 
+                                  width="10" 
+                                  height="8" 
+                                  viewBox="0 0 12 10"
+                                  fill="none"
+                                  stroke="white"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M1 5L4 8L11 1" />
+                                </svg>
+                              </button>
+                            )}
+                            
+                            {/* Clickable overlay to set as primary - only show on non-primary images */}
+                            {index !== primaryImageIndex && (
+                              <div
+                                onClick={() => handleSetPrimaryImage(index)}
+                                className="absolute inset-0 cursor-pointer"
+                                style={{
+                                  borderRadius: '12px',
+                                  zIndex: 5
+                                }}
+                              />
+                            )}
+                          </div>
+                        ))
+                      )}
                       
-                      {/* Upload Next Images Interface - Mobile */}
-                      {imageUrls.length < 10 && (
-                        <div className="flex flex-col items-center flex-shrink-0">
+                      {/* Upload Next Images Interface - Mobile - Fixed at 4th position (for 1-3 images) */}
+                      {imageUrls.length < 4 && imageUrls.length < 10 && (
+                        <div className="flex flex-col items-center" style={{ flexShrink: 0 }}>
                           <label 
                             className="flex items-center justify-center cursor-pointer"
                             style={{
@@ -1469,7 +1885,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                               height: '70px',
                               backgroundColor: '#F0F8FE',
                               border: '2px dashed #64B5F6',
-                              borderRadius: '10px'
+                              borderRadius: '12px'
                             }}
                           >
                             <input
@@ -1498,17 +1914,17 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                </div>
 
               {/* Mobile Location Section */}
-              <div className="flex items-start justify-between mt-4 mb-4">
+              <div className="flex items-start justify-between mt-16 mb-16">
                 <div className="flex flex-col">
                   <div className="flex items-center space-x-1 mb-0.5">
-                    <img src={locIcon} alt="Location" className="w-3 h-3" />
+                    <img src={locIcon} alt="Location" className="w-3 h-3 hidden" />
                     <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontSize: '0.7rem' }}>Your location</span>
                   </div>
                   <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="text-xs font-medium border-none focus:outline-none ml-4"
+                    className="text-xs font-medium border-none focus:outline-none ml-0"
                     style={{ color: '#64B5F6', fontSize: '0.7rem' }}
                   />
                 </div>
@@ -1565,97 +1981,97 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                             console.log('Currency button clicked, current state:', isCurrencyDropdownOpen);
                             setIsCurrencyDropdownOpen(!isCurrencyDropdownOpen);
                           }}
-                          className="pl-2 pr-1 py-2 border-none focus:outline-none bg-white flex items-center"
-                          style={{ color: '#E4E4E4', fontSize: '0.75rem', cursor: 'pointer' }}
+                        className="pl-2 pr-1 py-2 border-none focus:outline-none bg-white flex items-center"
+                        style={{ color: '#E4E4E4', fontSize: '0.7rem', cursor: 'pointer' }}
+                      >
+                        <span>{currency}</span>
+                        <svg
+                          className="w-2.5 h-2.5 ml-0.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          style={{ color: '#6B7280' }}
                         >
-                          <span>{currency}</span>
-                          <svg
-                            className="w-3 h-3 ml-0.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            style={{ color: '#6B7280' }}
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </button>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
 
-                        {/* Dropdown Menu */}
-                        {isCurrencyDropdownOpen && (
-                          <div
-                            className="absolute z-50 bg-white border border-gray-200 shadow-lg overflow-hidden"
-                            style={{ borderRadius: '12px', minWidth: '250px', left: '0', top: 'calc(100% + 8px)' }}
-                          >
-                            {currencies.map((curr, index) => (
-                              <div
-                                key={curr.value}
-                                className={`w-full ${
-                                  index === 0 ? 'rounded-t-xl' : ''
-                                } ${
-                                  index === currencies.length - 1 ? 'rounded-b-xl' : ''
-                                }`}
+                      {/* Dropdown Menu */}
+                      {isCurrencyDropdownOpen && (
+                        <div
+                          className="absolute z-50 bg-white border border-gray-200 shadow-lg overflow-hidden"
+                          style={{ borderRadius: '10px', minWidth: '220px', left: '0', top: 'calc(100% + 6px)' }}
+                        >
+                          {currencies.map((curr, index) => (
+                            <div
+                              key={curr.value}
+                              className={`w-full ${
+                                index === 0 ? 'rounded-t-lg' : ''
+                              } ${
+                                index === currencies.length - 1 ? 'rounded-b-lg' : ''
+                              }`}
+                              style={{
+                                backgroundColor: 'transparent'
+                              }}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCurrency(curr.value);
+                                  setIsCurrencyDropdownOpen(false);
+                                }}
+                                className="w-full text-left transition-colors relative flex items-center"
                                 style={{
-                                  backgroundColor: 'transparent'
+                                  color: '#6A6A6A',
+                                  cursor: 'pointer',
+                                  fontSize: '0.75rem',
+                                  padding: '8px 12px',
+                                  fontWeight: 500
                                 }}
                               >
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setCurrency(curr.value);
-                                    setIsCurrencyDropdownOpen(false);
-                                  }}
-                                  className="w-full text-left transition-colors relative flex items-center"
-                                  style={{
-                                    color: '#6A6A6A',
-                                    cursor: 'pointer',
-                                    fontSize: '0.8rem',
-                                    padding: '10px 16px',
-                                    fontWeight: 500
-                                  }}
-                                >
-                                  {currency === curr.value && (
-                                    <div
-                                      style={{
-                                        position: 'absolute',
-                                        left: '8px',
-                                        right: '8px',
-                                        top: '4px',
-                                        bottom: '4px',
-                                        backgroundColor: '#F0F8FE',
-                                        borderRadius: '8px',
-                                        zIndex: 0
-                                      }}
-                                    />
-                                  )}
-                                  <img
-                                    src={`https://flagcdn.com/w40/${curr.flagCode}.png`}
-                                    alt=""
+                                {currency === curr.value && (
+                                  <div
                                     style={{
-                                      width: '24px',
-                                      height: '18px',
-                                      marginRight: '12px',
-                                      position: 'relative',
-                                      zIndex: 1
+                                      position: 'absolute',
+                                      left: '6px',
+                                      right: '6px',
+                                      top: '3px',
+                                      bottom: '3px',
+                                      backgroundColor: '#F0F8FE',
+                                      borderRadius: '6px',
+                                      zIndex: 0
                                     }}
                                   />
-                                  <span style={{ position: 'relative', zIndex: 1 }}>
-                                    {curr.label} · {curr.value}
-                                  </span>
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                                )}
+                                <img
+                                  src={`https://flagcdn.com/w40/${curr.flagCode}.png`}
+                                  alt=""
+                                  style={{
+                                    width: '20px',
+                                    height: '15px',
+                                    marginRight: '10px',
+                                    position: 'relative',
+                                    zIndex: 1
+                                  }}
+                                />
+                                <span style={{ position: 'relative', zIndex: 1 }}>
+                                  {curr.label} · {curr.value}
+                                </span>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       </div>
 
-                      <div style={{ width: '1px', height: '26px', backgroundColor: '#D1D5DB', marginLeft: '8px', marginRight: '8px', flexShrink: 0 }}></div>
+                      <div style={{ width: '1px', height: '24px', backgroundColor: '#D1D5DB', marginLeft: '6px', marginRight: '6px', flexShrink: 0 }}></div>
                       <input
                         type="text"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         placeholder="Insert Pricing"
-                        className="create-listing-input flex-1 pl-2 pr-2 py-2 border-none focus:outline-none focus:ring-0 text-xs"
-                        style={{ borderLeft: 'none', boxShadow: 'none' }}
+                        className="create-listing-input flex-1 pl-2 pr-2 py-2 border-none focus:outline-none focus:ring-0"
+                        style={{ borderLeft: 'none', boxShadow: 'none', fontSize: '0.7rem' }}
                       />
                     </div>
                   </div>
@@ -1678,8 +2094,8 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                       type="number"
                       value={quantity}
                       onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                      className="px-3 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                      style={{ width: '100%' }}
+                      className="px-2.5 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ width: '100%', fontSize: '0.75rem' }}
                     />
                     <button
                       onClick={() => setQuantity(quantity + 1)}
@@ -1702,17 +2118,17 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                   <button
                     type="button"
                     onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none text-left flex items-center justify-between"
+                    className="w-full px-2.5 py-2 border border-gray-300 rounded-lg focus:outline-none text-left flex items-center justify-between"
                     style={{ 
                       borderColor: isCategoryDropdownOpen ? '#97CDF9' : '#D1D5DB',
                       boxShadow: isCategoryDropdownOpen ? '0 0 0 2px #97CDF9' : 'none'
                     }}
                   >
-                    <span style={{ color: category ? '#6A6A6A' : '#D9D9D9', fontSize: '0.8rem' }}>
+                    <span style={{ color: category ? '#6A6A6A' : '#D9D9D9', fontSize: '0.75rem' }}>
                       {category ? categories.find(c => c.value === category)?.label : 'Choose category'}
                     </span>
                     <svg 
-                      className="w-4 h-4" 
+                      className="w-3.5 h-3.5" 
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
@@ -1725,16 +2141,16 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                   {/* Dropdown Menu */}
                   {isCategoryDropdownOpen && (
                     <div 
-                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg overflow-hidden"
-                      style={{ borderRadius: '12px' }}
+                      className="absolute z-50 w-full mt-1.5 bg-white border border-gray-200 shadow-lg overflow-hidden"
+                      style={{ borderRadius: '10px' }}
                     >
                       {categories.map((cat, index) => (
                         <div
                           key={cat.value}
                           className={`w-full ${
-                            index === 0 ? 'rounded-t-xl' : ''
+                            index === 0 ? 'rounded-t-lg' : ''
                           } ${
-                            index === categories.length - 1 ? 'rounded-b-xl' : ''
+                            index === categories.length - 1 ? 'rounded-b-lg' : ''
                           }`}
                           style={{
                             backgroundColor: 'transparent'
@@ -1750,8 +2166,8 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                             style={{
                               color: '#6A6A6A',
                               cursor: 'pointer',
-                              fontSize: '0.8rem',
-                              padding: '10px 16px',
+                              fontSize: '0.75rem',
+                              padding: '8px 12px',
                               fontWeight: 500
                             }}
                           >
@@ -1759,12 +2175,12 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                               <div 
                                 style={{
                                   position: 'absolute',
-                                  left: '8px',
-                                  right: '8px',
-                                  top: '4px',
-                                  bottom: '4px',
+                                  left: '6px',
+                                  right: '6px',
+                                  top: '3px',
+                                  bottom: '3px',
                                   backgroundColor: '#F0F8FE',
-                                  borderRadius: '8px',
+                                  borderRadius: '6px',
                                   zIndex: -1
                                 }}
                               />
@@ -1788,7 +2204,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                   <button
                     type="button"
                     onClick={() => setIsOriginDropdownOpen(!isOriginDropdownOpen)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none text-left flex items-center justify-between"
+                    className="w-full px-2.5 py-2 border border-gray-300 rounded-lg focus:outline-none text-left flex items-center justify-between"
                     style={{ 
                       borderColor: isOriginDropdownOpen ? '#97CDF9' : '#D1D5DB',
                       boxShadow: isOriginDropdownOpen ? '0 0 0 2px #97CDF9' : 'none'
@@ -1801,24 +2217,24 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                            srcSet={`https://flagcdn.com/w80/${countries.find(c => c.value === origin)?.flagCode}.png 2x`}
                            alt={`${countries.find(c => c.value === origin)?.label} flag`}
                            style={{ 
-                             width: '20px',
-                             height: '15px',
-                             marginRight: '10px',
+                             width: '18px',
+                             height: '13px',
+                             marginRight: '8px',
                              borderRadius: '4px',
                              objectFit: 'cover'
                            }}
                          />
-                         <span style={{ color: '#6A6A6A', fontSize: '0.8rem', fontWeight: 500 }}>
+                         <span style={{ color: '#6A6A6A', fontSize: '0.75rem', fontWeight: 500 }}>
                            {countries.find(c => c.value === origin)?.label}
                          </span>
                        </div>
                      ) : (
-                       <span style={{ color: '#D9D9D9', fontSize: '0.8rem' }}>
+                       <span style={{ color: '#D9D9D9', fontSize: '0.75rem' }}>
                          Choose origin of product
                        </span>
                      )}
                     <svg 
-                      className="w-4 h-4" 
+                      className="w-3.5 h-3.5" 
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
@@ -1831,10 +2247,10 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                   {/* Dropdown Menu */}
                   {isOriginDropdownOpen && (
                     <div 
-                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg overflow-y-auto origin-dropdown-scroll"
+                      className="absolute z-50 w-full mt-1.5 bg-white border border-gray-200 shadow-lg overflow-y-auto origin-dropdown-scroll"
                       style={{ 
-                        borderRadius: '12px',
-                        maxHeight: '250px'
+                        borderRadius: '10px',
+                        maxHeight: '200px'
                       }}
                     >
                       <style>{`
@@ -1933,12 +2349,12 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                   <button
                     type="button"
                     onClick={() => setIsSaleTypeDropdownOpen(!isSaleTypeDropdownOpen)}
-                    className="w-full px-3 border border-gray-300 rounded-lg focus:outline-none text-left flex items-center justify-between"
+                    className="w-full px-2.5 border border-gray-300 rounded-lg focus:outline-none text-left flex items-center justify-between"
                     style={{
                       borderColor: isSaleTypeDropdownOpen ? '#97CDF9' : '#D1D5DB',
                       boxShadow: isSaleTypeDropdownOpen ? '0 0 0 2px #97CDF9' : 'none',
-                      paddingTop: saleType === 'Urgent' ? '5px' : '10px',
-                      paddingBottom: saleType === 'Urgent' ? '5px' : '10px'
+                      paddingTop: saleType === 'Urgent' ? '4px' : '8px',
+                      paddingBottom: saleType === 'Urgent' ? '4px' : '8px'
                     }}
                   >
                     <div className="flex items-center">
@@ -1948,9 +2364,9 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                           style={{
                             backgroundColor: '#FEF6E9',
                             color: '#F9A825',
-                            padding: '5px 12px',
+                            padding: '4px 10px',
                             borderRadius: '6px',
-                            fontSize: '0.75rem',
+                            fontSize: '0.7rem',
                             fontWeight: 500
                           }}
                         >
@@ -1959,20 +2375,20 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                             src={path2Icon} 
                             alt=""
                             style={{ 
-                              width: '12px',
-                              height: '12px',
-                              marginLeft: '6px'
+                              width: '11px',
+                              height: '11px',
+                              marginLeft: '5px'
                             }}
                           />
                         </div>
                       ) : (
-                        <span style={{ color: saleType ? '#6A6A6A' : '#D9D9D9', fontSize: '0.8rem' }}>
+                        <span style={{ color: saleType ? '#6A6A6A' : '#D9D9D9', fontSize: '0.75rem' }}>
                           {saleType ? saleTypes.find(s => s.value === saleType)?.label : 'Choose type of sale'}
                         </span>
                       )}
                     </div>
                     <svg 
-                      className="w-4 h-4" 
+                      className="w-3.5 h-3.5" 
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
@@ -1985,16 +2401,16 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                   {/* Dropdown Menu */}
                   {isSaleTypeDropdownOpen && (
                     <div 
-                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg overflow-hidden"
-                      style={{ borderRadius: '12px' }}
+                      className="absolute z-50 w-full mt-1.5 bg-white border border-gray-200 shadow-lg overflow-hidden"
+                      style={{ borderRadius: '10px' }}
                     >
                       {saleTypes.map((type, index) => (
                         <div
                           key={type.value}
                           className={`w-full ${
-                            index === 0 ? 'rounded-t-xl' : ''
+                            index === 0 ? 'rounded-t-lg' : ''
                           } ${
-                            index === saleTypes.length - 1 ? 'rounded-b-xl' : ''
+                            index === saleTypes.length - 1 ? 'rounded-b-lg' : ''
                           }`}
                           style={{
                             backgroundColor: 'transparent'
@@ -2010,8 +2426,8 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                             style={{
                               color: type.value === 'Default' ? '#6A6A6A' : '#999999',
                               cursor: 'pointer',
-                              fontSize: '0.8rem',
-                              padding: '16px 16px',
+                              fontSize: '0.75rem',
+                              padding: '10px 12px',
                               fontWeight: 500
                             }}
                           >
@@ -2019,12 +2435,12 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                               <div 
                                 style={{
                                   position: 'absolute',
-                                  left: '8px',
-                                  right: '8px',
-                                  top: '4px',
-                                  bottom: '4px',
+                                  left: '6px',
+                                  right: '6px',
+                                  top: '3px',
+                                  bottom: '3px',
                                   backgroundColor: '#F0F8FE',
-                                  borderRadius: '8px',
+                                  borderRadius: '6px',
                                   zIndex: 0
                                 }}
                               />
@@ -2035,12 +2451,12 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                                 src={type.icon} 
                                 alt=""
                                 style={{ 
-                                  width: '14px',
-                                  height: '14px',
+                                  width: '12px',
+                                  height: '12px',
                                   position: 'relative',
                                   zIndex: 1,
                                   opacity: 0.7,
-                                  marginLeft: '8px'
+                                  marginLeft: '6px'
                                 }}
                               />
                             )}
@@ -2932,8 +3348,8 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                               style={{
                                 color: '#6A6A6A',
                                 cursor: 'pointer',
-                                fontSize: '0.8rem',
-                                padding: '8px 16px',
+                                fontSize: '0.75rem',
+                                padding: '6px 12px',
                                 fontWeight: 500
                               }}
                             >
@@ -2941,12 +3357,12 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                                 <div 
                                   style={{
                                     position: 'absolute',
-                                    left: '8px',
-                                    right: '8px',
-                                    top: '4px',
-                                    bottom: '4px',
+                                    left: '6px',
+                                    right: '6px',
+                                    top: '3px',
+                                    bottom: '3px',
                                     backgroundColor: '#F0F8FE',
-                                    borderRadius: '8px',
+                                    borderRadius: '6px',
                                     zIndex: 0
                                   }}
                                 />
@@ -2956,9 +3372,9 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                                 srcSet={`https://flagcdn.com/w80/${country.flagCode}.png 2x`}
                                 alt={`${country.label} flag`}
                                 style={{ 
-                                  width: '24px',
-                                  height: '18px',
-                                  marginRight: '12px', 
+                                  width: '20px',
+                                  height: '15px',
+                                  marginRight: '10px', 
                                   position: 'relative', 
                                   zIndex: 1,
                                   objectFit: 'cover',
@@ -3182,17 +3598,16 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
           {/* Notification - Far Above Modal */}
           {showNotification && (
             <div 
-              className="fixed top-16 left-1/2 -translate-x-1/2 z-[60] animate-slide-down"
-              style={{ maxWidth: '350px' }}
+              className="fixed top-16 left-1/2 -translate-x-1/2 z-[60] animate-slide-down max-w-[300px] lg:max-w-[350px] w-[calc(100%-32px)]"
             >
               <div 
-                className="flex items-start space-x-3 p-3 rounded-xl shadow-lg"
+                className="flex items-start space-x-2 lg:space-x-3 p-2.5 lg:p-3 rounded-xl shadow-lg"
                 style={{ backgroundColor: '#F5FBFF', border: '1px solid #CFE8FC' }}
               >
                 {/* Listing Image */}
                 <div className="relative flex-shrink-0">
                   <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden" 
+                    className="w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center overflow-hidden" 
                     style={{ 
                       backgroundColor: '#E3F2FD',
                       border: '2px solid white'
@@ -3205,29 +3620,29 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                         className="w-full h-full object-cover" 
                       />
                     ) : (
-                      <img src={avatar} alt="Listing" className="w-6 h-6 rounded-full object-cover" />
+                      <img src={avatar} alt="Listing" className="w-5 h-5 lg:w-6 lg:h-6 rounded-full object-cover" />
                     )}
                   </div>
                   {/* Listingtoast Icon Badge - Bottom Right */}
                   <div 
-                    className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
+                    className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: '#FFF' }}
                   >
                     <img 
                       src={listingtoastIcon} 
                       alt="Listing" 
-                      className="w-3 h-3" 
+                      className="w-2.5 h-2.5 lg:w-3 lg:h-3" 
                     />
                   </div>
                 </div>
 
                 {/* Text Content */}
                 <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: '12px' }}>
+                  <p className="text-[11px] lg:text-xs">
                     <span style={{ color: '#939393' }}>Your listing is </span>
                     <span className="font-semibold" style={{ color: '#212121' }}>under review</span>
                   </p>
-                  <p style={{ fontSize: '12px', marginTop: '2px', color: '#939393' }}>
+                  <p className="text-[11px] lg:text-xs mt-0.5" style={{ color: '#939393' }}>
                     We analyze your listing, Please wait a f.
                   </p>
                 </div>
@@ -3237,7 +3652,13 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                   onClick={() => setShowNotification(false)}
                   className="flex-shrink-0 hover:opacity-70 transition-opacity"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#6A6A6A' }}>
+                  <svg 
+                    className="w-3.5 h-3.5 lg:w-4 lg:h-4" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    style={{ color: '#6A6A6A' }}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -3266,22 +3687,20 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
           {/* Success Modal - Centered */}
           <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div 
-              className="bg-white relative"
-              style={{ borderRadius: '30px', padding: '48px 40px', maxWidth: '420px', width: '100%' }}
+              className="bg-white relative rounded-[20px] lg:rounded-[30px] p-8 lg:p-12 max-w-[340px] lg:max-w-[420px] w-full"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Verity Icon - Top Center */}
-              <div className="flex justify-center mb-6">
-                <img src={verityIcon} alt="Success" className="w-16 h-16" />
+              <div className="flex justify-center mb-4 lg:mb-6">
+                <img src={verityIcon} alt="Success" className="w-12 h-12 lg:w-16 lg:h-16" />
               </div>
 
               {/* Title */}
               <h2 
-                className="text-center mb-3"
+                className="text-center mb-2 lg:mb-3 text-lg lg:text-[22px]"
                 style={{ 
                   color: '#212121', 
                   fontFamily: 'Bricolage Grotesque, sans-serif',
-                  fontSize: '22px',
                   fontWeight: '600'
                 }}
               >
@@ -3290,10 +3709,9 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
 
               {/* Description */}
               <p 
-                className="text-center mb-8"
+                className="text-center mb-6 lg:mb-8 text-xs lg:text-sm"
                 style={{ 
                   color: '#B0B0B0',
-                  fontSize: '14px',
                   lineHeight: '1.5'
                 }}
               >
@@ -3301,16 +3719,15 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
               </p>
 
               {/* Buttons */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 lg:gap-3">
                 {/* Back to Listing Page Button */}
                 <button
                   onClick={handleBackToHomepage}
-                  className="flex-1 py-2.5 rounded-xl font-medium transition-colors"
+                  className="flex-1 py-2 lg:py-2.5 rounded-xl font-medium transition-colors text-[9px] lg:text-[10px]"
                   style={{ 
                     backgroundColor: '#F1F1F1',
                     color: '#6A6A6A',
-                    borderRadius: '12px',
-                    fontSize: '10px'
+                    borderRadius: '12px'
                   }}
                 >
                   Back to listing page ({countdown}s)
@@ -3319,13 +3736,12 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                 {/* Add New Listing Button */}
                 <button
                   onClick={handleAddNewListing}
-                  className="flex-1 py-2.5 rounded-xl font-medium transition-colors"
+                  className="flex-1 py-2 lg:py-2.5 rounded-xl font-medium transition-colors text-[10px] lg:text-[11px]"
                   style={{ 
                     backgroundColor: 'white',
                     color: '#F9A825',
                     border: '1px solid #F9A825',
-                    borderRadius: '12px',
-                    fontSize: '11px'
+                    borderRadius: '12px'
                   }}
                 >
                   Add new listing
