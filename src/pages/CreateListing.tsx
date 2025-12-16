@@ -1711,41 +1711,6 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                               )}
                             </div>
                           ))}
-                            
-                            {/* Upload Next Images Interface - Mobile */}
-                            {imageUrls.length < 10 && (
-                              <div className="flex flex-col items-center" style={{ flexShrink: 0 }}>
-                                <label 
-                                  className="flex items-center justify-center cursor-pointer"
-                                  style={{
-                                    width: '70px',
-                                    height: '70px',
-                                    backgroundColor: '#F0F8FE',
-                                    border: '2px dashed #64B5F6',
-                                    borderRadius: '12px'
-                                  }}
-                                >
-                                  <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleImageUpload}
-                                    className="hidden"
-                                  />
-                                  <svg 
-                                    width="24" 
-                                    height="24" 
-                                    viewBox="0 0 32 32"
-                                    fill="none"
-                                    stroke="#64B5F6"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                  >
-                                    <path d="M16 8V24M8 16H24" />
-                                  </svg>
-                                </label>
-                              </div>
-                            )}
                           </div>
                           
                           {/* Fade effect on left - Mobile - exactly like desktop */}
@@ -1875,8 +1840,8 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                         ))
                       )}
                       
-                      {/* Upload Next Images Interface - Mobile - Fixed at 4th position (for 1-3 images) */}
-                      {imageUrls.length < 4 && imageUrls.length < 10 && (
+                      {/* Upload Next Images Interface - Mobile - Fixed at 4th position (outside container, like desktop) */}
+                      {imageUrls.length < 10 && (
                         <div className="flex flex-col items-center" style={{ flexShrink: 0 }}>
                           <label 
                             className="flex items-center justify-center cursor-pointer"
