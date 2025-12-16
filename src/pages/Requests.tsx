@@ -172,7 +172,7 @@ const Requests: React.FC = () => {
         width: isMobile ? '260px' : 'auto',
         flexShrink: isMobile ? 0 : 'initial',
         padding: isMobile ? '10px' : '16px',
-        borderRadius: '16px'
+        borderRadius: '20px'
       }}
     >
       {/* Product Name Label and Button - Desktop only */}
@@ -193,7 +193,7 @@ const Requests: React.FC = () => {
           {cardIsPending ? (
             <div className="flex items-center gap-2">
               <div 
-                className="px-2 py-0.5 rounded-lg"
+                className="px-2 py-0.5 rounded-md"
                 style={{ 
                   backgroundColor: '#F4F4F4',
                   fontSize: '10px',
@@ -572,8 +572,8 @@ const Requests: React.FC = () => {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Breadcrumbs */}
-      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '8px' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '4px' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ marginLeft: '-4px' }}>
           <nav className="flex items-center space-x-2" style={{ fontSize: '13px' }}>
             <img 
               src={arrowLeftIcon} 
