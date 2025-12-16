@@ -681,12 +681,13 @@ const Requests: React.FC = () => {
                   style={{ 
                     backgroundColor: '#FAFAFA',
                     borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 7px' : '8px 10px',
+                    padding: isMobile ? '5px 7px' : '7px 10px',
                     borderRadius: '8px',
                     fontFamily: 'Poppins, sans-serif',
                     gap: isMobile ? '4px' : '6px'
                   }}
                 >
+                  <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
                   <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
                   <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
                   <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
@@ -696,7 +697,7 @@ const Requests: React.FC = () => {
                   style={{ 
                     backgroundColor: '#FAFAFA',
                     borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 8px' : '8px 14px',
+                    padding: isMobile ? '5px 8px' : '7px 14px',
                     borderRadius: '8px',
                     fontFamily: 'Poppins, sans-serif',
                     gap: isMobile ? '4px' : '6px'
@@ -757,12 +758,13 @@ const Requests: React.FC = () => {
                   style={{ 
                     backgroundColor: '#FAFAFA',
                     borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 7px' : '8px 10px',
+                    padding: isMobile ? '5px 7px' : '7px 10px',
                     borderRadius: '8px',
                     fontFamily: 'Poppins, sans-serif',
                     gap: isMobile ? '4px' : '6px'
                   }}
                 >
+                  <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
                   <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
                   <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
                   <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
@@ -772,7 +774,7 @@ const Requests: React.FC = () => {
                   style={{ 
                     backgroundColor: '#FAFAFA',
                     borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 8px' : '8px 14px',
+                    padding: isMobile ? '5px 8px' : '7px 14px',
                     borderRadius: '8px',
                     fontFamily: 'Poppins, sans-serif',
                     gap: isMobile ? '4px' : '6px'
@@ -833,12 +835,13 @@ const Requests: React.FC = () => {
                   style={{ 
                     backgroundColor: '#FAFAFA',
                     borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 7px' : '8px 10px',
+                    padding: isMobile ? '5px 7px' : '7px 10px',
                     borderRadius: '8px',
                     fontFamily: 'Poppins, sans-serif',
                     gap: isMobile ? '4px' : '6px'
                   }}
                 >
+                  <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
                   <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
                   <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
                   <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
@@ -848,7 +851,7 @@ const Requests: React.FC = () => {
                   style={{ 
                     backgroundColor: '#FAFAFA',
                     borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 8px' : '8px 14px',
+                    padding: isMobile ? '5px 8px' : '7px 14px',
                     borderRadius: '8px',
                     fontFamily: 'Poppins, sans-serif',
                     gap: isMobile ? '4px' : '6px'
