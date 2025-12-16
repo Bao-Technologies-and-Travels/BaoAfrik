@@ -234,6 +234,7 @@ const Requests: React.FC = () => {
                       right: 0,
                       backgroundColor: '#FFFFFF',
                       borderRadius: '16px',
+                      border: '1px solid #E9E9E9',
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                       padding: '8px',
                       minWidth: '200px',
@@ -650,7 +651,7 @@ const Requests: React.FC = () => {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Breadcrumbs */}
-      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '0px' }}>
+      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '0px', marginBottom: '-16px' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center space-x-2" style={{ fontSize: '13px' }}>
             <img 
