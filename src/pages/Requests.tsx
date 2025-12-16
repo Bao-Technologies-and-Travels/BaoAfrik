@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
 import earthIcon from '../assets/images/pre/earth.svg';
@@ -7,6 +7,7 @@ import buyerIcon from '../assets/images/pre/buyer.svg';
 import locationIcon from '../assets/images/pre/PL.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
 import bellIcon from '../assets/images/pre/bm.svg';
+import shareIcon from '../assets/images/pre/Share.svg';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -14,6 +15,8 @@ const Requests: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 48;
   const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
+  const moreOptionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -24,8 +27,18 @@ const Requests: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (moreOptionsRef.current && !moreOptionsRef.current.contains(event.target as Node)) {
+        setMoreOptionsOpenFor(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const renderPagination = () => (
-    <div className={`flex flex-col ${isMobile ? 'items-center gap-4' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-16' : 'mb-32'} w-full`}>
+    <div className={`flex flex-col ${isMobile ? 'items-center gap-4' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
       <div className={`flex-1 flex justify-center w-full ${isMobile ? '' : ''}`}>
         <div className={`flex items-center gap-4 ${isMobile ? '' : ''}`} style={isMobile ? {} : { marginLeft: '80px' }}>
           <button
@@ -33,8 +46,8 @@ const Requests: React.FC = () => {
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
             style={{
-              width: '28px',
-              height: '28px',
+              width: '32px',
+              height: '32px',
               borderRadius: '8px',
               backgroundColor: '#F0F0F0',
               border: 'none',
@@ -57,7 +70,7 @@ const Requests: React.FC = () => {
                 onClick={() => setCurrentPage(page)}
                 style={{
                   fontFamily: 'Bricolage Grotesque, sans-serif',
-                  fontSize: '14px',
+                  fontSize: '16px',
                   color: page === currentPage ? '#212121' : '#B0B0B0',
                   cursor: 'pointer'
                 }}
@@ -66,13 +79,13 @@ const Requests: React.FC = () => {
               </span>
             ))}
 
-            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>…</span>
+            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px' }}>…</span>
             <span 
               onClick={() => setCurrentPage(totalPages)}
               style={{ 
                 color: '#B0B0B0', 
                 fontFamily: 'Bricolage Grotesque, sans-serif', 
-                fontSize: '14px',
+                fontSize: '16px',
                 cursor: 'pointer'
               }}
             >
@@ -85,8 +98,8 @@ const Requests: React.FC = () => {
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
             style={{
-              width: '28px',
-              height: '28px',
+              width: '32px',
+              height: '32px',
               borderRadius: '8px',
               backgroundColor: '#F0F0F0',
               border: 'none',
@@ -139,7 +152,7 @@ const Requests: React.FC = () => {
     </div>
   );
 
-  const renderRequestCard = (isPending: boolean = false) => (
+  const renderRequestCard = (isPending: boolean = false, cardId: string = '') => (
     <div 
       className="bg-white rounded-xl hover:shadow-md transition-shadow"
       style={{ 
@@ -152,28 +165,133 @@ const Requests: React.FC = () => {
     >
       {/* Product Name Label and Button - Desktop only */}
       {!isMobile && (
-        <div className="flex items-center justify-between mb-0">
-          <span style={{ fontSize: '12px', color: '#9C9C9C' }}>Request</span>
+        <div className="flex items-center justify-between mb-2">
+          <span 
+            style={{ 
+              fontSize: '10px', 
+              color: '#BABABA',
+              border: '1px solid #E1E1E1',
+              borderRadius: '999px',
+              padding: '2px 8px',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            Request
+          </span>
           {isPending ? (
-            <div className="flex items-center gap-2 px-3 py-1 rounded-lg" style={{ backgroundColor: '#F5F5F5' }}>
-              <div className="w-3 h-3 rounded-full bg-white border border-gray-300"></div>
-              <span style={{ fontSize: '12px', color: '#6A6A6A', fontWeight: 'normal' }}>Pending</span>
+            <div className="flex items-center gap-2">
+              <div 
+                className="px-2.5 py-1 rounded-lg"
+                style={{ 
+                  backgroundColor: '#F4F4F4',
+                  fontSize: '11px',
+                  color: '#6A6A6A',
+                  fontWeight: 'normal',
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              >
+                Pending
+              </div>
+              <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                <button
+                  type="button"
+                  className="w-5 h-5 rounded-full border flex items-center justify-center"
+                  style={{
+                    borderColor: '#B0B0B0',
+                    borderWidth: '1.5px',
+                    backgroundColor: '#FFFFFF',
+                    cursor: 'pointer',
+                    padding: 0
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMoreOptionsOpenFor(moreOptionsOpenFor === cardId ? null : cardId);
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                  </svg>
+                </button>
+                {moreOptionsOpenFor === cardId && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '26px',
+                      right: 0,
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '6px',
+                      minWidth: '150px',
+                      zIndex: 1000
+                    }}
+                  >
+                    <button
+                      type="button"
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        color: '#212121'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <button 
-                className="px-3 py-1 rounded-lg border"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg border"
                 style={{ 
                   backgroundColor: '#FFFFFF', 
                   borderColor: '#F9A825',
                   color: '#F9A825',
                   fontWeight: 'normal', 
-                  fontSize: '12px' 
+                  fontSize: '11px',
+                  fontFamily: 'Poppins, sans-serif',
+                  height: '26px',
+                  width: 'auto'
                 }}
               >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2 2H10V10H2V2ZM3 3V9H9V3H3ZM4 4H8V5H4V4ZM4 6H8V7H4V6Z" fill="#F9A825"/>
+                </svg>
                 Manage request
               </button>
-              <img src={bellIcon} alt="Bell" style={{ width: '16px', height: '16px' }} />
+              <button
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor: '#F4F4F4',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <img 
+                  src={shareIcon} 
+                  alt="Share" 
+                  style={{ 
+                    width: '16px', 
+                    height: '16px',
+                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                  }} 
+                />
+              </button>
             </div>
           )}
         </div>
@@ -182,7 +300,18 @@ const Requests: React.FC = () => {
       {/* Product Name Label Only - Mobile */}
       {isMobile && (
         <div className="mb-1">
-          <span style={{ fontSize: '9px', color: '#9C9C9C' }}>Request</span>
+          <span 
+            style={{ 
+              fontSize: '9px', 
+              color: '#BABABA',
+              border: '1px solid #E1E1E1',
+              borderRadius: '999px',
+              padding: '2px 6px',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            Request
+          </span>
         </div>
       )}
 
@@ -203,24 +332,33 @@ const Requests: React.FC = () => {
           <div className="flex flex-col gap-2">
             {/* First Row - Location */}
             <div 
-              className="flex items-center gap-1 px-2 py-1"
-              style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5"
+              style={{ 
+                backgroundColor: '#FFFFFF', 
+                borderRadius: '999px', 
+                width: 'fit-content',
+                border: '1px solid #E1E1E1'
+              }}
             >
               <img 
                 src={locationIcon} 
                 alt="Location"
                 className="w-3 h-3"
-                style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                style={{ filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)' }}
               />
-              <span style={{ fontSize: '12px', color: '#64B5F6' }}>London, United Kingdom</span>
+              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>London, United Kingdom</span>
             </div>
 
             {/* Second Row - Price and Country */}
             <div className="flex gap-2">
               {/* Price Tag */}
               <div 
-                className="flex items-center gap-1.5 px-3 py-1.5"
-                style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5"
+                style={{ 
+                  backgroundColor: '#FFFFFF', 
+                  borderRadius: '999px',
+                  border: '1px solid #E1E1E1'
+                }}
               >
                 <img 
                   src={moneyIcon} 
@@ -228,20 +366,24 @@ const Requests: React.FC = () => {
                   className="w-3 h-3"
                   style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                 />
-                <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>50 - 100 USD</span>
               </div>
 
               {/* Country Tag */}
               <div 
-                className="flex items-center gap-1.5 px-3 py-1.5"
-                style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5"
+                style={{ 
+                  backgroundColor: '#FFFFFF', 
+                  borderRadius: '999px',
+                  border: '1px solid #E1E1E1'
+                }}
               >
                 <img 
                   src="https://flagcdn.com/w20/za.png" 
                   alt="South Africa"
-                  className="w-4 h-3 object-cover rounded-sm"
+                  className="w-4 h-4 object-cover rounded-full"
                 />
-                <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
+                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>South Africa</span>
               </div>
             </div>
           </div>
@@ -250,7 +392,10 @@ const Requests: React.FC = () => {
           <div className="flex flex-col items-center mt-2">
             <div 
               className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
-              style={{ backgroundColor: '#F7C9B0' }}
+              style={{ 
+                backgroundColor: '#F7C9B0',
+                border: '2px solid #939393'
+              }}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
@@ -275,8 +420,13 @@ const Requests: React.FC = () => {
         <div className="flex flex-col gap-2 mb-3">
           {/* First Row - Location */}
           <div 
-            className="flex items-center gap-1 px-2 py-1"
-            style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+            className="flex items-center gap-1.5 px-2 py-1"
+            style={{ 
+              backgroundColor: '#FFFFFF', 
+              borderRadius: '999px', 
+              width: 'fit-content',
+              border: '1px solid #E1E1E1'
+            }}
           >
             <img 
               src={locationIcon} 
@@ -284,18 +434,22 @@ const Requests: React.FC = () => {
               style={{ 
                 width: '9px',
                 height: '9px',
-                filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)'
               }}
             />
-            <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>London, United Kingdom</span>
+            <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>London, United Kingdom</span>
           </div>
 
           {/* Second Row - Price and Country */}
           <div className="flex gap-2">
             {/* Price Tag */}
             <div 
-              className="flex items-center gap-1.5 px-3 py-1.5"
-              style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+              className="flex items-center gap-1.5 px-2 py-1"
+              style={{ 
+                backgroundColor: '#FFFFFF', 
+                borderRadius: '999px',
+                border: '1px solid #E1E1E1'
+              }}
             >
               <img 
                 src={moneyIcon} 
@@ -306,25 +460,29 @@ const Requests: React.FC = () => {
                   filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
                 }}
               />
-              <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>50 ~ 100 USD</span>
+              <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>50 ~ 100 USD</span>
             </div>
 
             {/* Country Tag */}
             <div 
-              className="flex items-center gap-1.5 px-3 py-1.5"
-              style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+              className="flex items-center gap-1.5 px-2 py-1"
+              style={{ 
+                backgroundColor: '#FFFFFF', 
+                borderRadius: '999px',
+                border: '1px solid #E1E1E1'
+              }}
             >
               <img 
                 src="https://flagcdn.com/w20/za.png" 
                 alt="South Africa"
                 style={{ 
                   width: '11px',
-                  height: '8px',
+                  height: '11px',
                   objectFit: 'cover',
-                  borderRadius: '2px'
+                  borderRadius: '50%'
                 }}
               />
-              <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>South Africa</span>
+              <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>South Africa</span>
             </div>
           </div>
         </div>
@@ -344,7 +502,8 @@ const Requests: React.FC = () => {
                 style={{ 
                   backgroundColor: '#F7C9B0',
                   width: '24px',
-                  height: '24px'
+                  height: '24px',
+                  border: '2px solid #939393'
                 }}
               >
                 <svg 
@@ -402,9 +561,9 @@ const Requests: React.FC = () => {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Breadcrumbs */}
-      <div className="hidden lg:block bg-white py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2" style={{ fontSize: '13px' }}>
+      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '12px' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ marginLeft: '-8px' }}>
+          <nav className="flex items-center" style={{ fontSize: '13px', gap: '8px' }}>
             <img 
               src={arrowLeftIcon} 
               alt="Back" 
@@ -432,12 +591,12 @@ const Requests: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <section className="py-16 px-6 sm:px-8 lg:px-16">
+      <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ paddingBottom: isMobile ? '32px' : '48px' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className={isMobile ? "flex flex-col mb-6 sm:mb-8" : "flex items-start justify-between mb-6 sm:mb-8"}>
             <div className="flex-1">
-              <h2 className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '20px' : '44px', fontWeight: '600', lineHeight: '1.2' }}>
+              <h2 className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '20px' : '44px', fontWeight: '500', lineHeight: '1.2' }}>
                 <span style={{ color: '#212121' }}>Buy & Sell </span>
                 <span style={{ 
                   background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
@@ -462,7 +621,7 @@ const Requests: React.FC = () => {
                   style={{ 
                     width: '16px', 
                     height: '16px',
-                    filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                   }}
                 />
                 <input
@@ -474,7 +633,7 @@ const Requests: React.FC = () => {
                     borderColor: '#E4E4E4',
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: isMobile ? '10px' : '14px',
-                    color: '#6A6A6A',
+                    color: '#D9D9D9',
                     padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
                   }}
                 />
@@ -499,7 +658,7 @@ const Requests: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 style={{ 
                 fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: isMobile ? '18px' : '24px',
+                fontSize: isMobile ? '16px' : '20px',
                 fontWeight: '500',
                 color: '#000000'
               }}>
@@ -538,19 +697,31 @@ const Requests: React.FC = () => {
                 </button>
               </div>
             </div>
-            <div 
-              className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
-              style={isMobile ? { 
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch'
-              } : {}}
-            >
-              {[1, 2, 3].map((index) => (
-                <React.Fragment key={index}>
-                  {renderRequestCard(false)}
-                </React.Fragment>
-              ))}
+            <div className="relative">
+              {/* Fade effect on the right - Desktop only */}
+              {!isMobile && (
+                <div 
+                  className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                  style={{
+                    background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                    height: 'calc(100% - 4rem)'
+                  }}
+                />
+              )}
+              <div 
+                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                style={isMobile ? { 
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                } : {}}
+              >
+                {[1, 2, 3].map((index) => (
+                  <React.Fragment key={index}>
+                    {renderRequestCard(false, `near-${index}`)}
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -559,7 +730,7 @@ const Requests: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 style={{ 
                 fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: isMobile ? '18px' : '24px',
+                fontSize: isMobile ? '16px' : '20px',
                 fontWeight: '500',
                 color: '#000000'
               }}>
@@ -598,19 +769,31 @@ const Requests: React.FC = () => {
                 </button>
               </div>
             </div>
-            <div 
-              className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
-              style={isMobile ? { 
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch'
-              } : {}}
-            >
-              {[1, 2, 3].map((index) => (
-                <React.Fragment key={index}>
-                  {renderRequestCard(true)}
-                </React.Fragment>
-              ))}
+            <div className="relative">
+              {/* Fade effect on the right - Desktop only */}
+              {!isMobile && (
+                <div 
+                  className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                  style={{
+                    background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                    height: 'calc(100% - 4rem)'
+                  }}
+                />
+              )}
+              <div 
+                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                style={isMobile ? { 
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                } : {}}
+              >
+                {[1, 2, 3].map((index) => (
+                  <React.Fragment key={index}>
+                    {renderRequestCard(true, `pending-${index}`)}
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -619,7 +802,7 @@ const Requests: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 style={{ 
                 fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: isMobile ? '18px' : '24px',
+                fontSize: isMobile ? '16px' : '20px',
                 fontWeight: '500',
                 color: '#000000'
               }}>
@@ -658,19 +841,31 @@ const Requests: React.FC = () => {
                 </button>
               </div>
             </div>
-            <div 
-              className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
-              style={isMobile ? { 
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch'
-              } : {}}
-            >
-              {[1, 2, 3, 4, 5, 6].map((index) => (
-                <React.Fragment key={index}>
-                  {renderRequestCard(false)}
-                </React.Fragment>
-              ))}
+            <div className="relative">
+              {/* Fade effect on the right - Desktop only */}
+              {!isMobile && (
+                <div 
+                  className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                  style={{
+                    background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                    height: 'calc(100% - 4rem)'
+                  }}
+                />
+              )}
+              <div 
+                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                style={isMobile ? { 
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                } : {}}
+              >
+                {[1, 2, 3, 4, 5, 6].map((index) => (
+                  <React.Fragment key={index}>
+                    {renderRequestCard(false, `all-${index}`)}
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
           </div>
 
