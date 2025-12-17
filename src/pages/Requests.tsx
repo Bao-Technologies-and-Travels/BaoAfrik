@@ -13,6 +13,8 @@ import bagIcon from '../assets/images/pre/bag.svg';
 import closeIcon from '../assets/images/pre/CLose.svg';
 import basketIcon from '../assets/images/pre/basket.png';
 import globyIcon from '../assets/images/pre/globy.svg';
+import emptyRequestIcon from '../assets/images/pre/emptysearch.svg';
+import requestArrowIcon from '../assets/images/pre/requestarrow.svg';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -929,55 +931,74 @@ const Requests: React.FC = () => {
                 Turn unmet needs into instant deals, discover what people are looking for, grab it, and sell it right where demand begins
               </p>
             </div>
-            {/* Search Bar */}
-            <div style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
-              <div className="relative flex items-center">
-                <img 
-                  src={locationIcon} 
-                  alt="Location"
-                  className="absolute left-3"
-                  style={{ 
-                    width: '16px', 
-                    height: '16px',
-                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                  }}
-                />
-                <input
-                  type="text"
-                  placeholder="Buyer location ?"
-                  className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 pl-10"
-                  style={{ 
-                    backgroundColor: '#FFFFFF',
-                    borderColor: '#E4E4E4',
-                    fontFamily: 'Poppins, sans-serif',
-                    fontSize: isMobile ? '10px' : '14px',
-                    color: '#D9D9D9',
-                    padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                  }}
-                />
-                <div 
-                  className="absolute right-2 flex items-center justify-center"
-                  style={{ 
-                    backgroundColor: '#F9A825',
-                    height: isMobile ? '20px' : '28px',
-                    paddingLeft: isMobile ? '10px' : '18px',
-                    paddingRight: isMobile ? '10px' : '18px',
-                    borderRadius: '8px'
-                  }}
-                >
-                  <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+            {/* Search Bar or Over 400 requests available */}
+            {selectedCountry && getFilteredCount() === 0 ? (
+              <div className="text-right" style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
+                <div style={{ 
+                  fontSize: isMobile ? '20px' : '44px', 
+                  fontWeight: '600',
+                  background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+                  Over 400
+                </div>
+                <div style={{ fontSize: isMobile ? '10px' : '18px', color: '#9C9C9C', marginTop: '4px' }}>
+                  Request availables
                 </div>
               </div>
-            </div>
+            ) : (
+              <div style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
+                <div className="relative flex items-center">
+                  <img 
+                    src={locationIcon} 
+                    alt="Location"
+                    className="absolute left-3"
+                    style={{ 
+                      width: '16px', 
+                      height: '16px',
+                      filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Buyer location ?"
+                    className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 pl-10"
+                    style={{ 
+                      backgroundColor: '#FFFFFF',
+                      borderColor: '#E4E4E4',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: isMobile ? '10px' : '14px',
+                      color: '#D9D9D9',
+                      padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
+                    }}
+                  />
+                  <div 
+                    className="absolute right-2 flex items-center justify-center"
+                    style={{ 
+                      backgroundColor: '#F9A825',
+                      height: isMobile ? '20px' : '28px',
+                      paddingLeft: isMobile ? '10px' : '18px',
+                      paddingRight: isMobile ? '10px' : '18px',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Filtered View or Regular Sections */}
           {selectedCountry ? (
             <>
-              {/* Filter Bar */}
-              <div className="flex items-center justify-between mb-6">
+              {/* Filter Bar - No Results Layout */}
+              <div className={isMobile ? "flex flex-col gap-4 mb-6" : "flex items-center justify-between mb-6"}>
+                {/* Left: Filters */}
                 <div className="flex items-center gap-2">
-                  {renderCountryFilterButton('relative', 'near')}
+                  {renderCountryFilterButton('relative', 'filtered')}
                   <button 
                     className="flex items-center border transition-colors hover:bg-gray-50"
                     style={{ 
@@ -994,56 +1015,228 @@ const Requests: React.FC = () => {
                     <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
                   </button>
                 </div>
-              </div>
 
-              {/* Filtered Title */}
-              <h3 
-                className="mb-6"
-                style={{ 
-                  fontFamily: 'Bricolage Grotesque, sans-serif',
-                  fontSize: isMobile ? '16px' : '20px',
-                  fontWeight: '500',
-                  color: '#000000'
-                }}
-              >
-                Request from {selectedCountry} ({getFilteredCount()} requests)
-              </h3>
-
-              {/* Filtered Cards */}
-              <div className="relative">
-                {!isMobile && (
-                  <div 
-                    className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
-                    style={{
-                      background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
-                      height: '100%'
-                    }}
-                  />
-                )}
-                <div 
-                  className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
-                  style={isMobile ? { 
-                    scrollbarWidth: 'none',
-                    msOverflowStyle: 'none',
-                    WebkitOverflowScrolling: 'touch'
-                  } : {}}
-                >
-                  {[
-                    { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                    { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                    { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                    { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                    { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                    { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
-                  ]
-                    .filter(card => card.country === selectedCountry)
-                    .map((product, index) => (
-                      <React.Fragment key={index}>
-                        {renderRequestCard(false, `filtered-${index}`, product)}
-                      </React.Fragment>
-                    ))}
+                {/* Right: Search Bar */}
+                <div style={{ width: isMobile ? '100%' : '380px', marginLeft: isMobile ? '0' : 'auto' }}>
+                  <div className="relative flex items-center">
+                    <img 
+                      src={locationIcon} 
+                      alt="Location"
+                      className="absolute left-3"
+                      style={{ 
+                        width: '16px', 
+                        height: '16px',
+                        filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                      }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Buyer location ?"
+                      className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 pl-10"
+                      style={{ 
+                        backgroundColor: '#FFFFFF',
+                        borderColor: '#E4E4E4',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '10px' : '14px',
+                        color: '#D9D9D9',
+                        padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
+                      }}
+                    />
+                    <div 
+                      className="absolute right-2 flex items-center justify-center"
+                      style={{ 
+                        backgroundColor: '#F9A825',
+                        height: isMobile ? '20px' : '28px',
+                        paddingLeft: isMobile ? '10px' : '18px',
+                        paddingRight: isMobile ? '10px' : '18px',
+                        borderRadius: '8px'
+                      }}
+                    >
+                      <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                    </div>
+                  </div>
                 </div>
+
               </div>
+
+              {/* Check if no results */}
+              {getFilteredCount() === 0 ? (
+                <>
+                  {/* Empty State */}
+                  <div className="text-center" style={{ padding: isMobile ? '32px 16px' : '48px 16px', marginBottom: '48px' }}>
+                    {/* Empty Request Icon */}
+                    <img 
+                      src={emptyRequestIcon} 
+                      alt="No requests found" 
+                      className="mx-auto" 
+                      style={{ 
+                        width: isMobile ? '40px' : '60px', 
+                        height: isMobile ? '40px' : '60px',
+                        marginBottom: isMobile ? '12px' : '16px'
+                      }}
+                    />
+                    
+                    {/* Title */}
+                    <h3 style={{ 
+                      fontSize: isMobile ? '16px' : '20px', 
+                      color: '#D9D9D9', 
+                      fontFamily: 'Bricolage Grotesque, sans-serif',
+                      fontWeight: '500',
+                      marginBottom: isMobile ? '8px' : '12px'
+                    }}>
+                      No results
+                    </h3>
+                    
+                    {/* Description */}
+                    <p style={{ 
+                      fontSize: isMobile ? '12px' : '16px', 
+                      color: '#B0B0B0', 
+                      fontFamily: 'Poppins, sans-serif', 
+                      maxWidth: isMobile ? '280px' : '500px', 
+                      margin: '0 auto',
+                      marginBottom: isMobile ? '16px' : '20px',
+                      lineHeight: '1.5'
+                    }}>
+                      We found nothing for your search, sorry. Please continue browsing the platform to discover more wonders.
+                    </p>
+                    
+                    {/* View available items link */}
+                    <Link
+                      to="/"
+                      className="inline-flex items-center gap-1.5 transition-opacity hover:opacity-80"
+                      style={{ 
+                        color: '#64B5F6',
+                        fontSize: isMobile ? '11px' : '13px',
+                        textDecoration: 'none',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      <span>View available items</span>
+                      <img 
+                        src={requestArrowIcon} 
+                        alt="Arrow" 
+                        style={{ 
+                          width: isMobile ? '10px' : '12px',
+                          height: isMobile ? '10px' : '12px',
+                          filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                        }}
+                      />
+                    </Link>
+                  </div>
+
+                  {/* Requests near you Section */}
+                  <div className="mb-12">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 style={{ 
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: isMobile ? '14px' : '18px',
+                        fontWeight: '500',
+                        color: '#000000'
+                      }}>
+                        Requests near you
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        {renderCountryFilterButton('relative', 'near-empty')}
+                        <button 
+                          className="flex items-center border transition-colors hover:bg-gray-50"
+                          style={{ 
+                            backgroundColor: '#FAFAFA',
+                            borderColor: '#E4E4E4',
+                            padding: isMobile ? '5px 8px' : '7px 14px',
+                            borderRadius: '8px',
+                            fontFamily: 'Poppins, sans-serif',
+                            gap: isMobile ? '4px' : '6px'
+                          }}
+                        >
+                          <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
+                          <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
+                          <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      {!isMobile && (
+                        <div 
+                          className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                          style={{
+                            background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                            height: '100%'
+                          }}
+                        />
+                      )}
+                      <div 
+                        className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                        style={isMobile ? { 
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none',
+                          WebkitOverflowScrolling: 'touch'
+                        } : {}}
+                      >
+                        {[
+                          { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                          { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                          { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
+                        ].map((product, index) => (
+                          <React.Fragment key={index}>
+                            {renderRequestCard(false, `near-empty-${index}`, product)}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Filtered Title */}
+                  <h3 
+                    className="mb-6"
+                    style={{ 
+                      fontFamily: 'Bricolage Grotesque, sans-serif',
+                      fontSize: isMobile ? '16px' : '20px',
+                      fontWeight: '500',
+                      color: '#000000'
+                    }}
+                  >
+                    Request from {selectedCountry} ({getFilteredCount()} requests)
+                  </h3>
+
+                  {/* Filtered Cards */}
+                  <div className="relative">
+                    {!isMobile && (
+                      <div 
+                        className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                        style={{
+                          background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                          height: '100%'
+                        }}
+                      />
+                    )}
+                    <div 
+                      className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                      style={isMobile ? { 
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none',
+                        WebkitOverflowScrolling: 'touch'
+                      } : {}}
+                    >
+                      {[
+                        { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                        { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                        { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                        { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                        { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                        { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
+                      ]
+                        .filter(card => card.country === selectedCountry)
+                        .map((product, index) => (
+                          <React.Fragment key={index}>
+                            {renderRequestCard(false, `filtered-${index}`, product)}
+                          </React.Fragment>
+                        ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           ) : (
             <>
