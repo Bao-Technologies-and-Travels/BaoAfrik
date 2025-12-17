@@ -24,7 +24,7 @@ const Requests: React.FC = () => {
   const moreOptionsRef = useRef<HTMLDivElement>(null);
   const [selectedCard, setSelectedCard] = useState<{ title: string; country: string; flag: string; location: string; description: string } | null>(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
-  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [openFilterDropdown, setOpenFilterDropdown] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState('');
   const filterDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +70,7 @@ const Requests: React.FC = () => {
         setMoreOptionsOpenFor(null);
       }
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
-        setIsFilterDropdownOpen(false);
+        setOpenFilterDropdown(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -207,11 +207,12 @@ const Requests: React.FC = () => {
   };
 
   // Render country filter button with dropdown
-  const renderCountryFilterButton = (position: 'relative' | 'absolute' = 'relative') => {
+  const renderCountryFilterButton = (position: 'relative' | 'absolute' = 'relative', sectionId: string = 'default') => {
     const selectedCountryData = selectedCountry ? africanCountries.find(c => c.name === selectedCountry) : null;
+    const isOpen = openFilterDropdown === sectionId;
     
     return (
-      <div ref={filterDropdownRef} style={{ position, zIndex: 20 }}>
+      <div ref={sectionId === 'default' ? filterDropdownRef : null} style={{ position, zIndex: 20 }}>
         {selectedCountry ? (
           // Selected country pill
           <div 
@@ -225,6 +226,7 @@ const Requests: React.FC = () => {
               src={selectedCountryData?.flag || ''} 
               alt={selectedCountry}
               className="w-4 h-4 object-cover rounded-full"
+              style={{ width: '16px', height: '16px' }}
             />
             <span style={{ color: '#64B5F6', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
               {selectedCountry}
@@ -246,7 +248,7 @@ const Requests: React.FC = () => {
         ) : (
           // Filter button
           <button 
-            onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+            onClick={() => setOpenFilterDropdown(isOpen ? null : sectionId)}
             className="flex items-center border transition-colors hover:bg-gray-50"
             style={{ 
               backgroundColor: '#FAFAFA',
@@ -266,7 +268,7 @@ const Requests: React.FC = () => {
               style={{ 
                 width: isMobile ? '12px' : '16px', 
                 height: isMobile ? '12px' : '16px',
-                transform: isFilterDropdownOpen ? 'rotate(180deg)' : 'none',
+                transform: isOpen ? 'rotate(180deg)' : 'none',
                 transition: 'transform 0.2s'
               }} 
             />
@@ -274,7 +276,7 @@ const Requests: React.FC = () => {
         )}
         
         {/* Dropdown Menu */}
-        {isFilterDropdownOpen && !selectedCountry && (
+        {isOpen && !selectedCountry && (
           <div 
             className="absolute left-0 bg-white border border-gray-200 z-10 mt-2"
             style={{ 
@@ -311,7 +313,7 @@ const Requests: React.FC = () => {
               <button
                 onClick={() => {
                   setSelectedCountry('');
-                  setIsFilterDropdownOpen(false);
+                  setOpenFilterDropdown(null);
                 }}
                 style={{
                   backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
@@ -336,7 +338,7 @@ const Requests: React.FC = () => {
                   key={country.name}
                   onClick={() => {
                     setSelectedCountry(country.name);
-                    setIsFilterDropdownOpen(false);
+                    setOpenFilterDropdown(null);
                   }}
                   style={{
                     backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
@@ -348,7 +350,8 @@ const Requests: React.FC = () => {
                     <img 
                       src={country.flag} 
                       alt={`${country.name} flag`}
-                      className="w-5 h-4 object-cover rounded-full"
+                      className="object-cover rounded-full"
+                      style={{ width: '20px', height: '20px' }}
                     />
                     <span>{country.name}</span>
                   </span>
@@ -693,7 +696,8 @@ const Requests: React.FC = () => {
                 <img 
                   src={product.flag} 
                   alt={product.country}
-                  className="w-4 h-4 object-cover rounded-full"
+                  className="object-cover rounded-full"
+                  style={{ width: '16px', height: '16px' }}
                 />
                 <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.country}</span>
               </div>
@@ -973,7 +977,7 @@ const Requests: React.FC = () => {
               {/* Filter Bar */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  {renderCountryFilterButton('relative')}
+                  {renderCountryFilterButton('relative', 'near')}
                   <button 
                     className="flex items-center border transition-colors hover:bg-gray-50"
                     style={{ 
@@ -1055,7 +1059,7 @@ const Requests: React.FC = () => {
                     Requests near you
                   </h3>
                   <div className="flex items-center gap-2">
-                    {renderCountryFilterButton('relative')}
+                    {renderCountryFilterButton('relative', 'filtered')}
                     <button 
                       className="flex items-center border transition-colors hover:bg-gray-50"
                       style={{ 
@@ -1117,7 +1121,7 @@ const Requests: React.FC = () => {
                 Pending requests
               </h3>
               <div className="flex items-center gap-2">
-                {renderCountryFilterButton('relative')}
+                {renderCountryFilterButton('relative', 'pending')}
                 <button 
                   className="flex items-center border transition-colors hover:bg-gray-50"
                   style={{ 
@@ -1179,7 +1183,7 @@ const Requests: React.FC = () => {
                 All requests
               </h3>
               <div className="flex items-center gap-2">
-                {renderCountryFilterButton('relative')}
+                {renderCountryFilterButton('relative', 'all')}
                 <button 
                   className="flex items-center border transition-colors hover:bg-gray-50"
                   style={{ 
