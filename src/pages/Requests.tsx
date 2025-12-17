@@ -251,10 +251,11 @@ const Requests: React.FC = () => {
         {selectedPrice ? (
           // Selected price pill
           <div 
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            className="flex items-center gap-2 px-3 py-1.5"
             style={{ 
               backgroundColor: '#F0F8FE',
-              width: 'fit-content'
+              width: 'fit-content',
+              borderRadius: '8px'
             }}
           >
             <span style={{ color: '#64B5F6', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
@@ -362,10 +363,11 @@ const Requests: React.FC = () => {
         {selectedCountry ? (
           // Selected country pill
           <div 
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            className="flex items-center gap-2 px-3 py-1.5"
             style={{ 
               backgroundColor: '#F0F8FE',
-              width: 'fit-content'
+              width: 'fit-content',
+              borderRadius: '8px'
             }}
           >
             <img 
