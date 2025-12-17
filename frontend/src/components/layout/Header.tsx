@@ -1020,7 +1020,7 @@ const Header: React.FC<HeaderProps> = ({
 
                           {/* My requests */}
                           <Link
-                            to="/my-requests"
+                            to="/requests"
                             className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                             onClick={() => setIsDesktopMenuOpen(false)}
                           >
@@ -1715,7 +1715,7 @@ const Header: React.FC<HeaderProps> = ({
 
                       {/* My requests */}
                       <Link
-                        to="/my-requests"
+                        to="/requests"
                         className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >

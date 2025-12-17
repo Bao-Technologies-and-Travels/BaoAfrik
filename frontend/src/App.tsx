@@ -32,21 +32,19 @@ import Notifications from './pages/Notifications';
 import NotificationDetail from './pages/NotificationDetail';
 import ArchivedChats from './pages/ArchivedChats';
 import ProfileSettings from './pages/ProfileSettings';
-import MyRequests from './pages/MyRequests';
+import Requests from './pages/Requests';
 import './App.css';
 
 import { ToastProvider } from './contexts/ToastContext';
 
 function AppContent() {
   const location = useLocation();
-  const isProductDetailPage = location.pathname.startsWith('/product/');
   const isSellerProfilePage = location.pathname.startsWith('/seller/');
   const isUserAccountPage = location.pathname === '/account';
   const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success', '/two-factor-email', '/two-factor-phone', '/two-factor-code', '/two-factor-success'];
   const isAuthPage = authPages.includes(location.pathname);
   const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings', '/my-listings'];
   const isCustomLayoutPage = customLayoutPages.includes(location.pathname);
-  const editListingPage = ['/edit-listing'];
   const isEditListingPage = location.pathname.match(/^\/edit-listing\/[^/]+$/);
 
   // For auth pages, render without header/footer
@@ -131,8 +129,8 @@ function AppContent() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/my-requests" element={<MyRequests />} />
-          <Route path="/requests/:id" element={<MyRequests />} />
+          <Route path="/requests" element={<Requests />} />
+          <Route path="/requests/:id" element={<Requests />} />
         </Routes>
       </main>
       <Footer />

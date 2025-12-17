@@ -1932,7 +1932,7 @@ const Messages: React.FC = () => {
         conversationId,
         isProductInquiry,
       } = location.state;
-      
+
       if (stateProductData) {
         setProductData(stateProductData);
         setPreFilledMessage(statePreFilledMessage || '');
@@ -5568,7 +5568,7 @@ const Messages: React.FC = () => {
 
                           {/* My requests */}
                           <Link
-                            to="/my-requests"
+                            to="/requests"
                             className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                             onClick={() => setIsMenuDropdownOpen(false)}
                           >

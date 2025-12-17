@@ -48,6 +48,8 @@ import inactiveIcon from '../assets/images/pre/inactive.svg';
 import repostIcon from '../assets/images/pre/repost.svg';
 import renewIcon from '../assets/images/pre/renew.svg';
 import daysIcon from '../assets/images/pre/days.svg';
+import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
+
 import beauty from '../assets/images/pre/beauty.png';
 import books from '../assets/images/pre/books.png';
 import food from '../assets/images/pre/food.png';
@@ -65,124 +67,126 @@ import pencilIcon from '../assets/images/pre/pencil.svg';
 import { useToast } from "../contexts/ToastContext";
 
 // Country mapping for products
-const getProductCountry = (productOrigin?: string, productOriginCode?: string) => {
-  const countries = [
-    { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
-    { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },
-    { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png', abbreviation: 'BEN' },
-    { name: 'Botswana', code: 'bw', flag: 'https://flagcdn.com/w20/bw.png', abbreviation: 'BWA' },
-    { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
-    { name: 'Burundi', code: 'bi', flag: 'https://flagcdn.com/w20/bi.png', abbreviation: 'BDI' },
-    { name: 'Cabo Verde', code: 'cv', flag: 'https://flagcdn.com/w20/cv.png', abbreviation: 'CPV' },
-    { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
-    { name: 'Central African Republic', code: 'cf', flag: 'https://flagcdn.com/w20/cf.png', abbreviation: 'CAF' },
-    { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
-    { name: 'Comoros', code: 'km', flag: 'https://flagcdn.com/w20/km.png', abbreviation: 'COM' },
-    { name: 'Congo (Congo-Brazzaville)', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
-    { name: 'Côte d\'Ivoire', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
-    { name: 'Democratic Republic of the Congo', code: 'cd', flag: 'https://flagcdn.com/w20/cd.png', abbreviation: 'COD' },
-    { name: 'Djibouti', code: 'dj', flag: 'https://flagcdn.com/w20/dj.png', abbreviation: 'DJI' },
-    { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
-    { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png', abbreviation: 'GNQ' },
-    { name: 'Eritrea', code: 'er', flag: 'https://flagcdn.com/w20/er.png', abbreviation: 'ERI' },
-    { name: 'Eswatini', code: 'sz', flag: 'https://flagcdn.com/w20/sz.png', abbreviation: 'SWZ' },
-    { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
-    { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png', abbreviation: 'GAB' },
-    { name: 'Gambia', code: 'gm', flag: 'https://flagcdn.com/w20/gm.png', abbreviation: 'GMB' },
-    { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
-    { name: 'Guinea', code: 'gn', flag: 'https://flagcdn.com/w20/gn.png', abbreviation: 'GIN' },
-    { name: 'Guinea-Bissau', code: 'gw', flag: 'https://flagcdn.com/w20/gw.png', abbreviation: 'GNB' },
-    { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
-    { name: 'Lesotho', code: 'ls', flag: 'https://flagcdn.com/w20/ls.png', abbreviation: 'LSO' },
-    { name: 'Liberia', code: 'lr', flag: 'https://flagcdn.com/w20/lr.png', abbreviation: 'LBR' },
-    { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' },
-    { name: 'Madagascar', code: 'mg', flag: 'https://flagcdn.com/w20/mg.png', abbreviation: 'MDG' },
-    { name: 'Malawi', code: 'mw', flag: 'https://flagcdn.com/w20/mw.png', abbreviation: 'MWI' },
-    { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
-    { name: 'Mauritania', code: 'mr', flag: 'https://flagcdn.com/w20/mr.png', abbreviation: 'MRT' },
-    { name: 'Mauritius', code: 'mu', flag: 'https://flagcdn.com/w20/mu.png', abbreviation: 'MUS' },
-    { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
-    { name: 'Mozambique', code: 'mz', flag: 'https://flagcdn.com/w20/mz.png', abbreviation: 'MOZ' },
-    { name: 'Namibia', code: 'na', flag: 'https://flagcdn.com/w20/na.png', abbreviation: 'NAM' },
-    { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
-    { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGA' },
-    { name: 'Rwanda', code: 'rw', flag: 'https://flagcdn.com/w20/rw.png', abbreviation: 'RWA' },
-    { name: 'Sao Tome and Principe', code: 'st', flag: 'https://flagcdn.com/w20/st.png', abbreviation: 'STP' },
-    { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
-    { name: 'Seychelles', code: 'sc', flag: 'https://flagcdn.com/w20/sc.png', abbreviation: 'SYC' },
-    { name: 'Sierra Leone', code: 'sl', flag: 'https://flagcdn.com/w20/sl.png', abbreviation: 'SLE' },
-    { name: 'Somalia', code: 'so', flag: 'https://flagcdn.com/w20/so.png', abbreviation: 'SOM' },
-    { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
-    { name: 'South Sudan', code: 'ss', flag: 'https://flagcdn.com/w20/ss.png', abbreviation: 'SSD' },
-    { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
-    { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
-    { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png', abbreviation: 'TGO' },
-    { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
-    { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
-    { name: 'Zambia', code: 'zm', flag: 'https://flagcdn.com/w20/zm.png', abbreviation: 'ZMB' },
-    { name: 'Zimbabwe', code: 'zw', flag: 'https://flagcdn.com/w20/zw.png', abbreviation: 'ZWE' }
-  ];
+import { getProductCountry } from '../utils/countryHelpers';
+// replaced by shared util
 
-  // Common alternative names / spellings
-  const alternativeNames: Record<string, string> = {
-    'gambia': 'Gambia',
-    'ivory coast': 'Côte d\'Ivoire',
-    'cote divoire': 'Côte d\'Ivoire',
-    'côte d\'ivoire': 'Côte d\'Ivoire',
-    'swaziland': 'Eswatini',
-    'congo': 'Congo (Congo-Brazzaville)',
-    'congo brazzaville': 'Congo (Congo-Brazzaville)',
-    'dr congo': 'Democratic Republic of the Congo',
-    'drc': 'Democratic Republic of the Congo',
-    'congo kinshasa': 'Democratic Republic of the Congo',
-    'cape verde': 'Cabo Verde',
-    'sao tome': 'Sao Tome and Principe',
-    'são tomé': 'Sao Tome and Principe',
-    'são tomé and príncipe': 'Sao Tome and Principe',
-    'sao tome & principe': 'Sao Tome and Principe',
-    'cabo verde': 'Cabo Verde',
-    'democratic republic of congo': 'Democratic Republic of the Congo'
-  };
+// const countries = [
+//   { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
+//   { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },
+//   { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png', abbreviation: 'BEN' },
+//   { name: 'Botswana', code: 'bw', flag: 'https://flagcdn.com/w20/bw.png', abbreviation: 'BWA' },
+//   { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
+//   { name: 'Burundi', code: 'bi', flag: 'https://flagcdn.com/w20/bi.png', abbreviation: 'BDI' },
+//   { name: 'Cabo Verde', code: 'cv', flag: 'https://flagcdn.com/w20/cv.png', abbreviation: 'CPV' },
+//   { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
+//   { name: 'Central African Republic', code: 'cf', flag: 'https://flagcdn.com/w20/cf.png', abbreviation: 'CAF' },
+//   { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
+//   { name: 'Comoros', code: 'km', flag: 'https://flagcdn.com/w20/km.png', abbreviation: 'COM' },
+//   { name: 'Congo (Congo-Brazzaville)', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
+//   { name: 'Côte d\'Ivoire', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
+//   { name: 'Democratic Republic of the Congo', code: 'cd', flag: 'https://flagcdn.com/w20/cd.png', abbreviation: 'COD' },
+//   { name: 'Djibouti', code: 'dj', flag: 'https://flagcdn.com/w20/dj.png', abbreviation: 'DJI' },
+//   { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
+//   { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png', abbreviation: 'GNQ' },
+//   { name: 'Eritrea', code: 'er', flag: 'https://flagcdn.com/w20/er.png', abbreviation: 'ERI' },
+//   { name: 'Eswatini', code: 'sz', flag: 'https://flagcdn.com/w20/sz.png', abbreviation: 'SWZ' },
+//   { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
+//   { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png', abbreviation: 'GAB' },
+//   { name: 'Gambia', code: 'gm', flag: 'https://flagcdn.com/w20/gm.png', abbreviation: 'GMB' },
+//   { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
+//   { name: 'Guinea', code: 'gn', flag: 'https://flagcdn.com/w20/gn.png', abbreviation: 'GIN' },
+//   { name: 'Guinea-Bissau', code: 'gw', flag: 'https://flagcdn.com/w20/gw.png', abbreviation: 'GNB' },
+//   { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
+//   { name: 'Lesotho', code: 'ls', flag: 'https://flagcdn.com/w20/ls.png', abbreviation: 'LSO' },
+//   { name: 'Liberia', code: 'lr', flag: 'https://flagcdn.com/w20/lr.png', abbreviation: 'LBR' },
+//   { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' },
+//   { name: 'Madagascar', code: 'mg', flag: 'https://flagcdn.com/w20/mg.png', abbreviation: 'MDG' },
+//   { name: 'Malawi', code: 'mw', flag: 'https://flagcdn.com/w20/mw.png', abbreviation: 'MWI' },
+//   { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
+//   { name: 'Mauritania', code: 'mr', flag: 'https://flagcdn.com/w20/mr.png', abbreviation: 'MRT' },
+//   { name: 'Mauritius', code: 'mu', flag: 'https://flagcdn.com/w20/mu.png', abbreviation: 'MUS' },
+//   { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
+//   { name: 'Mozambique', code: 'mz', flag: 'https://flagcdn.com/w20/mz.png', abbreviation: 'MOZ' },
+//   { name: 'Namibia', code: 'na', flag: 'https://flagcdn.com/w20/na.png', abbreviation: 'NAM' },
+//   { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
+//   { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGA' },
+//   { name: 'Rwanda', code: 'rw', flag: 'https://flagcdn.com/w20/rw.png', abbreviation: 'RWA' },
+//   { name: 'Sao Tome and Principe', code: 'st', flag: 'https://flagcdn.com/w20/st.png', abbreviation: 'STP' },
+//   { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
+//   { name: 'Seychelles', code: 'sc', flag: 'https://flagcdn.com/w20/sc.png', abbreviation: 'SYC' },
+//   { name: 'Sierra Leone', code: 'sl', flag: 'https://flagcdn.com/w20/sl.png', abbreviation: 'SLE' },
+//   { name: 'Somalia', code: 'so', flag: 'https://flagcdn.com/w20/so.png', abbreviation: 'SOM' },
+//   { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
+//   { name: 'South Sudan', code: 'ss', flag: 'https://flagcdn.com/w20/ss.png', abbreviation: 'SSD' },
+//   { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
+//   { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
+//   { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png', abbreviation: 'TGO' },
+//   { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
+//   { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
+//   { name: 'Zambia', code: 'zm', flag: 'https://flagcdn.com/w20/zm.png', abbreviation: 'ZMB' },
+//   { name: 'Zimbabwe', code: 'zw', flag: 'https://flagcdn.com/w20/zw.png', abbreviation: 'ZWE' }
+// ];
 
-  const defaultCountry =
-    countries.find(c => c.name === 'Nigeria') ||
-    countries[0];
-
-  if (productOriginCode && productOriginCode.trim()) {
-    const codeNorm = productOriginCode.trim().toLowerCase();
-
-    const byCode = countries.find(
-      c =>
-        c.code.toLowerCase() === codeNorm ||
-        c.abbreviation.toLowerCase() === codeNorm
-    );
-
-    if (byCode) return byCode;
-  }
-
-  const rawOrigin = (productOrigin || '').trim();
-  if (rawOrigin) {
-    const normalizedOrigin = rawOrigin.toLowerCase();
-    const standardName = alternativeNames[normalizedOrigin] || normalizedOrigin;
-
-    let country = countries.find(c =>
-      c.name.toLowerCase() === standardName ||
-      c.code.toLowerCase() === standardName ||
-      c.abbreviation.toLowerCase() === standardName.toUpperCase()
-    );
-
-    if (country) return country;
-
-    country = countries.find(c =>
-      c.name.toLowerCase().includes(standardName) ||
-      standardName.includes(c.name.toLowerCase())
-    );
-
-    if (country) return country;
-  }
-
-  return defaultCountry;
+// Common alternative names / spellings
+const alternativeNames: Record<string, string> = {
+  'gambia': 'Gambia',
+  'ivory coast': 'Côte d\'Ivoire',
+  'cote divoire': 'Côte d\'Ivoire',
+  'côte d\'ivoire': 'Côte d\'Ivoire',
+  'swaziland': 'Eswatini',
+  'congo': 'Congo (Congo-Brazzaville)',
+  'congo brazzaville': 'Congo (Congo-Brazzaville)',
+  'dr congo': 'Democratic Republic of the Congo',
+  'drc': 'Democratic Republic of the Congo',
+  'congo kinshasa': 'Democratic Republic of the Congo',
+  'cape verde': 'Cabo Verde',
+  'sao tome': 'Sao Tome and Principe',
+  'são tomé': 'Sao Tome and Principe',
+  'são tomé and príncipe': 'Sao Tome and Principe',
+  'sao tome & principe': 'Sao Tome and Principe',
+  'cabo verde': 'Cabo Verde',
+  'democratic republic of congo': 'Democratic Republic of the Congo'
 };
+
+// const defaultCountry =
+//   countries.find(c => c.name === 'Nigeria') ||
+//   countries[0];
+
+// if (productOriginCode && productOriginCode.trim()) {
+//   const codeNorm = productOriginCode.trim().toLowerCase();
+
+//   const byCode = countries.find(
+//     c =>
+//       c.code.toLowerCase() === codeNorm ||
+//       c.abbreviation.toLowerCase() === codeNorm
+//   );
+
+//   if (byCode) return byCode;
+// }
+
+// const rawOrigin = (productOrigin || '').trim();
+// if (rawOrigin) {
+//   const normalizedOrigin = rawOrigin.toLowerCase();
+//   const standardName = alternativeNames[normalizedOrigin] || normalizedOrigin;
+
+//   let country = countries.find(c =>
+//     c.name.toLowerCase() === standardName ||
+//     c.code.toLowerCase() === standardName ||
+//     c.abbreviation.toLowerCase() === standardName.toUpperCase()
+//   );
+
+//   if (country) return country;
+
+//   country = countries.find(c =>
+//     c.name.toLowerCase().includes(standardName) ||
+//     standardName.includes(c.name.toLowerCase())
+//   );
+
+//   if (country) return country;
+// }
+
+// return defaultCountry;
+// };
 
 interface OwnerListingState {
   fromMyListings?: boolean;
@@ -195,6 +199,8 @@ interface OwnerListingState {
     daysLeft?: number;
     createdAt: number;
     messages?: number;
+    reviewStatus?: 'pending' | 'success' | 'failed';
+    reviewFailureReason?: string;
   };
 }
 
@@ -325,14 +331,14 @@ const capitalizeWords = (str: string): string => {
 };
 
 const getCategoryIcon = (category?: string) => {
-  if(!category) return pepperIcon;
+  if (!category) return pepperIcon;
 
   const k = category.toLowerCase();
-  if(k.includes('food') || k.includes('spice')) return pepperIcon;
-  if(k.includes('home') || k.includes('decor')) return home;
-  if(k.includes('fashion') || k.includes('textile')) return fashion;
-  if(k.includes('beauty') || k.includes('wellness')) return beauty;
-  if(k.includes('book') || k.includes('media')) return books;
+  if (k.includes('food') || k.includes('spice')) return pepperIcon;
+  if (k.includes('home') || k.includes('decor')) return home;
+  if (k.includes('fashion') || k.includes('textile')) return fashion;
+  if (k.includes('beauty') || k.includes('wellness')) return beauty;
+  if (k.includes('book') || k.includes('media')) return books;
   return pepperIcon;
 };
 
@@ -343,7 +349,6 @@ const ProductDetail: React.FC = () => {
 
   const { id } = useParams<{ id: string }>();
   const routerLocation = useLocation();
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
@@ -377,6 +382,25 @@ const ProductDetail: React.FC = () => {
   const ownerListing = ownerViewState?.listing;
   const isOwnerView = Boolean(ownerViewState?.fromMyListings && ownerListing);
 
+  const [isMobile, setIsMobile] = useState(false);
+  const mobileMessagesModalRef = useRef<HTMLDivElement>(null);
+  const [showMobileMessagesModal, setShowMobileMessagesModal] = useState(false);
+
+  // TODO ToggleReviewStatus
+  const [toggledReviewStatus, setToggledReviewStatus] = useState<'success' | 'failed' | null>(null);
+
+  // // Get the actual review status (use toggled state if available, otherwise use from listing)
+  const currentReviewStatus = toggledReviewStatus || ownerListing?.reviewStatus;
+
+  // // Toggle review status handler
+  const handleToggleReviewStatus = () => {
+    if (currentReviewStatus === 'success') {
+      setToggledReviewStatus('failed');
+    } else if (currentReviewStatus === 'failed') {
+      setToggledReviewStatus('success');
+    }
+  };
+
   // Reviews section state
   const [activeTab, setActiveTab] = useState<'reviews' | 'items'>('reviews');
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
@@ -394,6 +418,39 @@ const ProductDetail: React.FC = () => {
   const [isReviewPosted, setIsReviewPosted] = useState(false);
   const [postedReview, setPostedReview] = useState<{ rating: number; text: string; date: string } | null>(null);
   const { addToast } = useToast();
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Click outside handler for messages dropdown and modals
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (messagesDropdownRef.current && !messagesDropdownRef.current.contains(event.target as Node)) {
+        setShowMessagesDropdown(false);
+      }
+      if (repostModalRef.current && !repostModalRef.current.contains(event.target as Node)) {
+        setShowRepostModal(false);
+      }
+      if (mobileMessagesModalRef.current && !mobileMessagesModalRef.current.contains(event.target as Node)) {
+        setShowMobileMessagesModal(false);
+      }
+    };
+
+    if (showMessagesDropdown || showRepostModal || showMobileMessagesModal) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMessagesDropdown, showRepostModal, showMobileMessagesModal]);
 
   // Check if text is clamped
   useEffect(() => {
@@ -1057,7 +1114,6 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  const displayName = ownerListing?.title ?? product?.title;
   const displayPrice = ownerListing
     ? `${ownerListing.price} ${ownerListing.currency}`
     : (product?.currency && product?.price != null
@@ -1393,7 +1449,7 @@ const ProductDetail: React.FC = () => {
             {/* Back Arrow - Top Left */}
             <button
               onClick={() => navigate('/')}
-              className="absolute top-4 left-4 w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-lg"
+              className="absolute top-4 left-4 w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-lg z-10"
             >
               <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1507,9 +1563,6 @@ const ProductDetail: React.FC = () => {
               </div>
 
               {/* Price and posted Date */}
-              {/* <div className="mb-8" style={{ fontSize: '28px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                {product.currency} {product.price}
-              </div> */}
               <div className="flex items-center justify-between mb-8">
                 <div style={{ fontSize: '28px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   {displayPrice}
@@ -1912,6 +1965,133 @@ const ProductDetail: React.FC = () => {
                 </button>
               </div>
 
+              {/* Review Status Badge - Success State */}
+              {/* TODO: Frontend Testing Only - Remove toggle functionality when implementing backend */}
+              {isOwnerView && currentReviewStatus === 'success' && (
+                <div
+                  onClick={handleToggleReviewStatus}
+                  className="flex items-start gap-2 lg:gap-3 p-2 lg:p-2.5 mt-2 cursor-pointer"
+                  style={{
+                    backgroundColor: '#F5FBFF',
+                    border: '1px solid #B8DDFB',
+                    borderRadius: '14px'
+                  }}
+                >
+                  {/* Icon with white circular bg */}
+                  <div
+                    className="flex-shrink-0 rounded-full flex items-center justify-center w-8 h-8 lg:w-10 lg:h-10"
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      border: '2px solid #FFFFFF'
+                    }}
+                  >
+                    <img
+                      src={listingtoastIcon}
+                      alt="Listing"
+                      className="w-5 h-5 lg:w-6 lg:h-6"
+                    />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    {/* Title */}
+                    <p
+                      className="font-medium mb-0.5 text-xs lg:text-sm"
+                      style={{
+                        color: '#64B5F6',
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}
+                    >
+                      Your listing is under review
+                    </p>
+
+                    {/* Description */}
+                    <p
+                      className="text-[10px] lg:text-xs"
+                      style={{
+                        color: '#B0B0B0'
+                      }}
+                    >
+                      We analyze your listing, please wait a few minutes.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Review Status Badge - Failed State */}
+              {/* TODO: Frontend Testing Only - Remove toggle functionality when implementing backend */}
+              {isOwnerView && currentReviewStatus === 'failed' && (
+                <div
+                  onClick={handleToggleReviewStatus}
+                  className="flex items-start gap-2 lg:gap-3 p-2 lg:p-2.5 mt-2 cursor-pointer"
+                  style={{
+                    backgroundColor: '#FFFCF7',
+                    border: '1px solid #FFE0B2',
+                    borderRadius: '14px'
+                  }}
+                >
+                  {/* Warning Icon */}
+                  <div
+                    className="flex-shrink-0 rounded-full flex items-center justify-center w-8 h-8 lg:w-10 lg:h-10"
+                    style={{
+                      border: '2px solid #FFFFFF',
+                      backgroundColor: '#FFFCF7'
+                    }}
+                  >
+                    <img
+                      src={daysIcon}
+                      alt="Warning"
+                      className="w-5 h-5 lg:w-6 lg:h-6"
+                    />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    {/* Title */}
+                    <p
+                      className="font-medium mb-0.5 text-xs lg:text-sm"
+                      style={{
+                        color: '#F9A825',
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}
+                    >
+                      Your listing failed review
+                    </p>
+
+                    {/* Description */}
+                    <p
+                      className="text-[10px] lg:text-xs mb-1"
+                      style={{
+                        color: '#939393'
+                      }}
+                    >
+                      Sorry we can't post your listing on our marketplace
+                    </p>
+
+                    {/* Why Section */}
+                    <p
+                      className="font-semibold mb-0.5 text-[10px] lg:text-xs"
+                      style={{
+                        color: '#212121'
+                      }}
+                    >
+                      Why ? :
+                    </p>
+
+                    {/* Reason */}
+                    <p
+                      className="text-[10px] lg:text-xs"
+                      style={{
+                        color: '#939393',
+                        paddingLeft: '8px'
+                      }}
+                    >
+                      <span style={{ color: '#B0B0B0' }}>•</span> {ownerListing?.reviewFailureReason || 'Your product is not authentic'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Days Left Badge */}
               {isOwnerView && ownerListing?.daysLeft && (
                 <div
@@ -1979,7 +2159,7 @@ const ProductDetail: React.FC = () => {
               )}
 
               {/* Warning Badge for Inactive Listings */}
-              {isOwnerView && ownerListing?.status === 'inactive' && (
+              {isOwnerView && ownerListing?.status === 'inactive' && !currentReviewStatus && (
                 <div
                   className="flex items-start gap-3 p-2.5 mt-2"
                   style={{
@@ -2064,38 +2244,47 @@ const ProductDetail: React.FC = () => {
           {/* Gray Pill-Shaped Line at Top Center */}
           <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-1 rounded-full" style={{ backgroundColor: '#E1E1E1' }}></div>
           <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="font-normal capitalize" style={{ fontSize: '16px', color: '#939393' }}>
-                {product.title}
-              </p>
+            <div className="flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-normal capitalize" style={{ fontSize: '16px', color: '#939393' }}>
+                  {isOwnerView ? product.title : 'poivre blanc'}
+                </p>
+                {isMobile && isOwnerView && !currentReviewStatus && (
+                  <div className="flex-shrink-0">
+                    {renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
+                  </div>
+                )}
+              </div>
               <div className="mt-1" style={{ fontSize: '26px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                {product.currency} {product.price}
+                {isOwnerView ? displayPrice : `USD ${product.price}`}
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handleSave}
-                className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: '#F4F4F4' }}
-              >
-                <BookmarkIcon saved={isSaved} />
-              </button>
-              <button
-                onClick={() => setShowShareModal(true)}
-                className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: '#F4F4F4' }}
-              >
-                <img
-                  src={shareIcon}
-                  alt="Share"
-                  className="w-4 h-4"
-                  style={{ filter: 'brightness(0) saturate(100%) invert(74%) sepia(3%) saturate(524%) hue-rotate(182deg) brightness(90%) contrast(90%)' }}
-                />
-              </button>
-            </div>
+            {!isOwnerView && (
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handleSave}
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#F4F4F4' }}
+                >
+                  <BookmarkIcon saved={isSaved} />
+                </button>
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#F4F4F4' }}
+                >
+                  <img
+                    src={shareIcon}
+                    alt="Share"
+                    className="w-4 h-4"
+                    style={{ filter: 'brightness(0) saturate(100%) invert(74%) sepia(3%) saturate(524%) hue-rotate(182deg) brightness(90%) contrast(90%)' }}
+                  />
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center justify-between text-xs mt-4">
+          <div className="flex items-center justify-between text-xs" style={{ marginTop: isMobile && isOwnerView ? '0px' : '16px' }}>
             <div className="flex items-center gap-1.5" style={{ color: '#939393' }}>
               <img
                 src={locIcon}
@@ -2105,43 +2294,428 @@ const ProductDetail: React.FC = () => {
               />
               <span className="font-light">{product.location}</span>
             </div>
-            <div className="flex items-center gap-1" style={{ color: '#B0B0B0' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 7v5l3 1.5M12 21a9 9 0 100-18 9 9 0 000 18z"
-                  stroke="#B0B0B0"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="font-light">2 days ago</span>
-            </div>
+            {isMobile && isOwnerView ? (
+              <div className="flex items-center gap-2">
+                {(ownerListing?.status === 'inactive' || ownerListing?.daysLeft) ? (
+                  <>
+                    <button
+                      type="button"
+                      className="flex items-center justify-center"
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        backgroundColor: '#FFE9E9',
+                        borderRadius: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                    </button>
+                    <div ref={repostModalRef} style={{ position: 'relative' }}>
+                      <button
+                        type="button"
+                        className="flex items-center justify-center"
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          backgroundColor: '#F0F8FE',
+                          borderRadius: '12px',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowRepostModal(!showRepostModal);
+                        }}
+                      >
+                        <img src={repostIcon} alt="Repost" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)' }} />
+                      </button>
+
+                      {/* Repost Modal - Mobile */}
+                      {showRepostModal && (
+                        <div
+                          className="absolute top-full right-0 mt-2 z-50"
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #E9E9E9',
+                            borderRadius: '12px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '6px',
+                            minWidth: '160px'
+                          }}
+                        >
+                          {/* Option 1: Edit and repost */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate('/create-listing', { state: { draft: ownerListing ?? null } });
+                              setShowRepostModal(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-gray-50 rounded transition-colors"
+                            style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
+                          >
+                            <img src={pencilIcon} alt="Edit" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
+                            <span>Edit and repost</span>
+                          </button>
+
+                          {/* Option 2: Repost the listing */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('Repost the listing');
+                              setShowRepostModal(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-gray-50 rounded transition-colors"
+                            style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
+                          >
+                            <img src={repostIcon} alt="Repost" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
+                            <span>Repost the listing</span>
+                          </button>
+
+                          {/* Option 3: Close */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowRepostModal(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-2.5 py-2 rounded transition-colors mt-1"
+                            style={{
+                              backgroundColor: '#FAFAFA',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              fontSize: '12px',
+                              borderRadius: '8px'
+                            }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <span>Close</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="flex items-center justify-center"
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        backgroundColor: '#F4F4F4',
+                        borderRadius: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => navigate('/create-listing', { state: { draft: ownerListing ?? null } })}
+                    >
+                      <img src={pencilIcon} alt="Edit" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
+                    </button>
+                    <button
+                      type="button"
+                      className="flex items-center justify-center"
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        backgroundColor: '#FFE9E9',
+                        borderRadius: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                    </button>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-1" style={{ color: '#B0B0B0' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 7v5l3 1.5M12 21a9 9 0 100-18 9 9 0 000 18z"
+                    stroke="#B0B0B0"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="font-light">2 days ago</span>
+              </div>
+            )}
           </div>
 
+          {/* Review Status Badge - Success State - Mobile */}
+          {isMobile && isOwnerView && currentReviewStatus === 'success' && (
+            <div
+              onClick={handleToggleReviewStatus}
+              className="flex items-start gap-2 p-2 mt-4 cursor-pointer"
+              style={{
+                backgroundColor: '#F5FBFF',
+                border: '1px solid #B8DDFB',
+                borderRadius: '14px'
+              }}
+            >
+              {/* Icon with white circular bg */}
+              <div
+                className="flex-shrink-0 rounded-full flex items-center justify-center w-8 h-8"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  border: '2px solid #FFFFFF'
+                }}
+              >
+                <img
+                  src={listingtoastIcon}
+                  alt="Listing"
+                  className="w-5 h-5"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="flex-1">
+                {/* Title */}
+                <p
+                  className="font-medium mb-0.5 text-xs"
+                  style={{
+                    color: '#64B5F6',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}
+                >
+                  Your listing is under review
+                </p>
+
+                {/* Description */}
+                <p
+                  className="text-[10px]"
+                  style={{
+                    color: '#B0B0B0'
+                  }}
+                >
+                  We analyze your listing, please wait a few minutes.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Review Status Badge - Failed State - Mobile */}
+          {isMobile && isOwnerView && currentReviewStatus === 'failed' && (
+            <div
+              onClick={handleToggleReviewStatus}
+              className="flex items-start gap-2 p-2 mt-4 cursor-pointer"
+              style={{
+                backgroundColor: '#FFFCF7',
+                border: '1px solid #FFE0B2',
+                borderRadius: '14px'
+              }}
+            >
+              {/* Warning Icon */}
+              <div
+                className="flex-shrink-0 rounded-full flex items-center justify-center w-8 h-8"
+                style={{
+                  border: '2px solid #FFFFFF',
+                  backgroundColor: '#FFFCF7'
+                }}
+              >
+                <img
+                  src={daysIcon}
+                  alt="Warning"
+                  className="w-5 h-5"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="flex-1">
+                {/* Title */}
+                <p
+                  className="font-medium mb-0.5 text-xs"
+                  style={{
+                    color: '#F9A825',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}
+                >
+                  Your listing failed review
+                </p>
+
+                {/* Description */}
+                <p
+                  className="text-[10px] mb-1"
+                  style={{
+                    color: '#939393'
+                  }}
+                >
+                  Sorry we can't post your listing on our marketplace
+                </p>
+
+                {/* Why Section */}
+                <p
+                  className="font-semibold mb-0.5 text-[10px]"
+                  style={{
+                    color: '#212121'
+                  }}
+                >
+                  Why ? :
+                </p>
+
+                {/* Reason */}
+                <p
+                  className="text-[10px]"
+                  style={{
+                    color: '#939393',
+                    paddingLeft: '8px'
+                  }}
+                >
+                  <span style={{ color: '#B0B0B0' }}>•</span> {ownerListing?.reviewFailureReason || 'Your product is not authentic'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Spacing below success/failure badges - Mobile */}
+          {(isMobile && isOwnerView && currentReviewStatus) && (
+            <div className="mb-4"></div>
+          )}
+
+          {/* Warning Badge for Inactive Listings - Mobile - Above badges */}
+          {isMobile && isOwnerView && ownerListing?.status === 'inactive' && !currentReviewStatus && (
+            <div
+              className="flex items-start gap-3 p-2.5 mt-5 mb-3"
+              style={{
+                backgroundColor: '#FFFAFA',
+                border: '1px solid #FFE9E9',
+                borderRadius: '14px'
+              }}
+            >
+              <div
+                className="flex-shrink-0 rounded-full flex items-center justify-center"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  border: '2px solid #FFFFFF',
+                  backgroundColor: '#FFFFFF'
+                }}
+              >
+                <img src={renewIcon} alt="Warning" style={{ width: '20px', height: '20px' }} />
+              </div>
+              <div className="flex-1">
+                <p
+                  className="font-medium mb-1"
+                  style={{
+                    color: '#FF6E6E',
+                    fontSize: '13px',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}
+                >
+                  Your listing has been removed from our marketplace
+                </p>
+                <p
+                  className="text-xs"
+                  style={{
+                    color: '#939393',
+                    fontSize: '11px',
+                    lineHeight: '1.5',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  The time for your product to appear on our marketplace has expired. You can{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => setShowRepostModal(true)}>repost it</span> or{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }}>remove it</span>.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Days Left Badge - Mobile - Above badges */}
+          {isMobile && isOwnerView && ownerListing?.daysLeft && !currentReviewStatus && (
+            <div
+              className="flex items-start gap-3 p-2.5 mt-5 mb-3"
+              style={{
+                backgroundColor: '#FFFCF7',
+                border: '1px solid #FCD79B',
+                borderRadius: '14px'
+              }}
+            >
+              <div
+                className="flex-shrink-0 rounded-full flex items-center justify-center"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  border: '2px solid #FFFFFF',
+                  backgroundColor: '#FFFFFF'
+                }}
+              >
+                <img src={daysIcon} alt="Days left" style={{ width: '20px', height: '20px' }} />
+              </div>
+              <div className="flex-1">
+                <p
+                  className="font-medium mb-1"
+                  style={{
+                    color: '#F9A825',
+                    fontSize: '13px',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}
+                >
+                  {ownerListing.daysLeft} day{ownerListing.daysLeft !== 1 ? 's' : ''} left for your listing on our marketplace.
+                </p>
+                <p
+                  className="text-xs"
+                  style={{
+                    color: '#939393',
+                    fontSize: '11px',
+                    lineHeight: '1.5',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  Your item will soon be removed from our marketplace. You can{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => setShowRepostModal(true)}>repost it</span> or{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }}>remove it</span>.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Badges */}
-          <div className="flex flex-wrap items-center gap-2 mt-5 mb-4 text-xs">
+          <div className="flex flex-wrap items-center gap-2 mb-4 text-xs" style={{ marginTop: isMobile && isOwnerView ? '0' : '20px' }}>
             {/* Country Badge */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border" style={{ borderColor: '#E1E1E1' }}>
               <img
-                src={`https://flagcdn.com/w20/${product.originCode}.png`}
-                alt={`${product.origin} flag`}
+                src="https://flagcdn.com/w20/cm.png"
+                alt="Cameroon flag"
                 className="w-3.5 h-3.5 rounded-full object-cover"
               />
-              <span className="font-light" style={{ color: '#939393' }}>{capitalizeWords(product.origin)}</span>
+              <span className="font-light" style={{ color: '#939393' }}>Cameroun</span>
             </div>
 
             {/* Category Badge */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border" style={{ borderColor: '#E1E1E1' }}>
-              <img src={getCategoryIcon(product.category)} alt="Pepper" className="w-3 h-3" />
-              <span className="font-light" style={{ color: '#939393' }}>{capitalizeWords(product.category)}</span>
+              <img src={pepperIcon} alt="Pepper" className="w-3 h-3" />
+              <span className="font-light" style={{ color: '#939393' }}>Spices</span>
             </div>
 
-            {/* Availability Badge */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border" style={{ borderColor: '#E1E1E1' }}>
-              <img src={availableIcon} alt="Available" className="w-3 h-3" />
-              <span className="font-light" style={{ color: '#939393' }}>Available : {product.quantity}</span>
-            </div>
+            {/* Availability Badge - Hidden for mobile owner view */}
+            {!(isMobile && isOwnerView) && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border" style={{ borderColor: '#E1E1E1' }}>
+                <img src={availableIcon} alt="Available" className="w-3 h-3" />
+                <span className="font-light" style={{ color: '#939393' }}>Available : 1</span>
+              </div>
+            )}
+
+            {/* Posted Date for mobile owner view - at far right of badges */}
+            {isMobile && isOwnerView && (
+              <div className="flex items-center gap-1" style={{ color: '#B0B0B0', marginLeft: 'auto' }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 7v5l3 1.5M12 21a9 9 0 100-18 9 9 0 000 18z"
+                    stroke="#B0B0B0"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="font-light" style={{ fontSize: '10px' }}>{displayDateLabel}</span>
+              </div>
+            )}
           </div>
 
           {/* Description */}
@@ -2372,19 +2946,19 @@ const ProductDetail: React.FC = () => {
           )}
 
           {/* Seller Profile Section - Mobile */}
-          <div className="mt-1 mb-0">
+          <div className="mt-1" style={{ marginBottom: isMobile && isOwnerView ? '12px' : '0' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-gray-100 border overflow-hidden flex-shrink-0" style={{ borderColor: '#E0E0E0' }}>
                   <img
-                    src={product.seller.profileImage || sellerAvatar}
-                    alt={`${product?.seller.firstName} ${product?.seller.lastName}`}
+                    src={getSellerProfileImage(product.seller)}
+                    alt={sellerAvatar}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex flex-col leading-tight">
                   <span className="font-medium text-sm" style={{ color: '#212121' }}>
-                    {product?.seller.firstName} {product?.seller.lastName}
+                    {getSellerName(product.seller)}
                   </span>
                   {product.seller.verified ? (
                     <div className="inline-flex items-center gap-1 bg-green-50 rounded-full mt-1" style={{ padding: '2px 6px', fontSize: '10px', color: '#45C55B' }}>
@@ -2400,7 +2974,7 @@ const ProductDetail: React.FC = () => {
                 </div>
               </div>
               <button
-                onClick={handleSellerProfileClick}
+                onClick={() => navigate(`/seller/${getSellerName(product.seller).toLowerCase().replace(/\s+/g, '-')}`)}
                 className="flex items-center gap-1 px-3 py-1 rounded-full transition-colors hover:opacity-80 flex-shrink-0"
                 style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', fontSize: '11px', fontWeight: 500 }}
               >
@@ -2410,8 +2984,8 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
 
-          {/* Days Left Badge - Mobile */}
-          {isOwnerView && ownerListing?.daysLeft && (
+          {/* Days Left Badge - Mobile - Hidden, now shown above badges */}
+          {!isMobile && isOwnerView && ownerListing?.daysLeft && !currentReviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-2"
               style={{
@@ -2476,8 +3050,8 @@ const ProductDetail: React.FC = () => {
             </div>
           )}
 
-          {/* Warning Badge for Inactive Listings - Mobile */}
-          {isOwnerView && ownerListing?.status === 'inactive' && (
+          {/* Warning Badge for Inactive Listings - Mobile - Hidden, now shown above badges */}
+          {!isMobile && isOwnerView && ownerListing?.status === 'inactive' && !currentReviewStatus && (
             <div
               className="flex items-start gap-3 p-2.5 mt-2"
               style={{
@@ -2568,6 +3142,7 @@ const ProductDetail: React.FC = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-4.906-1.456L3 21l2.456-5.094A8.959 8.959 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
           </svg>
           <span>Chat with seller</span>
+          <img src={basketIcon} alt="Chat" className="w-4 h-4" style={{ filter: 'brightness(0) invert(1)' }} />
         </button>
       </div>
 
@@ -4349,8 +4924,402 @@ const ProductDetail: React.FC = () => {
         </>
       )}
 
+      {/* Mobile Give Your Opinion Modal */}
+      {showGiveOpinionModal && (
+        <>
+          {/* Overlay */}
+          <div
+            className="lg:hidden fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={() => setShowGiveOpinionModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="lg:hidden fixed inset-x-0 z-50 flex items-end justify-center" style={{ top: '15%', bottom: '0' }}>
+            <div
+              className="bg-white w-full max-w-full relative"
+              style={{ borderRadius: '30px', maxHeight: '90vh', overflowY: 'auto' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Gray Pill-Shaped Line at Bottom */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-28 h-1 rounded-full" style={{ backgroundColor: '#E1E1E1' }}></div>
+
+              {/* Top Section - Pill Shape with X */}
+              {!isReviewPosted && (
+                <div className="flex items-center justify-between px-5 pt-5 pb-3 relative">
+                  <button
+                    onClick={() => setShowGiveOpinionModal(false)}
+                    className="w-6 h-6 flex items-center justify-center absolute right-5"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border mx-auto" style={{ borderColor: '#E1E1E1', backgroundColor: 'white' }}>
+                    <span className="text-[10px]" style={{ color: '#B0B0B0' }}>Reviews & Ratings</span>
+                  </div>
+                </div>
+              )}
+
+              {/* X Button for Feedback State */}
+              {isReviewPosted && (
+                <div className="flex items-center justify-end px-5 pt-5 pb-3">
+                  <button
+                    onClick={() => setShowGiveOpinionModal(false)}
+                    className="w-6 h-6 flex items-center justify-center"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#BABABA' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+
+              {/* Content */}
+              <div className="px-5 pb-8">
+                {!isReviewPosted ? (
+                  <>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Give your opinion</h3>
+                    <p className="text-xs mb-6 text-center" style={{ color: '#B0B0B0' }}>Share your opinion about this product and help others learn a bit more about it.</p>
+
+                    {/* Star Rating Input */}
+                    <div className="flex items-center justify-center space-x-1 mb-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => setUserRating(star)}
+                          className="focus:outline-none hover:scale-110 transition-transform"
+                        >
+                          <svg
+                            className="w-7 h-7"
+                            viewBox="0 0 24 24"
+                            fill={userRating >= star ? '#FBBC05' : 'none'}
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path
+                              d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
+                              stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
+                            />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Give a note text/rating */}
+                    <div className="text-center mb-6" style={{
+                      color: userRating > 0 ? '#64B5F6' : (userReviewText.length > 0 ? '#64B5F6' : '#D9D9D9'),
+                      fontSize: '10px'
+                    }}>
+                      {userRating > 0 ? `${userRating}.0` : 'give a note'}
+                    </div>
+
+                    {/* Review Text Input */}
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 self-start mt-2">
+                        <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <textarea
+                        value={userReviewText}
+                        onChange={(e) => {
+                          if (e.target.value.length <= 1000) {
+                            setUserReviewText(e.target.value);
+                          }
+                        }}
+                        placeholder="What do you think of this product?"
+                        className="flex-1 rounded-lg px-3 text-sm focus:outline-none resize-none"
+                        style={{
+                          border: 'none',
+                          minHeight: '80px',
+                          paddingTop: '12px',
+                          paddingBottom: '12px',
+                          color: '#939393',
+                          backgroundColor: 'transparent',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word'
+                        }}
+                        maxLength={1000}
+                      />
+                    </div>
+
+                    {/* Post Review Button */}
+                    <div className="relative mt-4">
+                      <button
+                        onClick={() => {
+                          if (userRating > 0 && userReviewText.trim()) {
+                            const today = new Date();
+                            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            const dateStr = `${today.getDate()} ${months[today.getMonth()]}, ${today.getFullYear()}`;
+                            setPostedReview({
+                              rating: userRating,
+                              text: userReviewText,
+                              date: dateStr
+                            });
+                            setIsReviewPosted(true);
+                          }
+                        }}
+                        className="w-full py-2.5 font-normal transition-all relative"
+                        style={{
+                          backgroundColor: userRating > 0 ? '#FBBC05' : '#F4F4F4',
+                          color: userRating > 0 ? 'white' : '#6A6A6A',
+                          borderRadius: '12px'
+                        }}
+                        disabled={userRating === 0}
+                      >
+                        Post the review
+                        {/* Character Counter - Top Left */}
+                        {userReviewText.length > 0 && (
+                          <div
+                            className="absolute"
+                            style={{
+                              top: '-26px',
+                              left: '0',
+                              color: '#64B5F6',
+                              fontSize: '12px'
+                            }}
+                          >
+                            {userReviewText.length}/1000
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Thank You State */}
+                    <div className="mb-6 text-center">
+                      <h3 className="text-xl font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#212121' }}>
+                        Thank you for your<br />feedback. 😊
+                      </h3>
+                    </div>
+
+                    {/* Posted Review Card */}
+                    <div className="border rounded-3xl text-left mx-auto mb-4" style={{ borderColor: '#E1E1E1', maxWidth: '500px' }}>
+                      <div className="p-5">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-start space-x-3">
+                            {/* Avatar */}
+                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                              <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+
+                            <div>
+                              {/* Name */}
+                              <h4 className="font-semibold mb-1" style={{ color: '#0E0E0E', fontSize: '14px' }}>You</h4>
+
+                              {/* Star Rating */}
+                              <div className="flex items-center space-x-2">
+                                <div className="flex items-center">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <svg
+                                      key={star}
+                                      className="w-3.5 h-3.5"
+                                      fill={star <= postedReview!.rating ? '#F9A825' : '#E9E9E9'}
+                                      stroke="none"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                    </svg>
+                                  ))}
+                                </div>
+                                <span className="text-sm font-medium" style={{ color: '#939393' }}>{postedReview!.rating}.0</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Edit Button and Date */}
+                          <div className="flex flex-col items-end space-y-1 flex-shrink-0">
+                            <button
+                              onClick={() => {
+                                setIsReviewPosted(false);
+                              }}
+                              className="flex items-center space-x-1.5 px-2.5 py-1 border rounded-lg transition-colors hover:bg-gray-50"
+                              style={{ borderColor: '#D9D9D9' }}
+                            >
+                              <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                              <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
+                            </button>
+                            <span className="text-[10px]" style={{ color: '#939393' }}>{postedReview!.date}</span>
+                          </div>
+                        </div>
+
+                        {/* Review Text */}
+                        <p className="text-sm leading-relaxed" style={{ color: '#939393', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                          {postedReview!.text}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Close Button */}
+                    <button
+                      onClick={() => {
+                        setShowGiveOpinionModal(false);
+                        // Don't reset state - keep the review posted so it shows below ratings
+                      }}
+                      className="w-full py-3 font-normal text-white transition-colors"
+                      style={{ backgroundColor: '#F9A825', borderRadius: '12px' }}
+                    >
+                      Close
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Add spacing before footer */}
-      <div className="pb-32"></div>
+      <div className="pb-4 lg:pb-32">
+        {/* Mobile Footer Divider - Just above footer logo */}
+        <div className="lg:hidden border-t pt-1 mb-1" style={{ borderColor: '#E5E5E5' }}></div>
+      </div>
+
+      {/* Mobile Messages Modal */}
+      {showMobileMessagesModal && isMobile && isOwnerView && ownerListing?.messages && ownerListing.messages > 0 && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#00000033' }}
+            onClick={() => setShowMobileMessagesModal(false)}
+          />
+
+          {/* Modal */}
+          <div
+            ref={mobileMessagesModalRef}
+            className="fixed bottom-0 z-50 bg-white"
+            style={{
+              borderRadius: '30px',
+              maxHeight: '70vh',
+              overflowY: 'auto',
+              left: '12px',
+              right: '12px',
+              marginBottom: '12px'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4">
+              <h3 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', fontWeight: 600, color: '#212121' }}>
+                {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} for this product
+              </h3>
+              <button
+                onClick={() => setShowMobileMessagesModal(false)}
+                className="flex items-center justify-center"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Messages List */}
+            <div className="px-4 pb-4">
+              {recentMessages.map((message, index) => {
+                const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
+                return (
+                  <div
+                    key={message.id}
+                    className="cursor-pointer mb-3 last:mb-0 hover:opacity-90 transition-opacity"
+                    style={{
+                      border: '1px solid #E9E9E9',
+                      borderRadius: '14px',
+                      padding: '12px'
+                    }}
+                    onClick={() => {
+                      navigate(`/messages?productId=${ownerListing.id}&conversationId=${message.id}`);
+                      setShowMobileMessagesModal(false);
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Avatar */}
+                      <div
+                        className="rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          border: '2px solid #939393',
+                          backgroundColor: avatarColors[index % avatarColors.length]
+                        }}
+                      >
+                        <img
+                          src={message.avatar}
+                          alt={message.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        {/* Name and Rating */}
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span
+                            className="font-medium text-sm"
+                            style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}
+                          >
+                            {message.name}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <svg
+                              className="w-3 h-3"
+                              viewBox="0 0 24 24"
+                              fill="#FBBC05"
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            <span className="text-xs" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                              {message.rating}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Message State with Timestamp */}
+                        <div className="flex items-center justify-between gap-2" style={{ marginTop: '2px' }}>
+                          <div className="flex items-center gap-2">
+                            {message.messageState === 'new' ? (
+                              <span className="text-xs" style={{ color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>
+                                New message
+                              </span>
+                            ) : message.messageState === 'you' ? (
+                              <div className="flex items-center gap-1">
+                                <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: '#E3F2FD', color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>
+                                  You
+                                </span>
+                                <span className="text-xs truncate" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', maxWidth: '120px' }}>
+                                  {message.messagePreview}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-xs truncate" style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', maxWidth: '180px' }}>
+                                {message.messagePreview}
+                              </span>
+                            )}
+                          </div>
+                          <span className="flex-shrink-0" style={{ color: '#BBBBBB', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '10px' }}>
+                            {message.timestamp}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Drag Indicator */}
+            <div className="flex justify-center py-3">
+              <div style={{ width: '100px', height: '4px', backgroundColor: '#E9E9E9', borderRadius: '2px' }}></div>
+            </div>
+          </div>
+        </>
+      )}
+
     </div>
   );
 };

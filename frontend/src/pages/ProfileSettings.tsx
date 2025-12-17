@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import {apiClient} from '../services/api';
+import { apiClient } from '../services/api';
 
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
@@ -1110,61 +1110,61 @@ const ProfileSettings: React.FC = () => {
   };
 
   const handleSaveBio = async () => {
-  if (!biography.trim()) {
-    addToast({message: 'Please enter a bio', type: 'error', title: 'Action failed', duration: 2000});
-    return;
-  }
-  
-  try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/profile/bio`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({ bio: biography })
-    });
-    
-    if (!response.ok) throw new Error('Failed to save bio');
-    
-    addToast({message: 'Bio updated successfully', type: 'success', title: 'Action completed', duration: 2000});
-    setProfileData(prev => ({ ...prev, bio: biography }));
-  } catch (error) {
-    console.error('Error saving bio:', error);
-    addToast({message: 'Failed to save bio', type: 'error', title: 'Action failed', duration: 2000});
-  }
-};
+    if (!biography.trim()) {
+      addToast({ message: 'Please enter a bio', type: 'error', title: 'Action failed', duration: 2000 });
+      return;
+    }
 
-const handleUpdateProfile = async () => {
-  try {
-    setIsSaving(true);
-    
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/profile`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({
-        ...formData,
-        // Split full name into first and last name
-        firstName: formData.fullName.split(' ')[0],
-        lastName: formData.fullName.split(' ').slice(1).join(' ') || ''
-      })
-    });
-    
-    if (!response.ok) throw new Error('Failed to update profile');
-    
-    const data = await response.json();
-    addToast({message: 'Profile updated successfully', type: 'success', title: 'Profile updated', duration: 2000});
-    setProfileData(formData);
-  } catch (error) {
-    console.error('Error updating profile:', error);
-    addToast({message: 'Failed to update profile', type: 'error', title: 'Action failed', duration: 2000});
-  } finally {
-    setIsSaving(false);
-  }
-};
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/profile/bio`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ bio: biography })
+      });
+
+      if (!response.ok) throw new Error('Failed to save bio');
+
+      addToast({ message: 'Bio updated successfully', type: 'success', title: 'Action completed', duration: 2000 });
+      setProfileData(prev => ({ ...prev, bio: biography }));
+    } catch (error) {
+      console.error('Error saving bio:', error);
+      addToast({ message: 'Failed to save bio', type: 'error', title: 'Action failed', duration: 2000 });
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      setIsSaving(true);
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          ...formData,
+          // Split full name into first and last name
+          firstName: formData.fullName.split(' ')[0],
+          lastName: formData.fullName.split(' ').slice(1).join(' ') || ''
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to update profile');
+
+      const data = await response.json();
+      addToast({ message: 'Profile updated successfully', type: 'success', title: 'Profile updated', duration: 2000 });
+      setProfileData(formData);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      addToast({ message: 'Failed to update profile', type: 'error', title: 'Action failed', duration: 2000 });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleVerificationInput = (field: 'email' | 'phone', value: string) => {
     setVerificationForm(prev => ({ ...prev, [field]: value }));
@@ -2159,7 +2159,7 @@ const handleUpdateProfile = async () => {
 
                               {/* My requests */}
                               <Link
-                                to="/my-requests"
+                                to="/requests"
                                 className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                                 onClick={() => setIsMenuDropdownOpen(false)}
                               >

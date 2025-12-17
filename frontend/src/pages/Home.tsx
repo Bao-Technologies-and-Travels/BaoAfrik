@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getProductCountry } from '../utils/countryHelpers';
 import { Link, useNavigate } from 'react-router-dom';
 
 // Import product images from pre folder
@@ -29,7 +30,6 @@ import cameroonianCulture from '../assets/images/logos/culture.png'; // Traditio
 
 // Import scan icon
 import scanIcon from '../assets/images/logos/scanner (1).png';
-import { apiClient } from '../services';
 
 interface BaseProduct {
   id: string;
@@ -205,7 +205,7 @@ const Home: React.FC = () => {
     }
   };
 
-  // useEffect for fetching requess from API
+  // useEffect for fetching requests from API
   useEffect(() => {
     const fetchRequests = async () => {
       try {
@@ -227,7 +227,6 @@ const Home: React.FC = () => {
         }
 
         const result = await response.json();
-        console.log('Response data:', result);
         setRequests(Array.isArray(result.data) ? result.data : []);
 
       } catch (error) {
@@ -419,117 +418,119 @@ const Home: React.FC = () => {
   ].sort((a, b) => a.name.localeCompare(b.name));
 
   // Country mapping for products
-  const getProductCountry = (productId: number, productOrigin?: string) => {
-    const countries = [
-      { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
-      { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },
-      { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png', abbreviation: 'BEN' },
-      { name: 'Botswana', code: 'bw', flag: 'https://flagcdn.com/w20/bw.png', abbreviation: 'BWA' },
-      { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
-      { name: 'Burundi', code: 'bi', flag: 'https://flagcdn.com/w20/bi.png', abbreviation: 'BDI' },
-      { name: 'Cabo Verde', code: 'cv', flag: 'https://flagcdn.com/w20/cv.png', abbreviation: 'CPV' },
-      { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
-      { name: 'Central African Republic', code: 'cf', flag: 'https://flagcdn.com/w20/cf.png', abbreviation: 'CAF' },
-      { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
-      { name: 'Comoros', code: 'km', flag: 'https://flagcdn.com/w20/km.png', abbreviation: 'COM' },
-      { name: 'Congo (Congo-Brazzaville)', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
-      { name: 'Côte d\'Ivoire', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
-      { name: 'Democratic Republic of the Congo', code: 'cd', flag: 'https://flagcdn.com/w20/cd.png', abbreviation: 'COD' },
-      { name: 'Djibouti', code: 'dj', flag: 'https://flagcdn.com/w20/dj.png', abbreviation: 'DJI' },
-      { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
-      { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png', abbreviation: 'GNQ' },
-      { name: 'Eritrea', code: 'er', flag: 'https://flagcdn.com/w20/er.png', abbreviation: 'ERI' },
-      { name: 'Eswatini', code: 'sz', flag: 'https://flagcdn.com/w20/sz.png', abbreviation: 'SWZ' },
-      { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
-      { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png', abbreviation: 'GAB' },
-      { name: 'Gambia', code: 'gm', flag: 'https://flagcdn.com/w20/gm.png', abbreviation: 'GMB' },
-      { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
-      { name: 'Guinea', code: 'gn', flag: 'https://flagcdn.com/w20/gn.png', abbreviation: 'GIN' },
-      { name: 'Guinea-Bissau', code: 'gw', flag: 'https://flagcdn.com/w20/gw.png', abbreviation: 'GNB' },
-      { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
-      { name: 'Lesotho', code: 'ls', flag: 'https://flagcdn.com/w20/ls.png', abbreviation: 'LSO' },
-      { name: 'Liberia', code: 'lr', flag: 'https://flagcdn.com/w20/lr.png', abbreviation: 'LBR' },
-      { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' },
-      { name: 'Madagascar', code: 'mg', flag: 'https://flagcdn.com/w20/mg.png', abbreviation: 'MDG' },
-      { name: 'Malawi', code: 'mw', flag: 'https://flagcdn.com/w20/mw.png', abbreviation: 'MWI' },
-      { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
-      { name: 'Mauritania', code: 'mr', flag: 'https://flagcdn.com/w20/mr.png', abbreviation: 'MRT' },
-      { name: 'Mauritius', code: 'mu', flag: 'https://flagcdn.com/w20/mu.png', abbreviation: 'MUS' },
-      { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
-      { name: 'Mozambique', code: 'mz', flag: 'https://flagcdn.com/w20/mz.png', abbreviation: 'MOZ' },
-      { name: 'Namibia', code: 'na', flag: 'https://flagcdn.com/w20/na.png', abbreviation: 'NAM' },
-      { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
-      { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGA' },
-      { name: 'Rwanda', code: 'rw', flag: 'https://flagcdn.com/w20/rw.png', abbreviation: 'RWA' },
-      { name: 'Sao Tome and Principe', code: 'st', flag: 'https://flagcdn.com/w20/st.png', abbreviation: 'STP' },
-      { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
-      { name: 'Seychelles', code: 'sc', flag: 'https://flagcdn.com/w20/sc.png', abbreviation: 'SYC' },
-      { name: 'Sierra Leone', code: 'sl', flag: 'https://flagcdn.com/w20/sl.png', abbreviation: 'SLE' },
-      { name: 'Somalia', code: 'so', flag: 'https://flagcdn.com/w20/so.png', abbreviation: 'SOM' },
-      { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
-      { name: 'South Sudan', code: 'ss', flag: 'https://flagcdn.com/w20/ss.png', abbreviation: 'SSD' },
-      { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
-      { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
-      { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png', abbreviation: 'TGO' },
-      { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
-      { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
-      { name: 'Zambia', code: 'zm', flag: 'https://flagcdn.com/w20/zm.png', abbreviation: 'ZMB' },
-      { name: 'Zimbabwe', code: 'zw', flag: 'https://flagcdn.com/w20/zw.png', abbreviation: 'ZWE' }
-    ];
+  // replaced by shared util
 
-    if (!productOrigin) {
-      const defaultCountryIndex = productId % countries.length;
-      return countries[defaultCountryIndex] || countries[0];
-    }
+  // removed: countries array now provided by shared util
+  // const countries = [
+  // { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
+  // { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },
+  // { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png', abbreviation: 'BEN' },
+  // { name: 'Botswana', code: 'bw', flag: 'https://flagcdn.com/w20/bw.png', abbreviation: 'BWA' },
+  // { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
+  // { name: 'Burundi', code: 'bi', flag: 'https://flagcdn.com/w20/bi.png', abbreviation: 'BDI' },
+  // { name: 'Cabo Verde', code: 'cv', flag: 'https://flagcdn.com/w20/cv.png', abbreviation: 'CPV' },
+  // { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
+  // { name: 'Central African Republic', code: 'cf', flag: 'https://flagcdn.com/w20/cf.png', abbreviation: 'CAF' },
+  // { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
+  // { name: 'Comoros', code: 'km', flag: 'https://flagcdn.com/w20/km.png', abbreviation: 'COM' },
+  // { name: 'Congo (Congo-Brazzaville)', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
+  // { name: 'Côte d\'Ivoire', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
+  // { name: 'Democratic Republic of the Congo', code: 'cd', flag: 'https://flagcdn.com/w20/cd.png', abbreviation: 'COD' },
+  // { name: 'Djibouti', code: 'dj', flag: 'https://flagcdn.com/w20/dj.png', abbreviation: 'DJI' },
+  // { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
+  // { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png', abbreviation: 'GNQ' },
+  // { name: 'Eritrea', code: 'er', flag: 'https://flagcdn.com/w20/er.png', abbreviation: 'ERI' },
+  // { name: 'Eswatini', code: 'sz', flag: 'https://flagcdn.com/w20/sz.png', abbreviation: 'SWZ' },
+  // { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
+  // { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png', abbreviation: 'GAB' },
+  // { name: 'Gambia', code: 'gm', flag: 'https://flagcdn.com/w20/gm.png', abbreviation: 'GMB' },
+  // { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
+  // { name: 'Guinea', code: 'gn', flag: 'https://flagcdn.com/w20/gn.png', abbreviation: 'GIN' },
+  // { name: 'Guinea-Bissau', code: 'gw', flag: 'https://flagcdn.com/w20/gw.png', abbreviation: 'GNB' },
+  // { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
+  // { name: 'Lesotho', code: 'ls', flag: 'https://flagcdn.com/w20/ls.png', abbreviation: 'LSO' },
+  // { name: 'Liberia', code: 'lr', flag: 'https://flagcdn.com/w20/lr.png', abbreviation: 'LBR' },
+  // { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' },
+  // { name: 'Madagascar', code: 'mg', flag: 'https://flagcdn.com/w20/mg.png', abbreviation: 'MDG' },
+  // { name: 'Malawi', code: 'mw', flag: 'https://flagcdn.com/w20/mw.png', abbreviation: 'MWI' },
+  // { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
+  // { name: 'Mauritania', code: 'mr', flag: 'https://flagcdn.com/w20/mr.png', abbreviation: 'MRT' },
+  // { name: 'Mauritius', code: 'mu', flag: 'https://flagcdn.com/w20/mu.png', abbreviation: 'MUS' },
+  // { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
+  // { name: 'Mozambique', code: 'mz', flag: 'https://flagcdn.com/w20/mz.png', abbreviation: 'MOZ' },
+  // { name: 'Namibia', code: 'na', flag: 'https://flagcdn.com/w20/na.png', abbreviation: 'NAM' },
+  // { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
+  // { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGA' },
+  // { name: 'Rwanda', code: 'rw', flag: 'https://flagcdn.com/w20/rw.png', abbreviation: 'RWA' },
+  // { name: 'Sao Tome and Principe', code: 'st', flag: 'https://flagcdn.com/w20/st.png', abbreviation: 'STP' },
+  // { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
+  // { name: 'Seychelles', code: 'sc', flag: 'https://flagcdn.com/w20/sc.png', abbreviation: 'SYC' },
+  // { name: 'Sierra Leone', code: 'sl', flag: 'https://flagcdn.com/w20/sl.png', abbreviation: 'SLE' },
+  // { name: 'Somalia', code: 'so', flag: 'https://flagcdn.com/w20/so.png', abbreviation: 'SOM' },
+  // { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
+  // { name: 'South Sudan', code: 'ss', flag: 'https://flagcdn.com/w20/ss.png', abbreviation: 'SSD' },
+  // { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
+  // { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
+  // { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png', abbreviation: 'TGO' },
+  // { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
+  // { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
+  // { name: 'Zambia', code: 'zm', flag: 'https://flagcdn.com/w20/zm.png', abbreviation: 'ZMB' },
+  // { name: 'Zimbabwe', code: 'zw', flag: 'https://flagcdn.com/w20/zw.png', abbreviation: 'ZWE' }
+  // ];
 
-    // normalize the input
-    const normalizedOrigin = productOrigin.trim().toLowerCase();
+  // if (!productOrigin) {
+  //   const defaultCountryIndex = productId % countries.length;
+  //   return countries[defaultCountryIndex] || countries[0];
+  // }
 
-    // Add common alternative names for some countries
-    const alternativeNames: Record<string, string> = {
-      'gambia': 'Gambia',
-      'ivory coast': 'Côte d\'Ivoire',
-      'cote divoire': 'Côte d\'Ivoire',
-      'côte d\'ivoire': 'Côte d\'Ivoire',
-      'swaziland': 'Eswatini',
-      'congo': 'Congo (Congo-Brazzaville)',
-      'congo brazzaville': 'Congo (Congo-Brazzaville)',
-      'dr congo': 'Democratic Republic of the Congo',
-      'drc': 'Democratic Republic of the Congo',
-      'congo kinshasa': 'Democratic Republic of the Congo',
-      'cape verde': 'Cabo Verde',
-      'sao tome': 'Sao Tome and Principe',
-      'são tomé': 'Sao Tome and Principe',
-      'são tomé and príncipe': 'Sao Tome and Principe',
-      'sao tome & principe': 'Sao Tome and Principe'
-    };
+  // normalize the input
+  // const normalizedOrigin = productOrigin.trim().toLowerCase();
 
-    const standardName = alternativeNames[normalizedOrigin] || normalizedOrigin;
-
-    let country = countries.find(c =>
-      c.name.toLowerCase() === standardName.toLowerCase() ||
-      c.code.toLowerCase() === normalizedOrigin.toLowerCase() ||
-      c.abbreviation.toLowerCase() === normalizedOrigin.toLowerCase()
-    );
-
-    if (country) {
-      return country;
-    };
-
-    // Try partial matches
-    country = countries.find(c =>
-      c.name.toLowerCase().includes(standardName) ||
-      standardName.toLowerCase().includes(c.name.toLowerCase())
-    );
-
-    if (country) {
-      return country;
-    }
-
-    // Fallback to default based on productId
-    const defaultCountryIndex = productId % countries.length;
-    return countries[defaultCountryIndex] || countries[0];
+  // Add common alternative names for some countries
+  const alternativeNames: Record<string, string> = {
+    'gambia': 'Gambia',
+    'ivory coast': 'Côte d\'Ivoire',
+    'cote divoire': 'Côte d\'Ivoire',
+    'côte d\'ivoire': 'Côte d\'Ivoire',
+    'swaziland': 'Eswatini',
+    'congo': 'Congo (Congo-Brazzaville)',
+    'congo brazzaville': 'Congo (Congo-Brazzaville)',
+    'dr congo': 'Democratic Republic of the Congo',
+    'drc': 'Democratic Republic of the Congo',
+    'congo kinshasa': 'Democratic Republic of the Congo',
+    'cape verde': 'Cabo Verde',
+    'sao tome': 'Sao Tome and Principe',
+    'são tomé': 'Sao Tome and Principe',
+    'são tomé and príncipe': 'Sao Tome and Principe',
+    'sao tome & principe': 'Sao Tome and Principe'
   };
+
+  // const standardName = alternativeNames[normalizedOrigin] || normalizedOrigin;
+
+  // let country = countries.find(c =>
+  //   c.name.toLowerCase() === standardName.toLowerCase() ||
+  //   c.code.toLowerCase() === normalizedOrigin.toLowerCase() ||
+  //   c.abbreviation.toLowerCase() === normalizedOrigin.toLowerCase()
+  // );
+
+  // if (country) {
+  //   return country;
+  // };
+
+  // // Try partial matches
+  // country = countries.find(c =>
+  //   c.name.toLowerCase().includes(standardName) ||
+  //   standardName.toLowerCase().includes(c.name.toLowerCase())
+  // );
+
+  // if (country) {
+  //   return country;
+  // }
+
+  // // Fallback to default based on productId
+  // const defaultCountryIndex = productId % countries.length;
+  // return countries[defaultCountryIndex] || countries[0];
+  // };
 
   const formatPrice = (amount: number | string, currencyCode: string = 'USD'): string => {
     const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -577,7 +578,7 @@ const Home: React.FC = () => {
     // Apply country filter if a specific country is selected
     if (selectedCountry) {
       productsToFilter = productsToFilter.filter((product: FrontendProduct) =>
-        getProductCountry(product.id, product.origin).name === selectedCountry
+        getProductCountry(product.origin).name === selectedCountry
       );
     }
 
@@ -613,7 +614,7 @@ const Home: React.FC = () => {
     if (selectedCountry) {
       const beforeCount = displayProducts.length;
       displayProducts = displayProducts.filter((product: FrontendProduct) =>
-        getProductCountry(product.id, product.origin).name === selectedCountry
+        getProductCountry(product.origin).name === selectedCountry
       );
     }
 
@@ -706,14 +707,14 @@ const Home: React.FC = () => {
 
       if (selectedPlaceOfOriginText) {
         products = products.filter(product => {
-          const country = getProductCountry(product.id, product.origin).name;
+          const country = getProductCountry(product.origin).name;
           return country === selectedPlaceOfOriginText;
         });
       }
 
       if (selectedCountry) {
         products = products.filter(product =>
-          getProductCountry(product.id, product.origin).name === selectedCountry
+          getProductCountry(product.origin).name === selectedCountry
         );
       }
 
@@ -753,7 +754,7 @@ const Home: React.FC = () => {
     if (selectedPlaceOfOriginText) {
       const beforeCount = productsToSearch.length;
       productsToSearch = productsToSearch.filter((product: FrontendProduct) => {
-        const country = getProductCountry(product.id, product.origin).name;
+        const country = getProductCountry(product.origin).name;
         return country === selectedPlaceOfOriginText;
       });
     }
@@ -762,7 +763,7 @@ const Home: React.FC = () => {
     if (selectedCountry) {
       const beforeCount = productsToSearch.length;
       productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
-        getProductCountry(product.id, product.origin).name === selectedCountry
+        getProductCountry(product.origin).name === selectedCountry
       );
     }
 
@@ -1056,8 +1057,6 @@ const Home: React.FC = () => {
         status: 'PENDING'
       };
 
-      console.log('Sending request with data:', formData);
-
       const response = await fetch(`${process.env.REACT_APP_API_URL}/request`, {
         method: 'POST',
         headers: {
@@ -1072,7 +1071,6 @@ const Home: React.FC = () => {
         throw new Error(errorData.message || 'Failed to submit request');
       }
       const responseData = await response.json();
-      console.log('Request submitted successfully:', responseData);
 
       // Reset form
       setRequestProductName('');
@@ -1081,7 +1079,7 @@ const Home: React.FC = () => {
       setRequestPriceRange('');
 
       setShowRequestModal(false);
-      navigate('/my-requests');
+      navigate('/requests');
 
     } catch (error: any) {
       console.error('Error submitting request:', error);
@@ -2178,7 +2176,7 @@ const Home: React.FC = () => {
                   const categoryProducts = (allProductsComputed[category] || []);
                   const filteredProducts = selectedCountry
                     ? categoryProducts.filter(product =>
-                      getProductCountry(product.id, product.origin).name === selectedCountry
+                      getProductCountry(product.origin).name === selectedCountry
                     )
                     : categoryProducts;
                   return filteredProducts.length > 0;
@@ -2283,8 +2281,8 @@ const Home: React.FC = () => {
                                 left: window.innerWidth < 640 ? '6px' : '8px'
                               }}>
                                 <img
-                                  src={`https://flagcdn.com/w20/${getProductCountry(product.id, product.origin).code}.png`}
-                                  alt={getProductCountry(product.id, product.origin).name}
+                                  src={`https://flagcdn.com/w20/${getProductCountry(product.origin).code}.png`}
+                                  alt={getProductCountry(product.origin).name}
                                   style={{
                                     width: window.innerWidth < 640 ? '10px' : '12px',
                                     height: window.innerWidth < 640 ? '7px' : '8px',
@@ -2293,7 +2291,7 @@ const Home: React.FC = () => {
                                   }}
                                 />
                                 <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
-                                  {getProductCountry(product.id, product.origin).abbreviation}
+                                  {getProductCountry(product.origin).abbreviation}
                                 </span>
                               </div>
                             </div>
@@ -2396,7 +2394,7 @@ const Home: React.FC = () => {
                     // Filter products by selected country
                     const filteredProducts = selectedCountry
                       ? categoryProducts.filter(product =>
-                        getProductCountry(product.id, product.origin).name === selectedCountry
+                        getProductCountry(product.origin).name === selectedCountry
                       )
                       : categoryProducts;
                     if (filteredProducts.length === 0) return null;
@@ -2460,8 +2458,8 @@ const Home: React.FC = () => {
                                     left: window.innerWidth < 640 ? '6px' : '8px'
                                   }}>
                                     <img
-                                      src={getProductCountry(product.id, product.origin).flag}
-                                      alt={getProductCountry(product.id, product.origin).name}
+                                      src={getProductCountry(product.origin).flag}
+                                      alt={getProductCountry(product.origin).name}
                                       style={{
                                         width: window.innerWidth < 640 ? '10px' : '12px',
                                         height: window.innerWidth < 640 ? '7px' : '8px',
@@ -2470,7 +2468,7 @@ const Home: React.FC = () => {
                                       }}
                                     />
                                     <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
-                                      {getProductCountry(product.id, product.origin).abbreviation}
+                                      {getProductCountry(product.origin).abbreviation}
                                     </span>
                                   </div>
                                 </div>
@@ -2699,8 +2697,8 @@ const Home: React.FC = () => {
                               left: window.innerWidth < 640 ? '6px' : '8px'
                             }}>
                               <img
-                                src={getProductCountry(product.id, product.origin).flag}
-                                alt={getProductCountry(product.id, product.origin).name}
+                                src={getProductCountry(product.origin).flag}
+                                alt={getProductCountry(product.origin).name}
                                 style={{
                                   width: window.innerWidth < 640 ? '10px' : '12px',
                                   height: window.innerWidth < 640 ? '7px' : '8px',
@@ -2709,7 +2707,7 @@ const Home: React.FC = () => {
                                 }}
                               />
                               <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
-                                {getProductCountry(product.id, product.origin).abbreviation}
+                                {getProductCountry(product.origin).abbreviation}
                               </span>
                             </div>
                           </div>
@@ -2826,12 +2824,12 @@ const Home: React.FC = () => {
                         {/* Country Badge */}
                         <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
                           <img
-                            src={getProductCountry(product.id, product.origin).flag}
-                            alt={getProductCountry(product.id, product.origin).name}
+                            src={getProductCountry(product.origin).flag}
+                            alt={getProductCountry(product.origin).name}
                             className="w-3 h-2 object-cover rounded-sm"
                           />
                           <span className="text-xs font-medium text-gray-800">
-                            {getProductCountry(product.id, product.origin).abbreviation}
+                            {getProductCountry(product.origin).abbreviation}
                           </span>
                         </div>
                       </div>
@@ -3123,24 +3121,137 @@ const Home: React.FC = () => {
             {/* Filter and Price Buttons Row - Bottom on Mobile */}
             <div className={window.innerWidth < 640 ? "flex gap-2" : "contents"} style={{ order: window.innerWidth < 640 ? 2 : 1 }}>
               {/* Filter Button */}
+              <div className="relative filter-dropdown hidden md:block">
               <button
-                className="flex items-center border transition-colors hover:bg-gray-50"
+                onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+                className="flex items-center space-x-2 border rounded-lg transition-colors"
                 style={{
+                  padding: '8px 10px',
                   backgroundColor: '#FAFAFA',
                   borderColor: '#E4E4E4',
-                  padding: window.innerWidth < 640 ? '5px 7px' : '8px 10px',
-                  borderRadius: '8px',
-                  fontFamily: 'Poppins, sans-serif',
-                  gap: window.innerWidth < 640 ? '4px' : '6px',
-                  flex: window.innerWidth < 640 ? '0 1 auto' : 'initial',
-                  maxWidth: window.innerWidth < 640 ? '45%' : 'none'
+                  fontFamily: 'Poppins, sans-serif'
                 }}
               >
-                <span style={{ color: '#BABABA', fontSize: window.innerWidth < 640 ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
-                <img src={earthIcon} alt="Globe" style={{ width: window.innerWidth < 640 ? '16px' : '22px', height: window.innerWidth < 640 ? '16px' : '22px' }} />
-                <span style={{ color: '#6A6A6A', fontSize: window.innerWidth < 640 ? '10px' : '14px' }}>Africa</span>
-                <img src={arrowDownIcon} alt="Arrow" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
+                <span className="text-base font-normal" style={{ color: '#BABABA' }}>Filter :</span>
+                <img src={earthIcon} alt="Earth" style={{ width: '22px', height: '22px' }} />
+                <span className="text-base font-medium" style={{ color: '#6A6A6A' }}>{selectedCountry || 'Africa'}</span>
+                <img
+                  src={arrowDownIcon}
+                  alt="Arrow"
+                  className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`}
+                />
               </button>
+
+              {/* Dropdown Menu */}
+              {isFilterDropdownOpen && (
+                <div
+                  className="absolute left-0 bg-white border border-gray-200 z-10"
+                  style={{
+                    width: '200px',
+                    flexShrink: 0,
+                    borderRadius: '16px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    top: '0'
+                  }}
+                >
+                  <style>
+                    {`
+                    .filter-dropdown-scroll::-webkit-scrollbar {
+                      width: 2px;
+                    }
+                    .filter-dropdown-scroll::-webkit-scrollbar-track {
+                      background: transparent;
+                    }
+                    .filter-dropdown-scroll::-webkit-scrollbar-thumb {
+                      background-color: #E4E4E4;
+                      border-radius: 10px;
+                    }
+                  `}
+                  </style>
+
+                  {/* Search Input at Top */}
+                  <div className="px-3 pt-3 pb-2 border-b border-gray-200">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Filter :"
+                        className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none"
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          color: '#6A6A6A',
+                          border: 'none'
+                        }}
+                      />
+                      <button
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                        onClick={() => setIsFilterDropdownOpen(false)}
+                      >
+                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Scrollable Country List */}
+                  <div
+                    className="py-2 overflow-y-auto filter-dropdown-scroll"
+                    style={{
+                      maxHeight: 'calc(6 * 44px)',
+                      scrollbarWidth: 'thin',
+                      scrollbarColor: '#E4E4E4 transparent'
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        setSelectedCountry('');
+                        setIsFilterDropdownOpen(false);
+                      }}
+                      style={{
+                        backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
+                        color: !selectedCountry ? '#64B5F6' : '#BABABA'
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-center">
+                        <img
+                          src={globyIcon}
+                          alt="Globe"
+                          className="w-4 h-4 mr-2"
+                          style={{
+                            filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                          }}
+                        />
+                        <span>Africa</span>
+                      </div>
+                    </button>
+                    {africanCountries.map((country) => (
+                      <button
+                        key={country.name}
+                        onClick={() => {
+                          setSelectedCountry(country.name);
+                          setIsFilterDropdownOpen(false);
+                        }}
+                        style={{
+                          backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
+                          color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                      >
+                        <span className="flex items-center space-x-2">
+                          <img
+                            src={country.flag}
+                            alt={`${country.name} flag`}
+                            className="w-5 h-4 object-cover rounded-sm"
+                          />
+                          <span>{country.name}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
               {/* Price Button */}
               <button
@@ -3216,7 +3327,7 @@ const Home: React.FC = () => {
                           className="px-3 py-1 rounded-lg text-white"
                           style={{ backgroundColor: '#F9A825', fontWeight: 'normal', fontSize: '12px' }}
                           onClick={() => {
-                            navigate('/my-requests')
+                            navigate('/requests')
                           }}
                         >
                           Manage request
@@ -3251,17 +3362,17 @@ const Home: React.FC = () => {
                     </p>
 
                     {/* Price Range */}
-                    {request.minPrice && request.maxPrice && (
-                      <div className="mb-2">
-                        <span style={{
-                          fontSize: window.innerWidth < 640 ? '9px' : '12px',
-                          color: '#333',
-                          fontWeight: '500'
-                        }}>
-                          {request.currency || 'USD'} {request.minPrice} - {request.maxPrice}
-                        </span>
-                      </div>
-                    )}
+                    {/* {request.minPrice && request.maxPrice && (
+                    <div className="mb-2">
+                      <span style={{
+                        fontSize: window.innerWidth < 640 ? '9px' : '12px',
+                        color: '#333',
+                        fontWeight: '500'
+                      }}>
+                        {request.currency || 'USD'} {request.minPrice} - {request.maxPrice}
+                      </span>
+                    </div>
+                  )} */}
 
                     {/* Tags and User Info Row - Desktop/Tablet */}
                     {window.innerWidth >= 640 && (
@@ -3295,7 +3406,7 @@ const Home: React.FC = () => {
                                 className="w-3 h-3"
                                 style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                               />
-                              <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                              <span style={{ fontSize: '12px', color: '#64B5F6' }}>{request ? `${request.minPrice ?? ''} - ${request.maxPrice ?? ''} ${request.currency ?? ''}` : ''}</span>
                             </div>
 
                             {/* Country Tag */}
@@ -3303,12 +3414,19 @@ const Home: React.FC = () => {
                               className="flex items-center gap-1.5 px-3 py-1.5"
                               style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
                             >
-                              <img
-                                src="https://flagcdn.com/w20/za.png"
-                                alt="South Africa"
-                                className="w-4 h-3 object-cover rounded-sm"
-                              />
-                              <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
+                              {(() => {
+                                const country = getProductCountry(request?.origin);
+                                return (
+                                  <>
+                                    <img
+                                      src={country.flag}
+                                      alt={country.name}
+                                      className="w-4 h-3 object-cover rounded-sm"
+                                    />
+                                    <span style={{ fontSize: '12px', color: '#64B5F6' }}>{country.name}</span>
+                                  </>
+                                );
+                              })()}
                             </div>
                           </div>
                         </div>
@@ -3319,10 +3437,18 @@ const Home: React.FC = () => {
                             className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
                             style={{ backgroundColor: '#F7C9B0' }}
                           >
-                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C" />
-                              <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C" />
-                            </svg>
+                            {request && request.user && request.user.profileImage ? (
+                              <img
+                                src={request.user.profileImage}
+                                alt={request.user.firstName || 'User'}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                              />
+                            ) : (
+                              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C" />
+                                <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C" />
+                              </svg>
+                            )}
                           </div>
                           <div
                             className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 border -mt-2"
