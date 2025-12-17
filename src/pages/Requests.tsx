@@ -9,6 +9,8 @@ import moneyIcon from '../assets/images/pre/money.svg';
 import bellIcon from '../assets/images/pre/bm.svg';
 import shareIcon from '../assets/images/pre/Share.svg';
 import requestIcon from '../assets/images/pre/request.svg';
+import bagIcon from '../assets/images/pre/bag.svg';
+import closeIcon from '../assets/images/pre/CLose.svg';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +20,8 @@ const Requests: React.FC = () => {
   const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
   const moreOptionsRef = useRef<HTMLDivElement>(null);
+  const [selectedCard, setSelectedCard] = useState<{ title: string; country: string; flag: string; location: string; description: string } | null>(null);
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -153,19 +157,34 @@ const Requests: React.FC = () => {
     </div>
   );
 
-  const renderRequestCard = (isPending: boolean = false, cardId: string = '', productData?: { title: string; country: string; flag: string; location: string; isPending?: boolean }) => {
+  const renderRequestCard = (isPending: boolean = false, cardId: string = '', productData?: { title: string; country: string; flag: string; location: string; isPending?: boolean; description?: string }) => {
     const defaultProduct = {
       title: 'Snails from South Africa',
       country: 'South Africa',
       flag: 'https://flagcdn.com/w20/za.png',
-      location: 'London, United Kingdom'
+      location: 'London, United Kingdom',
+      description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.'
     };
     const product = productData || defaultProduct;
     const cardIsPending = productData?.isPending !== undefined ? productData.isPending : isPending;
     
     return (
     <div 
-      className="bg-white hover:shadow-md transition-shadow"
+      className="bg-white hover:shadow-md transition-shadow cursor-pointer"
+      onClick={(e) => {
+        // Prevent modal from opening when clicking on buttons inside the card
+        if ((e.target as HTMLElement).closest('button')) {
+          return;
+        }
+        setSelectedCard({
+          title: product.title,
+          country: product.country,
+          flag: product.flag,
+          location: product.location,
+          description: product.description || 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.'
+        });
+        setShowRequestModal(true);
+      }}
       style={{ 
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
         height: 'auto',
@@ -808,9 +827,9 @@ const Requests: React.FC = () => {
                 } : {}}
               >
                 {[
-                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA' },
-                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France' },
-                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada' }
+                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
                 ].map((product, index) => (
                   <React.Fragment key={index}>
                     {renderRequestCard(false, `near-${index}`, product)}
@@ -885,9 +904,9 @@ const Requests: React.FC = () => {
                 } : {}}
               >
                 {[
-                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany' },
-                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia' },
-                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE' }
+                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
                 ].map((product, index) => (
                   <React.Fragment key={index}>
                     {renderRequestCard(true, `pending-${index}`, product)}
@@ -962,12 +981,12 @@ const Requests: React.FC = () => {
                 } : {}}
               >
                 {[
-                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', isPending: false },
-                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', isPending: true },
-                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', isPending: false },
-                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', isPending: true },
-                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', isPending: false },
-                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', isPending: true }
+                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', isPending: false, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', isPending: true, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', isPending: false, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', isPending: true, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', isPending: false, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', isPending: true, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
                 ].map((product, index) => (
                   <React.Fragment key={index}>
                     {renderRequestCard(product.isPending || false, `all-${index}`, { ...product, isPending: product.isPending })}
@@ -981,6 +1000,197 @@ const Requests: React.FC = () => {
           {renderPagination()}
         </div>
       </section>
+
+      {/* Request Detail Modal */}
+      {showRequestModal && selectedCard && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={() => {
+              setShowRequestModal(false);
+              setSelectedCard(null);
+            }}
+          />
+
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 relative max-w-md w-full pb-10"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => {
+                  setShowRequestModal(false);
+                  setSelectedCard(null);
+                }}
+                className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center"
+              >
+                <img
+                  src={closeIcon}
+                  alt="Close"
+                  className="w-5 h-5"
+                />
+              </button>
+
+              {/* Request Badge - Centered */}
+              <div className="flex justify-center mb-4">
+                <span 
+                  style={{ 
+                    fontSize: '10px', 
+                    color: '#BABABA',
+                    border: '1px solid #E1E1E1',
+                    borderRadius: '999px',
+                    padding: '2px 8px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  Request
+                </span>
+              </div>
+
+              {/* Product Name */}
+              <h2
+                className="text-xl text-center mb-3"
+                style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+              >
+                {selectedCard.title}
+              </h2>
+
+              {/* Description */}
+              <p 
+                className="text-sm text-center mb-6"
+                style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+              >
+                {selectedCard.description}
+              </p>
+
+              {/* Three Badges - Same as Buy & Sell Instantly */}
+              <div className="flex flex-col gap-2 mb-6">
+                {/* Location Badge */}
+                <div 
+                  className="flex items-center gap-1 px-2 py-1"
+                  style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                >
+                  <img 
+                    src={locationIcon} 
+                    alt="Location"
+                    className="w-3 h-3"
+                    style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                  />
+                  <span style={{ fontSize: '12px', color: '#64B5F6' }}>{selectedCard.location}</span>
+                </div>
+
+                {/* Price and Country Badges */}
+                <div className="flex gap-2">
+                  {/* Price Badge */}
+                  <div 
+                    className="flex items-center gap-1.5 px-3 py-1.5"
+                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                  >
+                    <img 
+                      src={moneyIcon} 
+                      alt="Money"
+                      className="w-3 h-3"
+                      style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                    />
+                    <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                  </div>
+
+                  {/* Country Badge */}
+                  <div 
+                    className="flex items-center gap-1.5 px-3 py-1.5"
+                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                  >
+                    <img 
+                      src={selectedCard.flag} 
+                      alt={selectedCard.country}
+                      className="w-4 h-3 object-cover rounded-sm"
+                    />
+                    <span style={{ fontSize: '12px', color: '#64B5F6' }}>{selectedCard.country}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gray Divider */}
+              <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9', marginBottom: '16px' }}></div>
+
+              {/* Seller Info Section */}
+              <div className="flex items-center justify-between">
+                {/* Avatar and Info */}
+                <div className="flex items-center gap-3">
+                  {/* Avatar */}
+                  <div 
+                    className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden"
+                    style={{ backgroundColor: '#F7C9B0', border: '2px solid #939393' }}
+                  >
+                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
+                      <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
+                    </svg>
+                  </div>
+
+                  {/* Name and Rating */}
+                  <div className="flex flex-col">
+                    <span style={{ fontSize: '14px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                      Nadine MABE
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg
+                          key={star}
+                          width="12"
+                          height="12"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M6 0L7.5 4.5L12 4.5L8.25 7.5L9.75 12L6 9L2.25 12L3.75 7.5L0 4.5L4.5 4.5L6 0Z"
+                            fill="#F9A825"
+                          />
+                        </svg>
+                      ))}
+                      <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', marginLeft: '4px' }}>
+                        4.3
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Message Buyer Button */}
+                <button
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg"
+                  style={{
+                    backgroundColor: '#F9A825',
+                    color: '#FFFFFF',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    // Handle message buyer action
+                    console.log('Message buyer clicked');
+                  }}
+                >
+                  <img 
+                    src={bagIcon} 
+                    alt="Cart" 
+                    className="w-4 h-4"
+                    style={{ filter: 'brightness(0) invert(1)' }}
+                  />
+                  <span>Message Buyer</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
