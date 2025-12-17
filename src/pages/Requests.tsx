@@ -651,9 +651,9 @@ const Requests: React.FC = () => {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Breadcrumbs */}
-      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '0px', marginBottom: '-24px' }}>
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-          <nav className="flex items-center space-x-2" style={{ fontSize: '13px' }}>
+      <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '0px', marginBottom: '-48px' }}>
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16" style={{ paddingLeft: '0px' }}>
+          <nav className="flex items-center space-x-2" style={{ fontSize: '13px', marginLeft: '0px' }}>
             <img 
               src={arrowLeftIcon} 
               alt="Back" 
