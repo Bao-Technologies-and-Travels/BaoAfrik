@@ -1045,7 +1045,7 @@ const Requests: React.FC = () => {
                     color: '#BABABA',
                     border: '1.5px solid #E1E1E1',
                     borderRadius: '999px',
-                    padding: '2px 8px',
+                    padding: '2px 12px',
                     fontFamily: 'Poppins, sans-serif'
                   }}
                 >
@@ -1152,6 +1152,7 @@ const Requests: React.FC = () => {
                           <path
                             d="M6 0L7.5 4.5L12 4.5L8.25 7.5L9.75 12L6 9L2.25 12L3.75 7.5L0 4.5L4.5 4.5L6 0Z"
                             fill={star === 5 ? '#B0B0B0' : '#F9A825'}
+                            style={{ strokeLinejoin: 'round', strokeLinecap: 'round' }}
                           />
                         </svg>
                       ))}
@@ -1164,7 +1165,7 @@ const Requests: React.FC = () => {
 
                 {/* Message Buyer Button */}
                 <button
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
                   style={{
                     backgroundColor: '#F9A825',
                     color: '#FFFFFF',
