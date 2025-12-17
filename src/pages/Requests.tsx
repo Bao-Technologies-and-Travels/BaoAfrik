@@ -308,14 +308,14 @@ const Requests: React.FC = () => {
           <div 
             className="absolute left-0 bg-white z-10 mt-2"
             style={{ 
-              width: '200px', 
+              width: '180px', 
               flexShrink: 0, 
               borderRadius: '16px',
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
               border: '1px solid #E9E9E9'
             }}
           >
-            <div className="py-2">
+            <div className="py-1.5">
               {priceOptions.map((option) => (
                 <button
                   key={option.value}
@@ -324,12 +324,25 @@ const Requests: React.FC = () => {
                     setOpenPriceDropdown(null);
                   }}
                   style={{
-                    backgroundColor: selectedPrice === option.value ? '#F0F8FE' : 'transparent',
                     color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0'
                   }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 transition-colors relative"
                 >
-                  {option.label}
+                  {selectedPrice === option.value && (
+                    <div 
+                      style={{
+                        position: 'absolute',
+                        left: '8px',
+                        right: '8px',
+                        top: '2px',
+                        bottom: '2px',
+                        backgroundColor: '#F0F8FE',
+                        borderRadius: '8px',
+                        zIndex: -1
+                      }}
+                    />
+                  )}
+                  <span style={{ position: 'relative', zIndex: 1 }}>{option.label}</span>
                 </button>
               ))}
             </div>
@@ -1063,23 +1076,69 @@ const Requests: React.FC = () => {
               </p>
             </div>
             {/* Search Bar or Over 400 requests available */}
-            {(selectedCountry || selectedPrice) && getFilteredCount() === 0 ? (
-              <div className="text-right" style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
-                <div style={{ 
-                  fontSize: isMobile ? '20px' : '44px', 
-                  fontWeight: '600',
-                  background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}>
-                  Over 400
+            {(selectedCountry || selectedPrice) ? (
+              // When filters are applied, show search bar in header (only if there are results)
+              getFilteredCount() === 0 ? (
+                // No results: show "Over 400 requests available"
+                <div className="text-right" style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
+                  <div style={{ 
+                    fontSize: isMobile ? '20px' : '44px', 
+                    fontWeight: '600',
+                    background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}>
+                    Over 400
+                  </div>
+                  <div style={{ fontSize: isMobile ? '10px' : '18px', color: '#9C9C9C', marginTop: '4px' }}>
+                    Request availables
+                  </div>
                 </div>
-                <div style={{ fontSize: isMobile ? '10px' : '18px', color: '#9C9C9C', marginTop: '4px' }}>
-                  Request availables
+              ) : (
+                // Has results: show search bar in header
+                <div style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
+                  <div className="relative flex items-center">
+                    <img 
+                      src={locationIcon} 
+                      alt="Location"
+                      className="absolute left-3"
+                      style={{ 
+                        width: '16px', 
+                        height: '16px',
+                        filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                      }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Buyer location ?"
+                      className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 pl-10"
+                      style={{ 
+                        backgroundColor: '#FFFFFF',
+                        borderColor: '#E4E4E4',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '10px' : '14px',
+                        color: '#D9D9D9',
+                        padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
+                      }}
+                    />
+                    <div 
+                      className="absolute right-2 flex items-center justify-center"
+                      style={{ 
+                        backgroundColor: '#F9A825',
+                        height: isMobile ? '20px' : '28px',
+                        paddingLeft: isMobile ? '10px' : '18px',
+                        paddingRight: isMobile ? '10px' : '18px',
+                        borderRadius: '8px'
+                      }}
+                    >
+                      <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )
             ) : (
+              // No filters: show search bar normally
               <div style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
                 <div className="relative flex items-center">
                   <img 
@@ -1125,7 +1184,7 @@ const Requests: React.FC = () => {
           {/* Filtered View or Regular Sections */}
           {(selectedCountry || selectedPrice) ? (
             <>
-              {/* Filter Bar - No Results Layout */}
+              {/* Filter Bar */}
               <div className={isMobile ? "flex flex-col gap-4 mb-6" : "flex items-center justify-between mb-6"}>
                 {/* Left: Filters */}
                 <div className="flex items-center gap-2">
@@ -1133,47 +1192,48 @@ const Requests: React.FC = () => {
                   {renderPriceFilterButton('relative', 'filtered')}
                 </div>
 
-                {/* Right: Search Bar */}
-                <div style={{ width: isMobile ? '100%' : '380px', marginLeft: isMobile ? '0' : 'auto' }}>
-                  <div className="relative flex items-center">
-                    <img 
-                      src={locationIcon} 
-                      alt="Location"
-                      className="absolute left-3"
-                      style={{ 
-                        width: '16px', 
-                        height: '16px',
-                        filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                      }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Buyer location ?"
-                      className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 pl-10"
-                      style={{ 
-                        backgroundColor: '#FFFFFF',
-                        borderColor: '#E4E4E4',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: isMobile ? '10px' : '14px',
-                        color: '#D9D9D9',
-                        padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                      }}
-                    />
-                    <div 
-                      className="absolute right-2 flex items-center justify-center"
-                      style={{ 
-                        backgroundColor: '#F9A825',
-                        height: isMobile ? '20px' : '28px',
-                        paddingLeft: isMobile ? '10px' : '18px',
-                        paddingRight: isMobile ? '10px' : '18px',
-                        borderRadius: '8px'
-                      }}
-                    >
-                      <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                {/* Right: Search Bar - Only show when no results */}
+                {getFilteredCount() === 0 && (
+                  <div style={{ width: isMobile ? '100%' : '380px', marginLeft: isMobile ? '0' : 'auto' }}>
+                    <div className="relative flex items-center">
+                      <img 
+                        src={locationIcon} 
+                        alt="Location"
+                        className="absolute left-3"
+                        style={{ 
+                          width: '16px', 
+                          height: '16px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Buyer location ?"
+                        className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 pl-10"
+                        style={{ 
+                          backgroundColor: '#FFFFFF',
+                          borderColor: '#E4E4E4',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: isMobile ? '10px' : '14px',
+                          color: '#D9D9D9',
+                          padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
+                        }}
+                      />
+                      <div 
+                        className="absolute right-2 flex items-center justify-center"
+                        style={{ 
+                          backgroundColor: '#F9A825',
+                          height: isMobile ? '20px' : '28px',
+                          paddingLeft: isMobile ? '10px' : '18px',
+                          paddingRight: isMobile ? '10px' : '18px',
+                          borderRadius: '8px'
+                        }}
+                      >
+                        <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                      </div>
                     </div>
                   </div>
-                </div>
-
+                )}
               </div>
 
               {/* Check if no results */}
