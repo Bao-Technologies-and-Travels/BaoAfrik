@@ -11,6 +11,7 @@ import shareIcon from '../assets/images/pre/Share.svg';
 import requestIcon from '../assets/images/pre/request.svg';
 import bagIcon from '../assets/images/pre/bag.svg';
 import closeIcon from '../assets/images/pre/CLose.svg';
+import basketIcon from '../assets/images/pre/basket.png';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -1017,7 +1018,7 @@ const Requests: React.FC = () => {
           {/* Modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
-              className="bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 relative max-w-md w-full pb-10"
+              className="bg-white rounded-[30px] pt-8 sm:pt-10 px-5 sm:px-6 relative max-w-sm w-full pb-8"
               style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -1027,22 +1028,22 @@ const Requests: React.FC = () => {
                   setShowRequestModal(false);
                   setSelectedCard(null);
                 }}
-                className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center"
+                className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
               >
                 <img
                   src={closeIcon}
                   alt="Close"
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                 />
               </button>
 
               {/* Request Badge - Centered */}
-              <div className="flex justify-center mb-4">
+              <div className="flex justify-center mb-3">
                 <span 
                   style={{ 
                     fontSize: '10px', 
                     color: '#BABABA',
-                    border: '1px solid #E1E1E1',
+                    border: '1.5px solid #E1E1E1',
                     borderRadius: '999px',
                     padding: '2px 8px',
                     fontFamily: 'Poppins, sans-serif'
@@ -1054,7 +1055,7 @@ const Requests: React.FC = () => {
 
               {/* Product Name */}
               <h2
-                className="text-xl text-center mb-3"
+                className="text-lg text-center mb-2"
                 style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
               >
                 {selectedCard.title}
@@ -1062,17 +1063,17 @@ const Requests: React.FC = () => {
 
               {/* Description */}
               <p 
-                className="text-sm text-center mb-6"
-                style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+                className="text-xs text-center mb-5"
+                style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
               >
                 {selectedCard.description}
               </p>
 
-              {/* Three Badges - Same as Buy & Sell Instantly */}
-              <div className="flex flex-col gap-2 mb-6">
+              {/* Three Badges - Centered */}
+              <div className="flex flex-col items-center gap-2 mb-5">
                 {/* Location Badge */}
                 <div 
-                  className="flex items-center gap-1 px-2 py-1"
+                  className="flex items-center justify-center gap-1 px-2 py-1"
                   style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
                 >
                   <img 
@@ -1081,11 +1082,11 @@ const Requests: React.FC = () => {
                     className="w-3 h-3"
                     style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                   />
-                  <span style={{ fontSize: '12px', color: '#64B5F6' }}>{selectedCard.location}</span>
+                  <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.location}</span>
                 </div>
 
                 {/* Price and Country Badges */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 justify-center">
                   {/* Price Badge */}
                   <div 
                     className="flex items-center gap-1.5 px-3 py-1.5"
@@ -1097,7 +1098,7 @@ const Requests: React.FC = () => {
                       className="w-3 h-3"
                       style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                     />
-                    <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>50 - 100 USD</span>
                   </div>
 
                   {/* Country Badge */}
@@ -1108,26 +1109,26 @@ const Requests: React.FC = () => {
                     <img 
                       src={selectedCard.flag} 
                       alt={selectedCard.country}
-                      className="w-4 h-3 object-cover rounded-sm"
+                      className="w-4 h-4 object-cover rounded-full"
                     />
-                    <span style={{ fontSize: '12px', color: '#64B5F6' }}>{selectedCard.country}</span>
+                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.country}</span>
                   </div>
                 </div>
               </div>
 
               {/* Gray Divider */}
-              <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9', marginBottom: '16px' }}></div>
+              <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9', marginBottom: '12px' }}></div>
 
               {/* Seller Info Section */}
               <div className="flex items-center justify-between">
                 {/* Avatar and Info */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   {/* Avatar */}
                   <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden"
+                    className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden"
                     style={{ backgroundColor: '#F7C9B0', border: '2px solid #939393' }}
                   >
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
                       <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
                     </svg>
@@ -1135,26 +1136,26 @@ const Requests: React.FC = () => {
 
                   {/* Name and Rating */}
                   <div className="flex flex-col">
-                    <span style={{ fontSize: '14px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                    <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
                       Nadine MABE
                     </span>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <svg
                           key={star}
-                          width="12"
-                          height="12"
+                          width="11"
+                          height="11"
                           viewBox="0 0 12 12"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
                             d="M6 0L7.5 4.5L12 4.5L8.25 7.5L9.75 12L6 9L2.25 12L3.75 7.5L0 4.5L4.5 4.5L6 0Z"
-                            fill="#F9A825"
+                            fill={star === 5 ? '#B0B0B0' : '#F9A825'}
                           />
                         </svg>
                       ))}
-                      <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', marginLeft: '4px' }}>
+                      <span style={{ fontSize: '11px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', marginLeft: '4px' }}>
                         4.3
                       </span>
                     </div>
@@ -1163,15 +1164,16 @@ const Requests: React.FC = () => {
 
                 {/* Message Buyer Button */}
                 <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                   style={{
                     backgroundColor: '#F9A825',
                     color: '#FFFFFF',
                     fontFamily: 'Poppins, sans-serif',
-                    fontSize: '13px',
-                    fontWeight: 500,
+                    fontSize: '12px',
+                    fontWeight: 400,
                     border: 'none',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    height: 'auto'
                   }}
                   onClick={() => {
                     // Handle message buyer action
@@ -1179,7 +1181,7 @@ const Requests: React.FC = () => {
                   }}
                 >
                   <img 
-                    src={bagIcon} 
+                    src={basketIcon} 
                     alt="Cart" 
                     className="w-4 h-4"
                     style={{ filter: 'brightness(0) invert(1)' }}
