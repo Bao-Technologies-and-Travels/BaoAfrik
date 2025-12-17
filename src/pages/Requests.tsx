@@ -12,6 +12,7 @@ import requestIcon from '../assets/images/pre/request.svg';
 import bagIcon from '../assets/images/pre/bag.svg';
 import closeIcon from '../assets/images/pre/CLose.svg';
 import basketIcon from '../assets/images/pre/basket.png';
+import globyIcon from '../assets/images/pre/globy.svg';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +24,36 @@ const Requests: React.FC = () => {
   const moreOptionsRef = useRef<HTMLDivElement>(null);
   const [selectedCard, setSelectedCard] = useState<{ title: string; country: string; flag: string; location: string; description: string } | null>(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+
+  const africanCountries = [
+    { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png' },
+    { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png' },
+    { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png' },
+    { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png' },
+    { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png' },
+    { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png' },
+    { name: 'Congo', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png' },
+    { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png' },
+    { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png' },
+    { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png' },
+    { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png' },
+    { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png' },
+    { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png' },
+    { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png' },
+    { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png' },
+    { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png' },
+    { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png' },
+    { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png' },
+    { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png' },
+    { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png' },
+    { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png' },
+    { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png' },
+    { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png' },
+    { name: 'Zambia', code: 'zm', flag: 'https://flagcdn.com/w20/zm.png' }
+  ];
 
   useEffect(() => {
     const checkMobile = () => {
@@ -37,6 +68,9 @@ const Requests: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (moreOptionsRef.current && !moreOptionsRef.current.contains(event.target as Node)) {
         setMoreOptionsOpenFor(null);
+      }
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setIsFilterDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -157,6 +191,175 @@ const Requests: React.FC = () => {
       </div>
     </div>
   );
+
+  // Get total filtered count
+  const getFilteredCount = () => {
+    const allCards = [
+      { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+      { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+      { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+      { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+      { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+      { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
+    ];
+    if (!selectedCountry) return allCards.length;
+    return allCards.filter(card => card.country === selectedCountry).length;
+  };
+
+  // Render country filter button with dropdown
+  const renderCountryFilterButton = (position: 'relative' | 'absolute' = 'relative') => {
+    const selectedCountryData = selectedCountry ? africanCountries.find(c => c.name === selectedCountry) : null;
+    
+    return (
+      <div ref={filterDropdownRef} style={{ position, zIndex: 20 }}>
+        {selectedCountry ? (
+          // Selected country pill
+          <div 
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            style={{ 
+              backgroundColor: '#F0F8FE',
+              width: 'fit-content'
+            }}
+          >
+            <img 
+              src={selectedCountryData?.flag || ''} 
+              alt={selectedCountry}
+              className="w-4 h-4 object-cover rounded-full"
+            />
+            <span style={{ color: '#64B5F6', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+              {selectedCountry}
+            </span>
+            <button
+              onClick={() => setSelectedCountry('')}
+              className="flex items-center justify-center"
+              style={{ 
+                width: '16px', 
+                height: '16px',
+                cursor: 'pointer'
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 3L3 9M3 3L9 9" stroke="#64B5F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        ) : (
+          // Filter button
+          <button 
+            onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+            className="flex items-center border transition-colors hover:bg-gray-50"
+            style={{ 
+              backgroundColor: '#FAFAFA',
+              borderColor: '#E4E4E4',
+              padding: isMobile ? '5px 7px' : '7px 10px',
+              borderRadius: '8px',
+              fontFamily: 'Poppins, sans-serif',
+              gap: isMobile ? '4px' : '6px'
+            }}
+          >
+            <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
+            <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
+            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
+            <img 
+              src={arrowDownIcon} 
+              alt="Arrow" 
+              style={{ 
+                width: isMobile ? '12px' : '16px', 
+                height: isMobile ? '12px' : '16px',
+                transform: isFilterDropdownOpen ? 'rotate(180deg)' : 'none',
+                transition: 'transform 0.2s'
+              }} 
+            />
+          </button>
+        )}
+        
+        {/* Dropdown Menu */}
+        {isFilterDropdownOpen && !selectedCountry && (
+          <div 
+            className="absolute left-0 bg-white border border-gray-200 z-10 mt-2"
+            style={{ 
+              width: '200px', 
+              flexShrink: 0, 
+              borderRadius: '16px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+            }}
+          >
+            <style>
+              {`
+                .filter-dropdown-scroll::-webkit-scrollbar {
+                  width: 2px;
+                }
+                .filter-dropdown-scroll::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                .filter-dropdown-scroll::-webkit-scrollbar-thumb {
+                  background-color: #E4E4E4;
+                  border-radius: 10px;
+                }
+              `}
+            </style>
+            
+            {/* Scrollable Country List */}
+            <div 
+              className="py-2 overflow-y-auto filter-dropdown-scroll"
+              style={{
+                maxHeight: 'calc(6 * 44px)',
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#E4E4E4 transparent'
+              }}
+            >
+              <button
+                onClick={() => {
+                  setSelectedCountry('');
+                  setIsFilterDropdownOpen(false);
+                }}
+                style={{
+                  backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
+                  color: !selectedCountry ? '#64B5F6' : '#BABABA'
+                }}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center">
+                  <img 
+                    src={globyIcon} 
+                    alt="Globe"
+                    className="w-4 h-4 mr-2"
+                    style={{
+                      filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                    }}
+                  />
+                  <span>Africa</span>
+                </div>
+              </button>
+              {africanCountries.map((country) => (
+                <button
+                  key={country.name}
+                  onClick={() => {
+                    setSelectedCountry(country.name);
+                    setIsFilterDropdownOpen(false);
+                  }}
+                  style={{
+                    backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
+                    color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                >
+                  <span className="flex items-center space-x-2">
+                    <img 
+                      src={country.flag} 
+                      alt={`${country.name} flag`}
+                      className="w-5 h-4 object-cover rounded-full"
+                    />
+                    <span>{country.name}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderRequestCard = (isPending: boolean = false, cardId: string = '', productData?: { title: string; country: string; flag: string; location: string; isPending?: boolean; description?: string }) => {
     const defaultProduct = {
@@ -584,6 +787,7 @@ const Requests: React.FC = () => {
               <img 
                 src={product.flag} 
                 alt={product.country}
+                className="rounded-full"
                 style={{ 
                   width: '11px',
                   height: '11px',
@@ -763,51 +967,112 @@ const Requests: React.FC = () => {
             </div>
           </div>
 
-          {/* Requests near you Section */}
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h3 style={{ 
-                fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: isMobile ? '14px' : '18px',
-                fontWeight: '500',
-                color: '#000000'
-              }}>
-                Requests near you
-              </h3>
-              <div className="flex items-center gap-2">
-                <button 
-                  className="flex items-center border transition-colors hover:bg-gray-50"
-                  style={{ 
-                    backgroundColor: '#FAFAFA',
-                    borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 7px' : '7px 10px',
-                    borderRadius: '8px',
-                    fontFamily: 'Poppins, sans-serif',
-                    gap: isMobile ? '4px' : '6px'
-                  }}
-                >
-                  <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
-                  <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
-                  <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
-                  <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                </button>
-                <button 
-                  className="flex items-center border transition-colors hover:bg-gray-50"
-                  style={{ 
-                    backgroundColor: '#FAFAFA',
-                    borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 8px' : '7px 14px',
-                    borderRadius: '8px',
-                    fontFamily: 'Poppins, sans-serif',
-                    gap: isMobile ? '4px' : '6px'
-                  }}
-                >
-                  <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
-                  <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
-                  <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                </button>
+          {/* Filtered View or Regular Sections */}
+          {selectedCountry ? (
+            <>
+              {/* Filter Bar */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  {renderCountryFilterButton('relative')}
+                  <button 
+                    className="flex items-center border transition-colors hover:bg-gray-50"
+                    style={{ 
+                      backgroundColor: '#FAFAFA',
+                      borderColor: '#E4E4E4',
+                      padding: isMobile ? '5px 8px' : '7px 14px',
+                      borderRadius: '8px',
+                      fontFamily: 'Poppins, sans-serif',
+                      gap: isMobile ? '4px' : '6px'
+                    }}
+                  >
+                    <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
+                    <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
+                    <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                  </button>
+                </div>
               </div>
-            </div>
+
+              {/* Filtered Title */}
+              <h3 
+                className="mb-6"
+                style={{ 
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontSize: isMobile ? '16px' : '20px',
+                  fontWeight: '500',
+                  color: '#000000'
+                }}
+              >
+                Request from {selectedCountry} ({getFilteredCount()} requests)
+              </h3>
+
+              {/* Filtered Cards */}
+              <div className="relative">
+                {!isMobile && (
+                  <div 
+                    className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                    style={{
+                      background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                      height: '100%'
+                    }}
+                  />
+                )}
+                <div 
+                  className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                  style={isMobile ? { 
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    WebkitOverflowScrolling: 'touch'
+                  } : {}}
+                >
+                  {[
+                    { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                    { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                    { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                    { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                    { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
+                    { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
+                  ]
+                    .filter(card => card.country === selectedCountry)
+                    .map((product, index) => (
+                      <React.Fragment key={index}>
+                        {renderRequestCard(false, `filtered-${index}`, product)}
+                      </React.Fragment>
+                    ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Requests near you Section */}
+              <div className="mb-12">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 style={{ 
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontSize: isMobile ? '14px' : '18px',
+                    fontWeight: '500',
+                    color: '#000000'
+                  }}>
+                    Requests near you
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    {renderCountryFilterButton('relative')}
+                    <button 
+                      className="flex items-center border transition-colors hover:bg-gray-50"
+                      style={{ 
+                        backgroundColor: '#FAFAFA',
+                        borderColor: '#E4E4E4',
+                        padding: isMobile ? '5px 8px' : '7px 14px',
+                        borderRadius: '8px',
+                        fontFamily: 'Poppins, sans-serif',
+                        gap: isMobile ? '4px' : '6px'
+                      }}
+                    >
+                      <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
+                      <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
+                      <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                    </button>
+                  </div>
+                </div>
             <div className="relative">
               {/* Fade effect on the right - Desktop only */}
               {!isMobile && (
@@ -852,22 +1117,7 @@ const Requests: React.FC = () => {
                 Pending requests
               </h3>
               <div className="flex items-center gap-2">
-                <button 
-                  className="flex items-center border transition-colors hover:bg-gray-50"
-                  style={{ 
-                    backgroundColor: '#FAFAFA',
-                    borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 7px' : '7px 10px',
-                    borderRadius: '8px',
-                    fontFamily: 'Poppins, sans-serif',
-                    gap: isMobile ? '4px' : '6px'
-                  }}
-                >
-                  <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
-                  <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
-                  <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
-                  <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                </button>
+                {renderCountryFilterButton('relative')}
                 <button 
                   className="flex items-center border transition-colors hover:bg-gray-50"
                   style={{ 
@@ -929,22 +1179,7 @@ const Requests: React.FC = () => {
                 All requests
               </h3>
               <div className="flex items-center gap-2">
-                <button 
-                  className="flex items-center border transition-colors hover:bg-gray-50"
-                  style={{ 
-                    backgroundColor: '#FAFAFA',
-                    borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 7px' : '7px 10px',
-                    borderRadius: '8px',
-                    fontFamily: 'Poppins, sans-serif',
-                    gap: isMobile ? '4px' : '6px'
-                  }}
-                >
-                  <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
-                  <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
-                  <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
-                  <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                </button>
+                {renderCountryFilterButton('relative')}
                 <button 
                   className="flex items-center border transition-colors hover:bg-gray-50"
                   style={{ 
@@ -999,6 +1234,8 @@ const Requests: React.FC = () => {
 
           {/* Pagination */}
           {renderPagination()}
+            </>
+          )}
         </div>
       </section>
 
