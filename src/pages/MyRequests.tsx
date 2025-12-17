@@ -12,6 +12,9 @@ import bulletIcon from '../assets/images/pre/bullet.svg';
 import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 import backArrowIcon from '../assets/images/pre/back arrow.svg';
 import statusIcon from '../assets/images/pre/status.svg';
+import lilLogo from '../assets/images/pre/lil.png';
+import activeIcon from '../assets/images/pre/active.svg';
+import inactiveIcon from '../assets/images/pre/inactive.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -86,6 +89,102 @@ const sortOptions: SortOption[] = [
   }
 ];
 
+const getParentKeyByValue = (value: SortValue): string | null => {
+  for (const option of sortOptions) {
+    for (const child of option.children) {
+      if (child.value === value) return option.key;
+    }
+  }
+  return null;
+};
+
+const getSecondaryKeyByValue = (value: SortValue): string | null => {
+  for (const option of sortOptions) {
+    for (const child of option.children) {
+      if (child.value === value) return child.key;
+    }
+  }
+  return null;
+};
+
+const getSortSelectionDetails = (value: SortValue) => {
+  for (const option of sortOptions) {
+    for (const child of option.children) {
+      if (child.value === value) {
+        return {
+          primary: option,
+          secondaryLabel: child.label,
+          tertiaryLabel: null as string | null
+        };
+      }
+    }
+  }
+  return null;
+};
+
+const renderSortIcon = (option: SortOption, isSelected: boolean) => {
+  const color = isSelected ? '#64B5F6' : '#939393';
+  if (option.icon && option.key !== 'date') {
+    return (
+      <img
+        src={option.icon}
+        alt={option.label}
+        className="w-4 h-4"
+        style={{
+          filter: isSelected
+            ? 'brightness(0) saturate(100%) invert(65%) sepia(33%) saturate(417%) hue-rotate(176deg) brightness(96%) contrast(96%)'
+            : 'grayscale(100%) opacity(0.5)'
+        }}
+      />
+    );
+  }
+  if (option.key === 'date') {
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="1.5" />
+        <path d="M12 7v5l3 2" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  return null;
+};
+
+const badgeStyles = (filter: Exclude<StatusFilter, 'All Status'>) => {
+  if (filter === 'Ongoing') {
+    return {
+      bg: '#F0F8FE',
+      color: '#64B5F6',
+      icon: null
+    };
+  }
+  if (filter === 'Pending') {
+    return {
+      bg: '#F4F4F4',
+      color: '#6A6A6A',
+      icon: null
+    };
+  }
+  if (filter === 'Completed') {
+    return {
+      bg: '#EDFBF0',
+      color: '#4CD964',
+      icon: null
+    };
+  }
+  if (filter === 'Expired') {
+    return {
+      bg: '#FFE9E9',
+      color: '#FF5151',
+      icon: null
+    };
+  }
+  return {
+    bg: '#F4F4F4',
+    color: '#939393',
+    icon: null
+  };
+};
+
 const MyRequests: React.FC = () => {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
@@ -96,6 +195,8 @@ const MyRequests: React.FC = () => {
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const statusDropdownRef = useRef<HTMLDivElement | null>(null);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [hoveredPrimarySort, setHoveredPrimarySort] = useState<string | null>(null);
+  const [hoveredSecondarySort, setHoveredSecondarySort] = useState<string | null>(null);
   const [selectedSort, setSelectedSort] = useState<{ label: string; value: SortValue } | null>(null);
   const sortDropdownRef = useRef<HTMLDivElement | null>(null);
   const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
@@ -109,6 +210,13 @@ const MyRequests: React.FC = () => {
     { id: '4', title: 'Craft Beers', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Benin', originFlag: 'https://flagcdn.com/w20/bj.png', price: '30 - 60 USD', status: 'expired' },
     { id: '5', title: 'Exotic Fruits', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Nigeria', originFlag: 'https://flagcdn.com/w20/ng.png', price: '25 - 50 USD', status: 'ongoing' },
     { id: '6', title: 'Rare Spices', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Morocco', originFlag: 'https://flagcdn.com/w20/ma.png', price: '35 - 70 USD', status: 'pending' },
+    { id: '7', title: 'Premium Coffee Beans', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ethiopia', originFlag: 'https://flagcdn.com/w20/et.png', price: '60 - 120 USD', status: 'completed' },
+    { id: '8', title: 'Traditional Kente Fabric', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ghana', originFlag: 'https://flagcdn.com/w20/gh.png', price: '45 - 85 USD', status: 'ongoing' },
+    { id: '9', title: 'Shea Butter Products', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Nigeria', originFlag: 'https://flagcdn.com/w20/ng.png', price: '20 - 40 USD', status: 'pending' },
+    { id: '10', title: 'African Black Soap', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ghana', originFlag: 'https://flagcdn.com/w20/gh.png', price: '8 - 15 USD', status: 'expired' },
+    { id: '11', title: 'Baobab Powder', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Senegal', originFlag: 'https://flagcdn.com/w20/sn.png', price: '55 - 110 USD', status: 'completed' },
+    { id: '12', title: 'Moroccan Argan Oil', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Morocco', originFlag: 'https://flagcdn.com/w20/ma.png', price: '75 - 150 USD', status: 'ongoing' },
+    { id: '13', title: 'Desert Salt', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Senegal', originFlag: 'https://flagcdn.com/w20/sn.png', price: '12 - 25 USD', status: 'pending' },
   ];
   const [requests, setRequests] = useState<Request[]>(initialRequests);
 
@@ -194,7 +302,24 @@ const MyRequests: React.FC = () => {
       event.stopPropagation();
     }
     setSelectedSort(null);
+    setHoveredPrimarySort(null);
+    setHoveredSecondarySort(null);
   };
+
+  const selectedPrimaryKey = selectedSort ? getParentKeyByValue(selectedSort.value) : null;
+  const selectedSecondaryKey = selectedSort ? getSecondaryKeyByValue(selectedSort.value) : null;
+  const selectedSortDetails = selectedSort ? getSortSelectionDetails(selectedSort.value) : null;
+  const resolvedPrimaryKey = hoveredPrimarySort ?? selectedPrimaryKey ?? sortOptions[0].key;
+  const resolvedPrimaryIndex = sortOptions.findIndex((option) => option.key === resolvedPrimaryKey);
+  const secondaryOptions = sortOptions[resolvedPrimaryIndex]?.children ?? sortOptions[0].children;
+  const resolvedSecondaryKey = hoveredSecondarySort ?? selectedSecondaryKey ?? secondaryOptions[0]?.key ?? null;
+  const resolvedSecondaryIndex = secondaryOptions.findIndex((child) => child.key === resolvedSecondaryKey);
+  const secondaryPanelWidths: Record<string, number> = {
+    date: 95,
+    name: 90,
+    price: 150
+  };
+  const secondaryPanelWidth = secondaryPanelWidths[resolvedPrimaryKey] ?? 130;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -205,6 +330,7 @@ const MyRequests: React.FC = () => {
       }
       if (sortDropdownRef.current && !sortDropdownRef.current.contains(target)) {
         setIsSortDropdownOpen(false);
+        setHoveredSecondarySort(null);
       }
       if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
         setMoreOptionsOpenFor(null);
@@ -242,36 +368,16 @@ const MyRequests: React.FC = () => {
 
     const config = statusConfig[status];
     
-    // Pending status should not have a dropdown arrow (based on Requests page)
-    const showArrow = status !== 'pending';
-    
-    // For pending, the badge should be simpler (no arrow)
-    if (status === 'pending') {
-      return (
-        <div
-          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md"
-          style={{
-            backgroundColor: config.bgColor,
-            fontSize: '10px'
-          }}
-        >
-          <span
-            style={{
-              color: config.textColor,
-              fontFamily: 'Poppins, sans-serif'
-            }}
-          >
-            {config.text}
-          </span>
-        </div>
-      );
-    }
     return (
       <div
-        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full"
+        className="inline-flex items-center gap-1 px-2.5 rounded-full"
         style={{
           backgroundColor: config.bgColor,
-          fontSize: '10px'
+          fontSize: '10px',
+          borderRadius: '12px',
+          paddingTop: '4px',
+          paddingBottom: '6px',
+          height: '24px'
         }}
       >
         <span
@@ -282,11 +388,9 @@ const MyRequests: React.FC = () => {
         >
           {config.text}
         </span>
-        {showArrow && (
-          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        )}
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
       </div>
     );
   };
@@ -304,14 +408,14 @@ const MyRequests: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr 0.5fr',
+          gridTemplateColumns: '1.2fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
           gap: '16px',
           padding: '16px 20px'
         }}
       >
         {/* Column 1: Creation date */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 400 }}>Creation date</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+          <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 400 }}>Creation date</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
@@ -322,8 +426,8 @@ const MyRequests: React.FC = () => {
           </div>
         </div>
         {/* Column 2: Product Name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Product Name</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+          <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Product Name</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
@@ -334,8 +438,8 @@ const MyRequests: React.FC = () => {
           </div>
         </div>
         {/* Column 3: Location */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Location</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+          <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Location</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
@@ -346,8 +450,8 @@ const MyRequests: React.FC = () => {
           </div>
         </div>
         {/* Column 4: Origin Of Product */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Origin Of Product</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+          <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Origin Of Product</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
@@ -358,8 +462,8 @@ const MyRequests: React.FC = () => {
           </div>
         </div>
         {/* Column 5: Price */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Price</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+          <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Price</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
@@ -370,8 +474,8 @@ const MyRequests: React.FC = () => {
           </div>
         </div>
         {/* Column 6: Status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Status</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+          <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Status</span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <svg width="8" height="4" viewBox="0 0 8 4" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 0L7.4641 3.5H0.535898L4 0Z" stroke="#939393" strokeWidth="1" fill="none" />
@@ -381,9 +485,8 @@ const MyRequests: React.FC = () => {
             </svg>
           </div>
         </div>
-        {/* Column 7: Actions */}
+        {/* Column 7: More Options - No title */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>Actions</span>
         </div>
       </div>
       {/* Header Divider */}
@@ -395,28 +498,28 @@ const MyRequests: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr 0.5fr',
+              gridTemplateColumns: '1.2fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
               gap: '16px',
               padding: '14px 20px',
               alignItems: 'center'
             }}
           >
             {/* Column 1: Creation date */}
-            <div>
+            <div style={{ textAlign: 'center' }}>
               <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 {formatDate(request.createdAt)}
               </span>
             </div>
 
             {/* Column 2: Product Name */}
-            <div>
+            <div style={{ textAlign: 'center' }}>
               <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
                 {request.title}
               </span>
             </div>
 
             {/* Column 3: Location */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
               <img
                 src={request.locationFlag}
                 alt={request.location}
@@ -424,16 +527,27 @@ const MyRequests: React.FC = () => {
                   width: '16px',
                   height: '16px',
                   borderRadius: '50%',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
+                  flexShrink: 0
                 }}
               />
-              <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
+              <span 
+                style={{ 
+                  color: '#939393', 
+                  fontSize: '12px', 
+                  fontFamily: 'Poppins, sans-serif',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '120px'
+                }}
+              >
                 {request.location}
               </span>
             </div>
 
             {/* Column 4: Origin Of Product */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
               <img
                 src={request.originFlag}
                 alt={request.origin}
@@ -441,7 +555,8 @@ const MyRequests: React.FC = () => {
                   width: '16px',
                   height: '16px',
                   borderRadius: '50%',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
+                  flexShrink: 0
                 }}
               />
               <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
@@ -450,19 +565,19 @@ const MyRequests: React.FC = () => {
             </div>
 
             {/* Column 5: Price */}
-            <div>
+            <div style={{ textAlign: 'center' }}>
               <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
                 {request.price}
               </span>
             </div>
 
             {/* Column 6: Status */}
-            <div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
               {renderStatusBadge(request.status)}
             </div>
 
             {/* Column 7: More Options */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', paddingLeft: '8px' }} onClick={(e) => e.stopPropagation()}>
               <div style={{ position: 'relative' }} ref={moreOptionsRef}>
                 <button
                   type="button"
@@ -699,174 +814,328 @@ const MyRequests: React.FC = () => {
           </div>
 
           {/* Filters and Sort - Desktop */}
-          {!isMobile && (
-            <div className="max-w-6xl mx-auto w-full px-0 mb-6">
-              <div className="flex items-center gap-4">
-                {/* All requests badge */}
-                <div className="flex items-center gap-2">
-                  <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                    All requests
-                  </span>
-                  <span
-                    className="px-2 py-0.5 rounded-full font-medium"
+          {!isMobile && (!shouldShowEmptyState && !isSearchNoResultsState) && (
+            <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-6 mb-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 w-full">
+                {/* Left Side - Filters */}
+                <div className="flex items-center gap-3 flex-wrap">
+                  {/* All Requests Badge */}
+                  {!isSearchActive && (
+                    <div className="flex items-center gap-2">
+                      <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                        All requests
+                      </span>
+                      <span
+                        className="px-2 py-0.5 rounded-full font-medium"
+                        style={{
+                          backgroundColor: '#F1F1F1',
+                          color: '#939393',
+                          fontSize: '12px',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        {totalRequests}
+                      </span>
+                    </div>
+                  )}
+
+                {/* Sort By Filter */}
+                <div className="relative" ref={sortDropdownRef}>
+                  {selectedSortDetails ? (
+                    <button
+                      type="button"
+                      onClick={() => setIsSortDropdownOpen((prev) => !prev)}
+                      className="inline-flex items-center justify-between gap-3 px-3 py-1 rounded-full"
+                      style={{
+                        backgroundColor: '#F0F8FE',
+                        fontFamily: 'Poppins, sans-serif',
+                        color: '#64B5F6',
+                        minHeight: '30px'
+                      }}
+                    >
+                      <span className="flex items-center gap-1 text-[11px] sm:text-xs" style={{ color: '#64B5F6' }}>
+                        <span className="flex items-center gap-1">
+                          {renderSortIcon(selectedSortDetails.primary, true)}
+                          <span style={{ fontWeight: 500 }}>{selectedSortDetails.primary.label}</span>
+                        </span>
+                        <span>:</span>
+                        <span style={{ fontWeight: 500 }}>{selectedSortDetails.secondaryLabel}</span>
+                        {selectedSortDetails.tertiaryLabel && (
+                          <>
+                            <span>:</span>
+                            <span style={{ fontWeight: 500 }}>{selectedSortDetails.tertiaryLabel}</span>
+                          </>
+                        )}
+                      </span>
+                      <span
+                        role="button"
+                        aria-label="Clear sort selection"
+                        onClick={(event) => clearSelectedSort(event)}
+                        className="text-base leading-none cursor-pointer"
+                        style={{ color: '#64B5F6', lineHeight: 1 }}
+                      >
+                        ×
+                      </span>
+                    </button>
+                  ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsSortDropdownOpen((prev) => !prev)}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
                     style={{
-                      backgroundColor: '#F1F1F1',
-                      color: '#939393',
-                      fontSize: '12px',
+                      backgroundColor: isSortDropdownOpen ? '#F0F8FE' : '#FAFAFA',
                       fontFamily: 'Poppins, sans-serif'
                     }}
                   >
-                    {totalRequests}
-                  </span>
-                </div>
-
-                {/* Sort by dropdown */}
-                <div ref={sortDropdownRef} style={{ position: 'relative' }}>
-                  <button
-                    type="button"
-                    onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                    className="flex items-center gap-2 px-3 py-1.5 border rounded-lg"
-                    style={{
-                      backgroundColor: '#FAFAFA',
-                      borderColor: '#E4E4E4',
-                      fontFamily: 'Poppins, sans-serif',
-                      fontSize: '13px',
-                      color: '#939393'
-                    }}
-                  >
-                    <img src={filterIcon} alt="Filter" className="w-4 h-4" />
-                    <span>Sort by</span>
-                    <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" />
-                  </button>
-                  {isSortDropdownOpen && (
-                    <div
+                    <img
+                      src={filterIcon}
+                      alt="Filter"
+                      className="w-4 h-4"
                       style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        marginTop: '8px',
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '12px',
-                        border: '1px solid #E9E9E9',
-                        boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                        padding: '8px',
-                        minWidth: '200px',
-                        zIndex: 100
+                          filter: 'brightness(0) saturate(100%) invert(70%)'
+                      }}
+                    />
+                    <span
+                      style={{
+                        color: '#939393',
+                        fontSize: '13px'
                       }}
                     >
-                      {sortOptions.map((option) => (
-                        <div key={option.key}>
-                          <div
-                            style={{
-                              padding: '8px 12px',
-                              color: '#939393',
-                              fontSize: '12px',
-                              fontFamily: 'Poppins, sans-serif',
-                              fontWeight: 500
-                            }}
-                          >
-                            {option.label}
-                          </div>
-                          {option.children.map((child) => (
+                        Sort by
+                    </span>
+                    <img
+                      src={arrowDownIcon}
+                      alt="Arrow"
+                      className="w-3 h-3"
+                      style={{
+                          filter: 'brightness(0) saturate(100%) invert(40%)'
+                      }}
+                    />
+                  </button>
+                  )}
+
+                  {isSortDropdownOpen && (
+                    <>
+                      <div
+                        className="absolute mt-2 z-30"
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '12px',
+                          border: '1px solid #E9E9E9',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          padding: '8px',
+                          minWidth: '200px'
+                        }}
+                      >
+                        {sortOptions.map((option) => {
+                          const isSelected = option.key === selectedPrimaryKey;
+                          const isHovered = option.key === hoveredPrimarySort;
+                          const backgroundColor = isSelected ? '#F0F8FE' : isHovered ? '#FAFAFA' : 'transparent';
+                          const textColor = isSelected ? '#64B5F6' : '#939393';
+                          return (
+                            <button
+                              key={option.key}
+                              type="button"
+                              onMouseEnter={() => {
+                                setHoveredPrimarySort(option.key);
+                                setHoveredSecondarySort(null);
+                              }}
+                              onClick={() => {
+                                setHoveredPrimarySort(option.key);
+                                setHoveredSecondarySort(null);
+                              }}
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors"
+                              style={{
+                                backgroundColor,
+                                color: textColor,
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '13px'
+                              }}
+                            >
+                              <span className="flex items-center gap-2">
+                                {renderSortIcon(option, isSelected)}
+                                {option.label}
+                              </span>
+                              <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M2 2l3 4-3 4"
+                                  stroke={isSelected ? '#64B5F6' : '#939393'}
+                                  strokeWidth="1.2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          onClick={() => setIsSortDropdownOpen(false)}
+                          className="mt-2 w-full flex items-center gap-2 px-3 py-2 rounded-lg"
+                          style={{
+                            backgroundColor: '#F8F8F8',
+                            color: '#939393',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px'
+                          }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                          </svg>
+                          Close
+                        </button>
+                      </div>
+
+                      <div
+                        className="absolute mt-2 z-40"
+                        style={{
+                          left: '210px',
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '12px',
+                          border: '1px solid #E9E9E9',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          width: `${secondaryPanelWidth}px`,
+                          minWidth: `${secondaryPanelWidth}px`,
+                          maxWidth: `${secondaryPanelWidth}px`,
+                          padding: '6px 10px',
+                          top:
+                            (hoveredPrimarySort
+                              ? sortOptions.findIndex((option) => option.key === hoveredPrimarySort) * 40
+                              : selectedPrimaryKey
+                              ? sortOptions.findIndex((option) => option.key === selectedPrimaryKey) * 40
+                              : 0) + 8
+                        }}
+                      >
+                        {secondaryOptions.map((child) => {
+                          const isSelected = child.key === selectedSecondaryKey && selectedPrimaryKey === (hoveredPrimarySort ?? selectedPrimaryKey);
+                          const isHovered = child.key === hoveredSecondarySort;
+                          const backgroundColor = isSelected ? '#F0F8FE' : isHovered ? '#FAFAFA' : 'transparent';
+                          const textColor = isSelected ? '#64B5F6' : '#939393';
+                          return (
                             <button
                               key={child.key}
                               type="button"
+                              onMouseEnter={() => setHoveredSecondarySort(child.key)}
                               onClick={() => {
                                 if (child.value) {
-                                  setSelectedSort({ label: `${option.label}: ${child.label}`, value: child.value });
+                                  setSelectedSort({ label: `${sortOptions.find(o => o.key === (hoveredPrimarySort ?? selectedPrimaryKey))?.label}: ${child.label}`, value: child.value });
                                   setIsSortDropdownOpen(false);
                                 }
                               }}
+                              className="w-full flex items-center px-3 py-1.5 rounded-lg transition-colors"
                               style={{
-                                width: '100%',
-                                textAlign: 'left',
-                                padding: '6px 12px 6px 24px',
-                                border: 'none',
-                                background: 'transparent',
-                                cursor: 'pointer',
-                                color: '#939393',
+                                backgroundColor,
+                                color: textColor,
+                                fontFamily: 'Poppins, sans-serif',
                                 fontSize: '12px',
-                                fontFamily: 'Poppins, sans-serif'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#FAFAFA';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'transparent';
+                                whiteSpace: 'nowrap',
+                                justifyContent: 'flex-start',
+                                alignItems: 'center'
                               }}
                             >
-                              {child.label}
+                              <span>{child.label}</span>
                             </button>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
+                          );
+                        })}
+                      </div>
+                    </>
                   )}
                 </div>
 
-                {/* All Status dropdown */}
-                <div ref={statusDropdownRef} style={{ position: 'relative' }}>
-                  <button
-                    type="button"
-                    onClick={toggleStatusDropdown}
-                    className="flex items-center gap-2 px-3 py-1.5 border rounded-lg"
-                    style={{
-                      backgroundColor: '#FAFAFA',
-                      borderColor: '#E4E4E4',
-                      fontFamily: 'Poppins, sans-serif',
-                      fontSize: '13px',
-                      color: '#939393'
-                    }}
-                  >
-                    <img src={statusIcon} alt="Status" className="w-4 h-4" />
-                    <span>All Status</span>
-                    <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" />
-                  </button>
-                  {isStatusDropdownOpen && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        marginTop: '8px',
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '12px',
-                        border: '1px solid #E9E9E9',
-                        boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                        padding: '8px',
-                        minWidth: '150px',
-                        zIndex: 100
-                      }}
-                    >
-                      {statusOptions.map((status) => (
-                        <button
-                          key={status}
-                          type="button"
-                          onClick={() => handleStatusSelect(status)}
+                  {/* Status Filter */}
+                  <div className="relative" ref={statusDropdownRef}>
+                    {statusFilter === 'All Status' ? (
+                      <button
+                        type="button"
+                        onClick={toggleStatusDropdown}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                        style={{
+                          backgroundColor: '#FAFAFA',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        <span style={{ color: '#939393', fontSize: '13px' }}>{statusFilter}</span>
+                        <img src={arrowDownIcon} alt="Arrow" className="w-3 h-3" style={{ filter: 'brightness(0) saturate(100%) invert(60%)' }} />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={toggleStatusDropdown}
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full"
+                        style={{
+                          backgroundColor: badgeStyles(statusFilter).bg,
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        {badgeStyles(statusFilter).icon}
+                        <span
                           style={{
-                            width: '100%',
-                            textAlign: 'left',
-                            padding: '8px 12px',
-                            border: 'none',
-                            background: 'transparent',
-                            cursor: 'pointer',
-                            color: '#939393',
-                            fontSize: '12px',
-                            fontFamily: 'Poppins, sans-serif',
-                            borderRadius: '8px'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#FAFAFA';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = 'transparent';
+                            color: badgeStyles(statusFilter).color,
+                            fontSize: '11px'
                           }}
                         >
-                          {status}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                          {statusFilter}
+                        </span>
+                        <span
+                          style={{
+                            color: badgeStyles(statusFilter).color,
+                            fontSize: '12px',
+                            lineHeight: 1,
+                            marginLeft: '4px'
+                          }}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            clearStatusFilter();
+                          }}
+                        >
+                          ×
+                        </span>
+                      </button>
+                    )}
+
+                    {isStatusDropdownOpen && (
+                      <div
+                        className="absolute right-0 mt-2 bg-white z-10"
+                        style={{
+                          borderRadius: '10px',
+                          border: '1px solid #E9E9E9',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          minWidth: '160px'
+                        }}
+                      >
+                        {statusOptions.map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => handleStatusSelect(option)}
+                            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 transition-colors"
+                            style={{ fontFamily: 'Poppins, sans-serif', fontSize: '13px', color: '#212121' }}
+                          >
+                            {option === 'Ongoing' && (
+                              <div className="flex items-center gap-1">
+                                <span style={{ color: '#64B5F6' }}>Ongoing</span>
+                              </div>
+                            )}
+                            {option === 'Pending' && (
+                              <div className="flex items-center gap-1">
+                                <span style={{ color: '#6A6A6A' }}>Pending</span>
+                              </div>
+                            )}
+                            {option === 'Completed' && (
+                              <div className="flex items-center gap-1">
+                                <span style={{ color: '#4CD964' }}>Completed</span>
+                              </div>
+                            )}
+                            {option === 'Expired' && (
+                              <div className="flex items-center gap-1">
+                                <span style={{ color: '#FF5151' }}>Expired</span>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -897,6 +1166,47 @@ const MyRequests: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="bg-white">
+          <div className="px-4 sm:px-6 lg:px-8 py-5">
+            {/* Desktop Footer - Hidden on mobile */}
+            <div className="hidden lg:flex flex-row items-center justify-between text-xs" style={{ color: '#BABABA' }}>
+              <div className="flex items-center space-x-1.5">
+                <img src={lilLogo} alt="Bao Afrik" className="w-5 h-5" />
+                <span>©</span>
+                <span className="text-[11px]">All rights reserved</span>
+              </div>
+              <div className="flex items-center space-x-3 text-[11px]">
+                <Link to="/contact" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Contact Us</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/terms" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/privacy" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Privacy policies</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/cookies" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Cookies</Link>
+              </div>
+            </div>
+
+            {/* Mobile Footer - Two lines, only visible on mobile, second line fits on one line */}
+            <div className="lg:hidden flex flex-col items-center text-xs space-y-2" style={{ color: '#BABABA' }}>
+              <div className="flex items-center space-x-1.5">
+                <img src={lilLogo} alt="Bao Afrik" className="w-5 h-5" />
+                <span>©</span>
+                <span className="text-[11px]">All rights reserved</span>
+              </div>
+              <div className="flex items-center space-x-1.5 text-[10px] flex-wrap justify-center">
+                <Link to="/contact" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Contact Us</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/terms" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/privacy" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Privacy policies</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/cookies" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Cookies</Link>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );
