@@ -17,6 +17,8 @@ import activeIcon from '../assets/images/pre/active.svg';
 import inactiveIcon from '../assets/images/pre/inactive.svg';
 import locationIcon from '../assets/images/pre/PL.svg';
 import closeIcon from '../assets/images/pre/CLose.svg';
+import redtrashIcon from '../assets/images/pre/redtrash.svg';
+import verityIcon from '../assets/images/pre/verity.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -207,6 +209,9 @@ const MyRequests: React.FC = () => {
   const statusModalRef = useRef<HTMLDivElement | null>(null);
   const [viewRequestModalOpen, setViewRequestModalOpen] = useState(false);
   const [selectedRequestForView, setSelectedRequestForView] = useState<Request | null>(null);
+  const [requestToDelete, setRequestToDelete] = useState<Request | null>(null);
+  const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
+  const [deleteReason, setDeleteReason] = useState<string>('');
 
   // Mock data - replace with actual data from backend
   const initialRequests: Request[] = [
@@ -374,6 +379,22 @@ const MyRequests: React.FC = () => {
       )
     );
     setStatusModalOpenFor(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (requestToDelete) {
+      setIsDeleteSuccess(true);
+    }
+  };
+
+  const handleDeleteClose = () => {
+    if (isDeleteSuccess && requestToDelete) {
+      // Actually delete the request
+      setRequests((prev) => prev.filter((request) => request.id !== requestToDelete.id));
+    }
+    setRequestToDelete(null);
+    setIsDeleteSuccess(false);
+    setDeleteReason('');
   };
 
   const renderStatusBadge = (requestId: string) => {
@@ -1503,19 +1524,22 @@ const MyRequests: React.FC = () => {
               </div>
 
               {/* Footer Buttons */}
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '20px' }}>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '20px', paddingBottom: '20px' }}>
                 {/* Delete Button */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // TODO: Handle delete
+                    setRequestToDelete(selectedRequestForView);
+                    setIsDeleteSuccess(false);
+                    setDeleteReason('');
                     setViewRequestModalOpen(false);
                     setSelectedRequestForView(null);
                   }}
                   style={{
-                    backgroundColor: 'transparent',
-                    border: 'none',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #FF5151',
+                    borderRadius: '12px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -1537,9 +1561,9 @@ const MyRequests: React.FC = () => {
                   }}
                   style={{
                     backgroundColor: '#212121',
-                    borderRadius: '12px',
+                    borderRadius: '16px',
                     border: 'none',
-                    padding: '8px 24px',
+                    padding: '8px 32px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -1552,6 +1576,297 @@ const MyRequests: React.FC = () => {
                   <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Close</span>
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {requestToDelete && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: '#0000001A',
+              display: 'flex',
+              alignItems: isMobile ? 'flex-end' : 'center',
+              justifyContent: 'center',
+              zIndex: 10000
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                handleDeleteClose();
+              }
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '30px',
+                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                padding: '30px',
+                paddingBottom: isMobile ? '8px' : '15px',
+                maxWidth: '420px',
+                width: isMobile ? '95%' : '90%',
+                minHeight: isDeleteSuccess ? '320px' : '400px',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                marginBottom: isMobile ? '12px' : '0'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={handleDeleteClose}
+                style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+
+              {isDeleteSuccess ? (
+                <>
+                  {/* Success Icon */}
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                    <img
+                      src={verityIcon}
+                      alt="Success"
+                      style={{ width: '80px', height: '80px' }}
+                    />
+                  </div>
+
+                  {/* Success Text */}
+                  <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <p
+                      style={{
+                        color: '#212121',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '16px',
+                        lineHeight: '1.5',
+                        margin: 0
+                      }}
+                    >
+                      The request "{requestToDelete.title}" has been successfully removed.
+                    </p>
+                  </div>
+
+                  {/* Close Button */}
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={handleDeleteClose}
+                      style={{
+                        backgroundColor: '#F9A825',
+                        borderRadius: '12px',
+                        border: 'none',
+                        padding: isMobile ? '8px 120px' : '10px 140px',
+                        cursor: 'pointer',
+                        color: '#FFFFFF',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '13px' : '14px',
+                        fontWeight: 300
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Delete Icon */}
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                    <img
+                      src={redtrashIcon}
+                      alt="Delete"
+                      style={{ width: '80px', height: '80px' }}
+                    />
+                  </div>
+
+                  {/* Title */}
+                  <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                    <p
+                      style={{
+                        color: '#212121',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '16px',
+                        lineHeight: '1.5',
+                        margin: 0,
+                        fontWeight: 600
+                      }}
+                    >
+                      Why do you delete your request?
+                    </p>
+                  </div>
+
+                  {/* Radio Options */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '30px' }}>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        cursor: 'pointer',
+                        padding: '8px',
+                        borderRadius: '8px',
+                        backgroundColor: deleteReason === 'got' ? '#F0F8FE' : 'transparent',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (deleteReason !== 'got') {
+                          e.currentTarget.style.backgroundColor = '#FAFAFA';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (deleteReason !== 'got') {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="deleteReason"
+                        value="got"
+                        checked={deleteReason === 'got'}
+                        onChange={(e) => setDeleteReason(e.target.value)}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      />
+                      <span style={{ color: '#212121', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                        I got what I was looking for
+                      </span>
+                    </label>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        cursor: 'pointer',
+                        padding: '8px',
+                        borderRadius: '8px',
+                        backgroundColor: deleteReason === 'not_got' ? '#F0F8FE' : 'transparent',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (deleteReason !== 'not_got') {
+                          e.currentTarget.style.backgroundColor = '#FAFAFA';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (deleteReason !== 'not_got') {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="deleteReason"
+                        value="not_got"
+                        checked={deleteReason === 'not_got'}
+                        onChange={(e) => setDeleteReason(e.target.value)}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      />
+                      <span style={{ color: '#212121', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                        I didn't get what I was looking for
+                      </span>
+                    </label>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        cursor: 'pointer',
+                        padding: '8px',
+                        borderRadius: '8px',
+                        backgroundColor: deleteReason === 'other' ? '#F0F8FE' : 'transparent',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (deleteReason !== 'other') {
+                          e.currentTarget.style.backgroundColor = '#FAFAFA';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (deleteReason !== 'other') {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="deleteReason"
+                        value="other"
+                        checked={deleteReason === 'other'}
+                        onChange={(e) => setDeleteReason(e.target.value)}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      />
+                      <span style={{ color: '#212121', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                        Other
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Buttons */}
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={handleDeleteClose}
+                      style={{
+                        backgroundColor: '#F1F1F1',
+                        borderRadius: '12px',
+                        border: 'none',
+                        padding: isMobile ? '8px 24px' : '10px 28px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <svg width={isMobile ? "14" : "16"} height={isMobile ? "14" : "16"} viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '13px' : '14px' }}>Cancel</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleConfirmDelete}
+                      disabled={!deleteReason}
+                      style={{
+                        backgroundColor: deleteReason ? '#FF5151' : '#FFB3B3',
+                        borderRadius: '12px',
+                        border: 'none',
+                        padding: isMobile ? '8px 24px' : '10px 28px',
+                        cursor: deleteReason ? 'pointer' : 'not-allowed',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        opacity: deleteReason ? 1 : 0.6
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px', filter: 'brightness(0) invert(1)' }} />
+                      <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '13px' : '14px' }}>Delete</span>
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* Drag Indicator - Mobile Only */}
+              {isMobile && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '44px', marginBottom: '12px' }}>
+                  <div style={{ width: '100px', height: '4px', backgroundColor: '#E9E9E9', borderRadius: '2px' }}></div>
+                </div>
+              )}
             </div>
           </div>
         )}
