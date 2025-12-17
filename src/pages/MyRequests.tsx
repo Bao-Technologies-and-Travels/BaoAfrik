@@ -372,7 +372,10 @@ const MyRequests: React.FC = () => {
     setStatusModalOpenFor(null);
   };
 
-  const renderStatusBadge = (status: Request['status'], requestId: string) => {
+  const renderStatusBadge = (requestId: string) => {
+    const request = requests.find(r => r.id === requestId);
+    if (!request) return null;
+    
     const statusConfig = {
       ongoing: { text: 'Ongoing', textColor: '#64B5F6', bgColor: '#F0F8FE' },
       pending: { text: 'Pending', textColor: '#6A6A6A', bgColor: '#F4F4F4' },
@@ -380,7 +383,7 @@ const MyRequests: React.FC = () => {
       expired: { text: 'Expired', textColor: '#FF5151', bgColor: '#FFE9E9' }
     };
 
-    const config = statusConfig[status];
+    const config = statusConfig[request.status];
     const isModalOpen = statusModalOpenFor === requestId;
     
     return (
@@ -436,8 +439,8 @@ const MyRequests: React.FC = () => {
               borderRadius: '12px',
               border: '1px solid #E9E9E9',
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-              padding: '6px',
-              width: '120px',
+              padding: '4px',
+              width: '100px',
               zIndex: 1000,
               display: 'flex',
               flexDirection: 'column',
@@ -446,7 +449,7 @@ const MyRequests: React.FC = () => {
           >
             {(['ongoing', 'pending', 'completed', 'expired'] as Request['status'][]).map((optionStatus) => {
               const optionConfig = statusConfig[optionStatus];
-              const isSelected = status === optionStatus;
+              const isSelected = request.status === optionStatus;
               return (
                 <button
                   key={optionStatus}
@@ -457,13 +460,13 @@ const MyRequests: React.FC = () => {
                   }}
                   style={{
                     width: '100%',
-                    padding: '6px 10px',
+                    padding: '4px 8px',
                     borderRadius: isSelected ? '6px' : '0',
                     backgroundColor: isSelected ? optionConfig.bgColor : 'transparent',
-                    border: isSelected ? `1px solid ${optionConfig.textColor}` : 'none',
+                    border: 'none',
                     color: optionConfig.textColor,
                     fontFamily: 'Poppins, sans-serif',
-                    fontSize: '13px',
+                    fontSize: '12px',
                     textAlign: 'left',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease'
@@ -492,22 +495,22 @@ const MyRequests: React.FC = () => {
               }}
               style={{
                 width: '100%',
-                padding: '6px 10px',
+                padding: '4px 8px',
                 borderRadius: '6px',
                 backgroundColor: '#FAFAFA',
                 border: 'none',
                 color: '#B0B0B0',
                 fontFamily: 'Poppins, sans-serif',
-                fontSize: '13px',
+                fontSize: '12px',
                 textAlign: 'left',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '4px',
                 marginTop: '2px'
               }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
               <span style={{ color: '#B0B0B0' }}>Close</span>
@@ -531,7 +534,7 @@ const MyRequests: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1.8fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+          gridTemplateColumns: '2.2fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
           gap: '16px',
           padding: '16px 20px'
         }}
@@ -621,7 +624,7 @@ const MyRequests: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1.8fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+              gridTemplateColumns: '2.2fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
               gap: '16px',
               padding: '14px 20px',
               alignItems: 'center'
@@ -696,7 +699,7 @@ const MyRequests: React.FC = () => {
 
             {/* Column 6: Status */}
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              {renderStatusBadge(request.status, request.id)}
+              {renderStatusBadge(request.id)}
             </div>
 
             {/* Column 7: More Options */}
@@ -727,17 +730,82 @@ const MyRequests: React.FC = () => {
                   <div
                     style={{
                       position: 'absolute',
-                      top: '26px',
-                      right: 0,
+                      top: '32px',
+                      right: '0',
                       backgroundColor: '#FFFFFF',
                       borderRadius: '12px',
                       border: '1px solid #E9E9E9',
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                      padding: isMobile ? '4px' : '6px',
-                      minWidth: isMobile ? '130px' : '150px',
+                      padding: '8px',
+                      minWidth: '180px',
                       zIndex: 1000
                     }}
                   >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // TODO: Navigate to request detail page
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        borderRadius: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#FAFAFA';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <span style={{ color: '#939393', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>View the request</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // TODO: Handle delete
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        borderRadius: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#FFF5F5';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                      <span style={{ color: '#FF5151', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Delete the listing</span>
+                    </button>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -748,22 +816,19 @@ const MyRequests: React.FC = () => {
                         width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: isMobile ? '6px' : '8px',
-                        padding: isMobile ? '6px 8px' : '8px 10px',
+                        gap: '10px',
+                        padding: '10px 12px',
                         border: 'none',
-                        background: 'transparent',
+                        background: '#FAFAFA',
                         cursor: 'pointer',
-                        borderRadius: '6px'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#FAFAFA';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
+                        borderRadius: '8px',
+                        marginTop: '4px'
                       }}
                     >
-                      <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px', flexShrink: 0, filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                      <span style={{ color: '#939393', fontSize: isMobile ? '12px' : '13px', fontFamily: 'Poppins, sans-serif', lineHeight: 1, whiteSpace: 'nowrap' }}>Delete the request</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
                     </button>
                   </div>
                 )}
@@ -1281,7 +1346,7 @@ const MyRequests: React.FC = () => {
                     <div key={request.id} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E4E4E4', borderRadius: '12px', padding: '16px' }}>
                       <h3 style={{ color: '#6A6A6A', fontSize: '14px', fontFamily: 'Poppins, sans-serif', marginBottom: '8px' }}>{request.title}</h3>
                       <p style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>{request.price.replace(' - ', ' ~ ')}</p>
-                      {renderStatusBadge(request.status, request.id)}
+                      {renderStatusBadge(request.id)}
                     </div>
                   ))}
                 </div>
