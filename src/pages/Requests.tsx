@@ -1232,6 +1232,7 @@ const Requests: React.FC = () => {
                       style={{ 
                         backgroundColor: '#FFFFFF',
                         borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                        borderWidth: isSearchFocused ? '2px' : '1px',
                         fontFamily: 'Poppins, sans-serif',
                         fontSize: isMobile ? '10px' : '14px',
                         color: searchQuery ? '#212121' : '#D9D9D9',
@@ -1254,16 +1255,26 @@ const Requests: React.FC = () => {
                     </button>
                     {/* Suggestions Dropdown */}
                     {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
-                      <div
-                        className="absolute top-full left-0 right-0 mt-1 z-50"
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                          maxHeight: '200px',
-                          overflowY: 'auto'
-                        }}
-                      >
+                      <>
+                        <style>{`
+                          .search-suggestions-dropdown::-webkit-scrollbar {
+                            display: none;
+                          }
+                          .search-suggestions-dropdown {
+                            -ms-overflow-style: none;
+                            scrollbar-width: none;
+                          }
+                        `}</style>
+                        <div
+                          className="search-suggestions-dropdown absolute top-full left-0 right-0 mt-1 z-50"
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                            maxHeight: '180px',
+                            overflowY: 'auto'
+                          }}
+                        >
                         {getFilteredSuggestions().map((location, index) => (
                           <div
                             key={index}
@@ -1272,26 +1283,27 @@ const Requests: React.FC = () => {
                               setShowSearchSuggestions(false);
                               handleSearch();
                             }}
-                            className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                            className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
                             style={{
-                              borderBottom: index < getFilteredSuggestions().length - 1 ? '1px solid #F0F0F0' : 'none'
+                              padding: isMobile ? '6px 10px' : '8px 12px'
                             }}
                           >
                             <img 
                               src={locationIcon} 
                               alt="Location"
                               style={{ 
-                                width: '16px', 
-                                height: '16px',
+                                width: isMobile ? '12px' : '14px', 
+                                height: isMobile ? '12px' : '14px',
                                 filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
                               }}
                             />
-                            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+                            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '9px' : '13px', fontFamily: 'Poppins, sans-serif' }}>
                               {location}
                             </span>
                           </div>
                         ))}
-                      </div>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
@@ -1442,6 +1454,7 @@ const Requests: React.FC = () => {
                       style={{ 
                         backgroundColor: '#FFFFFF',
                         borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                        borderWidth: isSearchFocused ? '2px' : '1px',
                         fontFamily: 'Poppins, sans-serif',
                         fontSize: isMobile ? '10px' : '14px',
                         color: searchQuery ? '#212121' : '#D9D9D9',
@@ -1464,16 +1477,26 @@ const Requests: React.FC = () => {
                     </button>
                     {/* Suggestions Dropdown */}
                     {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
-                      <div
-                        className="absolute top-full left-0 right-0 mt-1 z-50"
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                          maxHeight: '200px',
-                          overflowY: 'auto'
-                        }}
-                      >
+                      <>
+                        <style>{`
+                          .search-suggestions-dropdown::-webkit-scrollbar {
+                            display: none;
+                          }
+                          .search-suggestions-dropdown {
+                            -ms-overflow-style: none;
+                            scrollbar-width: none;
+                          }
+                        `}</style>
+                        <div
+                          className="search-suggestions-dropdown absolute top-full left-0 right-0 mt-1 z-50"
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                            maxHeight: '180px',
+                            overflowY: 'auto'
+                          }}
+                        >
                         {getFilteredSuggestions().map((location, index) => (
                           <div
                             key={index}
@@ -1482,26 +1505,27 @@ const Requests: React.FC = () => {
                               setShowSearchSuggestions(false);
                               handleSearch();
                             }}
-                            className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                            className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
                             style={{
-                              borderBottom: index < getFilteredSuggestions().length - 1 ? '1px solid #F0F0F0' : 'none'
+                              padding: isMobile ? '6px 10px' : '8px 12px'
                             }}
                           >
                             <img 
                               src={locationIcon} 
                               alt="Location"
                               style={{ 
-                                width: '16px', 
-                                height: '16px',
+                                width: isMobile ? '12px' : '14px', 
+                                height: isMobile ? '12px' : '14px',
                                 filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
                               }}
                             />
-                            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+                            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '9px' : '13px', fontFamily: 'Poppins, sans-serif' }}>
                               {location}
                             </span>
                           </div>
                         ))}
-                      </div>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
@@ -1529,11 +1553,113 @@ const Requests: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-16">
-                  <p style={{ color: '#D9D9D9', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '14px' : '18px' }}>
-                    No requests found for "{searchQuery}"
-                  </p>
-                </div>
+                <>
+                  {/* Empty State */}
+                  <div className="text-center" style={{ padding: isMobile ? '48px 16px' : '64px 16px', marginTop: isMobile ? '32px' : '48px', marginBottom: isMobile ? '48px' : '64px' }}>
+                    {/* Empty Request Icon */}
+                    <img 
+                      src={emptyRequestIcon} 
+                      alt="No requests found" 
+                      className="mx-auto" 
+                      style={{ 
+                        width: isMobile ? '40px' : '60px', 
+                        height: isMobile ? '40px' : '60px',
+                        marginBottom: isMobile ? '12px' : '16px'
+                      }}
+                    />
+                    
+                    {/* Title */}
+                    <h3 style={{ 
+                      fontSize: isMobile ? '16px' : '20px', 
+                      color: '#D9D9D9', 
+                      fontFamily: 'Bricolage Grotesque, sans-serif',
+                      fontWeight: '500',
+                      marginBottom: isMobile ? '8px' : '12px'
+                    }}>
+                      No results
+                    </h3>
+                    
+                    {/* Description */}
+                    <p style={{ 
+                      fontSize: isMobile ? '12px' : '16px', 
+                      color: '#B0B0B0', 
+                      fontFamily: 'Poppins, sans-serif', 
+                      maxWidth: isMobile ? '280px' : '500px', 
+                      margin: '0 auto',
+                      marginBottom: isMobile ? '16px' : '20px',
+                      lineHeight: '1.5'
+                    }}>
+                      We found nothing for your search, sorry. Please continue browsing the platform to discover more wonders.
+                    </p>
+                    
+                    {/* View available items link */}
+                    <Link
+                      to="/"
+                      className="inline-flex items-center gap-1.5 transition-opacity hover:opacity-80"
+                      style={{ 
+                        color: '#64B5F6',
+                        fontSize: isMobile ? '11px' : '13px',
+                        textDecoration: 'none',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      <span>View available items</span>
+                      <img 
+                        src={requestArrowIcon} 
+                        alt="Arrow" 
+                        style={{ 
+                          width: isMobile ? '10px' : '12px',
+                          height: isMobile ? '10px' : '12px',
+                          filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                        }}
+                      />
+                    </Link>
+                  </div>
+
+                  {/* Requests near you Section */}
+                  <div className="mb-12">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 style={{ 
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: isMobile ? '14px' : '18px',
+                        fontWeight: '500',
+                        color: '#000000'
+                      }}>
+                        Requests near you
+                      </h3>
+                      <div className="flex items-center gap-3">
+                        <button 
+                          className="rounded-full flex items-center justify-center transition-all duration-200"
+                          style={{
+                            width: isMobile ? '20px' : '24px',
+                            height: isMobile ? '20px' : '24px'
+                          }}
+                          aria-label="Previous"
+                        >
+                          <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                        </button>
+                        <button 
+                          className="rounded-full flex items-center justify-center transition-all duration-200"
+                          style={{
+                            width: isMobile ? '20px' : '24px',
+                            height: isMobile ? '20px' : '24px'
+                          }}
+                          aria-label="Next"
+                        >
+                          <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                        </button>
+                      </div>
+                    </div>
+                    {/* Cards grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                      {getAllCards().slice(0, 3).map((product, index) => (
+                        <div key={`near-empty-${index}`}>
+                          {renderRequestCard(false, `near-empty-${index}`, product)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* Pagination */}
