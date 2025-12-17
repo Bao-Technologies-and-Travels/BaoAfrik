@@ -31,6 +31,18 @@ const Requests: React.FC = () => {
   const [openFilterDropdown, setOpenFilterDropdown] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState('');
   const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const [openPriceDropdown, setOpenPriceDropdown] = useState<string | null>(null);
+  const [selectedPrice, setSelectedPrice] = useState('');
+  const priceDropdownRef = useRef<HTMLDivElement>(null);
+
+  const priceOptions = [
+    { label: 'All', value: '' },
+    { label: 'Less than 10 USD', value: 'less-than-10' },
+    { label: '10 ~ 50 USD', value: '10-50' },
+    { label: '50 ~ 100 USD', value: '50-100' },
+    { label: '100 ~ 200 USD', value: '100-200' },
+    { label: 'More than 200 USD', value: 'more-than-200' }
+  ];
 
   const africanCountries = [
     { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png' },
@@ -75,6 +87,9 @@ const Requests: React.FC = () => {
       }
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
         setOpenFilterDropdown(null);
+      }
+      if (priceDropdownRef.current && !priceDropdownRef.current.contains(event.target as Node)) {
+        setOpenPriceDropdown(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -934,7 +949,7 @@ const Requests: React.FC = () => {
               </p>
             </div>
             {/* Search Bar or Over 400 requests available */}
-            {selectedCountry && getFilteredCount() === 0 ? (
+            {(selectedCountry || selectedPrice) && getFilteredCount() === 0 ? (
               <div className="text-right" style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
                 <div style={{ 
                   fontSize: isMobile ? '20px' : '44px', 
@@ -994,28 +1009,14 @@ const Requests: React.FC = () => {
           </div>
 
           {/* Filtered View or Regular Sections */}
-          {selectedCountry ? (
+          {(selectedCountry || selectedPrice) ? (
             <>
               {/* Filter Bar - No Results Layout */}
               <div className={isMobile ? "flex flex-col gap-4 mb-6" : "flex items-center justify-between mb-6"}>
                 {/* Left: Filters */}
                 <div className="flex items-center gap-2">
                   {renderCountryFilterButton('relative', 'filtered')}
-                  <button 
-                    className="flex items-center border transition-colors hover:bg-gray-50"
-                    style={{ 
-                      backgroundColor: '#FAFAFA',
-                      borderColor: '#E4E4E4',
-                      padding: isMobile ? '5px 8px' : '7px 14px',
-                      borderRadius: '8px',
-                      fontFamily: 'Poppins, sans-serif',
-                      gap: isMobile ? '4px' : '6px'
-                    }}
-                  >
-                    <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
-                    <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
-                    <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                  </button>
+                  {renderPriceFilterButton('relative', 'filtered')}
                 </div>
 
                 {/* Right: Search Bar */}
@@ -1062,7 +1063,7 @@ const Requests: React.FC = () => {
               </div>
 
               {/* Check if no results */}
-              {getFilteredCount() === 0 ? (
+              {getFilteredCount() === 0 && (selectedCountry || selectedPrice) ? (
                 <>
                   {/* Empty State */}
                   <div className="text-center" style={{ padding: isMobile ? '48px 16px' : '64px 16px', marginTop: isMobile ? '32px' : '48px', marginBottom: isMobile ? '48px' : '64px' }}>
@@ -1203,7 +1204,7 @@ const Requests: React.FC = () => {
                       color: '#000000'
                     }}
                   >
-                    Request from {selectedCountry} ({getFilteredCount()} requests)
+                    {selectedCountry ? `Request from ${selectedCountry}` : 'Requests'}{selectedPrice ? ` - ${priceOptions.find(opt => opt.value === selectedPrice)?.label || ''}` : ''} ({getFilteredCount()} requests)
                   </h3>
 
                   {/* Filtered Cards */}
@@ -1226,14 +1227,28 @@ const Requests: React.FC = () => {
                       } : {}}
                     >
                       {[
-                        { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                        { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                        { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                        { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                        { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                        { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
+                        { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 75 },
+                        { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 45 },
+                        { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 25 },
+                        { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 8 },
+                        { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 150 },
+                        { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 250 }
                       ]
-                        .filter(card => card.country === selectedCountry)
+                        .filter(card => {
+                          if (selectedCountry && card.country !== selectedCountry) return false;
+                          if (selectedPrice) {
+                            const price = card.price || 0;
+                            switch(selectedPrice) {
+                              case 'less-than-10': return price < 10;
+                              case '10-50': return price >= 10 && price <= 50;
+                              case '50-100': return price >= 50 && price <= 100;
+                              case '100-200': return price >= 100 && price <= 200;
+                              case 'more-than-200': return price > 200;
+                              default: return true;
+                            }
+                          }
+                          return true;
+                        })
                         .map((product, index) => (
                           <React.Fragment key={index}>
                             {renderRequestCard(false, `filtered-${index}`, product)}
@@ -1257,24 +1272,10 @@ const Requests: React.FC = () => {
                   }}>
                     Requests near you
                   </h3>
-                  <div className="flex items-center gap-2">
-                    {renderCountryFilterButton('relative', 'filtered')}
-                    <button 
-                      className="flex items-center border transition-colors hover:bg-gray-50"
-                      style={{ 
-                        backgroundColor: '#FAFAFA',
-                        borderColor: '#E4E4E4',
-                        padding: isMobile ? '5px 8px' : '7px 14px',
-                        borderRadius: '8px',
-                        fontFamily: 'Poppins, sans-serif',
-                        gap: isMobile ? '4px' : '6px'
-                      }}
-                    >
-                      <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
-                      <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
-                      <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                    </button>
-                  </div>
+                <div className="flex items-center gap-2">
+                  {renderCountryFilterButton('relative', 'filtered')}
+                  {renderPriceFilterButton('relative', 'filtered')}
+                </div>
                 </div>
             <div className="relative">
               {/* Fade effect on the right - Desktop only */}
@@ -1296,9 +1297,9 @@ const Requests: React.FC = () => {
                 } : {}}
               >
                 {[
-                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
+                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 75 },
+                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 45 },
+                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 25 }
                 ].map((product, index) => (
                   <React.Fragment key={index}>
                     {renderRequestCard(false, `near-${index}`, product)}
@@ -1321,21 +1322,7 @@ const Requests: React.FC = () => {
               </h3>
               <div className="flex items-center gap-2">
                 {renderCountryFilterButton('relative', 'pending')}
-                <button 
-                  className="flex items-center border transition-colors hover:bg-gray-50"
-                  style={{ 
-                    backgroundColor: '#FAFAFA',
-                    borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 8px' : '7px 14px',
-                    borderRadius: '8px',
-                    fontFamily: 'Poppins, sans-serif',
-                    gap: isMobile ? '4px' : '6px'
-                  }}
-                >
-                  <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
-                  <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
-                  <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                </button>
+                {renderPriceFilterButton('relative', 'pending')}
               </div>
             </div>
             <div className="relative">
@@ -1358,9 +1345,9 @@ const Requests: React.FC = () => {
                 } : {}}
               >
                 {[
-                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
+                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 8 },
+                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 150 },
+                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 250 }
                 ].map((product, index) => (
                   <React.Fragment key={index}>
                     {renderRequestCard(true, `pending-${index}`, product)}
@@ -1383,21 +1370,7 @@ const Requests: React.FC = () => {
               </h3>
               <div className="flex items-center gap-2">
                 {renderCountryFilterButton('relative', 'all')}
-                <button 
-                  className="flex items-center border transition-colors hover:bg-gray-50"
-                  style={{ 
-                    backgroundColor: '#FAFAFA',
-                    borderColor: '#E4E4E4',
-                    padding: isMobile ? '5px 8px' : '7px 14px',
-                    borderRadius: '8px',
-                    fontFamily: 'Poppins, sans-serif',
-                    gap: isMobile ? '4px' : '6px'
-                  }}
-                >
-                  <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
-                  <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
-                  <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                </button>
+                {renderPriceFilterButton('relative', 'all')}
               </div>
             </div>
             <div className="relative">
@@ -1420,12 +1393,12 @@ const Requests: React.FC = () => {
                 } : {}}
               >
                 {[
-                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', isPending: false, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', isPending: true, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', isPending: false, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', isPending: true, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', isPending: false, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', isPending: true, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
+                  { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', isPending: false, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 75 },
+                  { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', isPending: true, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 8 },
+                  { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', isPending: false, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 45 },
+                  { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', isPending: true, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 150 },
+                  { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', isPending: false, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 25 },
+                  { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', isPending: true, description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 250 }
                 ].map((product, index) => (
                   <React.Fragment key={index}>
                     {renderRequestCard(product.isPending || false, `all-${index}`, { ...product, isPending: product.isPending })}
