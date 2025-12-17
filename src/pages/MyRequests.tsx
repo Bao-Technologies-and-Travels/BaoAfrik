@@ -201,6 +201,8 @@ const MyRequests: React.FC = () => {
   const sortDropdownRef = useRef<HTMLDivElement | null>(null);
   const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
   const moreOptionsRef = useRef<HTMLDivElement | null>(null);
+  const [statusModalOpenFor, setStatusModalOpenFor] = useState<string | null>(null);
+  const statusModalRef = useRef<HTMLDivElement | null>(null);
 
   // Mock data - replace with actual data from backend
   const initialRequests: Request[] = [
@@ -335,6 +337,9 @@ const MyRequests: React.FC = () => {
       if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
         setMoreOptionsOpenFor(null);
       }
+      if (statusModalRef.current && !statusModalRef.current.contains(target)) {
+        setStatusModalOpenFor(null);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -358,7 +363,16 @@ const MyRequests: React.FC = () => {
     return `${day} / ${month} / ${year}`;
   };
 
-  const renderStatusBadge = (status: Request['status']) => {
+  const handleStatusChange = (requestId: string, newStatus: Request['status']) => {
+    setRequests((prev) =>
+      prev.map((request) =>
+        request.id === requestId ? { ...request, status: newStatus } : request
+      )
+    );
+    setStatusModalOpenFor(null);
+  };
+
+  const renderStatusBadge = (status: Request['status'], requestId: string) => {
     const statusConfig = {
       ongoing: { text: 'Ongoing', textColor: '#64B5F6', bgColor: '#F0F8FE' },
       pending: { text: 'Pending', textColor: '#6A6A6A', bgColor: '#F4F4F4' },
@@ -367,30 +381,139 @@ const MyRequests: React.FC = () => {
     };
 
     const config = statusConfig[status];
+    const isModalOpen = statusModalOpenFor === requestId;
     
     return (
-      <div
-        className="inline-flex items-center gap-1 px-2.5 rounded-full"
-        style={{
-          backgroundColor: config.bgColor,
-          fontSize: '10px',
-          borderRadius: '12px',
-          paddingTop: '4px',
-          paddingBottom: '6px',
-          height: '24px'
-        }}
-      >
-        <span
+      <div style={{ position: 'relative' }} ref={statusModalRef}>
+        <div
+          className="inline-flex items-center gap-1 px-2.5 rounded-full"
           style={{
-            color: config.textColor,
-            fontFamily: 'Poppins, sans-serif'
+            backgroundColor: config.bgColor,
+            fontSize: '10px',
+            borderRadius: '8px',
+            paddingTop: '4px',
+            paddingBottom: '6px',
+            height: '24px'
           }}
         >
-          {config.text}
-        </span>
-        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+          <span
+            style={{
+              color: config.textColor,
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            {config.text}
+          </span>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setStatusModalOpenFor(isModalOpen ? null : requestId);
+            }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        {isModalOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '32px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
+              border: '1px solid #E9E9E9',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              padding: '6px',
+              width: '120px',
+              zIndex: 1000,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '2px'
+            }}
+          >
+            {(['ongoing', 'pending', 'completed', 'expired'] as Request['status'][]).map((optionStatus) => {
+              const optionConfig = statusConfig[optionStatus];
+              const isSelected = status === optionStatus;
+              return (
+                <button
+                  key={optionStatus}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStatusChange(requestId, optionStatus);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    borderRadius: isSelected ? '6px' : '0',
+                    backgroundColor: isSelected ? optionConfig.bgColor : 'transparent',
+                    border: isSelected ? `1px solid ${optionConfig.textColor}` : 'none',
+                    color: optionConfig.textColor,
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '13px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = '#FAFAFA';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
+                >
+                  {optionConfig.text}
+                </button>
+              );
+            })}
+            <div style={{ height: '1px', backgroundColor: '#E9E9E9', margin: '4px 0' }} />
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setStatusModalOpenFor(null);
+              }}
+              style={{
+                width: '100%',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                backgroundColor: '#FAFAFA',
+                border: 'none',
+                color: '#B0B0B0',
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '13px',
+                textAlign: 'left',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                marginTop: '2px'
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+              <span style={{ color: '#B0B0B0' }}>Close</span>
+            </button>
+          </div>
+        )}
       </div>
     );
   };
@@ -408,7 +531,7 @@ const MyRequests: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1.2fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+          gridTemplateColumns: '1.8fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
           gap: '16px',
           padding: '16px 20px'
         }}
@@ -498,7 +621,7 @@ const MyRequests: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1.2fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+              gridTemplateColumns: '1.8fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
               gap: '16px',
               padding: '14px 20px',
               alignItems: 'center'
@@ -567,13 +690,13 @@ const MyRequests: React.FC = () => {
             {/* Column 5: Price */}
             <div style={{ textAlign: 'center' }}>
               <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
-                {request.price}
+                {request.price.replace(' - ', ' ~ ')}
               </span>
             </div>
 
             {/* Column 6: Status */}
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              {renderStatusBadge(request.status)}
+              {renderStatusBadge(request.status, request.id)}
             </div>
 
             {/* Column 7: More Options */}
@@ -663,7 +786,7 @@ const MyRequests: React.FC = () => {
 
   const toggleIconFilters = {
     active: 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)',
-    inactive: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
+    inactive: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(176deg) brightness(103%) contrast(95%)'
   };
 
   return (
@@ -1157,8 +1280,8 @@ const MyRequests: React.FC = () => {
                   {sortedRequests.map((request) => (
                     <div key={request.id} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E4E4E4', borderRadius: '12px', padding: '16px' }}>
                       <h3 style={{ color: '#6A6A6A', fontSize: '14px', fontFamily: 'Poppins, sans-serif', marginBottom: '8px' }}>{request.title}</h3>
-                      <p style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>{request.price}</p>
-                      {renderStatusBadge(request.status)}
+                      <p style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>{request.price.replace(' - ', ' ~ ')}</p>
+                      {renderStatusBadge(request.status, request.id)}
                     </div>
                   ))}
                 </div>
