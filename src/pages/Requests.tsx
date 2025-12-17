@@ -15,6 +15,8 @@ import basketIcon from '../assets/images/pre/basket.png';
 import globyIcon from '../assets/images/pre/globy.svg';
 import emptyRequestIcon from '../assets/images/pre/emptysearch.svg';
 import requestArrowIcon from '../assets/images/pre/requestarrow.svg';
+import grayArrowIcon from '../assets/images/pre/gray.svg';
+import blackArrowIcon from '../assets/images/pre/black.svg';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -1063,7 +1065,7 @@ const Requests: React.FC = () => {
               {getFilteredCount() === 0 ? (
                 <>
                   {/* Empty State */}
-                  <div className="text-center" style={{ padding: isMobile ? '32px 16px' : '48px 16px', marginBottom: '48px' }}>
+                  <div className="text-center" style={{ padding: isMobile ? '48px 16px' : '64px 16px', marginTop: isMobile ? '32px' : '48px', marginBottom: isMobile ? '48px' : '64px' }}>
                     {/* Empty Request Icon */}
                     <img 
                       src={emptyRequestIcon} 
@@ -1135,22 +1137,26 @@ const Requests: React.FC = () => {
                       }}>
                         Requests near you
                       </h3>
-                      <div className="flex items-center gap-2">
-                        {renderCountryFilterButton('relative', 'near-empty')}
+                      <div className="flex items-center gap-3">
                         <button 
-                          className="flex items-center border transition-colors hover:bg-gray-50"
-                          style={{ 
-                            backgroundColor: '#FAFAFA',
-                            borderColor: '#E4E4E4',
-                            padding: isMobile ? '5px 8px' : '7px 14px',
-                            borderRadius: '8px',
-                            fontFamily: 'Poppins, sans-serif',
-                            gap: isMobile ? '4px' : '6px'
+                          className="rounded-full flex items-center justify-center transition-all duration-200"
+                          style={{
+                            width: isMobile ? '20px' : '24px',
+                            height: isMobile ? '20px' : '24px'
                           }}
+                          aria-label="Previous"
                         >
-                          <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
-                          <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
-                          <img src={arrowDownIcon} alt="Arrow" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                          <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                        </button>
+                        <button 
+                          className="rounded-full flex items-center justify-center transition-all duration-200"
+                          style={{
+                            width: isMobile ? '20px' : '24px',
+                            height: isMobile ? '20px' : '24px'
+                          }}
+                          aria-label="Next"
+                        >
+                          <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
                         </button>
                       </div>
                     </div>
