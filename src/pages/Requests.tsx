@@ -214,15 +214,129 @@ const Requests: React.FC = () => {
   // Get total filtered count
   const getFilteredCount = () => {
     const allCards = [
-      { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-      { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-      { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-      { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-      { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' },
-      { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!' }
+      { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 75 },
+      { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 45 },
+      { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 25 },
+      { title: 'African Black Soap', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Berlin, Germany', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 8 },
+      { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 150 },
+      { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 250 }
     ];
-    if (!selectedCountry) return allCards.length;
-    return allCards.filter(card => card.country === selectedCountry).length;
+    let filtered = allCards;
+    if (selectedCountry) {
+      filtered = filtered.filter(card => card.country === selectedCountry);
+    }
+    if (selectedPrice) {
+      filtered = filtered.filter(card => {
+        const price = card.price || 0;
+        switch(selectedPrice) {
+          case 'less-than-10': return price < 10;
+          case '10-50': return price >= 10 && price <= 50;
+          case '50-100': return price >= 50 && price <= 100;
+          case '100-200': return price >= 100 && price <= 200;
+          case 'more-than-200': return price > 200;
+          default: return true;
+        }
+      });
+    }
+    return filtered.length;
+  };
+
+  // Render price filter button with dropdown
+  const renderPriceFilterButton = (position: 'relative' | 'absolute' = 'relative', sectionId: string = 'default') => {
+    const isOpen = openPriceDropdown === sectionId;
+    const selectedPriceOption = priceOptions.find(opt => opt.value === selectedPrice);
+    
+    return (
+      <div ref={sectionId === 'default' ? priceDropdownRef : null} style={{ position, zIndex: 20 }}>
+        {selectedPrice ? (
+          // Selected price pill
+          <div 
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            style={{ 
+              backgroundColor: '#F0F8FE',
+              width: 'fit-content'
+            }}
+          >
+            <span style={{ color: '#64B5F6', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+              {selectedPriceOption?.label || selectedPrice}
+            </span>
+            <button
+              onClick={() => setSelectedPrice('')}
+              className="flex items-center justify-center"
+              style={{ 
+                width: '16px', 
+                height: '16px',
+                cursor: 'pointer'
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 3L3 9M3 3L9 9" stroke="#64B5F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        ) : (
+          // Price filter button
+          <button 
+            onClick={() => setOpenPriceDropdown(isOpen ? null : sectionId)}
+            className="flex items-center border transition-colors hover:bg-gray-50"
+            style={{ 
+              backgroundColor: '#FAFAFA',
+              borderColor: '#E4E4E4',
+              padding: isMobile ? '5px 8px' : '7px 14px',
+              borderRadius: '8px',
+              fontFamily: 'Poppins, sans-serif',
+              gap: isMobile ? '4px' : '6px'
+            }}
+          >
+            <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
+            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
+            <img 
+              src={arrowDownIcon} 
+              alt="Arrow" 
+              style={{ 
+                width: isMobile ? '12px' : '16px', 
+                height: isMobile ? '12px' : '16px',
+                transform: isOpen ? 'rotate(180deg)' : 'none',
+                transition: 'transform 0.2s'
+              }} 
+            />
+          </button>
+        )}
+        
+        {/* Dropdown Menu */}
+        {isOpen && !selectedPrice && (
+          <div 
+            className="absolute left-0 bg-white z-10 mt-2"
+            style={{ 
+              width: '200px', 
+              flexShrink: 0, 
+              borderRadius: '16px',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              border: '1px solid #E9E9E9'
+            }}
+          >
+            <div className="py-2">
+              {priceOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setSelectedPrice(option.value);
+                    setOpenPriceDropdown(null);
+                  }}
+                  style={{
+                    backgroundColor: selectedPrice === option.value ? '#F0F8FE' : 'transparent',
+                    color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0'
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   // Render country filter button with dropdown
