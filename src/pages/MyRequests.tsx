@@ -559,7 +559,7 @@ const MyRequests: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '4.5fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+          gridTemplateColumns: '1.8fr 2.2fr 1.5fr 1.5fr 1fr 1fr 0.5fr',
           gap: '16px',
           padding: '16px 20px'
         }}
@@ -649,7 +649,7 @@ const MyRequests: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '4.5fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+              gridTemplateColumns: '1.8fr 2.2fr 1.5fr 1.5fr 1fr 1fr 0.5fr',
               gap: '16px',
               padding: '14px 20px',
               alignItems: 'center'
@@ -832,7 +832,7 @@ const MyRequests: React.FC = () => {
                       }}
                     >
                       <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                      <span style={{ color: '#FF5151', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Delete the request</span>
+                      <span style={{ color: '#FF5151', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Delete request</span>
                     </button>
                     <button
                       type="button"
