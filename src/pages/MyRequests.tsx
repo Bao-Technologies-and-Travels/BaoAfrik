@@ -559,7 +559,7 @@ const MyRequests: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '3.5fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+          gridTemplateColumns: '4.5fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
           gap: '16px',
           padding: '16px 20px'
         }}
@@ -649,7 +649,7 @@ const MyRequests: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '3.5fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+              gridTemplateColumns: '4.5fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
               gap: '16px',
               padding: '14px 20px',
               alignItems: 'center'
@@ -1745,7 +1745,7 @@ const MyRequests: React.FC = () => {
                         onChange={(e) => setDeleteReason(e.target.value)}
                         style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                       />
-                      <span style={{ color: '#212121', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                      <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
                         I got what I was looking for
                       </span>
                     </label>
@@ -1779,7 +1779,7 @@ const MyRequests: React.FC = () => {
                         onChange={(e) => setDeleteReason(e.target.value)}
                         style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                       />
-                      <span style={{ color: '#212121', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                      <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
                         I didn't get what I was looking for
                       </span>
                     </label>
@@ -1813,14 +1813,14 @@ const MyRequests: React.FC = () => {
                         onChange={(e) => setDeleteReason(e.target.value)}
                         style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                       />
-                      <span style={{ color: '#212121', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                      <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
                         Other
                       </span>
                     </label>
                   </div>
 
                   {/* Buttons */}
-                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '20px' }}>
                     <button
                       type="button"
                       onClick={handleDeleteClose}
@@ -1828,7 +1828,7 @@ const MyRequests: React.FC = () => {
                         backgroundColor: '#F1F1F1',
                         borderRadius: '12px',
                         border: 'none',
-                        padding: isMobile ? '8px 32px' : '10px 36px',
+                        padding: isMobile ? '6px 40px' : '8px 48px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -1848,7 +1848,7 @@ const MyRequests: React.FC = () => {
                         backgroundColor: deleteReason ? '#FF5151' : '#FFB3B3',
                         borderRadius: '12px',
                         border: 'none',
-                        padding: isMobile ? '8px 32px' : '10px 36px',
+                        padding: isMobile ? '6px 40px' : '8px 48px',
                         cursor: deleteReason ? 'pointer' : 'not-allowed',
                         display: 'flex',
                         alignItems: 'center',
