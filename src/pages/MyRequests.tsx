@@ -805,7 +805,9 @@ const MyRequests: React.FC = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        // TODO: Handle delete
+                        setRequestToDelete(request);
+                        setIsDeleteSuccess(false);
+                        setDeleteReason('');
                         setMoreOptionsOpenFor(null);
                       }}
                       onMouseDown={(e) => {
@@ -830,7 +832,7 @@ const MyRequests: React.FC = () => {
                       }}
                     >
                       <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                      <span style={{ color: '#FF5151', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Delete the listing</span>
+                      <span style={{ color: '#FF5151', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Delete the request</span>
                     </button>
                     <button
                       type="button"
@@ -1538,7 +1540,7 @@ const MyRequests: React.FC = () => {
                   }}
                   style={{
                     backgroundColor: '#FFFFFF',
-                    border: '1px solid #FF5151',
+                    border: 'none',
                     borderRadius: '12px',
                     cursor: 'pointer',
                     display: 'flex',
@@ -1561,9 +1563,9 @@ const MyRequests: React.FC = () => {
                   }}
                   style={{
                     backgroundColor: '#212121',
-                    borderRadius: '16px',
+                    borderRadius: '12px',
                     border: 'none',
-                    padding: '8px 32px',
+                    padding: '8px 40px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -1826,7 +1828,7 @@ const MyRequests: React.FC = () => {
                         backgroundColor: '#F1F1F1',
                         borderRadius: '12px',
                         border: 'none',
-                        padding: isMobile ? '8px 24px' : '10px 28px',
+                        padding: isMobile ? '8px 32px' : '10px 36px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -1846,7 +1848,7 @@ const MyRequests: React.FC = () => {
                         backgroundColor: deleteReason ? '#FF5151' : '#FFB3B3',
                         borderRadius: '12px',
                         border: 'none',
-                        padding: isMobile ? '8px 24px' : '10px 28px',
+                        padding: isMobile ? '8px 32px' : '10px 36px',
                         cursor: deleteReason ? 'pointer' : 'not-allowed',
                         display: 'flex',
                         alignItems: 'center',
