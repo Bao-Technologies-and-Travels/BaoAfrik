@@ -15,6 +15,8 @@ import statusIcon from '../assets/images/pre/status.svg';
 import lilLogo from '../assets/images/pre/lil.png';
 import activeIcon from '../assets/images/pre/active.svg';
 import inactiveIcon from '../assets/images/pre/inactive.svg';
+import locationIcon from '../assets/images/pre/PL.svg';
+import closeIcon from '../assets/images/pre/CLose.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -203,6 +205,8 @@ const MyRequests: React.FC = () => {
   const moreOptionsRef = useRef<HTMLDivElement | null>(null);
   const [statusModalOpenFor, setStatusModalOpenFor] = useState<string | null>(null);
   const statusModalRef = useRef<HTMLDivElement | null>(null);
+  const [viewRequestModalOpen, setViewRequestModalOpen] = useState(false);
+  const [selectedRequestForView, setSelectedRequestForView] = useState<Request | null>(null);
 
   // Mock data - replace with actual data from backend
   const initialRequests: Request[] = [
@@ -449,7 +453,8 @@ const MyRequests: React.FC = () => {
           >
             {(['ongoing', 'pending', 'completed', 'expired'] as Request['status'][]).map((optionStatus) => {
               const optionConfig = statusConfig[optionStatus];
-              const isSelected = request.status === optionStatus;
+              const currentRequest = requests.find(r => r.id === requestId);
+              const isSelected = currentRequest?.status === optionStatus;
               return (
                 <button
                   key={optionStatus}
@@ -486,7 +491,6 @@ const MyRequests: React.FC = () => {
                 </button>
               );
             })}
-            <div style={{ height: '1px', backgroundColor: '#E9E9E9', margin: '4px 0' }} />
             <button
               type="button"
               onClick={(e) => {
@@ -534,7 +538,7 @@ const MyRequests: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '2.2fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+          gridTemplateColumns: '3.5fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
           gap: '16px',
           padding: '16px 20px'
         }}
@@ -624,7 +628,7 @@ const MyRequests: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '2.2fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
+              gridTemplateColumns: '3.5fr 1.5fr 1.2fr 1.2fr 1fr 1fr 0.4fr',
               gap: '16px',
               padding: '14px 20px',
               alignItems: 'center'
@@ -745,7 +749,8 @@ const MyRequests: React.FC = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        // TODO: Navigate to request detail page
+                        setSelectedRequestForView(request);
+                        setViewRequestModalOpen(true);
                         setMoreOptionsOpenFor(null);
                       }}
                       onMouseDown={(e) => {
@@ -1354,6 +1359,202 @@ const MyRequests: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* View Request Modal */}
+        {viewRequestModalOpen && selectedRequestForView && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: '#0000001A',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setViewRequestModalOpen(false);
+                setSelectedRequestForView(null);
+              }
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '30px',
+                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                padding: '30px',
+                paddingBottom: isMobile ? '8px' : '15px',
+                maxWidth: '420px',
+                width: isMobile ? '95%' : '90%',
+                minHeight: '320px',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                marginBottom: isMobile ? '12px' : '0'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setViewRequestModalOpen(false);
+                  setSelectedRequestForView(null);
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                <img
+                  src={closeIcon}
+                  alt="Close"
+                  className="w-4 h-4"
+                />
+              </button>
+
+              {/* Request Badge - Centered */}
+              <div className="flex justify-center mb-3">
+                <span 
+                  style={{ 
+                    fontSize: '10px', 
+                    color: '#BABABA',
+                    border: '1.5px solid #E1E1E1',
+                    borderRadius: '999px',
+                    padding: '2px 12px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  Request
+                </span>
+              </div>
+
+              {/* Product Name */}
+              <h2
+                className="text-lg text-center mb-2"
+                style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+              >
+                {selectedRequestForView.title}
+              </h2>
+
+              {/* Description */}
+              <p 
+                className="text-xs text-center mb-5"
+                style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+              >
+                Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!
+              </p>
+
+              {/* Three Badges - Centered */}
+              <div className="flex flex-col items-center gap-2 mb-5">
+                {/* Location Badge */}
+                <div 
+                  className="flex items-center justify-center gap-1 px-2 py-1"
+                  style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                >
+                  <img 
+                    src={locationIcon} 
+                    alt="Location"
+                    className="w-3 h-3"
+                    style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                  />
+                  <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.location}</span>
+                </div>
+
+                {/* Price and Country Badges */}
+                <div className="flex gap-2 justify-center">
+                  {/* Price Badge */}
+                  <div 
+                    className="flex items-center gap-1.5 px-3 py-1.5"
+                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                  >
+                    <img 
+                      src={moneyIcon} 
+                      alt="Money"
+                      className="w-3 h-3"
+                      style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                    />
+                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.price.replace(' - ', ' ~ ')}</span>
+                  </div>
+
+                  {/* Country Badge */}
+                  <div 
+                    className="flex items-center gap-1.5 px-3 py-1.5"
+                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                  >
+                    <img 
+                      src={selectedRequestForView.originFlag} 
+                      alt={selectedRequestForView.origin}
+                      className="w-4 h-4 object-cover rounded-full"
+                    />
+                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.origin}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer Buttons */}
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '20px' }}>
+                {/* Delete Button */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // TODO: Handle delete
+                    setViewRequestModalOpen(false);
+                    setSelectedRequestForView(null);
+                  }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px'
+                  }}
+                >
+                  <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                  <span style={{ color: '#FF5151', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Delete the request</span>
+                </button>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setViewRequestModalOpen(false);
+                    setSelectedRequestForView(null);
+                  }}
+                  style={{
+                    backgroundColor: '#212121',
+                    borderRadius: '12px',
+                    border: 'none',
+                    padding: '8px 24px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                  <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Close</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <footer className="bg-white">
