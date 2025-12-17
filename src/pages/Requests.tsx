@@ -34,6 +34,33 @@ const Requests: React.FC = () => {
   const [openPriceDropdown, setOpenPriceDropdown] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState('');
   const priceDropdownRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchDropdownRef = useRef<HTMLDivElement>(null);
+
+  const locationSuggestions = [
+    'Pakse, Laos',
+    'Palermo, Italy',
+    'Panama City, Panama',
+    'Paris, France',
+    'Patna, India',
+    'Perth, Australia',
+    'Philadelphia, USA',
+    'Phnom Penh, Cambodia',
+    'Prague, Czech Republic',
+    'Porto, Portugal',
+    'Portland, USA',
+    'Pune, India',
+    'London, United Kingdom',
+    'New York, USA',
+    'Toronto, Canada',
+    'Berlin, Germany',
+    'Sydney, Australia',
+    'Dubai, UAE'
+  ];
 
   const priceOptions = [
     { label: 'All', value: '' },
@@ -91,10 +118,45 @@ const Requests: React.FC = () => {
       if (priceDropdownRef.current && !priceDropdownRef.current.contains(event.target as Node)) {
         setOpenPriceDropdown(null);
       }
+      if (searchDropdownRef.current && !searchDropdownRef.current.contains(event.target as Node)) {
+        setShowSearchSuggestions(false);
+        setIsSearchFocused(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Filter location suggestions based on search query
+  const getFilteredSuggestions = () => {
+    if (!searchQuery.trim()) return [];
+    const query = searchQuery.toLowerCase();
+    return locationSuggestions.filter(location => 
+      location.toLowerCase().startsWith(query) || 
+      location.toLowerCase().includes(query)
+    ).slice(0, 6);
+  };
+
+  // Handle search
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      setIsSearchActive(true);
+      setShowSearchSuggestions(false);
+      setIsSearchFocused(false);
+    }
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (value.trim()) {
+      setShowSearchSuggestions(true);
+    } else {
+      setShowSearchSuggestions(false);
+      setIsSearchActive(false);
+    }
+  };
 
   const renderPagination = () => (
     <div className={`flex flex-col ${isMobile ? 'items-center gap-4' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
@@ -211,9 +273,9 @@ const Requests: React.FC = () => {
     </div>
   );
 
-  // Get total filtered count
-  const getFilteredCount = () => {
-    const allCards = [
+  // Get all cards for filtering
+  const getAllCards = () => {
+    return [
       { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 75 },
       { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 45 },
       { title: 'Shea Butter Products', country: 'Nigeria', flag: 'https://flagcdn.com/w20/ng.png', location: 'Toronto, Canada', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 25 },
@@ -221,10 +283,25 @@ const Requests: React.FC = () => {
       { title: 'Baobab Powder', country: 'Senegal', flag: 'https://flagcdn.com/w20/sn.png', location: 'Sydney, Australia', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 150 },
       { title: 'Moroccan Argan Oil', country: 'Morocco', flag: 'https://flagcdn.com/w20/ma.png', location: 'Dubai, UAE', description: 'Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!', price: 250 }
     ];
-    let filtered = allCards;
+  };
+
+  // Get filtered cards
+  const getFilteredCards = () => {
+    let filtered = getAllCards();
+    
+    // Apply search filter
+    if (isSearchActive && searchQuery.trim()) {
+      filtered = filtered.filter(card => 
+        card.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply country filter
     if (selectedCountry) {
       filtered = filtered.filter(card => card.country === selectedCountry);
     }
+    
+    // Apply price filter
     if (selectedPrice) {
       filtered = filtered.filter(card => {
         const price = card.price || 0;
@@ -238,7 +315,13 @@ const Requests: React.FC = () => {
         }
       });
     }
-    return filtered.length;
+    
+    return filtered;
+  };
+
+  // Get total filtered count
+  const getFilteredCount = () => {
+    return getFilteredCards().length;
   };
 
   // Render price filter button with dropdown
@@ -1078,7 +1161,24 @@ const Requests: React.FC = () => {
               </p>
             </div>
             {/* Search Bar or Over 400 requests available */}
-            {(selectedCountry || selectedPrice) ? (
+            {isSearchActive ? (
+              // When search is active: show "Over 400 requests available"
+              <div className="text-right" style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
+                <div style={{ 
+                  fontSize: isMobile ? '20px' : '44px', 
+                  fontWeight: '600',
+                  background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+                  Over 400
+                </div>
+                <div style={{ fontSize: isMobile ? '10px' : '18px', color: '#9C9C9C', marginTop: '4px' }}>
+                  Request availables
+                </div>
+              </div>
+            ) : (selectedCountry || selectedPrice) ? (
               // When filters are applied, show search bar in header (only if there are results)
               getFilteredCount() === 0 ? (
                 // No results: show "Over 400 requests available"
@@ -1100,11 +1200,11 @@ const Requests: React.FC = () => {
               ) : (
                 // Has results: show search bar in header
                 <div style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
-                  <div className="relative flex items-center">
+                  <div className="relative flex items-center" ref={searchDropdownRef}>
                     <img 
                       src={locationIcon} 
                       alt="Location"
-                      className="absolute left-3"
+                      className="absolute left-3 z-10"
                       style={{ 
                         width: '16px', 
                         height: '16px',
@@ -1112,41 +1212,98 @@ const Requests: React.FC = () => {
                       }}
                     />
                     <input
+                      ref={searchInputRef}
                       type="text"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      onFocus={() => {
+                        setIsSearchFocused(true);
+                        if (searchQuery.trim()) {
+                          setShowSearchSuggestions(true);
+                        }
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSearch();
+                        }
+                      }}
                       placeholder="Buyer location ?"
-                      className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 pl-10"
+                      className="w-full border rounded-lg focus:outline-none pl-10"
                       style={{ 
                         backgroundColor: '#FFFFFF',
-                        borderColor: '#E4E4E4',
+                        borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
                         fontFamily: 'Poppins, sans-serif',
                         fontSize: isMobile ? '10px' : '14px',
-                        color: '#D9D9D9',
+                        color: searchQuery ? '#212121' : '#D9D9D9',
                         padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
                       }}
                     />
-                    <div 
-                      className="absolute right-2 flex items-center justify-center"
+                    <button
+                      onClick={handleSearch}
+                      className="absolute right-2 flex items-center justify-center cursor-pointer"
                       style={{ 
                         backgroundColor: '#F9A825',
                         height: isMobile ? '20px' : '28px',
                         paddingLeft: isMobile ? '10px' : '18px',
                         paddingRight: isMobile ? '10px' : '18px',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        border: 'none'
                       }}
                     >
                       <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                    </div>
+                    </button>
+                    {/* Suggestions Dropdown */}
+                    {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
+                      <div
+                        className="absolute top-full left-0 right-0 mt-1 z-50"
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                          maxHeight: '200px',
+                          overflowY: 'auto'
+                        }}
+                      >
+                        {getFilteredSuggestions().map((location, index) => (
+                          <div
+                            key={index}
+                            onClick={() => {
+                              setSearchQuery(location);
+                              setShowSearchSuggestions(false);
+                              handleSearch();
+                            }}
+                            className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                            style={{
+                              borderBottom: index < getFilteredSuggestions().length - 1 ? '1px solid #F0F0F0' : 'none'
+                            }}
+                          >
+                            <img 
+                              src={locationIcon} 
+                              alt="Location"
+                              style={{ 
+                                width: '16px', 
+                                height: '16px',
+                                filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
+                              }}
+                            />
+                            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+                              {location}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )
             ) : (
               // No filters: show search bar normally
               <div style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
-                <div className="relative flex items-center">
+                <div className="relative flex items-center" ref={searchDropdownRef}>
                   <img 
                     src={locationIcon} 
                     alt="Location"
-                    className="absolute left-3"
+                    className="absolute left-3 z-10"
                     style={{ 
                       width: '16px', 
                       height: '16px',
@@ -1154,37 +1311,235 @@ const Requests: React.FC = () => {
                     }}
                   />
                   <input
+                    ref={searchInputRef}
                     type="text"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onFocus={() => {
+                      setIsSearchFocused(true);
+                      if (searchQuery.trim()) {
+                        setShowSearchSuggestions(true);
+                      }
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSearch();
+                      }
+                    }}
                     placeholder="Buyer location ?"
-                    className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 pl-10"
+                    className="w-full border rounded-lg focus:outline-none pl-10"
                     style={{ 
                       backgroundColor: '#FFFFFF',
-                      borderColor: '#E4E4E4',
+                      borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
                       fontFamily: 'Poppins, sans-serif',
                       fontSize: isMobile ? '10px' : '14px',
-                      color: '#D9D9D9',
+                      color: searchQuery ? '#212121' : '#D9D9D9',
                       padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
                     }}
                   />
-                  <div 
-                    className="absolute right-2 flex items-center justify-center"
+                  <button
+                    onClick={handleSearch}
+                    className="absolute right-2 flex items-center justify-center cursor-pointer"
                     style={{ 
                       backgroundColor: '#F9A825',
                       height: isMobile ? '20px' : '28px',
                       paddingLeft: isMobile ? '10px' : '18px',
                       paddingRight: isMobile ? '10px' : '18px',
-                      borderRadius: '8px'
+                      borderRadius: '8px',
+                      border: 'none'
                     }}
                   >
                     <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                  </div>
+                  </button>
+                  {/* Suggestions Dropdown */}
+                  {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
+                    <div
+                      className="absolute top-full left-0 right-0 mt-1 z-50"
+                      style={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                        maxHeight: '200px',
+                        overflowY: 'auto'
+                      }}
+                    >
+                      {getFilteredSuggestions().map((location, index) => (
+                        <div
+                          key={index}
+                          onClick={() => {
+                            setSearchQuery(location);
+                            setShowSearchSuggestions(false);
+                            handleSearch();
+                          }}
+                          className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                          style={{
+                            borderBottom: index < getFilteredSuggestions().length - 1 ? '1px solid #F0F0F0' : 'none'
+                          }}
+                        >
+                          <img 
+                            src={locationIcon} 
+                            alt="Location"
+                            style={{ 
+                              width: '16px', 
+                              height: '16px',
+                              filter: 'brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(2000%) hue-rotate(0deg) brightness(1) contrast(1)'
+                            }}
+                          />
+                          <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+                            {location}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Filtered View or Regular Sections */}
-          {(selectedCountry || selectedPrice) ? (
+          {/* Search Results View */}
+          {isSearchActive && searchQuery.trim() ? (
+            <>
+              {/* Filter Bar */}
+              <div className={isMobile ? "flex flex-col gap-4 mb-6" : "flex items-center justify-between mb-6"}>
+                {/* Left: Filters */}
+                <div className="flex items-center gap-2">
+                  {renderCountryFilterButton('relative', 'search')}
+                  {renderPriceFilterButton('relative', 'search')}
+                </div>
+
+                {/* Right: Search Bar */}
+                <div style={{ width: isMobile ? '100%' : '380px', marginLeft: isMobile ? '0' : 'auto' }}>
+                  <div className="relative flex items-center" ref={searchDropdownRef}>
+                    <img 
+                      src={locationIcon} 
+                      alt="Location"
+                      className="absolute left-3 z-10"
+                      style={{ 
+                        width: '16px', 
+                        height: '16px',
+                        filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                      }}
+                    />
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      onFocus={() => {
+                        setIsSearchFocused(true);
+                        if (searchQuery.trim()) {
+                          setShowSearchSuggestions(true);
+                        }
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSearch();
+                        }
+                      }}
+                      placeholder="Buyer location ?"
+                      className="w-full border rounded-lg focus:outline-none pl-10"
+                      style={{ 
+                        backgroundColor: '#FFFFFF',
+                        borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '10px' : '14px',
+                        color: searchQuery ? '#212121' : '#D9D9D9',
+                        padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
+                      }}
+                    />
+                    <button
+                      onClick={handleSearch}
+                      className="absolute right-2 flex items-center justify-center cursor-pointer"
+                      style={{ 
+                        backgroundColor: '#F9A825',
+                        height: isMobile ? '20px' : '28px',
+                        paddingLeft: isMobile ? '10px' : '18px',
+                        paddingRight: isMobile ? '10px' : '18px',
+                        borderRadius: '8px',
+                        border: 'none'
+                      }}
+                    >
+                      <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
+                    </button>
+                    {/* Suggestions Dropdown */}
+                    {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
+                      <div
+                        className="absolute top-full left-0 right-0 mt-1 z-50"
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                          maxHeight: '200px',
+                          overflowY: 'auto'
+                        }}
+                      >
+                        {getFilteredSuggestions().map((location, index) => (
+                          <div
+                            key={index}
+                            onClick={() => {
+                              setSearchQuery(location);
+                              setShowSearchSuggestions(false);
+                              handleSearch();
+                            }}
+                            className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                            style={{
+                              borderBottom: index < getFilteredSuggestions().length - 1 ? '1px solid #F0F0F0' : 'none'
+                            }}
+                          >
+                            <img 
+                              src={locationIcon} 
+                              alt="Location"
+                              style={{ 
+                                width: '16px', 
+                                height: '16px',
+                                filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
+                              }}
+                            />
+                            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+                              {location}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Search Results Title */}
+              <div className="mb-6">
+                <h3 style={{ 
+                  fontSize: isMobile ? '14px' : '18px', 
+                  fontWeight: '500',
+                  color: '#000000',
+                  fontFamily: 'Bricolage Grotesque, sans-serif'
+                }}>
+                  Results for "{searchQuery}" ({getFilteredCards().length} requests)
+                </h3>
+              </div>
+
+              {/* Search Results Cards */}
+              {getFilteredCards().length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {getFilteredCards().map((product: { title: string; country: string; flag: string; location: string; description?: string; price: number }, index: number) => (
+                    <div key={`search-${index}`}>
+                      {renderRequestCard(false, `search-${index}`, product)}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <p style={{ color: '#D9D9D9', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '14px' : '18px' }}>
+                    No requests found for "{searchQuery}"
+                  </p>
+                </div>
+              )}
+
+              {/* Pagination */}
+              {renderPagination()}
+            </>
+          ) : (selectedCountry || selectedPrice) ? (
             <>
               {/* Filter Bar */}
               <div className={isMobile ? "flex flex-col gap-4 mb-6" : "flex items-center justify-between mb-6"}>
@@ -1197,11 +1552,11 @@ const Requests: React.FC = () => {
                 {/* Right: Search Bar - Only show when no results */}
                 {getFilteredCount() === 0 && (
                   <div style={{ width: isMobile ? '100%' : '380px', marginLeft: isMobile ? '0' : 'auto' }}>
-                    <div className="relative flex items-center">
+                    <div className="relative flex items-center" ref={searchDropdownRef}>
                       <img 
                         src={locationIcon} 
                         alt="Location"
-                        className="absolute left-3"
+                        className="absolute left-3 z-10"
                         style={{ 
                           width: '16px', 
                           height: '16px',
@@ -1209,30 +1564,87 @@ const Requests: React.FC = () => {
                         }}
                       />
                       <input
+                        ref={searchInputRef}
                         type="text"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onFocus={() => {
+                          setIsSearchFocused(true);
+                          if (searchQuery.trim()) {
+                            setShowSearchSuggestions(true);
+                          }
+                        }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSearch();
+                          }
+                        }}
                         placeholder="Buyer location ?"
-                        className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 pl-10"
+                        className="w-full border rounded-lg focus:outline-none pl-10"
                         style={{ 
                           backgroundColor: '#FFFFFF',
-                          borderColor: '#E4E4E4',
+                          borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
                           fontFamily: 'Poppins, sans-serif',
                           fontSize: isMobile ? '10px' : '14px',
-                          color: '#D9D9D9',
+                          color: searchQuery ? '#212121' : '#D9D9D9',
                           padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
                         }}
                       />
-                      <div 
-                        className="absolute right-2 flex items-center justify-center"
+                      <button
+                        onClick={handleSearch}
+                        className="absolute right-2 flex items-center justify-center cursor-pointer"
                         style={{ 
                           backgroundColor: '#F9A825',
                           height: isMobile ? '20px' : '28px',
                           paddingLeft: isMobile ? '10px' : '18px',
                           paddingRight: isMobile ? '10px' : '18px',
-                          borderRadius: '8px'
+                          borderRadius: '8px',
+                          border: 'none'
                         }}
                       >
                         <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
-                      </div>
+                      </button>
+                      {/* Suggestions Dropdown */}
+                      {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
+                        <div
+                          className="absolute top-full left-0 right-0 mt-1 z-50"
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                            maxHeight: '200px',
+                            overflowY: 'auto'
+                          }}
+                        >
+                          {getFilteredSuggestions().map((location, index) => (
+                            <div
+                              key={index}
+                              onClick={() => {
+                                setSearchQuery(location);
+                                setShowSearchSuggestions(false);
+                                handleSearch();
+                              }}
+                              className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                              style={{
+                                borderBottom: index < getFilteredSuggestions().length - 1 ? '1px solid #F0F0F0' : 'none'
+                              }}
+                            >
+                              <img 
+                                src={locationIcon} 
+                                alt="Location"
+                                style={{ 
+                                  width: '16px', 
+                                  height: '16px',
+                                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(2000%) hue-rotate(0deg) brightness(1) contrast(1)'
+                                }}
+                              />
+                              <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+                                {location}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
