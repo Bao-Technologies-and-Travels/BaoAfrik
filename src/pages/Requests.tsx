@@ -1384,9 +1384,6 @@ const Requests: React.FC = () => {
                             handleSearch();
                           }}
                           className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
-                          style={{
-                            borderBottom: index < getFilteredSuggestions().length - 1 ? '1px solid #F0F0F0' : 'none'
-                          }}
                         >
                           <img 
                             src={locationIcon} 
@@ -1662,8 +1659,8 @@ const Requests: React.FC = () => {
                 </>
               )}
 
-              {/* Pagination */}
-              {renderPagination()}
+              {/* Pagination - Only show when there are results */}
+              {getFilteredCards().length > 0 && renderPagination()}
             </>
           ) : (selectedCountry || selectedPrice) ? (
             <>
@@ -1751,9 +1748,6 @@ const Requests: React.FC = () => {
                                 handleSearch();
                               }}
                               className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
-                              style={{
-                                borderBottom: index < getFilteredSuggestions().length - 1 ? '1px solid #F0F0F0' : 'none'
-                              }}
                             >
                               <img 
                                 src={locationIcon} 
