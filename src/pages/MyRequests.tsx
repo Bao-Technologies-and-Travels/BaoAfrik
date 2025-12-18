@@ -559,8 +559,8 @@ const MyRequests: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1.8fr 2.2fr 1.5fr 1.5fr 1fr 1fr 0.5fr',
-          gap: '0px',
+          gridTemplateColumns: '1.5fr 2fr 1.5fr 1.5fr 1.2fr 1.2fr 0.6fr',
+          gap: '6px',
           padding: '16px 16px 16px 0px'
         }}
       >
@@ -649,8 +649,8 @@ const MyRequests: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1.8fr 2.2fr 1.5fr 1.5fr 1fr 1fr 0.5fr',
-              gap: '0px',
+              gridTemplateColumns: '1.5fr 2fr 1.5fr 1.5fr 1.2fr 1.2fr 0.6fr',
+              gap: '6px',
               padding: '14px 16px 14px 0px',
               alignItems: 'center'
             }}
