@@ -15,5 +15,6 @@ router.post('/upload-url', chatController.generatePresignedUrl);
 router.post('/conversations/:conversationId/read', chatController.markAsRead);
 router.get('/unread-counts', chatController.getUnreadCounts);
 router.post('/contact-seller', chatController.contactSeller);
+router.post('/contact-request', chatController.contactRequest);
 
 export default router;

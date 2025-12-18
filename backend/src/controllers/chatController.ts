@@ -26,6 +26,99 @@ export class ChatController {
         }
     };
 
+    contactRequest = async (req: Request, res: Response) => {
+        try {
+            const { requestId, message, productData } = req.body;
+            const sellerId = req.user!.id;
+
+            if (!requestId) {
+                return res.status(422).json({
+                    success: false,
+                    error: 'Request ID is required'
+                });
+            }
+
+            // Get request and requester information
+            const request = await prisma.productRequest.findUnique({
+                where: { id: requestId },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true
+                        }
+                    }
+                }
+            });
+
+            if (!request) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Product request not found'
+                });
+            }
+
+            if (request.userId === sellerId) {
+                return res.status(422).json({
+                    success: false,
+                    error: 'Cannot create conversation with yourself'
+                });
+            }
+
+            // Create conversation
+            const conversation = await this.chatService.createConversation({
+                creatorId: sellerId,
+                participantId: request.userId,
+                productId: null,
+                requestId: request.id,
+                initialMessage: message,
+                productData: productData || {
+                    id: request.id,
+                    name: request.productName,
+                    description: request.description,
+                    origin: request.origin,
+                    sellerLocation: request.sellerLocation,
+                    price: request.minPrice || 0,
+                    currency: request.currency || 'USD',
+                    isRequest: true,
+                    requestData: {
+                        minPrice: request.minPrice,
+                        maxPrice: request.maxPrice,
+                        status: request.status
+                    },
+                    seller: {
+                        id: request.user.id,
+                        email: request.user.email,
+                        firstName: request.user.firstName,
+                        lastName: request.user.lastName,
+                        profileImage: request.user.profileImage
+                    }
+                }
+            });
+
+            return res.json({
+                success: true,
+                data: {
+                    conversation,
+                    request: {
+                        id: request.id,
+                        productName: request.productName,
+                        status: request.status
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error in contactRequest:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to process contact request'
+            });
+        }
+    };
+
     contactSeller = async (req: Request, res: Response) => {
         try {
             const { productId } = req.body;

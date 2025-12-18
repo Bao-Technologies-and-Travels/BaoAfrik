@@ -247,6 +247,7 @@ export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeo
 export const ConversationScalarFieldEnum = {
   id: 'id',
   productId: 'productId',
+  requestId: 'requestId',
   lastMessageId: 'lastMessageId',
   lastMessageAt: 'lastMessageAt',
   createdAt: 'createdAt',

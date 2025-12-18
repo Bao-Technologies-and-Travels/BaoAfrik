@@ -1,15 +1,13 @@
 import prisma from '@/config/database'; import { MessageType } from '../generated/client';
 // import { s3Service } from './s3Service';
 import { gcpStorageService } from './gcpStorageService';
-import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
-
-// const prisma = new PrismaClient({} as any);
 
 export interface CreateConversationData {
     creatorId: string;
     participantId: string;
-    productId?: string;
+    productId?: string | null;
+    requestId?: string | null;
     initialMessage?: string;
     productData?: any;
 }
@@ -346,7 +344,20 @@ export class ChatService {
         return processedMessages;
     }
 
+    private async checkDbEncryptAvailable() {
+        try {
+            await prisma.$queryRaw`SELECT db_encrypt('test')`;
+            return true;
+        } catch (error) {
+            console.warn('Database encryption function not available, using app-level encryption only');
+            return false;
+        }
+    }
+
     async createConversation(data: CreateConversationData) {
+        // Check if db_encrypt function exists (outside transaction)
+        const dbEncryptAvailable = await this.checkDbEncryptAvailable();
+
         return await prisma.$transaction(async (tx: any) => {
             // Find conversations where both users are participants
             const possibleConvs = await tx.conversation.findMany({
@@ -381,20 +392,32 @@ export class ChatService {
 
             const now = new Date();
 
-            // Create new conversation
-            const conversation = await tx.conversation.create({
-                data: {
-                    productId: data.productId || null,
-                    productData: data.productData ? JSON.stringify(data.productData) : null,
-                    participants: {
-                        create: [
-                            { userId: data.creatorId },
-                            { userId: data.participantId }
-                        ]
-                    },
-                    createdAt: now,
-                    updatedAt: now
+            // Create new conversation with request data
+            const conversationData: any = {
+                participants: {
+                    create: [
+                        { userId: data.creatorId },
+                        { userId: data.participantId }
+                    ]
                 },
+                createdAt: now,
+                updatedAt: now
+            };
+
+            // Add productId or requestId based on what's provided
+            if (data.productId) {
+                conversationData.productId = data.productId;
+            }
+            if (data.requestId) {
+                conversationData.requestId = data.requestId;
+                // Store product data as string in the conversation
+                if (data.productData) {
+                    conversationData.productData = JSON.stringify(data.productData);
+                }
+            }
+
+            const conversation = await tx.conversation.create({
+                data: conversationData,
                 include: {
                     participants: {
                         include: {
@@ -433,17 +456,26 @@ export class ChatService {
                 // encrypt the innitial message
                 const appEncrypted = this.encryptMessage(data.initialMessage);
 
-                // database level encryptionfor initial message
-                const dbEncryptedContent = await tx.$queryRaw<{ db_encrypted: string }[]>`
-                SELECT db_encrypt(${appEncrypted.encrypted}) as db_encrypted
-                `;
+                // Use database encryption if available, otherwise use app-level encryption only
+                let dbEncryptedContent = null;
+                if (dbEncryptAvailable) {
+                    try {
+                        const result = await tx.$queryRaw<{ db_encrypted: string }[]>`
+                        SELECT db_encrypt(${appEncrypted.encrypted}) as db_encrypted
+                        `;
+                        dbEncryptedContent = result[0]?.db_encrypted || null;
+                    } catch (error) {
+                        console.warn('Database encryption failed, using app-level encryption only');
+                        dbEncryptedContent = null;
+                    }
+                }
 
                 const initialMessage = await tx.message.create({
                     data: {
                         conversationId: conversation.id,
                         senderId: data.creatorId,
                         content: appEncrypted.encrypted,
-                        dbEncryptedContent: dbEncryptedContent[0]?.db_encrypted || null,
+                        dbEncryptedContent: dbEncryptedContent,
                         encryptionIv: appEncrypted.iv,
                         encryptionAuthTag: appEncrypted.authTag,
                         messageType: MessageType.TEXT,
@@ -468,13 +500,13 @@ export class ChatService {
             }
 
             // parse productData for response
-            let parsedProductData = null;
-            try {
-                if (conversation.productData) {
+            let parsedProductData = data.productData || null;
+            if (!parsedProductData && conversation.productData) {
+                try {
                     parsedProductData = JSON.parse(conversation.productData);
+                } catch (error) {
+                    parsedProductData = null;
                 }
-            } catch (error) {
-                parsedProductData = null;
             }
 
             return {
