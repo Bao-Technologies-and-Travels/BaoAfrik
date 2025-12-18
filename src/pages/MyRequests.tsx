@@ -23,6 +23,7 @@ import bagIcon from '../assets/images/pre/bag.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
 import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
+import SDicon from '../assets/images/pre/SDicon.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -217,6 +218,9 @@ const MyRequests: React.FC = () => {
   const [requestToDelete, setRequestToDelete] = useState<Request | null>(null);
   const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
   const [deleteReason, setDeleteReason] = useState<string>('');
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
+  const [mobileSearchSubmitted, setMobileSearchSubmitted] = useState(false);
 
   // Mock data - replace with actual data from backend
   const initialRequests: Request[] = [
@@ -872,9 +876,9 @@ const MyRequests: React.FC = () => {
           </div>
         )}
 
-        {/* Request Badge Only - Mobile */}
+        {/* Request Badge, Status Badge and More Options - Mobile */}
         {isMobile && (
-          <div className="mb-1">
+          <div className="flex items-center justify-between mb-1">
             <span
               style={{
                 fontSize: '9px',
@@ -887,6 +891,246 @@ const MyRequests: React.FC = () => {
             >
               Request
             </span>
+            <div className="flex items-center gap-2" style={{ position: 'relative' }}>
+              {/* Status Badge with Arrow */}
+              <div style={{ position: 'relative' }} ref={statusModalRef}>
+                <div
+                  className="inline-flex items-center gap-1 px-2 rounded-full"
+                  style={{
+                    backgroundColor: config.bgColor,
+                    fontSize: '9px',
+                    borderRadius: '8px',
+                    paddingTop: '3px',
+                    paddingBottom: '4px',
+                    height: '20px'
+                  }}
+                >
+                  <span
+                    style={{
+                      color: config.textColor,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    {config.text}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                {/* Status Modal */}
+                {isStatusModalOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '28px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '4px',
+                      width: '90px',
+                      zIndex: 1000,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px'
+                    }}
+                  >
+                    {(['ongoing', 'pending', 'completed', 'expired'] as Request['status'][]).map((optionStatus) => {
+                      const optionConfig = statusConfig[optionStatus];
+                      const currentRequest = requests.find(r => r.id === request.id);
+                      const isSelected = currentRequest?.status === optionStatus;
+                      return (
+                        <button
+                          key={optionStatus}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStatusChange(request.id, optionStatus);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '4px 8px',
+                            borderRadius: isSelected ? '6px' : '0',
+                            backgroundColor: isSelected ? optionConfig.bgColor : 'transparent',
+                            border: 'none',
+                            color: optionConfig.textColor,
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '11px',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          {optionConfig.text}
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setStatusModalOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        backgroundColor: '#FAFAFA',
+                        border: 'none',
+                        color: '#B0B0B0',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '11px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        marginTop: '2px'
+                      }}
+                    >
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      <span style={{ color: '#B0B0B0' }}>Close</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+              {/* More Options Button */}
+              <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                <button
+                  type="button"
+                  className="w-4 h-4 rounded-full border flex items-center justify-center"
+                  style={{
+                    borderColor: '#B0B0B0',
+                    borderWidth: '1.5px',
+                    backgroundColor: '#FFFFFF',
+                    cursor: 'pointer',
+                    padding: 0
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMoreOptionsOpenFor(isMoreOptionsOpen ? null : request.id);
+                  }}
+                >
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="3" cy="6" r="1" fill="#B0B0B0" />
+                    <circle cx="6" cy="6" r="1" fill="#B0B0B0" />
+                    <circle cx="9" cy="6" r="1" fill="#B0B0B0" />
+                  </svg>
+                </button>
+                {isMoreOptionsOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '28px',
+                      right: '0',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '6px',
+                      minWidth: '150px',
+                      zIndex: 1000
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedRequestForView(request);
+                        setViewRequestModalOpen(true);
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 10px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        borderRadius: '8px'
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>View the request</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setRequestToDelete(request);
+                        setIsDeleteSuccess(false);
+                        setDeleteReason('');
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 10px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        borderRadius: '8px'
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                      <span style={{ color: '#FF5151', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>Delete request</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 10px',
+                        border: 'none',
+                        background: '#FAFAFA',
+                        cursor: 'pointer',
+                        borderRadius: '8px',
+                        marginTop: '4px'
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -1061,7 +1305,7 @@ const MyRequests: React.FC = () => {
         {/* Ongoing requests Section */}
         {ongoingRequests.length > 0 && (
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
+            <div className={`flex items-center justify-between mb-6 ${isMobile ? 'px-4' : ''}`}>
               <h3 style={{
                 fontFamily: 'Bricolage Grotesque, sans-serif',
                 fontSize: isMobile ? '14px' : '18px',
@@ -1070,7 +1314,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Ongoing requests {'>'}
               </h3>
-              <div className="flex items-center gap-3">
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-4' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1107,6 +1351,10 @@ const MyRequests: React.FC = () => {
               <div
                 className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                 style={isMobile ? {
+                  paddingLeft: '16px',
+                  paddingRight: '16px',
+                  paddingTop: '8px',
+                  paddingBottom: '8px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   WebkitOverflowScrolling: 'touch'
@@ -1121,7 +1369,7 @@ const MyRequests: React.FC = () => {
         {/* Pending requests Section */}
         {pendingRequests.length > 0 && (
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
+            <div className={`flex items-center justify-between mb-6 ${isMobile ? 'px-4' : ''}`}>
               <h3 style={{
                 fontFamily: 'Bricolage Grotesque, sans-serif',
                 fontSize: isMobile ? '14px' : '18px',
@@ -1130,7 +1378,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Pending requests {'>'}
               </h3>
-              <div className="flex items-center gap-3">
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-4' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1167,6 +1415,10 @@ const MyRequests: React.FC = () => {
               <div
                 className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                 style={isMobile ? {
+                  paddingLeft: '16px',
+                  paddingRight: '16px',
+                  paddingTop: '8px',
+                  paddingBottom: '8px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   WebkitOverflowScrolling: 'touch'
@@ -1181,7 +1433,7 @@ const MyRequests: React.FC = () => {
         {/* Completed requests Section (First Row) */}
         {completedRequests.length > 0 && (
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
+            <div className={`flex items-center justify-between mb-6 ${isMobile ? 'px-4' : ''}`}>
               <h3 style={{
                 fontFamily: 'Bricolage Grotesque, sans-serif',
                 fontSize: isMobile ? '14px' : '18px',
@@ -1190,7 +1442,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Completed requests {'>'}
               </h3>
-              <div className="flex items-center gap-3">
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-4' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1227,6 +1479,10 @@ const MyRequests: React.FC = () => {
               <div
                 className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                 style={isMobile ? {
+                  paddingLeft: '16px',
+                  paddingRight: '16px',
+                  paddingTop: '8px',
+                  paddingBottom: '8px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   WebkitOverflowScrolling: 'touch'
@@ -1241,7 +1497,7 @@ const MyRequests: React.FC = () => {
         {/* Expired requests Section */}
         {expiredRequests.length > 0 && (
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
+            <div className={`flex items-center justify-between mb-6 ${isMobile ? 'px-4' : ''}`}>
               <h3 style={{
                 fontFamily: 'Bricolage Grotesque, sans-serif',
                 fontSize: isMobile ? '14px' : '18px',
@@ -1250,7 +1506,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Expired requests {'>'}
               </h3>
-              <div className="flex items-center gap-3">
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-4' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1287,6 +1543,10 @@ const MyRequests: React.FC = () => {
               <div
                 className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                 style={isMobile ? {
+                  paddingLeft: '16px',
+                  paddingRight: '16px',
+                  paddingTop: '8px',
+                  paddingBottom: '8px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   WebkitOverflowScrolling: 'touch'
@@ -1637,6 +1897,125 @@ const MyRequests: React.FC = () => {
     inactive: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(176deg) brightness(103%) contrast(95%)'
   };
 
+  // Mobile Search View
+  if (showMobileSearch && isMobile) {
+    const mobileSearchFiltered = mobileSearchSubmitted ? requests.filter(request => {
+      const query = mobileSearchQuery.toLowerCase().trim();
+      return (
+        request.title.toLowerCase().includes(query) ||
+        request.location.toLowerCase().includes(query) ||
+        request.origin.toLowerCase().includes(query) ||
+        (request.description && request.description.toLowerCase().includes(query))
+      );
+    }) : [];
+
+    const hasSearchResults = mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchFiltered.length > 0;
+    const isNoResults = mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchFiltered.length === 0;
+    const showSearchButton = !mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchFiltered.length === 0 && mobileSearchQuery.trim() === '');
+
+    return (
+      <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        {/* Search Bar at Top */}
+        <div className="px-4 pt-4 pb-3">
+          <div 
+            className="flex items-center gap-3 px-3 py-2 bg-white" 
+            style={{ 
+              border: `1px solid ${mobileSearchQuery ? '#97CDF9' : '#E4E4E4'}`, 
+              borderRadius: '12px' 
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setShowMobileSearch(false);
+                setMobileSearchQuery('');
+                setMobileSearchSubmitted(false);
+              }}
+              className="flex-shrink-0"
+            >
+              <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+            </button>
+            <input
+              type="text"
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
+              className="flex-1 outline-none"
+              style={{ fontFamily: 'Poppins, sans-serif', fontSize: '14px', color: '#212121' }}
+              placeholder="Search requests..."
+              autoFocus
+            />
+            {mobileSearchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileSearchQuery('');
+                  setMobileSearchSubmitted(false);
+                }}
+                className="flex-shrink-0"
+              >
+                <img src={SDicon} alt="Clear" className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Search Results Title */}
+        {hasSearchResults && (
+          <div className="px-4 pb-3">
+            <h2 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', color: '#212121', fontWeight: 600 }}>
+              Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({mobileSearchFiltered.length} {mobileSearchFiltered.length === 1 ? 'request' : 'requests'})</span>
+            </h2>
+          </div>
+        )}
+
+        {/* Search Results or Empty State */}
+        <div className="flex-1 overflow-y-auto px-4 pb-24">
+          {isNoResults && (
+            <div className="flex flex-col items-center justify-center" style={{ paddingTop: '140px' }}>
+              <img src={bagIcon} alt="No requests" style={{ width: '50px', height: '50px', marginBottom: '14px', opacity: 0.3 }} />
+              <p style={{ color: '#939393', fontSize: '11px', textAlign: 'center', marginBottom: '14px', lineHeight: '1.5' }}>
+                No requests found. Please try adjusting<br />your search criteria.
+              </p>
+            </div>
+          )}
+
+          {hasSearchResults && (
+            <div className="grid grid-cols-1 gap-4">
+              {mobileSearchFiltered.map((request) => renderGridCard(request))}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Search Button */}
+        {showSearchButton && (
+          <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 bg-white" style={{ boxShadow: 'none', border: 'none', borderTop: 'none' }}>
+            <button
+              type="button"
+              className="w-full py-3 rounded-xl"
+              style={{
+                backgroundColor: mobileSearchQuery.trim() ? '#F9A825' : '#D9D9D9',
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: '14px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 500,
+                cursor: mobileSearchQuery.trim() ? 'pointer' : 'not-allowed',
+                boxShadow: 'none'
+              }}
+              onClick={() => {
+                if (mobileSearchQuery.trim()) {
+                  setMobileSearchSubmitted(true);
+                }
+              }}
+            >
+              Search
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Header - Hidden on mobile */}
@@ -1660,6 +2039,7 @@ const MyRequests: React.FC = () => {
                 className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
                 style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
                 aria-label="Search"
+                onClick={() => setShowMobileSearch(true)}
               >
                 <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
               </button>
