@@ -19,6 +19,7 @@ import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
 import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 import backArrowIcon from '../assets/images/pre/back arrow.svg';
+import SDicon from '../assets/images/pre/SDicon.svg';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -42,6 +43,9 @@ const Requests: React.FC = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchDropdownRef = useRef<HTMLDivElement>(null);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
+  const [mobileSearchSubmitted, setMobileSearchSubmitted] = useState(false);
 
   const locationSuggestions = [
     'Pakse, Laos',
@@ -1374,6 +1378,127 @@ const Requests: React.FC = () => {
     );
   };
 
+  // Mobile Search View
+  if (showMobileSearch && isMobile) {
+    const mobileSearchFiltered = mobileSearchSubmitted ? getAllCards().filter(card => {
+      const query = mobileSearchQuery.toLowerCase().trim();
+      return (
+        card.title.toLowerCase().includes(query) ||
+        card.location.toLowerCase().includes(query) ||
+        card.country.toLowerCase().includes(query) ||
+        (card.description && card.description.toLowerCase().includes(query))
+      );
+    }) : [];
+
+    const hasSearchResults = mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchFiltered.length > 0;
+    const isNoResults = mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchFiltered.length === 0;
+    const showSearchButton = !mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchFiltered.length === 0 && mobileSearchQuery.trim() === '');
+
+    return (
+      <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        {/* Search Bar at Top */}
+        <div className="px-4 pt-4 pb-3">
+          <div 
+            className="flex items-center gap-3 px-3 py-2 bg-white" 
+            style={{ 
+              border: `1px solid ${mobileSearchQuery ? '#97CDF9' : '#E4E4E4'}`, 
+              borderRadius: '12px' 
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setShowMobileSearch(false);
+                setMobileSearchQuery('');
+                setMobileSearchSubmitted(false);
+              }}
+              className="flex-shrink-0"
+            >
+              <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+            </button>
+            <input
+              type="text"
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
+              className="flex-1 outline-none"
+              style={{ fontFamily: 'Poppins, sans-serif', fontSize: '14px', color: '#212121' }}
+              placeholder="Search requests..."
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setMobileSearchQuery('');
+                setMobileSearchSubmitted(false);
+              }}
+              className="flex-shrink-0"
+            >
+              <img src={SDicon} alt="Clear" className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Search Results Title */}
+        {hasSearchResults && (
+          <div className="px-4 pb-3">
+            <h2 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', color: '#212121', fontWeight: 600 }}>
+              Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({mobileSearchFiltered.length} {mobileSearchFiltered.length === 1 ? 'request' : 'requests'})</span>
+            </h2>
+          </div>
+        )}
+
+        {/* Search Results or Empty State */}
+        <div className="flex-1 overflow-y-auto px-4 pb-24">
+          {isNoResults && (
+            <div className="flex flex-col items-center justify-center" style={{ paddingTop: '140px' }}>
+              <img src={emptyRequestIcon} alt="No requests" style={{ width: '50px', height: '50px', marginBottom: '14px', opacity: 0.3 }} />
+              <p style={{ color: '#939393', fontSize: '11px', textAlign: 'center', marginBottom: '14px', lineHeight: '1.5' }}>
+                No requests found. Please try adjusting<br />your search criteria.
+              </p>
+            </div>
+          )}
+
+          {hasSearchResults && (
+            <div className="grid grid-cols-1 gap-4">
+              {mobileSearchFiltered.map((product, index) => (
+                <React.Fragment key={index}>
+                  {renderRequestCard(false, `mobile-search-${index}`, product)}
+                </React.Fragment>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Search Button */}
+        {showSearchButton && (
+          <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 bg-white" style={{ boxShadow: 'none', border: 'none', borderTop: 'none' }}>
+            <button
+              type="button"
+              className="w-full py-3 rounded-xl"
+              style={{
+                backgroundColor: mobileSearchQuery.trim() ? '#F9A825' : '#D9D9D9',
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: '14px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 500,
+                cursor: 'pointer',
+                boxShadow: 'none'
+              }}
+              onClick={() => {
+                if (mobileSearchQuery.trim()) {
+                  setMobileSearchSubmitted(true);
+                }
+              }}
+            >
+              Search
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Mobile Top Bar */}
@@ -1394,6 +1519,7 @@ const Requests: React.FC = () => {
               className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
               style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
               aria-label="Search"
+              onClick={() => setShowMobileSearch(true)}
             >
               <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
             </button>
