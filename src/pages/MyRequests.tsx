@@ -19,6 +19,10 @@ import locationIcon from '../assets/images/pre/PL.svg';
 import closeIcon from '../assets/images/pre/CLose.svg';
 import redtrashIcon from '../assets/images/pre/redtrash.svg';
 import verityIcon from '../assets/images/pre/verity.svg';
+import bagIcon from '../assets/images/pre/bag.svg';
+import draftsIcon from '../assets/images/pre/drafts.svg';
+import grayArrowIcon from '../assets/images/pre/gray.svg';
+import blackArrowIcon from '../assets/images/pre/black.svg';
 
 // Import product images
 import a1 from '../assets/images/pre/a1.png';
@@ -565,22 +569,21 @@ const MyRequests: React.FC = () => {
 
     const config = statusConfig[request.status];
     const defaultDescription = 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.';
+    const isStatusModalOpen = statusModalOpenFor === request.id;
+    const isMoreOptionsOpen = moreOptionsOpenFor === request.id;
 
     return (
       <div
         key={request.id}
-        className="bg-white hover:shadow-md transition-shadow cursor-pointer"
-        onClick={() => {
-          setSelectedRequestForView(request);
-          setViewRequestModalOpen(true);
-        }}
+        className="bg-white hover:shadow-md transition-shadow"
         style={{
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
           height: 'auto',
           width: isMobile ? '260px' : 'auto',
           flexShrink: isMobile ? 0 : 'initial',
           padding: isMobile ? '10px' : '16px',
-          borderRadius: '24px'
+          borderRadius: '24px',
+          position: 'relative'
         }}
       >
         {/* Request Badge and Status Badge - Desktop only */}
@@ -598,34 +601,272 @@ const MyRequests: React.FC = () => {
             >
               Request
             </span>
-            <div className="flex items-center gap-2">
-              <div
-                className="px-2 py-0.5"
-                style={{
-                  backgroundColor: config.bgColor,
-                  fontSize: '10px',
-                  color: config.textColor,
-                  fontWeight: 'normal',
-                  fontFamily: 'Poppins, sans-serif',
-                  borderRadius: '8px'
-                }}
-              >
-                {config.text}
-              </div>
-              <div
-                className="w-5 h-5 rounded-full border flex items-center justify-center"
-                style={{
-                  borderColor: '#FFFFFF',
-                  borderWidth: '1.5px',
-                  backgroundColor: '#FFFFFF'
-                }}
-              >
+            <div className="flex items-center gap-2" style={{ position: 'relative' }}>
+              {/* Status Badge with Arrow */}
+              <div style={{ position: 'relative' }}>
                 <div
-                  className="w-3 h-3 rounded-full"
+                  className="inline-flex items-center gap-1 px-2.5"
                   style={{
-                    backgroundColor: '#FFFFFF'
+                    backgroundColor: config.bgColor,
+                    fontSize: '10px',
+                    borderRadius: '8px',
+                    paddingTop: '4px',
+                    paddingBottom: '6px',
+                    height: '24px'
                   }}
-                />
+                >
+                  <span
+                    style={{
+                      color: config.textColor,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    {config.text}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                {/* Status Modal */}
+                {isStatusModalOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '32px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '4px',
+                      width: '100px',
+                      zIndex: 1000,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px'
+                    }}
+                  >
+                    {(['ongoing', 'pending', 'completed', 'expired'] as Request['status'][]).map((optionStatus) => {
+                      const optionConfig = statusConfig[optionStatus];
+                      const currentRequest = requests.find(r => r.id === request.id);
+                      const isSelected = currentRequest?.status === optionStatus;
+                      return (
+                        <button
+                          key={optionStatus}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStatusChange(request.id, optionStatus);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '4px 8px',
+                            borderRadius: isSelected ? '6px' : '0',
+                            backgroundColor: isSelected ? optionConfig.bgColor : 'transparent',
+                            border: 'none',
+                            color: optionConfig.textColor,
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '12px',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.backgroundColor = '#FAFAFA';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }
+                          }}
+                        >
+                          {optionConfig.text}
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setStatusModalOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        backgroundColor: '#FAFAFA',
+                        border: 'none',
+                        color: '#B0B0B0',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        marginTop: '2px'
+                      }}
+                    >
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      <span style={{ color: '#B0B0B0' }}>Close</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+              {/* More Options Button */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  className="w-5 h-5 rounded-full border flex items-center justify-center"
+                  style={{
+                    borderColor: '#B0B0B0',
+                    borderWidth: '1.5px',
+                    backgroundColor: '#FFFFFF',
+                    cursor: 'pointer',
+                    padding: 0
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMoreOptionsOpenFor(isMoreOptionsOpen ? null : request.id);
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                  </svg>
+                </button>
+                {isMoreOptionsOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '32px',
+                      right: '0',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '8px',
+                      minWidth: '180px',
+                      zIndex: 1000
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedRequestForView(request);
+                        setViewRequestModalOpen(true);
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        borderRadius: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#FAFAFA';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <span style={{ color: '#939393', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>View the request</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setRequestToDelete(request);
+                        setIsDeleteSuccess(false);
+                        setDeleteReason('');
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        borderRadius: '8px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#FFF5F5';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                      <span style={{ color: '#FF5151', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Delete request</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px 12px',
+                        border: 'none',
+                        background: '#FAFAFA',
+                        cursor: 'pointer',
+                        borderRadius: '8px',
+                        marginTop: '4px'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -829,6 +1070,28 @@ const MyRequests: React.FC = () => {
               }}>
                 Ongoing requests {'>'}
               </h3>
+              <div className="flex items-center gap-3">
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: isMobile ? '16px' : '20px',
+                    height: isMobile ? '16px' : '20px'
+                  }}
+                  aria-label="Previous"
+                >
+                  <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                </button>
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: isMobile ? '16px' : '20px',
+                    height: isMobile ? '16px' : '20px'
+                  }}
+                  aria-label="Next"
+                >
+                  <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                </button>
+              </div>
             </div>
             <div className="relative">
               {/* Fade effect on the right - Desktop only */}
@@ -849,7 +1112,7 @@ const MyRequests: React.FC = () => {
                   WebkitOverflowScrolling: 'touch'
                 } : {}}
               >
-                {ongoingRequests.map((request) => renderGridCard(request))}
+                {ongoingRequests.slice(0, 3).map((request) => renderGridCard(request))}
               </div>
             </div>
           </div>
@@ -867,6 +1130,28 @@ const MyRequests: React.FC = () => {
               }}>
                 Pending requests {'>'}
               </h3>
+              <div className="flex items-center gap-3">
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: isMobile ? '16px' : '20px',
+                    height: isMobile ? '16px' : '20px'
+                  }}
+                  aria-label="Previous"
+                >
+                  <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                </button>
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: isMobile ? '16px' : '20px',
+                    height: isMobile ? '16px' : '20px'
+                  }}
+                  aria-label="Next"
+                >
+                  <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                </button>
+              </div>
             </div>
             <div className="relative">
               {/* Fade effect on the right - Desktop only */}
@@ -887,7 +1172,7 @@ const MyRequests: React.FC = () => {
                   WebkitOverflowScrolling: 'touch'
                 } : {}}
               >
-                {pendingRequests.map((request) => renderGridCard(request))}
+                {pendingRequests.slice(0, 3).map((request) => renderGridCard(request))}
               </div>
             </div>
           </div>
@@ -905,6 +1190,28 @@ const MyRequests: React.FC = () => {
               }}>
                 Completed requests {'>'}
               </h3>
+              <div className="flex items-center gap-3">
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: isMobile ? '16px' : '20px',
+                    height: isMobile ? '16px' : '20px'
+                  }}
+                  aria-label="Previous"
+                >
+                  <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                </button>
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: isMobile ? '16px' : '20px',
+                    height: isMobile ? '16px' : '20px'
+                  }}
+                  aria-label="Next"
+                >
+                  <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                </button>
+              </div>
             </div>
             <div className="relative">
               {/* Fade effect on the right - Desktop only */}
@@ -925,13 +1232,13 @@ const MyRequests: React.FC = () => {
                   WebkitOverflowScrolling: 'touch'
                 } : {}}
               >
-                {completedRequests.map((request) => renderGridCard(request))}
+                {completedRequests.slice(0, 3).map((request) => renderGridCard(request))}
               </div>
             </div>
           </div>
         )}
 
-        {/* Completed requests Section (Second Row - Expired) */}
+        {/* Expired requests Section */}
         {expiredRequests.length > 0 && (
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
@@ -941,8 +1248,30 @@ const MyRequests: React.FC = () => {
                 fontWeight: '500',
                 color: '#000000'
               }}>
-                Completed requests {'>'}
+                Expired requests {'>'}
               </h3>
+              <div className="flex items-center gap-3">
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: isMobile ? '16px' : '20px',
+                    height: isMobile ? '16px' : '20px'
+                  }}
+                  aria-label="Previous"
+                >
+                  <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                </button>
+                <button 
+                  className="rounded-full flex items-center justify-center transition-all duration-200"
+                  style={{
+                    width: isMobile ? '16px' : '20px',
+                    height: isMobile ? '16px' : '20px'
+                  }}
+                  aria-label="Next"
+                >
+                  <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                </button>
+              </div>
             </div>
             <div className="relative">
               {/* Fade effect on the right - Desktop only */}
@@ -963,7 +1292,7 @@ const MyRequests: React.FC = () => {
                   WebkitOverflowScrolling: 'touch'
                 } : {}}
               >
-                {expiredRequests.map((request) => renderGridCard(request))}
+                {expiredRequests.slice(0, 3).map((request) => renderGridCard(request))}
               </div>
             </div>
           </div>
@@ -1787,12 +2116,53 @@ const MyRequests: React.FC = () => {
           <div className="max-w-[78rem] mx-auto w-full pl-0 pr-0">
             <div className="lg:-ml-8 w-full">
               {shouldShowEmptyState ? (
-                <div className="text-center py-16">
-                  <p style={{ color: '#9C9C9C', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
-                    {isSearchNoResultsState
-                      ? "We couldn't find any requests that match your search. Try adjusting your keywords or filters."
-                      : "You don't have any requests yet."}
+                <div className="text-center" style={{ padding: isMobile ? '32px 16px' : '48px 16px' }}>
+                  {/* Shopping Bag with Magnifying Glass Icon */}
+                  <img 
+                    src={bagIcon} 
+                    alt="No requests found" 
+                    className="mx-auto" 
+                    style={{ 
+                      width: isMobile ? '40px' : '60px', 
+                      height: isMobile ? '40px' : '60px',
+                      marginBottom: isMobile ? '12px' : '16px'
+                    }}
+                  />
+                  
+                  {/* Message */}
+                  <p style={{ 
+                    fontSize: isMobile ? '12px' : '18px', 
+                    color: '#6A6A6A', 
+                    fontFamily: 'Poppins, sans-serif', 
+                    maxWidth: isMobile ? '280px' : '500px', 
+                    margin: isMobile ? '0 auto 12px' : '0 auto 16px',
+                    lineHeight: '1.5'
+                  }}>
+                    Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
                   </p>
+                  
+                  {/* Make a Request Button */}
+                  <button
+                    onClick={() => navigate('/requests')}
+                    className="inline-flex items-center mx-auto"
+                    style={{
+                      display: 'flex',
+                      padding: isMobile ? '8px 16px' : '10px 20px',
+                      alignItems: 'center',
+                      gap: isMobile ? '4px' : '6px',
+                      borderRadius: '8px',
+                      backgroundColor: '#F0F8FE',
+                      color: '#64B5F6',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: isMobile ? '11px' : '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    <img src={draftsIcon} alt="Request" style={{ width: isMobile ? '14px' : '20px', height: isMobile ? '14px' : '20px' }} />
+                    <span>Make a request</span>
+                  </button>
                 </div>
               ) : (
                 viewMode === 'list' ? renderRequestsList() : renderRequestsGrid()
