@@ -943,11 +943,11 @@ const MyRequests: React.FC = () => {
                       left: '50%',
                       transform: 'translateX(-50%)',
                       backgroundColor: '#FFFFFF',
-                      borderRadius: '12px',
+                      borderRadius: isMobile ? '12px' : '12px',
                       border: '1px solid #E9E9E9',
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                      padding: '4px',
-                      width: '90px',
+                      padding: isMobile ? '3px' : '4px',
+                      width: isMobile ? '80px' : '90px',
                       zIndex: 1000,
                       display: 'flex',
                       flexDirection: 'column',
@@ -965,16 +965,17 @@ const MyRequests: React.FC = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             handleStatusChange(request.id, optionStatus);
+                            setStatusModalOpenFor(null);
                           }}
                           style={{
                             width: '100%',
-                            padding: '4px 8px',
+                            padding: isMobile ? '3px 6px' : '4px 8px',
                             borderRadius: isSelected ? '6px' : '0',
                             backgroundColor: isSelected ? optionConfig.bgColor : 'transparent',
                             border: 'none',
                             color: optionConfig.textColor,
                             fontFamily: 'Poppins, sans-serif',
-                            fontSize: '11px',
+                            fontSize: isMobile ? '10px' : '11px',
                             textAlign: 'left',
                             cursor: 'pointer',
                             transition: 'all 0.2s ease'
@@ -992,13 +993,13 @@ const MyRequests: React.FC = () => {
                       }}
                       style={{
                         width: '100%',
-                        padding: '4px 8px',
+                        padding: isMobile ? '3px 6px' : '4px 8px',
                         borderRadius: '6px',
                         backgroundColor: '#FAFAFA',
                         border: 'none',
                         color: '#B0B0B0',
                         fontFamily: 'Poppins, sans-serif',
-                        fontSize: '11px',
+                        fontSize: isMobile ? '10px' : '11px',
                         textAlign: 'left',
                         cursor: 'pointer',
                         display: 'flex',
@@ -1007,7 +1008,7 @@ const MyRequests: React.FC = () => {
                         marginTop: '2px'
                       }}
                     >
-                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width={isMobile ? "7" : "8"} height={isMobile ? "7" : "8"} viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M18 6L6 18M6 6l12 12" />
                       </svg>
                       <span style={{ color: '#B0B0B0' }}>Close</span>
@@ -1048,8 +1049,8 @@ const MyRequests: React.FC = () => {
                       borderRadius: '12px',
                       border: '1px solid #E9E9E9',
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                      padding: '6px',
-                      minWidth: '150px',
+                      padding: isMobile ? '4px' : '6px',
+                      minWidth: isMobile ? '130px' : '150px',
                       zIndex: 1000
                     }}
                   >
@@ -1065,19 +1066,19 @@ const MyRequests: React.FC = () => {
                         width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        padding: '8px 10px',
+                        gap: isMobile ? '6px' : '8px',
+                        padding: isMobile ? '6px 8px' : '8px 10px',
                         border: 'none',
                         background: 'transparent',
                         cursor: 'pointer',
                         borderRadius: '8px'
                       }}
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width={isMobile ? "12" : "14"} height={isMobile ? "12" : "14"} viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
-                      <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>View the request</span>
+                      <span style={{ color: '#939393', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif' }}>View the request</span>
                     </button>
                     <button
                       type="button"
@@ -1092,16 +1093,16 @@ const MyRequests: React.FC = () => {
                         width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        padding: '8px 10px',
+                        gap: isMobile ? '6px' : '8px',
+                        padding: isMobile ? '6px 8px' : '8px 10px',
                         border: 'none',
                         background: 'transparent',
                         cursor: 'pointer',
                         borderRadius: '8px'
                       }}
                     >
-                      <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                      <span style={{ color: '#FF5151', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>Delete request</span>
+                      <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '12px' : '14px', height: isMobile ? '12px' : '14px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                      <span style={{ color: '#FF5151', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif' }}>Delete request</span>
                     </button>
                     <button
                       type="button"
@@ -1113,8 +1114,8 @@ const MyRequests: React.FC = () => {
                         width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        padding: '8px 10px',
+                        gap: isMobile ? '6px' : '8px',
+                        padding: isMobile ? '6px 8px' : '8px 10px',
                         border: 'none',
                         background: '#FAFAFA',
                         cursor: 'pointer',
@@ -1122,10 +1123,10 @@ const MyRequests: React.FC = () => {
                         marginTop: '4px'
                       }}
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width={isMobile ? "12" : "14"} height={isMobile ? "12" : "14"} viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M18 6L6 18M6 6l12 12" />
                       </svg>
-                      <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                      <span style={{ color: '#B0B0B0', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
                     </button>
                   </div>
                 )}
@@ -1314,7 +1315,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Ongoing requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-4' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-6' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1378,7 +1379,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Pending requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-4' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-6' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1442,7 +1443,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Completed requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-4' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-6' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1506,7 +1507,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Expired requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-4' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-6' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -2545,7 +2546,7 @@ const MyRequests: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                viewMode === 'list' ? renderRequestsList() : renderRequestsGrid()
+                isMobile ? renderRequestsGrid() : (viewMode === 'list' ? renderRequestsList() : renderRequestsGrid())
               )}
             </div>
           </div>
@@ -2553,261 +2554,413 @@ const MyRequests: React.FC = () => {
 
         {/* View Request Modal */}
         {viewRequestModalOpen && selectedRequestForView && (
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: '#0000001A',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10000
-            }}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
+          <>
+            {/* Overlay */}
+            <div
+              className="fixed inset-0 z-50"
+              style={{ backgroundColor: '#0000001A' }}
+              onClick={() => {
                 setViewRequestModalOpen(false);
                 setSelectedRequestForView(null);
-              }
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '30px',
-                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                padding: '30px',
-                paddingBottom: isMobile ? '8px' : '15px',
-                maxWidth: '420px',
-                width: isMobile ? '95%' : '90%',
-                minHeight: '320px',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                marginBottom: isMobile ? '12px' : '0'
               }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setViewRequestModalOpen(false);
-                  setSelectedRequestForView(null);
-                }}
-                style={{
-                  position: 'absolute',
-                  top: '20px',
-                  right: '20px',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px'
-                }}
-              >
-                <img
-                  src={closeIcon}
-                  alt="Close"
-                  className="w-4 h-4"
-                />
-              </button>
-
-              {/* Request Badge - Centered */}
-              <div className="flex justify-center mb-3">
-                <span 
+            />
+            {isMobile ? (
+              // Mobile: Bottom sheet
+              <div className="fixed inset-0 z-50 flex items-end justify-center p-4">
+                <div
+                  className="bg-white relative w-full"
                   style={{ 
-                    fontSize: '10px', 
-                    color: '#BABABA',
-                    border: '1.5px solid #E1E1E1',
-                    borderRadius: '999px',
-                    padding: '2px 12px',
-                    fontFamily: 'Poppins, sans-serif'
+                    borderRadius: '30px',
+                    boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                    maxWidth: '420px',
+                    maxHeight: '90vh',
+                    overflowY: 'auto'
                   }}
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  Request
-                </span>
-              </div>
+                  <div className="pt-8 px-5 pb-8 relative">
+                    {/* Close Button */}
+                    <button
+                      onClick={() => {
+                        setViewRequestModalOpen(false);
+                        setSelectedRequestForView(null);
+                      }}
+                      className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
+                    >
+                      <img
+                        src={closeIcon}
+                        alt="Close"
+                        className="w-4 h-4"
+                      />
+                    </button>
 
-              {/* Product Name */}
-              <h2
-                className="text-lg text-center mb-2"
-                style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
-              >
-                {selectedRequestForView.title}
-              </h2>
+                    {/* Request Badge - Centered */}
+                    <div className="flex justify-center mb-3">
+                      <span 
+                        style={{ 
+                          fontSize: '10px', 
+                          color: '#BABABA',
+                          border: '1.5px solid #E1E1E1',
+                          borderRadius: '999px',
+                          padding: '2px 12px',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        Request
+                      </span>
+                    </div>
 
-              {/* Description */}
-              <p 
-                className="text-xs text-center mb-5"
-                style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
-              >
-                Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!
-              </p>
+                    {/* Product Name */}
+                    <h2
+                      className="text-lg text-center mb-2"
+                      style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+                    >
+                      {selectedRequestForView.title}
+                    </h2>
 
-              {/* Three Badges - Centered */}
-              <div className="flex flex-col items-center gap-2 mb-5">
-                {/* Location Badge */}
-                <div 
-                  className="flex items-center justify-center gap-1 px-2 py-1"
-                  style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
-                >
-                  <img 
-                    src={locationIcon} 
-                    alt="Location"
-                    className="w-3 h-3"
-                    style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
-                  />
-                  <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.location}</span>
-                </div>
+                    {/* Description */}
+                    <p 
+                      className="text-xs text-center mb-5"
+                      style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+                    >
+                      Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!
+                    </p>
 
-                {/* Price and Country Badges */}
-                <div className="flex gap-2 justify-center">
-                  {/* Price Badge */}
-                  <div 
-                    className="flex items-center gap-1.5 px-3 py-1.5"
-                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                  >
-                    <img 
-                      src={moneyIcon} 
-                      alt="Money"
-                      className="w-3 h-3"
-                      style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
-                    />
-                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.price.replace(' - ', ' ~ ')}</span>
+                    {/* Three Badges - Centered */}
+                    <div className="flex flex-col items-center gap-2 mb-5">
+                      {/* Location Badge */}
+                      <div 
+                        className="flex items-center justify-center gap-1 px-2 py-1"
+                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                      >
+                        <img 
+                          src={locationIcon} 
+                          alt="Location"
+                          className="w-3 h-3"
+                          style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.location}</span>
+                      </div>
+
+                      {/* Price and Country Badges */}
+                      <div className="flex gap-2 justify-center">
+                        {/* Price Badge */}
+                        <div 
+                          className="flex items-center gap-1.5 px-3 py-1.5"
+                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                        >
+                          <img 
+                            src={moneyIcon} 
+                            alt="Money"
+                            className="w-3 h-3"
+                            style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                          />
+                          <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.price.replace(' - ', ' ~ ')}</span>
+                        </div>
+
+                        {/* Country Badge */}
+                        <div 
+                          className="flex items-center gap-1.5 px-3 py-1.5"
+                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                        >
+                          <img 
+                            src={selectedRequestForView.originFlag} 
+                            alt={selectedRequestForView.origin}
+                            className="w-4 h-4 object-cover rounded-full"
+                          />
+                          <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.origin}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer Buttons */}
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '20px', paddingBottom: '20px' }}>
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setRequestToDelete(selectedRequestForView);
+                          setIsDeleteSuccess(false);
+                          setDeleteReason('');
+                          setViewRequestModalOpen(false);
+                          setSelectedRequestForView(null);
+                        }}
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          border: 'none',
+                          borderRadius: '12px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 16px'
+                        }}
+                      >
+                        <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                        <span style={{ color: '#FF5151', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Delete the request</span>
+                      </button>
+
+                      {/* Close Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setViewRequestModalOpen(false);
+                          setSelectedRequestForView(null);
+                        }}
+                        style={{
+                          backgroundColor: '#212121',
+                          borderRadius: '12px',
+                          border: 'none',
+                          padding: '8px 40px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                        <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Close</span>
+                      </button>
+                    </div>
+                    
+                    {/* Drag Indicator at far bottom */}
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'center', 
+                      paddingBottom: '8px',
+                      paddingTop: '4px'
+                    }}>
+                      <div style={{
+                        width: '80px',
+                        height: '4px',
+                        backgroundColor: '#D9D9D9',
+                        borderRadius: '2px'
+                      }} />
+                    </div>
                   </div>
-
-                  {/* Country Badge */}
-                  <div 
-                    className="flex items-center gap-1.5 px-3 py-1.5"
-                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                  >
-                    <img 
-                      src={selectedRequestForView.originFlag} 
-                      alt={selectedRequestForView.origin}
-                      className="w-4 h-4 object-cover rounded-full"
-                    />
-                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.origin}</span>
-                  </div>
                 </div>
               </div>
+              ) : (
+                // Desktop: Centered modal
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <div
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '30px',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '30px',
+                      paddingBottom: '15px',
+                      maxWidth: '420px',
+                      width: '90%',
+                      minHeight: '320px',
+                      position: 'relative',
+                      display: 'flex',
+                      flexDirection: 'column'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Close Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setViewRequestModalOpen(false);
+                        setSelectedRequestForView(null);
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: '20px',
+                        right: '20px',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px'
+                      }}
+                    >
+                      <img
+                        src={closeIcon}
+                        alt="Close"
+                        className="w-4 h-4"
+                      />
+                    </button>
 
-              {/* Footer Buttons */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '20px', paddingBottom: '20px' }}>
-                {/* Delete Button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setRequestToDelete(selectedRequestForView);
-                    setIsDeleteSuccess(false);
-                    setDeleteReason('');
-                    setViewRequestModalOpen(false);
-                    setSelectedRequestForView(null);
-                  }}
-                  style={{
-                    backgroundColor: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '12px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px'
-                  }}
-                >
-                  <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                  <span style={{ color: '#FF5151', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Delete the request</span>
-                </button>
+                    {/* Request Badge - Centered */}
+                    <div className="flex justify-center mb-3">
+                      <span 
+                        style={{ 
+                          fontSize: '10px', 
+                          color: '#BABABA',
+                          border: '1.5px solid #E1E1E1',
+                          borderRadius: '999px',
+                          padding: '2px 12px',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        Request
+                      </span>
+                    </div>
 
-                {/* Close Button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setViewRequestModalOpen(false);
-                    setSelectedRequestForView(null);
-                  }}
-                  style={{
-                    backgroundColor: '#212121',
-                    borderRadius: '12px',
-                    border: 'none',
-                    padding: '8px 40px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                  <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Close</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+                    {/* Product Name */}
+                    <h2
+                      className="text-lg text-center mb-2"
+                      style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+                    >
+                      {selectedRequestForView.title}
+                    </h2>
+
+                    {/* Description */}
+                    <p 
+                      className="text-xs text-center mb-5"
+                      style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+                    >
+                      Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!
+                    </p>
+
+                    {/* Three Badges - Centered */}
+                    <div className="flex flex-col items-center gap-2 mb-5">
+                      {/* Location Badge */}
+                      <div 
+                        className="flex items-center justify-center gap-1 px-2 py-1"
+                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                      >
+                        <img 
+                          src={locationIcon} 
+                          alt="Location"
+                          className="w-3 h-3"
+                          style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.location}</span>
+                      </div>
+
+                      {/* Price and Country Badges */}
+                      <div className="flex gap-2 justify-center">
+                        {/* Price Badge */}
+                        <div 
+                          className="flex items-center gap-1.5 px-3 py-1.5"
+                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                        >
+                          <img 
+                            src={moneyIcon} 
+                            alt="Money"
+                            className="w-3 h-3"
+                            style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                          />
+                          <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.price.replace(' - ', ' ~ ')}</span>
+                        </div>
+
+                        {/* Country Badge */}
+                        <div 
+                          className="flex items-center gap-1.5 px-3 py-1.5"
+                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                        >
+                          <img 
+                            src={selectedRequestForView.originFlag} 
+                            alt={selectedRequestForView.origin}
+                            className="w-4 h-4 object-cover rounded-full"
+                          />
+                          <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.origin}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer Buttons */}
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '20px', paddingBottom: '20px' }}>
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setRequestToDelete(selectedRequestForView);
+                          setIsDeleteSuccess(false);
+                          setDeleteReason('');
+                          setViewRequestModalOpen(false);
+                          setSelectedRequestForView(null);
+                        }}
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          border: 'none',
+                          borderRadius: '12px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 16px'
+                        }}
+                      >
+                        <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                        <span style={{ color: '#FF5151', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Delete the request</span>
+                      </button>
+
+                      {/* Close Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setViewRequestModalOpen(false);
+                          setSelectedRequestForView(null);
+                        }}
+                        style={{
+                          backgroundColor: '#212121',
+                          borderRadius: '12px',
+                          border: 'none',
+                          padding: '8px 40px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                        <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Close</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
 
         {/* Delete Confirmation Modal */}
         {requestToDelete && (
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: '#0000001A',
-              display: 'flex',
-              alignItems: isMobile ? 'flex-end' : 'center',
-              justifyContent: 'center',
-              zIndex: 10000
-            }}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                handleDeleteClose();
-              }
-            }}
-          >
+          <>
+            {/* Overlay */}
             <div
-              style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '30px',
-                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                padding: '30px',
-                paddingBottom: isMobile ? '8px' : '15px',
-                maxWidth: '420px',
-                width: isMobile ? '95%' : '90%',
-                minHeight: isDeleteSuccess ? '320px' : '400px',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                marginBottom: isMobile ? '12px' : '0'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={handleDeleteClose}
-                style={{
-                  position: 'absolute',
-                  top: '20px',
-                  right: '20px',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px'
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
+              className="fixed inset-0 z-50"
+              style={{ backgroundColor: '#0000001A' }}
+              onClick={handleDeleteClose}
+            />
+            {isMobile ? (
+              // Mobile: Bottom sheet
+              <div className="fixed inset-0 z-50 flex items-end justify-center p-4">
+                <div
+                  className="bg-white relative w-full"
+                  style={{ 
+                    borderRadius: '30px',
+                    boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                    maxWidth: '420px',
+                    maxHeight: '90vh',
+                    overflowY: 'auto'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="pt-8 px-5 pb-8 relative">
+                    {/* Close Button */}
+                    <button
+                      type="button"
+                      onClick={handleDeleteClose}
+                      className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
 
-              {isDeleteSuccess ? (
+                    {isDeleteSuccess ? (
                 <>
                   {/* Success Icon */}
                   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
@@ -3030,16 +3183,290 @@ const MyRequests: React.FC = () => {
                   </div>
                 </>
               )}
+                    
+                    {/* Drag Indicator at far bottom */}
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'center', 
+                      paddingBottom: '8px',
+                      paddingTop: '4px'
+                    }}>
+                      <div style={{
+                        width: '80px',
+                        height: '4px',
+                        backgroundColor: '#D9D9D9',
+                        borderRadius: '2px'
+                      }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              ) : (
+                // Desktop: Centered modal
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <div
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '30px',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '30px',
+                      paddingBottom: '15px',
+                      maxWidth: '420px',
+                      width: '90%',
+                      minHeight: isDeleteSuccess ? '320px' : '400px',
+                      position: 'relative',
+                      display: 'flex',
+                      flexDirection: 'column'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Close Button */}
+                    <button
+                      type="button"
+                      onClick={handleDeleteClose}
+                      style={{
+                        position: 'absolute',
+                        top: '20px',
+                        right: '20px',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px'
+                      }}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
 
-              {/* Drag Indicator - Mobile Only */}
-              {isMobile && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '44px', marginBottom: '12px' }}>
-                  <div style={{ width: '100px', height: '4px', backgroundColor: '#E9E9E9', borderRadius: '2px' }}></div>
+                    {isDeleteSuccess ? (
+                      <>
+                        {/* Success Icon */}
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                          <img
+                            src={verityIcon}
+                            alt="Success"
+                            style={{ width: '80px', height: '80px' }}
+                          />
+                        </div>
+
+                        {/* Success Text */}
+                        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                          <p
+                            style={{
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontSize: '16px',
+                              lineHeight: '1.5',
+                              margin: 0
+                            }}
+                          >
+                            The request "{requestToDelete.title}" has been successfully removed.
+                          </p>
+                        </div>
+
+                        {/* Close Button */}
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={handleDeleteClose}
+                            style={{
+                              backgroundColor: '#F9A825',
+                              borderRadius: '12px',
+                              border: 'none',
+                              padding: '10px 140px',
+                              cursor: 'pointer',
+                              color: '#FFFFFF',
+                              fontFamily: 'Poppins, sans-serif',
+                              fontSize: '14px',
+                              fontWeight: 300
+                            }}
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {/* Delete Icon */}
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                          <img
+                            src={redtrashIcon}
+                            alt="Delete"
+                            style={{ width: '80px', height: '80px' }}
+                          />
+                        </div>
+
+                        {/* Title */}
+                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                          <p
+                            style={{
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontSize: '16px',
+                              lineHeight: '1.5',
+                              margin: 0,
+                              fontWeight: 600
+                            }}
+                          >
+                            Why do you delete your request?
+                          </p>
+                        </div>
+
+                        {/* Radio Options */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '30px' }}>
+                          <label
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              cursor: 'pointer',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              backgroundColor: deleteReason === 'got' ? '#F0F8FE' : 'transparent',
+                              transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (deleteReason !== 'got') {
+                                e.currentTarget.style.backgroundColor = '#FAFAFA';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (deleteReason !== 'got') {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                          >
+                            <input
+                              type="radio"
+                              name="deleteReason"
+                              value="got"
+                              checked={deleteReason === 'got'}
+                              onChange={(e) => setDeleteReason(e.target.value)}
+                              style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            />
+                            <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                              I got what I was looking for
+                            </span>
+                          </label>
+                          <label
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              cursor: 'pointer',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              backgroundColor: deleteReason === 'not_got' ? '#F0F8FE' : 'transparent',
+                              transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (deleteReason !== 'not_got') {
+                                e.currentTarget.style.backgroundColor = '#FAFAFA';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (deleteReason !== 'not_got') {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                          >
+                            <input
+                              type="radio"
+                              name="deleteReason"
+                              value="not_got"
+                              checked={deleteReason === 'not_got'}
+                              onChange={(e) => setDeleteReason(e.target.value)}
+                              style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            />
+                            <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                              I didn't get what I was looking for
+                            </span>
+                          </label>
+                          <label
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              cursor: 'pointer',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              backgroundColor: deleteReason === 'other' ? '#F0F8FE' : 'transparent',
+                              transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (deleteReason !== 'other') {
+                                e.currentTarget.style.backgroundColor = '#FAFAFA';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (deleteReason !== 'other') {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                          >
+                            <input
+                              type="radio"
+                              name="deleteReason"
+                              value="other"
+                              checked={deleteReason === 'other'}
+                              onChange={(e) => setDeleteReason(e.target.value)}
+                              style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            />
+                            <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                              Other
+                            </span>
+                          </label>
+                        </div>
+
+                        {/* Buttons */}
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '20px' }}>
+                          <button
+                            type="button"
+                            onClick={handleDeleteClose}
+                            style={{
+                              backgroundColor: '#F1F1F1',
+                              borderRadius: '12px',
+                              border: 'none',
+                              padding: '8px 48px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px'
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M18 6L6 18M6 6l12 12" />
+                            </svg>
+                            <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleConfirmDelete}
+                            disabled={!deleteReason}
+                            style={{
+                              backgroundColor: deleteReason ? '#FF5151' : '#FFB3B3',
+                              borderRadius: '12px',
+                              border: 'none',
+                              padding: '8px 48px',
+                              cursor: deleteReason ? 'pointer' : 'not-allowed',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              opacity: deleteReason ? 1 : 0.6
+                            }}
+                          >
+                            <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) invert(1)' }} />
+                            <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Delete</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
-        )}
+            </>
+          )}
 
         {/* Footer */}
         <footer className="bg-white">
