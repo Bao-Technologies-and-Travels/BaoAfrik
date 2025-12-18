@@ -871,7 +871,7 @@ const Requests: React.FC = () => {
             Request
           </span>
           {/* Share button - only for non-pending cards in Requests near you section */}
-          {!cardIsPending && cardId.startsWith('near') && (
+          {!cardIsPending && (cardId.startsWith('near') || cardId.startsWith('filtered')) && (
             <button
               className="rounded-full flex items-center justify-center"
               style={{
@@ -1460,7 +1460,7 @@ const Requests: React.FC = () => {
                   Instantly
                 </span>
               </h2>
-              <p style={{ fontSize: isMobile ? '9px' : '16px', color: '#9C9C9C', maxWidth: isMobile ? '220px' : '600px', lineHeight: '1.6', margin: isMobile ? '0 auto' : '0' }}>
+              <p style={{ fontSize: isMobile ? '11px' : '16px', color: '#9C9C9C', maxWidth: isMobile ? '280px' : '600px', lineHeight: '1.6', margin: isMobile ? '0 auto' : '0' }}>
                 Turn unmet needs into instant deals, discover what people are looking for, grab it, and sell it right where demand begins
               </p>
             </div>
@@ -1718,7 +1718,7 @@ const Requests: React.FC = () => {
           {isSearchActive && searchQuery.trim() ? (
             <>
               {/* Filter Bar */}
-              <div className={isMobile ? "flex flex-col gap-4 mb-6" : "flex items-center justify-between mb-6"}>
+              <div className={isMobile ? "flex flex-col gap-4 mb-3" : "flex items-center justify-between mb-6"}>
                 {/* Left: Filters */}
                 <div className="flex items-center gap-2">
                   {renderCountryFilterButton('relative', 'search')}
@@ -2011,15 +2011,15 @@ const Requests: React.FC = () => {
           ) : (selectedCountry || selectedPrice) ? (
             <>
               {/* Filter Bar */}
-              <div className={isMobile ? "flex flex-col gap-4 mb-6" : "flex items-center justify-between mb-6"}>
+              <div className={isMobile ? "flex flex-col gap-4 mb-3" : "flex items-center justify-between mb-6"}>
                 {/* Left: Filters */}
                 <div className="flex items-center gap-2">
                   {renderCountryFilterButton('relative', 'filtered')}
                   {renderPriceFilterButton('relative', 'filtered')}
                 </div>
 
-                {/* Right: Search Bar - Only show when no results */}
-                {getFilteredCount() === 0 && (
+                {/* Right: Search Bar - Only show when no results (Desktop only) */}
+                {getFilteredCount() === 0 && !isMobile && (
                   <div style={{ width: isMobile ? '100%' : '380px', marginLeft: isMobile ? '0' : 'auto' }}>
                     <div className="relative flex items-center" ref={searchDropdownRef}>
                       <img 
@@ -2184,41 +2184,38 @@ const Requests: React.FC = () => {
                   {/* Requests near you Section */}
                   <div className="mb-12">
                     {isMobile ? (
-                      <>
+                      <div className="flex items-center justify-between mb-6">
                         <h3 style={{ 
                           fontFamily: 'Bricolage Grotesque, sans-serif',
                           fontSize: '14px',
                           fontWeight: '500',
-                          color: '#000000',
-                          marginBottom: '4px'
+                          color: '#000000'
                         }}>
                           Requests near you
                         </h3>
-                        <div className="flex items-center justify-end mb-6">
-                          <div className="flex items-center gap-2">
-                            <button 
-                              className="rounded-full flex items-center justify-center transition-all duration-200"
-                              style={{
-                                width: '16px',
-                                height: '16px'
-                              }}
-                              aria-label="Previous"
-                            >
-                              <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                            </button>
-                            <button 
-                              className="rounded-full flex items-center justify-center transition-all duration-200"
-                              style={{
-                                width: '16px',
-                                height: '16px'
-                              }}
-                              aria-label="Next"
-                            >
-                              <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-                            </button>
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            className="rounded-full flex items-center justify-center transition-all duration-200"
+                            style={{
+                              width: '16px',
+                              height: '16px'
+                            }}
+                            aria-label="Previous"
+                          >
+                            <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                          </button>
+                          <button 
+                            className="rounded-full flex items-center justify-center transition-all duration-200"
+                            style={{
+                              width: '16px',
+                              height: '16px'
+                            }}
+                            aria-label="Next"
+                          >
+                            <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                          </button>
                         </div>
-                      </>
+                      </div>
                     ) : (
                       <div className="flex items-center justify-between mb-6">
                         <h3 style={{ 
@@ -2264,9 +2261,9 @@ const Requests: React.FC = () => {
                         />
                       )}
                       <div 
-                        className={isMobile ? "flex gap-6 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                        className={isMobile ? "flex gap-6 mb-2 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                         style={isMobile ? { 
-                          padding: '16px 0',
+                          padding: '12px 0 8px 0',
                           scrollbarWidth: 'none',
                           msOverflowStyle: 'none',
                           WebkitOverflowScrolling: 'touch'
@@ -2312,9 +2309,9 @@ const Requests: React.FC = () => {
                       />
                     )}
                     <div 
-                      className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                      className={isMobile ? "flex gap-4 mb-2 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                       style={isMobile ? { 
-                        padding: '16px 0',
+                        padding: '12px 0 8px 0',
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
                         WebkitOverflowScrolling: 'touch'
@@ -2368,7 +2365,7 @@ const Requests: React.FC = () => {
                         }}>
                           Requests near you
                         </h3>
-                        <div className="flex items-center justify-between mb-6">
+                        <div className={`flex items-center justify-between ${isMobile ? 'mb-0' : 'mb-6'}`}>
                           <div className="flex items-center gap-2" style={{ marginLeft: isMobile ? '-12px' : '0' }}>
                             {renderCountryFilterButton('relative', 'filtered')}
                             {renderPriceFilterButton('relative', 'filtered')}
@@ -2398,7 +2395,7 @@ const Requests: React.FC = () => {
                         </div>
                       </>
                     ) : (
-                  <div className="flex items-center justify-between mb-6">
+                  <div className={`flex items-center justify-between ${isMobile ? 'mb-0' : 'mb-6'}`}>
                     <h3 style={{ 
                       fontFamily: 'Bricolage Grotesque, sans-serif',
                       fontSize: '18px',
@@ -2425,8 +2422,9 @@ const Requests: React.FC = () => {
                 />
               )}
               <div 
-                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                className={isMobile ? "flex gap-4 mb-2 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                 style={isMobile ? { 
+                  padding: '12px 0 8px 0',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   WebkitOverflowScrolling: 'touch'
@@ -2458,7 +2456,7 @@ const Requests: React.FC = () => {
                         }}>
                           Pending requests
                         </h3>
-                        <div className="flex items-center justify-between mb-6">
+                        <div className={`flex items-center justify-between ${isMobile ? 'mb-0' : 'mb-6'}`}>
                           <div className="flex items-center gap-2" style={{ marginLeft: isMobile ? '-8px' : '0' }}>
                             {renderCountryFilterButton('relative', 'pending')}
                             {renderPriceFilterButton('relative', 'pending')}
@@ -2488,7 +2486,7 @@ const Requests: React.FC = () => {
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-between mb-6">
+              <div className={`flex items-center justify-between ${isMobile ? 'mb-0' : 'mb-6'}`}>
                 <h3 style={{ 
                   fontFamily: 'Bricolage Grotesque, sans-serif',
                   fontSize: '18px',
@@ -2515,8 +2513,9 @@ const Requests: React.FC = () => {
                 />
               )}
               <div 
-                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                className={isMobile ? "flex gap-4 mb-2 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                 style={isMobile ? { 
+                  padding: '12px 0 8px 0',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   WebkitOverflowScrolling: 'touch'
@@ -2548,7 +2547,7 @@ const Requests: React.FC = () => {
                         }}>
                           All requests
                         </h3>
-                        <div className="flex items-center justify-between mb-6">
+                        <div className={`flex items-center justify-between ${isMobile ? 'mb-0' : 'mb-6'}`}>
                           <div className="flex items-center gap-2" style={{ marginLeft: isMobile ? '-8px' : '0' }}>
                             {renderCountryFilterButton('relative', 'all')}
                             {renderPriceFilterButton('relative', 'all')}
@@ -2578,7 +2577,7 @@ const Requests: React.FC = () => {
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-between mb-6">
+              <div className={`flex items-center justify-between ${isMobile ? 'mb-0' : 'mb-6'}`}>
                 <h3 style={{ 
                   fontFamily: 'Bricolage Grotesque, sans-serif',
                   fontSize: '18px',
@@ -2605,8 +2604,9 @@ const Requests: React.FC = () => {
                 />
               )}
               <div 
-                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                className={isMobile ? "flex gap-4 mb-2 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                 style={isMobile ? { 
+                  padding: '12px 0 8px 0',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   WebkitOverflowScrolling: 'touch'
