@@ -163,14 +163,14 @@ const Requests: React.FC = () => {
   const renderPagination = () => (
     <div className={`flex flex-col ${isMobile ? 'items-center gap-2' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
       <div className={`flex-1 flex justify-center w-full ${isMobile ? '' : ''}`}>
-        <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-4'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
+        <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-4'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
           <button
             aria-label="Previous page"
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
             style={{
-              width: isMobile ? '20px' : '32px',
-              height: isMobile ? '20px' : '32px',
+              width: isMobile ? '24px' : '32px',
+              height: isMobile ? '24px' : '32px',
               borderRadius: '8px',
               backgroundColor: '#F0F0F0',
               border: 'none',
@@ -181,19 +181,19 @@ const Requests: React.FC = () => {
               opacity: currentPage === 1 ? 0.5 : 1
             }}
           >
-            <svg width={isMobile ? '10' : '16'} height={isMobile ? '10' : '16'} viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width={isMobile ? '12' : '16'} height={isMobile ? '12' : '16'} viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
 
-          <div className="flex items-center" style={{ gap: isMobile ? '6px' : '24px' }}>
+          <div className="flex items-center" style={{ gap: isMobile ? '8px' : '24px' }}>
             {paginationNumbers.map((page) => (
               <span
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 style={{
                   fontFamily: 'Bricolage Grotesque, sans-serif',
-                  fontSize: isMobile ? '10px' : '16px',
+                  fontSize: isMobile ? '11px' : '16px',
                   color: page === currentPage ? '#212121' : '#B0B0B0',
                   cursor: 'pointer'
                 }}
@@ -202,13 +202,13 @@ const Requests: React.FC = () => {
               </span>
             ))}
 
-            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '10px' : '16px' }}>…</span>
+            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '11px' : '16px' }}>…</span>
             <span 
               onClick={() => setCurrentPage(totalPages)}
               style={{ 
                 color: '#B0B0B0', 
                 fontFamily: 'Bricolage Grotesque, sans-serif', 
-                fontSize: isMobile ? '10px' : '16px',
+                fontSize: isMobile ? '11px' : '16px',
                 cursor: 'pointer'
               }}
             >
@@ -221,8 +221,8 @@ const Requests: React.FC = () => {
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
             style={{
-              width: isMobile ? '20px' : '32px',
-              height: isMobile ? '20px' : '32px',
+              width: isMobile ? '24px' : '32px',
+              height: isMobile ? '24px' : '32px',
               borderRadius: '8px',
               backgroundColor: '#F0F0F0',
               border: 'none',
@@ -233,7 +233,7 @@ const Requests: React.FC = () => {
               opacity: currentPage === totalPages ? 0.5 : 1
             }}
           >
-            <svg width={isMobile ? '10' : '16'} height={isMobile ? '10' : '16'} viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width={isMobile ? '12' : '16'} height={isMobile ? '12' : '16'} viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 6l6 6-6 6" />
             </svg>
           </button>
@@ -242,18 +242,18 @@ const Requests: React.FC = () => {
 
       {/* Go to section */}
       <div className={`flex items-center gap-2 ${isMobile ? 'justify-center' : ''}`}>
-        <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '10px' : '12px' }}>Go to :</span>
+        <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '11px' : '12px' }}>Go to :</span>
         <input
           type="text"
           placeholder="e.g 40"
           style={{
             border: '1px solid #BABABA',
             borderRadius: '8px',
-            padding: isMobile ? '4px 8px' : '6px 10px',
+            padding: isMobile ? '5px 9px' : '6px 10px',
             fontFamily: 'Bricolage Grotesque, sans-serif',
-            fontSize: isMobile ? '10px' : '12px',
+            fontSize: isMobile ? '11px' : '12px',
             color: '#D9D9D9',
-            width: isMobile ? '50px' : '64px',
+            width: isMobile ? '55px' : '64px',
             textAlign: 'center'
           }}
         />
@@ -392,133 +392,48 @@ const Requests: React.FC = () => {
         
         {/* Dropdown Menu */}
         {isOpen && !selectedPrice && (
-          <>
-            {isMobile ? (
-              // Mobile: Bottom sheet modal
-              <div
-                style={{
-                  position: 'fixed',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  backgroundColor: '#FFFFFF',
-                  borderTopLeftRadius: '20px',
-                  borderTopRightRadius: '20px',
-                  boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
-                  zIndex: 10000,
-                  maxHeight: '60vh',
-                  overflowY: 'auto'
-                }}
-              >
-                {/* Drag Indicator */}
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  paddingTop: '12px',
-                  paddingBottom: '8px'
-                }}>
-                  <div style={{
-                    width: '40px',
-                    height: '4px',
-                    backgroundColor: '#D9D9D9',
-                    borderRadius: '2px'
-                  }} />
-                </div>
-                <div className="py-1.5 px-3">
-                  {priceOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setSelectedPrice(option.value);
-                        setOpenPriceDropdown(null);
-                      }}
+          <div 
+            className="absolute left-0 bg-white z-10 mt-2"
+            style={{ 
+              width: '180px', 
+              flexShrink: 0, 
+              borderRadius: '16px',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              border: '1px solid #E9E9E9'
+            }}
+          >
+            <div className="py-1.5">
+              {priceOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setSelectedPrice(option.value);
+                    setOpenPriceDropdown(null);
+                  }}
+                  style={{
+                    color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0'
+                  }}
+                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 transition-colors relative"
+                >
+                  {selectedPrice === option.value && (
+                    <div 
                       style={{
-                        color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0',
-                        fontSize: '12px',
-                        padding: '8px 6px'
+                        position: 'absolute',
+                        left: '8px',
+                        right: '8px',
+                        top: '2px',
+                        bottom: '2px',
+                        backgroundColor: '#F0F8FE',
+                        borderRadius: '8px',
+                        zIndex: -1
                       }}
-                      className="w-full text-left hover:bg-gray-50 transition-colors relative"
-                    >
-                      {selectedPrice === option.value && (
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            left: '8px',
-                            right: '8px',
-                            top: '4px',
-                            bottom: '4px',
-                            backgroundColor: '#F0F8FE',
-                            borderRadius: '8px',
-                            zIndex: -1
-                          }}
-                        />
-                      )}
-                      <span style={{ position: 'relative', zIndex: 1 }}>{option.label}</span>
-                    </button>
-                  ))}
-                </div>
-                <div style={{ paddingBottom: '20px' }} />
-              </div>
-            ) : (
-              // Desktop: Regular dropdown
-              <div 
-                className="absolute left-0 bg-white z-10 mt-2"
-                style={{ 
-                  width: '180px', 
-                  flexShrink: 0, 
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                  border: '1px solid #E9E9E9'
-                }}
-              >
-                <div className="py-1.5">
-                  {priceOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setSelectedPrice(option.value);
-                        setOpenPriceDropdown(null);
-                      }}
-                      style={{
-                        color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0'
-                      }}
-                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 transition-colors relative"
-                    >
-                      {selectedPrice === option.value && (
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            left: '8px',
-                            right: '8px',
-                            top: '2px',
-                            bottom: '2px',
-                            backgroundColor: '#F0F8FE',
-                            borderRadius: '8px',
-                            zIndex: -1
-                          }}
-                        />
-                      )}
-                      <span style={{ position: 'relative', zIndex: 1 }}>{option.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            {isMobile && (
-              <div
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                  zIndex: 9999
-                }}
-                onClick={() => setOpenPriceDropdown(null)}
-              />
-            )}
-          </>
+                    />
+                  )}
+                  <span style={{ position: 'relative', zIndex: 1 }}>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     );
@@ -597,193 +512,88 @@ const Requests: React.FC = () => {
         
         {/* Dropdown Menu */}
         {isOpen && !selectedCountry && (
-          <>
-            {isMobile ? (
-              // Mobile: Bottom sheet modal
-              <div
+          <div 
+            className="absolute left-0 bg-white border border-gray-200 z-10 mt-2"
+            style={{ 
+              width: '200px', 
+              flexShrink: 0, 
+              borderRadius: '16px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+            }}
+          >
+            <style>
+              {`
+                .filter-dropdown-scroll::-webkit-scrollbar {
+                  width: 2px;
+                }
+                .filter-dropdown-scroll::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                .filter-dropdown-scroll::-webkit-scrollbar-thumb {
+                  background-color: #E4E4E4;
+                  border-radius: 10px;
+                }
+              `}
+            </style>
+            
+            {/* Scrollable Country List */}
+            <div 
+              className="py-2 overflow-y-auto filter-dropdown-scroll"
+              style={{
+                maxHeight: 'calc(6 * 44px)',
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#E4E4E4 transparent'
+              }}
+            >
+              <button
+                onClick={() => {
+                  setSelectedCountry('');
+                  setOpenFilterDropdown(null);
+                }}
                 style={{
-                  position: 'fixed',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  backgroundColor: '#FFFFFF',
-                  borderTopLeftRadius: '20px',
-                  borderTopRightRadius: '20px',
-                  boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
-                  zIndex: 10000,
-                  maxHeight: '60vh',
-                  overflowY: 'auto'
+                  backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
+                  color: !selectedCountry ? '#64B5F6' : '#BABABA'
                 }}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
               >
-                {/* Drag Indicator */}
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  paddingTop: '12px',
-                  paddingBottom: '8px'
-                }}>
-                  <div style={{
-                    width: '40px',
-                    height: '4px',
-                    backgroundColor: '#D9D9D9',
-                    borderRadius: '2px'
-                  }} />
-                </div>
-                <div className="py-1.5 px-3">
-                  <button
-                    onClick={() => {
-                      setSelectedCountry('');
-                      setOpenFilterDropdown(null);
-                    }}
+                <div className="flex items-center">
+                  <img 
+                    src={globyIcon} 
+                    alt="Globe"
+                    className="w-4 h-4 mr-2"
                     style={{
-                      backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
-                      color: !selectedCountry ? '#64B5F6' : '#BABABA',
-                      fontSize: '12px',
-                      padding: '8px 6px'
+                      filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
                     }}
-                    className="w-full text-left hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center">
-                      <img 
-                        src={globyIcon} 
-                        alt="Globe"
-                        className="w-3.5 h-3.5 mr-2"
-                        style={{
-                          filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
-                        }}
-                      />
-                      <span>Africa</span>
-                    </div>
-                  </button>
-                  {africanCountries.map((country) => (
-                    <button
-                      key={country.name}
-                      onClick={() => {
-                        setSelectedCountry(country.name);
-                        setOpenFilterDropdown(null);
-                      }}
-                      style={{
-                        backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
-                        color: selectedCountry === country.name ? '#64B5F6' : '#BABABA',
-                        fontSize: '12px',
-                        padding: '8px 6px'
-                      }}
-                      className="w-full text-left hover:bg-gray-50 transition-colors"
-                    >
-                      <span className="flex items-center space-x-2">
-                        <img 
-                          src={country.flag} 
-                          alt={`${country.name} flag`}
-                          className="object-cover rounded-full"
-                          style={{ width: '16px', height: '16px' }}
-                        />
-                        <span>{country.name}</span>
-                      </span>
-                    </button>
-                  ))}
+                  />
+                  <span>Africa</span>
                 </div>
-                <div style={{ paddingBottom: '20px' }} />
-              </div>
-            ) : (
-              // Desktop: Regular dropdown
-              <div 
-                className="absolute left-0 bg-white border border-gray-200 z-10 mt-2"
-                style={{ 
-                  width: '200px', 
-                  flexShrink: 0, 
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-                }}
-              >
-                <style>
-                  {`
-                    .filter-dropdown-scroll::-webkit-scrollbar {
-                      width: 2px;
-                    }
-                    .filter-dropdown-scroll::-webkit-scrollbar-track {
-                      background: transparent;
-                    }
-                    .filter-dropdown-scroll::-webkit-scrollbar-thumb {
-                      background-color: #E4E4E4;
-                      border-radius: 10px;
-                    }
-                  `}
-                </style>
-                
-                {/* Scrollable Country List */}
-                <div 
-                  className="py-2 overflow-y-auto filter-dropdown-scroll"
-                  style={{
-                    maxHeight: 'calc(6 * 44px)',
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: '#E4E4E4 transparent'
+              </button>
+              {africanCountries.map((country) => (
+                <button
+                  key={country.name}
+                  onClick={() => {
+                    setSelectedCountry(country.name);
+                    setOpenFilterDropdown(null);
                   }}
+                  style={{
+                    backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
+                    color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
                 >
-                  <button
-                    onClick={() => {
-                      setSelectedCountry('');
-                      setOpenFilterDropdown(null);
-                    }}
-                    style={{
-                      backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
-                      color: !selectedCountry ? '#64B5F6' : '#BABABA'
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center">
-                      <img 
-                        src={globyIcon} 
-                        alt="Globe"
-                        className="w-4 h-4 mr-2"
-                        style={{
-                          filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
-                        }}
-                      />
-                      <span>Africa</span>
-                    </div>
-                  </button>
-                  {africanCountries.map((country) => (
-                    <button
-                      key={country.name}
-                      onClick={() => {
-                        setSelectedCountry(country.name);
-                        setOpenFilterDropdown(null);
-                      }}
-                      style={{
-                        backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
-                        color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
-                    >
-                      <span className="flex items-center space-x-2">
-                        <img 
-                          src={country.flag} 
-                          alt={`${country.name} flag`}
-                          className="object-cover rounded-full"
-                          style={{ width: '20px', height: '20px' }}
-                        />
-                        <span>{country.name}</span>
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            {isMobile && (
-              <div
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                  zIndex: 9999
-                }}
-                onClick={() => setOpenFilterDropdown(null)}
-              />
-            )}
-          </>
+                  <span className="flex items-center space-x-2">
+                    <img 
+                      src={country.flag} 
+                      alt={`${country.name} flag`}
+                      className="object-cover rounded-full"
+                      style={{ width: '20px', height: '20px' }}
+                    />
+                    <span>{country.name}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     );
@@ -1218,30 +1028,6 @@ const Requests: React.FC = () => {
               >
                 Pending
               </div>
-              <button
-                className="rounded-full flex items-center justify-center"
-                style={{
-                  backgroundColor: '#F4F4F4',
-                  border: 'none',
-                  cursor: 'pointer',
-                  width: '24px',
-                  height: '24px',
-                  flexShrink: 0
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                <img 
-                  src={shareIcon} 
-                  alt="Share" 
-                  style={{ 
-                    width: '12px', 
-                    height: '12px',
-                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                  }} 
-                />
-              </button>
               <div style={{ position: 'relative' }} ref={moreOptionsRef}>
                 <button
                   type="button"
@@ -1789,16 +1575,16 @@ const Requests: React.FC = () => {
               </div>
             </div>
 
-            {/* Right: Share button - only for non-pending cards */}
-            {!cardIsPending && (
+            {/* Right: Share button - only for non-pending cards on mobile (Requests near you section) */}
+            {!cardIsPending && isMobile && (
               <button
                 className="rounded-full flex items-center justify-center"
                 style={{
                   backgroundColor: '#F4F4F4',
                   border: 'none',
                   cursor: 'pointer',
-                  width: isMobile ? '24px' : '32px',
-                  height: isMobile ? '24px' : '32px',
+                  width: '24px',
+                  height: '24px',
                   flexShrink: 0
                 }}
                 onClick={(e) => {
@@ -1809,8 +1595,34 @@ const Requests: React.FC = () => {
                   src={shareIcon} 
                   alt="Share" 
                   style={{ 
-                    width: isMobile ? '12px' : '16px', 
-                    height: isMobile ? '12px' : '16px',
+                    width: '12px', 
+                    height: '12px',
+                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                  }} 
+                />
+              </button>
+            )}
+            {!cardIsPending && !isMobile && (
+              <button
+                className="rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor: '#F4F4F4',
+                  border: 'none',
+                  cursor: 'pointer',
+                  width: '32px',
+                  height: '32px',
+                  flexShrink: 0
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <img 
+                  src={shareIcon} 
+                  alt="Share" 
+                  style={{ 
+                    width: '16px', 
+                    height: '16px',
                     filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                   }} 
                 />
@@ -1955,7 +1767,7 @@ const Requests: React.FC = () => {
       <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ paddingBottom: isMobile ? '32px' : '48px', paddingTop: isMobile ? '40px' : '64px' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className={isMobile ? "flex flex-col items-center mb-6 sm:mb-8" : "flex items-start justify-between mb-6 sm:mb-8"} style={isMobile ? { marginTop: '24px' } : {}}>
+          <div className={isMobile ? "flex flex-col items-center mb-6 sm:mb-8" : "flex items-start justify-between mb-6 sm:mb-8"} style={isMobile ? { marginTop: '40px' } : {}}>
             <div className={isMobile ? "flex-1 text-center" : "flex-1"}>
               <h2 className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '20px' : '44px', fontWeight: '500', lineHeight: '1.2', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 <span style={{ color: '#212121' }}>Buy & Sell </span>
@@ -3157,26 +2969,50 @@ const Requests: React.FC = () => {
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-              className="bg-white rounded-[30px] pt-8 sm:pt-10 px-5 sm:px-6 relative max-w-sm w-full pb-8"
-              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close Button */}
-              <button
-                onClick={() => {
-                  setShowRequestModal(false);
-                  setSelectedCard(null);
+          {isMobile ? (
+            // Mobile: Bottom sheet modal
+            <div className="fixed inset-0 z-50 flex items-end">
+              <div
+                className="bg-white w-full relative max-w-sm mx-auto"
+                style={{ 
+                  borderTopLeftRadius: '20px',
+                  borderTopRightRadius: '20px',
+                  boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
+                  maxHeight: '90vh',
+                  overflowY: 'auto'
                 }}
-                className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
               >
-                <img
-                  src={closeIcon}
-                  alt="Close"
-                  className="w-4 h-4"
-                />
-              </button>
+                {/* Drag Indicator at top */}
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  paddingTop: '12px',
+                  paddingBottom: '8px'
+                }}>
+                  <div style={{
+                    width: '40px',
+                    height: '4px',
+                    backgroundColor: '#D9D9D9',
+                    borderRadius: '2px'
+                  }} />
+                </div>
+                
+                <div className="pt-2 px-5 pb-8 relative">
+                  {/* Close Button */}
+                  <button
+                    onClick={() => {
+                      setShowRequestModal(false);
+                      setSelectedCard(null);
+                    }}
+                    className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
+                  >
+                    <img
+                      src={closeIcon}
+                      alt="Close"
+                      className="w-4 h-4"
+                    />
+                  </button>
 
               {/* Request Badge - Centered */}
               <div className="flex justify-center mb-3">
@@ -3331,8 +3167,202 @@ const Requests: React.FC = () => {
                   <span>Message Buyer</span>
                 </button>
               </div>
+              
+              {/* Drag Indicator at bottom */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                paddingTop: '12px',
+                paddingBottom: '12px'
+              }}>
+                <div style={{
+                  width: '40px',
+                  height: '4px',
+                  backgroundColor: '#D9D9D9',
+                  borderRadius: '2px'
+                }} />
+              </div>
             </div>
           </div>
+          ) : (
+            // Desktop: Centered modal
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div
+                className="bg-white rounded-[30px] pt-8 sm:pt-10 px-5 sm:px-6 relative max-w-sm w-full pb-8"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => {
+                    setShowRequestModal(false);
+                    setSelectedCard(null);
+                  }}
+                  className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
+                >
+                  <img
+                    src={closeIcon}
+                    alt="Close"
+                    className="w-4 h-4"
+                  />
+                </button>
+
+                {/* Request Badge - Centered */}
+                <div className="flex justify-center mb-3">
+                  <span 
+                    style={{ 
+                      fontSize: '10px', 
+                      color: '#BABABA',
+                      border: '1.5px solid #E1E1E1',
+                      borderRadius: '999px',
+                      padding: '2px 12px',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    Request
+                  </span>
+                </div>
+
+                {/* Product Name */}
+                <h2
+                  className="text-lg text-center mb-2"
+                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+                >
+                  {selectedCard.title}
+                </h2>
+
+                {/* Description */}
+                <p 
+                  className="text-xs text-center mb-5"
+                  style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+                >
+                  {selectedCard.description}
+                </p>
+
+                {/* Three Badges - Centered */}
+                <div className="flex flex-col items-center gap-2 mb-5">
+                  {/* Location Badge */}
+                  <div 
+                    className="flex items-center justify-center gap-1 px-2 py-1"
+                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                  >
+                    <img 
+                      src={locationIcon} 
+                      alt="Location"
+                      className="w-3 h-3"
+                      style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                    />
+                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.location}</span>
+                  </div>
+
+                  {/* Price and Country Badges */}
+                  <div className="flex gap-2 justify-center">
+                    {/* Price Badge */}
+                    <div 
+                      className="flex items-center gap-1.5 px-3 py-1.5"
+                      style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                    >
+                      <img 
+                        src={moneyIcon} 
+                        alt="Money"
+                        className="w-3 h-3"
+                        style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                      />
+                      <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>50 - 100 USD</span>
+                    </div>
+
+                    {/* Country Badge */}
+                    <div 
+                      className="flex items-center gap-1.5 px-3 py-1.5"
+                      style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                    >
+                      <img 
+                        src={selectedCard.flag} 
+                        alt={selectedCard.country}
+                        className="w-4 h-4 object-cover rounded-full"
+                      />
+                      <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.country}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gray Divider */}
+                <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9', marginBottom: '12px' }}></div>
+
+                {/* Seller Info Section */}
+                <div className="flex items-center justify-between">
+                  {/* Avatar and Info */}
+                  <div className="flex items-center gap-2.5">
+                    {/* Avatar */}
+                    <div 
+                      className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden"
+                      style={{ backgroundColor: '#F7C9B0', border: '2px solid #939393' }}
+                    >
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
+                        <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
+                      </svg>
+                    </div>
+
+                    {/* Name and Rating */}
+                    <div className="flex flex-col">
+                      <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                        Nadine MABE
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <svg
+                            key={star}
+                            width="11"
+                            height="11"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6 0L7.5 4.5L12 4.5L8.25 7.5L9.75 12L6 9L2.25 12L3.75 7.5L0 4.5L4.5 4.5L6 0Z"
+                              fill={star === 5 ? '#B0B0B0' : '#F9A825'}
+                              style={{ strokeLinejoin: 'round', strokeLinecap: 'round' }}
+                            />
+                          </svg>
+                        ))}
+                        <span style={{ fontSize: '11px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', marginLeft: '4px' }}>
+                          4.3
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Message Buyer Button */}
+                  <button
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                    style={{
+                      backgroundColor: '#F9A825',
+                      color: '#FFFFFF',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: '12px',
+                      fontWeight: 400,
+                      border: 'none',
+                      cursor: 'pointer',
+                      height: 'auto'
+                    }}
+                    onClick={() => {
+                      // Handle message buyer action
+                      console.log('Message buyer clicked');
+                    }}
+                  >
+                    <img 
+                      src={basketIcon} 
+                      alt="Cart" 
+                      className="w-4 h-4"
+                      style={{ filter: 'brightness(0) invert(1)' }}
+                    />
+                    <span>Message Buyer</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
