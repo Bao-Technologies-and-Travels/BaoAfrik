@@ -121,7 +121,9 @@ const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/n
   // For all other pages, render with header/footer
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+      <div className="hidden lg:block">
+        <Header />
+      </div>
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />

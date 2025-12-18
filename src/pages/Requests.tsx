@@ -17,6 +17,8 @@ import emptyRequestIcon from '../assets/images/pre/emptysearch.svg';
 import requestArrowIcon from '../assets/images/pre/requestarrow.svg';
 import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
+import searchNormalIcon from '../assets/images/pre/search-normal.svg';
+import backArrowIcon from '../assets/images/pre/back arrow.svg';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -362,9 +364,10 @@ const Requests: React.FC = () => {
           // Price filter button
           <button 
             onClick={() => setOpenPriceDropdown(isOpen ? null : sectionId)}
-            className="flex items-center border transition-colors hover:bg-gray-50"
+            className="flex items-center transition-colors hover:bg-gray-50"
             style={{ 
-              backgroundColor: '#FAFAFA',
+              backgroundColor: isMobile ? '#FFFFFF' : '#FAFAFA',
+              border: isMobile ? 'none' : '1px solid #E4E4E4',
               borderColor: '#E4E4E4',
               padding: isMobile ? '5px 8px' : '7px 14px',
               borderRadius: '8px',
@@ -480,9 +483,10 @@ const Requests: React.FC = () => {
           // Filter button
           <button 
             onClick={() => setOpenFilterDropdown(isOpen ? null : sectionId)}
-            className="flex items-center border transition-colors hover:bg-gray-50"
+            className="flex items-center transition-colors hover:bg-gray-50"
             style={{ 
-              backgroundColor: '#FAFAFA',
+              backgroundColor: isMobile ? '#FFFFFF' : '#FAFAFA',
+              border: isMobile ? 'none' : '1px solid #E4E4E4',
               borderColor: '#E4E4E4',
               padding: isMobile ? '5px 7px' : '7px 10px',
               borderRadius: '8px',
@@ -490,7 +494,7 @@ const Requests: React.FC = () => {
               gap: isMobile ? '4px' : '6px'
             }}
           >
-            <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
+            {!isMobile && <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Filter :</span>}
             <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
             <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
             <img 
@@ -629,7 +633,8 @@ const Requests: React.FC = () => {
         width: isMobile ? '260px' : 'auto',
         flexShrink: isMobile ? 0 : 'initial',
         padding: isMobile ? '10px' : '16px',
-        borderRadius: '24px'
+        borderRadius: '24px',
+        margin: isMobile ? '0 4px' : '0'
       }}
     >
       {/* Product Name Label and Button - Desktop only */}
@@ -843,9 +848,9 @@ const Requests: React.FC = () => {
         </div>
       )}
 
-      {/* Product Name Label Only - Mobile */}
+      {/* Product Name Label and Status Badge - Mobile */}
       {isMobile && (
-        <div className="mb-1">
+        <div className="flex items-center justify-between mb-1">
           <span 
             style={{ 
               fontSize: '9px', 
@@ -858,6 +863,162 @@ const Requests: React.FC = () => {
           >
             Request
           </span>
+          {cardIsPending && (
+            <div className="flex items-center gap-2">
+              <div 
+                className="px-2 py-0.5 rounded-md"
+                style={{ 
+                  backgroundColor: '#F4F4F4',
+                  fontSize: '10px',
+                  color: '#6A6A6A',
+                  fontWeight: 'normal',
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              >
+                Pending
+              </div>
+              <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                <button
+                  type="button"
+                  className="w-5 h-5 rounded-full border flex items-center justify-center"
+                  style={{
+                    borderColor: '#B0B0B0',
+                    borderWidth: '1.5px',
+                    backgroundColor: '#FFFFFF',
+                    cursor: 'pointer',
+                    padding: 0
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMoreOptionsOpenFor(moreOptionsOpenFor === cardId ? null : cardId);
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                  </svg>
+                </button>
+                {moreOptionsOpenFor === cardId && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '26px',
+                      right: 0,
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '16px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: '8px',
+                      minWidth: '200px',
+                      zIndex: 1000
+                    }}
+                  >
+                    {/* Manage request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '13px',
+                        color: '#939393'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={requestIcon} 
+                        alt="Request" 
+                        style={{ 
+                          width: '18px', 
+                          height: '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span>Manage request</span>
+                    </button>
+                    
+                    {/* Share the request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '13px',
+                        color: '#939393',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={shareIcon} 
+                        alt="Share" 
+                        style={{ 
+                          width: '18px', 
+                          height: '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
+                    </button>
+                    
+                    {/* Close */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: '#FAFAFA',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '13px',
+                        color: '#939393'
+                      }}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Close</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1065,42 +1226,108 @@ const Requests: React.FC = () => {
                 </svg>
               </div>
               <div className="flex flex-col">
-                <span style={{ fontSize: '7px', color: '#BABABA', fontWeight: 'normal' }}>User profile</span>
                 <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>Seraphin DIKOUM</span>
+                {/* Rating below name */}
+                <div className="flex items-center gap-0.5 mt-0.5">
+                  <svg 
+                    className="text-yellow-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg 
+                    className="text-yellow-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg 
+                    className="text-yellow-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg 
+                    className="text-yellow-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg 
+                    className="text-gray-300" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500', marginLeft: '2px' }}>4.3</span>
+                </div>
               </div>
             </div>
 
-            {/* Right: Rating */}
-            <div className="flex items-center gap-0.5">
-              <svg 
-                className="text-yellow-500" 
-                fill="currentColor" 
-                viewBox="0 0 20 20"
-                style={{ width: '8px', height: '8px' }}
+            {/* Right: Share button - only for non-pending cards */}
+            {!cardIsPending && (
+              <button
+                className="rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor: '#F4F4F4',
+                  border: 'none',
+                  cursor: 'pointer',
+                  width: isMobile ? '24px' : '32px',
+                  height: isMobile ? '24px' : '32px',
+                  flexShrink: 0
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
               >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>4.3</span>
-            </div>
+                <img 
+                  src={shareIcon} 
+                  alt="Share" 
+                  style={{ 
+                    width: isMobile ? '12px' : '16px', 
+                    height: isMobile ? '12px' : '16px',
+                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                  }} 
+                />
+              </button>
+            )}
           </div>
         </>
       )}
 
-      {/* Respond to the request button - Mobile only */}
-      {isMobile && (
+      {/* Manage the request button - Mobile only (replaces Respond to request) */}
+      {isMobile && !cardIsPending && (
         <button 
-          className="w-full mt-3 text-white"
+          className="mt-3 flex items-center justify-center gap-1.5"
           style={{ 
-            backgroundColor: '#F9A825', 
+            backgroundColor: '#FFFFFF', 
+            borderColor: '#F9A825',
+            border: '1px solid #F9A825',
+            color: '#F9A825',
             fontWeight: 'normal', 
             fontSize: '9px',
             padding: '6px 10px',
             borderRadius: '6px',
-            border: 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            width: 'auto',
+            alignSelf: 'flex-start'
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
           }}
         >
-          Respond to the request
+          <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
+          Manage the request
         </button>
       )}
     </div>
@@ -1109,6 +1336,43 @@ const Requests: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {/* Mobile Top Bar */}
+      {isMobile && (
+        <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between mb-16">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+            aria-label="Back"
+          >
+            <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="Search"
+            >
+              <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="More options"
+            >
+              <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                <circle cx="4" cy="2" r="2" fill="#171717" />
+                <circle cx="12" cy="2" r="2" fill="#171717" />
+                <circle cx="20" cy="2" r="2" fill="#171717" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Breadcrumbs */}
       <div className="hidden lg:block bg-white" style={{ paddingTop: '24px', paddingBottom: '0px', marginBottom: '-48px' }}>
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16" style={{ paddingLeft: '0px' }}>
@@ -1140,11 +1404,11 @@ const Requests: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ paddingBottom: isMobile ? '32px' : '48px' }}>
+      <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ paddingBottom: isMobile ? '32px' : '48px', paddingTop: isMobile ? '20px' : '64px' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className={isMobile ? "flex flex-col mb-6 sm:mb-8" : "flex items-start justify-between mb-6 sm:mb-8"}>
-            <div className="flex-1">
+          <div className={isMobile ? "flex flex-col items-center mb-6 sm:mb-8" : "flex items-start justify-between mb-6 sm:mb-8"}>
+            <div className={isMobile ? "flex-1 text-center" : "flex-1"}>
               <h2 className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '20px' : '44px', fontWeight: '500', lineHeight: '1.2' }}>
                 <span style={{ color: '#212121' }}>Buy & Sell </span>
                 <span style={{ 
@@ -1156,11 +1420,13 @@ const Requests: React.FC = () => {
                   Instantly
                 </span>
               </h2>
-              <p style={{ fontSize: isMobile ? '9px' : '16px', color: '#9C9C9C', maxWidth: isMobile ? '220px' : '600px', lineHeight: '1.6' }}>
+              <p style={{ fontSize: isMobile ? '9px' : '16px', color: '#9C9C9C', maxWidth: isMobile ? '220px' : '600px', lineHeight: '1.6', margin: isMobile ? '0 auto' : '0' }}>
                 Turn unmet needs into instant deals, discover what people are looking for, grab it, and sell it right where demand begins
               </p>
             </div>
-            {/* Search Bar or Over 400 requests available */}
+            {/* Search Bar or Over 400 requests available - Hidden on mobile */}
+            {!isMobile && (
+              <>
             {isSearchActive ? (
               // When search is active: show "Over 400 requests available"
               <div className="text-right" style={{ width: isMobile ? '100%' : '380px', marginTop: isMobile ? '16px' : '0' }}>
@@ -1404,6 +1670,8 @@ const Requests: React.FC = () => {
                 </div>
               </div>
             )}
+              </>
+            )}
           </div>
 
           {/* Search Results View */}
@@ -1615,38 +1883,76 @@ const Requests: React.FC = () => {
 
                   {/* Requests near you Section */}
                   <div className="mb-12">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 style={{ 
-                        fontFamily: 'Bricolage Grotesque, sans-serif',
-                        fontSize: isMobile ? '14px' : '18px',
-                        fontWeight: '500',
-                        color: '#000000'
-                      }}>
-                        Requests near you
-                      </h3>
-                      <div className="flex items-center gap-3">
-                        <button 
-                          className="rounded-full flex items-center justify-center transition-all duration-200"
-                          style={{
-                            width: isMobile ? '20px' : '24px',
-                            height: isMobile ? '20px' : '24px'
-                          }}
-                          aria-label="Previous"
-                        >
-                          <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                        </button>
-                        <button 
-                          className="rounded-full flex items-center justify-center transition-all duration-200"
-                          style={{
-                            width: isMobile ? '20px' : '24px',
-                            height: isMobile ? '20px' : '24px'
-                          }}
-                          aria-label="Next"
-                        >
-                          <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-                        </button>
+                    {isMobile ? (
+                      <>
+                        <h3 style={{ 
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: '#000000',
+                          marginBottom: '4px'
+                        }}>
+                          Requests near you
+                        </h3>
+                        <div className="flex items-center justify-end mb-6">
+                          <div className="flex items-center gap-2">
+                            <button 
+                              className="rounded-full flex items-center justify-center transition-all duration-200"
+                              style={{
+                                width: '16px',
+                                height: '16px'
+                              }}
+                              aria-label="Previous"
+                            >
+                              <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                            </button>
+                            <button 
+                              className="rounded-full flex items-center justify-center transition-all duration-200"
+                              style={{
+                                width: '16px',
+                                height: '16px'
+                              }}
+                              aria-label="Next"
+                            >
+                              <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 style={{ 
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '18px',
+                          fontWeight: '500',
+                          color: '#000000'
+                        }}>
+                          Requests near you
+                        </h3>
+                        <div className="flex items-center gap-3">
+                          <button 
+                            className="rounded-full flex items-center justify-center transition-all duration-200"
+                            style={{
+                              width: '24px',
+                              height: '24px'
+                            }}
+                            aria-label="Previous"
+                          >
+                            <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                          </button>
+                          <button 
+                            className="rounded-full flex items-center justify-center transition-all duration-200"
+                            style={{
+                              width: '24px',
+                              height: '24px'
+                            }}
+                            aria-label="Next"
+                          >
+                            <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     {/* Cards grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       {getAllCards().slice(0, 3).map((product, index) => (
@@ -1837,38 +2143,76 @@ const Requests: React.FC = () => {
 
                   {/* Requests near you Section */}
                   <div className="mb-12">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 style={{ 
-                        fontFamily: 'Bricolage Grotesque, sans-serif',
-                        fontSize: isMobile ? '14px' : '18px',
-                        fontWeight: '500',
-                        color: '#000000'
-                      }}>
-                        Requests near you
-                      </h3>
-                      <div className="flex items-center gap-3">
-                        <button 
-                          className="rounded-full flex items-center justify-center transition-all duration-200"
-                          style={{
-                            width: isMobile ? '20px' : '24px',
-                            height: isMobile ? '20px' : '24px'
-                          }}
-                          aria-label="Previous"
-                        >
-                          <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                        </button>
-                        <button 
-                          className="rounded-full flex items-center justify-center transition-all duration-200"
-                          style={{
-                            width: isMobile ? '20px' : '24px',
-                            height: isMobile ? '20px' : '24px'
-                          }}
-                          aria-label="Next"
-                        >
-                          <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-                        </button>
+                    {isMobile ? (
+                      <>
+                        <h3 style={{ 
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: '#000000',
+                          marginBottom: '4px'
+                        }}>
+                          Requests near you
+                        </h3>
+                        <div className="flex items-center justify-end mb-6">
+                          <div className="flex items-center gap-2">
+                            <button 
+                              className="rounded-full flex items-center justify-center transition-all duration-200"
+                              style={{
+                                width: '16px',
+                                height: '16px'
+                              }}
+                              aria-label="Previous"
+                            >
+                              <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                            </button>
+                            <button 
+                              className="rounded-full flex items-center justify-center transition-all duration-200"
+                              style={{
+                                width: '16px',
+                                height: '16px'
+                              }}
+                              aria-label="Next"
+                            >
+                              <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 style={{ 
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '18px',
+                          fontWeight: '500',
+                          color: '#000000'
+                        }}>
+                          Requests near you
+                        </h3>
+                        <div className="flex items-center gap-3">
+                          <button 
+                            className="rounded-full flex items-center justify-center transition-all duration-200"
+                            style={{
+                              width: '24px',
+                              height: '24px'
+                            }}
+                            aria-label="Previous"
+                          >
+                            <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                          </button>
+                          <button 
+                            className="rounded-full flex items-center justify-center transition-all duration-200"
+                            style={{
+                              width: '24px',
+                              height: '24px'
+                            }}
+                            aria-label="Next"
+                          >
+                            <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="relative">
                       {!isMobile && (
                         <div 
@@ -1880,7 +2224,7 @@ const Requests: React.FC = () => {
                         />
                       )}
                       <div 
-                        className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                        className={isMobile ? "flex gap-6 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                         style={isMobile ? { 
                           scrollbarWidth: 'none',
                           msOverflowStyle: 'none',
@@ -1971,20 +2315,62 @@ const Requests: React.FC = () => {
             <>
               {/* Requests near you Section */}
               <div className="mb-12">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 style={{ 
-                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                    fontSize: isMobile ? '14px' : '18px',
-                    fontWeight: '500',
-                    color: '#000000'
-                  }}>
-                    Requests near you
-                  </h3>
-                <div className="flex items-center gap-2">
-                  {renderCountryFilterButton('relative', 'filtered')}
-                  {renderPriceFilterButton('relative', 'filtered')}
-                </div>
-                </div>
+                    {isMobile ? (
+                      <>
+                        <h3 style={{ 
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: '#000000',
+                          marginBottom: '4px'
+                        }}>
+                          Requests near you
+                        </h3>
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center gap-2" style={{ marginLeft: '0' }}>
+                            {renderCountryFilterButton('relative', 'filtered')}
+                            {renderPriceFilterButton('relative', 'filtered')}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              className="rounded-full flex items-center justify-center transition-all duration-200"
+                              style={{
+                                width: '16px',
+                                height: '16px'
+                              }}
+                              aria-label="Previous"
+                            >
+                              <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                            </button>
+                            <button 
+                              className="rounded-full flex items-center justify-center transition-all duration-200"
+                              style={{
+                                width: '16px',
+                                height: '16px'
+                              }}
+                              aria-label="Next"
+                            >
+                              <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 style={{ 
+                      fontFamily: 'Bricolage Grotesque, sans-serif',
+                      fontSize: '18px',
+                      fontWeight: '500',
+                      color: '#000000'
+                    }}>
+                      Requests near you
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      {renderCountryFilterButton('relative', 'filtered')}
+                      {renderPriceFilterButton('relative', 'filtered')}
+                    </div>
+                  </div>
+                )}
             <div className="relative">
               {/* Fade effect on the right - Desktop only */}
               {!isMobile && (
@@ -2019,20 +2405,62 @@ const Requests: React.FC = () => {
 
           {/* Pending requests Section */}
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h3 style={{ 
-                fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: isMobile ? '14px' : '18px',
-                fontWeight: '500',
-                color: '#000000'
-              }}>
-                Pending requests
-              </h3>
-              <div className="flex items-center gap-2">
-                {renderCountryFilterButton('relative', 'pending')}
-                {renderPriceFilterButton('relative', 'pending')}
+            {isMobile ? (
+              <>
+                        <h3 style={{ 
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: '#000000',
+                          marginBottom: '4px'
+                        }}>
+                          Pending requests
+                        </h3>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    {renderCountryFilterButton('relative', 'pending')}
+                    {renderPriceFilterButton('relative', 'pending')}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      className="rounded-full flex items-center justify-center transition-all duration-200"
+                      style={{
+                        width: '16px',
+                        height: '16px'
+                      }}
+                      aria-label="Previous"
+                    >
+                      <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                    </button>
+                    <button 
+                      className="rounded-full flex items-center justify-center transition-all duration-200"
+                      style={{
+                        width: '16px',
+                        height: '16px'
+                      }}
+                      aria-label="Next"
+                    >
+                      <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-between mb-6">
+                <h3 style={{ 
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontSize: '18px',
+                  fontWeight: '500',
+                  color: '#000000'
+                }}>
+                  Pending requests
+                </h3>
+                <div className="flex items-center gap-2">
+                  {renderCountryFilterButton('relative', 'pending')}
+                  {renderPriceFilterButton('relative', 'pending')}
+                </div>
               </div>
-            </div>
+            )}
             <div className="relative">
               {/* Fade effect on the right - Desktop only */}
               {!isMobile && (
@@ -2067,20 +2495,62 @@ const Requests: React.FC = () => {
 
           {/* All requests Section */}
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h3 style={{ 
-                fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: isMobile ? '14px' : '18px',
-                fontWeight: '500',
-                color: '#000000'
-              }}>
-                All requests
-              </h3>
-              <div className="flex items-center gap-2">
-                {renderCountryFilterButton('relative', 'all')}
-                {renderPriceFilterButton('relative', 'all')}
+            {isMobile ? (
+              <>
+                        <h3 style={{ 
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: '#000000',
+                          marginBottom: '4px'
+                        }}>
+                          All requests
+                        </h3>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    {renderCountryFilterButton('relative', 'all')}
+                    {renderPriceFilterButton('relative', 'all')}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      className="rounded-full flex items-center justify-center transition-all duration-200"
+                      style={{
+                        width: '16px',
+                        height: '16px'
+                      }}
+                      aria-label="Previous"
+                    >
+                      <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                    </button>
+                    <button 
+                      className="rounded-full flex items-center justify-center transition-all duration-200"
+                      style={{
+                        width: '16px',
+                        height: '16px'
+                      }}
+                      aria-label="Next"
+                    >
+                      <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-between mb-6">
+                <h3 style={{ 
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontSize: '18px',
+                  fontWeight: '500',
+                  color: '#000000'
+                }}>
+                  All requests
+                </h3>
+                <div className="flex items-center gap-2">
+                  {renderCountryFilterButton('relative', 'all')}
+                  {renderPriceFilterButton('relative', 'all')}
+                </div>
               </div>
-            </div>
+            )}
             <div className="relative">
               {/* Fade effect on the right - Desktop only */}
               {!isMobile && (
