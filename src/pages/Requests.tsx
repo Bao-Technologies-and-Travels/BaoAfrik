@@ -1394,12 +1394,25 @@ const Requests: React.FC = () => {
     const isNoResults = mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchFiltered.length === 0;
     const showSearchButton = !mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchFiltered.length === 0 && mobileSearchQuery.trim() === '');
 
+    // Filter location suggestions for mobile search
+    const getMobileSearchSuggestions = () => {
+      if (!mobileSearchQuery.trim()) return [];
+      const query = mobileSearchQuery.toLowerCase();
+      return locationSuggestions.filter(location => 
+        location.toLowerCase().startsWith(query) || 
+        location.toLowerCase().includes(query)
+      ).slice(0, 6);
+    };
+
+    const mobileSearchSuggestions = getMobileSearchSuggestions();
+    const showMobileSuggestions = !mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchSuggestions.length > 0;
+
     return (
       <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
         {/* Search Bar at Top */}
-        <div className="px-4 pt-4 pb-3">
+        <div className="px-4 pt-4 pb-3" style={{ position: 'relative' }}>
           <div 
-            className="flex items-center gap-3 px-3 py-2 bg-white" 
+            className="flex items-center gap-3 px-3 py-2 bg-white relative" 
             style={{ 
               border: `1px solid ${mobileSearchQuery ? '#97CDF9' : '#E4E4E4'}`, 
               borderRadius: '12px' 
@@ -1416,26 +1429,85 @@ const Requests: React.FC = () => {
             >
               <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
             </button>
+            <img 
+              src={locationIcon} 
+              alt="Location"
+              className="flex-shrink-0"
+              style={{ 
+                width: '16px', 
+                height: '16px',
+                filter: 'brightness(0) saturate(100%) invert(85.1%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)',
+                opacity: 1
+              }}
+            />
             <input
               type="text"
               value={mobileSearchQuery}
               onChange={(e) => setMobileSearchQuery(e.target.value)}
               className="flex-1 outline-none"
-              style={{ fontFamily: 'Poppins, sans-serif', fontSize: '14px', color: '#212121' }}
-              placeholder="Search requests..."
+              style={{ fontFamily: 'Poppins, sans-serif', fontSize: '14px', color: '#212121', paddingLeft: '0' }}
+              placeholder="Buyer location ?"
               autoFocus
             />
-            <button
-              type="button"
-              onClick={() => {
-                setMobileSearchQuery('');
-                setMobileSearchSubmitted(false);
-              }}
-              className="flex-shrink-0"
-            >
-              <img src={SDicon} alt="Clear" className="w-4 h-4" />
-            </button>
+            <style>{`
+              input[placeholder="Buyer location ?"]::placeholder {
+                color: #D9D9D9 !important;
+              }
+            `}</style>
+            {mobileSearchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileSearchQuery('');
+                  setMobileSearchSubmitted(false);
+                }}
+                className="flex-shrink-0"
+              >
+                <img src={SDicon} alt="Clear" className="w-4 h-4" />
+              </button>
+            )}
           </div>
+
+          {/* Location Suggestions Dropdown */}
+          {showMobileSuggestions && (
+            <div
+              className="absolute top-full left-4 right-4 mt-1 z-50"
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '8px',
+                maxHeight: '180px',
+                overflowY: 'auto',
+                marginTop: '4px'
+              }}
+            >
+              {mobileSearchSuggestions.map((location, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    setMobileSearchQuery(location);
+                    setMobileSearchSubmitted(true);
+                  }}
+                  className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
+                  style={{
+                    padding: '8px 12px'
+                  }}
+                >
+                  <img 
+                    src={locationIcon} 
+                    alt="Location"
+                    style={{ 
+                      width: '14px', 
+                      height: '14px',
+                      filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
+                    }}
+                  />
+                  <span style={{ color: '#6A6A6A', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                    {location}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Search Results Title */}
@@ -1450,11 +1522,65 @@ const Requests: React.FC = () => {
         {/* Search Results or Empty State */}
         <div className="flex-1 overflow-y-auto px-4 pb-24">
           {isNoResults && (
-            <div className="flex flex-col items-center justify-center" style={{ paddingTop: '140px' }}>
-              <img src={emptyRequestIcon} alt="No requests" style={{ width: '50px', height: '50px', marginBottom: '14px', opacity: 0.3 }} />
-              <p style={{ color: '#939393', fontSize: '11px', textAlign: 'center', marginBottom: '14px', lineHeight: '1.5' }}>
-                No requests found. Please try adjusting<br />your search criteria.
+            <div className="text-center" style={{ padding: '48px 16px', marginTop: '32px', marginBottom: '48px' }}>
+              {/* Empty Request Icon */}
+              <img 
+                src={emptyRequestIcon} 
+                alt="No requests found" 
+                className="mx-auto" 
+                style={{ 
+                  width: '40px', 
+                  height: '40px',
+                  marginBottom: '12px'
+                }}
+              />
+              
+              {/* Title */}
+              <h3 style={{ 
+                fontSize: '16px', 
+                color: '#D9D9D9', 
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                fontWeight: '500',
+                marginBottom: '8px'
+              }}>
+                No results
+              </h3>
+              
+              {/* Description */}
+              <p style={{ 
+                fontSize: '12px', 
+                color: '#B0B0B0', 
+                fontFamily: 'Poppins, sans-serif', 
+                maxWidth: '280px', 
+                margin: '0 auto',
+                marginBottom: '16px',
+                lineHeight: '1.5'
+              }}>
+                We found nothing for your search, sorry. Please continue browsing the platform to discover more wonders.
               </p>
+              
+              {/* View available items link */}
+              <Link
+                to="/"
+                className="inline-flex items-center gap-1.5 transition-opacity hover:opacity-80"
+                style={{ 
+                  color: '#64B5F6',
+                  fontSize: '11px',
+                  textDecoration: 'none',
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              >
+                <span>View available items</span>
+                <img 
+                  src={requestArrowIcon} 
+                  alt="Arrow" 
+                  style={{ 
+                    width: '10px',
+                    height: '10px',
+                    filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                  }}
+                />
+              </Link>
             </div>
           )}
 
@@ -1482,7 +1608,7 @@ const Requests: React.FC = () => {
                 fontSize: '14px',
                 fontFamily: 'Poppins, sans-serif',
                 fontWeight: 500,
-                cursor: 'pointer',
+                cursor: mobileSearchQuery.trim() ? 'pointer' : 'not-allowed',
                 boxShadow: 'none'
               }}
               onClick={() => {
