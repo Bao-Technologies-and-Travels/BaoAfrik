@@ -40,6 +40,7 @@ interface Request {
   originFlag: string;
   price: string;
   status: 'ongoing' | 'pending' | 'completed' | 'expired';
+  description?: string;
 }
 
 const statusOptions = ['Ongoing', 'Pending', 'Completed', 'Expired'] as const;
@@ -215,19 +216,19 @@ const MyRequests: React.FC = () => {
 
   // Mock data - replace with actual data from backend
   const initialRequests: Request[] = [
-    { id: '1', title: 'Snails from South Africa', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'South Africa', originFlag: 'https://flagcdn.com/w20/za.png', price: '50 - 100 USD', status: 'ongoing' },
-    { id: '2', title: 'Artisanal Cheeses', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Cameroon', originFlag: 'https://flagcdn.com/w20/cm.png', price: '40 - 90 USD', status: 'pending' },
-    { id: '3', title: 'Mushrooms of the East', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ivory Coast', originFlag: 'https://flagcdn.com/w20/ci.png', price: '15 - 45 USD', status: 'completed' },
-    { id: '4', title: 'Craft Beers', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Benin', originFlag: 'https://flagcdn.com/w20/bj.png', price: '30 - 60 USD', status: 'expired' },
-    { id: '5', title: 'Exotic Fruits', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Nigeria', originFlag: 'https://flagcdn.com/w20/ng.png', price: '25 - 50 USD', status: 'ongoing' },
-    { id: '6', title: 'Rare Spices', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Morocco', originFlag: 'https://flagcdn.com/w20/ma.png', price: '35 - 70 USD', status: 'pending' },
-    { id: '7', title: 'Premium Coffee Beans', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ethiopia', originFlag: 'https://flagcdn.com/w20/et.png', price: '60 - 120 USD', status: 'completed' },
-    { id: '8', title: 'Traditional Kente Fabric', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ghana', originFlag: 'https://flagcdn.com/w20/gh.png', price: '45 - 85 USD', status: 'ongoing' },
-    { id: '9', title: 'Shea Butter Products', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Nigeria', originFlag: 'https://flagcdn.com/w20/ng.png', price: '20 - 40 USD', status: 'pending' },
-    { id: '10', title: 'African Black Soap', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ghana', originFlag: 'https://flagcdn.com/w20/gh.png', price: '8 - 15 USD', status: 'expired' },
-    { id: '11', title: 'Baobab Powder', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Senegal', originFlag: 'https://flagcdn.com/w20/sn.png', price: '55 - 110 USD', status: 'completed' },
-    { id: '12', title: 'Moroccan Argan Oil', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Morocco', originFlag: 'https://flagcdn.com/w20/ma.png', price: '75 - 150 USD', status: 'ongoing' },
-    { id: '13', title: 'Desert Salt', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Senegal', originFlag: 'https://flagcdn.com/w20/sn.png', price: '12 - 25 USD', status: 'pending' },
+    { id: '1', title: 'Snails from South Africa', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'South Africa', originFlag: 'https://flagcdn.com/w20/za.png', price: '50 - 100 USD', status: 'ongoing', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '2', title: 'Artisanal Cheeses', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Cameroon', originFlag: 'https://flagcdn.com/w20/cm.png', price: '40 - 90 USD', status: 'pending', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '3', title: 'Mushrooms of the East', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ivory Coast', originFlag: 'https://flagcdn.com/w20/ci.png', price: '15 - 45 USD', status: 'completed', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '4', title: 'Craft Beers', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Benin', originFlag: 'https://flagcdn.com/w20/bj.png', price: '30 - 60 USD', status: 'expired', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '5', title: 'Exotic Fruits', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Nigeria', originFlag: 'https://flagcdn.com/w20/ng.png', price: '25 - 50 USD', status: 'ongoing', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '6', title: 'Rare Spices', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Morocco', originFlag: 'https://flagcdn.com/w20/ma.png', price: '35 - 70 USD', status: 'pending', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '7', title: 'Premium Coffee Beans', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ethiopia', originFlag: 'https://flagcdn.com/w20/et.png', price: '60 - 120 USD', status: 'completed', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '8', title: 'Traditional Kente Fabric', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ghana', originFlag: 'https://flagcdn.com/w20/gh.png', price: '45 - 85 USD', status: 'ongoing', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '9', title: 'Shea Butter Products', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Nigeria', originFlag: 'https://flagcdn.com/w20/ng.png', price: '20 - 40 USD', status: 'pending', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '10', title: 'African Black Soap', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Ghana', originFlag: 'https://flagcdn.com/w20/gh.png', price: '8 - 15 USD', status: 'expired', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '11', title: 'Baobab Powder', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Senegal', originFlag: 'https://flagcdn.com/w20/sn.png', price: '55 - 110 USD', status: 'completed', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '12', title: 'Moroccan Argan Oil', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Morocco', originFlag: 'https://flagcdn.com/w20/ma.png', price: '75 - 150 USD', status: 'ongoing', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+    { id: '13', title: 'Desert Salt', createdAt: 1726560000000, location: 'London, United Kingdom', locationFlag: 'https://flagcdn.com/w20/gb.png', origin: 'Senegal', originFlag: 'https://flagcdn.com/w20/sn.png', price: '12 - 25 USD', status: 'pending', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
   ];
   const [requests, setRequests] = useState<Request[]>(initialRequests);
 
@@ -540,6 +541,431 @@ const MyRequests: React.FC = () => {
               </svg>
               <span style={{ color: '#B0B0B0' }}>Close</span>
             </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const formatDateForGrid = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(-2);
+    return `${day}-${month}-${year}`;
+  };
+
+  const renderGridCard = (request: Request) => {
+    const statusConfig = {
+      ongoing: { text: 'Ongoing', textColor: '#64B5F6', bgColor: '#F0F8FE' },
+      pending: { text: 'Pending', textColor: '#6A6A6A', bgColor: '#F4F4F4' },
+      completed: { text: 'Completed', textColor: '#4CD964', bgColor: '#EDFBF0' },
+      expired: { text: 'Expired', textColor: '#FF5151', bgColor: '#FFE9E9' }
+    };
+
+    const config = statusConfig[request.status];
+    const defaultDescription = 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.';
+
+    return (
+      <div
+        key={request.id}
+        className="bg-white hover:shadow-md transition-shadow cursor-pointer"
+        onClick={() => {
+          setSelectedRequestForView(request);
+          setViewRequestModalOpen(true);
+        }}
+        style={{
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          height: 'auto',
+          width: isMobile ? '260px' : 'auto',
+          flexShrink: isMobile ? 0 : 'initial',
+          padding: isMobile ? '10px' : '16px',
+          borderRadius: '24px'
+        }}
+      >
+        {/* Request Badge and Status Badge - Desktop only */}
+        {!isMobile && (
+          <div className="flex items-center justify-between mb-2">
+            <span
+              style={{
+                fontSize: '10px',
+                color: '#BABABA',
+                border: '1px solid #E1E1E1',
+                borderRadius: '999px',
+                padding: '2px 8px',
+                fontFamily: 'Poppins, sans-serif'
+              }}
+            >
+              Request
+            </span>
+            <div className="flex items-center gap-2">
+              <div
+                className="px-2 py-0.5"
+                style={{
+                  backgroundColor: config.bgColor,
+                  fontSize: '10px',
+                  color: config.textColor,
+                  fontWeight: 'normal',
+                  fontFamily: 'Poppins, sans-serif',
+                  borderRadius: '8px'
+                }}
+              >
+                {config.text}
+              </div>
+              <div
+                className="w-5 h-5 rounded-full border flex items-center justify-center"
+                style={{
+                  borderColor: '#FFFFFF',
+                  borderWidth: '1.5px',
+                  backgroundColor: '#FFFFFF'
+                }}
+              >
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{
+                    backgroundColor: '#FFFFFF'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Request Badge Only - Mobile */}
+        {isMobile && (
+          <div className="mb-1">
+            <span
+              style={{
+                fontSize: '9px',
+                color: '#BABABA',
+                border: '1px solid #E1E1E1',
+                borderRadius: '999px',
+                padding: '2px 6px',
+                fontFamily: 'Poppins, sans-serif'
+              }}
+            >
+              Request
+            </span>
+          </div>
+        )}
+
+        {/* Product Title */}
+        <h3 className="mb-2 sm:mb-3" style={{ fontSize: isMobile ? '11px' : '14px', fontWeight: '500', color: '#212121' }}>
+          {request.title}
+        </h3>
+
+        {/* Creation Date */}
+        <div className="flex items-center gap-1.5 mb-2 sm:mb-3">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="#939393" strokeWidth="1.5" />
+            <path d="M12 7v5l3 2" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span style={{ fontSize: isMobile ? '9px' : '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+            Creation date: {formatDateForGrid(request.createdAt)}
+          </span>
+        </div>
+
+        {/* Description */}
+        <p className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '7px' : '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
+          {request.description || defaultDescription}
+        </p>
+
+        {/* Tags and Status Badge Row - Desktop/Tablet */}
+        {!isMobile && (
+          <div className="flex items-end justify-between">
+            {/* Tags - Stacked Layout */}
+            <div className="flex flex-col gap-2">
+              {/* First Row - Location */}
+              <div
+                className="flex items-center gap-1.5 px-2.5 py-1"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '999px',
+                  width: 'fit-content',
+                  border: '1px solid #E1E1E1'
+                }}
+              >
+                <img
+                  src={locationIcon}
+                  alt="Location"
+                  className="w-3 h-3"
+                  style={{ filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)' }}
+                />
+                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.location}</span>
+              </div>
+
+              {/* Second Row - Price and Country */}
+              <div className="flex gap-2">
+                {/* Price Tag */}
+                <div
+                  className="flex items-center gap-1.5 px-2.5 py-1"
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '999px',
+                    border: '1px solid #E1E1E1'
+                  }}
+                >
+                  <img
+                    src={moneyIcon}
+                    alt="Money"
+                    className="w-3 h-3"
+                    style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                  />
+                  <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.price.replace(' - ', ' ~ ')}</span>
+                </div>
+
+                {/* Country Tag */}
+                <div
+                  className="flex items-center gap-1.5 px-2.5 py-1"
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '999px',
+                    border: '1px solid #E1E1E1'
+                  }}
+                >
+                  <img
+                    src={request.originFlag}
+                    alt={request.origin}
+                    className="object-cover rounded-full"
+                    style={{ width: '16px', height: '16px' }}
+                  />
+                  <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.origin}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tags - Mobile Only */}
+        {isMobile && (
+          <div className="flex flex-col gap-2 mb-3">
+            {/* First Row - Location */}
+            <div
+              className="flex items-center gap-1.5 px-2 py-0.5"
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '999px',
+                width: 'fit-content',
+                border: '1px solid #E1E1E1'
+              }}
+            >
+              <img
+                src={locationIcon}
+                alt="Location"
+                style={{
+                  width: '9px',
+                  height: '9px',
+                  filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)'
+                }}
+              />
+              <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.location}</span>
+            </div>
+
+            {/* Second Row - Price and Country */}
+            <div className="flex gap-2">
+              {/* Price Tag */}
+              <div
+                className="flex items-center gap-1.5 px-2 py-0.5"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '999px',
+                  border: '1px solid #E1E1E1'
+                }}
+              >
+                <img
+                  src={moneyIcon}
+                  alt="Money"
+                  style={{
+                    width: '9px',
+                    height: '9px',
+                    filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                  }}
+                />
+                <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.price.replace(' - ', ' ~ ')}</span>
+              </div>
+
+              {/* Country Tag */}
+              <div
+                className="flex items-center gap-1.5 px-2 py-0.5"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '999px',
+                  border: '1px solid #E1E1E1'
+                }}
+              >
+                <img
+                  src={request.originFlag}
+                  alt={request.origin}
+                  className="object-cover rounded-full"
+                  style={{ width: '12px', height: '12px' }}
+                />
+                <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.origin}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderRequestsGrid = () => {
+    // Group requests by status
+    const ongoingRequests = sortedRequests.filter(r => r.status === 'ongoing');
+    const pendingRequests = sortedRequests.filter(r => r.status === 'pending');
+    const completedRequests = sortedRequests.filter(r => r.status === 'completed');
+    const expiredRequests = sortedRequests.filter(r => r.status === 'expired');
+
+    return (
+      <div>
+        {/* Ongoing requests Section */}
+        {ongoingRequests.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 style={{
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                fontSize: isMobile ? '14px' : '18px',
+                fontWeight: '500',
+                color: '#000000'
+              }}>
+                Ongoing requests {'>'}
+              </h3>
+            </div>
+            <div className="relative">
+              {/* Fade effect on the right - Desktop only */}
+              {!isMobile && (
+                <div
+                  className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                  style={{
+                    background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                    height: '100%'
+                  }}
+                />
+              )}
+              <div
+                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                style={isMobile ? {
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                } : {}}
+              >
+                {ongoingRequests.map((request) => renderGridCard(request))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pending requests Section */}
+        {pendingRequests.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 style={{
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                fontSize: isMobile ? '14px' : '18px',
+                fontWeight: '500',
+                color: '#000000'
+              }}>
+                Pending requests {'>'}
+              </h3>
+            </div>
+            <div className="relative">
+              {/* Fade effect on the right - Desktop only */}
+              {!isMobile && (
+                <div
+                  className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                  style={{
+                    background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                    height: '100%'
+                  }}
+                />
+              )}
+              <div
+                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                style={isMobile ? {
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                } : {}}
+              >
+                {pendingRequests.map((request) => renderGridCard(request))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Completed requests Section (First Row) */}
+        {completedRequests.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 style={{
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                fontSize: isMobile ? '14px' : '18px',
+                fontWeight: '500',
+                color: '#000000'
+              }}>
+                Completed requests {'>'}
+              </h3>
+            </div>
+            <div className="relative">
+              {/* Fade effect on the right - Desktop only */}
+              {!isMobile && (
+                <div
+                  className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                  style={{
+                    background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                    height: '100%'
+                  }}
+                />
+              )}
+              <div
+                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                style={isMobile ? {
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                } : {}}
+              >
+                {completedRequests.map((request) => renderGridCard(request))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Completed requests Section (Second Row - Expired) */}
+        {expiredRequests.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 style={{
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                fontSize: isMobile ? '14px' : '18px',
+                fontWeight: '500',
+                color: '#000000'
+              }}>
+                Completed requests {'>'}
+              </h3>
+            </div>
+            <div className="relative">
+              {/* Fade effect on the right - Desktop only */}
+              {!isMobile && (
+                <div
+                  className="absolute top-0 right-0 bottom-0 w-32 pointer-events-none z-10"
+                  style={{
+                    background: 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)',
+                    height: '100%'
+                  }}
+                />
+              )}
+              <div
+                className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                style={isMobile ? {
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                } : {}}
+              >
+                {expiredRequests.map((request) => renderGridCard(request))}
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -1369,17 +1795,7 @@ const MyRequests: React.FC = () => {
                   </p>
                 </div>
               ) : (
-                viewMode === 'list' ? renderRequestsList() : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {sortedRequests.map((request) => (
-                      <div key={request.id} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E4E4E4', borderRadius: '12px', padding: '16px' }}>
-                        <h3 style={{ color: '#6A6A6A', fontSize: '14px', fontFamily: 'Poppins, sans-serif', marginBottom: '8px' }}>{request.title}</h3>
-                        <p style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>{request.price.replace(' - ', ' ~ ')}</p>
-                        {renderStatusBadge(request.id)}
-                      </div>
-                    ))}
-                  </div>
-                )
+                viewMode === 'list' ? renderRequestsList() : renderRequestsGrid()
               )}
             </div>
           </div>
