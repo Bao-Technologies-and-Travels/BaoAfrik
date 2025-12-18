@@ -163,7 +163,7 @@ const Requests: React.FC = () => {
   const renderPagination = () => (
     <div className={`flex flex-col ${isMobile ? 'items-center gap-2' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
       <div className={`flex-1 flex justify-center w-full ${isMobile ? '' : ''}`}>
-        <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-4'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
+        <div className={`flex items-center ${isMobile ? 'gap-4' : 'gap-4'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
           <button
             aria-label="Previous page"
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
@@ -186,14 +186,14 @@ const Requests: React.FC = () => {
             </svg>
           </button>
 
-          <div className="flex items-center" style={{ gap: isMobile ? '8px' : '24px' }}>
+          <div className="flex items-center" style={{ gap: isMobile ? '12px' : '24px' }}>
             {paginationNumbers.map((page) => (
               <span
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 style={{
                   fontFamily: 'Bricolage Grotesque, sans-serif',
-                  fontSize: isMobile ? '11px' : '16px',
+                  fontSize: isMobile ? '12px' : '16px',
                   color: page === currentPage ? '#212121' : '#B0B0B0',
                   cursor: 'pointer'
                 }}
@@ -202,13 +202,13 @@ const Requests: React.FC = () => {
               </span>
             ))}
 
-            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '11px' : '16px' }}>…</span>
+            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '12px' : '16px' }}>…</span>
             <span 
               onClick={() => setCurrentPage(totalPages)}
               style={{ 
                 color: '#B0B0B0', 
                 fontFamily: 'Bricolage Grotesque, sans-serif', 
-                fontSize: isMobile ? '11px' : '16px',
+                fontSize: isMobile ? '12px' : '16px',
                 cursor: 'pointer'
               }}
             >
@@ -241,7 +241,7 @@ const Requests: React.FC = () => {
       </div>
 
       {/* Go to section */}
-      <div className={`flex items-center gap-2 ${isMobile ? 'justify-center' : ''}`}>
+      <div className={`flex items-center ${isMobile ? 'gap-3 justify-center' : 'gap-2'}`}>
         <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '11px' : '12px' }}>Go to :</span>
         <input
           type="text"
@@ -395,14 +395,14 @@ const Requests: React.FC = () => {
           <div 
             className="absolute left-0 bg-white z-10 mt-2"
             style={{ 
-              width: '180px', 
+              width: isMobile ? '140px' : '180px', 
               flexShrink: 0, 
-              borderRadius: '16px',
+              borderRadius: isMobile ? '12px' : '16px',
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
               border: '1px solid #E9E9E9'
             }}
           >
-            <div className="py-1.5">
+            <div className={isMobile ? 'py-1' : 'py-1.5'}>
               {priceOptions.map((option) => (
                 <button
                   key={option.value}
@@ -411,16 +411,18 @@ const Requests: React.FC = () => {
                     setOpenPriceDropdown(null);
                   }}
                   style={{
-                    color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0'
+                    color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0',
+                    fontSize: isMobile ? '10px' : '12px',
+                    padding: isMobile ? '6px 10px' : '8px 12px'
                   }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 transition-colors relative"
+                  className="w-full text-left hover:bg-gray-50 transition-colors relative"
                 >
                   {selectedPrice === option.value && (
                     <div 
                       style={{
                         position: 'absolute',
-                        left: '8px',
-                        right: '8px',
+                        left: isMobile ? '6px' : '8px',
+                        right: isMobile ? '6px' : '8px',
                         top: '2px',
                         bottom: '2px',
                         backgroundColor: '#F0F8FE',
@@ -515,9 +517,9 @@ const Requests: React.FC = () => {
           <div 
             className="absolute left-0 bg-white border border-gray-200 z-10 mt-2"
             style={{ 
-              width: '200px', 
+              width: isMobile ? '160px' : '200px', 
               flexShrink: 0, 
-              borderRadius: '16px',
+              borderRadius: isMobile ? '12px' : '16px',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
             }}
           >
@@ -538,9 +540,9 @@ const Requests: React.FC = () => {
             
             {/* Scrollable Country List */}
             <div 
-              className="py-2 overflow-y-auto filter-dropdown-scroll"
+              className={`overflow-y-auto filter-dropdown-scroll ${isMobile ? 'py-1' : 'py-2'}`}
               style={{
-                maxHeight: 'calc(6 * 44px)',
+                maxHeight: isMobile ? 'calc(4 * 36px)' : 'calc(6 * 44px)',
                 scrollbarWidth: 'thin',
                 scrollbarColor: '#E4E4E4 transparent'
               }}
@@ -552,15 +554,17 @@ const Requests: React.FC = () => {
                 }}
                 style={{
                   backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
-                  color: !selectedCountry ? '#64B5F6' : '#BABABA'
+                  color: !selectedCountry ? '#64B5F6' : '#BABABA',
+                  padding: isMobile ? '6px 10px' : '8px 16px',
+                  fontSize: isMobile ? '11px' : '14px'
                 }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                className="w-full text-left hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center">
                   <img 
                     src={globyIcon} 
                     alt="Globe"
-                    className="w-4 h-4 mr-2"
+                    className={isMobile ? 'w-3 h-3 mr-1.5' : 'w-4 h-4 mr-2'}
                     style={{
                       filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
                     }}
@@ -577,16 +581,18 @@ const Requests: React.FC = () => {
                   }}
                   style={{
                     backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
-                    color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                    color: selectedCountry === country.name ? '#64B5F6' : '#BABABA',
+                    padding: isMobile ? '6px 10px' : '8px 16px',
+                    fontSize: isMobile ? '11px' : '14px'
                   }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                  className="w-full text-left hover:bg-gray-50 transition-colors"
                 >
-                  <span className="flex items-center space-x-2">
+                  <span className="flex items-center" style={{ gap: isMobile ? '6px' : '8px' }}>
                     <img 
                       src={country.flag} 
                       alt={`${country.name} flag`}
                       className="object-cover rounded-full"
-                      style={{ width: '20px', height: '20px' }}
+                      style={{ width: isMobile ? '16px' : '20px', height: isMobile ? '16px' : '20px' }}
                     />
                     <span>{country.name}</span>
                   </span>
@@ -690,271 +696,121 @@ const Requests: React.FC = () => {
                   </svg>
                 </button>
                 {moreOptionsOpenFor === cardId && (
-                  <>
-                    {isMobile ? (
-                      // Mobile: Bottom sheet modal
-                      <>
-                        <div
-                          style={{
-                            position: 'fixed',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            backgroundColor: '#FFFFFF',
-                            borderTopLeftRadius: '20px',
-                            borderTopRightRadius: '20px',
-                            boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
-                            zIndex: 10000,
-                            padding: '8px',
-                            paddingBottom: '20px'
-                          }}
-                        >
-                          {/* Drag Indicator */}
-                          <div style={{ 
-                            display: 'flex', 
-                            justifyContent: 'center', 
-                            paddingTop: '12px',
-                            paddingBottom: '8px'
-                          }}>
-                            <div style={{
-                              width: '40px',
-                              height: '4px',
-                              backgroundColor: '#D9D9D9',
-                              borderRadius: '2px'
-                            }} />
-                          </div>
-                          <div style={{ padding: '0 4px' }}>
-                            {/* Manage request */}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setMoreOptionsOpenFor(null);
-                              }}
-                              style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 8px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                backgroundColor: 'transparent',
-                                cursor: 'pointer',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '12px',
-                                color: '#939393'
-                              }}
-                            >
-                              <img 
-                                src={requestIcon} 
-                                alt="Request" 
-                                style={{ 
-                                  width: '14px', 
-                                  height: '14px',
-                                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                                }} 
-                              />
-                              <span>Manage request</span>
-                            </button>
-                            
-                            {/* Share the request */}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setMoreOptionsOpenFor(null);
-                              }}
-                              style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 8px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                backgroundColor: 'transparent',
-                                cursor: 'pointer',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '12px',
-                                color: '#939393',
-                                whiteSpace: 'nowrap'
-                              }}
-                            >
-                              <img 
-                                src={shareIcon} 
-                                alt="Share" 
-                                style={{ 
-                                  width: '14px', 
-                                  height: '14px',
-                                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                                }} 
-                              />
-                              <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
-                            </button>
-                            
-                            {/* Close */}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setMoreOptionsOpenFor(null);
-                              }}
-                              style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 8px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                backgroundColor: '#FAFAFA',
-                                cursor: 'pointer',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '12px',
-                                color: '#939393',
-                                marginTop: '4px'
-                              }}
-                            >
-                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                              <span>Close</span>
-                            </button>
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                            zIndex: 9999
-                          }}
-                          onClick={() => setMoreOptionsOpenFor(null)}
-                        />
-                      </>
-                    ) : (
-                      // Desktop: Regular dropdown
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '26px',
-                          right: 0,
-                          backgroundColor: '#FFFFFF',
-                          borderRadius: '16px',
-                          border: '1px solid #E9E9E9',
-                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                          padding: '8px',
-                          minWidth: '200px',
-                          zIndex: 1000
-                        }}
-                      >
-                        {/* Manage request */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMoreOptionsOpenFor(null);
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '8px 12px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            cursor: 'pointer',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '13px',
-                            color: '#939393'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                        >
-                          <img 
-                            src={requestIcon} 
-                            alt="Request" 
-                            style={{ 
-                              width: '18px', 
-                              height: '18px',
-                              filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                            }} 
-                          />
-                          <span>Manage request</span>
-                        </button>
-                        
-                        {/* Share the request */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMoreOptionsOpenFor(null);
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '8px 12px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            cursor: 'pointer',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '13px',
-                            color: '#939393',
-                            whiteSpace: 'nowrap'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                        >
-                          <img 
-                            src={shareIcon} 
-                            alt="Share" 
-                            style={{ 
-                              width: '18px', 
-                              height: '18px',
-                              filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                            }} 
-                          />
-                          <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
-                        </button>
-                        
-                        {/* Close */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMoreOptionsOpenFor(null);
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '8px 12px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            backgroundColor: '#FAFAFA',
-                            cursor: 'pointer',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '13px',
-                            color: '#939393'
-                          }}
-                        >
-                          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                          <span>Close</span>
-                        </button>
-                      </div>
-                    )}
-                  </>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '26px',
+                      right: 0,
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: isMobile ? '12px' : '16px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: isMobile ? '6px' : '8px',
+                      minWidth: isMobile ? '150px' : '200px',
+                      zIndex: 1000
+                    }}
+                  >
+                    {/* Manage request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={requestIcon} 
+                        alt="Request" 
+                        style={{ 
+                          width: isMobile ? '14px' : '18px', 
+                          height: isMobile ? '14px' : '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span>Manage request</span>
+                    </button>
+                    
+                    {/* Share the request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={shareIcon} 
+                        alt="Share" 
+                        style={{ 
+                          width: isMobile ? '14px' : '18px', 
+                          height: isMobile ? '14px' : '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
+                    </button>
+                    
+                    {/* Close */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: '#FAFAFA',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393'
+                      }}
+                    >
+                      <svg width={isMobile ? '14' : '18'} height={isMobile ? '14' : '18'} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Close</span>
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -1014,6 +870,35 @@ const Requests: React.FC = () => {
           >
             Request
           </span>
+          {/* Share button - only for non-pending cards in Requests near you section */}
+          {!cardIsPending && cardId.startsWith('near') && (
+            <button
+              className="rounded-full flex items-center justify-center"
+              style={{
+                backgroundColor: '#F4F4F4',
+                border: 'none',
+                cursor: 'pointer',
+                width: '24px',
+                height: '24px',
+                flexShrink: 0,
+                position: 'absolute',
+                right: 0
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <img 
+                src={shareIcon} 
+                alt="Share" 
+                style={{ 
+                  width: '12px', 
+                  height: '12px',
+                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                }} 
+              />
+            </button>
+          )}
           {cardIsPending && (
             <div className="flex items-center gap-2" style={{ position: 'absolute', right: 0, alignItems: 'center' }}>
               <div 
@@ -1051,271 +936,121 @@ const Requests: React.FC = () => {
                   </svg>
                 </button>
                 {moreOptionsOpenFor === cardId && (
-                  <>
-                    {isMobile ? (
-                      // Mobile: Bottom sheet modal
-                      <>
-                        <div
-                          style={{
-                            position: 'fixed',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            backgroundColor: '#FFFFFF',
-                            borderTopLeftRadius: '20px',
-                            borderTopRightRadius: '20px',
-                            boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
-                            zIndex: 10000,
-                            padding: '8px',
-                            paddingBottom: '20px'
-                          }}
-                        >
-                          {/* Drag Indicator */}
-                          <div style={{ 
-                            display: 'flex', 
-                            justifyContent: 'center', 
-                            paddingTop: '12px',
-                            paddingBottom: '8px'
-                          }}>
-                            <div style={{
-                              width: '40px',
-                              height: '4px',
-                              backgroundColor: '#D9D9D9',
-                              borderRadius: '2px'
-                            }} />
-                          </div>
-                          <div style={{ padding: '0 4px' }}>
-                            {/* Manage request */}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setMoreOptionsOpenFor(null);
-                              }}
-                              style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 8px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                backgroundColor: 'transparent',
-                                cursor: 'pointer',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '12px',
-                                color: '#939393'
-                              }}
-                            >
-                              <img 
-                                src={requestIcon} 
-                                alt="Request" 
-                                style={{ 
-                                  width: '14px', 
-                                  height: '14px',
-                                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                                }} 
-                              />
-                              <span>Manage request</span>
-                            </button>
-                            
-                            {/* Share the request */}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setMoreOptionsOpenFor(null);
-                              }}
-                              style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 8px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                backgroundColor: 'transparent',
-                                cursor: 'pointer',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '12px',
-                                color: '#939393',
-                                whiteSpace: 'nowrap'
-                              }}
-                            >
-                              <img 
-                                src={shareIcon} 
-                                alt="Share" 
-                                style={{ 
-                                  width: '14px', 
-                                  height: '14px',
-                                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                                }} 
-                              />
-                              <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
-                            </button>
-                            
-                            {/* Close */}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setMoreOptionsOpenFor(null);
-                              }}
-                              style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 8px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                backgroundColor: '#FAFAFA',
-                                cursor: 'pointer',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '12px',
-                                color: '#939393',
-                                marginTop: '4px'
-                              }}
-                            >
-                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                              <span>Close</span>
-                            </button>
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                            zIndex: 9999
-                          }}
-                          onClick={() => setMoreOptionsOpenFor(null)}
-                        />
-                      </>
-                    ) : (
-                      // Desktop: Regular dropdown
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '26px',
-                          right: 0,
-                          backgroundColor: '#FFFFFF',
-                          borderRadius: '16px',
-                          border: '1px solid #E9E9E9',
-                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                          padding: '8px',
-                          minWidth: '200px',
-                          zIndex: 1000
-                        }}
-                      >
-                        {/* Manage request */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMoreOptionsOpenFor(null);
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '8px 12px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            cursor: 'pointer',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '13px',
-                            color: '#939393'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                        >
-                          <img 
-                            src={requestIcon} 
-                            alt="Request" 
-                            style={{ 
-                              width: '18px', 
-                              height: '18px',
-                              filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                            }} 
-                          />
-                          <span>Manage request</span>
-                        </button>
-                        
-                        {/* Share the request */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMoreOptionsOpenFor(null);
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '8px 12px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            cursor: 'pointer',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '13px',
-                            color: '#939393',
-                            whiteSpace: 'nowrap'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                        >
-                          <img 
-                            src={shareIcon} 
-                            alt="Share" 
-                            style={{ 
-                              width: '18px', 
-                              height: '18px',
-                              filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                            }} 
-                          />
-                          <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
-                        </button>
-                        
-                        {/* Close */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMoreOptionsOpenFor(null);
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '8px 12px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            backgroundColor: '#FAFAFA',
-                            cursor: 'pointer',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '13px',
-                            color: '#939393'
-                          }}
-                        >
-                          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                          <span>Close</span>
-                        </button>
-                      </div>
-                    )}
-                  </>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '26px',
+                      right: 0,
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: isMobile ? '12px' : '16px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: isMobile ? '6px' : '8px',
+                      minWidth: isMobile ? '150px' : '200px',
+                      zIndex: 1000
+                    }}
+                  >
+                    {/* Manage request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={requestIcon} 
+                        alt="Request" 
+                        style={{ 
+                          width: isMobile ? '14px' : '18px', 
+                          height: isMobile ? '14px' : '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span>Manage request</span>
+                    </button>
+                    
+                    {/* Share the request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={shareIcon} 
+                        alt="Share" 
+                        style={{ 
+                          width: isMobile ? '14px' : '18px', 
+                          height: isMobile ? '14px' : '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
+                    </button>
+                    
+                    {/* Close */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: '#FAFAFA',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393'
+                      }}
+                    >
+                      <svg width={isMobile ? '14' : '18'} height={isMobile ? '14' : '18'} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Close</span>
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -1575,34 +1310,8 @@ const Requests: React.FC = () => {
               </div>
             </div>
 
-            {/* Right: Share button - only for non-pending cards on mobile (Requests near you section) */}
-            {!cardIsPending && isMobile && (
-              <button
-                className="rounded-full flex items-center justify-center"
-                style={{
-                  backgroundColor: '#F4F4F4',
-                  border: 'none',
-                  cursor: 'pointer',
-                  width: '24px',
-                  height: '24px',
-                  flexShrink: 0
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                <img 
-                  src={shareIcon} 
-                  alt="Share" 
-                  style={{ 
-                    width: '12px', 
-                    height: '12px',
-                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                  }} 
-                />
-              </button>
-            )}
-            {!cardIsPending && !isMobile && (
+            {/* Right: Share button - only for non-pending cards in Requests near you section (Desktop only) */}
+            {!cardIsPending && cardId.startsWith('near') && !isMobile && (
               <button
                 className="rounded-full flex items-center justify-center"
                 style={{
@@ -1634,35 +1343,6 @@ const Requests: React.FC = () => {
 
       {/* Manage the request button - Mobile only (replaces Respond to request) */}
       {isMobile && !cardIsPending && (
-        <div className="w-full flex justify-center mt-3">
-          <button 
-            className="flex items-center justify-center gap-1.5 mx-auto"
-            style={{ 
-              backgroundColor: '#FFFFFF', 
-              borderColor: '#F9A825',
-              border: '1px solid #F9A825',
-              color: '#F9A825',
-              fontWeight: 'normal', 
-              fontSize: '9px',
-              padding: '6px 10px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              width: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
-            Manage the request
-          </button>
-        </div>
-      )}
-      {/* Manage the request button - Mobile for pending cards */}
-      {isMobile && cardIsPending && (
         <div className="w-full flex justify-center mt-3">
           <button 
             className="flex items-center justify-center gap-1.5 mx-auto"
@@ -2970,35 +2650,20 @@ const Requests: React.FC = () => {
 
           {/* Modal */}
           {isMobile ? (
-            // Mobile: Bottom sheet modal
-            <div className="fixed inset-0 z-50 flex items-end">
+            // Mobile: Bottom sheet with original form
+            <div className="fixed inset-0 z-50 flex items-end justify-center p-4">
               <div
-                className="bg-white w-full relative max-w-sm mx-auto"
+                className="bg-white relative w-full"
                 style={{ 
-                  borderTopLeftRadius: '20px',
-                  borderTopRightRadius: '20px',
-                  boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
+                  borderRadius: '30px',
+                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                  maxWidth: '420px',
                   maxHeight: '90vh',
                   overflowY: 'auto'
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Drag Indicator at top */}
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  paddingTop: '12px',
-                  paddingBottom: '8px'
-                }}>
-                  <div style={{
-                    width: '40px',
-                    height: '4px',
-                    backgroundColor: '#D9D9D9',
-                    borderRadius: '2px'
-                  }} />
-                </div>
-                
-                <div className="pt-2 px-5 pb-8 relative">
+                <div className="pt-8 px-5 pb-8 relative">
                   {/* Close Button */}
                   <button
                     onClick={() => {
@@ -3014,355 +2679,356 @@ const Requests: React.FC = () => {
                     />
                   </button>
 
-              {/* Request Badge - Centered */}
-              <div className="flex justify-center mb-3">
-                <span 
-                  style={{ 
-                    fontSize: '10px', 
-                    color: '#BABABA',
-                    border: '1.5px solid #E1E1E1',
-                    borderRadius: '999px',
-                    padding: '2px 12px',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}
-                >
-                  Request
-                </span>
-              </div>
-
-              {/* Product Name */}
-              <h2
-                className="text-lg text-center mb-2"
-                style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
-              >
-                {selectedCard.title}
-              </h2>
-
-              {/* Description */}
-              <p 
-                className="text-xs text-center mb-5"
-                style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
-              >
-                {selectedCard.description}
-              </p>
-
-              {/* Three Badges - Centered */}
-              <div className="flex flex-col items-center gap-2 mb-5">
-                {/* Location Badge */}
-                <div 
-                  className="flex items-center justify-center gap-1 px-2 py-1"
-                  style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
-                >
-                  <img 
-                    src={locationIcon} 
-                    alt="Location"
-                    className="w-3 h-3"
-                    style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
-                  />
-                  <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.location}</span>
-                </div>
-
-                {/* Price and Country Badges */}
-                <div className="flex gap-2 justify-center">
-                  {/* Price Badge */}
-                  <div 
-                    className="flex items-center gap-1.5 px-3 py-1.5"
-                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                  >
-                    <img 
-                      src={moneyIcon} 
-                      alt="Money"
-                      className="w-3 h-3"
-                      style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
-                    />
-                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>50 - 100 USD</span>
-                  </div>
-
-                  {/* Country Badge */}
-                  <div 
-                    className="flex items-center gap-1.5 px-3 py-1.5"
-                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                  >
-                    <img 
-                      src={selectedCard.flag} 
-                      alt={selectedCard.country}
-                      className="w-4 h-4 object-cover rounded-full"
-                    />
-                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.country}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Gray Divider */}
-              <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9', marginBottom: '12px' }}></div>
-
-              {/* Seller Info Section */}
-              <div className="flex items-center justify-between">
-                {/* Avatar and Info */}
-                <div className="flex items-center gap-2.5">
-                  {/* Avatar */}
-                  <div 
-                    className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden"
-                    style={{ backgroundColor: '#F7C9B0', border: '2px solid #939393' }}
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
-                      <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
-                    </svg>
-                  </div>
-
-                  {/* Name and Rating */}
-                  <div className="flex flex-col">
-                    <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
-                      Nadine MABE
+                  {/* Request Badge - Centered */}
+                  <div className="flex justify-center mb-3">
+                    <span 
+                      style={{ 
+                        fontSize: '10px', 
+                        color: '#BABABA',
+                        border: '1.5px solid #E1E1E1',
+                        borderRadius: '999px',
+                        padding: '2px 12px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      Request
                     </span>
-                    <div className="flex items-center gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <svg
-                          key={star}
-                          width="11"
-                          height="11"
-                          viewBox="0 0 12 12"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M6 0L7.5 4.5L12 4.5L8.25 7.5L9.75 12L6 9L2.25 12L3.75 7.5L0 4.5L4.5 4.5L6 0Z"
-                            fill={star === 5 ? '#B0B0B0' : '#F9A825'}
-                            style={{ strokeLinejoin: 'round', strokeLinecap: 'round' }}
-                          />
-                        </svg>
-                      ))}
-                      <span style={{ fontSize: '11px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', marginLeft: '4px' }}>
-                        4.3
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Message Buyer Button */}
-                <button
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-                  style={{
-                    backgroundColor: '#F9A825',
-                    color: '#FFFFFF',
-                    fontFamily: 'Poppins, sans-serif',
-                    fontSize: '12px',
-                    fontWeight: 400,
-                    border: 'none',
-                    cursor: 'pointer',
-                    height: 'auto'
-                  }}
-                  onClick={() => {
-                    // Handle message buyer action
-                    console.log('Message buyer clicked');
-                  }}
-                >
-                  <img 
-                    src={basketIcon} 
-                    alt="Cart" 
-                    className="w-4 h-4"
-                    style={{ filter: 'brightness(0) invert(1)' }}
-                  />
-                  <span>Message Buyer</span>
-                </button>
-              </div>
-              
-              {/* Drag Indicator at bottom */}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                paddingTop: '12px',
-                paddingBottom: '12px'
-              }}>
-                <div style={{
-                  width: '40px',
-                  height: '4px',
-                  backgroundColor: '#D9D9D9',
-                  borderRadius: '2px'
-                }} />
-              </div>
-            </div>
-          </div>
-          ) : (
-            // Desktop: Centered modal
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div
-                className="bg-white rounded-[30px] pt-8 sm:pt-10 px-5 sm:px-6 relative max-w-sm w-full pb-8"
-                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Close Button */}
-                <button
-                  onClick={() => {
-                    setShowRequestModal(false);
-                    setSelectedCard(null);
-                  }}
-                  className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
-                >
-                  <img
-                    src={closeIcon}
-                    alt="Close"
-                    className="w-4 h-4"
-                  />
-                </button>
-
-                {/* Request Badge - Centered */}
-                <div className="flex justify-center mb-3">
-                  <span 
-                    style={{ 
-                      fontSize: '10px', 
-                      color: '#BABABA',
-                      border: '1.5px solid #E1E1E1',
-                      borderRadius: '999px',
-                      padding: '2px 12px',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                  >
-                    Request
-                  </span>
-                </div>
-
-                {/* Product Name */}
-                <h2
-                  className="text-lg text-center mb-2"
-                  style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
-                >
-                  {selectedCard.title}
-                </h2>
-
-                {/* Description */}
-                <p 
-                  className="text-xs text-center mb-5"
-                  style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
-                >
-                  {selectedCard.description}
-                </p>
-
-                {/* Three Badges - Centered */}
-                <div className="flex flex-col items-center gap-2 mb-5">
-                  {/* Location Badge */}
-                  <div 
-                    className="flex items-center justify-center gap-1 px-2 py-1"
-                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
-                  >
-                    <img 
-                      src={locationIcon} 
-                      alt="Location"
-                      className="w-3 h-3"
-                      style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
-                    />
-                    <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.location}</span>
                   </div>
 
-                  {/* Price and Country Badges */}
-                  <div className="flex gap-2 justify-center">
-                    {/* Price Badge */}
+                  {/* Product Name */}
+                  <h2
+                    className="text-lg text-center mb-2"
+                    style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+                  >
+                    {selectedCard.title}
+                  </h2>
+
+                  {/* Description */}
+                  <p 
+                    className="text-xs text-center mb-5"
+                    style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+                  >
+                    {selectedCard.description}
+                  </p>
+
+                  {/* Three Badges - Centered */}
+                  <div className="flex flex-col items-center gap-2 mb-5">
+                    {/* Location Badge */}
                     <div 
-                      className="flex items-center gap-1.5 px-3 py-1.5"
-                      style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                      className="flex items-center justify-center gap-1 px-2 py-1"
+                      style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
                     >
                       <img 
-                        src={moneyIcon} 
-                        alt="Money"
+                        src={locationIcon} 
+                        alt="Location"
                         className="w-3 h-3"
                         style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                       />
-                      <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>50 - 100 USD</span>
+                      <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.location}</span>
                     </div>
 
-                    {/* Country Badge */}
-                    <div 
-                      className="flex items-center gap-1.5 px-3 py-1.5"
-                      style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                    >
-                      <img 
-                        src={selectedCard.flag} 
-                        alt={selectedCard.country}
-                        className="w-4 h-4 object-cover rounded-full"
-                      />
-                      <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.country}</span>
-                    </div>
-                  </div>
-                </div>
+                    {/* Price and Country Badges */}
+                    <div className="flex gap-2 justify-center">
+                      {/* Price Badge */}
+                      <div 
+                        className="flex items-center gap-1.5 px-3 py-1.5"
+                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                      >
+                        <img 
+                          src={moneyIcon} 
+                          alt="Money"
+                          className="w-3 h-3"
+                          style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>50 ~ 100 USD</span>
+                      </div>
 
-                {/* Gray Divider */}
-                <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9', marginBottom: '12px' }}></div>
-
-                {/* Seller Info Section */}
-                <div className="flex items-center justify-between">
-                  {/* Avatar and Info */}
-                  <div className="flex items-center gap-2.5">
-                    {/* Avatar */}
-                    <div 
-                      className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden"
-                      style={{ backgroundColor: '#F7C9B0', border: '2px solid #939393' }}
-                    >
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
-                        <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
-                      </svg>
-                    </div>
-
-                    {/* Name and Rating */}
-                    <div className="flex flex-col">
-                      <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
-                        Nadine MABE
-                      </span>
-                      <div className="flex items-center gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <svg
-                            key={star}
-                            width="11"
-                            height="11"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M6 0L7.5 4.5L12 4.5L8.25 7.5L9.75 12L6 9L2.25 12L3.75 7.5L0 4.5L4.5 4.5L6 0Z"
-                              fill={star === 5 ? '#B0B0B0' : '#F9A825'}
-                              style={{ strokeLinejoin: 'round', strokeLinecap: 'round' }}
-                            />
-                          </svg>
-                        ))}
-                        <span style={{ fontSize: '11px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', marginLeft: '4px' }}>
-                          4.3
-                        </span>
+                      {/* Country Badge */}
+                      <div 
+                        className="flex items-center gap-1.5 px-3 py-1.5"
+                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                      >
+                        <img 
+                          src={selectedCard.flag} 
+                          alt={selectedCard.country}
+                          className="w-4 h-4 object-cover rounded-full"
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.country}</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Message Buyer Button */}
-                  <button
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-                    style={{
-                      backgroundColor: '#F9A825',
-                      color: '#FFFFFF',
-                      fontFamily: 'Poppins, sans-serif',
-                      fontSize: '12px',
-                      fontWeight: 400,
-                      border: 'none',
-                      cursor: 'pointer',
-                      height: 'auto'
-                    }}
-                    onClick={() => {
-                      // Handle message buyer action
-                      console.log('Message buyer clicked');
-                    }}
-                  >
-                    <img 
-                      src={basketIcon} 
-                      alt="Cart" 
-                      className="w-4 h-4"
-                      style={{ filter: 'brightness(0) invert(1)' }}
-                    />
-                    <span>Message Buyer</span>
-                  </button>
+                  {/* Gray Divider */}
+                  <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9', marginBottom: '12px' }}></div>
+
+                  {/* Seller Info Section */}
+                  <div className="flex flex-col">
+                    {/* Avatar and Info */}
+                    <div className="flex items-center gap-2.5 mb-3">
+                      {/* Avatar */}
+                      <div 
+                        className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden"
+                        style={{ backgroundColor: '#F7C9B0', border: '2px solid #939393' }}
+                      >
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
+                          <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
+                        </svg>
+                      </div>
+
+                      {/* Name and Rating */}
+                      <div className="flex flex-col">
+                        <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                          Nadine MABE
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <svg
+                              key={star}
+                              width="11"
+                              height="11"
+                              viewBox="0 0 12 12"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M6 0L7.5 4.5L12 4.5L8.25 7.5L9.75 12L6 9L2.25 12L3.75 7.5L0 4.5L4.5 4.5L6 0Z"
+                                fill={star === 5 ? '#B0B0B0' : '#F9A825'}
+                                style={{ strokeLinejoin: 'round', strokeLinecap: 'round' }}
+                              />
+                            </svg>
+                          ))}
+                          <span style={{ fontSize: '11px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', marginLeft: '4px' }}>
+                            4.3
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Message Buyer Button - Below ratings */}
+                    <button
+                      className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg w-full"
+                      style={{
+                        backgroundColor: '#F9A825',
+                        color: '#FFFFFF',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        fontWeight: 400,
+                        border: 'none',
+                        cursor: 'pointer',
+                        height: 'auto'
+                      }}
+                      onClick={() => {
+                        // Handle message buyer action
+                        console.log('Message buyer clicked');
+                      }}
+                    >
+                      <img 
+                        src={basketIcon} 
+                        alt="Cart" 
+                        className="w-4 h-4"
+                        style={{ filter: 'brightness(0) invert(1)' }}
+                      />
+                      <span>Message Buyer</span>
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Drag Indicator at far bottom */}
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  paddingBottom: '8px',
+                  paddingTop: '4px'
+                }}>
+                  <div style={{
+                    width: '80px',
+                    height: '4px',
+                    backgroundColor: '#D9D9D9',
+                    borderRadius: '2px'
+                  }} />
                 </div>
               </div>
             </div>
-          )}
+            ) : (
+              // Desktop: Centered modal
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div
+                  className="bg-white rounded-[30px] pt-8 sm:pt-10 px-5 sm:px-6 relative max-w-sm w-full pb-8"
+                  style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Close Button */}
+                  <button
+                    onClick={() => {
+                      setShowRequestModal(false);
+                      setSelectedCard(null);
+                    }}
+                    className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
+                  >
+                    <img
+                      src={closeIcon}
+                      alt="Close"
+                      className="w-4 h-4"
+                    />
+                  </button>
+
+                  {/* Request Badge - Centered */}
+                  <div className="flex justify-center mb-3">
+                    <span 
+                      style={{ 
+                        fontSize: '10px', 
+                        color: '#BABABA',
+                        border: '1.5px solid #E1E1E1',
+                        borderRadius: '999px',
+                        padding: '2px 12px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      Request
+                    </span>
+                  </div>
+
+                  {/* Product Name */}
+                  <h2
+                    className="text-lg text-center mb-2"
+                    style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}
+                  >
+                    {selectedCard.title}
+                  </h2>
+
+                  {/* Description */}
+                  <p 
+                    className="text-xs text-center mb-5"
+                    style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+                  >
+                    {selectedCard.description}
+                  </p>
+
+                  {/* Three Badges - Centered */}
+                  <div className="flex flex-col items-center gap-2 mb-5">
+                    {/* Location Badge */}
+                    <div 
+                      className="flex items-center justify-center gap-1 px-2 py-1"
+                      style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                    >
+                      <img 
+                        src={locationIcon} 
+                        alt="Location"
+                        className="w-3 h-3"
+                        style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                      />
+                      <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.location}</span>
+                    </div>
+
+                    {/* Price and Country Badges */}
+                    <div className="flex gap-2 justify-center">
+                      {/* Price Badge */}
+                      <div 
+                        className="flex items-center gap-1.5 px-3 py-1.5"
+                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                      >
+                        <img 
+                          src={moneyIcon} 
+                          alt="Money"
+                          className="w-3 h-3"
+                          style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>50 - 100 USD</span>
+                      </div>
+
+                      {/* Country Badge */}
+                      <div 
+                        className="flex items-center gap-1.5 px-3 py-1.5"
+                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                      >
+                        <img 
+                          src={selectedCard.flag} 
+                          alt={selectedCard.country}
+                          className="w-4 h-4 object-cover rounded-full"
+                        />
+                        <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedCard.country}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Gray Divider */}
+                  <div style={{ width: '100%', height: '1px', backgroundColor: '#E9E9E9', marginBottom: '12px' }}></div>
+
+                  {/* Seller Info Section */}
+                  <div className="flex items-center justify-between">
+                    {/* Avatar and Info */}
+                    <div className="flex items-center gap-2.5">
+                      {/* Avatar */}
+                      <div 
+                        className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden"
+                        style={{ backgroundColor: '#F7C9B0', border: '2px solid #939393' }}
+                      >
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
+                          <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
+                        </svg>
+                      </div>
+
+                      {/* Name and Rating */}
+                      <div className="flex flex-col">
+                        <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                          Nadine MABE
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <svg
+                              key={star}
+                              width="11"
+                              height="11"
+                              viewBox="0 0 12 12"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M6 0L7.5 4.5L12 4.5L8.25 7.5L9.75 12L6 9L2.25 12L3.75 7.5L0 4.5L4.5 4.5L6 0Z"
+                                fill={star === 5 ? '#B0B0B0' : '#F9A825'}
+                                style={{ strokeLinejoin: 'round', strokeLinecap: 'round' }}
+                              />
+                            </svg>
+                          ))}
+                          <span style={{ fontSize: '11px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', marginLeft: '4px' }}>
+                            4.3
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Message Buyer Button */}
+                    <button
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                      style={{
+                        backgroundColor: '#F9A825',
+                        color: '#FFFFFF',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        fontWeight: 400,
+                        border: 'none',
+                        cursor: 'pointer',
+                        height: 'auto'
+                      }}
+                      onClick={() => {
+                        // Handle message buyer action
+                        console.log('Message buyer clicked');
+                      }}
+                    >
+                      <img 
+                        src={basketIcon} 
+                        alt="Cart" 
+                        className="w-4 h-4"
+                        style={{ filter: 'brightness(0) invert(1)' }}
+                      />
+                      <span>Message Buyer</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
         </>
       )}
     </div>
