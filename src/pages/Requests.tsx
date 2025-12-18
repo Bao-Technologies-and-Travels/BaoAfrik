@@ -161,16 +161,16 @@ const Requests: React.FC = () => {
   };
 
   const renderPagination = () => (
-    <div className={`flex flex-col ${isMobile ? 'items-center gap-4' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
+    <div className={`flex flex-col ${isMobile ? 'items-center gap-2' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
       <div className={`flex-1 flex justify-center w-full ${isMobile ? '' : ''}`}>
-        <div className={`flex items-center gap-4 ${isMobile ? '' : ''}`} style={isMobile ? {} : { marginLeft: '80px' }}>
+        <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-4'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
           <button
             aria-label="Previous page"
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
             style={{
-              width: '32px',
-              height: '32px',
+              width: isMobile ? '20px' : '32px',
+              height: isMobile ? '20px' : '32px',
               borderRadius: '8px',
               backgroundColor: '#F0F0F0',
               border: 'none',
@@ -181,19 +181,19 @@ const Requests: React.FC = () => {
               opacity: currentPage === 1 ? 0.5 : 1
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width={isMobile ? '10' : '16'} height={isMobile ? '10' : '16'} viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
 
-          <div className="flex items-center" style={{ gap: '24px' }}>
+          <div className="flex items-center" style={{ gap: isMobile ? '6px' : '24px' }}>
             {paginationNumbers.map((page) => (
               <span
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 style={{
                   fontFamily: 'Bricolage Grotesque, sans-serif',
-                  fontSize: '16px',
+                  fontSize: isMobile ? '10px' : '16px',
                   color: page === currentPage ? '#212121' : '#B0B0B0',
                   cursor: 'pointer'
                 }}
@@ -202,13 +202,13 @@ const Requests: React.FC = () => {
               </span>
             ))}
 
-            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px' }}>…</span>
+            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '10px' : '16px' }}>…</span>
             <span 
               onClick={() => setCurrentPage(totalPages)}
               style={{ 
                 color: '#B0B0B0', 
                 fontFamily: 'Bricolage Grotesque, sans-serif', 
-                fontSize: '16px',
+                fontSize: isMobile ? '10px' : '16px',
                 cursor: 'pointer'
               }}
             >
@@ -221,8 +221,8 @@ const Requests: React.FC = () => {
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
             style={{
-              width: '32px',
-              height: '32px',
+              width: isMobile ? '20px' : '32px',
+              height: isMobile ? '20px' : '32px',
               borderRadius: '8px',
               backgroundColor: '#F0F0F0',
               border: 'none',
@@ -233,7 +233,7 @@ const Requests: React.FC = () => {
               opacity: currentPage === totalPages ? 0.5 : 1
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width={isMobile ? '10' : '16'} height={isMobile ? '10' : '16'} viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 6l6 6-6 6" />
             </svg>
           </button>
@@ -242,18 +242,18 @@ const Requests: React.FC = () => {
 
       {/* Go to section */}
       <div className={`flex items-center gap-2 ${isMobile ? 'justify-center' : ''}`}>
-        <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
+        <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '10px' : '12px' }}>Go to :</span>
         <input
           type="text"
           placeholder="e.g 40"
           style={{
             border: '1px solid #BABABA',
             borderRadius: '8px',
-            padding: '6px 10px',
+            padding: isMobile ? '4px 8px' : '6px 10px',
             fontFamily: 'Bricolage Grotesque, sans-serif',
-            fontSize: '12px',
+            fontSize: isMobile ? '10px' : '12px',
             color: '#D9D9D9',
-            width: '64px',
+            width: isMobile ? '50px' : '64px',
             textAlign: 'center'
           }}
         />
@@ -392,48 +392,133 @@ const Requests: React.FC = () => {
         
         {/* Dropdown Menu */}
         {isOpen && !selectedPrice && (
-          <div 
-            className="absolute left-0 bg-white z-10 mt-2"
-            style={{ 
-              width: '180px', 
-              flexShrink: 0, 
-              borderRadius: '16px',
-              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-              border: '1px solid #E9E9E9'
-            }}
-          >
-            <div className="py-1.5">
-              {priceOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    setSelectedPrice(option.value);
-                    setOpenPriceDropdown(null);
-                  }}
-                  style={{
-                    color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0'
-                  }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 transition-colors relative"
-                >
-                  {selectedPrice === option.value && (
-                    <div 
-                      style={{
-                        position: 'absolute',
-                        left: '8px',
-                        right: '8px',
-                        top: '2px',
-                        bottom: '2px',
-                        backgroundColor: '#F0F8FE',
-                        borderRadius: '8px',
-                        zIndex: -1
+          <>
+            {isMobile ? (
+              // Mobile: Bottom sheet modal
+              <div
+                style={{
+                  position: 'fixed',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  backgroundColor: '#FFFFFF',
+                  borderTopLeftRadius: '20px',
+                  borderTopRightRadius: '20px',
+                  boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
+                  zIndex: 10000,
+                  maxHeight: '60vh',
+                  overflowY: 'auto'
+                }}
+              >
+                {/* Drag Indicator */}
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  paddingTop: '12px',
+                  paddingBottom: '8px'
+                }}>
+                  <div style={{
+                    width: '40px',
+                    height: '4px',
+                    backgroundColor: '#D9D9D9',
+                    borderRadius: '2px'
+                  }} />
+                </div>
+                <div className="py-1.5 px-3">
+                  {priceOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setSelectedPrice(option.value);
+                        setOpenPriceDropdown(null);
                       }}
-                    />
-                  )}
-                  <span style={{ position: 'relative', zIndex: 1 }}>{option.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+                      style={{
+                        color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0',
+                        fontSize: '12px',
+                        padding: '8px 6px'
+                      }}
+                      className="w-full text-left hover:bg-gray-50 transition-colors relative"
+                    >
+                      {selectedPrice === option.value && (
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            left: '8px',
+                            right: '8px',
+                            top: '4px',
+                            bottom: '4px',
+                            backgroundColor: '#F0F8FE',
+                            borderRadius: '8px',
+                            zIndex: -1
+                          }}
+                        />
+                      )}
+                      <span style={{ position: 'relative', zIndex: 1 }}>{option.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <div style={{ paddingBottom: '20px' }} />
+              </div>
+            ) : (
+              // Desktop: Regular dropdown
+              <div 
+                className="absolute left-0 bg-white z-10 mt-2"
+                style={{ 
+                  width: '180px', 
+                  flexShrink: 0, 
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                  border: '1px solid #E9E9E9'
+                }}
+              >
+                <div className="py-1.5">
+                  {priceOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setSelectedPrice(option.value);
+                        setOpenPriceDropdown(null);
+                      }}
+                      style={{
+                        color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0'
+                      }}
+                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 transition-colors relative"
+                    >
+                      {selectedPrice === option.value && (
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            left: '8px',
+                            right: '8px',
+                            top: '2px',
+                            bottom: '2px',
+                            backgroundColor: '#F0F8FE',
+                            borderRadius: '8px',
+                            zIndex: -1
+                          }}
+                        />
+                      )}
+                      <span style={{ position: 'relative', zIndex: 1 }}>{option.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {isMobile && (
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  zIndex: 9999
+                }}
+                onClick={() => setOpenPriceDropdown(null)}
+              />
+            )}
+          </>
         )}
       </div>
     );
@@ -512,88 +597,193 @@ const Requests: React.FC = () => {
         
         {/* Dropdown Menu */}
         {isOpen && !selectedCountry && (
-          <div 
-            className="absolute left-0 bg-white border border-gray-200 z-10 mt-2"
-            style={{ 
-              width: '200px', 
-              flexShrink: 0, 
-              borderRadius: '16px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-            }}
-          >
-            <style>
-              {`
-                .filter-dropdown-scroll::-webkit-scrollbar {
-                  width: 2px;
-                }
-                .filter-dropdown-scroll::-webkit-scrollbar-track {
-                  background: transparent;
-                }
-                .filter-dropdown-scroll::-webkit-scrollbar-thumb {
-                  background-color: #E4E4E4;
-                  border-radius: 10px;
-                }
-              `}
-            </style>
-            
-            {/* Scrollable Country List */}
-            <div 
-              className="py-2 overflow-y-auto filter-dropdown-scroll"
-              style={{
-                maxHeight: 'calc(6 * 44px)',
-                scrollbarWidth: 'thin',
-                scrollbarColor: '#E4E4E4 transparent'
-              }}
-            >
-              <button
-                onClick={() => {
-                  setSelectedCountry('');
-                  setOpenFilterDropdown(null);
-                }}
+          <>
+            {isMobile ? (
+              // Mobile: Bottom sheet modal
+              <div
                 style={{
-                  backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
-                  color: !selectedCountry ? '#64B5F6' : '#BABABA'
+                  position: 'fixed',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  backgroundColor: '#FFFFFF',
+                  borderTopLeftRadius: '20px',
+                  borderTopRightRadius: '20px',
+                  boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
+                  zIndex: 10000,
+                  maxHeight: '60vh',
+                  overflowY: 'auto'
                 }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
               >
-                <div className="flex items-center">
-                  <img 
-                    src={globyIcon} 
-                    alt="Globe"
-                    className="w-4 h-4 mr-2"
-                    style={{
-                      filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
-                    }}
-                  />
-                  <span>Africa</span>
+                {/* Drag Indicator */}
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  paddingTop: '12px',
+                  paddingBottom: '8px'
+                }}>
+                  <div style={{
+                    width: '40px',
+                    height: '4px',
+                    backgroundColor: '#D9D9D9',
+                    borderRadius: '2px'
+                  }} />
                 </div>
-              </button>
-              {africanCountries.map((country) => (
-                <button
-                  key={country.name}
-                  onClick={() => {
-                    setSelectedCountry(country.name);
-                    setOpenFilterDropdown(null);
-                  }}
+                <div className="py-1.5 px-3">
+                  <button
+                    onClick={() => {
+                      setSelectedCountry('');
+                      setOpenFilterDropdown(null);
+                    }}
+                    style={{
+                      backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
+                      color: !selectedCountry ? '#64B5F6' : '#BABABA',
+                      fontSize: '12px',
+                      padding: '8px 6px'
+                    }}
+                    className="w-full text-left hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <img 
+                        src={globyIcon} 
+                        alt="Globe"
+                        className="w-3.5 h-3.5 mr-2"
+                        style={{
+                          filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                        }}
+                      />
+                      <span>Africa</span>
+                    </div>
+                  </button>
+                  {africanCountries.map((country) => (
+                    <button
+                      key={country.name}
+                      onClick={() => {
+                        setSelectedCountry(country.name);
+                        setOpenFilterDropdown(null);
+                      }}
+                      style={{
+                        backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
+                        color: selectedCountry === country.name ? '#64B5F6' : '#BABABA',
+                        fontSize: '12px',
+                        padding: '8px 6px'
+                      }}
+                      className="w-full text-left hover:bg-gray-50 transition-colors"
+                    >
+                      <span className="flex items-center space-x-2">
+                        <img 
+                          src={country.flag} 
+                          alt={`${country.name} flag`}
+                          className="object-cover rounded-full"
+                          style={{ width: '16px', height: '16px' }}
+                        />
+                        <span>{country.name}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <div style={{ paddingBottom: '20px' }} />
+              </div>
+            ) : (
+              // Desktop: Regular dropdown
+              <div 
+                className="absolute left-0 bg-white border border-gray-200 z-10 mt-2"
+                style={{ 
+                  width: '200px', 
+                  flexShrink: 0, 
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                }}
+              >
+                <style>
+                  {`
+                    .filter-dropdown-scroll::-webkit-scrollbar {
+                      width: 2px;
+                    }
+                    .filter-dropdown-scroll::-webkit-scrollbar-track {
+                      background: transparent;
+                    }
+                    .filter-dropdown-scroll::-webkit-scrollbar-thumb {
+                      background-color: #E4E4E4;
+                      border-radius: 10px;
+                    }
+                  `}
+                </style>
+                
+                {/* Scrollable Country List */}
+                <div 
+                  className="py-2 overflow-y-auto filter-dropdown-scroll"
                   style={{
-                    backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
-                    color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                    maxHeight: 'calc(6 * 44px)',
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#E4E4E4 transparent'
                   }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
                 >
-                  <span className="flex items-center space-x-2">
-                    <img 
-                      src={country.flag} 
-                      alt={`${country.name} flag`}
-                      className="object-cover rounded-full"
-                      style={{ width: '20px', height: '20px' }}
-                    />
-                    <span>{country.name}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+                  <button
+                    onClick={() => {
+                      setSelectedCountry('');
+                      setOpenFilterDropdown(null);
+                    }}
+                    style={{
+                      backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
+                      color: !selectedCountry ? '#64B5F6' : '#BABABA'
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <img 
+                        src={globyIcon} 
+                        alt="Globe"
+                        className="w-4 h-4 mr-2"
+                        style={{
+                          filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                        }}
+                      />
+                      <span>Africa</span>
+                    </div>
+                  </button>
+                  {africanCountries.map((country) => (
+                    <button
+                      key={country.name}
+                      onClick={() => {
+                        setSelectedCountry(country.name);
+                        setOpenFilterDropdown(null);
+                      }}
+                      style={{
+                        backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
+                        color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                    >
+                      <span className="flex items-center space-x-2">
+                        <img 
+                          src={country.flag} 
+                          alt={`${country.name} flag`}
+                          className="object-cover rounded-full"
+                          style={{ width: '20px', height: '20px' }}
+                        />
+                        <span>{country.name}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {isMobile && (
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  zIndex: 9999
+                }}
+                onClick={() => setOpenFilterDropdown(null)}
+              />
+            )}
+          </>
         )}
       </div>
     );
@@ -628,6 +818,7 @@ const Requests: React.FC = () => {
         setShowRequestModal(true);
       }}
       style={{ 
+        position: isMobile ? 'relative' : 'relative',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
         height: 'auto',
         width: isMobile ? '260px' : 'auto',
@@ -689,121 +880,271 @@ const Requests: React.FC = () => {
                   </svg>
                 </button>
                 {moreOptionsOpenFor === cardId && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '26px',
-                      right: 0,
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '16px',
-                      border: '1px solid #E9E9E9',
-                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                      padding: '8px',
-                      minWidth: '200px',
-                      zIndex: 1000
-                    }}
-                  >
-                    {/* Manage request */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMoreOptionsOpenFor(null);
-                      }}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '13px',
-                        color: '#939393'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <img 
-                        src={requestIcon} 
-                        alt="Request" 
-                        style={{ 
-                          width: '18px', 
-                          height: '18px',
-                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                        }} 
-                      />
-                      <span>Manage request</span>
-                    </button>
-                    
-                    {/* Share the request */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMoreOptionsOpenFor(null);
-                      }}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '13px',
-                        color: '#939393',
-                        whiteSpace: 'nowrap'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <img 
-                        src={shareIcon} 
-                        alt="Share" 
-                        style={{ 
-                          width: '18px', 
-                          height: '18px',
-                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                        }} 
-                      />
-                      <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
-                    </button>
-                    
-                    {/* Close */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMoreOptionsOpenFor(null);
-                      }}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: '#FAFAFA',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '13px',
-                        color: '#939393'
-                      }}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span>Close</span>
-                    </button>
-                  </div>
+                  <>
+                    {isMobile ? (
+                      // Mobile: Bottom sheet modal
+                      <>
+                        <div
+                          style={{
+                            position: 'fixed',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            backgroundColor: '#FFFFFF',
+                            borderTopLeftRadius: '20px',
+                            borderTopRightRadius: '20px',
+                            boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
+                            zIndex: 10000,
+                            padding: '8px',
+                            paddingBottom: '20px'
+                          }}
+                        >
+                          {/* Drag Indicator */}
+                          <div style={{ 
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            paddingTop: '12px',
+                            paddingBottom: '8px'
+                          }}>
+                            <div style={{
+                              width: '40px',
+                              height: '4px',
+                              backgroundColor: '#D9D9D9',
+                              borderRadius: '2px'
+                            }} />
+                          </div>
+                          <div style={{ padding: '0 4px' }}>
+                            {/* Manage request */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMoreOptionsOpenFor(null);
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '10px 8px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '12px',
+                                color: '#939393'
+                              }}
+                            >
+                              <img 
+                                src={requestIcon} 
+                                alt="Request" 
+                                style={{ 
+                                  width: '14px', 
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }} 
+                              />
+                              <span>Manage request</span>
+                            </button>
+                            
+                            {/* Share the request */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMoreOptionsOpenFor(null);
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '10px 8px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '12px',
+                                color: '#939393',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              <img 
+                                src={shareIcon} 
+                                alt="Share" 
+                                style={{ 
+                                  width: '14px', 
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }} 
+                              />
+                              <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
+                            </button>
+                            
+                            {/* Close */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMoreOptionsOpenFor(null);
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '10px 8px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                backgroundColor: '#FAFAFA',
+                                cursor: 'pointer',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '12px',
+                                color: '#939393',
+                                marginTop: '4px'
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                              <span>Close</span>
+                            </button>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                            zIndex: 9999
+                          }}
+                          onClick={() => setMoreOptionsOpenFor(null)}
+                        />
+                      </>
+                    ) : (
+                      // Desktop: Regular dropdown
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '26px',
+                          right: 0,
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '16px',
+                          border: '1px solid #E9E9E9',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          padding: '8px',
+                          minWidth: '200px',
+                          zIndex: 1000
+                        }}
+                      >
+                        {/* Manage request */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoreOptionsOpenFor(null);
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            color: '#939393'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
+                          <img 
+                            src={requestIcon} 
+                            alt="Request" 
+                            style={{ 
+                              width: '18px', 
+                              height: '18px',
+                              filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                            }} 
+                          />
+                          <span>Manage request</span>
+                        </button>
+                        
+                        {/* Share the request */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoreOptionsOpenFor(null);
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            color: '#939393',
+                            whiteSpace: 'nowrap'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
+                          <img 
+                            src={shareIcon} 
+                            alt="Share" 
+                            style={{ 
+                              width: '18px', 
+                              height: '18px',
+                              filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                            }} 
+                          />
+                          <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
+                        </button>
+                        
+                        {/* Close */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoreOptionsOpenFor(null);
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: '#FAFAFA',
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            color: '#939393'
+                          }}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <span>Close</span>
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -850,7 +1191,7 @@ const Requests: React.FC = () => {
 
       {/* Product Name Label and Status Badge - Mobile */}
       {isMobile && (
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-1" style={{ position: 'relative' }}>
           <span 
             style={{ 
               fontSize: '9px', 
@@ -864,7 +1205,7 @@ const Requests: React.FC = () => {
             Request
           </span>
           {cardIsPending && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" style={{ position: 'absolute', right: 0, alignItems: 'center' }}>
               <div 
                 className="px-2 py-0.5 rounded-md"
                 style={{ 
@@ -877,6 +1218,30 @@ const Requests: React.FC = () => {
               >
                 Pending
               </div>
+              <button
+                className="rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor: '#F4F4F4',
+                  border: 'none',
+                  cursor: 'pointer',
+                  width: '24px',
+                  height: '24px',
+                  flexShrink: 0
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <img 
+                  src={shareIcon} 
+                  alt="Share" 
+                  style={{ 
+                    width: '12px', 
+                    height: '12px',
+                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                  }} 
+                />
+              </button>
               <div style={{ position: 'relative' }} ref={moreOptionsRef}>
                 <button
                   type="button"
@@ -900,121 +1265,271 @@ const Requests: React.FC = () => {
                   </svg>
                 </button>
                 {moreOptionsOpenFor === cardId && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '26px',
-                      right: 0,
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '16px',
-                      border: '1px solid #E9E9E9',
-                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                      padding: '8px',
-                      minWidth: '200px',
-                      zIndex: 1000
-                    }}
-                  >
-                    {/* Manage request */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMoreOptionsOpenFor(null);
-                      }}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '13px',
-                        color: '#939393'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <img 
-                        src={requestIcon} 
-                        alt="Request" 
-                        style={{ 
-                          width: '18px', 
-                          height: '18px',
-                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                        }} 
-                      />
-                      <span>Manage request</span>
-                    </button>
-                    
-                    {/* Share the request */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMoreOptionsOpenFor(null);
-                      }}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '13px',
-                        color: '#939393',
-                        whiteSpace: 'nowrap'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <img 
-                        src={shareIcon} 
-                        alt="Share" 
-                        style={{ 
-                          width: '18px', 
-                          height: '18px',
-                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                        }} 
-                      />
-                      <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
-                    </button>
-                    
-                    {/* Close */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMoreOptionsOpenFor(null);
-                      }}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: '#FAFAFA',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: '13px',
-                        color: '#939393'
-                      }}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span>Close</span>
-                    </button>
-                  </div>
+                  <>
+                    {isMobile ? (
+                      // Mobile: Bottom sheet modal
+                      <>
+                        <div
+                          style={{
+                            position: 'fixed',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            backgroundColor: '#FFFFFF',
+                            borderTopLeftRadius: '20px',
+                            borderTopRightRadius: '20px',
+                            boxShadow: '0 -4px 30px 0 rgba(0, 0, 0, 0.1)',
+                            zIndex: 10000,
+                            padding: '8px',
+                            paddingBottom: '20px'
+                          }}
+                        >
+                          {/* Drag Indicator */}
+                          <div style={{ 
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            paddingTop: '12px',
+                            paddingBottom: '8px'
+                          }}>
+                            <div style={{
+                              width: '40px',
+                              height: '4px',
+                              backgroundColor: '#D9D9D9',
+                              borderRadius: '2px'
+                            }} />
+                          </div>
+                          <div style={{ padding: '0 4px' }}>
+                            {/* Manage request */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMoreOptionsOpenFor(null);
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '10px 8px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '12px',
+                                color: '#939393'
+                              }}
+                            >
+                              <img 
+                                src={requestIcon} 
+                                alt="Request" 
+                                style={{ 
+                                  width: '14px', 
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }} 
+                              />
+                              <span>Manage request</span>
+                            </button>
+                            
+                            {/* Share the request */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMoreOptionsOpenFor(null);
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '10px 8px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '12px',
+                                color: '#939393',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              <img 
+                                src={shareIcon} 
+                                alt="Share" 
+                                style={{ 
+                                  width: '14px', 
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }} 
+                              />
+                              <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
+                            </button>
+                            
+                            {/* Close */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMoreOptionsOpenFor(null);
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '10px 8px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                backgroundColor: '#FAFAFA',
+                                cursor: 'pointer',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '12px',
+                                color: '#939393',
+                                marginTop: '4px'
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                              <span>Close</span>
+                            </button>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                            zIndex: 9999
+                          }}
+                          onClick={() => setMoreOptionsOpenFor(null)}
+                        />
+                      </>
+                    ) : (
+                      // Desktop: Regular dropdown
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '26px',
+                          right: 0,
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '16px',
+                          border: '1px solid #E9E9E9',
+                          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                          padding: '8px',
+                          minWidth: '200px',
+                          zIndex: 1000
+                        }}
+                      >
+                        {/* Manage request */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoreOptionsOpenFor(null);
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            color: '#939393'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
+                          <img 
+                            src={requestIcon} 
+                            alt="Request" 
+                            style={{ 
+                              width: '18px', 
+                              height: '18px',
+                              filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                            }} 
+                          />
+                          <span>Manage request</span>
+                        </button>
+                        
+                        {/* Share the request */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoreOptionsOpenFor(null);
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            color: '#939393',
+                            whiteSpace: 'nowrap'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
+                          <img 
+                            src={shareIcon} 
+                            alt="Share" 
+                            style={{ 
+                              width: '18px', 
+                              height: '18px',
+                              filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                            }} 
+                          />
+                          <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
+                        </button>
+                        
+                        {/* Close */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoreOptionsOpenFor(null);
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: '#FAFAFA',
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            color: '#939393'
+                          }}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <span>Close</span>
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -1307,28 +1822,61 @@ const Requests: React.FC = () => {
 
       {/* Manage the request button - Mobile only (replaces Respond to request) */}
       {isMobile && !cardIsPending && (
-        <button 
-          className="mt-3 flex items-center justify-center gap-1.5"
-          style={{ 
-            backgroundColor: '#FFFFFF', 
-            borderColor: '#F9A825',
-            border: '1px solid #F9A825',
-            color: '#F9A825',
-            fontWeight: 'normal', 
-            fontSize: '9px',
-            padding: '6px 10px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            width: 'auto',
-            alignSelf: 'flex-start'
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
-          Manage the request
-        </button>
+        <div className="w-full flex justify-center mt-3">
+          <button 
+            className="flex items-center justify-center gap-1.5 mx-auto"
+            style={{ 
+              backgroundColor: '#FFFFFF', 
+              borderColor: '#F9A825',
+              border: '1px solid #F9A825',
+              color: '#F9A825',
+              fontWeight: 'normal', 
+              fontSize: '9px',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              width: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
+            Manage the request
+          </button>
+        </div>
+      )}
+      {/* Manage the request button - Mobile for pending cards */}
+      {isMobile && cardIsPending && (
+        <div className="w-full flex justify-center mt-3">
+          <button 
+            className="flex items-center justify-center gap-1.5 mx-auto"
+            style={{ 
+              backgroundColor: '#FFFFFF', 
+              borderColor: '#F9A825',
+              border: '1px solid #F9A825',
+              color: '#F9A825',
+              fontWeight: 'normal', 
+              fontSize: '9px',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              width: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
+            Manage the request
+          </button>
+        </div>
       )}
     </div>
     );
@@ -1404,12 +1952,12 @@ const Requests: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ paddingBottom: isMobile ? '32px' : '48px', paddingTop: isMobile ? '20px' : '64px' }}>
+      <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ paddingBottom: isMobile ? '32px' : '48px', paddingTop: isMobile ? '40px' : '64px' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className={isMobile ? "flex flex-col items-center mb-6 sm:mb-8" : "flex items-start justify-between mb-6 sm:mb-8"}>
+          <div className={isMobile ? "flex flex-col items-center mb-6 sm:mb-8" : "flex items-start justify-between mb-6 sm:mb-8"} style={isMobile ? { marginTop: '24px' } : {}}>
             <div className={isMobile ? "flex-1 text-center" : "flex-1"}>
-              <h2 className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '20px' : '44px', fontWeight: '500', lineHeight: '1.2' }}>
+              <h2 className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '20px' : '44px', fontWeight: '500', lineHeight: '1.2', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 <span style={{ color: '#212121' }}>Buy & Sell </span>
                 <span style={{ 
                   background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
@@ -2226,6 +2774,7 @@ const Requests: React.FC = () => {
                       <div 
                         className={isMobile ? "flex gap-6 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                         style={isMobile ? { 
+                          padding: '16px 0',
                           scrollbarWidth: 'none',
                           msOverflowStyle: 'none',
                           WebkitOverflowScrolling: 'touch'
@@ -2273,6 +2822,7 @@ const Requests: React.FC = () => {
                     <div 
                       className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
                       style={isMobile ? { 
+                        padding: '16px 0',
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
                         WebkitOverflowScrolling: 'touch'
@@ -2327,7 +2877,7 @@ const Requests: React.FC = () => {
                           Requests near you
                         </h3>
                         <div className="flex items-center justify-between mb-6">
-                          <div className="flex items-center gap-2" style={{ marginLeft: '0' }}>
+                          <div className="flex items-center gap-2" style={{ marginLeft: isMobile ? '-12px' : '0' }}>
                             {renderCountryFilterButton('relative', 'filtered')}
                             {renderPriceFilterButton('relative', 'filtered')}
                           </div>
@@ -2416,11 +2966,11 @@ const Requests: React.FC = () => {
                         }}>
                           Pending requests
                         </h3>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    {renderCountryFilterButton('relative', 'pending')}
-                    {renderPriceFilterButton('relative', 'pending')}
-                  </div>
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center gap-2" style={{ marginLeft: isMobile ? '-8px' : '0' }}>
+                            {renderCountryFilterButton('relative', 'pending')}
+                            {renderPriceFilterButton('relative', 'pending')}
+                          </div>
                   <div className="flex items-center gap-2">
                     <button 
                       className="rounded-full flex items-center justify-center transition-all duration-200"
@@ -2506,11 +3056,11 @@ const Requests: React.FC = () => {
                         }}>
                           All requests
                         </h3>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    {renderCountryFilterButton('relative', 'all')}
-                    {renderPriceFilterButton('relative', 'all')}
-                  </div>
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center gap-2" style={{ marginLeft: isMobile ? '-8px' : '0' }}>
+                            {renderCountryFilterButton('relative', 'all')}
+                            {renderPriceFilterButton('relative', 'all')}
+                          </div>
                   <div className="flex items-center gap-2">
                     <button 
                       className="rounded-full flex items-center justify-center transition-all duration-200"
