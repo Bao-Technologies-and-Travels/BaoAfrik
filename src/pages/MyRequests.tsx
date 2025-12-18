@@ -937,6 +937,7 @@ const MyRequests: React.FC = () => {
                 {/* Status Modal */}
                 {isStatusModalOpen && (
                   <div
+                    onClick={(e) => e.stopPropagation()}
                     style={{
                       position: 'absolute',
                       top: '28px',
@@ -948,7 +949,7 @@ const MyRequests: React.FC = () => {
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                       padding: isMobile ? '3px' : '4px',
                       width: isMobile ? '80px' : '90px',
-                      zIndex: 1000,
+                      zIndex: isMobile ? 10000 : 1000,
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '2px'
@@ -963,9 +964,14 @@ const MyRequests: React.FC = () => {
                           key={optionStatus}
                           type="button"
                           onClick={(e) => {
+                            e.preventDefault();
                             e.stopPropagation();
                             handleStatusChange(request.id, optionStatus);
                             setStatusModalOpenFor(null);
+                          }}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                           }}
                           style={{
                             width: '100%',
@@ -988,8 +994,13 @@ const MyRequests: React.FC = () => {
                     <button
                       type="button"
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         setStatusModalOpenFor(null);
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                       }}
                       style={{
                         width: '100%',
@@ -1057,10 +1068,13 @@ const MyRequests: React.FC = () => {
                     <button
                       type="button"
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
-                        setSelectedRequestForView(request);
-                        setViewRequestModalOpen(true);
                         setMoreOptionsOpenFor(null);
+                        setTimeout(() => {
+                          setSelectedRequestForView(request);
+                          setViewRequestModalOpen(true);
+                        }, 0);
                       }}
                       style={{
                         width: '100%',
@@ -1078,7 +1092,7 @@ const MyRequests: React.FC = () => {
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
-                      <span style={{ color: '#939393', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif' }}>View the request</span>
+                      <span style={{ color: '#939393', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>View the request</span>
                     </button>
                     <button
                       type="button"
@@ -1315,7 +1329,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Ongoing requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-6' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-8' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1379,7 +1393,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Pending requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-6' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-8' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1443,7 +1457,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Completed requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-6' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-8' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1507,7 +1521,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Expired requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-6' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'pr-8' : ''}`}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
