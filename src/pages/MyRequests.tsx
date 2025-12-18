@@ -560,8 +560,8 @@ const MyRequests: React.FC = () => {
         style={{
           display: 'grid',
           gridTemplateColumns: '1.8fr 2.2fr 1.5fr 1.5fr 1fr 1fr 0.5fr',
-          gap: '16px',
-          padding: '16px 20px'
+          gap: '0px',
+          padding: '16px 16px 16px 0px'
         }}
       >
         {/* Column 1: Creation date */}
@@ -641,7 +641,7 @@ const MyRequests: React.FC = () => {
         </div>
       </div>
       {/* Header Divider */}
-      <div style={{ height: '1px', backgroundColor: '#E4E4E4', margin: '0 20px' }} />
+      <div style={{ height: '1px', backgroundColor: '#E4E4E4', margin: '0 16px 0 0px' }} />
 
       {/* Table Rows */}
       {sortedRequests.map((request, index) => (
@@ -650,8 +650,8 @@ const MyRequests: React.FC = () => {
             style={{
               display: 'grid',
               gridTemplateColumns: '1.8fr 2.2fr 1.5fr 1.5fr 1fr 1fr 0.5fr',
-              gap: '16px',
-              padding: '14px 20px',
+              gap: '0px',
+              padding: '14px 16px 14px 0px',
               alignItems: 'center'
             }}
           >
@@ -864,7 +864,7 @@ const MyRequests: React.FC = () => {
             </div>
           </div>
           {index < sortedRequests.length - 1 && (
-            <div style={{ height: '1px', backgroundColor: '#E4E4E4', margin: '0 20px' }} />
+            <div style={{ height: '1px', backgroundColor: '#E4E4E4', margin: '0 16px 0 0px' }} />
           )}
         </div>
       ))}
@@ -1358,28 +1358,30 @@ const MyRequests: React.FC = () => {
           )}
 
           {/* Main Content */}
-          <div className="max-w-6xl mx-auto w-full px-0">
-            {shouldShowEmptyState ? (
-              <div className="text-center py-16">
-                <p style={{ color: '#9C9C9C', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
-                  {isSearchNoResultsState
-                    ? "We couldn't find any requests that match your search. Try adjusting your keywords or filters."
-                    : "You don't have any requests yet."}
-                </p>
-              </div>
-            ) : (
-              viewMode === 'list' ? renderRequestsList() : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {sortedRequests.map((request) => (
-                    <div key={request.id} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E4E4E4', borderRadius: '12px', padding: '16px' }}>
-                      <h3 style={{ color: '#6A6A6A', fontSize: '14px', fontFamily: 'Poppins, sans-serif', marginBottom: '8px' }}>{request.title}</h3>
-                      <p style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>{request.price.replace(' - ', ' ~ ')}</p>
-                      {renderStatusBadge(request.id)}
-                    </div>
-                  ))}
+          <div className="max-w-[78rem] mx-auto w-full pl-0 pr-0">
+            <div className="lg:-ml-8 w-full">
+              {shouldShowEmptyState ? (
+                <div className="text-center py-16">
+                  <p style={{ color: '#9C9C9C', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                    {isSearchNoResultsState
+                      ? "We couldn't find any requests that match your search. Try adjusting your keywords or filters."
+                      : "You don't have any requests yet."}
+                  </p>
                 </div>
-              )
-            )}
+              ) : (
+                viewMode === 'list' ? renderRequestsList() : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {sortedRequests.map((request) => (
+                      <div key={request.id} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E4E4E4', borderRadius: '12px', padding: '16px' }}>
+                        <h3 style={{ color: '#6A6A6A', fontSize: '14px', fontFamily: 'Poppins, sans-serif', marginBottom: '8px' }}>{request.title}</h3>
+                        <p style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>{request.price.replace(' - ', ' ~ ')}</p>
+                        {renderStatusBadge(request.id)}
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+            </div>
           </div>
         </div>
 
