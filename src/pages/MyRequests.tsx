@@ -2743,7 +2743,7 @@ const MyRequests: React.FC = () => {
                         }}
                         style={{
                           backgroundColor: '#212121',
-                          borderRadius: '12px',
+                          borderRadius: isMobile ? '10px' : '12px',
                           border: 'none',
                           padding: isMobile ? '5px 20px' : '8px 40px',
                           cursor: 'pointer',
@@ -3019,7 +3019,7 @@ const MyRequests: React.FC = () => {
                   </div>
 
                   {/* Close Button */}
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
                     <button
                       type="button"
                       onClick={handleDeleteClose}
@@ -3037,6 +3037,21 @@ const MyRequests: React.FC = () => {
                     >
                       Close
                     </button>
+                  </div>
+
+                  {/* Drag Indicator at far bottom */}
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    paddingBottom: '8px',
+                    paddingTop: '4px'
+                  }}>
+                    <div style={{
+                      width: '80px',
+                      height: '4px',
+                      backgroundColor: '#D9D9D9',
+                      borderRadius: '2px'
+                    }} />
                   </div>
                 </>
               ) : (
@@ -3215,21 +3230,6 @@ const MyRequests: React.FC = () => {
                   </div>
                 </>
               )}
-                    
-                    {/* Drag Indicator at far bottom */}
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'center', 
-                      paddingBottom: '8px',
-                      paddingTop: '4px'
-                    }}>
-                      <div style={{
-                        width: '80px',
-                        height: '4px',
-                        backgroundColor: '#D9D9D9',
-                        borderRadius: '2px'
-                      }} />
-                    </div>
                   </div>
                 </div>
               </div>
