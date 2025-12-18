@@ -1068,31 +1068,37 @@ const MyRequests: React.FC = () => {
                     <button
                       type="button"
                       onClick={(e) => {
-                        e.preventDefault();
                         e.stopPropagation();
+                        setSelectedRequestForView(request);
+                        setViewRequestModalOpen(true);
                         setMoreOptionsOpenFor(null);
-                        setTimeout(() => {
-                          setSelectedRequestForView(request);
-                          setViewRequestModalOpen(true);
-                        }, 0);
+                      }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
                       }}
                       style={{
                         width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: isMobile ? '6px' : '8px',
-                        padding: isMobile ? '6px 8px' : '8px 10px',
+                        gap: isMobile ? '6px' : '10px',
+                        padding: isMobile ? '6px 8px' : '10px 12px',
                         border: 'none',
                         background: 'transparent',
                         cursor: 'pointer',
                         borderRadius: '8px'
                       }}
+                      onMouseEnter={!isMobile ? (e) => {
+                        e.currentTarget.style.backgroundColor = '#FAFAFA';
+                      } : undefined}
+                      onMouseLeave={!isMobile ? (e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      } : undefined}
                     >
-                      <svg width={isMobile ? "12" : "14"} height={isMobile ? "12" : "14"} viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width={isMobile ? "12" : "16"} height={isMobile ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
-                      <span style={{ color: '#939393', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>View the request</span>
+                      <span style={{ color: '#939393', fontSize: isMobile ? '11px' : '13px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>View the request</span>
                     </button>
                     <button
                       type="button"
@@ -1103,20 +1109,29 @@ const MyRequests: React.FC = () => {
                         setDeleteReason('');
                         setMoreOptionsOpenFor(null);
                       }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                      }}
                       style={{
                         width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: isMobile ? '6px' : '8px',
-                        padding: isMobile ? '6px 8px' : '8px 10px',
+                        gap: isMobile ? '6px' : '10px',
+                        padding: isMobile ? '6px 8px' : '10px 12px',
                         border: 'none',
                         background: 'transparent',
                         cursor: 'pointer',
                         borderRadius: '8px'
                       }}
+                      onMouseEnter={!isMobile ? (e) => {
+                        e.currentTarget.style.backgroundColor = '#FFF5F5';
+                      } : undefined}
+                      onMouseLeave={!isMobile ? (e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      } : undefined}
                     >
-                      <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '12px' : '14px', height: isMobile ? '12px' : '14px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                      <span style={{ color: '#FF5151', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif' }}>Delete request</span>
+                      <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                      <span style={{ color: '#FF5151', fontSize: isMobile ? '11px' : '13px', fontFamily: 'Poppins, sans-serif' }}>Delete request</span>
                     </button>
                     <button
                       type="button"
@@ -1124,12 +1139,15 @@ const MyRequests: React.FC = () => {
                         e.stopPropagation();
                         setMoreOptionsOpenFor(null);
                       }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                      }}
                       style={{
                         width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: isMobile ? '6px' : '8px',
-                        padding: isMobile ? '6px 8px' : '8px 10px',
+                        gap: isMobile ? '6px' : '10px',
+                        padding: isMobile ? '6px 8px' : '10px 12px',
                         border: 'none',
                         background: '#FAFAFA',
                         cursor: 'pointer',
@@ -1137,10 +1155,10 @@ const MyRequests: React.FC = () => {
                         marginTop: '4px'
                       }}
                     >
-                      <svg width={isMobile ? "12" : "14"} height={isMobile ? "12" : "14"} viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width={isMobile ? "12" : "16"} height={isMobile ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M18 6L6 18M6 6l12 12" />
                       </svg>
-                      <span style={{ color: '#B0B0B0', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                      <span style={{ color: '#B0B0B0', fontSize: isMobile ? '11px' : '13px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
                     </button>
                   </div>
                 )}
@@ -1329,7 +1347,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Ongoing requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-8' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'ml-auto' : ''}`} style={isMobile ? { marginRight: '-8px' } : {}}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1393,7 +1411,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Pending requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-8' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'ml-auto' : ''}`} style={isMobile ? { marginRight: '-8px' } : {}}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1457,7 +1475,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Completed requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-8' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'ml-auto' : ''}`} style={isMobile ? { marginRight: '-8px' } : {}}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -1521,7 +1539,7 @@ const MyRequests: React.FC = () => {
               }}>
                 Expired requests {'>'}
               </h3>
-              <div className={`flex items-center gap-3 ${isMobile ? 'pr-8' : ''}`}>
+              <div className={`flex items-center gap-3 ${isMobile ? 'ml-auto' : ''}`} style={isMobile ? { marginRight: '-8px' } : {}}>
                 <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
@@ -2688,7 +2706,7 @@ const MyRequests: React.FC = () => {
                     </div>
 
                     {/* Footer Buttons */}
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '20px', paddingBottom: '20px' }}>
+                    <div style={{ display: 'flex', gap: isMobile ? '12px' : '8px', justifyContent: isMobile ? 'center' : 'space-between', marginTop: 'auto', paddingTop: '20px', paddingBottom: '20px' }}>
                       {/* Delete Button */}
                       <button
                         type="button"
@@ -2707,12 +2725,12 @@ const MyRequests: React.FC = () => {
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '8px',
-                          padding: '8px 16px'
+                          gap: isMobile ? '6px' : '8px',
+                          padding: isMobile ? '5px 16px' : '8px 16px'
                         }}
                       >
-                        <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                        <span style={{ color: '#FF5151', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Delete the request</span>
+                        <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px', filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                        <span style={{ color: '#FF5151', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '11px' : '14px' }}>Delete the request</span>
                       </button>
 
                       {/* Close Button */}
@@ -2727,17 +2745,17 @@ const MyRequests: React.FC = () => {
                           backgroundColor: '#212121',
                           borderRadius: '12px',
                           border: 'none',
-                          padding: '8px 40px',
+                          padding: isMobile ? '5px 20px' : '8px 40px',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '8px'
+                          gap: isMobile ? '6px' : '8px'
                         }}
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width={isMobile ? "12" : "16"} height={isMobile ? "12" : "16"} viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M18 6L6 18M6 6l12 12" />
                         </svg>
-                        <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Close</span>
+                        <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '11px' : '14px' }}>Close</span>
                       </button>
                     </div>
                     
