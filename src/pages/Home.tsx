@@ -117,6 +117,7 @@ const Home: React.FC = () => {
   const [mobileSearchQuery, setMobileSearchQuery] = useState('');
   const [mobileSearchSubmitted, setMobileSearchSubmitted] = useState(false);
   const [isMobileSearchFocused, setIsMobileSearchFocused] = useState(false);
+  const [showMobileSearchHistory, setShowMobileSearchHistory] = useState(false);
   const categoryDropdownRef = React.useRef<HTMLDivElement>(null);
   const productOriginDropdownRef = React.useRef<HTMLDivElement>(null);
   const [selectedCard, setSelectedCard] = useState<{ title: string; country: string; flag: string; location: string; description: string } | null>(null);
@@ -2432,9 +2433,14 @@ const Home: React.FC = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
                   onFocus={() => {
-                    setFocusedSearchSection('mobile-search');
-                    if (searchHistory.length > 0) {
-                      setShowSearchHistory(true);
+                    if (isMobile) {
+                      setShowMobileSearchFlow(true);
+                      setMobileSearchQuery(searchQuery);
+                    } else {
+                      setFocusedSearchSection('mobile-search');
+                      if (searchHistory.length > 0) {
+                        setShowSearchHistory(true);
+                      }
                     }
                   }}
                   onBlur={() => {
@@ -4809,7 +4815,7 @@ const Home: React.FC = () => {
               className="w-full py-3 rounded-lg"
               style={{
                 backgroundColor: (mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) ? '#F9A825' : '#E9E9E9',
-                color: (mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) ? '#FFFFFF' : '#E9E9E9',
+                color: (mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) ? '#FFFFFF' : '#6A6A6A',
                 border: 'none',
                 fontSize: '14px',
                 fontFamily: 'Poppins, sans-serif',
@@ -4858,9 +4864,26 @@ const Home: React.FC = () => {
                   type="text"
                   placeholder="What are you looking for today ?"
                   value={mobileSearchQuery}
-                  onChange={(e) => setMobileSearchQuery(e.target.value)}
-                  onFocus={() => setIsMobileSearchFocused(true)}
-                  onBlur={() => setIsMobileSearchFocused(false)}
+                  onChange={(e) => {
+                    setMobileSearchQuery(e.target.value);
+                    if (e.target.value.trim() && searchHistory.length > 0) {
+                      setShowMobileSearchHistory(true);
+                    } else {
+                      setShowMobileSearchHistory(false);
+                    }
+                  }}
+                  onFocus={() => {
+                    setIsMobileSearchFocused(true);
+                    if (mobileSearchQuery.trim() && searchHistory.length > 0) {
+                      setShowMobileSearchHistory(true);
+                    }
+                  }}
+                  onBlur={() => {
+                    setIsMobileSearchFocused(false);
+                    setTimeout(() => {
+                      setShowMobileSearchHistory(false);
+                    }, 200);
+                  }}
                   className="w-full px-4 py-3 pr-12 focus:outline-none text-sm"
                   style={{
                     borderRadius: '30px',
@@ -4876,6 +4899,7 @@ const Home: React.FC = () => {
                     onClick={() => {
                       setMobileSearchQuery('');
                       setMobileSearchSubmitted(false);
+                      setShowMobileSearchHistory(false);
                     }}
                     className="absolute right-4 top-1/2 -translate-y-1/2"
                     style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
@@ -4896,6 +4920,41 @@ const Home: React.FC = () => {
                     style={{ opacity: 0.6 }}
                   />
                 </button>
+                
+                {/* Search History Dropdown */}
+                {showMobileSearchHistory && mobileSearchQuery.trim() && searchHistory.length > 0 && (
+                  <div
+                    className="absolute top-full left-0 right-0 mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-lg"
+                    style={{
+                      maxHeight: '200px',
+                      overflowY: 'auto'
+                    }}
+                  >
+                    {searchHistory
+                      .filter(item => item.toLowerCase().includes(mobileSearchQuery.toLowerCase()))
+                      .map((item, index) => (
+                        <div
+                          key={index}
+                          onClick={() => {
+                            setMobileSearchQuery(item);
+                            setShowMobileSearchHistory(false);
+                          }}
+                          className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-4 py-2"
+                          style={{
+                            borderBottom: index < searchHistory.length - 1 ? '1px solid #F0F0F0' : 'none'
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                          </svg>
+                          <span style={{ color: '#6A6A6A', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                            {item}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
               <button
                 onClick={() => {
@@ -5012,18 +5071,89 @@ const Home: React.FC = () => {
             </div>
           )}
 
+          {/* Country Filter - Show when seller location is applied */}
+          {mobileFilterSellerLocation && mobileSearchSubmitted && (
+            <div className="px-4 pb-3">
+              {renderCountryFilterButton('relative', 'mobile-search-country')}
+            </div>
+          )}
+
+          {/* Category and Country Filters - Show when no filters applied and search is submitted */}
+          {!mobileFilterCategory && !mobileFilterProductOrigin && !mobileFilterSellerLocation && mobileSearchSubmitted && (
+            <div className="px-4 pb-3 space-y-3">
+              {/* Category Filter */}
+              <div className="flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <style>{`
+                  .category-scroll::-webkit-scrollbar {
+                    display: none;
+                  }
+                `}</style>
+                <div className="flex gap-2 category-scroll" style={{ minWidth: 'max-content' }}>
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setActiveCategory(category)}
+                      className="px-3 py-1.5 rounded-full whitespace-nowrap transition-colors"
+                      style={{
+                        backgroundColor: activeCategory === category ? '#F0F8FE' : '#FFFFFF',
+                        border: `1px solid ${activeCategory === category ? '#64B5F6' : '#E4E4E4'}`,
+                        color: activeCategory === category ? '#64B5F6' : '#6A6A6A',
+                        fontSize: '12px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Country Filter */}
+              <div>
+                {renderCountryFilterButton('relative', 'mobile-search-country-no-filter')}
+              </div>
+            </div>
+          )}
+
           {/* Search Results or Empty State */}
           <div className="flex-1 overflow-y-auto px-4 pb-24">
             {mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && (
               <>
                 {(() => {
-                  const filteredProducts = getProductsToDisplay().filter(product => {
+                  // Get all products
+                  let products = [];
+                  if (activeCategory === 'All') {
+                    products = Object.values(allProducts).flat();
+                  } else {
+                    products = allProducts[activeCategory as keyof typeof allProducts] || [];
+                  }
+                  
+                  // Apply country filter if selected
+                  if (selectedCountry) {
+                    products = products.filter(product => 
+                      getProductCountry(product.id).name === selectedCountry
+                    );
+                  }
+                  
+                  // Helper function to get product category
+                  const getProductCategory = (productId: number): string => {
+                    for (const [category, categoryProducts] of Object.entries(allProducts)) {
+                      if (categoryProducts.some(p => p.id === productId)) {
+                        return category;
+                      }
+                    }
+                    return '';
+                  };
+                  
+                  // Filter by search query and mobile filters
+                  const filteredProducts = products.filter(product => {
                     const query = mobileSearchQuery.toLowerCase().trim();
+                    const productCategory = getProductCategory(product.id);
                     const matchesSearch = product.name.toLowerCase().includes(query) ||
-                      product.category?.toLowerCase().includes(query) ||
-                      product.description?.toLowerCase().includes(query);
+                      productCategory.toLowerCase().includes(query) ||
+                      product.location.toLowerCase().includes(query);
                     
-                    const matchesCategory = !mobileFilterCategory || product.category === mobileFilterCategory;
+                    const matchesCategory = !mobileFilterCategory || productCategory === mobileFilterCategory;
                     const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.id).name === mobileFilterProductOrigin;
                     const matchesLocation = !mobileFilterSellerLocation || product.location?.toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
                     
@@ -5032,29 +5162,48 @@ const Home: React.FC = () => {
 
                   if (filteredProducts.length === 0) {
                     return (
-                      <div className="flex flex-col items-center justify-center" style={{ paddingTop: '140px' }}>
-                        <img src={bagIcon} alt="No products" style={{ width: '50px', height: '50px', marginBottom: '14px', opacity: 0.3 }} />
-                        <p style={{ color: '#939393', fontSize: '11px', textAlign: 'center', marginBottom: '14px', lineHeight: '1.5' }}>
-                          No products found. Please try adjusting<br />your search criteria.
+                      <div className="text-center" style={{ padding: '48px 16px' }}>
+                        <img 
+                          src={bagIcon} 
+                          alt="No products found" 
+                          className="mx-auto" 
+                          style={{ 
+                            width: '60px', 
+                            height: '60px',
+                            marginBottom: '16px'
+                          }}
+                        />
+                        <p style={{ 
+                          fontSize: '18px', 
+                          color: '#6A6A6A', 
+                          fontFamily: 'Poppins, sans-serif', 
+                          maxWidth: '500px', 
+                          margin: '0 auto 16px',
+                          lineHeight: '1.5'
+                        }}>
+                          Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
                         </p>
                         <button
                           type="button"
-                          onClick={() => navigate('/requests')}
+                          onClick={() => setShowRequestModal(true)}
+                          className="inline-flex items-center mx-auto"
                           style={{
-                            backgroundColor: '#64B5F6',
-                            color: '#FFFFFF',
-                            padding: '7px 18px',
-                            borderRadius: '12px',
-                            border: 'none',
-                            fontSize: '11px',
-                            fontFamily: 'Poppins, sans-serif',
                             display: 'flex',
+                            padding: '10px 20px',
                             alignItems: 'center',
-                            gap: '5px',
-                            cursor: 'pointer'
+                            gap: '6px',
+                            borderRadius: '8px',
+                            backgroundColor: '#F0F8FE',
+                            color: '#64B5F6',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '14px',
+                            fontWeight: '500'
                           }}
                         >
-                          View available items
+                          <img src={draftsIcon} alt="Request" style={{ width: '20px', height: '20px' }} />
+                          <span>Make a request</span>
                         </button>
                       </div>
                     );
@@ -5091,14 +5240,14 @@ const Home: React.FC = () => {
                                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                                 </svg>
                                 <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                                  {product.rating || '4.5'}
+                                  4.5
                                 </span>
                                 <span style={{ color: '#B0B0B0', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                                  ({product.reviews || '12'} Reviews)
+                                  (12 Reviews)
                                 </span>
                               </div>
                               <span className="font-semibold" style={{ color: '#212121', fontSize: '14px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                {product.currency} {product.price}
+                                USD {product.price}
                               </span>
                             </div>
                           </div>
