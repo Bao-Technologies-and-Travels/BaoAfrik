@@ -496,7 +496,7 @@ const Header: React.FC<HeaderProps> = ({
                 // Logged in user buttons
                 <>
                   {/* Language Toggle */}
-                  <div className="relative">
+                  {/* <div className="relative">
                     <button
                       onClick={toggleLanguageDropdown}
                       className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
@@ -510,10 +510,8 @@ const Header: React.FC<HeaderProps> = ({
                       />
                     </button>
 
-                    {/* Language Dropdown */}
                     {isLanguageDropdownOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
-                        {/* Header */}
                         <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                           <h3 className="text-sm font-medium text-gray-700">
                             Language :
@@ -538,7 +536,6 @@ const Header: React.FC<HeaderProps> = ({
                           </button>
                         </div>
 
-                        {/* Language Options */}
                         <div className="py-2">
                           <button
                             onClick={() => handleLanguageChange("EN")}
@@ -575,7 +572,7 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
                       </div>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* start selling button */}
                   {/* <Link
@@ -1148,7 +1145,7 @@ const Header: React.FC<HeaderProps> = ({
                 // Not logged in buttons (includes visitor mode)
                 <>
                   {/* Language Toggle */}
-                  <div className="relative">
+                  {/* <div className="relative">
                     <button
                       onClick={toggleLanguageDropdown}
                       className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
@@ -1162,10 +1159,8 @@ const Header: React.FC<HeaderProps> = ({
                       />
                     </button>
 
-                    {/* Language Dropdown */}
                     {isLanguageDropdownOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
-                        {/* Header */}
                         <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                           <h3 className="text-sm font-medium text-gray-700">
                             Language :
@@ -1190,7 +1185,6 @@ const Header: React.FC<HeaderProps> = ({
                           </button>
                         </div>
 
-                        {/* Language Options */}
                         <div className="py-2">
                           <button
                             onClick={() => handleLanguageChange("EN")}
@@ -1227,7 +1221,7 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
                       </div>
                     )}
-                  </div>
+                  </div> */}
 
                   <Link
                     to="/login"
@@ -1269,7 +1263,7 @@ const Header: React.FC<HeaderProps> = ({
                 // Logged in user mobile navigation
                 <>
                   {/* Language Toggle for mobile */}
-                  <div className="relative mr-1">
+                  {/* <div className="relative mr-1">
                     <button
                       onClick={toggleLanguageDropdown}
                       className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
@@ -1279,10 +1273,8 @@ const Header: React.FC<HeaderProps> = ({
                       <img src={arrowDownIcon} alt="Arrow" className="ml-1 w-4 h-4" />
                     </button>
 
-                    {/* Language Dropdown for mobile */}
                     {isLanguageDropdownOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
-                        {/* Header */}
                         <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                           <h3 className="text-sm font-medium text-gray-700">Language :</h3>
                           <button
@@ -1295,7 +1287,6 @@ const Header: React.FC<HeaderProps> = ({
                           </button>
                         </div>
 
-                        {/* Language Options */}
                         <div className="py-2">
                           <button
                             onClick={() => handleLanguageChange('EN')}
@@ -1320,7 +1311,7 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
                       </div>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Become a seller button - only for logged in users */}
                   {/* <Link

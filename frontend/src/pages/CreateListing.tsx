@@ -99,6 +99,14 @@ const CreateListing: React.FC = () => {
   const { addToast } = useToast();
   const { user } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+
+  const ukCities = [
+    'London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool',
+    'Leeds', 'Newcastle', 'Sheffield', 'Bristol', 'Belfast',
+    'Edinburgh', 'Cardiff', 'Leicester', 'Coventry', 'Nottingham',
+    'Southampton', 'Plymouth', 'Derby', 'Reading', 'York'
+  ];
 
   const clearListingsCache = () => {
     try {
@@ -431,7 +439,7 @@ const CreateListing: React.FC = () => {
         setQuantity(product.quantity || 1);
         setCategory(product.category || '');
         setOrigin(product.origin || '');
-        setSaleType(product.saleType || 'Default');
+        // setSaleType(product.saleType || 'Default');
         setDeliveryAvailable(product.deliveryAvailable || false);
         setLocation(product.location || 'London | United Kingdom');
 
@@ -464,16 +472,16 @@ const CreateListing: React.FC = () => {
     { value: 'Home & Decor', label: 'Home & Decor' }
   ];
 
-  const saleTypes = [
-    { value: 'Default', label: 'Default' },
-    { value: 'Urgent', label: 'Urgent', icon: pathIcon }
-  ];
+  // const saleTypes = [
+  //   { value: 'Default', label: 'Default' },
+  //   { value: 'Urgent', label: 'Urgent', icon: pathIcon }
+  // ];
 
   const currencies = [
-    { value: 'USD', label: 'US Dollar', flagCode: 'us' },
-    { value: 'CAD', label: 'Canadian Dollar', flagCode: 'ca' },
+    // { value: 'USD', label: 'US Dollar', flagCode: 'us' },
+    // { value: 'CAD', label: 'Canadian Dollar', flagCode: 'ca' },
     { value: 'GBP', label: 'Pound Sterling', flagCode: 'gb' },
-    { value: 'EUR', label: 'Euro', flagCode: 'eu' }
+    // { value: 'EUR', label: 'Euro', flagCode: 'eu' }
   ];
 
   const countries = [
@@ -913,7 +921,7 @@ const CreateListing: React.FC = () => {
         category: category || '',
         origin: origin || '',
         location: location || '',
-        saleType,
+        // saleType,
         deliveryAvailable: Boolean(deliveryAvailable),
         status: 'DRAFT'
       };
@@ -1051,7 +1059,7 @@ const CreateListing: React.FC = () => {
         category,
         origin: origin || undefined,
         location: location || undefined,
-        saleType,
+        // saleType,
         deliveryAvailable: Boolean(deliveryAvailable)
       };
 
@@ -1171,6 +1179,21 @@ const CreateListing: React.FC = () => {
     }
   }, [showSuccessModal, countdown, navigate, title, price, currency, imageUrls, primaryImageIndex, category]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const dropdown = document.querySelector('.location-dropdown-container');
+      if (isLocationDropdownOpen && dropdown && !dropdown.contains(target) && !target.closest('button[onclick*="setIsLocationDropdownOpen"]')) {
+        setIsLocationDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isLocationDropdownOpen]);
+
   const handleBackToHomepage = () => {
     // Navigate to owner view state (product detail with fromMyListings state)
     const newListingId = `new-${Date.now()}`;
@@ -1206,7 +1229,6 @@ const CreateListing: React.FC = () => {
     setQuantity(1);
     setCategory('');
     setOrigin('');
-    setSaleType('Default');
     setDeliveryAvailable(false);
     setLocation('London, United Kingdom');
     setImages([]);
@@ -1763,7 +1785,7 @@ const CreateListing: React.FC = () => {
             {/* Right Side Navigation */}
             <div className="flex items-center space-x-4 -mr-12">
               {/* Language Selector */}
-              <div className="relative language-selector">
+              {/* <div className="relative language-selector">
                 <button
                   onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                   className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
@@ -1772,7 +1794,6 @@ const CreateListing: React.FC = () => {
                   <img src={translationToggleIcon} alt="Toggle" className="w-4 h-4" />
                 </button>
 
-                {/* Dropdown Menu */}
                 {isLanguageDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                     <div className="py-1">
@@ -1799,7 +1820,7 @@ const CreateListing: React.FC = () => {
                     </div>
                   </div>
                 )}
-              </div>
+              </div> */}
 
               {/* Start Selling Button */}
               {/* <Link
@@ -2337,26 +2358,51 @@ const CreateListing: React.FC = () => {
                 </div>
 
                 {/* Location Section */}
-                <div className="flex items-start justify-between mt-4" style={{ maxWidth: '560px' }}>
-                  <div className="flex flex-col">
-                    <div className="flex items-center space-x-1.5 mb-1">
-                      <img src={locIcon} alt="Location" className="w-4 h-4" />
-                      <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
+                <div className="relative location-dropdown-container">
+                  <div className="flex items-start justify-between mt-4" style={{ maxWidth: '560px' }}>
+                    <div className="flex flex-col">
+                      <div className="flex items-center space-x-1.5 mb-1">
+                        <img src={locIcon} alt="Location" className="w-4 h-4" />
+                        <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={location}
+                        readOnly
+                        className="text-xs font-medium border-none focus:outline-none ml-6 cursor-default"
+                        style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
+                      />
                     </div>
-                    <input
-                      type="text"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="text-xs font-medium border-none focus:outline-none ml-6"
-                      style={{ color: '#64B5F6' }}
-                    />
+                    <button
+                      type="button"
+                      onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+                      className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
+                      style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                    >
+                      Change location
+                    </button>
                   </div>
-                  <button
-                    className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
-                    style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
-                  >
-                    Change location
-                  </button>
+                  {/* Location Dropdown */}
+                  {isLocationDropdownOpen && (
+                    <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200">
+                      <div className="p-2 max-h-60 overflow-auto">
+                        <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
+                        {ukCities.map((city) => (
+                          <button
+                            key={city}
+                            type="button"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
+                            onClick={() => {
+                              setLocation(`${city} | United Kingdom`);
+                              setIsLocationDropdownOpen(false);
+                            }}
+                          >
+                            {city}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -2802,26 +2848,51 @@ const CreateListing: React.FC = () => {
                 </div>
 
                 {/* Mobile Location Section */}
-                <div className="flex items-start justify-between mt-24 mb-24">
-                  <div className="flex flex-col">
-                    <div className="flex items-center mb-0.5" style={{ marginLeft: '-2px' }}>
-                      <img src={locIcon} alt="Location" className="w-3 h-3 hidden" />
-                      <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontSize: '0.7rem' }}>Your location</span>
+                <div className="relative location-dropdown-container">
+                  <div className="flex items-start justify-between mt-4" style={{ maxWidth: '560px' }}>
+                    <div className="flex flex-col">
+                      <div className="flex items-center space-x-1.5 mb-1">
+                        <img src={locIcon} alt="Location" className="w-4 h-4" />
+                        <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={location}
+                        readOnly
+                        className="text-xs font-medium border-none focus:outline-none ml-6 cursor-default"
+                        style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
+                      />
                     </div>
-                    <input
-                      type="text"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="text-xs font-medium border-none focus:outline-none ml-0"
-                      style={{ color: '#64B5F6', fontSize: '0.7rem' }}
-                    />
+                    <button
+                      type="button"
+                      onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+                      className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
+                      style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                    >
+                      Change location
+                    </button>
                   </div>
-                  <button
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
-                    style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '0.7rem' }}
-                  >
-                    Change location
-                  </button>
+                  {/* Location Dropdown */}
+                  {isLocationDropdownOpen && (
+                    <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200">
+                      <div className="p-2 max-h-60 overflow-auto">
+                        <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
+                        {ukCities.map((city) => (
+                          <button
+                            key={city}
+                            type="button"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
+                            onClick={() => {
+                              setLocation(`${city} | United Kingdom`);
+                              setIsLocationDropdownOpen(false);
+                            }}
+                          >
+                            {city}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Mobile Title Input */}
@@ -3221,12 +3292,11 @@ const CreateListing: React.FC = () => {
                 </div>
 
                 {/* Mobile Type of sale */}
-                <div>
+                {/* <div>
                   <label className="block text-xs font-medium mb-1.5" style={{ color: '#6A6A6A' }}>
                     Type of sale
                   </label>
                   <div className="relative sale-type-dropdown w-full">
-                    {/* Dropdown Button */}
                     <button
                       type="button"
                       onClick={() => setIsSaleTypeDropdownOpen(!isSaleTypeDropdownOpen)}
@@ -3279,7 +3349,6 @@ const CreateListing: React.FC = () => {
                       </svg>
                     </button>
 
-                    {/* Dropdown Menu */}
                     {isSaleTypeDropdownOpen && (
                       <div
                         className="absolute z-50 w-full mt-1.5 bg-white border border-gray-200 shadow-lg overflow-hidden"
@@ -3345,7 +3414,7 @@ const CreateListing: React.FC = () => {
                       </div>
                     )}
                   </div>
-                </div>
+                </div> */}
 
                 {/* Mobile Delivery available */}
                 <div className="py-3 mb-12">
@@ -3381,20 +3450,28 @@ const CreateListing: React.FC = () => {
                     style={{
                       backgroundColor: isFormComplete ? '#F9A825' : '#E9E9E9',
                       color: isFormComplete ? '#FFFFFF' : '#6A6A6A',
-                      cursor: isFormComplete ? 'pointer' : 'not-allowed'
+                      cursor: isFormComplete ? 'pointer' : 'not-allowed',
+                      minHeight: '40px',
+                      position: 'relative'
                     }}
                   >
-                    <span>Post listing</span>
-                    <img
-                      src={flyIcon}
-                      alt="Post"
-                      className="w-4 h-4"
-                      style={{
-                        filter: isFormComplete
-                          ? 'brightness(0) invert(1)'
-                          : 'none'
-                      }}
-                    />
+                    {isLoading ? (
+                      <div className="flex items-center justify-center w-full">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      </div>
+                    ) : (
+                      <>
+                        <span>Post listing</span>
+                        <img
+                          src={flyIcon}
+                          alt="Post"
+                          className="w-4 h-4"
+                          style={{
+                            filter: isFormComplete ? 'brightness(0) invert(1)' : 'none'
+                          }}
+                        />
+                      </>
+                    )}
                   </button>
                   <button
                     onClick={handleSaveDraft}
@@ -3913,7 +3990,7 @@ const CreateListing: React.FC = () => {
                               className="pl-4 pr-1 py-3 border-none focus:outline-none bg-white flex items-center"
                               style={{ color: '#E4E4E4', fontSize: '0.85rem', cursor: 'pointer' }}
                             >
-                              <span>{currency}</span>
+                              <span className="font-bold">{currency}</span>
                               <svg
                                 className="w-4 h-4 ml-1"
                                 fill="none"
@@ -4263,12 +4340,11 @@ const CreateListing: React.FC = () => {
                   </div>
 
                   {/* Type of sale */}
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: '#6A6A6A' }}>
                       Type of sale
                     </label>
                     <div className="relative sale-type-dropdown" style={{ width: '100%', maxWidth: '560px' }}>
-                      {/* Dropdown Button */}
                       <button
                         type="button"
                         onClick={() => setIsSaleTypeDropdownOpen(!isSaleTypeDropdownOpen)}
@@ -4321,7 +4397,6 @@ const CreateListing: React.FC = () => {
                         </svg>
                       </button>
 
-                      {/* Dropdown Menu */}
                       {isSaleTypeDropdownOpen && (
                         <div
                           className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg overflow-hidden"
@@ -4387,7 +4462,7 @@ const CreateListing: React.FC = () => {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Delivery available */}
                   <div className="py-6">
@@ -4431,20 +4506,28 @@ const CreateListing: React.FC = () => {
                       style={{
                         backgroundColor: isFormComplete ? '#F9A825' : '#E9E9E9',
                         color: isFormComplete ? '#FFFFFF' : '#6A6A6A',
-                        cursor: isFormComplete ? 'pointer' : 'not-allowed'
+                        cursor: isFormComplete ? 'pointer' : 'not-allowed',
+                        minHeight: '40px',
+                        position: 'relative'
                       }}
                     >
-                      <span>Post listing</span>
-                      <img
-                        src={flyIcon}
-                        alt="Post"
-                        className="w-5 h-5"
-                        style={{
-                          filter: isFormComplete
-                            ? 'brightness(0) invert(1)'
-                            : 'none'
-                        }}
-                      />
+                      {isLoading ? (
+                        <div className="flex items-center justify-center w-full">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        </div>
+                      ) : (
+                        <>
+                          <span>Post listing</span>
+                          <img
+                            src={flyIcon}
+                            alt="Post"
+                            className="w-4 h-4"
+                            style={{
+                              filter: isFormComplete ? 'brightness(0) invert(1)' : 'none'
+                            }}
+                          />
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

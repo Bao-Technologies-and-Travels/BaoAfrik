@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -63,131 +63,10 @@ import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
 import locationIcon from '../assets/images/pre/PL.svg';
 import pencilIcon from '../assets/images/pre/pencil.svg';
+import avatar from "../assets/images/logos/avatar.png";
 
 import { useToast } from "../contexts/ToastContext";
-
-// Country mapping for products
 import { getProductCountry } from '../utils/countryHelpers';
-// replaced by shared util
-
-// const countries = [
-//   { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
-//   { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },
-//   { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png', abbreviation: 'BEN' },
-//   { name: 'Botswana', code: 'bw', flag: 'https://flagcdn.com/w20/bw.png', abbreviation: 'BWA' },
-//   { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
-//   { name: 'Burundi', code: 'bi', flag: 'https://flagcdn.com/w20/bi.png', abbreviation: 'BDI' },
-//   { name: 'Cabo Verde', code: 'cv', flag: 'https://flagcdn.com/w20/cv.png', abbreviation: 'CPV' },
-//   { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
-//   { name: 'Central African Republic', code: 'cf', flag: 'https://flagcdn.com/w20/cf.png', abbreviation: 'CAF' },
-//   { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
-//   { name: 'Comoros', code: 'km', flag: 'https://flagcdn.com/w20/km.png', abbreviation: 'COM' },
-//   { name: 'Congo (Congo-Brazzaville)', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
-//   { name: 'Côte d\'Ivoire', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
-//   { name: 'Democratic Republic of the Congo', code: 'cd', flag: 'https://flagcdn.com/w20/cd.png', abbreviation: 'COD' },
-//   { name: 'Djibouti', code: 'dj', flag: 'https://flagcdn.com/w20/dj.png', abbreviation: 'DJI' },
-//   { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
-//   { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png', abbreviation: 'GNQ' },
-//   { name: 'Eritrea', code: 'er', flag: 'https://flagcdn.com/w20/er.png', abbreviation: 'ERI' },
-//   { name: 'Eswatini', code: 'sz', flag: 'https://flagcdn.com/w20/sz.png', abbreviation: 'SWZ' },
-//   { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
-//   { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png', abbreviation: 'GAB' },
-//   { name: 'Gambia', code: 'gm', flag: 'https://flagcdn.com/w20/gm.png', abbreviation: 'GMB' },
-//   { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
-//   { name: 'Guinea', code: 'gn', flag: 'https://flagcdn.com/w20/gn.png', abbreviation: 'GIN' },
-//   { name: 'Guinea-Bissau', code: 'gw', flag: 'https://flagcdn.com/w20/gw.png', abbreviation: 'GNB' },
-//   { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
-//   { name: 'Lesotho', code: 'ls', flag: 'https://flagcdn.com/w20/ls.png', abbreviation: 'LSO' },
-//   { name: 'Liberia', code: 'lr', flag: 'https://flagcdn.com/w20/lr.png', abbreviation: 'LBR' },
-//   { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' },
-//   { name: 'Madagascar', code: 'mg', flag: 'https://flagcdn.com/w20/mg.png', abbreviation: 'MDG' },
-//   { name: 'Malawi', code: 'mw', flag: 'https://flagcdn.com/w20/mw.png', abbreviation: 'MWI' },
-//   { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
-//   { name: 'Mauritania', code: 'mr', flag: 'https://flagcdn.com/w20/mr.png', abbreviation: 'MRT' },
-//   { name: 'Mauritius', code: 'mu', flag: 'https://flagcdn.com/w20/mu.png', abbreviation: 'MUS' },
-//   { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
-//   { name: 'Mozambique', code: 'mz', flag: 'https://flagcdn.com/w20/mz.png', abbreviation: 'MOZ' },
-//   { name: 'Namibia', code: 'na', flag: 'https://flagcdn.com/w20/na.png', abbreviation: 'NAM' },
-//   { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
-//   { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGA' },
-//   { name: 'Rwanda', code: 'rw', flag: 'https://flagcdn.com/w20/rw.png', abbreviation: 'RWA' },
-//   { name: 'Sao Tome and Principe', code: 'st', flag: 'https://flagcdn.com/w20/st.png', abbreviation: 'STP' },
-//   { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
-//   { name: 'Seychelles', code: 'sc', flag: 'https://flagcdn.com/w20/sc.png', abbreviation: 'SYC' },
-//   { name: 'Sierra Leone', code: 'sl', flag: 'https://flagcdn.com/w20/sl.png', abbreviation: 'SLE' },
-//   { name: 'Somalia', code: 'so', flag: 'https://flagcdn.com/w20/so.png', abbreviation: 'SOM' },
-//   { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
-//   { name: 'South Sudan', code: 'ss', flag: 'https://flagcdn.com/w20/ss.png', abbreviation: 'SSD' },
-//   { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
-//   { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
-//   { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png', abbreviation: 'TGO' },
-//   { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
-//   { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
-//   { name: 'Zambia', code: 'zm', flag: 'https://flagcdn.com/w20/zm.png', abbreviation: 'ZMB' },
-//   { name: 'Zimbabwe', code: 'zw', flag: 'https://flagcdn.com/w20/zw.png', abbreviation: 'ZWE' }
-// ];
-
-// Common alternative names / spellings
-const alternativeNames: Record<string, string> = {
-  'gambia': 'Gambia',
-  'ivory coast': 'Côte d\'Ivoire',
-  'cote divoire': 'Côte d\'Ivoire',
-  'côte d\'ivoire': 'Côte d\'Ivoire',
-  'swaziland': 'Eswatini',
-  'congo': 'Congo (Congo-Brazzaville)',
-  'congo brazzaville': 'Congo (Congo-Brazzaville)',
-  'dr congo': 'Democratic Republic of the Congo',
-  'drc': 'Democratic Republic of the Congo',
-  'congo kinshasa': 'Democratic Republic of the Congo',
-  'cape verde': 'Cabo Verde',
-  'sao tome': 'Sao Tome and Principe',
-  'são tomé': 'Sao Tome and Principe',
-  'são tomé and príncipe': 'Sao Tome and Principe',
-  'sao tome & principe': 'Sao Tome and Principe',
-  'cabo verde': 'Cabo Verde',
-  'democratic republic of congo': 'Democratic Republic of the Congo'
-};
-
-// const defaultCountry =
-//   countries.find(c => c.name === 'Nigeria') ||
-//   countries[0];
-
-// if (productOriginCode && productOriginCode.trim()) {
-//   const codeNorm = productOriginCode.trim().toLowerCase();
-
-//   const byCode = countries.find(
-//     c =>
-//       c.code.toLowerCase() === codeNorm ||
-//       c.abbreviation.toLowerCase() === codeNorm
-//   );
-
-//   if (byCode) return byCode;
-// }
-
-// const rawOrigin = (productOrigin || '').trim();
-// if (rawOrigin) {
-//   const normalizedOrigin = rawOrigin.toLowerCase();
-//   const standardName = alternativeNames[normalizedOrigin] || normalizedOrigin;
-
-//   let country = countries.find(c =>
-//     c.name.toLowerCase() === standardName ||
-//     c.code.toLowerCase() === standardName ||
-//     c.abbreviation.toLowerCase() === standardName.toUpperCase()
-//   );
-
-//   if (country) return country;
-
-//   country = countries.find(c =>
-//     c.name.toLowerCase().includes(standardName) ||
-//     standardName.includes(c.name.toLowerCase())
-//   );
-
-//   if (country) return country;
-// }
-
-// return defaultCountry;
-// };
-
 interface OwnerListingState {
   fromMyListings?: boolean;
   listing?: {
@@ -253,11 +132,43 @@ interface Product {
   };
 }
 
+interface ProductReviewUser {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  profileImage: string | null;
+}
+
+interface ProductReviewDTO {
+  id: string;
+  rating: number;
+  comment?: string | null;
+  createdAt: string;
+  user: ProductReviewUser;
+}
+
+interface ProductReviewsSummary {
+  reviews: ProductReviewDTO[];
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: { [rating: number]: number };
+}
+
 const formatOwnerDate = (timestamp?: number) => {
   if (!timestamp) return '';
   return new Date(timestamp).toLocaleDateString('en-US', {
     weekday: 'short',
     day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+};
+
+const formatReviewDate = (isoDate: string) => {
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
     month: 'short',
     year: 'numeric'
   });
@@ -350,6 +261,7 @@ const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const routerLocation = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
   const [isShared, setIsShared] = useState(false);
@@ -405,18 +317,17 @@ const ProductDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'reviews' | 'items'>('reviews');
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('The most relevant');
-  const [userRating, setUserRating] = useState(0);
+  const [userRating, setUserRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [userReviewText, setUserReviewText] = useState('');
   const [reviewHelpfulness, setReviewHelpfulness] = useState<{ [key: string]: 'yes' | 'no' | null }>({});
-  const [reviewHelpfulCounts, setReviewHelpfulCounts] = useState<{ [key: string]: { yes: number; no: number } }>({
-    review1: { yes: 27, no: 2 },
-    review2: { yes: 15, no: 3 },
-    review3: { yes: 8, no: 12 }
-  });
+  const [reviewHelpfulCounts, setReviewHelpfulCounts] = useState<{ [key: string]: { yes: number; no: number } }>({});
   const [expandedDiscussions, setExpandedDiscussions] = useState<{ [key: string]: boolean }>({});
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const [isReviewPosted, setIsReviewPosted] = useState(false);
   const [postedReview, setPostedReview] = useState<{ rating: number; text: string; date: string } | null>(null);
+  const [reviewsSummary, setReviewsSummary] = useState<ProductReviewsSummary | null>(null);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
   const { addToast } = useToast();
 
   // Mobile detection
@@ -524,6 +435,104 @@ const ProductDetail: React.FC = () => {
       timestamp: 'Today, 10:52'
     }
   ].slice(0, Math.min(ownerListing.messages, 4)) : [];
+
+  // Load product reviews from backend
+  const loadReviews = useCallback(async () => {
+    if (!id) return;
+
+    let isMounted = true;
+
+    try {
+      setIsLoadingReviews(true);
+      const token = localStorage.getItem('accessToken');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/products/${id}/reviews`,
+        { headers, cache: 'no-cache' }
+      );
+
+      if (!response.ok) {
+        // If 404, treat as no reviews instead of error
+        if (response.status === 404) {
+          setReviewsSummary({
+            reviews: [],
+            averageRating: 0,
+            totalReviews: 0,
+            ratingDistribution: {}
+          });
+          return;
+        }
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
+      }
+
+      const result = await response.json();
+
+      if (!isMounted) return;
+
+      if (result?.success) {
+        const data = result.data || {};
+        setReviewsSummary({
+          reviews: Array.isArray(data.reviews) ? data.reviews : [],
+          averageRating: Number(data.averageRating) || 0,
+          totalReviews: Number(data.totalReviews) || 0,
+          ratingDistribution: data.ratingDistribution || {}
+        });
+      } else {
+        // Handle case where success is false but no error message
+        setReviewsSummary({
+          reviews: [],
+          averageRating: 0,
+          totalReviews: 0,
+          ratingDistribution: {}
+        });
+      }
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+      if (isMounted) {
+        addToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to load reviews. Please try again later.',
+          duration: 3000
+        });
+      }
+    } finally {
+      if (isMounted) {
+        setIsLoadingReviews(false);
+      }
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id, addToast]);
+
+  // Initial load of reviews
+  useEffect(() => {
+    loadReviews();
+  }, [loadReviews]);
+
+  // Refresh reviews after posting a new review
+  useEffect(() => {
+    if (isReviewPosted && postedReview) {
+      // Small delay to ensure backend has processed the new review
+      const timer = setTimeout(() => {
+        loadReviews().catch(error => {
+          console.error('Error refreshing reviews after posting:', error);
+        });
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isReviewPosted, postedReview, loadReviews]);
 
   // Filter options
   const filterOptions = [
@@ -1177,6 +1186,114 @@ const ProductDetail: React.FC = () => {
         avatar: sellerAvatar
       }
     ]
+  };
+
+  // Seller rating derived from backend user data
+  const sellerRatingValue = getSellerRating(product?.seller);
+  const hasSellerRating = sellerRatingValue > 0;
+
+  const totalReviews = reviewsSummary?.totalReviews ?? 0;
+  const averageRating = reviewsSummary?.averageRating ?? 0;
+  const ratingDistribution = reviewsSummary?.ratingDistribution ?? {};
+
+  const getRatingPercentage = (rating: number): string => {
+    if (!totalReviews) return '0%';
+    const count = ratingDistribution[rating] || 0;
+    return `${(count / totalReviews) * 100}%`;
+  };
+
+  const handlePostReview = async () => {
+    if (!id) {
+      addToast({
+        type: 'error',
+        title: 'Cannot post review',
+        message: 'Product ID is missing.',
+        duration: 2000
+      });
+      return;
+    }
+
+    if (userRating === 0) {
+      addToast({
+        type: 'error',
+        title: 'Rating required',
+        message: 'Please select a rating before posting your review.',
+        duration: 2000
+      });
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken');
+
+      if (!token) {
+        addToast({
+          type: 'error',
+          title: 'Sign in required',
+          message: 'You need to be logged in to post a review.',
+          duration: 2000
+        });
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          rating: userRating,
+          comment: userReviewText.trim() || undefined
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result?.success) {
+        const message = result?.message || 'Failed to save review';
+        throw new Error(message);
+      }
+
+      // Always reload reviews from server to ensure consistency
+      await loadReviews();
+
+      // Update local state for immediate feedback
+      const now = new Date();
+      const dateLabel = now.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+
+      setPostedReview({
+        rating: userRating,
+        text: userReviewText.trim(),
+        date: dateLabel
+      });
+
+      // Reset form
+      setUserRating(0);
+      setUserReviewText('');
+      setHoverRating(null);
+
+      // Show success message
+      addToast({
+        type: 'success',
+        title: 'Review posted',
+        message: 'Thank you for your feedback!',
+        duration: 2000
+      });
+
+    } catch (error: any) {
+      console.error('Error posting review:', error);
+      addToast({
+        type: 'error',
+        title: 'Could not post review',
+        message: error?.message || 'Something went wrong while saving your review.',
+        duration: 3000
+      });
+    }
   };
 
   const handleWishlist = async (productId: string) => {
@@ -1956,7 +2073,7 @@ const ProductDetail: React.FC = () => {
 
                 {/* See Seller Profile Button */}
                 <button
-                  onClick={handleSellerProfileClick}
+                  onClick={() => navigate(`/seller/${getSellerName(product.seller).toLowerCase().replace(/\s+/g, '-')}`)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors hover:opacity-80 flex-shrink-0 ml-auto"
                   style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', fontSize: '12px', fontWeight: 500, marginTop: '12px' }}
                 >
@@ -3264,253 +3381,101 @@ const ProductDetail: React.FC = () => {
 
                 {/* Review Cards */}
                 <div className="space-y-4">
-                  {/* Review 1 - Samine Herald */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-[22px] h-[22px] lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2 text-[13px] lg:text-sm">Samine Herald</h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <svg key={star} className="w-3 lg:w-3.5 h-3 lg:h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
+                  {isLoadingReviews ? (
+                    <div className="space-y-4">
+                      {[1, 2].map((i) => (
+                        <div key={i} className="animate-pulse">
+                          <div className="flex items-start space-x-3 mb-3">
+                            <div className="w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-gray-200" />
+                            <div className="flex-1 space-y-2">
+                              <div className="h-3 bg-gray-200 rounded w-1/3" />
+                              <div className="h-3 bg-gray-200 rounded w-1/4" />
                             </div>
-                            <span className="text-xs lg:text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
                           </div>
-                          <span className="text-[10px] lg:text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
+                          <div className="h-3 bg-gray-200 rounded w-full mb-2" />
+                          <div className="h-3 bg-gray-200 rounded w-2/3" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : reviewsSummary && reviewsSummary.reviews.length > 0 ? (
+                    reviewsSummary.reviews.map((review) => (
+                      <div key={review.id} className="pb-6">
+                        <div className="flex items-start space-x-3 mb-3">
+                          <div className="w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                            {review.user.profileImage ? (
+                              <img src={review.user.profileImage} alt={`${review.user.firstName || ''} ${review.user.lastName || ''}`} className="w-full h-full object-cover" />
+                            ) : (
+                              <svg className="w-[22px] h-[22px] lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-900 mb-2 text-[13px] lg:text-sm">
+                              {`${review.user.firstName || ''} ${review.user.lastName || ''}`.trim() || 'Anonymous'}
+                            </h4>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <div className="flex items-center">
+                                  {[1, 2, 3, 4, 5].map((star) => {
+                                    const isFilled = star <= review.rating;
+                                    const hasHalfStar = star > Math.floor(review.rating) && star - 0.5 <= review.rating && review.rating % 1 >= 0.5;
+
+                                    return (
+                                      <div key={star} className="relative w-3 lg:w-3.5 h-3 lg:h-3.5">
+                                        {/* Gray background star */}
+                                        <svg
+                                          className="absolute w-full h-full text-gray-300"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+
+                                        {/* Yellow filled star (full or half) */}
+                                        <div
+                                          className="absolute top-0 left-0 h-full overflow-hidden"
+                                          style={{
+                                            width: isFilled ? '100%' : hasHalfStar ? '50%' : '0%'
+                                          }}
+                                        >
+                                          <svg
+                                            className="w-full h-full text-yellow-400 fill-current"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                          </svg>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <span className="text-xs lg:text-sm font-medium" style={{ color: '#939393' }}>
+                                  {Number.isInteger(review.rating) ? review.rating.toFixed(1) : review.rating.toString()}
+                                </span>
+                              </div>
+                              <span className="text-[10px] lg:text-xs" style={{ color: '#939393' }}>
+                                {formatReviewDate(review.createdAt)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {review.comment && (
+                          <p className="text-xs lg:text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                            {review.comment}
+                          </p>
+                        )}
+
+                        {/* Helpfulness Section */}
+                        <div className="flex items-center justify-between flex-wrap gap-3">
+                          {renderHelpfulnessControls(review.id)}
                         </div>
                       </div>
-                    </div>
-                    <p className="text-xs lg:text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                      Outstanding quality! This product exceeded all my expectations. The white pepper has an amazing aroma and rich flavor that's perfect for my cooking. The packaging was beautiful and it arrived in perfect condition ahead of schedule.
+                    ))
+                  ) : (
+                    <p className="text-xs lg:text-sm" style={{ color: '#B0B0B0' }}>
+                      No reviews yet for this product.
                     </p>
-
-                    {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between flex-wrap gap-3">
-                      {renderHelpfulnessControls('review1')}
-                      <button
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
-                        onClick={() => handleDiscussionToggle('review1')}
-                      >
-                        {expandedDiscussions.review1 ? 'View less' : `View the discussion (${reviewDiscussionData.review1?.length || 0})`}
-                      </button>
-                    </div>
-                    {expandedDiscussions.review1 && reviewDiscussionData.review1 && (
-                      <div className="mt-4 space-y-3 lg:space-y-4">
-                        {reviewDiscussionData.review1.map((comment) => (
-                          <div key={comment.id} className="flex space-x-2 lg:space-x-3">
-                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                            <div className="flex-1 pl-3 lg:pl-4">
-                              <div className="flex items-start space-x-2 lg:space-x-3">
-                                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                  {comment.avatar ? (
-                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <svg className="w-3 h-3 lg:w-4 lg:h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                    </svg>
-                                  )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center space-x-1.5 lg:space-x-2 flex-1 min-w-0">
-                                      <span className="text-xs lg:text-sm font-medium lg:font-semibold text-gray-900 truncate">{comment.author}</span>
-                                      {comment.isOwner && (
-                                        <span className="text-[9px] lg:text-[10px] font-medium px-1.5 lg:px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                          {comment.role || 'Product Owner'}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <span className="text-[10px] lg:text-xs flex-shrink-0" style={{ color: '#939393' }}>{comment.date}</span>
-                                  </div>
-                                  <p className="text-xs lg:text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                                </div>
-                              </div>
-                              <div className="mt-2 lg:mt-3 pl-10 lg:pl-12">
-                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Review 2 - Kael Otto */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-[22px] h-[22px] lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2 text-[13px] lg:text-sm">Kael Otto</h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <svg key={star} className="w-3 lg:w-3.5 h-3 lg:h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-xs lg:text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
-                          </div>
-                          <span className="text-[10px] lg:text-xs" style={{ color: '#939393' }}>Posted on 12 Dec 2024</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-xs lg:text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                      Amazing product! The quality exceeded my expectations. The white pepper has such a distinct, mild heat that enhances every dish. Fast shipping and the item was exactly as described. Highly recommend for authentic African spices!
-                    </p>
-
-                    {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between flex-wrap gap-3">
-                      {renderHelpfulnessControls('review2')}
-                      <button
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
-                        onClick={() => handleDiscussionToggle('review2')}
-                      >
-                        {expandedDiscussions.review2 ? 'View less' : `View the discussion (${reviewDiscussionData.review2?.length || 0})`}
-                      </button>
-                    </div>
-                    {expandedDiscussions.review2 && reviewDiscussionData.review2 && (
-                      <div className="mt-4 space-y-3 lg:space-y-4">
-                        {reviewDiscussionData.review2.map((comment) => (
-                          <div key={comment.id} className="flex space-x-2 lg:space-x-3">
-                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                            <div className="flex-1 pl-3 lg:pl-4">
-                              <div className="flex items-start space-x-2 lg:space-x-3">
-                                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                  {comment.avatar ? (
-                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <svg className="w-3 h-3 lg:w-4 lg:h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                    </svg>
-                                  )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center space-x-1.5 lg:space-x-2 flex-1 min-w-0">
-                                      <span className="text-xs lg:text-sm font-medium lg:font-semibold text-gray-900 truncate">{comment.author}</span>
-                                      {comment.isOwner && (
-                                        <span className="text-[9px] lg:text-[10px] font-medium px-1.5 lg:px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                          {comment.role || 'Product Owner'}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <span className="text-[10px] lg:text-xs flex-shrink-0" style={{ color: '#939393' }}>{comment.date}</span>
-                                  </div>
-                                  <p className="text-xs lg:text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                                </div>
-                              </div>
-                              <div className="mt-2 lg:mt-3 pl-10 lg:pl-12">
-                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Review 3 - Alex Johnson */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-[22px] h-[22px] lg:w-6 lg:h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2 text-[13px] lg:text-sm">Alex Johnson</h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              {[1, 2].map((star) => (
-                                <svg key={star} className="w-3 lg:w-3.5 h-3 lg:h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                              {[1, 2, 3].map((star) => (
-                                <svg key={`empty-${star}`} className="w-3 lg:w-3.5 h-3 lg:h-3.5 text-gray-300 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-xs lg:text-sm font-medium" style={{ color: '#939393' }}>2.1</span>
-                          </div>
-                          <span className="text-[10px] lg:text-xs" style={{ color: '#939393' }}>Posted on 8 Nov 2024</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-xs lg:text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                      The product was okay, but not exactly what I expected. The flavor wasn't as strong as I hoped for and the quantity seemed less than advertised. Shipping took longer than anticipated. It's decent but there are better options available.
-                    </p>
-
-                    {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between flex-wrap gap-3">
-                      {renderHelpfulnessControls('review3')}
-                      <button
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
-                        onClick={() => handleDiscussionToggle('review3')}
-                      >
-                        {expandedDiscussions.review3 ? 'View less' : `View the discussion (${reviewDiscussionData.review3?.length || 0})`}
-                      </button>
-                    </div>
-                    {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
-                      <div className="mt-4 space-y-3 lg:space-y-4">
-                        {reviewDiscussionData.review3.map((comment) => (
-                          <div key={comment.id} className="flex space-x-2 lg:space-x-3">
-                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                            <div className="flex-1 pl-3 lg:pl-4">
-                              <div className="flex items-start space-x-2 lg:space-x-3">
-                                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                  {comment.avatar ? (
-                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <svg className="w-3 h-3 lg:w-4 lg:h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                    </svg>
-                                  )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center space-x-1.5 lg:space-x-2 flex-1 min-w-0">
-                                      <span className="text-xs lg:text-sm font-medium lg:font-semibold text-gray-900 truncate">{comment.author}</span>
-                                      {comment.isOwner && (
-                                        <span className="text-[9px] lg:text-[10px] font-medium px-1.5 lg:px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                          {comment.role || 'Product Owner'}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <span className="text-[10px] lg:text-xs flex-shrink-0" style={{ color: '#939393' }}>{comment.date}</span>
-                                  </div>
-                                  <p className="text-xs lg:text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                                </div>
-                              </div>
-                              <div className="mt-2 lg:mt-3 pl-10 lg:pl-12">
-                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
 
                 {/* Pagination */}
@@ -3540,10 +3505,44 @@ const ProductDetail: React.FC = () => {
                 <div className="mb-6 text-left lg:text-center">
                   <div className="flex items-center justify-between lg:justify-center space-x-2 mb-2">
                     <div className="flex items-center space-x-2">
-                      <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
-                      <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
+                      <div className="flex items-center space-x-2">
+                        <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          {Number.isInteger(averageRating) ? averageRating.toFixed(1) : averageRating.toString()}
+                        </div>
+                        <div className="flex items-center">
+                          {[1, 2, 3, 4, 5].map((star) => {
+                            const isFilled = star <= averageRating;
+                            const hasHalfStar = star > Math.floor(averageRating) && star - 0.5 <= averageRating && averageRating % 1 >= 0.5;
+
+                            return (
+                              <div key={star} className="relative w-5 h-5">
+                                {/* Gray background star */}
+                                <svg
+                                  className="absolute w-full h-full text-gray-300"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+
+                                {/* Yellow filled star (full or half) */}
+                                <div
+                                  className="absolute top-0 left-0 h-full overflow-hidden"
+                                  style={{
+                                    width: isFilled ? '100%' : hasHalfStar ? '50%' : '0%'
+                                  }}
+                                >
+                                  <svg
+                                    className="w-full h-full text-yellow-400 fill-current"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                  </svg>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
                     {!isReviewPosted && (
                       <div className="lg:hidden">
@@ -3557,25 +3556,28 @@ const ProductDetail: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
+                  <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates ({totalReviews})</div>
 
                   {/* Rating Bars */}
                   <div className="space-y-2 mb-2 lg:mb-0">
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '70%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '60%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '40%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '20%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '10%' }}></div>
-                    </div>
+                    {[5, 4, 3, 2, 1].map((rating) => {
+                      const count = ratingDistribution[rating] || 0;
+                      const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
+                      return (
+                        <div key={rating} className="flex items-center space-x-2">
+                          <span className="text-xs w-4 text-gray-600">{rating}</span>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5 flex-1">
+                            <div
+                              className="bg-yellow-400 h-1.5 rounded-full"
+                              style={{ width: `${percentage}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs w-8 text-right text-gray-500">
+                            {count}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -3588,9 +3590,17 @@ const ProductDetail: React.FC = () => {
                           <div className="flex items-start space-x-2.5">
                             {/* Avatar */}
                             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                              {/* <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                               </svg>
+                               */}
+                              <img
+                                src={user?.profileImage || avatar}
+                                alt="User Icon"
+                                className="w-8 h-8 rounded-full object-cover"
+                                width="32"
+                                height="32"
+                              />
                             </div>
 
                             <div>
@@ -3600,17 +3610,39 @@ const ProductDetail: React.FC = () => {
                               {/* Star Rating */}
                               <div className="flex items-center space-x-2">
                                 <div className="flex items-center">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <svg
-                                      key={star}
-                                      className="w-3 h-3"
-                                      fill={star <= postedReview.rating ? '#F9A825' : '#E9E9E9'}
-                                      stroke="none"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg>
-                                  ))}
+                                  {[1, 2, 3, 4, 5].map((star) => {
+                                    const isFilled = star <= postedReview.rating;
+                                    const hasHalfStar = star > Math.floor(postedReview.rating) && star - 0.5 <= postedReview.rating && postedReview.rating % 1 >= 0.5;
+
+                                    return (
+                                      <div key={star} className="relative w-3 h-3">
+                                        {/* Gray background star */}
+                                        <svg
+                                          className="absolute w-full h-full text-gray-300"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+
+                                        {/* Yellow filled star (full or half) */}
+                                        <div
+                                          className="absolute top-0 left-0 h-full overflow-hidden"
+                                          style={{
+                                            width: isFilled ? '100%' : hasHalfStar ? '50%' : '0%'
+                                          }}
+                                        >
+                                          <svg
+                                            className="w-full h-full text-yellow-400 fill-current"
+                                            viewBox="0 0 24 24"
+                                            fill="#F9A825"
+                                            stroke="none"
+                                          >
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                          </svg>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
                                 <span className="text-xs font-medium" style={{ color: '#939393' }}>{postedReview.rating}.0</span>
                               </div>
@@ -3652,27 +3684,59 @@ const ProductDetail: React.FC = () => {
 
                       {/* Star Rating Input */}
                       <div className="flex items-center justify-center space-x-1 mb-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            onClick={() => setUserRating(star)}
-                            className="focus:outline-none hover:scale-110 transition-transform"
-                          >
-                            <svg
-                              className="w-7 h-7"
-                              viewBox="0 0 24 24"
-                              fill={userRating >= star ? '#FBBC05' : 'none'}
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const isActive = hoverRating !== null
+                            ? hoverRating >= star
+                            : userRating >= star;
+                          const isHalf = hoverRating !== null
+                            ? hoverRating >= star - 0.5 && hoverRating < star
+                            : userRating >= star - 0.5 && userRating < star;
+
+                          return (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                const isLeftHalf = e.clientX < rect.left + rect.width / 2;
+                                setUserRating(isLeftHalf ? star - 0.5 : star);
+                              }}
+                              onMouseMove={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                const isLeftHalf = e.clientX < rect.left + rect.width / 2;
+                                setHoverRating(isLeftHalf ? star - 0.5 : star);
+                              }}
+                              onMouseLeave={() => setHoverRating(null)}
+                              className="relative focus:outline-none hover:scale-110 transition-transform"
                             >
-                              <path
-                                d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
-                                stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
-                              />
-                            </svg>
-                          </button>
-                        ))}
+                              <svg
+                                className="w-7 h-7"
+                                viewBox="0 0 24 24"
+                                fill={isActive ? '#FBBC05' : 'none'}
+                                stroke="#FBBC05"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                              >
+                                <path
+                                  d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
+                                  stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
+                                />
+                              </svg>
+                              {isHalf && (
+                                <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                                  <svg
+                                    className="w-7 h-7 absolute top-0 left-0"
+                                    viewBox="0 0 24 24"
+                                    fill="#FBBC05"
+                                    stroke="none"
+                                  >
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                  </svg>
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
 
                       {/* Give a note text/rating */}
@@ -3686,9 +3750,13 @@ const ProductDetail: React.FC = () => {
                       {/* Review Text Input */}
                       <div className="flex items-center space-x-3 mb-4 pl-8">
                         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 self-start mt-2">
-                          <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                          </svg>
+                          <img
+                            src={user?.profileImage || avatar}
+                            alt="User Icon"
+                            className="w-8 h-8 rounded-full object-cover"
+                            width="32"
+                            height="32"
+                          />
                         </div>
                         <style dangerouslySetInnerHTML={{
                           __html: `
@@ -3727,6 +3795,7 @@ const ProductDetail: React.FC = () => {
                       <div className="pl-8 relative mt-4">
                         <button
                           onClick={() => {
+                            handlePostReview()
                             if (userRating > 0 && userReviewText.trim()) {
                               const today = new Date();
                               const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -3792,24 +3861,59 @@ const ProductDetail: React.FC = () => {
                                 {/* Star Rating */}
                                 <div className="flex items-center space-x-2">
                                   <div className="flex items-center">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                      <svg
-                                        key={star}
-                                        className="w-3 h-3 fill-current"
-                                        style={{ color: star <= (postedReview?.rating || 0) ? '#FBBC05' : '#E9E9E9' }}
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                      </svg>
-                                    ))}
+                                    {postedReview ? (
+                                      [1, 2, 3, 4, 5].map((star) => {
+                                        const isFilled = star <= Math.floor(postedReview.rating) ||
+                                          (star === Math.ceil(postedReview.rating) && postedReview.rating % 1 >= 0.5);
+                                        const isHalf = star === Math.ceil(postedReview.rating) && postedReview.rating % 1 < 0.5 && postedReview.rating % 1 > 0;
+
+                                        return (
+                                          <div key={star} className="relative">
+                                            <svg
+                                              className="w-3 h-3 fill-current"
+                                              style={{ color: isFilled ? '#FBBC05' : '#E9E9E9' }}
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                            </svg>
+                                            {isHalf && (
+                                              <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                                                <svg
+                                                  className="w-3 h-3 absolute top-0 left-0"
+                                                  viewBox="0 0 24 24"
+                                                  fill="#FBBC05"
+                                                  stroke="none"
+                                                >
+                                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                                </svg>
+                                              </div>
+                                            )}
+                                          </div>
+                                        );
+                                      })
+                                    ) : (
+                                      [1, 2, 3, 4, 5].map((star) => (
+                                        <div key={star} className="relative">
+                                          <svg
+                                            className="w-3 h-3 fill-current"
+                                            style={{ color: '#E9E9E9' }}
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                          </svg>
+                                        </div>
+                                      ))
+                                    )}
                                   </div>
-                                  <span className="text-xs" style={{ color: '#939393' }}>{postedReview?.rating}.0</span>
+                                  <span className="text-xs" style={{ color: '#939393' }}>
+                                    {postedReview ? `${postedReview.rating.toFixed(1)}` : '0.0'}
+                                  </span>
                                 </div>
                               </div>
                             </div>
 
                             {/* Edit Button and Date */}
-                            <div className="flex flex-col items-end space-y-1.5 flex-shrink-0">
+                            <div className="flex flex-col items-end space-y-1 flex-shrink-0">
                               <button
                                 onClick={() => {
                                   setIsReviewPosted(false);
@@ -3821,7 +3925,11 @@ const ProductDetail: React.FC = () => {
                                 <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
                                 <span className="text-xs" style={{ color: '#6A6A6A' }}>Edit</span>
                               </button>
-                              <span className="text-[10px] whitespace-nowrap" style={{ color: '#B0B0B0' }}>{postedReview?.date}</span>
+                              {postedReview?.date && (
+                                <span className="text-[10px] whitespace-nowrap" style={{ color: '#B0B0B0' }}>
+                                  {postedReview.date}
+                                </span>
+                              )}
                             </div>
                           </div>
 
@@ -4984,27 +5092,62 @@ const ProductDetail: React.FC = () => {
 
                     {/* Star Rating Input */}
                     <div className="flex items-center justify-center space-x-1 mb-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          onClick={() => setUserRating(star)}
-                          className="focus:outline-none hover:scale-110 transition-transform"
-                        >
-                          <svg
-                            className="w-7 h-7"
-                            viewBox="0 0 24 24"
-                            fill={userRating >= star ? '#FBBC05' : 'none'}
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const isActive = hoverRating !== null
+                          ? hoverRating >= star
+                          : userRating >= star;
+                        const isHalf = hoverRating !== null
+                          ? hoverRating >= star - 0.5 && hoverRating < star
+                          : userRating >= star - 0.5 && userRating < star;
+
+                        return (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={(e) => {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              const isLeftHalf = e.clientX < rect.left + rect.width / 2;
+                              setUserRating(isLeftHalf ? star - 0.5 : star);
+                            }}
+                            onMouseMove={(e) => {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              const isLeftHalf = e.clientX < rect.left + rect.width / 2;
+                              setHoverRating(isLeftHalf ? star - 0.5 : star);
+                            }}
+                            onMouseLeave={() => setHoverRating(null)}
+                            className="relative focus:outline-none hover:scale-110 transition-transform"
                           >
-                            <path
-                              d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
-                              stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
-                            />
-                          </svg>
-                        </button>
-                      ))}
+                            <svg
+                              className="w-7 h-7"
+                              viewBox="0 0 24 24"
+                              fill={isActive ? '#FBBC05' : 'none'}
+                              stroke="#FBBC05"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                            >
+                              <path
+                                d="M12 2.5l2.5 6.5h7l-5.5 4.5 2 7-6-4.5-6 4.5 2-7-5.5-4.5h7z"
+                                stroke={userRating >= star ? '#FBBC05' : '#E9E9E9'}
+                              />
+                            </svg>
+                            {isHalf && (
+                              <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                                <svg
+                                  className="w-7 h-7 absolute top-0 left-0"
+                                  viewBox="0 0 24 24"
+                                  fill="#FBBC05"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  stroke="#FBBC05"
+                                >
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
 
                     {/* Give a note text/rating */}
@@ -5018,9 +5161,16 @@ const ProductDetail: React.FC = () => {
                     {/* Review Text Input */}
                     <div className="flex items-center space-x-3 mb-4">
                       <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 self-start mt-2">
-                        <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        {/* <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
+                        </svg> */}
+                        <img
+                          src={user?.profileImage || avatar}
+                          alt="User Icon"
+                          className="w-8 h-8 rounded-full object-cover"
+                          width="32"
+                          height="32"
+                        />
                       </div>
                       <textarea
                         value={userReviewText}

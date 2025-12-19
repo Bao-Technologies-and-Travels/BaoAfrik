@@ -22,6 +22,7 @@ import buyerIcon from '../assets/images/pre/buyer.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
 import draftsIcon from '../assets/images/pre/drafts.svg';
 import bagIcon from '../assets/images/pre/bag.svg';
+import locIcon from '../assets/images/pre/Loc.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -126,6 +127,7 @@ const Home: React.FC = () => {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestProductName, setRequestProductName] = useState('');
   const [requestProductOrigin, setRequestProductOrigin] = useState('');
+  const [requestSellerLocation, setrequestSellerLocation] = useState('');
   const [requestDescription, setRequestDescription] = useState('');
   const [requestPriceRange, setRequestPriceRange] = useState('');
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
@@ -141,6 +143,15 @@ const Home: React.FC = () => {
   const [requests, setRequests] = useState<any[]>([]);
   const [isLoadingRequests, setIsLoadingRequests] = useState(true);
   const [requestsError, setRequestsError] = useState<string | null>(null);
+  const [location, setLocation] = useState('London |  United Kingdom');
+  const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+
+  const ukCities = [
+    'London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool',
+    'Leeds', 'Newcastle', 'Sheffield', 'Bristol', 'Belfast',
+    'Edinburgh', 'Cardiff', 'Leicester', 'Coventry', 'Nottingham',
+    'Southampton', 'Plymouth', 'Derby', 'Reading', 'York'
+  ];
 
   // UseEffect for fetching products
   useEffect(() => {
@@ -1075,6 +1086,7 @@ const Home: React.FC = () => {
       // Reset form
       setRequestProductName('');
       setRequestProductOrigin('');
+      setrequestSellerLocation('');
       setRequestDescription('');
       setRequestPriceRange('');
 
@@ -3047,8 +3059,34 @@ const Home: React.FC = () => {
         </section>
       )}
 
+      {/* Make a Request Card - Always Visible */}
+      {/* <section className="py-8 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col items-center text-center">
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
+                Can't find what you're looking for?
+              </h3>
+              <p className="text-sm sm:text-base text-gray-600 mb-6 max-w-2xl">
+                Don't worry, just ask for it and we will bring it for you.
+              </p>
+              <button
+                onClick={() => setShowRequestModal(true)}
+                className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-white font-medium transition-colors"
+                style={{
+                  background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
+                  minWidth: '200px'
+                }}
+              >
+                Make a Request
+              </button>
+            </div>
+          </div>
+        </div>
+      </section> */}
+
       {/* Buy & Sell Instantly Section */}
-      <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <section className="pb-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="flex items-start justify-between mb-6 sm:mb-8">
@@ -3122,40 +3160,40 @@ const Home: React.FC = () => {
             <div className={window.innerWidth < 640 ? "flex gap-2" : "contents"} style={{ order: window.innerWidth < 640 ? 2 : 1 }}>
               {/* Filter Button */}
               <div className="relative filter-dropdown hidden md:block">
-              <button
-                onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-                className="flex items-center space-x-2 border rounded-lg transition-colors"
-                style={{
-                  padding: '8px 10px',
-                  backgroundColor: '#FAFAFA',
-                  borderColor: '#E4E4E4',
-                  fontFamily: 'Poppins, sans-serif'
-                }}
-              >
-                <span className="text-base font-normal" style={{ color: '#BABABA' }}>Filter :</span>
-                <img src={earthIcon} alt="Earth" style={{ width: '22px', height: '22px' }} />
-                <span className="text-base font-medium" style={{ color: '#6A6A6A' }}>{selectedCountry || 'Africa'}</span>
-                <img
-                  src={arrowDownIcon}
-                  alt="Arrow"
-                  className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {/* Dropdown Menu */}
-              {isFilterDropdownOpen && (
-                <div
-                  className="absolute left-0 bg-white border border-gray-200 z-10"
+                <button
+                  onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+                  className="flex items-center space-x-2 border rounded-lg transition-colors"
                   style={{
-                    width: '200px',
-                    flexShrink: 0,
-                    borderRadius: '16px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                    top: '0'
+                    padding: '8px 10px',
+                    backgroundColor: '#FAFAFA',
+                    borderColor: '#E4E4E4',
+                    fontFamily: 'Poppins, sans-serif'
                   }}
                 >
-                  <style>
-                    {`
+                  <span className="text-base font-normal" style={{ color: '#BABABA' }}>Filter :</span>
+                  <img src={earthIcon} alt="Earth" style={{ width: '22px', height: '22px' }} />
+                  <span className="text-base font-medium" style={{ color: '#6A6A6A' }}>{selectedCountry || 'Africa'}</span>
+                  <img
+                    src={arrowDownIcon}
+                    alt="Arrow"
+                    className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isFilterDropdownOpen && (
+                  <div
+                    className="absolute left-0 bg-white border border-gray-200 z-10"
+                    style={{
+                      width: '200px',
+                      flexShrink: 0,
+                      borderRadius: '16px',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                      top: '0'
+                    }}
+                  >
+                    <style>
+                      {`
                     .filter-dropdown-scroll::-webkit-scrollbar {
                       width: 2px;
                     }
@@ -3167,91 +3205,91 @@ const Home: React.FC = () => {
                       border-radius: 10px;
                     }
                   `}
-                  </style>
+                    </style>
 
-                  {/* Search Input at Top */}
-                  <div className="px-3 pt-3 pb-2 border-b border-gray-200">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Filter :"
-                        className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none"
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          color: '#6A6A6A',
-                          border: 'none'
-                        }}
-                      />
-                      <button
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                        onClick={() => setIsFilterDropdownOpen(false)}
-                      >
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Scrollable Country List */}
-                  <div
-                    className="py-2 overflow-y-auto filter-dropdown-scroll"
-                    style={{
-                      maxHeight: 'calc(6 * 44px)',
-                      scrollbarWidth: 'thin',
-                      scrollbarColor: '#E4E4E4 transparent'
-                    }}
-                  >
-                    <button
-                      onClick={() => {
-                        setSelectedCountry('');
-                        setIsFilterDropdownOpen(false);
-                      }}
-                      style={{
-                        backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
-                        color: !selectedCountry ? '#64B5F6' : '#BABABA'
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center">
-                        <img
-                          src={globyIcon}
-                          alt="Globe"
-                          className="w-4 h-4 mr-2"
+                    {/* Search Input at Top */}
+                    <div className="px-3 pt-3 pb-2 border-b border-gray-200">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Filter :"
+                          className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none"
                           style={{
-                            filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                            backgroundColor: '#FFFFFF',
+                            color: '#6A6A6A',
+                            border: 'none'
                           }}
                         />
-                        <span>Africa</span>
+                        <button
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                          onClick={() => setIsFilterDropdownOpen(false)}
+                        >
+                          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
                       </div>
-                    </button>
-                    {africanCountries.map((country) => (
+                    </div>
+
+                    {/* Scrollable Country List */}
+                    <div
+                      className="py-2 overflow-y-auto filter-dropdown-scroll"
+                      style={{
+                        maxHeight: 'calc(6 * 44px)',
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: '#E4E4E4 transparent'
+                      }}
+                    >
                       <button
-                        key={country.name}
                         onClick={() => {
-                          setSelectedCountry(country.name);
+                          setSelectedCountry('');
                           setIsFilterDropdownOpen(false);
                         }}
                         style={{
-                          backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
-                          color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                          backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
+                          color: !selectedCountry ? '#64B5F6' : '#BABABA'
                         }}
                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
                       >
-                        <span className="flex items-center space-x-2">
+                        <div className="flex items-center">
                           <img
-                            src={country.flag}
-                            alt={`${country.name} flag`}
-                            className="w-5 h-4 object-cover rounded-sm"
+                            src={globyIcon}
+                            alt="Globe"
+                            className="w-4 h-4 mr-2"
+                            style={{
+                              filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                            }}
                           />
-                          <span>{country.name}</span>
-                        </span>
+                          <span>Africa</span>
+                        </div>
                       </button>
-                    ))}
+                      {africanCountries.map((country) => (
+                        <button
+                          key={country.name}
+                          onClick={() => {
+                            setSelectedCountry(country.name);
+                            setIsFilterDropdownOpen(false);
+                          }}
+                          style={{
+                            backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
+                            color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                        >
+                          <span className="flex items-center space-x-2">
+                            <img
+                              src={country.flag}
+                              alt={`${country.name} flag`}
+                              className="w-5 h-4 object-cover rounded-sm"
+                            />
+                            <span>{country.name}</span>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
               {/* Price Button */}
               <button
@@ -3390,7 +3428,7 @@ const Home: React.FC = () => {
                               className="w-3 h-3"
                               style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                             />
-                            <span style={{ fontSize: '12px', color: '#64B5F6' }}>London | United Kingdom</span>
+                            <span style={{ fontSize: '12px', color: '#64B5F6' }}>{requestSellerLocation}</span>
                           </div>
 
                           {/* Second Row - Price and Country */}
@@ -3480,7 +3518,7 @@ const Home: React.FC = () => {
                               filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
                             }}
                           />
-                          <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>London | United Kingdom</span>
+                          <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>{requestSellerLocation}</span>
                         </div>
 
                         {/* Second Row - Price and Country */}
@@ -3765,30 +3803,52 @@ const Home: React.FC = () => {
             </div>
 
             {/* Location Section */}
-            <div style={{ marginBottom: window.innerWidth < 640 ? '12px' : '16px' }}>
-              <label style={{ fontSize: window.innerWidth < 640 ? '10px' : '12px', color: '#6A6A6A', display: 'block', marginBottom: window.innerWidth < 640 ? '-2px' : '-4px' }}>
-                Your location
-              </label>
-              <div className="flex items-center justify-between">
-                <span style={{ fontSize: window.innerWidth < 640 ? '10px' : '12px', color: '#64B5F6' }}>
-                  London | United Kingdom
-                </span>
-                <button
-                  style={{
-                    padding: window.innerWidth < 640 ? '4px 8px' : '6px 12px',
-                    borderRadius: '8px',
-                    backgroundColor: '#F0F8FE',
-                    color: '#64B5F6',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: window.innerWidth < 640 ? '9px' : '12px',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}
-                >
-                  Change location
-                </button>
-              </div>
-            </div>
+            <div className="relative location-dropdown-container">
+                  <div className="flex items-start justify-between mt-4" style={{ maxWidth: '560px' }}>
+                    <div className="flex flex-col">
+                      <div className="flex items-center space-x-1.5 mb-1">
+                        <img src={locIcon} alt="Location" className="w-4 h-4" />
+                        <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={location}
+                        readOnly
+                        className="text-xs font-medium border-none focus:outline-none ml-6 cursor-default"
+                        style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+                      className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
+                      style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                    >
+                      Change location
+                    </button>
+                  </div>
+                  {/* Location Dropdown */}
+                  {isLocationDropdownOpen && (
+                    <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200">
+                      <div className="p-2 max-h-60 overflow-auto">
+                        <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
+                        {ukCities.map((city) => (
+                          <button
+                            key={city}
+                            type="button"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
+                            onClick={() => {
+                              setLocation(`${city} | United Kingdom`);
+                              setIsLocationDropdownOpen(false);
+                            }}
+                          >
+                            {city}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
             {/* Price Range Section */}
             <div style={{ marginBottom: window.innerWidth < 640 ? '12px' : '16px' }}>
