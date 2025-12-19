@@ -234,7 +234,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
               // Logged in user buttons
               <>
                 {/* Language Toggle */}
-                <div className="relative">
+                {/* <div className="relative">
                   <button
                     onClick={toggleLanguageDropdown}
                     className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
@@ -245,10 +245,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                   </button>
                   
                   {/* Language Dropdown */}
-                  {isLanguageDropdownOpen && (
+                  {/* {isLanguageDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
                       {/* Header */}
-                      <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
+                      {/* <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                         <h3 className="text-sm font-medium text-gray-700">Language :</h3>
                         <button
                           onClick={() => setIsLanguageDropdownOpen(false)}
@@ -261,7 +261,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       </div>
                       
                       {/* Language Options */}
-                      <div className="py-2">
+                      {/* <div className="py-2">
                         <button
                           onClick={() => handleLanguageChange('EN')}
                           className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
@@ -284,8 +284,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                         </button>
                       </div>
                     </div>
-                  )}
-                </div>
+                  )} */}
+                {/* </div> */}
                 
                 <Link 
                   to="/register" 
@@ -715,7 +715,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
               // Not logged in buttons (includes visitor mode)
               <>
                 {/* Language Toggle */}
-                <div className="relative">
+                {/* <div className="relative">
                   <button
                     onClick={toggleLanguageDropdown}
                     className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
@@ -726,10 +726,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                   </button>
                   
                   {/* Language Dropdown */}
-                  {isLanguageDropdownOpen && (
+                  {/* {isLanguageDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
                       {/* Header */}
-                      <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
+                      {/* <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                         <h3 className="text-sm font-medium text-gray-700">Language :</h3>
                         <button
                           onClick={() => setIsLanguageDropdownOpen(false)}
@@ -742,7 +742,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       </div>
                       
                       {/* Language Options */}
-                      <div className="py-2">
+                      {/* <div className="py-2">
                         <button
                           onClick={() => handleLanguageChange('EN')}
                           className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
@@ -765,8 +765,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                         </button>
                       </div>
                     </div>
-                  )}
-                </div>
+                  )} */}
+                {/* </div> */}
                 
                  <Link 
                    to="/login" 
@@ -800,7 +800,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
               // Logged in user mobile navigation
               <>
                 {/* Language Toggle for mobile */}
-                <div className="relative mr-1">
+                {/* <div className="relative mr-1">
                    <button
                     onClick={toggleLanguageDropdown}
                     className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
@@ -811,10 +811,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                    </button>
                   
                   {/* Language Dropdown for mobile */}
-                  {isLanguageDropdownOpen && (
+                  {/* {isLanguageDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
                       {/* Header */}
-                      <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
+                      {/* <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                         <h3 className="text-sm font-medium text-gray-700">Language :</h3>
                         <button
                           onClick={() => setIsLanguageDropdownOpen(false)}
@@ -827,7 +827,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                        </div>
 
                       {/* Language Options */}
-                      <div className="py-2">
+                      {/* <div className="py-2">
                         <button
                           onClick={() => handleLanguageChange('EN')}
                           className="w-full flex items-center px-4 py-2 text-sm transition-colors duration-200"
@@ -850,8 +850,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                         </button>
                        </div>
                              </div>
-                  )}
-                             </div>
+                  )} */}
+                             {/* </div> */}
                 
                 {/* Become a seller button - only for logged in users */}
                          <Link 
@@ -904,7 +904,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                // Logged out user mobile navigation
               <>
                 {/* Language Toggle for mobile */}
-                 <div className="relative" style={{ marginRight: window.innerWidth < 640 ? '8px' : '4px' }}>
+                 {/* <div className="relative" style={{ marginRight: window.innerWidth < 640 ? '8px' : '4px' }}>
                   <button
                     onClick={toggleLanguageDropdown}
                      className="flex items-center border rounded-lg bg-white font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
@@ -920,10 +920,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                   </button>
                   
                   {/* Language Dropdown for mobile */}
-                  {isLanguageDropdownOpen && (
+                  {/* {isLanguageDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
                       {/* Header */}
-                      <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
+                      {/* <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                         <h3 className="text-sm font-medium text-gray-700">Language :</h3>
                         <button
                           onClick={() => setIsLanguageDropdownOpen(false)}
@@ -936,7 +936,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                       </div>
                       
                       {/* Language Options */}
-                      <div className="py-2">
+                      {/* <div className="py-2">
                         <button
                           onClick={() => handleLanguageChange('EN')}
                           className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${
@@ -1000,8 +1000,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                         </button>
                       </div>
                     </div>
-                  )}
-                </div>
+                  )} */}
+                {/* </div> */}
                 
                  {/* Sign In Button - Mobile */}
                  <Link 
@@ -1060,7 +1060,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
               {/* Translation Toggle and Close Button */}
               <div className="flex items-center space-x-2">
                 {/* Translation Toggle */}
-                 <div className="relative">
+                 {/* <div className="relative">
                    <button
                     onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                     className="flex items-center border rounded-lg bg-white font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
@@ -1077,10 +1077,10 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                    </button>
                    
                   {/* Language Dropdown */}
-                   {isLanguageDropdownOpen && (
+                   {/* {isLanguageDropdownOpen && (
                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
                        {/* Header */}
-                       <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
+                       {/* <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                          <h3 className="text-sm font-medium text-gray-700">Language :</h3>
                          <button
                            onClick={() => setIsLanguageDropdownOpen(false)}
@@ -1093,7 +1093,7 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                        </div>
                        
                        {/* Language Options */}
-                       <div className="py-2">
+                       {/* <div className="py-2">
                          <button
                           onClick={() => {
                             setSelectedLanguage('EN');
@@ -1136,8 +1136,8 @@ const Header: React.FC<HeaderProps> = ({ showSearchBar = false, isProductDetailP
                          </button>
                        </div>
                      </div>
-                   )}
-                 </div>
+                   )} */}
+                 {/* </div> */}
                  
                 {/* Close Button */}
                  <button
