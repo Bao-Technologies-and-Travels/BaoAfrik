@@ -1944,8 +1944,6 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      {/* Header */}
-      <Header />
       {/* Hidden file input for image selection */}
       <input
         id="image-upload"
