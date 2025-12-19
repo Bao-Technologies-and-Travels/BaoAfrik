@@ -1,8 +1,7 @@
 import prisma from '../config/database';
-import { Product, ProductStatus, SaleType, Prisma } from '../generated/client';
+import { Product, ProductStatus, Prisma, ProductReview } from '../generated/client';
 import { s3Service } from './s3Service';
 import { gcpStorageService } from './gcpStorageService';
-
 
 export interface CreateProductData {
     title: string;
@@ -13,7 +12,6 @@ export interface CreateProductData {
     category: string;
     origin: string;
     location: string;
-    saleType: 'DEFAULT' | 'URGENT';
     deliveryAvailable: boolean;
     status?: 'DRAFT' | 'PUBLISHED' | 'SOLD' | 'EXPIRED' | 'DELETED';
 }
@@ -27,7 +25,6 @@ export interface UpdateProductData {
     category?: string;
     origin?: string;
     location?: string;
-    saleType?: 'DEFAULT' | 'URGENT';
     deliveryAvailable?: boolean;
     status?: 'DRAFT' | 'PUBLISHED' | 'SOLD' | 'EXPIRED' | 'DELETED';
 }
@@ -42,7 +39,6 @@ export interface ProductImage {
 interface ProductFilters {
     category?: string;
     origin?: string;
-    saleType?: SaleType;
     minPrice?: number;
     maxPrice?: number;
     search?: string;
@@ -82,6 +78,11 @@ function parseProductImages(images: Prisma.JsonValue | null): ProductImage[] {
 
 function toPrismaJson(images: ProductImage[]): Prisma.JsonArray {
     return images as unknown as Prisma.JsonArray;
+}
+
+export interface ProductReviewInput {
+    rating: number;
+    comment?: string;
 }
 
 export class ProductService {
@@ -176,7 +177,6 @@ export class ProductService {
             // Apply filters
             if (filters.category) where.category = filters.category;
             if (filters.origin) where.origin = filters.origin;
-            if (filters.saleType) where.saleType = filters.saleType;
 
             if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
                 where.price = {};
@@ -501,6 +501,100 @@ export class ProductService {
             return product;
         } catch (error: any) {
             throw new Error(`Error updating product status: ${error.message}`);
+        }
+    }
+
+    // Get reviews and rating summary for a product
+    async getProductReviews(productId: string): Promise<{
+        reviews: (ProductReview & {
+            user: {
+                id: string;
+                firstName: string | null;
+                lastName: string | null;
+                profileImage: string | null;
+            };
+        })[];
+        averageRating: number;
+        totalReviews: number;
+        ratingDistribution: { [rating: number]: number };
+    }> {
+        try {
+            const reviews = await prisma.productReview.findMany({
+                where: { productId },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true
+                        }
+                    }
+                },
+                orderBy: { createdAt: 'desc' }
+            });
+
+            const totalReviews = reviews.length;
+            const ratingDistribution: { [rating: number]: number } = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+            let sum = 0;
+            for (const review of reviews) {
+                sum += review.rating;
+                if (review.rating >= 1 && review.rating <= 5) {
+                    ratingDistribution[review.rating] = (ratingDistribution[review.rating] || 0) + 1;
+                }
+            }
+
+            const averageRating = totalReviews > 0 ? parseFloat((sum / totalReviews).toFixed(1)) : 0;
+
+            return {
+                reviews,
+                averageRating,
+                totalReviews,
+                ratingDistribution
+            };
+        } catch (error: any) {
+            throw new Error(`Error fetching product reviews: ${error.message}`);
+        }
+    }
+
+    // Create or update a product review for the current user
+    async upsertProductReview(productId: string, userId: string, rating: number, comment?: string): Promise<ProductReview> {
+        try {
+            if (!productId || !userId) {
+                throw new Error('Product ID and User ID are required');
+            }
+
+            const product = await prisma.product.findUnique({ where: { id: productId } });
+
+            if (!product || !product.isActive) {
+                throw new Error('Product not found');
+            }
+
+            const clampedRating = Math.min(5, Math.max(1, Math.round(rating)));
+
+            const review = await prisma.productReview.upsert({
+                where: {
+                    productId_userId: {
+                        productId,
+                        userId
+                    }
+                },
+                update: {
+                    rating: clampedRating,
+                    comment
+                },
+                create: {
+                    productId,
+                    userId,
+                    rating: clampedRating,
+                    comment
+                }
+            });
+
+            return review;
+        } catch (error: any) {
+            throw new Error(`Error saving review: ${error.message}`);
         }
     }
 }

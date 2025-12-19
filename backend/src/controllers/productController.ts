@@ -27,7 +27,6 @@ export class ProductController {
         category,
         origin,
         location,
-        saleType = 'Default',
         deliveryAvailable = false
       } = req.body;
 
@@ -39,10 +38,7 @@ export class ProductController {
           message: 'User not authenticated'
         });
       }
-
-      // Convert frontend saleType to backend format with proper typing
-      const backendSaleType: 'DEFAULT' | 'URGENT' = saleType === 'Urgent' ? 'URGENT' : 'DEFAULT';
-
+    
       const productData = {
         title,
         description,
@@ -52,7 +48,6 @@ export class ProductController {
         category,
         origin,
         location,
-        saleType: backendSaleType, 
         deliveryAvailable: Boolean(deliveryAvailable),
         status: 'DRAFT' as const // Use const assertion
       };
@@ -78,7 +73,6 @@ export class ProductController {
       const {
         category,
         origin,
-        saleType,
         minPrice,
         maxPrice,
         search,
@@ -93,7 +87,6 @@ export class ProductController {
       const filters = {
         category: category as string,
         origin: origin as string,
-        saleType: saleType as any,
         minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
         maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
         search: searchQuery as string,
@@ -170,11 +163,6 @@ export class ProductController {
           success: false,
           message: 'User authentication required'
         });
-      }
-
-      // Convert saleType if provided
-      if (updateData.saleType && typeof updateData.saleType === 'string') {
-        updateData.saleType = updateData.saleType === 'Urgent' ? 'URGENT' : 'DEFAULT';
       }
 
       const product = await productService.updateProduct(id, updateData, userId);
@@ -532,6 +520,88 @@ export class ProductController {
         data: result
       });
     } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Get reviews and rating summary for a product
+  async getProductReviews(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Product ID is required'
+        });
+      }
+
+      const summary = await productService.getProductReviews(id);
+
+      return res.json({
+        success: true,
+        data: summary
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Create or update a review for the current user
+  async upsertProductReview(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { rating, comment } = req.body;
+      const userId = (req as any).user?.id;
+
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Product ID is required'
+        });
+      }
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'User not authenticated'
+        });
+      }
+
+      const numericRating = typeof rating === 'string' ? parseFloat(rating) : rating;
+
+      if (!numericRating || Number.isNaN(numericRating)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Valid rating is required'
+        });
+      }
+
+      const review = await productService.upsertProductReview(id, userId, numericRating, comment);
+      const summary = await productService.getProductReviews(id);
+
+      return res.status(201).json({
+        success: true,
+        message: 'Review saved successfully',
+        data: {
+          review,
+          summary
+        }
+      });
+    } catch (error: any) {
+      if (error.message === 'Product not found') {
+        return res.status(404).json({
+          success: false,
+          message: error.message
+        });
+      }
+
       return res.status(500).json({
         success: false,
         message: error.message

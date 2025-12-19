@@ -43,6 +43,11 @@ export type ProductLike = Prisma.ProductLikeModel
  */
 export type ProductSave = Prisma.ProductSaveModel
 /**
+ * Model ProductReview
+ * 
+ */
+export type ProductReview = Prisma.ProductReviewModel
+/**
  * Model Message
  * 
  */

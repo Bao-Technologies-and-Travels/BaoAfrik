@@ -17,6 +17,10 @@ router.put('/:id', authenticateToken, validateUpdateProduct, productController.u
 router.delete('/:id', authenticateToken, productController.deleteProduct);
 // router.put('/:id/save', authenticateToken, productController.saveProduct);
 
+// Reviews routes
+router.get('/:id/reviews', productController.getProductReviews);
+router.post('/:id/reviews', authenticateToken, productController.upsertProductReview);
+
 // Status routes
 router.patch('/:id/status', authenticateToken, productController.updateProductStatus);
 

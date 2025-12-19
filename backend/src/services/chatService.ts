@@ -83,36 +83,21 @@ export class ChatService {
     }
 
     async getUserConversations(userId: string) {
+    try {
         const conversations = await prisma.conversation.findMany({
             where: {
                 participants: {
                     some: {
-                        userId: userId
+                        userId: userId,
                     }
                 }
             },
             include: {
                 participants: {
+                    where: {
+                    },
                     include: {
                         user: {
-                            select: {
-                                id: true,
-                                email: true,
-                                firstName: true,
-                                lastName: true,
-                                profileImage: true,
-                                isVerifiedSeller: true
-                            }
-                        }
-                    }
-                },
-                product: {
-                    select: {
-                        id: true,
-                        title: true,
-                        price: true,
-                        images: true,
-                        seller: {
                             select: {
                                 id: true,
                                 firstName: true,
@@ -122,117 +107,50 @@ export class ChatService {
                         }
                     }
                 },
-                lastMessage: {
+                messages: {
+                    orderBy: {
+                        createdAt: 'desc'
+                    },
+                    take: 1
+                },
+                product: {
                     select: {
                         id: true,
-                        content: true,
-                        messageType: true,
-                        createdAt: true,
-                        productData: true,
-                        encryptionIv: true,
-                        encryptionAuthTag: true,
-                        sender: {
-                            select: {
-                                id: true,
-                                firstName: true,
-                                lastName: true
-                            }
-                        }
+                        title: true,
+                        price: true,
+                        currency: true,
+                        images: true,
+                        status: true
                     }
                 },
-                messages: {
-                    where: {
-                        isRead: false,
-                        senderId: { not: userId }
-                    },
-                    select: {
-                        id: true
-                    }
-                }
+                lastMessage: true
             },
             orderBy: {
-                lastMessageAt: 'desc'
+                updatedAt: 'desc'
             }
         });
 
-        const processedConversations = conversations.map((conv: any) => {
-            const otherParticipants = conv.participants.filter((p: any) => p.userId !== userId);
+        return conversations.map(conversation => {
+            const otherParticipant = conversation.participants.find(
+                p => p.userId !== userId
+            )?.user;
 
-            if (otherParticipants.length === 0) {
-                console.warn('Conversation has no other participant. Conversation:', conv.id, 'All Participants:', conv.participants.map((p: any) => p.user?.email));
-                return null;
-            }
+            const lastMessage = conversation.lastMessage || conversation.messages[0] || null;
 
-            const otherParticipant = otherParticipants[0]?.user;
-
-            if (!otherParticipant) {
-                return null;
-            }
-
-            const currentUserParticipant = conv.participants.find((p: any) => p.userId === userId);
-
-            // parse productData from conversation
-            let conversationProductData = null;
-            try {
-                if (conv.productData) {
-                    conversationProductData = JSON.parse(conv.productData);
-                }
-            } catch (error) {
-                conversationProductData = null;
-            }
-
-            let lastMessageContent = '';
-            let lastMessageProductData = null;
-
-            if (conv.lastMessage) {
-                try {
-                    // decrypt last message content
-                    if (conv.lastMessage.encryptionIv && conv.lastMessage.encryptionAuthTag) {
-                        lastMessageContent = this.decryptMessage(
-                            conv.lastMessage.content,
-                            conv.lastMessage.encryptionIv,
-                            conv.lastMessage.encryptionAuthTag
-                        );
-                    } else {
-                        lastMessageContent = conv.lastMessage.content;
-                    }
-
-                    // parse productData from last message
-                    if (conv.lastMessage.productData) {
-                        lastMessageProductData = JSON.parse(conv.lastMessage.productData);
-                    }
-                } catch (error) {
-                    lastMessageContent = '[Encrypted message]';
-                    lastMessageProductData = null;
-                }
-            }
-
-
-            const result = {
-                id: conv.id,
-                participant: otherParticipant,
-                product: conv.product,
-                productData: conversationProductData,
-                lastMessage: conv.lastMessage ? {
-                    ...conv.lastMessage,
-                    content: lastMessageContent,
-                    productdata: lastMessageProductData,
-                    formattedTime: this.formatTo12HourTime(conv.lastMessage.createdAt)
-                } : null,
-                unreadCount: conv.messages.length,
-                lastReadAt: currentUserParticipant?.lastReadAt ? this.formatTo12HourTime(currentUserParticipant.lastReadAt) : null,
-                updatedAt: conv.updatedAt,
-                formattedUpdatedAt: this.formatTo12HourTime(conv.updatedAt),
-                createdAt: conv.createdAt,
-                formattedCreatedAt: this.formatTo12HourTime(conv.createdAt),
-                isEmailBased: !conv.productId
+            return {
+                id: conversation.id,
+                product: conversation.product,
+                otherParticipant,
+                lastMessage,
+                unreadCount: 0, // This would be calculated based on message status
+                updatedAt: conversation.updatedAt
             };
-
-            return result;
-        }).filter((conv: any): conv is NonNullable<typeof conv> => conv !== null);
-
-        return processedConversations;
+        });
+    } catch (error) {
+        console.error('Error fetching user conversations:', error);
+        throw new Error('Failed to fetch conversations');
     }
+}
 
     async getConversationMessages(conversationId: string, userId: string) {
         // Verify user has access to this conversation

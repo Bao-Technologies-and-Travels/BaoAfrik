@@ -178,15 +178,14 @@ export class WebSocketService {
 
   private async joinUserConversations(socket: AuthenticatedSocket, userId: string) {
     try {
-      const conversations = await this.chatService.getUserConversations(userId);
-
-      conversations.forEach((conv: any) => {
-        socket.join(`conversation:${conv.id}`);
-      });
-
-      socket.join(userId);
-    } catch (error) {
-      throw new Error('Error joining conversations');
+        const conversations = await this.chatService.getUserConversations(userId);
+        conversations.forEach(conversation => {
+            socket.join(`conversation_${conversation.id}`);
+        });
+        console.log(`User ${userId} joined ${conversations.length} conversations`);
+    } catch (error: any) {
+        console.error('Error joining conversations for user', userId, ':', error);
+        throw new Error(`Error joining conversations: ${error.message}`);
     }
   }
 
