@@ -118,6 +118,40 @@ const Home: React.FC = () => {
   const [mobileSearchSubmitted, setMobileSearchSubmitted] = useState(false);
   const [isMobileSearchFocused, setIsMobileSearchFocused] = useState(false);
   const [showMobileSearchHistory, setShowMobileSearchHistory] = useState(false);
+  const [showSellerLocationSuggestions, setShowSellerLocationSuggestions] = useState(false);
+  const [hoveredCategoryOption, setHoveredCategoryOption] = useState<string | null>(null);
+  const [hoveredOriginOption, setHoveredOriginOption] = useState<string | null>(null);
+  
+  const locationSuggestions = [
+    'Pakse, Laos',
+    'Palermo, Italy',
+    'Panama City, Panama',
+    'Paris, France',
+    'Patna, India',
+    'Perth, Australia',
+    'Philadelphia, USA',
+    'Phnom Penh, Cambodia',
+    'Prague, Czech Republic',
+    'Porto, Portugal',
+    'Portland, USA',
+    'Pune, India',
+    'London, United Kingdom',
+    'New York, USA',
+    'Toronto, Canada',
+    'Berlin, Germany',
+    'Sydney, Australia',
+    'Dubai, UAE'
+  ];
+  
+  // Get filtered location suggestions
+  const getFilteredLocationSuggestions = () => {
+    if (!mobileFilterSellerLocation.trim()) return [];
+    const query = mobileFilterSellerLocation.toLowerCase();
+    return locationSuggestions.filter(location => 
+      location.toLowerCase().startsWith(query) || 
+      location.toLowerCase().includes(query)
+    ).slice(0, 6);
+  };
   const categoryDropdownRef = React.useRef<HTMLDivElement>(null);
   const productOriginDropdownRef = React.useRef<HTMLDivElement>(null);
   const [selectedCard, setSelectedCard] = useState<{ title: string; country: string; flag: string; location: string; description: string } | null>(null);
@@ -4679,11 +4713,15 @@ const Home: React.FC = () => {
                         onClick={() => {
                           setMobileFilterCategory(category);
                           setIsCategoryDropdownOpen(false);
+                          setHoveredCategoryOption(null);
                         }}
-                        className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors"
+                        onMouseEnter={() => setHoveredCategoryOption(category)}
+                        onMouseLeave={() => setHoveredCategoryOption(null)}
+                        className="w-full text-left px-3 py-2 transition-colors relative"
                         style={{
                           color: '#6A6A6A',
-                          fontSize: '12px'
+                          fontSize: '12px',
+                          backgroundColor: hoveredCategoryOption === category ? '#F0F8FE' : 'transparent'
                         }}
                       >
                         {category}
@@ -4764,11 +4802,15 @@ const Home: React.FC = () => {
                         onClick={() => {
                           setMobileFilterProductOrigin(country.name);
                           setIsProductOriginDropdownOpen(false);
+                          setHoveredOriginOption(null);
                         }}
-                        className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        onMouseEnter={() => setHoveredOriginOption(country.name)}
+                        onMouseLeave={() => setHoveredOriginOption(null)}
+                        className="w-full text-left px-3 py-2 transition-colors flex items-center gap-2 relative"
                         style={{
                           color: '#6A6A6A',
-                          fontSize: '12px'
+                          fontSize: '12px',
+                          backgroundColor: hoveredOriginOption === country.name ? '#F0F8FE' : 'transparent'
                         }}
                       >
                         <img src={country.flag} alt={country.name} style={{ width: '16px', height: '12px', borderRadius: '4px' }} />
@@ -4781,14 +4823,31 @@ const Home: React.FC = () => {
             </div>
 
             {/* Seller Location Filter */}
-            <div>
+            <div className="relative">
               <label style={{ fontSize: '12px', fontWeight: 500, color: '#6A6A6A', marginBottom: '8px', display: 'block' }}>
                 Seller location
               </label>
               <input
                 type="text"
                 value={mobileFilterSellerLocation}
-                onChange={(e) => setMobileFilterSellerLocation(e.target.value)}
+                onChange={(e) => {
+                  setMobileFilterSellerLocation(e.target.value);
+                  if (e.target.value.trim()) {
+                    setShowSellerLocationSuggestions(true);
+                  } else {
+                    setShowSellerLocationSuggestions(false);
+                  }
+                }}
+                onFocus={() => {
+                  if (mobileFilterSellerLocation.trim()) {
+                    setShowSellerLocationSuggestions(true);
+                  }
+                }}
+                onBlur={() => {
+                  setTimeout(() => {
+                    setShowSellerLocationSuggestions(false);
+                  }, 200);
+                }}
                 placeholder="Choose seller location"
                 className="w-full px-3 py-2.5 border rounded-lg"
                 style={{
@@ -4800,6 +4859,46 @@ const Home: React.FC = () => {
                   fontFamily: 'Poppins, sans-serif'
                 }}
               />
+              
+              {/* Location Suggestions Dropdown */}
+              {showSellerLocationSuggestions && getFilteredLocationSuggestions().length > 0 && (
+                <div
+                  className="absolute top-full left-0 right-0 mt-1 z-50 bg-white rounded-lg"
+                  style={{
+                    maxHeight: '180px',
+                    overflowY: 'auto',
+                    boxShadow: 'none',
+                    border: 'none'
+                  }}
+                >
+                  {getFilteredLocationSuggestions().map((location, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        setMobileFilterSellerLocation(location);
+                        setShowSellerLocationSuggestions(false);
+                      }}
+                      className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
+                      style={{
+                        padding: '8px 12px'
+                      }}
+                    >
+                      <img 
+                        src={locationIcon} 
+                        alt="Location"
+                        style={{ 
+                          width: '14px', 
+                          height: '14px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
+                        }}
+                      />
+                      <span style={{ color: '#6A6A6A', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                        {location}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -4964,8 +5063,8 @@ const Home: React.FC = () => {
               </button>
             </div>
             
-            {/* Search History Dropdown - Positioned below search bar and filter */}
-            {showMobileSearchHistory && searchHistory.length > 0 && (
+            {/* Search History Dropdown - Only show when no filters applied */}
+            {showMobileSearchHistory && searchHistory.length > 0 && !mobileFilterCategory && !mobileFilterProductOrigin && !mobileFilterSellerLocation && (
               <div 
                 className="mt-1 z-50 bg-white"
                 style={{
@@ -4973,12 +5072,12 @@ const Home: React.FC = () => {
                 }}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-2">
-                  <h3 className="font-medium text-xs" style={{ color: '#212121' }}>
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <h3 className="font-medium text-sm" style={{ color: '#212121' }}>
                     Search history
                   </h3>
                   <button className="text-gray-400 hover:text-gray-600">
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                       <circle cx="4" cy="10" r="1.5"/>
                       <circle cx="10" cy="10" r="1.5"/>
                       <circle cx="16" cy="10" r="1.5"/>
@@ -4996,16 +5095,16 @@ const Home: React.FC = () => {
                         setShowMobileSearchHistory(false);
                         setMobileSearchSubmitted(true);
                       }}
-                      className="w-full flex items-center justify-between px-4 py-2 hover:bg-gray-50 transition-colors text-left"
+                      className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
                       style={{
                         backgroundColor: index === 0 ? '#F0F8FE' : 'transparent'
                       }}
                     >
-                      <span className="font-normal text-xs" style={{ color: '#6A6A6A' }}>
+                      <span className="font-normal text-sm" style={{ color: '#6A6A6A' }}>
                         {item.length > 25 ? item.substring(0, 25) + '...' : item}
                       </span>
                       <svg 
-                        className="w-3 h-3 flex-shrink-0 ml-2" 
+                        className="w-3.5 h-3.5 flex-shrink-0 ml-2" 
                         fill="none" 
                         stroke="#6A6A6A" 
                         strokeWidth="2"
@@ -5090,6 +5189,65 @@ const Home: React.FC = () => {
                     </button>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Search History Dropdown - Show below active filters when filters are applied */}
+          {showMobileSearchHistory && searchHistory.length > 0 && (mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) && (
+            <div className="px-4 pb-3">
+              <div 
+                className="bg-white"
+                style={{
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <h3 className="font-medium text-sm" style={{ color: '#212121' }}>
+                    Search history
+                  </h3>
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                      <circle cx="4" cy="10" r="1.5"/>
+                      <circle cx="10" cy="10" r="1.5"/>
+                      <circle cx="16" cy="10" r="1.5"/>
+                    </svg>
+                  </button>
+                </div>
+                
+                {/* Search History Items */}
+                <div>
+                  {searchHistory.map((item, index) => (
+                    <button 
+                      key={index}
+                      onClick={() => {
+                        setMobileSearchQuery(item);
+                        setShowMobileSearchHistory(false);
+                        setMobileSearchSubmitted(true);
+                      }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                      style={{
+                        backgroundColor: index === 0 ? '#F0F8FE' : 'transparent'
+                      }}
+                    >
+                      <span className="font-normal text-sm" style={{ color: '#6A6A6A' }}>
+                        {item.length > 25 ? item.substring(0, 25) + '...' : item}
+                      </span>
+                      <svg 
+                        className="w-3.5 h-3.5 flex-shrink-0 ml-2" 
+                        fill="none" 
+                        stroke="#6A6A6A" 
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M7 17L17 7M7 7h10v10" />
+                      </svg>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
