@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Header from '../components/layout/Header';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -1874,6 +1875,8 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
+      {/* Header */}
+      <Header />
       {/* Hidden file input for image selection */}
       <input
         id="image-upload"
