@@ -64,6 +64,11 @@ const Home: React.FC = () => {
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('');
+  const [openFilterDropdown, setOpenFilterDropdown] = useState<string | null>(null);
+  const [openPriceDropdown, setOpenPriceDropdown] = useState<string | null>(null);
+  const [selectedPrice, setSelectedPrice] = useState('');
+  const filterDropdownRef = React.useRef<HTMLDivElement>(null);
+  const priceDropdownRef = React.useRef<HTMLDivElement>(null);
   const [notifications, setNotifications] = useState<Array<{
     id: string;
     product: {
@@ -80,6 +85,8 @@ const Home: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const totalPages = 48;
+  const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const [isMobile, setIsMobile] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>(['Epices Camerounais', 'Vêtements', 'Produits Nigerians', 'Masque culturel', 'Accessoires traditionnels']);
   const [showSearchHistory, setShowSearchHistory] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -128,6 +135,15 @@ const Home: React.FC = () => {
   ];
 
   const categories = ['All', 'Food & Spices', 'Fashion & Textiles', 'Beauty & Wellness', 'Home & Decor', 'Books & Media'];
+
+  const priceOptions = [
+    { label: 'All', value: '' },
+    { label: 'Less than 10 USD', value: 'less-than-10' },
+    { label: '10 ~ 50 USD', value: '10-50' },
+    { label: '50 ~ 100 USD', value: '50-100' },
+    { label: '100 ~ 200 USD', value: '100-200' },
+    { label: 'More than 200 USD', value: 'more-than-200' }
+  ];
 
   const africanCountries = [
     { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png' },
@@ -452,6 +468,15 @@ const Home: React.FC = () => {
 
   // Auto-slide functionality
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
     const slideInterval = setInterval(() => {
       setCurrentSlide((prevSlide) => 
         prevSlide === bannerSlides.length - 1 ? 0 : prevSlide + 1
@@ -460,6 +485,298 @@ const Home: React.FC = () => {
 
     return () => clearInterval(slideInterval);
   }, [bannerSlides.length]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setOpenFilterDropdown(null);
+      }
+      if (priceDropdownRef.current && !priceDropdownRef.current.contains(event.target as Node)) {
+        setOpenPriceDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Render price filter button with dropdown
+  const renderPriceFilterButton = (position: 'relative' | 'absolute' = 'relative', sectionId: string = 'default') => {
+    const isOpen = openPriceDropdown === sectionId;
+    const selectedPriceOption = priceOptions.find(opt => opt.value === selectedPrice);
+    
+    return (
+      <div ref={sectionId === 'default' ? priceDropdownRef : null} style={{ position, zIndex: 20 }}>
+        {selectedPrice ? (
+          // Selected price pill
+          <div 
+            className="flex items-center gap-2 px-3 py-1.5"
+            style={{ 
+              backgroundColor: '#F0F8FE',
+              width: 'fit-content',
+              borderRadius: '8px'
+            }}
+          >
+            <span style={{ color: '#64B5F6', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+              {selectedPriceOption?.label || selectedPrice}
+            </span>
+            <button
+              onClick={() => setSelectedPrice('')}
+              className="flex items-center justify-center"
+              style={{ 
+                width: '16px', 
+                height: '16px',
+                cursor: 'pointer'
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 3L3 9M3 3L9 9" stroke="#64B5F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        ) : (
+          // Price filter button
+          <button 
+            onClick={() => setOpenPriceDropdown(isOpen ? null : sectionId)}
+            className="flex items-center transition-colors hover:bg-gray-50"
+            style={{ 
+              backgroundColor: isMobile ? '#FFFFFF' : '#FAFAFA',
+              border: isMobile ? 'none' : '1px solid #E4E4E4',
+              borderColor: '#E4E4E4',
+              padding: isMobile ? '5px 8px' : '7px 14px',
+              borderRadius: '8px',
+              fontFamily: 'Poppins, sans-serif',
+              gap: isMobile ? '4px' : '6px'
+            }}
+          >
+            <span style={{ color: '#BABABA', fontSize: isMobile ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
+            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>All</span>
+            <img 
+              src={arrowDownIcon} 
+              alt="Arrow" 
+              style={{ 
+                width: isMobile ? '12px' : '16px', 
+                height: isMobile ? '12px' : '16px',
+                transform: isOpen ? 'rotate(180deg)' : 'none',
+                transition: 'transform 0.2s'
+              }} 
+            />
+          </button>
+        )}
+        
+        {/* Dropdown Menu */}
+        {isOpen && !selectedPrice && (
+          <div 
+            className="absolute left-0 bg-white z-10 mt-2"
+            style={{ 
+              width: isMobile ? '140px' : '180px', 
+              flexShrink: 0, 
+              borderRadius: isMobile ? '12px' : '16px',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              border: '1px solid #E9E9E9'
+            }}
+          >
+            <div className={isMobile ? 'py-1' : 'py-1.5'}>
+              {priceOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setSelectedPrice(option.value);
+                    setOpenPriceDropdown(null);
+                  }}
+                  style={{
+                    color: selectedPrice === option.value ? '#64B5F6' : '#B0B0B0',
+                    fontSize: isMobile ? '10px' : '12px',
+                    padding: isMobile ? '6px 10px' : '8px 12px'
+                  }}
+                  className="w-full text-left hover:bg-gray-50 transition-colors relative"
+                >
+                  {selectedPrice === option.value && (
+                    <div 
+                      style={{
+                        position: 'absolute',
+                        left: isMobile ? '6px' : '8px',
+                        right: isMobile ? '6px' : '8px',
+                        top: '2px',
+                        bottom: '2px',
+                        backgroundColor: '#F0F8FE',
+                        borderRadius: '8px',
+                        zIndex: -1
+                      }}
+                    />
+                  )}
+                  <span style={{ position: 'relative', zIndex: 1 }}>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Render country filter button with dropdown
+  const renderCountryFilterButton = (position: 'relative' | 'absolute' = 'relative', sectionId: string = 'default') => {
+    const selectedCountryData = selectedCountry ? africanCountries.find(c => c.name === selectedCountry) : null;
+    const isOpen = openFilterDropdown === sectionId;
+    
+    return (
+      <div ref={sectionId === 'default' ? filterDropdownRef : null} style={{ position, zIndex: 20 }}>
+        {selectedCountry ? (
+          // Selected country pill
+          <div 
+            className="flex items-center gap-2 px-3 py-1.5"
+            style={{ 
+              backgroundColor: '#F0F8FE',
+              width: 'fit-content',
+              borderRadius: '8px'
+            }}
+          >
+            <img 
+              src={selectedCountryData?.flag || ''} 
+              alt={selectedCountry}
+              className="w-4 h-4 object-cover rounded-full"
+              style={{ width: '16px', height: '16px' }}
+            />
+            <span style={{ color: '#64B5F6', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
+              {selectedCountry}
+            </span>
+            <button
+              onClick={() => setSelectedCountry('')}
+              className="flex items-center justify-center"
+              style={{ 
+                width: '16px', 
+                height: '16px',
+                cursor: 'pointer'
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 3L3 9M3 3L9 9" stroke="#64B5F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        ) : (
+          // Filter button
+          <button 
+            onClick={() => setOpenFilterDropdown(isOpen ? null : sectionId)}
+            className="flex items-center transition-colors hover:bg-gray-50"
+            style={{ 
+              backgroundColor: isMobile ? '#FFFFFF' : '#FAFAFA',
+              border: isMobile ? 'none' : '1px solid #E4E4E4',
+              borderColor: '#E4E4E4',
+              padding: isMobile ? '5px 7px' : '7px 10px',
+              borderRadius: '8px',
+              fontFamily: 'Poppins, sans-serif',
+              gap: isMobile ? '4px' : '6px'
+            }}
+          >
+            {!isMobile && <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Filter :</span>}
+            <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
+            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
+            <img 
+              src={arrowDownIcon} 
+              alt="Arrow" 
+              style={{ 
+                width: isMobile ? '12px' : '16px', 
+                height: isMobile ? '12px' : '16px',
+                transform: isOpen ? 'rotate(180deg)' : 'none',
+                transition: 'transform 0.2s'
+              }} 
+            />
+          </button>
+        )}
+        
+        {/* Dropdown Menu */}
+        {isOpen && !selectedCountry && (
+          <div 
+            className="absolute left-0 bg-white border border-gray-200 z-10 mt-2"
+            style={{ 
+              width: isMobile ? '160px' : '200px', 
+              flexShrink: 0, 
+              borderRadius: isMobile ? '12px' : '16px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+            }}
+          >
+            <style>
+              {`
+                .filter-dropdown-scroll::-webkit-scrollbar {
+                  width: 2px;
+                }
+                .filter-dropdown-scroll::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                .filter-dropdown-scroll::-webkit-scrollbar-thumb {
+                  background-color: #E4E4E4;
+                  border-radius: 10px;
+                }
+              `}
+            </style>
+            
+            {/* Scrollable Country List */}
+            <div 
+              className={`overflow-y-auto filter-dropdown-scroll ${isMobile ? 'py-1' : 'py-2'}`}
+              style={{
+                maxHeight: isMobile ? 'calc(4 * 36px)' : 'calc(6 * 44px)',
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#E4E4E4 transparent'
+              }}
+            >
+              <button
+                onClick={() => {
+                  setSelectedCountry('');
+                  setOpenFilterDropdown(null);
+                }}
+                style={{
+                  backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
+                  color: !selectedCountry ? '#64B5F6' : '#BABABA',
+                  padding: isMobile ? '6px 10px' : '8px 16px',
+                  fontSize: isMobile ? '11px' : '14px'
+                }}
+                className="w-full text-left hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center">
+                  <img 
+                    src={globyIcon} 
+                    alt="Globe"
+                    className={isMobile ? 'w-3 h-3 mr-1.5' : 'w-4 h-4 mr-2'}
+                    style={{
+                      filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                    }}
+                  />
+                  <span>Africa</span>
+                </div>
+              </button>
+              {africanCountries.map((country) => (
+                <button
+                  key={country.name}
+                  onClick={() => {
+                    setSelectedCountry(country.name);
+                    setOpenFilterDropdown(null);
+                  }}
+                  style={{
+                    backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
+                    color: selectedCountry === country.name ? '#64B5F6' : '#BABABA',
+                    padding: isMobile ? '6px 10px' : '8px 16px',
+                    fontSize: isMobile ? '11px' : '14px'
+                  }}
+                  className="w-full text-left hover:bg-gray-50 transition-colors"
+                >
+                  <span className="flex items-center" style={{ gap: isMobile ? '6px' : '8px' }}>
+                    <img 
+                      src={country.flag} 
+                      alt={`${country.name} flag`}
+                      className="object-cover rounded-full"
+                      style={{ width: isMobile ? '16px' : '20px', height: isMobile ? '16px' : '20px' }}
+                    />
+                    <span>{country.name}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Re-run search when country filter changes and search is active
   useEffect(() => {
@@ -1607,7 +1924,7 @@ const Home: React.FC = () => {
                 <img 
                   src={country.flag} 
                   alt={`${country.name} flag`}
-                  className="w-3.5 h-2.5 object-cover rounded-sm"
+                  className="w-3.5 h-3.5 object-cover rounded-full"
                 />
                 <span 
                   className="text-xs font-normal whitespace-nowrap"
@@ -1626,135 +1943,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="relative filter-dropdown hidden md:block">
-            <button
-              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-              className="flex items-center space-x-2 border rounded-lg transition-colors"
-              style={{
-                padding: '8px 10px',
-                backgroundColor: '#FAFAFA',
-                borderColor: '#E4E4E4',
-                fontFamily: 'Poppins, sans-serif'
-              }}
-            >
-                <span className="text-base font-normal" style={{ color: '#BABABA' }}>Filter :</span>
-                <img src={earthIcon} alt="Earth" style={{ width: '22px', height: '22px' }} />
-                <span className="text-base font-medium" style={{ color: '#6A6A6A' }}>{selectedCountry || 'Africa'}</span>
-              <img
-                src={arrowDownIcon}
-                alt="Arrow"
-                className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-            
-            {/* Dropdown Menu */}
-            {isFilterDropdownOpen && (
-              <div 
-                className="absolute left-0 bg-white border border-gray-200 z-10"
-                style={{ 
-                  width: '200px', 
-                  flexShrink: 0, 
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                  top: '0'
-                }}
-              >
-                <style>
-                  {`
-                    .filter-dropdown-scroll::-webkit-scrollbar {
-                      width: 2px;
-                    }
-                    .filter-dropdown-scroll::-webkit-scrollbar-track {
-                      background: transparent;
-                    }
-                    .filter-dropdown-scroll::-webkit-scrollbar-thumb {
-                      background-color: #E4E4E4;
-                      border-radius: 10px;
-                    }
-                  `}
-                </style>
-                
-                {/* Search Input at Top */}
-                <div className="px-3 pt-3 pb-2 border-b border-gray-200">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Filter :"
-                      className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none"
-                      style={{ 
-                        backgroundColor: '#FFFFFF',
-                        color: '#6A6A6A',
-                        border: 'none'
-                      }}
-                    />
-                    <button
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                      onClick={() => setIsFilterDropdownOpen(false)}
-                    >
-                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Scrollable Country List */}
-                <div 
-                  className="py-2 overflow-y-auto filter-dropdown-scroll"
-                  style={{
-                    maxHeight: 'calc(6 * 44px)',
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: '#E4E4E4 transparent'
-                  }}
-                >
-                  <button
-                    onClick={() => {
-                      setSelectedCountry('');
-                      setIsFilterDropdownOpen(false);
-                    }}
-                    style={{
-                      backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
-                      color: !selectedCountry ? '#64B5F6' : '#BABABA'
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center">
-                      <img 
-                        src={globyIcon} 
-                        alt="Globe"
-                        className="w-4 h-4 mr-2"
-                        style={{
-                          filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
-                        }}
-                      />
-                      <span>Africa</span>
-                    </div>
-                  </button>
-                  {africanCountries.map((country) => (
-                    <button
-                      key={country.name}
-                      onClick={() => {
-                        setSelectedCountry(country.name);
-                        setIsFilterDropdownOpen(false);
-                      }}
-                      style={{
-                        backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
-                        color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
-                    >
-                      <span className="flex items-center space-x-2">
-                        <img 
-                          src={country.flag} 
-                          alt={`${country.name} flag`}
-                          className="w-5 h-4 object-cover rounded-sm"
-                        />
-                        <span>{country.name}</span>
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+              {renderCountryFilterButton('relative', 'top-filter')}
             </div>
             
             {/* Notifications - Centered */}
@@ -1908,7 +2097,7 @@ const Home: React.FC = () => {
                     <div style={{ marginTop: window.innerWidth < 640 ? '32px' : '48px' }}>
           <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '16px' : '24px' }}>
                         <h3 className="font-semibold text-gray-900" style={{ 
-                          fontFamily: 'Poppins, sans-serif',
+                          fontFamily: 'Faktum, sans-serif',
                           fontSize: window.innerWidth < 640 ? '14px' : '20px'
                         }}>
                           Other products near you
@@ -1951,11 +2140,11 @@ const Home: React.FC = () => {
                                   <img 
                                     src={`https://flagcdn.com/w20/${getProductCountry(product.id).code}.png`}
                                     alt={getProductCountry(product.id).name}
+                                    className="rounded-full"
                                     style={{ 
                                       width: window.innerWidth < 640 ? '10px' : '12px',
-                                      height: window.innerWidth < 640 ? '7px' : '8px',
-                                      objectFit: 'cover',
-                                      borderRadius: '2px'
+                                      height: window.innerWidth < 640 ? '10px' : '12px',
+                                      objectFit: 'cover'
                                     }}
                                   />
                                   <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
@@ -2129,11 +2318,11 @@ const Home: React.FC = () => {
                                 <img 
                                   src={getProductCountry(product.id).flag} 
                                   alt={getProductCountry(product.id).name}
+                                  className="rounded-full"
                                   style={{ 
                                     width: window.innerWidth < 640 ? '10px' : '12px',
-                                    height: window.innerWidth < 640 ? '7px' : '8px',
-                                    objectFit: 'cover',
-                                    borderRadius: '2px'
+                                    height: window.innerWidth < 640 ? '10px' : '12px',
+                                    objectFit: 'cover'
                                   }}
                                 />
                                 <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
@@ -2324,7 +2513,7 @@ const Home: React.FC = () => {
               <div style={{ marginTop: window.innerWidth < 640 ? '32px' : '48px' }}>
                 <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '16px' : '24px' }}>
                   <h3 className="font-semibold text-gray-900" style={{ 
-                    fontFamily: 'Poppins, sans-serif',
+                    fontFamily: 'Faktum, sans-serif',
                     fontSize: window.innerWidth < 640 ? '14px' : '20px'
                   }}>
                     Other products near you
@@ -2367,11 +2556,11 @@ const Home: React.FC = () => {
                           <img 
                             src={getProductCountry(product.id).flag} 
                             alt={getProductCountry(product.id).name}
+                            className="rounded-full"
                             style={{ 
                               width: window.innerWidth < 640 ? '10px' : '12px',
-                              height: window.innerWidth < 640 ? '7px' : '8px',
-                              objectFit: 'cover',
-                              borderRadius: '2px'
+                              height: window.innerWidth < 640 ? '10px' : '12px',
+                              objectFit: 'cover'
                             }}
                           />
                           <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
@@ -2489,7 +2678,7 @@ const Home: React.FC = () => {
                     <img 
                       src={getProductCountry(product.id).flag} 
                       alt={getProductCountry(product.id).name}
-                      className="w-3 h-2 object-cover rounded-sm"
+                      className="w-3 h-3 object-cover rounded-full"
                     />
                     <span className="text-xs font-medium text-gray-800">
                       {getProductCountry(product.id).abbreviation}
@@ -2556,155 +2745,120 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Pagination - Mobile Responsive - Hide when no search results */}
+      {/* Pagination - Hide when no search results */}
       {!shouldShowNoResultsState() && (
       <section className="py-8 sm:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Mobile Pagination */}
-          <div className="md:hidden flex items-center justify-center relative px-2">
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="px-2 py-1 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ fontSize: '14px', color: '#BABABA' }}
-              >
-                Previous
-              </button>
-              <div className="flex space-x-0.5">
-                {(() => {
-                  const pages = [];
-                  const showPages = [];
-                  
-                  if (totalPages <= 5) {
-                    for (let i = 1; i <= totalPages; i++) showPages.push(i);
-                  } else {
-                    if (currentPage <= 3) {
-                      showPages.push(1, 2, 3, '...', totalPages);
-                    } else if (currentPage >= totalPages - 2) {
-                      showPages.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
-                    } else {
-                      showPages.push(1, '...', currentPage, '...', totalPages);
-                    }
-                  }
-                  
-                  return (
-                    <>
-                      {showPages.map((page, index) => (
-                        page === '...' ? (
-                          <span key={`ellipsis-${index}`} className="px-2 py-1 font-normal" style={{ fontSize: '14px', color: '#BABABA' }}>
-                            ...
-                          </span>
-                        ) : (
-                  <button
-                            key={page}
-                            onClick={() => setCurrentPage(page as number)}
-                            className="px-2 py-1 font-normal transition-colors relative"
-                            style={{ fontSize: '14px', color: page === currentPage ? '#212121' : '#BABABA' }}
+          <div className={`flex flex-col ${isMobile ? 'items-center gap-2' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
+            <div className={`flex-1 flex justify-center w-full ${isMobile ? '' : ''}`}>
+              <div className={`flex items-center ${isMobile ? 'gap-4' : 'gap-4'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
+                <button
+                  aria-label="Previous page"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  style={{
+                    width: isMobile ? '24px' : '32px',
+                    height: isMobile ? '24px' : '32px',
+                    borderRadius: '8px',
+                    backgroundColor: '#F0F0F0',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                    opacity: currentPage === 1 ? 0.5 : 1
+                  }}
+                >
+                  <svg width={isMobile ? '12' : '16'} height={isMobile ? '12' : '16'} viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
+                </button>
+
+                <div className="flex items-center" style={{ gap: isMobile ? '12px' : '24px' }}>
+                  {paginationNumbers.map((page) => (
+                    <span
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      style={{
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: isMobile ? '12px' : '16px',
+                        color: page === currentPage ? '#212121' : '#B0B0B0',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {page}
+                    </span>
+                  ))}
+
+                  <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '12px' : '16px' }}>…</span>
+                  <span 
+                    onClick={() => setCurrentPage(totalPages)}
+                    style={{ 
+                      color: '#B0B0B0', 
+                      fontFamily: 'Bricolage Grotesque, sans-serif', 
+                      fontSize: isMobile ? '12px' : '16px',
+                      cursor: 'pointer'
+                    }}
                   >
-                    {page}
-                            {page === currentPage && (
-                              <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-4 h-0.5" style={{ backgroundColor: '#212121' }}></div>
-                            )}
-                  </button>
-                        )
-                ))}
-                    </>
-                  );
-                })()}
-              </div>
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="px-2 py-1 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ fontSize: '14px', color: '#212121' }}
-              >
-                Next
-              </button>
-              <div className="flex items-center ml-2">
-                <span className="px-2 py-0.5 rounded font-normal border text-xs" style={{ color: '#212121', backgroundColor: '#F5F5F5', borderColor: '#E4E4E4' }}>
-                  {currentPage}
-                </span>
-                <span className="mx-1 font-normal" style={{ fontSize: '14px', color: '#BABABA' }}>/</span>
-                <span className="font-normal" style={{ fontSize: '14px', color: '#BABABA' }}>
-                  {totalPages}
-                </span>
+                    {totalPages}
+                  </span>
+                </div>
+
+                <button
+                  aria-label="Next page"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    width: isMobile ? '24px' : '32px',
+                    height: isMobile ? '24px' : '32px',
+                    borderRadius: '8px',
+                    backgroundColor: '#F0F0F0',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                    opacity: currentPage === totalPages ? 0.5 : 1
+                  }}
+                >
+                  <svg width={isMobile ? '12' : '16'} height={isMobile ? '12' : '16'} viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </button>
               </div>
             </div>
-          </div>
-          
-          {/* Desktop Pagination */}
-          <div className="hidden md:flex items-center justify-center relative">
-            <div className="flex items-center space-x-4">
+
+            {/* Go to section */}
+            <div className={`flex items-center ${isMobile ? 'gap-3 justify-center' : 'gap-2'}`}>
+              <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '11px' : '12px' }}>Go to :</span>
+              <input
+                type="text"
+                placeholder="e.g 40"
+                style={{
+                  border: '1px solid #BABABA',
+                  borderRadius: '8px',
+                  padding: isMobile ? '5px 9px' : '6px 10px',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontSize: isMobile ? '11px' : '12px',
+                  color: '#D9D9D9',
+                  width: isMobile ? '55px' : '64px',
+                  textAlign: 'center'
+                }}
+              />
               <button
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ fontSize: '18px', color: '#BABABA' }}
+                style={{
+                  backgroundColor: '#212121',
+                  color: '#FFFFFF',
+                  borderRadius: '8px',
+                  padding: '6px 14px',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  border: 'none'
+                }}
               >
-                Previous
+                Go
               </button>
-              <div className="flex space-x-1">
-                {(() => {
-                  const pages = [];
-                  const showPages = [];
-                  
-                  if (totalPages <= 7) {
-                    for (let i = 1; i <= totalPages; i++) showPages.push(i);
-                  } else {
-                    if (currentPage <= 4) {
-                      showPages.push(1, 2, 3, 4, 5, '...', totalPages);
-                    } else if (currentPage >= totalPages - 3) {
-                      showPages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-                    } else {
-                      showPages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
-                    }
-                  }
-                  
-                  return (
-                    <>
-                      {showPages.map((page, index) => (
-                        page === '...' ? (
-                          <span key={`ellipsis-${index}`} className="px-4 py-2 font-normal" style={{ fontSize: '18px', color: '#BABABA' }}>
-                            ...
-                          </span>
-                        ) : (
-                  <button
-                            key={page}
-                            onClick={() => setCurrentPage(page as number)}
-                            className="px-4 py-2 font-normal transition-colors relative"
-                            style={{ fontSize: '18px', color: page === currentPage ? '#212121' : '#BABABA' }}
-                  >
-                    {page}
-                            {page === currentPage && (
-                              <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-0.5" style={{ backgroundColor: '#212121' }}></div>
-                            )}
-                  </button>
-                        )
-                ))}
-                    </>
-                  );
-                })()}
-              </div>
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 font-normal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ fontSize: '18px', color: '#212121' }}
-              >
-                Next
-              </button>
-              <div className="flex items-center absolute right-0">
-                <span className="px-4 py-0.5 rounded-lg font-normal border" style={{ fontSize: '18px', color: '#212121', backgroundColor: '#F5F5F5', borderColor: '#E4E4E4' }}>
-                  {currentPage}
-                </span>
-                <span className="mx-2 font-normal" style={{ fontSize: '18px', color: '#BABABA' }}>
-                  /
-                </span>
-                <span className="font-normal" style={{ fontSize: '18px', color: '#BABABA' }}>
-                  {totalPages}
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -2784,44 +2938,8 @@ const Home: React.FC = () => {
 
             {/* Filter and Price Buttons Row - Bottom on Mobile */}
             <div className={window.innerWidth < 640 ? "flex gap-2" : "contents"} style={{ order: window.innerWidth < 640 ? 2 : 1 }}>
-              {/* Filter Button */}
-              <button 
-                className="flex items-center border transition-colors hover:bg-gray-50"
-                style={{ 
-                  backgroundColor: '#FAFAFA',
-                  borderColor: '#E4E4E4',
-                  padding: window.innerWidth < 640 ? '5px 7px' : '8px 10px',
-                  borderRadius: '8px',
-                  fontFamily: 'Poppins, sans-serif',
-                  gap: window.innerWidth < 640 ? '4px' : '6px',
-                  flex: window.innerWidth < 640 ? '0 1 auto' : 'initial',
-                  maxWidth: window.innerWidth < 640 ? '45%' : 'none'
-                }}
-              >
-                <span style={{ color: '#BABABA', fontSize: window.innerWidth < 640 ? '10px' : '14px', fontWeight: 'normal' }}>Filter :</span>
-                <img src={earthIcon} alt="Globe" style={{ width: window.innerWidth < 640 ? '16px' : '22px', height: window.innerWidth < 640 ? '16px' : '22px' }} />
-                <span style={{ color: '#6A6A6A', fontSize: window.innerWidth < 640 ? '10px' : '14px' }}>Africa</span>
-                <img src={arrowDownIcon} alt="Arrow" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
-              </button>
-
-              {/* Price Button */}
-              <button 
-                className="flex items-center border transition-colors hover:bg-gray-50"
-                style={{ 
-                  backgroundColor: '#FAFAFA',
-                  borderColor: '#E4E4E4',
-                  padding: window.innerWidth < 640 ? '5px 8px' : '8px 14px',
-                  borderRadius: '8px',
-                  fontFamily: 'Poppins, sans-serif',
-                  gap: window.innerWidth < 640 ? '4px' : '6px',
-                  flex: window.innerWidth < 640 ? '0 1 auto' : 'initial',
-                  maxWidth: window.innerWidth < 640 ? '35%' : 'none'
-                }}
-              >
-                <span style={{ color: '#BABABA', fontSize: window.innerWidth < 640 ? '10px' : '14px', fontWeight: 'normal' }}>Price :</span>
-                <span style={{ color: '#6A6A6A', fontSize: window.innerWidth < 640 ? '10px' : '14px' }}>All</span>
-                <img src={arrowDownIcon} alt="Arrow" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
-              </button>
+              {renderCountryFilterButton('relative', 'buy-sell')}
+              {renderPriceFilterButton('relative', 'buy-sell')}
             </div>
           </div>
 
