@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/layout/Header';
 
@@ -48,11 +48,15 @@ import cameroonianCulture from '../assets/images/logos/culture.png'; // Traditio
 
 // Import scan icon
 import scanIcon from '../assets/images/logos/scanner (1).png';
+import backArrowIcon from '../assets/images/pre/back arrow.svg';
+import SDicon from '../assets/images/pre/SDicon.svg';
+import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 
 
 const Home: React.FC = () => {
   const { user, isVisitor } = useAuth();
   const navigationLocation = useLocation();
+  const navigate = useNavigate();
   const productGridRef = React.useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -100,6 +104,21 @@ const Home: React.FC = () => {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
   const moreOptionsRef = React.useRef<HTMLDivElement>(null);
+  
+  // Mobile filter and search flow states
+  const [showMobileFilterPage, setShowMobileFilterPage] = useState(false);
+  const [showMobileSearchFlow, setShowMobileSearchFlow] = useState(false);
+  const [filterPageOpenedFrom, setFilterPageOpenedFrom] = useState<'home' | 'search'>('home');
+  const [mobileFilterCategory, setMobileFilterCategory] = useState('');
+  const [mobileFilterProductOrigin, setMobileFilterProductOrigin] = useState('');
+  const [mobileFilterSellerLocation, setMobileFilterSellerLocation] = useState('');
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [isProductOriginDropdownOpen, setIsProductOriginDropdownOpen] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
+  const [mobileSearchSubmitted, setMobileSearchSubmitted] = useState(false);
+  const [isMobileSearchFocused, setIsMobileSearchFocused] = useState(false);
+  const categoryDropdownRef = React.useRef<HTMLDivElement>(null);
+  const productOriginDropdownRef = React.useRef<HTMLDivElement>(null);
   const [selectedCard, setSelectedCard] = useState<{ title: string; country: string; flag: string; location: string; description: string } | null>(null);
   const [requestProductName, setRequestProductName] = useState('');
   const [requestProductOrigin, setRequestProductOrigin] = useState('');
@@ -480,6 +499,21 @@ const Home: React.FC = () => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Handle click outside for filter dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(target)) {
+        setIsCategoryDropdownOpen(false);
+      }
+      if (productOriginDropdownRef.current && !productOriginDropdownRef.current.contains(target)) {
+        setIsProductOriginDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -2442,7 +2476,14 @@ const Home: React.FC = () => {
               
               {/* Filter Button */}
               <button
-                onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+                onClick={() => {
+                  if (isMobile) {
+                    setFilterPageOpenedFrom('home');
+                    setShowMobileFilterPage(true);
+                  } else {
+                    setIsMobileFilterOpen(!isMobileFilterOpen);
+                  }
+                }}
                 className="flex items-center justify-center relative flex-shrink-0"
                 style={{
                   width: '48px',
@@ -4533,6 +4574,568 @@ const Home: React.FC = () => {
               Close
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Mobile Filter Page */}
+      {showMobileFilterPage && isMobile && (
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 pt-4 pb-3">
+            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Filter
+            </h1>
+            <button
+              onClick={() => {
+                setShowMobileFilterPage(false);
+                if (filterPageOpenedFrom === 'home' && !showMobileSearchFlow) {
+                  setShowMobileSearchFlow(true);
+                }
+              }}
+              style={{ color: '#171717', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          {/* Filter Fields */}
+          <div className="px-4 space-y-4 pb-24">
+            {/* Category Filter */}
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 500, color: '#6A6A6A', marginBottom: '8px', display: 'block' }}>
+                Categories
+              </label>
+              <div className="relative" ref={categoryDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                  className="w-full px-3 py-2.5 border rounded-lg text-left flex items-center justify-between"
+                  style={{
+                    borderColor: '#E9E9E9',
+                    borderRadius: '8px',
+                    backgroundColor: '#FFFFFF',
+                    minHeight: '44px'
+                  }}
+                >
+                  <div className="flex items-center gap-2 flex-wrap flex-1">
+                    {mobileFilterCategory ? (
+                      <div
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded"
+                        style={{
+                          backgroundColor: '#F1F1F1',
+                          borderRadius: '6px'
+                        }}
+                      >
+                        <span style={{ fontSize: '12px', color: '#6A6A6A' }}>
+                          {categories.find(c => c === mobileFilterCategory) || mobileFilterCategory}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMobileFilterCategory('');
+                          }}
+                          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M9 3L3 9M3 3l6 6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: '#D9D9D9', fontSize: '12px' }}>Search a category</span>
+                    )}
+                  </div>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#D9D9D9"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isCategoryDropdownOpen && (
+                  <div
+                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden"
+                    style={{ maxHeight: '200px', overflowY: 'auto' }}
+                  >
+                    {categories.filter(c => c !== 'All').map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => {
+                          setMobileFilterCategory(category);
+                          setIsCategoryDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors"
+                        style={{
+                          color: '#6A6A6A',
+                          fontSize: '12px'
+                        }}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Product Origin Filter */}
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 500, color: '#6A6A6A', marginBottom: '8px', display: 'block' }}>
+                Product Origin
+              </label>
+              <div className="relative" ref={productOriginDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsProductOriginDropdownOpen(!isProductOriginDropdownOpen)}
+                  className="w-full px-3 py-2.5 border rounded-lg text-left flex items-center justify-between"
+                  style={{
+                    borderColor: '#E9E9E9',
+                    borderRadius: '8px',
+                    backgroundColor: '#FFFFFF',
+                    minHeight: '44px'
+                  }}
+                >
+                  <div className="flex items-center gap-2 flex-wrap flex-1">
+                    {mobileFilterProductOrigin ? (
+                      <div
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded"
+                        style={{
+                          backgroundColor: '#F1F1F1',
+                          borderRadius: '6px'
+                        }}
+                      >
+                        <span style={{ fontSize: '12px', color: '#6A6A6A' }}>
+                          {mobileFilterProductOrigin}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMobileFilterProductOrigin('');
+                          }}
+                          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M9 3L3 9M3 3l6 6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: '#D9D9D9', fontSize: '12px' }}>Choose product origin</span>
+                    )}
+                  </div>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#D9D9D9"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isProductOriginDropdownOpen && (
+                  <div
+                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden"
+                    style={{ maxHeight: '200px', overflowY: 'auto' }}
+                  >
+                    {africanCountries.map((country) => (
+                      <button
+                        key={country.code}
+                        type="button"
+                        onClick={() => {
+                          setMobileFilterProductOrigin(country.name);
+                          setIsProductOriginDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        style={{
+                          color: '#6A6A6A',
+                          fontSize: '12px'
+                        }}
+                      >
+                        <img src={country.flag} alt={country.name} style={{ width: '16px', height: '12px', borderRadius: '4px' }} />
+                        <span>{country.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Seller Location Filter */}
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 500, color: '#6A6A6A', marginBottom: '8px', display: 'block' }}>
+                Seller location
+              </label>
+              <input
+                type="text"
+                value={mobileFilterSellerLocation}
+                onChange={(e) => setMobileFilterSellerLocation(e.target.value)}
+                placeholder="Choose seller location"
+                className="w-full px-3 py-2.5 border rounded-lg"
+                style={{
+                  borderColor: '#E9E9E9',
+                  borderRadius: '8px',
+                  backgroundColor: '#FFFFFF',
+                  color: '#212121',
+                  fontSize: '12px',
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Apply Filter Button */}
+          <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 bg-white" style={{ borderTop: '1px solid #E9E9E9' }}>
+            <button
+              onClick={() => {
+                if (!showMobileSearchFlow) {
+                  setShowMobileSearchFlow(true);
+                }
+                setShowMobileFilterPage(false);
+              }}
+              className="w-full py-3 rounded-lg"
+              style={{
+                backgroundColor: (mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) ? '#F9A825' : '#E9E9E9',
+                color: (mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) ? '#FFFFFF' : '#E9E9E9',
+                border: 'none',
+                fontSize: '14px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 500,
+                cursor: 'pointer',
+                borderRadius: '8px'
+              }}
+            >
+              Apply filter
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Search Flow */}
+      {showMobileSearchFlow && isMobile && (
+        <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 pt-4 pb-3">
+            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Search a product
+            </h1>
+            <button
+              onClick={() => {
+                setShowMobileSearchFlow(false);
+                setMobileSearchQuery('');
+                setMobileSearchSubmitted(false);
+                setMobileFilterCategory('');
+                setMobileFilterProductOrigin('');
+                setMobileFilterSellerLocation('');
+              }}
+              style={{ color: '#171717', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          {/* Search Bar and Filter Button */}
+          <div className="px-4 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="What are you looking for today ?"
+                  value={mobileSearchQuery}
+                  onChange={(e) => setMobileSearchQuery(e.target.value)}
+                  onFocus={() => setIsMobileSearchFocused(true)}
+                  onBlur={() => setIsMobileSearchFocused(false)}
+                  className="w-full px-4 py-3 pr-12 focus:outline-none text-sm"
+                  style={{
+                    borderRadius: '30px',
+                    border: `1px solid ${isMobileSearchFocused ? '#B8DDFB' : '#E9E9E9'}`,
+                    backgroundColor: '#FFF',
+                    fontFamily: 'Poppins, sans-serif',
+                    color: '#212121',
+                    caretColor: '#64B5F6'
+                  }}
+                />
+                {mobileSearchQuery && (
+                  <button
+                    onClick={() => {
+                      setMobileSearchQuery('');
+                      setMobileSearchSubmitted(false);
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2"
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+                  >
+                    <img src={SDicon} alt="Clear" className="w-4 h-4" />
+                  </button>
+                )}
+                <button 
+                  onClick={handleScan}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                  style={{ display: mobileSearchQuery ? 'none' : 'block' }}
+                  title="Scan image to search"
+                >
+                  <img 
+                    src={scanIcon} 
+                    alt="Scan" 
+                    className="w-5 h-5"
+                    style={{ opacity: 0.6 }}
+                  />
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  setFilterPageOpenedFrom('search');
+                  setShowMobileFilterPage(true);
+                }}
+                className="flex items-center justify-center relative flex-shrink-0"
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  border: '0.5px solid #E9E9E9',
+                  backgroundColor: '#FFF'
+                }}
+                aria-label="Filter"
+              >
+                <svg 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 20 20" 
+                  fill="none"
+                >
+                  <line x1="3" y1="6" x2="17" y2="6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
+                  <line x1="3" y1="14" x2="17" y2="14" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
+                </svg>
+                {(mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) && (
+                  <div 
+                    className="absolute"
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: '#FF0000',
+                      bottom: '2px',
+                      right: '2px'
+                    }}
+                  />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Active Filters Section */}
+          {(mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) && (
+            <div className="px-4 pb-3">
+              <p style={{ fontSize: '12px', color: '#B0B0B0', marginBottom: '8px' }}>Active filter :</p>
+              <div className="flex flex-wrap gap-2">
+                {mobileFilterCategory && (
+                  <div
+                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded"
+                    style={{
+                      backgroundColor: '#F0F8FE',
+                      borderRadius: '6px'
+                    }}
+                  >
+                    <span style={{ fontSize: '12px', color: '#64B5F6' }}>
+                      {mobileFilterCategory}
+                    </span>
+                    <button
+                      onClick={() => setMobileFilterCategory('')}
+                      style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M9 3L3 9M3 3l6 6" stroke="#64B5F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                )}
+                {mobileFilterProductOrigin && (
+                  <div
+                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded"
+                    style={{
+                      backgroundColor: '#F0F8FE',
+                      borderRadius: '6px'
+                    }}
+                  >
+                    <span style={{ fontSize: '12px', color: '#64B5F6' }}>
+                      {mobileFilterProductOrigin}
+                    </span>
+                    <button
+                      onClick={() => setMobileFilterProductOrigin('')}
+                      style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M9 3L3 9M3 3l6 6" stroke="#64B5F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                )}
+                {mobileFilterSellerLocation && (
+                  <div
+                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded"
+                    style={{
+                      backgroundColor: '#F0F8FE',
+                      borderRadius: '6px'
+                    }}
+                  >
+                    <span style={{ fontSize: '12px', color: '#64B5F6' }}>
+                      {mobileFilterSellerLocation}
+                    </span>
+                    <button
+                      onClick={() => setMobileFilterSellerLocation('')}
+                      style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M9 3L3 9M3 3l6 6" stroke="#64B5F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Search Results or Empty State */}
+          <div className="flex-1 overflow-y-auto px-4 pb-24">
+            {mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && (
+              <>
+                {(() => {
+                  const filteredProducts = getProductsToDisplay().filter(product => {
+                    const query = mobileSearchQuery.toLowerCase().trim();
+                    const matchesSearch = product.name.toLowerCase().includes(query) ||
+                      product.category?.toLowerCase().includes(query) ||
+                      product.description?.toLowerCase().includes(query);
+                    
+                    const matchesCategory = !mobileFilterCategory || product.category === mobileFilterCategory;
+                    const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.id).name === mobileFilterProductOrigin;
+                    const matchesLocation = !mobileFilterSellerLocation || product.location?.toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
+                    
+                    return matchesSearch && matchesCategory && matchesOrigin && matchesLocation;
+                  });
+
+                  if (filteredProducts.length === 0) {
+                    return (
+                      <div className="flex flex-col items-center justify-center" style={{ paddingTop: '140px' }}>
+                        <img src={bagIcon} alt="No products" style={{ width: '50px', height: '50px', marginBottom: '14px', opacity: 0.3 }} />
+                        <p style={{ color: '#939393', fontSize: '11px', textAlign: 'center', marginBottom: '14px', lineHeight: '1.5' }}>
+                          No products found. Please try adjusting<br />your search criteria.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => navigate('/requests')}
+                          style={{
+                            backgroundColor: '#64B5F6',
+                            color: '#FFFFFF',
+                            padding: '7px 18px',
+                            borderRadius: '12px',
+                            border: 'none',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          View available items
+                        </button>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <>
+                      <div className="pb-3">
+                        <h2 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', color: '#212121', fontWeight: 600 }}>
+                          Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'})</span>
+                        </h2>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {filteredProducts.map((product) => (
+                          <div
+                            key={product.id}
+                            className="bg-white rounded-lg overflow-hidden cursor-pointer"
+                            onClick={() => navigate(`/product/${product.id}`)}
+                          >
+                            <div className="aspect-square relative overflow-hidden mb-1" style={{ borderRadius: '12px', padding: '2px' }}>
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                                style={{ borderRadius: '12px' }}
+                              />
+                            </div>
+                            <div className="px-2 pb-2">
+                              <h3 className="font-medium mb-1 text-[12px] truncate" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
+                                {product.name}
+                              </h3>
+                              <div className="flex items-center gap-1 mb-2">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="#FBBC05" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                                <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                                  {product.rating || '4.5'}
+                                </span>
+                                <span style={{ color: '#B0B0B0', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                                  ({product.reviews || '12'} Reviews)
+                                </span>
+                              </div>
+                              <span className="font-semibold" style={{ color: '#212121', fontSize: '14px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                {product.currency} {product.price}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  );
+                })()}
+              </>
+            )}
+          </div>
+
+          {/* Bottom Search Button */}
+          {(!mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchQuery.trim() === '')) && (
+            <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 bg-white" style={{ borderTop: '1px solid #E9E9E9' }}>
+              <button
+                type="button"
+                className="w-full py-3 rounded-xl"
+                style={{
+                  backgroundColor: mobileSearchQuery.trim() ? '#F9A825' : '#D9D9D9',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  fontSize: '14px',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 500,
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (mobileSearchQuery.trim()) {
+                    setMobileSearchSubmitted(true);
+                  }
+                }}
+              >
+                Search
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
