@@ -4866,7 +4866,7 @@ const Home: React.FC = () => {
                   value={mobileSearchQuery}
                   onChange={(e) => {
                     setMobileSearchQuery(e.target.value);
-                    if (e.target.value.trim() && searchHistory.length > 0) {
+                    if (searchHistory.length > 0) {
                       setShowMobileSearchHistory(true);
                     } else {
                       setShowMobileSearchHistory(false);
@@ -4874,7 +4874,7 @@ const Home: React.FC = () => {
                   }}
                   onFocus={() => {
                     setIsMobileSearchFocused(true);
-                    if (mobileSearchQuery.trim() && searchHistory.length > 0) {
+                    if (searchHistory.length > 0) {
                       setShowMobileSearchHistory(true);
                     }
                   }}
@@ -4922,37 +4922,55 @@ const Home: React.FC = () => {
                 </button>
                 
                 {/* Search History Dropdown */}
-                {showMobileSearchHistory && mobileSearchQuery.trim() && searchHistory.length > 0 && (
-                  <div
-                    className="absolute top-full left-0 right-0 mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-lg"
+                {showMobileSearchHistory && searchHistory.length > 0 && (
+                  <div 
+                    className="absolute top-full left-0 right-0 mt-1 z-50 bg-white rounded-lg shadow-lg border border-gray-100"
                     style={{
-                      maxHeight: '200px',
-                      overflowY: 'auto'
+                      fontFamily: 'Poppins, sans-serif'
                     }}
                   >
-                    {searchHistory
-                      .filter(item => item.toLowerCase().includes(mobileSearchQuery.toLowerCase()))
-                      .map((item, index) => (
-                        <div
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                      <h3 className="font-medium text-sm" style={{ color: '#212121' }}>
+                        Search history
+                      </h3>
+                      <button className="text-gray-400 hover:text-gray-600">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <circle cx="4" cy="10" r="1.5"/>
+                          <circle cx="10" cy="10" r="1.5"/>
+                          <circle cx="16" cy="10" r="1.5"/>
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    {/* Search History Items */}
+                    <div className="py-1">
+                      {searchHistory.map((item, index) => (
+                        <button 
                           key={index}
                           onClick={() => {
                             setMobileSearchQuery(item);
                             setShowMobileSearchHistory(false);
+                            setMobileSearchSubmitted(true);
                           }}
-                          className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-4 py-2"
+                          className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                           style={{
-                            borderBottom: index < searchHistory.length - 1 ? '1px solid #F0F0F0' : 'none'
+                            backgroundColor: index === 0 ? '#F0F8FE' : 'transparent'
                           }}
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
-                          </svg>
-                          <span style={{ color: '#6A6A6A', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                            {item}
+                          <span className="font-normal text-sm" style={{ color: '#6A6A6A' }}>
+                            {item.length > 25 ? item.substring(0, 25) + '...' : item}
                           </span>
-                        </div>
+                          <svg 
+                            className="w-4 h-4 flex-shrink-0 ml-2" 
+                            fill="#6A6A6A" 
+                            viewBox="0 0 20 20"
+                          >
+                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </button>
                       ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -5074,43 +5092,191 @@ const Home: React.FC = () => {
           {/* Country Filter - Show when seller location is applied */}
           {mobileFilterSellerLocation && mobileSearchSubmitted && (
             <div className="px-4 pb-3">
-              {renderCountryFilterButton('relative', 'mobile-search-country')}
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                {/* More Options Button */}
+                <button
+                  className="flex-shrink-0 flex items-center justify-center"
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    border: '1px solid #E9E9E9',
+                    backgroundColor: '#FFF'
+                  }}
+                  aria-label="More options"
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <circle cx="3.5" cy="7" r="1.25" fill="#6A6A6A"/>
+                    <circle cx="7" cy="7" r="1.25" fill="#6A6A6A"/>
+                    <circle cx="10.5" cy="7" r="1.25" fill="#6A6A6A"/>
+                  </svg>
+                </button>
+
+                {/* Africa Button */}
+                <button
+                  onClick={() => setSelectedCountry('')}
+                  className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+                  style={{
+                    backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
+                    border: !selectedCountry ? '1px solid #CFE8FC' : 'none',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  <img 
+                    src={globyIcon} 
+                    alt="Globe"
+                    className="w-3.5 h-3.5"
+                    style={{
+                      filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                    }}
+                  />
+                  <span 
+                    className="text-xs font-normal whitespace-nowrap"
+                    style={{ 
+                      color: !selectedCountry ? '#5BA5E0' : '#6A6A6A'
+                    }}
+                  >
+                    Africa
+                  </span>
+                </button>
+
+                {/* Country Buttons */}
+                {africanCountries.slice(0, 10).map((country) => (
+                  <button
+                    key={country.name}
+                    onClick={() => setSelectedCountry(country.name)}
+                    className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+                    style={{
+                      backgroundColor: '#FAFAFA',
+                      border: 'none',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    <img 
+                      src={country.flag} 
+                      alt={`${country.name} flag`}
+                      className="w-3.5 h-3.5 object-cover rounded-full"
+                    />
+                    <span 
+                      className="text-xs font-normal whitespace-nowrap"
+                      style={{ color: '#6A6A6A' }}
+                    >
+                      {country.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
           {/* Category and Country Filters - Show when no filters applied and search is submitted */}
           {!mobileFilterCategory && !mobileFilterProductOrigin && !mobileFilterSellerLocation && mobileSearchSubmitted && (
             <div className="px-4 pb-3 space-y-3">
-              {/* Category Filter */}
-              <div className="flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {/* Category Filter - Match Home Page */}
+              <div className="flex justify-start space-x-2 overflow-x-auto scrollbar-hide relative">
                 <style>{`
-                  .category-scroll::-webkit-scrollbar {
+                  .scrollbar-hide::-webkit-scrollbar {
                     display: none;
                   }
+                  .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                  }
                 `}</style>
-                <div className="flex gap-2 category-scroll" style={{ minWidth: 'max-content' }}>
-                  {categories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => setActiveCategory(category)}
-                      className="px-3 py-1.5 rounded-full whitespace-nowrap transition-colors"
-                      style={{
-                        backgroundColor: activeCategory === category ? '#F0F8FE' : '#FFFFFF',
-                        border: `1px solid ${activeCategory === category ? '#64B5F6' : '#E4E4E4'}`,
-                        color: activeCategory === category ? '#64B5F6' : '#6A6A6A',
-                        fontSize: '12px',
-                        fontFamily: 'Poppins, sans-serif'
-                      }}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    className={`whitespace-nowrap pb-2 px-0.5 transition-colors flex-shrink-0 relative`}
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: '300',
+                      fontFamily: 'Poppins, sans-serif',
+                      color: activeCategory === category ? '#64B5F6' : '#BABABA'
+                    }}
+                  >
+                    {category}
+                    {activeCategory === category && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: '#64B5F6' }}></div>
+                    )}
+                  </button>
+                ))}
               </div>
               
-              {/* Country Filter */}
-              <div>
-                {renderCountryFilterButton('relative', 'mobile-search-country-no-filter')}
+              {/* Country Filter - Match Home Page Mobile Horizontal Scroll */}
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                {/* More Options Button */}
+                <button
+                  className="flex-shrink-0 flex items-center justify-center"
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    border: '1px solid #E9E9E9',
+                    backgroundColor: '#FFF'
+                  }}
+                  aria-label="More options"
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <circle cx="3.5" cy="7" r="1.25" fill="#6A6A6A"/>
+                    <circle cx="7" cy="7" r="1.25" fill="#6A6A6A"/>
+                    <circle cx="10.5" cy="7" r="1.25" fill="#6A6A6A"/>
+                  </svg>
+                </button>
+
+                {/* Africa Button */}
+                <button
+                  onClick={() => setSelectedCountry('')}
+                  className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+                  style={{
+                    backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
+                    border: !selectedCountry ? '1px solid #CFE8FC' : 'none',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  <img 
+                    src={globyIcon} 
+                    alt="Globe"
+                    className="w-3.5 h-3.5"
+                    style={{
+                      filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                    }}
+                  />
+                  <span 
+                    className="text-xs font-normal whitespace-nowrap"
+                    style={{ 
+                      color: !selectedCountry ? '#5BA5E0' : '#6A6A6A'
+                    }}
+                  >
+                    Africa
+                  </span>
+                </button>
+
+                {/* Country Buttons */}
+                {africanCountries.slice(0, 10).map((country) => (
+                  <button
+                    key={country.name}
+                    onClick={() => setSelectedCountry(country.name)}
+                    className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+                    style={{
+                      backgroundColor: '#FAFAFA',
+                      border: 'none',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    <img 
+                      src={country.flag} 
+                      alt={`${country.name} flag`}
+                      className="w-3.5 h-3.5 object-cover rounded-full"
+                    />
+                    <span 
+                      className="text-xs font-normal whitespace-nowrap"
+                      style={{ color: '#6A6A6A' }}
+                    >
+                      {country.name}
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -5162,23 +5328,23 @@ const Home: React.FC = () => {
 
                   if (filteredProducts.length === 0) {
                     return (
-                      <div className="text-center" style={{ padding: '48px 16px' }}>
+                      <div className="text-center" style={{ padding: '32px 16px' }}>
                         <img 
                           src={bagIcon} 
                           alt="No products found" 
                           className="mx-auto" 
                           style={{ 
-                            width: '60px', 
-                            height: '60px',
-                            marginBottom: '16px'
+                            width: '40px', 
+                            height: '40px',
+                            marginBottom: '12px'
                           }}
                         />
                         <p style={{ 
-                          fontSize: '18px', 
+                          fontSize: '12px', 
                           color: '#6A6A6A', 
                           fontFamily: 'Poppins, sans-serif', 
-                          maxWidth: '500px', 
-                          margin: '0 auto 16px',
+                          maxWidth: '280px', 
+                          margin: '0 auto 12px',
                           lineHeight: '1.5'
                         }}>
                           Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
@@ -5189,20 +5355,20 @@ const Home: React.FC = () => {
                           className="inline-flex items-center mx-auto"
                           style={{
                             display: 'flex',
-                            padding: '10px 20px',
+                            padding: '8px 16px',
                             alignItems: 'center',
-                            gap: '6px',
+                            gap: '4px',
                             borderRadius: '8px',
                             backgroundColor: '#F0F8FE',
                             color: '#64B5F6',
                             border: 'none',
                             cursor: 'pointer',
                             fontFamily: 'Poppins, sans-serif',
-                            fontSize: '14px',
+                            fontSize: '11px',
                             fontWeight: '500'
                           }}
                         >
-                          <img src={draftsIcon} alt="Request" style={{ width: '20px', height: '20px' }} />
+                          <img src={draftsIcon} alt="Request" style={{ width: '14px', height: '14px' }} />
                           <span>Make a request</span>
                         </button>
                       </div>
@@ -5212,45 +5378,134 @@ const Home: React.FC = () => {
                   return (
                     <>
                       <div className="pb-3">
-                        <h2 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', color: '#212121', fontWeight: 600 }}>
+                        <h2 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', color: '#212121', fontWeight: 500 }}>
                           Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'})</span>
                         </h2>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         {filteredProducts.map((product) => (
-                          <div
+                          <Link
                             key={product.id}
-                            className="bg-white rounded-lg overflow-hidden cursor-pointer"
-                            onClick={() => navigate(`/product/${product.id}`)}
+                            to={`/product/${product.id}`}
+                            className="bg-white rounded-lg overflow-hidden transition-all duration-200 block"
                           >
-                            <div className="aspect-square relative overflow-hidden mb-1" style={{ borderRadius: '12px', padding: '2px' }}>
-                              <img
-                                src={product.image}
+                            {/* Product Image - Top */}
+                            <div className="aspect-square relative overflow-hidden mb-1" style={{ borderRadius: '10px' }}>
+                              <img 
+                                src={product.image} 
                                 alt={product.name}
                                 className="w-full h-full object-cover"
-                                style={{ borderRadius: '12px' }}
+                                style={{ borderRadius: '10px' }}
+                                loading="lazy"
                               />
-                            </div>
-                            <div className="px-2 pb-2">
-                              <h3 className="font-medium mb-1 text-[12px] truncate" style={{ color: '#212121', fontFamily: 'Poppins, sans-serif' }}>
-                                {product.name}
-                              </h3>
-                              <div className="flex items-center gap-1 mb-2">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="#FBBC05" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                                <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                                  4.5
-                                </span>
-                                <span style={{ color: '#B0B0B0', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>
-                                  (12 Reviews)
+                              
+                              {/* Country Badge */}
+                              <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                                display: 'flex', 
+                                padding: '1px 4px', 
+                                justifyContent: 'center', 
+                                alignItems: 'center', 
+                                gap: '2px',
+                                top: '6px',
+                                left: '6px'
+                              }}>
+                                <img 
+                                  src={getProductCountry(product.id).flag} 
+                                  alt={getProductCountry(product.id).name}
+                                  className="rounded-full"
+                                  style={{ 
+                                    width: '10px',
+                                    height: '10px',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                                <span className="font-medium text-gray-800" style={{ fontSize: '8px' }}>
+                                  {getProductCountry(product.id).abbreviation}
                                 </span>
                               </div>
-                              <span className="font-semibold" style={{ color: '#212121', fontSize: '14px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                USD {product.price}
-                              </span>
                             </div>
-                          </div>
+                            
+                            {/* Product Content */}
+                            <div className="flex flex-col" style={{ padding: '0 6px 6px 6px' }}>
+                              {/* Price and Verified Badge Row */}
+                              <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                                <div className="font-bold text-gray-900" style={{ fontSize: '12px' }}>
+                                  ${product.price}
+                                </div>
+                                {product.verified ? (
+                                  <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                                    display: 'flex', 
+                                    padding: '1px 3px', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: '1px', 
+                                    fontSize: '7px' 
+                                  }}>
+                                    <img src={verifyIcon} alt="Verified" style={{ width: '6px', height: '6px' }} />
+                                    <span>Verified seller</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ 
+                                    display: 'flex', 
+                                    padding: '1px 3px', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: '1px', 
+                                    fontSize: '7px' 
+                                  }}>
+                                    <img src={unverifyIcon} alt="Unverified" style={{ width: '6px', height: '6px' }} />
+                                    <span>Unverified Seller</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Product Name */}
+                              <h3 className="line-clamp-2 font-medium" style={{ 
+                                fontSize: '10px', 
+                                color: '#212121',
+                                marginBottom: '4px'
+                              }}>{product.name}</h3>
+                              
+                              {/* Location and Bookmark Row - Below Product Name */}
+                              <div className="flex items-center justify-between">
+                                {/* Location */}
+                                <div className="flex items-center text-gray-500 flex-1">
+                                  <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                                    width: '8px',
+                                    height: '8px',
+                                    marginRight: '3px'
+                                  }} />
+                                  <span className="truncate font-normal" style={{ fontSize: '8px' }}>{product.location}</span>
+                                </div>
+                                
+                                {/* Bookmark Button */}
+                                <div style={{ marginLeft: '4px' }}>
+                                  <button 
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      handleSave(product.id);
+                                    }}
+                                    className="transition-colors touch-manipulation"
+                                    title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                                    style={{ 
+                                      width: '16px', 
+                                      height: '16px', 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      justifyContent: 'center' 
+                                    }}
+                                  >
+                                    <img src={bookmarkIcon} alt="Bookmark" style={{
+                                      width: '16px',
+                                      height: '16px',
+                                      filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                                    }} />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
                         ))}
                       </div>
                     </>
