@@ -94,7 +94,7 @@ const Home: React.FC = () => {
   const totalPages = 48;
   const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const [isMobile, setIsMobile] = useState(false);
-  const [searchHistory, setSearchHistory] = useState<string[]>(['Epices Camerounais', 'Vêtements', 'Produits Nigerians', 'Masque culturel', 'Accessoires traditionnels']);
+  const [searchHistory, setSearchHistory] = useState<string[]>(['Cameroonian spices', 'Ivorian clothing', 'Nigerian products', 'Cultural mask', 'Traditional accessories']);
   const [showSearchHistory, setShowSearchHistory] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [selectedCategoryText, setSelectedCategoryText] = useState('');
@@ -4857,7 +4857,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Search Bar and Filter Button */}
-          <div className="px-4 pb-3">
+          <div className="px-4 pb-3 relative">
             <div className="flex items-center gap-2">
               <div className="flex-1 relative">
                 <input
@@ -4921,58 +4921,105 @@ const Home: React.FC = () => {
                   />
                 </button>
                 
-                {/* Search History Dropdown */}
-                {showMobileSearchHistory && searchHistory.length > 0 && (
+              </div>
+              <button
+                onClick={() => {
+                  setFilterPageOpenedFrom('search');
+                  setShowMobileFilterPage(true);
+                }}
+                className="flex items-center justify-center relative flex-shrink-0"
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  border: '0.5px solid #E9E9E9',
+                  backgroundColor: '#FFF'
+                }}
+                aria-label="Filter"
+              >
+                <svg 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 20 20" 
+                  fill="none"
+                >
+                  <line x1="3" y1="6" x2="17" y2="6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
+                  <line x1="3" y1="14" x2="17" y2="14" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
+                </svg>
+                {(mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) && (
                   <div 
-                    className="absolute top-full left-0 right-0 mt-1 z-50 bg-white rounded-lg shadow-lg border border-gray-100"
+                    className="absolute"
                     style={{
-                      fontFamily: 'Poppins, sans-serif'
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: '#FF0000',
+                      bottom: '2px',
+                      right: '2px'
                     }}
-                  >
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                      <h3 className="font-medium text-sm" style={{ color: '#212121' }}>
-                        Search history
-                      </h3>
-                      <button className="text-gray-400 hover:text-gray-600">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <circle cx="4" cy="10" r="1.5"/>
-                          <circle cx="10" cy="10" r="1.5"/>
-                          <circle cx="16" cy="10" r="1.5"/>
-                        </svg>
-                      </button>
-                    </div>
-                    
-                    {/* Search History Items */}
-                    <div className="py-1">
-                      {searchHistory.map((item, index) => (
-                        <button 
-                          key={index}
-                          onClick={() => {
-                            setMobileSearchQuery(item);
-                            setShowMobileSearchHistory(false);
-                            setMobileSearchSubmitted(true);
-                          }}
-                          className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left"
-                          style={{
-                            backgroundColor: index === 0 ? '#F0F8FE' : 'transparent'
-                          }}
-                        >
-                          <span className="font-normal text-sm" style={{ color: '#6A6A6A' }}>
-                            {item.length > 25 ? item.substring(0, 25) + '...' : item}
-                          </span>
-                          <svg 
-                            className="w-4 h-4 flex-shrink-0 ml-2" 
-                            fill="#6A6A6A" 
-                            viewBox="0 0 20 20"
-                          >
-                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  />
                 )}
+              </button>
+            </div>
+            
+            {/* Search History Dropdown - Positioned below search bar and filter */}
+            {showMobileSearchHistory && searchHistory.length > 0 && (
+              <div 
+                className="mt-1 z-50 bg-white"
+                style={{
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-2">
+                  <h3 className="font-medium text-xs" style={{ color: '#212121' }}>
+                    Search history
+                  </h3>
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <circle cx="4" cy="10" r="1.5"/>
+                      <circle cx="10" cy="10" r="1.5"/>
+                      <circle cx="16" cy="10" r="1.5"/>
+                    </svg>
+                  </button>
+                </div>
+                
+                {/* Search History Items */}
+                <div>
+                  {searchHistory.map((item, index) => (
+                    <button 
+                      key={index}
+                      onClick={() => {
+                        setMobileSearchQuery(item);
+                        setShowMobileSearchHistory(false);
+                        setMobileSearchSubmitted(true);
+                      }}
+                      className="w-full flex items-center justify-between px-4 py-2 hover:bg-gray-50 transition-colors text-left"
+                      style={{
+                        backgroundColor: index === 0 ? '#F0F8FE' : 'transparent'
+                      }}
+                    >
+                      <span className="font-normal text-xs" style={{ color: '#6A6A6A' }}>
+                        {item.length > 25 ? item.substring(0, 25) + '...' : item}
+                      </span>
+                      <svg 
+                        className="w-3 h-3 flex-shrink-0 ml-2" 
+                        fill="none" 
+                        stroke="#6A6A6A" 
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M7 17L17 7M7 7h10v10" />
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
               </div>
               <button
                 onClick={() => {
