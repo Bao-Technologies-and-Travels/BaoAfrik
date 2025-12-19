@@ -5020,48 +5020,6 @@ const Home: React.FC = () => {
                 </div>
               </div>
             )}
-              </div>
-              <button
-                onClick={() => {
-                  setFilterPageOpenedFrom('search');
-                  setShowMobileFilterPage(true);
-                }}
-                className="flex items-center justify-center relative flex-shrink-0"
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  border: '0.5px solid #E9E9E9',
-                  backgroundColor: '#FFF'
-                }}
-                aria-label="Filter"
-              >
-                <svg 
-                  width="20" 
-                  height="20" 
-                  viewBox="0 0 20 20" 
-                  fill="none"
-                >
-                  <line x1="3" y1="6" x2="17" y2="6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
-                  <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
-                  <line x1="3" y1="14" x2="17" y2="14" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round"/>
-                  <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#6A6A6A" strokeWidth="1.5"/>
-                </svg>
-                {(mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) && (
-                  <div 
-                    className="absolute"
-                    style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      backgroundColor: '#FF0000',
-                      bottom: '2px',
-                      right: '2px'
-                    }}
-                  />
-                )}
-              </button>
-            </div>
           </div>
 
           {/* Active Filters Section */}
