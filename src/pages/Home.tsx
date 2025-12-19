@@ -3641,7 +3641,7 @@ const Home: React.FC = () => {
       )}
 
       {/* Buy & Sell Instantly Section */}
-      <section className="pt-4 pb-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <section className="pt-0 pb-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif', marginTop: '-32px' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="flex items-start justify-between mb-6 sm:mb-8">
