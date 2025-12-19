@@ -37,6 +37,8 @@ import draftsIcon from '../assets/images/pre/drafts.svg';
 import bagIcon from '../assets/images/pre/bag.svg';
 import settingIcon from '../assets/images/pre/setting.svg';
 import requestArrowIcon from '../assets/images/pre/requestarrow.svg';
+import shareIcon from '../assets/images/pre/Share.svg';
+import requestIcon from '../assets/images/pre/request.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -95,6 +97,9 @@ const Home: React.FC = () => {
   const [selectedPlaceOfOriginText, setSelectedPlaceOfOriginText] = useState('');
   const [focusedSearchSection, setFocusedSearchSection] = useState<string | null>(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
+  const moreOptionsRef = React.useRef<HTMLDivElement>(null);
+  const [selectedCard, setSelectedCard] = useState<{ title: string; country: string; flag: string; location: string; description: string } | null>(null);
   const [requestProductName, setRequestProductName] = useState('');
   const [requestProductOrigin, setRequestProductOrigin] = useState('');
   const [requestDescription, setRequestDescription] = useState('');
@@ -775,6 +780,776 @@ const Home: React.FC = () => {
           </div>
         )}
       </div>
+    );
+  };
+
+  // Render request card (same as Requests page)
+  const renderRequestCard = (isPending: boolean = false, cardId: string = '', productData?: { title: string; country: string; flag: string; location: string; isPending?: boolean; description?: string }) => {
+    const defaultProduct = {
+      title: 'Snails from South Africa',
+      country: 'South Africa',
+      flag: 'https://flagcdn.com/w20/za.png',
+      location: 'London, United Kingdom',
+      description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.'
+    };
+    const product = productData || defaultProduct;
+    const cardIsPending = productData?.isPending !== undefined ? productData.isPending : isPending;
+    
+    return (
+    <div 
+      className="bg-white hover:shadow-md transition-shadow cursor-pointer"
+      onClick={(e) => {
+        // Prevent modal from opening when clicking on buttons inside the card
+        if ((e.target as HTMLElement).closest('button')) {
+          return;
+        }
+        setSelectedCard({
+          title: product.title,
+          country: product.country,
+          flag: product.flag,
+          location: product.location,
+          description: product.description || 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.'
+        });
+        setShowRequestModal(true);
+      }}
+      style={{ 
+        position: isMobile ? 'relative' : 'relative',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
+        height: 'auto',
+        width: isMobile ? '260px' : 'auto',
+        flexShrink: isMobile ? 0 : 'initial',
+        padding: isMobile ? '10px' : '16px',
+        borderRadius: '24px',
+        margin: isMobile ? '0 4px' : '0'
+      }}
+    >
+      {/* Product Name Label and Button - Desktop only */}
+      {!isMobile && (
+        <div className="flex items-center justify-between mb-2">
+          <span 
+            style={{ 
+              fontSize: '10px', 
+              color: '#BABABA',
+              border: '1px solid #E1E1E1',
+              borderRadius: '999px',
+              padding: '2px 8px',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            Request
+          </span>
+          {cardIsPending ? (
+            <div className="flex items-center gap-2">
+              <div 
+                className="px-2 py-0.5 rounded-md"
+                style={{ 
+                  backgroundColor: '#F4F4F4',
+                  fontSize: '10px',
+                  color: '#6A6A6A',
+                  fontWeight: 'normal',
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              >
+                Pending
+              </div>
+              <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                <button
+                  type="button"
+                  className="w-5 h-5 rounded-full border flex items-center justify-center"
+                  style={{
+                    borderColor: '#B0B0B0',
+                    borderWidth: '1.5px',
+                    backgroundColor: '#FFFFFF',
+                    cursor: 'pointer',
+                    padding: 0
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMoreOptionsOpenFor(moreOptionsOpenFor === cardId ? null : cardId);
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                  </svg>
+                </button>
+                {moreOptionsOpenFor === cardId && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '26px',
+                      right: 0,
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: isMobile ? '12px' : '16px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: isMobile ? '6px' : '8px',
+                      minWidth: isMobile ? '150px' : '200px',
+                      zIndex: 1000
+                    }}
+                  >
+                    {/* Manage request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={requestIcon} 
+                        alt="Request" 
+                        style={{ 
+                          width: isMobile ? '14px' : '18px', 
+                          height: isMobile ? '14px' : '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span>Manage request</span>
+                    </button>
+                    
+                    {/* Share the request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={shareIcon} 
+                        alt="Share" 
+                        style={{ 
+                          width: isMobile ? '14px' : '18px', 
+                          height: isMobile ? '14px' : '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
+                    </button>
+                    
+                    {/* Close */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: '#FAFAFA',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393'
+                      }}
+                    >
+                      <svg width={isMobile ? '14' : '18'} height={isMobile ? '14' : '18'} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Close</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button 
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg border"
+                style={{ 
+                  backgroundColor: '#FFFFFF', 
+                  borderColor: '#F9A825',
+                  color: '#F9A825',
+                  fontWeight: 'normal', 
+                  fontSize: '11px',
+                  fontFamily: 'Poppins, sans-serif',
+                  height: '26px',
+                  width: 'auto'
+                }}
+              >
+                <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
+                Manage request
+              </button>
+              <button
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor: '#F4F4F4',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <img 
+                  src={shareIcon} 
+                  alt="Share" 
+                  style={{ 
+                    width: '16px', 
+                    height: '16px',
+                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                  }} 
+                />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Product Name Label and Status Badge - Mobile */}
+      {isMobile && (
+        <div className="flex items-center justify-between mb-1" style={{ position: 'relative' }}>
+          <span 
+            style={{ 
+              fontSize: '9px', 
+              color: '#BABABA',
+              border: '1px solid #E1E1E1',
+              borderRadius: '999px',
+              padding: '2px 6px',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            Request
+          </span>
+          {/* Share button - only for non-pending cards in Requests near you section */}
+          {!cardIsPending && (cardId.startsWith('near') || cardId.startsWith('filtered') || cardId.startsWith('buy-sell')) && (
+            <button
+              className="rounded-full flex items-center justify-center"
+              style={{
+                backgroundColor: '#F4F4F4',
+                border: 'none',
+                cursor: 'pointer',
+                width: '24px',
+                height: '24px',
+                flexShrink: 0,
+                position: 'absolute',
+                right: 0
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <img 
+                src={shareIcon} 
+                alt="Share" 
+                style={{ 
+                  width: '12px', 
+                  height: '12px',
+                  filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                }} 
+              />
+            </button>
+          )}
+          {cardIsPending && (
+            <div className="flex items-center gap-2" style={{ position: 'absolute', right: 0, alignItems: 'center' }}>
+              <div 
+                className="px-2 py-0.5 rounded-md"
+                style={{ 
+                  backgroundColor: '#F4F4F4',
+                  fontSize: '10px',
+                  color: '#6A6A6A',
+                  fontWeight: 'normal',
+                  fontFamily: 'Poppins, sans-serif'
+                }}
+              >
+                Pending
+              </div>
+              <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                <button
+                  type="button"
+                  className="w-5 h-5 rounded-full border flex items-center justify-center"
+                  style={{
+                    borderColor: '#B0B0B0',
+                    borderWidth: '1.5px',
+                    backgroundColor: '#FFFFFF',
+                    cursor: 'pointer',
+                    padding: 0
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMoreOptionsOpenFor(moreOptionsOpenFor === cardId ? null : cardId);
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                    <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                  </svg>
+                </button>
+                {moreOptionsOpenFor === cardId && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '26px',
+                      right: 0,
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: isMobile ? '12px' : '16px',
+                      border: '1px solid #E9E9E9',
+                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                      padding: isMobile ? '6px' : '8px',
+                      minWidth: isMobile ? '150px' : '200px',
+                      zIndex: 1000
+                    }}
+                  >
+                    {/* Manage request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={requestIcon} 
+                        alt="Request" 
+                        style={{ 
+                          width: isMobile ? '14px' : '18px', 
+                          height: isMobile ? '14px' : '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span>Manage request</span>
+                    </button>
+                    
+                    {/* Share the request */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <img 
+                        src={shareIcon} 
+                        alt="Share" 
+                        style={{ 
+                          width: isMobile ? '14px' : '18px', 
+                          height: isMobile ? '14px' : '18px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }} 
+                      />
+                      <span style={{ whiteSpace: 'nowrap' }}>Share the request</span>
+                    </button>
+                    
+                    {/* Close */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoreOptionsOpenFor(null);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isMobile ? '8px' : '10px',
+                        padding: isMobile ? '6px 10px' : '8px 12px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: '#FAFAFA',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '13px',
+                        color: '#939393'
+                      }}
+                    >
+                      <svg width={isMobile ? '14' : '18'} height={isMobile ? '14' : '18'} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>Close</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Product Title */}
+      <h3 className="mb-2 sm:mb-3" style={{ fontSize: isMobile ? '11px' : '14px', fontWeight: '500', color: '#212121' }}>
+        {product.title}
+      </h3>
+
+      {/* Description */}
+      <p className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '7px' : '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
+        {product.description || 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.'}
+      </p>
+
+      {/* Tags and User Info Row - Desktop/Tablet */}
+      {!isMobile && (
+        <div className="flex items-end justify-between">
+          {/* Tags - Stacked Layout */}
+          <div className="flex flex-col gap-2">
+            {/* First Row - Location */}
+            <div 
+              className="flex items-center gap-1.5 px-2.5 py-1"
+              style={{ 
+                backgroundColor: '#FFFFFF', 
+                borderRadius: '999px', 
+                width: 'fit-content',
+                border: '1px solid #E1E1E1'
+              }}
+            >
+              <img 
+                src={locationIcon} 
+                alt="Location"
+                className="w-3 h-3"
+                style={{ filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)' }}
+              />
+              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.location}</span>
+            </div>
+
+            {/* Second Row - Price and Country */}
+            <div className="flex gap-2">
+              {/* Price Tag */}
+              <div 
+                className="flex items-center gap-1.5 px-2.5 py-1"
+                style={{ 
+                  backgroundColor: '#FFFFFF', 
+                  borderRadius: '999px',
+                  border: '1px solid #E1E1E1'
+                }}
+              >
+                <img 
+                  src={moneyIcon} 
+                  alt="Money"
+                  className="w-3 h-3"
+                  style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                />
+                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>50 - 100 USD</span>
+              </div>
+
+              {/* Country Tag */}
+              <div 
+                className="flex items-center gap-1.5 px-2.5 py-1"
+                style={{ 
+                  backgroundColor: '#FFFFFF', 
+                  borderRadius: '999px',
+                  border: '1px solid #E1E1E1'
+                }}
+              >
+                <img 
+                  src={product.flag} 
+                  alt={product.country}
+                  className="object-cover rounded-full"
+                  style={{ width: '16px', height: '16px' }}
+                />
+                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.country}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* User Info */}
+          <div className="flex flex-col items-center mt-2">
+            <div 
+              className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
+              style={{ 
+                backgroundColor: '#F7C9B0',
+                border: '2px solid #939393'
+              }}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
+                <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
+              </svg>
+            </div>
+            <div 
+              className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 border -mt-2"
+              style={{ borderColor: '#F4F4F4', backgroundColor: '#FFFFFF', borderRadius: '12px' }}
+            >
+              <svg className="w-2.5 h-2.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <span style={{ fontSize: '10px', color: '#212121', fontWeight: '500' }}>4.3</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tags - Mobile Only */}
+      {isMobile && (
+        <div className="flex flex-col gap-2 mb-3">
+          {/* First Row - Location */}
+          <div 
+            className="flex items-center gap-1.5 px-2 py-0.5"
+            style={{ 
+              backgroundColor: '#FFFFFF', 
+              borderRadius: '999px', 
+              width: 'fit-content',
+              border: '1px solid #E1E1E1'
+            }}
+          >
+            <img 
+              src={locationIcon} 
+              alt="Location"
+              style={{ 
+                width: '9px',
+                height: '9px',
+                filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)'
+              }}
+            />
+            <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.location}</span>
+          </div>
+
+          {/* Second Row - Price and Country */}
+          <div className="flex gap-2">
+            {/* Price Tag */}
+            <div 
+              className="flex items-center gap-1.5 px-2 py-0.5"
+              style={{ 
+                backgroundColor: '#FFFFFF', 
+                borderRadius: '999px',
+                border: '1px solid #E1E1E1'
+              }}
+            >
+              <img 
+                src={moneyIcon} 
+                alt="Money"
+                style={{ 
+                  width: '9px',
+                  height: '9px',
+                  filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                }}
+              />
+              <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>50 ~ 100 USD</span>
+            </div>
+
+            {/* Country Tag */}
+            <div 
+              className="flex items-center gap-1.5 px-2 py-0.5"
+              style={{ 
+                backgroundColor: '#FFFFFF', 
+                borderRadius: '999px',
+                border: '1px solid #E1E1E1'
+              }}
+            >
+              <img 
+                src={product.flag} 
+                alt={product.country}
+                className="rounded-full"
+                style={{ 
+                  width: '11px',
+                  height: '11px',
+                  objectFit: 'cover',
+                  borderRadius: '50%'
+                }}
+              />
+              <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.country}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Profile Section - Mobile (New Layout) */}
+      {isMobile && (
+        <>
+          {/* Gray Divider */}
+          <div style={{ width: '100%', height: '0.5px', backgroundColor: '#E4E4E4', marginBottom: '8px' }}></div>
+          
+          <div className="flex items-center justify-between">
+            {/* Left: Avatar and User Info */}
+            <div className="flex items-center gap-2">
+              <div 
+                className="rounded-full flex items-center justify-center overflow-hidden"
+                style={{ 
+                  backgroundColor: '#F7C9B0',
+                  width: '24px',
+                  height: '24px',
+                  border: '2px solid #939393'
+                }}
+              >
+                <svg 
+                  style={{ width: '14px', height: '14px' }} 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
+                  <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#8B5E3C"/>
+                </svg>
+              </div>
+              <div className="flex flex-col">
+                <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>Seraphin DIKOUM</span>
+                {/* Rating below name */}
+                <div className="flex items-center gap-0.5 mt-0.5">
+                  <svg 
+                    className="text-yellow-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg 
+                    className="text-yellow-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg 
+                    className="text-yellow-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg 
+                    className="text-yellow-500" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg 
+                    className="text-gray-300" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                    style={{ width: '8px', height: '8px' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500', marginLeft: '2px' }}>4.3</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Share button - only for non-pending cards in Requests near you section (Desktop only) */}
+            {!cardIsPending && (cardId.startsWith('near') || cardId.startsWith('filtered') || cardId.startsWith('buy-sell')) && !isMobile && (
+              <button
+                className="rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor: '#F4F4F4',
+                  border: 'none',
+                  cursor: 'pointer',
+                  width: '32px',
+                  height: '32px',
+                  flexShrink: 0
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <img 
+                  src={shareIcon} 
+                  alt="Share" 
+                  style={{ 
+                    width: '16px', 
+                    height: '16px',
+                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                  }} 
+                />
+              </button>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Manage the request button - Mobile only (replaces Respond to request) */}
+      {isMobile && !cardIsPending && (
+        <div className="w-full flex justify-center mt-3">
+          <button 
+            className="flex items-center justify-center gap-1.5 mx-auto"
+            style={{ 
+              backgroundColor: '#FFFFFF', 
+              borderColor: '#F9A825',
+              border: '1px solid #F9A825',
+              color: '#F9A825',
+              fontWeight: 'normal', 
+              fontSize: '9px',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              width: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
+            Manage the request
+          </button>
+        </div>
+      )}
+    </div>
     );
   };
 
@@ -2751,7 +3526,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className={`flex flex-col ${isMobile ? 'items-center gap-2' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
             <div className={`flex-1 flex justify-center w-full ${isMobile ? '' : ''}`}>
-              <div className={`flex items-center ${isMobile ? 'gap-4' : 'gap-4'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
+              <div className={`flex items-center ${isMobile ? 'gap-6' : 'gap-6'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
                 <button
                   aria-label="Previous page"
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
@@ -2774,7 +3549,7 @@ const Home: React.FC = () => {
                   </svg>
                 </button>
 
-                <div className="flex items-center" style={{ gap: isMobile ? '12px' : '24px' }}>
+                 <div className="flex items-center" style={{ gap: isMobile ? '24px' : '36px' }}>
                   {paginationNumbers.map((page) => (
                     <span
                       key={page}
@@ -2866,7 +3641,7 @@ const Home: React.FC = () => {
       )}
 
       {/* Buy & Sell Instantly Section */}
-      <section className="py-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <section className="pt-4 pb-16 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="flex items-start justify-between mb-6 sm:mb-8">
@@ -2956,80 +3731,174 @@ const Home: React.FC = () => {
               />
             )}
             <div 
-              className={window.innerWidth < 640 ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
-              style={window.innerWidth < 640 ? { 
+              className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+              style={isMobile ? { 
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
                 WebkitOverflowScrolling: 'touch'
               } : {}}
             >
-              {[1, 2, 3].map((index) => (
+              {[
+                { title: 'Snails from South Africa', country: 'South Africa', flag: 'https://flagcdn.com/w20/za.png', location: 'London, United Kingdom', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+                { title: 'Traditional Kente Fabric', country: 'Ghana', flag: 'https://flagcdn.com/w20/gh.png', location: 'Paris, France', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' },
+                { title: 'Premium Coffee Beans', country: 'Ethiopia', flag: 'https://flagcdn.com/w20/et.png', location: 'New York, USA', description: 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.' }
+              ].map((product, index) => (
                 <div 
                   key={index}
-                  className="bg-white rounded-xl hover:shadow-md transition-shadow"
+                  className="bg-white hover:shadow-md transition-shadow cursor-pointer"
                   style={{ 
+                    position: isMobile ? 'relative' : 'relative',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', 
                     height: 'auto',
-                    width: window.innerWidth < 640 ? '260px' : 'auto',
-                    flexShrink: window.innerWidth < 640 ? 0 : 'initial',
-                    padding: window.innerWidth < 640 ? '10px' : '16px'
+                    width: isMobile ? '260px' : 'auto',
+                    flexShrink: isMobile ? 0 : 'initial',
+                    padding: isMobile ? '10px' : '16px',
+                    borderRadius: '24px',
+                    margin: isMobile ? '0 4px' : '0'
                   }}
                 >
                   {/* Product Name Label and Button - Desktop only */}
-                  {window.innerWidth >= 640 && (
-                    <div className="flex items-center justify-between mb-0">
-                      <span style={{ fontSize: '12px', color: '#9C9C9C' }}>Product name</span>
-                      <button 
-                        className="px-3 py-1 rounded-lg text-white"
-                        style={{ backgroundColor: '#F9A825', fontWeight: 'normal', fontSize: '12px' }}
+                  {!isMobile && (
+                    <div className="flex items-center justify-between mb-2">
+                      <span 
+                        style={{ 
+                          fontSize: '10px', 
+                          color: '#BABABA',
+                          border: '1px solid #E1E1E1',
+                          borderRadius: '999px',
+                          padding: '2px 8px',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
                       >
-                        Manage request
+                        Request
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button 
+                          className="flex items-center gap-1.5 px-3 py-1 rounded-lg border"
+                          style={{ 
+                            backgroundColor: '#FFFFFF', 
+                            borderColor: '#F9A825',
+                            color: '#F9A825',
+                            fontWeight: 'normal', 
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            height: '26px',
+                            width: 'auto'
+                          }}
+                        >
+                          <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
+                          Manage request
+                        </button>
+                        <button
+                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          style={{
+                            backgroundColor: '#F4F4F4',
+                            border: 'none',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <img 
+                            src={shareIcon} 
+                            alt="Share" 
+                            style={{ 
+                              width: '16px', 
+                              height: '16px',
+                              filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                            }} 
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Product Name Label and Status Badge - Mobile */}
+                  {isMobile && (
+                    <div className="flex items-center justify-between mb-1" style={{ position: 'relative' }}>
+                      <span 
+                        style={{ 
+                          fontSize: '9px', 
+                          color: '#BABABA',
+                          border: '1px solid #E1E1E1',
+                          borderRadius: '999px',
+                          padding: '2px 6px',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        Request
+                      </span>
+                      <button
+                        className="rounded-full flex items-center justify-center"
+                        style={{
+                          backgroundColor: '#F4F4F4',
+                          border: 'none',
+                          cursor: 'pointer',
+                          width: '24px',
+                          height: '24px',
+                          flexShrink: 0,
+                          position: 'absolute',
+                          right: 0
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        <img 
+                          src={shareIcon} 
+                          alt="Share" 
+                          style={{ 
+                            width: '12px', 
+                            height: '12px',
+                            filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                          }} 
+                        />
                       </button>
                     </div>
                   )}
 
-                  {/* Product Name Label Only - Mobile */}
-                  {window.innerWidth < 640 && (
-                    <div className="mb-1">
-                      <span style={{ fontSize: '9px', color: '#9C9C9C' }}>Product name</span>
-                    </div>
-                  )}
-
                   {/* Product Title */}
-                  <h3 className="mb-2 sm:mb-3" style={{ fontSize: window.innerWidth < 640 ? '11px' : '14px', fontWeight: '500', color: '#212121' }}>
-                    Snails from South Africa
+                  <h3 className="mb-2 sm:mb-3" style={{ fontSize: isMobile ? '11px' : '14px', fontWeight: '500', color: '#212121' }}>
+                    {product.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="mb-3 sm:mb-4" style={{ fontSize: window.innerWidth < 640 ? '7px' : '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  <p className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '7px' : '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
+                    {product.description}
                   </p>
 
                   {/* Tags and User Info Row - Desktop/Tablet */}
-                  {window.innerWidth >= 640 && (
+                  {!isMobile && (
                     <div className="flex items-end justify-between">
                       {/* Tags - Stacked Layout */}
                       <div className="flex flex-col gap-2">
                         {/* First Row - Location */}
                         <div 
-                          className="flex items-center gap-1 px-2 py-1"
-                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                          className="flex items-center gap-1.5 px-2.5 py-1"
+                          style={{ 
+                            backgroundColor: '#FFFFFF', 
+                            borderRadius: '999px', 
+                            width: 'fit-content',
+                            border: '1px solid #E1E1E1'
+                          }}
                         >
                           <img 
                             src={locationIcon} 
                             alt="Location"
                             className="w-3 h-3"
-                            style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
+                            style={{ filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)' }}
                           />
-                          <span style={{ fontSize: '12px', color: '#64B5F6' }}>London, United Kingdom</span>
+                          <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.location}</span>
                         </div>
 
                         {/* Second Row - Price and Country */}
                         <div className="flex gap-2">
                           {/* Price Tag */}
                           <div 
-                            className="flex items-center gap-1.5 px-3 py-1.5"
-                            style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                            className="flex items-center gap-1.5 px-2.5 py-1"
+                            style={{ 
+                              backgroundColor: '#FFFFFF', 
+                              borderRadius: '999px',
+                              border: '1px solid #E1E1E1'
+                            }}
                           >
                             <img 
                               src={moneyIcon} 
@@ -3037,20 +3906,25 @@ const Home: React.FC = () => {
                               className="w-3 h-3"
                               style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                             />
-                            <span style={{ fontSize: '12px', color: '#64B5F6' }}>50 - 100 USD</span>
+                            <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>50 - 100 USD</span>
                           </div>
 
                           {/* Country Tag */}
                           <div 
-                            className="flex items-center gap-1.5 px-3 py-1.5"
-                            style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                            className="flex items-center gap-1.5 px-2.5 py-1"
+                            style={{ 
+                              backgroundColor: '#FFFFFF', 
+                              borderRadius: '999px',
+                              border: '1px solid #E1E1E1'
+                            }}
                           >
                             <img 
-                              src="https://flagcdn.com/w20/za.png" 
-                              alt="South Africa"
-                              className="w-4 h-3 object-cover rounded-sm"
+                              src={product.flag} 
+                              alt={product.country}
+                              className="object-cover rounded-full"
+                              style={{ width: '16px', height: '16px' }}
                             />
-                            <span style={{ fontSize: '12px', color: '#64B5F6' }}>South Africa</span>
+                            <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.country}</span>
                           </div>
                         </div>
                       </div>
@@ -3059,7 +3933,10 @@ const Home: React.FC = () => {
                       <div className="flex flex-col items-center mt-2">
                         <div 
                           className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
-                          style={{ backgroundColor: '#F7C9B0' }}
+                          style={{ 
+                            backgroundColor: '#F7C9B0',
+                            border: '2px solid #939393'
+                          }}
                         >
                           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#8B5E3C"/>
@@ -3080,12 +3957,17 @@ const Home: React.FC = () => {
                   )}
 
                   {/* Tags - Mobile Only */}
-                  {window.innerWidth < 640 && (
+                  {isMobile && (
                     <div className="flex flex-col gap-2 mb-3">
                       {/* First Row - Location */}
                       <div 
-                        className="flex items-center gap-1 px-2 py-1"
-                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px', width: 'fit-content' }}
+                        className="flex items-center gap-1.5 px-2 py-0.5"
+                        style={{ 
+                          backgroundColor: '#FFFFFF', 
+                          borderRadius: '999px', 
+                          width: 'fit-content',
+                          border: '1px solid #E1E1E1'
+                        }}
                       >
                         <img 
                           src={locationIcon} 
@@ -3093,18 +3975,22 @@ const Home: React.FC = () => {
                           style={{ 
                             width: '9px',
                             height: '9px',
-                            filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+                            filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)'
                           }}
                         />
-                        <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>London, United Kingdom</span>
+                        <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.location}</span>
                       </div>
 
                       {/* Second Row - Price and Country */}
                       <div className="flex gap-2">
                         {/* Price Tag */}
                         <div 
-                          className="flex items-center gap-1.5 px-3 py-1.5"
-                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                          className="flex items-center gap-1.5 px-2 py-0.5"
+                          style={{ 
+                            backgroundColor: '#FFFFFF', 
+                            borderRadius: '999px',
+                            border: '1px solid #E1E1E1'
+                          }}
                         >
                           <img 
                             src={moneyIcon} 
@@ -3115,32 +4001,37 @@ const Home: React.FC = () => {
                               filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
                             }}
                           />
-                          <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>50 ~ 100 USD</span>
+                          <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>50 ~ 100 USD</span>
                         </div>
 
                         {/* Country Tag */}
                         <div 
-                          className="flex items-center gap-1.5 px-3 py-1.5"
-                          style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                          className="flex items-center gap-1.5 px-2 py-0.5"
+                          style={{ 
+                            backgroundColor: '#FFFFFF', 
+                            borderRadius: '999px',
+                            border: '1px solid #E1E1E1'
+                          }}
                         >
                           <img 
-                            src="https://flagcdn.com/w20/za.png" 
-                            alt="South Africa"
+                            src={product.flag} 
+                            alt={product.country}
+                            className="rounded-full"
                             style={{ 
                               width: '11px',
-                              height: '8px',
+                              height: '11px',
                               objectFit: 'cover',
-                              borderRadius: '2px'
+                              borderRadius: '50%'
                             }}
                           />
-                          <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>South Africa</span>
+                          <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{product.country}</span>
                         </div>
                       </div>
                     </div>
                   )}
 
                   {/* User Profile Section - Mobile (New Layout) */}
-                  {window.innerWidth < 640 && (
+                  {isMobile && (
                     <>
                       {/* Gray Divider */}
                       <div style={{ width: '100%', height: '0.5px', backgroundColor: '#E4E4E4', marginBottom: '8px' }}></div>
@@ -3153,7 +4044,8 @@ const Home: React.FC = () => {
                             style={{ 
                               backgroundColor: '#F7C9B0',
                               width: '24px',
-                              height: '24px'
+                              height: '24px',
+                              border: '2px solid #939393'
                             }}
                           >
                             <svg 
@@ -3167,41 +4059,85 @@ const Home: React.FC = () => {
                             </svg>
                           </div>
                           <div className="flex flex-col">
-                            <span style={{ fontSize: '7px', color: '#BABABA', fontWeight: 'normal' }}>User profile</span>
                             <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>Seraphin DIKOUM</span>
+                            {/* Rating below name */}
+                            <div className="flex items-center gap-0.5 mt-0.5">
+                              <svg 
+                                className="text-yellow-500" 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                                style={{ width: '8px', height: '8px' }}
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg 
+                                className="text-yellow-500" 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                                style={{ width: '8px', height: '8px' }}
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg 
+                                className="text-yellow-500" 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                                style={{ width: '8px', height: '8px' }}
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg 
+                                className="text-yellow-500" 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                                style={{ width: '8px', height: '8px' }}
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <svg 
+                                className="text-gray-300" 
+                                fill="currentColor" 
+                                viewBox="0 0 20 20"
+                                style={{ width: '8px', height: '8px' }}
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500', marginLeft: '2px' }}>4.3</span>
+                            </div>
                           </div>
-                        </div>
-
-                        {/* Right: Rating */}
-                        <div className="flex items-center gap-0.5">
-                          <svg 
-                            className="text-yellow-500" 
-                            fill="currentColor" 
-                            viewBox="0 0 20 20"
-                            style={{ width: '8px', height: '8px' }}
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>4.3</span>
                         </div>
                       </div>
                     </>
                   )}
 
-                  {/* Respond to the request button - Mobile only */}
-                  {window.innerWidth < 640 && (
-                    <button 
-                      className="w-full mt-3 text-white"
-                      style={{ 
-                        backgroundColor: '#F9A825', 
-                        fontWeight: 'normal', 
-                        fontSize: '9px',
-                        padding: '6px 10px',
-                        borderRadius: '6px'
-                      }}
-                    >
-                      Respond to the request
-                    </button>
+                  {/* Manage the request button - Mobile only */}
+                  {isMobile && (
+                    <div className="w-full flex justify-center mt-3">
+                      <button 
+                        className="flex items-center justify-center gap-1.5 mx-auto"
+                        style={{ 
+                          backgroundColor: '#FFFFFF', 
+                          borderColor: '#F9A825',
+                          border: '1px solid #F9A825',
+                          color: '#F9A825',
+                          fontWeight: 'normal', 
+                          fontSize: '9px',
+                          padding: '6px 10px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          width: 'auto',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
+                        Manage the request
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}

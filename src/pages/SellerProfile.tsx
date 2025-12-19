@@ -77,6 +77,20 @@ const SellerProfile: React.FC = () => {
   const [isReviewPosted, setIsReviewPosted] = useState(false);
   const [postedReview, setPostedReview] = useState<{rating: number; text: string; date: string} | null>(null);
   const [showGiveOpinionModal, setShowGiveOpinionModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
+  const totalPages = 48;
+  const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Update active tab when URL parameter changes
   useEffect(() => {
@@ -2339,149 +2353,116 @@ const SellerProfile: React.FC = () => {
               </div>
               
                 {/* Pagination */}
-                <div className="mt-6 lg:mt-8">
-                  {/* Desktop/Tablet Pagination */}
-                  <div className="hidden lg:flex items-center justify-between">
-                    <div className="flex-1"></div>
-                    
-                    <div className="flex items-center space-x-12">
-                      <button
-                        disabled={true}
-                        className="font-normal transition-colors disabled:cursor-not-allowed text-base"
-                        style={{ color: '#BABABA' }}
-                      >
-                        Previous
-                      </button>
-                      
-                      <div className="flex items-baseline space-x-6">
-                        <button
-                          className="font-normal transition-colors relative pb-1 text-base"
-                          style={{ color: '#212121' }}
-                        >
-                          <span>1</span>
-                          <div 
-                            className="absolute bottom-0 left-1/2 -translate-x-1/2"
-                            style={{
-                              width: '200%',
-                              height: '2px',
-                              backgroundColor: '#212121'
-                            }}
-                          />
-                        </button>
-                        <button
-                          className="font-normal transition-colors hover:text-gray-900 text-base"
-                          style={{ color: '#BABABA' }}
-                        >
-                          2
-                        </button>
-                      </div>
-                      
-                      <button
-                        className="font-normal transition-colors text-base"
-                        style={{ color: '#212121' }}
-                      >
-                        Next
-                      </button>
-                    </div>
-                    
-                    <div className="flex-1 flex justify-end">
-                      <div className="flex items-center space-x-1">
-                        <div className="rounded border px-3 py-1" style={{ backgroundColor: '#F5F5F5', borderColor: '#E9E9E9' }}>
-                          <span className="font-normal text-base" style={{ color: '#212121' }}>1</span>
-                        </div>
-                        <span className="font-normal text-base" style={{ color: '#BABABA' }}>/ 2</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Mobile Pagination */}
-                  <div className="lg:hidden space-y-4">
-                    {/* Page navigation */}
-                    <div className="flex items-center justify-center gap-4">
+                <div className={`flex flex-col ${isMobile ? 'items-center gap-2' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
+                  <div className={`flex-1 flex justify-center w-full ${isMobile ? '' : ''}`}>
+                    <div className={`flex items-center ${isMobile ? 'gap-6' : 'gap-6'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
                       <button
                         aria-label="Previous page"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
                         style={{
-                          width: '28px',
-                          height: '28px',
+                          width: isMobile ? '24px' : '32px',
+                          height: isMobile ? '24px' : '32px',
                           borderRadius: '8px',
                           backgroundColor: '#F0F0F0',
                           border: 'none',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center'
+                          justifyContent: 'center',
+                          cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                          opacity: currentPage === 1 ? 0.5 : 1
                         }}
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width={isMobile ? '12' : '16'} height={isMobile ? '12' : '16'} viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M15 18l-6-6 6-6" />
                         </svg>
                       </button>
 
-                      <div className="flex items-center" style={{ gap: '24px' }}>
-                        <span
-                          style={{
-                            fontFamily: 'Bricolage Grotesque, sans-serif',
-                            fontSize: '14px',
-                            color: '#212121'
+                      <div className="flex items-center" style={{ gap: isMobile ? '24px' : '36px' }}>
+                        {paginationNumbers.map((page) => (
+                          <span
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            style={{
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontSize: isMobile ? '12px' : '16px',
+                              color: page === currentPage ? '#212121' : '#B0B0B0',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {page}
+                          </span>
+                        ))}
+
+                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '12px' : '16px' }}>…</span>
+                        <span 
+                          onClick={() => setCurrentPage(totalPages)}
+                          style={{ 
+                            color: '#B0B0B0', 
+                            fontFamily: 'Bricolage Grotesque, sans-serif', 
+                            fontSize: isMobile ? '12px' : '16px',
+                            cursor: 'pointer'
                           }}
                         >
-                          1
+                          {totalPages}
                         </span>
-                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>2</span>
-                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>3</span>
-                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>…</span>
-                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>48</span>
                       </div>
 
                       <button
                         aria-label="Next page"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
                         style={{
-                          width: '28px',
-                          height: '28px',
+                          width: isMobile ? '24px' : '32px',
+                          height: isMobile ? '24px' : '32px',
                           borderRadius: '8px',
                           backgroundColor: '#F0F0F0',
                           border: 'none',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center'
+                          justifyContent: 'center',
+                          cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                          opacity: currentPage === totalPages ? 0.5 : 1
                         }}
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width={isMobile ? '12' : '16'} height={isMobile ? '12' : '16'} viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M9 6l6 6-6 6" />
                         </svg>
                       </button>
                     </div>
+                  </div>
 
-                    {/* Go to section */}
-                    <div className="flex items-center gap-2 justify-center">
-                      <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
-                      <input
-                        type="text"
-                        placeholder="e.g 40"
-                        style={{
-                          border: '1px solid #BABABA',
-                          borderRadius: '8px',
-                          padding: '6px 10px',
-                          fontFamily: 'Bricolage Grotesque, sans-serif',
-                          fontSize: '12px',
-                          color: '#D9D9D9',
-                          width: '64px',
-                          textAlign: 'center'
-                        }}
-                      />
-                      <button
-                        style={{
-                          backgroundColor: '#212121',
-                          color: '#FFFFFF',
-                          borderRadius: '8px',
-                          padding: '6px 14px',
-                          fontFamily: 'Bricolage Grotesque, sans-serif',
-                          fontSize: '12px',
-                          border: 'none'
-                        }}
-                      >
-                        Go
-                      </button>
-                    </div>
+                  {/* Go to section */}
+                  <div className={`flex items-center ${isMobile ? 'gap-3 justify-center' : 'gap-2'}`}>
+                    <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '11px' : '12px' }}>Go to :</span>
+                    <input
+                      type="text"
+                      placeholder="e.g 40"
+                      style={{
+                        border: '1px solid #BABABA',
+                        borderRadius: '8px',
+                        padding: isMobile ? '5px 9px' : '6px 10px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: isMobile ? '11px' : '12px',
+                        color: '#D9D9D9',
+                        width: isMobile ? '55px' : '64px',
+                        textAlign: 'center'
+                      }}
+                    />
+                    <button
+                      style={{
+                        backgroundColor: '#212121',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: isMobile ? '5px 12px' : '6px 14px',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: isMobile ? '11px' : '12px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Go
+                    </button>
                   </div>
                 </div>
             </>
