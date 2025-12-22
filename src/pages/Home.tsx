@@ -1944,6 +1944,8 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
+      {/* Header - Only visible on mobile */}
+      {isMobile && <Header />}
       {/* Hidden file input for image selection */}
       <input
         id="image-upload"
@@ -4981,16 +4983,25 @@ const Home: React.FC = () => {
                       setShowMobileSearchHistory(false);
                     }, 200);
                   }}
-                  className="w-full px-4 py-3 pr-12 focus:outline-none text-sm"
+                  className="w-full px-4 py-3 pr-12 focus:outline-none"
                   style={{
                     borderRadius: '30px',
                     border: `1px solid ${isMobileSearchFocused ? '#B8DDFB' : '#E9E9E9'}`,
                     backgroundColor: '#FFF',
                     fontFamily: 'Poppins, sans-serif',
                     color: '#212121',
-                    caretColor: '#64B5F6'
+                    caretColor: '#64B5F6',
+                    fontSize: '11px'
                   }}
                 />
+                <style>
+                  {`
+                    input[placeholder="What are you looking for today ?"]::placeholder {
+                      font-size: 11px;
+                      color: #D9D9D9;
+                    }
+                  `}
+                </style>
                 {mobileSearchQuery && (
                   <button
                     onClick={() => {
@@ -5022,6 +5033,7 @@ const Home: React.FC = () => {
               <button
                 onClick={() => {
                   setFilterPageOpenedFrom('search');
+                  setShowMobileSearchFlow(false);
                   setShowMobileFilterPage(true);
                 }}
                 className="flex items-center justify-center relative flex-shrink-0"
@@ -5095,7 +5107,7 @@ const Home: React.FC = () => {
                       }}
                       className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
                       style={{
-                        backgroundColor: index === 0 ? '#F0F8FE' : 'transparent'
+                        backgroundColor: 'transparent'
                       }}
                     >
                       <span className="font-normal text-sm" style={{ color: '#6A6A6A' }}>
@@ -5226,7 +5238,7 @@ const Home: React.FC = () => {
                       }}
                       className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
                       style={{
-                        backgroundColor: index === 0 ? '#F0F8FE' : 'transparent'
+                        backgroundColor: 'transparent'
                       }}
                     >
                       <span className="font-normal text-sm" style={{ color: '#6A6A6A' }}>
@@ -5250,8 +5262,47 @@ const Home: React.FC = () => {
             </div>
           )}
 
-          {/* Country Filter - Show when seller location is applied */}
-          {mobileFilterSellerLocation && mobileSearchSubmitted && (
+          {/* Country Filter - Show when seller location is applied, but hide when no results */}
+          {mobileFilterSellerLocation && mobileSearchSubmitted && (() => {
+            // Check if there are search results
+            let products = [];
+            if (activeCategory === 'All') {
+              products = Object.values(allProducts).flat();
+            } else {
+              products = allProducts[activeCategory as keyof typeof allProducts] || [];
+            }
+            
+            if (selectedCountry) {
+              products = products.filter(product => 
+                getProductCountry(product.id).name === selectedCountry
+              );
+            }
+            
+            const getProductCategory = (productId: number): string => {
+              for (const [category, categoryProducts] of Object.entries(allProducts)) {
+                if (categoryProducts.some(p => p.id === productId)) {
+                  return category;
+                }
+              }
+              return '';
+            };
+            
+            const filteredProducts = products.filter(product => {
+              const query = mobileSearchQuery.toLowerCase().trim();
+              const productCategory = getProductCategory(product.id);
+              const matchesSearch = product.name.toLowerCase().includes(query) ||
+                productCategory.toLowerCase().includes(query) ||
+                product.location.toLowerCase().includes(query);
+              
+              const matchesCategory = !mobileFilterCategory || productCategory === mobileFilterCategory;
+              const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.id).name === mobileFilterProductOrigin;
+              const matchesLocation = !mobileFilterSellerLocation || product.location?.toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
+              
+              return matchesSearch && matchesCategory && matchesOrigin && matchesLocation;
+            });
+            
+            return filteredProducts.length > 0;
+          })() && (
             <div className="px-4 pb-3">
               <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                 {/* More Options Button */}
@@ -5320,7 +5371,9 @@ const Home: React.FC = () => {
                     />
                     <span 
                       className="text-xs font-normal whitespace-nowrap"
-                      style={{ color: '#6A6A6A' }}
+                      style={{ 
+                        color: '#6A6A6A'
+                      }}
                     >
                       {country.name}
                     </span>
@@ -5330,8 +5383,47 @@ const Home: React.FC = () => {
             </div>
           )}
 
-          {/* Category and Country Filters - Show when no filters applied and search is submitted */}
-          {!mobileFilterCategory && !mobileFilterProductOrigin && !mobileFilterSellerLocation && mobileSearchSubmitted && (
+          {/* Category and Country Filters - Show when no filters applied and search is submitted, but hide when no results */}
+          {!mobileFilterCategory && !mobileFilterProductOrigin && !mobileFilterSellerLocation && mobileSearchSubmitted && (() => {
+            // Check if there are search results
+            let products = [];
+            if (activeCategory === 'All') {
+              products = Object.values(allProducts).flat();
+            } else {
+              products = allProducts[activeCategory as keyof typeof allProducts] || [];
+            }
+            
+            if (selectedCountry) {
+              products = products.filter(product => 
+                getProductCountry(product.id).name === selectedCountry
+              );
+            }
+            
+            const getProductCategory = (productId: number): string => {
+              for (const [category, categoryProducts] of Object.entries(allProducts)) {
+                if (categoryProducts.some(p => p.id === productId)) {
+                  return category;
+                }
+              }
+              return '';
+            };
+            
+            const filteredProducts = products.filter(product => {
+              const query = mobileSearchQuery.toLowerCase().trim();
+              const productCategory = getProductCategory(product.id);
+              const matchesSearch = product.name.toLowerCase().includes(query) ||
+                productCategory.toLowerCase().includes(query) ||
+                product.location.toLowerCase().includes(query);
+              
+              const matchesCategory = !mobileFilterCategory || productCategory === mobileFilterCategory;
+              const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.id).name === mobileFilterProductOrigin;
+              const matchesLocation = !mobileFilterSellerLocation || product.location?.toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
+              
+              return matchesSearch && matchesCategory && matchesOrigin && matchesLocation;
+            });
+            
+            return filteredProducts.length > 0;
+          })() && (
             <div className="px-4 pb-3 space-y-3">
               {/* Category Filter - Match Home Page */}
               <div className="flex justify-start space-x-2 overflow-x-auto scrollbar-hide relative">
@@ -5432,7 +5524,9 @@ const Home: React.FC = () => {
                     />
                     <span 
                       className="text-xs font-normal whitespace-nowrap"
-                      style={{ color: '#6A6A6A' }}
+                      style={{ 
+                        color: '#6A6A6A'
+                      }}
                     >
                       {country.name}
                     </span>
@@ -5489,50 +5583,196 @@ const Home: React.FC = () => {
 
                   if (filteredProducts.length === 0) {
                     return (
-                      <div className="text-center" style={{ padding: '32px 16px' }}>
-                        <img 
-                          src={bagIcon} 
-                          alt="No products found" 
-                          className="mx-auto" 
-                          style={{ 
-                            width: '40px', 
-                            height: '40px',
-                            marginBottom: '12px'
-                          }}
-                        />
-                        <p style={{ 
-                          fontSize: '12px', 
-                          color: '#6A6A6A', 
-                          fontFamily: 'Poppins, sans-serif', 
-                          maxWidth: '280px', 
-                          margin: '0 auto 12px',
-                          lineHeight: '1.5'
-                        }}>
-                          Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => setShowRequestModal(true)}
-                          className="inline-flex items-center mx-auto"
-                          style={{
-                            display: 'flex',
-                            padding: '8px 16px',
-                            alignItems: 'center',
-                            gap: '4px',
-                            borderRadius: '8px',
-                            backgroundColor: '#F0F8FE',
-                            color: '#64B5F6',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: '11px',
-                            fontWeight: '500'
-                          }}
-                        >
-                          <img src={draftsIcon} alt="Request" style={{ width: '14px', height: '14px' }} />
-                          <span>Make a request</span>
-                        </button>
-                      </div>
+                      <>
+                        <div className="text-center" style={{ padding: '32px 16px' }}>
+                          <img 
+                            src={bagIcon} 
+                            alt="No products found" 
+                            className="mx-auto" 
+                            style={{ 
+                              width: '40px', 
+                              height: '40px',
+                              marginBottom: '12px'
+                            }}
+                          />
+                          <p style={{ 
+                            fontSize: '12px', 
+                            color: '#6A6A6A', 
+                            fontFamily: 'Poppins, sans-serif', 
+                            maxWidth: '280px', 
+                            margin: '0 auto 12px',
+                            lineHeight: '1.5'
+                          }}>
+                            Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setShowRequestModal(true)}
+                            className="inline-flex items-center mx-auto"
+                            style={{
+                              display: 'flex',
+                              padding: '8px 16px',
+                              alignItems: 'center',
+                              gap: '4px',
+                              borderRadius: '8px',
+                              backgroundColor: '#F0F8FE',
+                              color: '#64B5F6',
+                              border: 'none',
+                              cursor: 'pointer',
+                              fontFamily: 'Poppins, sans-serif',
+                              fontSize: '11px',
+                              fontWeight: '500'
+                            }}
+                          >
+                            <img src={draftsIcon} alt="Request" style={{ width: '14px', height: '14px' }} />
+                            <span>Make a request</span>
+                          </button>
+                        </div>
+                        
+                        {/* Other Products Near You Section */}
+                        <div style={{ marginTop: '32px' }}>
+                          <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
+                            <h3 className="font-semibold text-gray-900" style={{ 
+                              fontFamily: 'Faktum, sans-serif',
+                              fontSize: '14px'
+                            }}>
+                              Other products near you
+                            </h3>
+                            <button className="font-medium hover:underline" style={{ 
+                              color: '#64B5F6', 
+                              fontFamily: 'Poppins, sans-serif',
+                              fontSize: '10px'
+                            }}>
+                              View more...
+                            </button>
+                          </div>
+                          
+                          {/* Product Cards */}
+                          <div className="grid grid-cols-2 gap-3">
+                            {Object.values(allProducts).flat().slice(0, 6).map((product) => (
+                              <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                                {/* Product Image - Top */}
+                                <div className="aspect-square relative overflow-hidden mb-1" style={{ borderRadius: '10px' }}>
+                                  <img 
+                                    src={product.image} 
+                                    alt={product.name}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                    style={{ borderRadius: '10px' }}
+                                    loading="lazy"
+                                    width="200"
+                                    height="200"
+                                  />
+                                  
+                                  {/* Country Badge */}
+                                  <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                                    display: 'flex', 
+                                    padding: '1px 4px', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: '2px',
+                                    top: '6px',
+                                    left: '6px'
+                                  }}>
+                                    <img 
+                                      src={`https://flagcdn.com/w20/${getProductCountry(product.id).code}.png`}
+                                      alt={getProductCountry(product.id).name}
+                                      className="rounded-full"
+                                      style={{ 
+                                        width: '10px',
+                                        height: '10px',
+                                        objectFit: 'cover'
+                                      }}
+                                    />
+                                    <span className="font-medium text-gray-800" style={{ fontSize: '8px' }}>
+                                      {getProductCountry(product.id).abbreviation}
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                {/* Product Content */}
+                                <div className="flex flex-col" style={{ padding: '0 6px 6px 6px' }}>
+                                  {/* Price and Verified Badge Row */}
+                                  <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                                    <div className="font-bold text-gray-900" style={{ fontSize: '12px' }}>
+                                      ${product.price}
+                                    </div>
+                                    {product.verified ? (
+                                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                                        display: 'flex', 
+                                        padding: '1px 3px', 
+                                        justifyContent: 'center', 
+                                        alignItems: 'center', 
+                                        gap: '1px', 
+                                        fontSize: '7px' 
+                                      }}>
+                                        <img src={verifyIcon} alt="Verified" style={{ width: '6px', height: '6px' }} />
+                                        <span>Verified seller</span>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ 
+                                        display: 'flex', 
+                                        padding: '1px 3px', 
+                                        justifyContent: 'center', 
+                                        alignItems: 'center', 
+                                        gap: '1px', 
+                                        fontSize: '7px' 
+                                      }}>
+                                        <img src={unverifyIcon} alt="Unverified" style={{ width: '6px', height: '6px' }} />
+                                        <span>Unverified Seller</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Product Name */}
+                                  <h3 className="line-clamp-2 font-medium" style={{ 
+                                    fontSize: '10px', 
+                                    color: '#212121',
+                                    marginBottom: '4px'
+                                  }}>
+                                    {product.name}
+                                  </h3>
+                                  
+                                  {/* Location and Bookmark Row */}
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center text-gray-500 flex-1">
+                                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                                        width: '8px',
+                                        height: '8px',
+                                        marginRight: '3px'
+                                      }} />
+                                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>{product.location}</span>
+                                    </div>
+                                    {/* Bookmark Button */}
+                                    <button
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleSave(product.id);
+                                      }}
+                                      className="flex-shrink-0"
+                                      style={{ 
+                                        background: 'transparent', 
+                                        border: 'none', 
+                                        cursor: 'pointer', 
+                                        padding: '2px'
+                                      }}
+                                    >
+                                      <img 
+                                        src={savedProducts.has(product.id) ? bookmarkIcon : bookmarkIcon} 
+                                        alt={savedProducts.has(product.id) ? 'Saved' : 'Save'} 
+                                        style={{ 
+                                          width: '12px', 
+                                          height: '12px',
+                                          filter: savedProducts.has(product.id) ? 'brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)' : 'none'
+                                        }} 
+                                      />
+                                    </button>
+                                  </div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </>
                     );
                   }
 
