@@ -102,7 +102,9 @@ export class ChatService {
                                     firstName: true,
                                     lastName: true,
                                     profileImage: true,
-                                    email: true
+                                    email: true,
+                                    location: true,
+                                    createdAt: true
                                 }
                             }
                         }
@@ -317,7 +319,7 @@ export class ChatService {
             }
         });
     }
-    
+
     private async checkDbEncryptAvailable() {
         try {
             await prisma.$queryRaw`SELECT db_encrypt('test')`;

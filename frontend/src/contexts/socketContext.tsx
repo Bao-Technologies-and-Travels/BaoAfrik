@@ -23,21 +23,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             forceNew: true
         });
 
-        s.on('connect', () => {
-            console.log('Socket connected:', s.id);
-        });
-
-        s.on('connect_error', (err) => {
-            console.error('Socket connection error:', err.message);
-        });
-
-        s.on('disconnect', (reason) => {
-            console.log('Socket disconnected:', reason);
-            if (reason === 'io server disconnect') {
-                s.connect();
-            }
-        });
-
         setSocket(s);
         return () => {
             s.off('connect');

@@ -717,6 +717,7 @@ const Messages: React.FC = () => {
     contextSocket.on("connect_error", handleConnectError);
 
     contextSocket.on("new_message", handleNewMessage);
+    contextSocket.on("receive_message", handleNewMessage);
     contextSocket.on("message_status_update", handleMessageStatusUpdate);
     contextSocket.on("message_sent", handleMessageSent);
     contextSocket.on("message_delivered", handleMessageDelivered);
@@ -1068,6 +1069,7 @@ const Messages: React.FC = () => {
         fileUrl: messageData.fileUrl,
         fileName: messageData.fileName,
         fileSize: messageData.fileSize,
+        replyToId: messageData.replyToId,
         senderId: currentUser?.id,
         sender: {
           id: currentUser?.id,
@@ -2322,6 +2324,7 @@ const Messages: React.FC = () => {
         sendMessageViaSocket(currentConversation.id, {
           content: textToSend,
           messageType: "TEXT",
+          replyToId: replyingTo?.id,
           productData: shouldSendProductData ? productData : undefined,
         });
 
@@ -3304,14 +3307,25 @@ const Messages: React.FC = () => {
                       {/* Location */}
                       <div className="flex items-center space-x-0.5">
                         <img src={locIcon} alt="Location" className="w-3 h-3" />
-                        <span style={{ fontSize: '10px', color: '#64B5F6' }}>London | United Kingdom</span>
+                        <span style={{ fontSize: '10px', color: '#64B5F6' }}>
+                          {currentConversation?.otherParticipant?.location || 'London | United Kingdom'}
+                        </span>
                       </div>
                     </div>
 
                     {/* Join Date */}
-                    <div className="flex items-center justify-center space-x-1 mb-2">
-                      <img src={profileIcon} alt="Profile" className="w-3 h-3" style={{ filter: 'brightness(0) saturate(100%) invert(44%) sepia(0%) saturate(0%) hue-rotate(208deg) brightness(94%) contrast(86%)' }} />
-                      <span style={{ fontSize: '10px', color: '#6A6A6A' }}>Joined BAO' Afrik in June 2018</span>
+                    <div className="flex items-center justify-center space-x-2 text-sm mb-4">
+                      <img
+                        src={profileIcon}
+                        alt="Profile"
+                        className="w-4 h-4"
+                        style={{ filter: 'brightness(0) saturate(100%) invert(44%) sepia(0%) saturate(0%) hue-rotate(208deg) brightness(94%) contrast(86%)' }}
+                      />
+                      <span style={{ color: '#BABABA' }}>
+                        Joined BAO' Afrik in {currentConversation?.otherParticipant?.createdAt
+                          ? new Date(currentConversation.otherParticipant.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                          : 'June 2018'}
+                      </span>
                     </div>
 
                     {/* Bio - Shortened */}
@@ -3327,7 +3341,22 @@ const Messages: React.FC = () => {
                           backgroundColor: '#F0F8FE',
                           color: '#64B5F6'
                         }}
-                        onClick={() => navigate('/seller/user')}
+                        onClick={() => {
+                          const participant = currentConversation?.otherParticipant;
+                          if (participant) {
+                            const sellerSlug = `${participant.firstName} ${participant.lastName}`
+                              .toLowerCase()
+                              .trim()
+                              .replace(/\s+/g, '-')
+                              .replace(/[^a-z0-9-]/g, '');
+
+                            // Store seller data in sessionStorage for SellerProfile.tsx
+                            sessionStorage.setItem(`seller_${sellerSlug}_data`, JSON.stringify(participant));
+                            sessionStorage.setItem(`seller_${sellerSlug}_id`, participant.id);
+
+                            navigate(`/seller/${sellerSlug}`);
+                          }
+                        }}
                       >
                         See user profile
                       </button>
@@ -3461,9 +3490,9 @@ const Messages: React.FC = () => {
                       >
                         <div className="max-w-[75%] relative">
                           {/* Images (if present) - NO bubble */}
-                          {message.images && message.images.length > 0 && (
+                          {Array.isArray(message.images) && message.images.length > 0 && (
                             <div className={`flex flex-wrap gap-1 mb-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
-                              {message.images.map((image: File, imgIndex: number) => (
+                              {Array.isArray(message.images) && message.images.map((image: File, imgIndex: number) => (
                                 <img
                                   key={imgIndex}
                                   src={URL.createObjectURL(image)}
@@ -3480,7 +3509,7 @@ const Messages: React.FC = () => {
                           )}
 
                           {/* Message bubble with text and/or product card and/or documents and/or voice */}
-                          {(message.text || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0) || message.type === 'voice') && (
+                          {(message.text || (!Array.isArray(message.images) || message.images.length === 0) && message.isProductInquiry && message.productData || (Array.isArray(message.documents) && message.documents.length > 0) || message.type === 'voice') && (
                             <div
                               className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md' : 'rounded-br-md'} cursor-pointer`}
                               style={{
@@ -3782,11 +3811,10 @@ const Messages: React.FC = () => {
                                       </div>
                                     </div>
                                   )}
-
                                   {/* Document Display in Message */}
-                                  {message.documents && message.documents.length > 0 && (
+                                  {Array.isArray(message.documents) && message.documents.length > 0 && (
                                     <div className={message.text ? 'mt-2' : ''}>
-                                      {message.documents.map((doc: File, docIndex: number) => {
+                                      {Array.isArray(message.documents) && message.documents && message.documents.map((doc: any, docIndex: number) => {
                                         const fileName = doc.name.split('.');
                                         const extension = fileName.pop() || '';
                                         const nameWithoutExt = fileName.join('.');
@@ -4290,7 +4318,7 @@ const Messages: React.FC = () => {
                       {/* Content */}
                       <div className="flex-1">
                         <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                          {replyToMessage.isIncoming ? `${currentConversation.participant.firstName || ""} ${currentConversation.participant.lastName || ""}`.trim() : 'You'}
+                          {replyToMessage.isIncoming ? `${currentConversation?.otherParticipant?.firstName || ""} ${currentConversation?.otherParticipant?.lastName || ""}`.trim() : 'You'}
                         </div>
                         <div className="text-xs" style={{ color: '#6A6A6A' }}>
                           {replyToMessage.text}
@@ -4953,7 +4981,7 @@ const Messages: React.FC = () => {
                 <div className="flex-1 overflow-y-auto p-1">
                   {conversations
                     .filter((conversation) => {
-                      // Get the other participant for search
+                      // Get other participant for search
                       const otherParticipant = conversation.participants?.find(
                         (p: any) => p.userId !== currentUser?.id
                       );
@@ -4962,12 +4990,23 @@ const Messages: React.FC = () => {
                           }`.trim()
                         : otherParticipant?.email?.split("@")[0] ||
                         "Unknown User";
-                      // console.log(conversation.participants);
+
+                      // Format last message with proper sender indication
+                      const formatLastMessage = () => {
+                        if (!conversation.lastMessage) return "No messages yet";
+
+                        const isOutgoing = conversation.lastMessage.senderId === currentUser?.id;
+                        const content = conversation.lastMessage.content || "";
+
+                        if (isOutgoing) {
+                          return `You: ${content}`;
+                        } else {
+                          return content;
+                        }
+                      };
 
                       if (chatSearchQuery) {
-                        const lastMessage =
-                          conversation.lastMessage?.content || "";
-                        // console.log("last message is", lastMessage);
+                        const lastMessage = formatLastMessage();
                         return (
                           participantName
                             .toLowerCase()
@@ -4987,12 +5026,26 @@ const Messages: React.FC = () => {
                       return true;
                     })
                     .map((conversation) => {
-                      // Get the other participant 
-                      const participant = conversation.participant;
+                      // Get the other participant - use otherParticipant from backend
+                      const participant = conversation.otherParticipant;
                       const displayName = participant
-                        ? `${participant.firstName} ${participant.lastName}`
+                        ? `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Unknown User"
                         : "Unknown User";
                       const profileImage = participant?.profileImage;
+
+                      // Format last message with proper sender indication
+                      const formatLastMessage = () => {
+                        if (!conversation.lastMessage) return "No messages yet";
+
+                        const isOutgoing = conversation.lastMessage.senderId === currentUser?.id;
+                        const content = conversation.lastMessage.content || "";
+
+                        if (isOutgoing) {
+                          return `You: ${content}`;
+                        } else {
+                          return content;
+                        }
+                      };
 
                       return (
                         <div
@@ -5065,11 +5118,17 @@ const Messages: React.FC = () => {
                               </div>
                               <div className="flex items-center justify-between -mt-1">
                                 <p className="text-sm text-gray-600 truncate">
-                                  {conversation.lastMessage?.content ||
-                                    "No messages yet"}
+                                  {formatLastMessage()}
                                 </p>
                                 {conversation.unreadCount > 0 && (
-                                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                                  <div className="flex items-center space-x-1">
+                                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                                    {conversation.unreadCount > 1 && (
+                                      <span className="text-xs text-blue-500 font-medium">
+                                        {conversation.unreadCount}
+                                      </span>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                             </div>
@@ -5624,7 +5683,7 @@ const Messages: React.FC = () => {
                             onClick={() => setIsMenuDropdownOpen(false)}
                           >
                             <svg className="w-3 h-3 mr-1.5 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#F9A822' }}>
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
                             </svg>
                             Start selling
                           </Link>
@@ -5884,11 +5943,11 @@ const Messages: React.FC = () => {
                           {/* Avatar */}
                           <img
                             src={
-                              currentConversation?.participant?.profileImage ||
+                              currentConversation?.otherParticipant?.profileImage ||
                               eboAvatar
                             }
                             alt={
-                              currentConversation?.participant?.firstName ||
+                              currentConversation?.otherParticipant?.firstName ||
                               "Seller"
                             }
                             className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
@@ -5897,10 +5956,10 @@ const Messages: React.FC = () => {
                           {/* Name and Rating */}
                           <div className="flex items-center justify-center space-x-2 mb-4">
                             <h3 className="text-xl font-semibold text-gray-900">
-                              {currentConversation?.participant
-                                ? `${currentConversation.participant.firstName ||
+                              {currentConversation?.otherParticipant
+                                ? `${currentConversation.otherParticipant.firstName ||
                                   ""
-                                  } ${currentConversation.participant.lastName ||
+                                  } ${currentConversation.otherParticipant.lastName ||
                                   ""
                                   }`.trim()
                                 : "Unknown User"}
@@ -5941,7 +6000,7 @@ const Messages: React.FC = () => {
                                 className="w-4 h-4"
                               />
                               <span style={{ color: "#64B5F6" }}>
-                                London | United Kingdom
+                                {currentConversation?.otherParticipant?.location || 'London | United Kingdom'}
                               </span>
                             </div>
                           </div>
@@ -5954,7 +6013,9 @@ const Messages: React.FC = () => {
                               className="w-4 h-4"
                             />
                             <span style={{ color: "#BABABA" }}>
-                              Joined BAO' Afrik in June 2018
+                              Joined BAO' Afrik in {currentConversation?.otherParticipant?.createdAt
+                                ? new Date(currentConversation.otherParticipant.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                                : 'June 2018'}
                             </span>
                           </div>
 
@@ -5978,6 +6039,22 @@ const Messages: React.FC = () => {
                             style={{
                               backgroundColor: "#F0F8FE",
                               color: "#64B5F6",
+                            }}
+                            onClick={() => {
+                              const participant = currentConversation?.otherParticipant;
+                              if (participant) {
+                                const sellerSlug = `${participant.firstName} ${participant.lastName}`
+                                  .toLowerCase()
+                                  .trim()
+                                  .replace(/\s+/g, '-')
+                                  .replace(/[^a-z0-9-]/g, '');
+
+                                // Store seller data in sessionStorage for SellerProfile.tsx
+                                sessionStorage.setItem(`seller_${sellerSlug}_data`, JSON.stringify(participant));
+                                sessionStorage.setItem(`seller_${sellerSlug}_id`, participant.id);
+
+                                navigate(`/seller/${sellerSlug}`);
+                              }
                             }}
                           >
                             See user profile
@@ -6339,9 +6416,9 @@ const Messages: React.FC = () => {
 
                             <div className="max-w-xs lg:max-w-md relative">
                               {/* Images (if present) - NO bubble */}
-                              {message.images && message.images.length > 0 && (
+                              {Array.isArray(message.images) && message.images.length > 0 && (
                                 <div className={`flex flex-wrap gap-2 mb-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
-                                  {message.images.map((image: File, imgIndex: number) => (
+                                  {Array.isArray(message.images) && message.images.map((image: File, imgIndex: number) => (
                                     <img
                                       key={imgIndex}
                                       src={URL.createObjectURL(image)}
@@ -7422,7 +7499,7 @@ const Messages: React.FC = () => {
                           {/* Content */}
                           <div className="flex-1">
                             <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                              {replyToMessage.isIncoming ? `${currentConversation.participant.firstName || ""} ${currentConversation.participant.lastName || ""}`.trim() : 'You'}
+                              {replyToMessage.isIncoming ? `${currentConversation?.otherParticipant?.firstName || ""} ${currentConversation?.otherParticipant?.lastName || ""}`.trim() : 'You'}
                             </div>
                             <div className="text-xs" style={{ color: '#6A6A6A' }}>
                               {replyToMessage.text}

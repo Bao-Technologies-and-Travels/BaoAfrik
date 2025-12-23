@@ -86,10 +86,8 @@ export class WebSocketService {
   private setupEventHandlers() {
     this.io.on('connection', (socket: AuthenticatedSocket) => {
       if (!socket.user) {
-        console.log('Unauthenticated socket connected');
         return;
       }
-      console.log(`User ${socket.user.id} connected`);
 
       const authenticatedSocket = socket as AuthenticatedSocket;
 
@@ -382,9 +380,11 @@ export class WebSocketService {
       const participants = (conversation.participants || []).map((p: any) => p.user).filter(Boolean);
       const recipientIds = participants.map((u: any) => u.id).filter((id: string) => id && id !== senderId);
 
-      // Emit to recipients: receive_message, notification, notification_count
+      // Broadcast message to all in the conversation room except sender
+      socket.to(`conversation:${conversationId}`).emit('receive_message', { ...messageResponse, isIncoming: true });
+
+      // Also send notifications and counts to each recipient's personal room
       for (const recipientId of recipientIds) {
-        this.io.to(recipientId).emit('receive_message', { ...messageResponse, isIncoming: true });
         try {
           const senderName = `${socket.user?.firstName || ''} ${socket.user?.lastName || ''}`.trim() || socket.user?.email || 'Someone';
           const preview = (content || '').toString().slice(0, 120);
