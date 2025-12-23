@@ -57,7 +57,7 @@ const CreateListing: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('GBP');
   const [quantity, setQuantity] = useState(1);
   const [category, setCategory] = useState('');
   const [origin, setOrigin] = useState('');

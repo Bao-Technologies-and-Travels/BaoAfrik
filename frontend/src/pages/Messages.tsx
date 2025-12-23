@@ -70,7 +70,6 @@ import { useSocket } from '../contexts/socketContext'
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
 import { gcpStorageService } from "../services/gcpStorageService";
-import Header from '../components/layout/Header';
 
 // PDF Icon Component
 const PDFIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
@@ -101,6 +100,35 @@ const PNGIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
   </svg>
 );
 
+interface User {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  profileImage?: string | null;
+  email?: string;
+}
+interface Message {
+  id: string;
+  content: string;
+  sender: User;
+  timestamp: string;
+  status: 'SENDING' | 'SENT' | 'DELIVERED' | 'READ';
+  isIncoming: boolean;
+  replyTo?: {
+    id: string;
+    content: string;
+    sender: User;
+  } | null;
+  timeString?: string;
+  dateString?: string;
+  messageType?: string;
+  fileUrl?: string | null;
+  fileName?: string | null;
+  fileSize?: number | null;
+  tempId?: string;
+  isProductInquiry?: boolean;
+}
+
 const Messages: React.FC = () => {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
@@ -111,7 +139,7 @@ const Messages: React.FC = () => {
   const [isMessageSent, setIsMessageSent] = useState(false);
   const [conversation, setconversation] = useState<any>(null);
   const [selectedTab, setSelectedTab] = useState('All');
-  const [messageStatuses, setMessageStatuses] = useState<{ [key: number]: 'sending' | 'delivered' | 'read' }>({});
+  const [messageStatus, setMessageStatus] = useState<Record<string, 'SENDING' | 'SENT' | 'DELIVERED' | 'READ'>>({});
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null);
@@ -172,7 +200,7 @@ const Messages: React.FC = () => {
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const chatListRef = React.useRef<HTMLDivElement>(null);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const { addToast } = useToast();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
@@ -208,6 +236,12 @@ const Messages: React.FC = () => {
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
   const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
+
+  const formatTime = (date: Date | string) => {
+    const d = new Date(date);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   // fetch notifications on mount
   useEffect(() => {
@@ -426,42 +460,37 @@ const Messages: React.FC = () => {
 
   // Load persisted product inquiry state on mount
   useEffect(() => {
-
     const savedProductInquiry = localStorage.getItem("productInquiryData");
-    if (savedProductInquiry && !productData) {
+    if (savedProductInquiry) {
       try {
         const inquiryData = JSON.parse(savedProductInquiry);
-        const isExpired = inquiryData.timestamp && (Date.now() - inquiryData.timestamp) > 60 * 60 * 1000;
-        if (!isExpired) {
+        if (inquiryData?.productData) {
           setProductData(inquiryData.productData);
           setPreFilledMessage(inquiryData.preFilledMessage || "");
           setMessageText(inquiryData.preFilledMessage || "");
           setIsProductInquiry(true);
           setIsMessageSent(inquiryData.isMessageSent || false);
-        } else {
-          localStorage.removeItem("productInquiryData");
         }
       } catch (error) {
+        console.error("Error parsing product inquiry data:", error);
         localStorage.removeItem("productInquiryData");
       }
     }
   }, []);
 
   useEffect(() => {
-    // Persist product inquiry state
+    // Persist product inquiry state (forever, only remove on logout or explicit clear)
     if (productData) {
       localStorage.setItem(
         "productInquiryData",
         JSON.stringify({
           productData,
           preFilledMessage,
-          isMessageSent,
-          timestamp: Date.now()
+          isMessageSent
         })
       );
-    } else {
-      localStorage.removeItem("productInquiryData");
     }
+    // Do NOT clear on just blank productData—leave for explicit removal
   }, [productData, preFilledMessage, isMessageSent]);
 
   // When opening a conversation, check if it's from a product inquiry
@@ -576,54 +605,52 @@ const Messages: React.FC = () => {
     };
 
     const handleNewMessage = (serverMessage: any) => {
-      setMessages((prev) => {
-        const isOurMessage = serverMessage.senderId === currentUser?.id;
+      const senderId = serverMessage.senderId || serverMessage.sender?.id;
+      const isIncoming = senderId !== currentUser?.id;
+      if (!isIncoming) return;
 
-        const existingMessageIndex = prev.findIndex(
-          (msg) =>
-            msg.id === serverMessage.id ||
-            (serverMessage.tempId && msg.tempId === serverMessage.tempId)
-        );
-
-        const timeString = serverMessage.createdAt
-          ? new Date(serverMessage.createdAt).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-          })
-          : (serverMessage.timeString || '');
-
-        const normalized = {
-          ...serverMessage,
-          text: serverMessage.content || serverMessage.text,
-          content: serverMessage.content,
-          isIncoming: !isOurMessage,
-          timeStamp: serverMessage.createdAt,
-          dateString: serverMessage.createdAt ? new Date(serverMessage.createdAt).toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-          }) : "",
-          timeString,
-          status: isOurMessage ? "sent" : "read",
-          productData: serverMessage.productData || null,
-          isProductInquiry: !!serverMessage.productData
-        };
-
-        if (existingMessageIndex >= 0) {
-          const updated = [...prev];
-          updated[existingMessageIndex] = { ...updated[existingMessageIndex], ...normalized };
-          return updated;
+      let normalizedProductData: any = null;
+      if (serverMessage.productData) {
+        try {
+          normalizedProductData = typeof serverMessage.productData === 'string'
+            ? JSON.parse(serverMessage.productData)
+            : serverMessage.productData;
+        } catch (_) {
+          normalizedProductData = serverMessage.productData;
         }
-        return [...prev, normalized];
+      }
+
+      setMessages((prev) => {
+        const existingMessageIds = new Set(prev.map(msg => msg.id || msg.tempId));
+        if (existingMessageIds.has(serverMessage.id || serverMessage.tempId)) {
+          return prev;
+        }
+
+        const timeString = formatTime(serverMessage.createdAt || new Date());
+
+        const newMessage = {
+          ...serverMessage,
+          id: serverMessage.id || serverMessage.tempId,
+          isIncoming,
+          status: 'DELIVERED',
+          timeStamp: serverMessage.createdAt || new Date(),
+          timeString,
+          productData: normalizedProductData,
+          isProductInquiry: !!normalizedProductData,
+          sender: serverMessage.sender || {
+            id: serverMessage.senderId,
+            firstName: 'Unknown',
+            lastName: 'User'
+          }
+        };
+        return [...prev, newMessage];
       });
     };
 
     const handleMessageStatusUpdate = (data: any) => {
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === data.messageId ? { ...msg, status: 'delivered' } : msg
+          msg.id === data.messageId ? { ...msg, status: 'DELIVERED' } : msg
         )
       );
     };
@@ -636,7 +663,7 @@ const Messages: React.FC = () => {
             return {
               ...msg,
               ...data,
-              status: 'sent',
+              status: 'SENT',
               tempId: undefined
             };
           }
@@ -648,7 +675,7 @@ const Messages: React.FC = () => {
     const handleMessageDelivered = (data: any) => {
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === data.messageId ? { ...msg, status: 'delivered' } : msg
+          msg.id === data.messageId ? { ...msg, status: 'DELIVERED' } : msg
         )
       )
     };
@@ -656,7 +683,7 @@ const Messages: React.FC = () => {
     const handleMessageRead = (data: any) => {
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === data.messageId ? { ...msg, status: 'read' } : msg))
+          msg.id === data.messageId ? { ...msg, status: 'READ' } : msg))
     };
 
     const handleUserTyping = (data: any) => {
@@ -719,6 +746,27 @@ const Messages: React.FC = () => {
       contextSocket.off("conversation_joined");
     };
   }, [contextSocket, activeConversationId, currentUser?.id, typingTimeout]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleReconnect = (attemptNumber: number) => {
+      console.log(`Attempting to reconnect (${attemptNumber})...`);
+    };
+    const handleReconnectError = (error: Error) => {
+      console.error('Reconnection error:', error);
+    };
+    const handleReconnectFailed = () => {
+      console.error('Failed to reconnect');
+    };
+    socket.on('reconnect_attempt', handleReconnect);
+    socket.on('reconnect_error', handleReconnectError);
+    socket.on('reconnect_failed', handleReconnectFailed);
+    return () => {
+      socket.off('reconnect_attempt', handleReconnect);
+      socket.off('reconnect_error', handleReconnectError);
+      socket.off('reconnect_failed', handleReconnectFailed);
+    };
+  }, [socket]);
 
   const fetchConversations = useCallback(async () => {
     if (isLoadingConversations) {
@@ -1092,23 +1140,80 @@ const Messages: React.FC = () => {
     [socket, isSocketConnected, currentUser, addToast]
   );
 
-  // Mark as read function
-  const markAsReadViaSocket = (conversationId: string) => {
-    if (socket) {
-      socket.emit("mark_as_read", conversationId);
-    }
-  };
+  // handle message status updates
+  useEffect(() => {
+    if (!socket) return;
+    const handleMessageStatusUpdate = (data: {
+      messageId: string;
+      status: 'SENT' | 'DELIVERED' | 'READ';
+      updatedAt: string;
+    }) => {
+      setMessageStatus(prev => ({
+        ...prev,
+        [data.messageId]: data.status
+      }));
+      // Update the message in the messages list
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === data.messageId
+            ? {
+              ...msg,
+              status: data.status,
+              updatedAt: data.updatedAt
+            }
+            : msg
+        )
+      );
+    };
+    socket.on('message_status_updated', handleMessageStatusUpdate);
+    return () => {
+      socket.off('message_status_updated', handleMessageStatusUpdate);
+    };
+  }, [socket]);
 
-  // Typing indicators
-  const startTyping = (conversationId: string) => {
-    if (socket) {
-      socket.emit("typing_start", conversationId);
-    }
-  };
+  // Add this function to update message status
+  const updateMessageStatus = useCallback((messageId: string, status: 'SENT' | 'DELIVERED' | 'READ') => {
+    if (!socket || !activeConversationId) return;
+    socket.emit('message_status_update', {
+      messageId,
+      status
+    });
+  }, [socket, activeConversationId]);
 
-  const stopTyping = (conversationId: string) => {
-    if (socket) {
-      socket.emit("typing_stop", conversationId);
+  // Update your message rendering to show status icons
+  const renderMessageStatus = (message: any) => {
+    const status = messageStatus[message.id] || message.status;
+
+    switch (status) {
+      case 'SENDING':
+        return (
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case 'SENT':
+        return <span>✓</span>; // Single tick
+      case 'DELIVERED':
+        // return <span>✓✓</span>; // Double grey ticks
+        return (
+          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        );
+      case 'READ':
+        // return <span style={{ color: '#4CAF50' }}>✓✓</span>; // Double blue ticks
+        return (
+          <div className="flex items-center">
+            <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </div>
+        );
+      default:
+        return null;
     }
   };
 
@@ -1567,6 +1672,28 @@ const Messages: React.FC = () => {
     handleTypingDetection();
   };
 
+  // reply click
+  const handleReplyClick = (message: any) => {
+    if (!message) return;
+
+    const replyMessage: Message = {
+      id: message.id,
+      content: message.content || '',
+      sender: {
+        id: message.sender?.id || 'unknown',
+        firstName: message.sender?.firstName || 'User',
+        lastName: message.sender?.lastName || '',
+        profileImage: message.sender?.profileImage || null
+      },
+      timestamp: message.timestamp || new Date().toISOString(),
+      status: message.status || 'SENT',
+      isIncoming: message.isIncoming || false
+    };
+    setReplyingTo(replyMessage);
+
+    messageInputRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   // Typing detection logic
   const handleTypingDetection = useCallback(() => {
     if (!currentConversation?.id || !socket || !isSocketConnected) {
@@ -1681,22 +1808,22 @@ const Messages: React.FC = () => {
 
   // Render sidebar status indicator
   const renderSidebarStatus = (messageId: any) => {
-    const status = messageStatuses[messageId] || 'sending';
+    const status = messageStatus[messageId] || 'SENDING';
 
     switch (status) {
-      case 'sending':
+      case 'SENDING':
         return (
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
-      case 'delivered':
+      case 'DELIVERED':
         return (
           <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
           </svg>
         );
-      case 'read':
+      case 'READ':
         return (
           <div className="flex items-center">
             <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
@@ -1765,7 +1892,15 @@ const Messages: React.FC = () => {
       // Find the message to reply to
       const message = messages.find(m => m.id === messageId);
       if (message) {
-        setReplyToMessage(message);
+        handleReplyClick({
+          ...message,
+          sender: message.sender || {
+            id: 'unknown',
+            firstName: 'User',
+            lastName: '',
+            profileImage: null
+          }
+        });
       }
     }
 
@@ -1886,37 +2021,37 @@ const Messages: React.FC = () => {
   }, [activeMessageOptionsId]);
 
   // Render message status indicator
-  const renderMessageStatus = (messageId: any) => {
-    const status = messageStatuses[messageId] || 'sending';
+  // const renderMessageStatus = (messageId: any) => {
+  //   const status = messageStatus[messageId] || 'SENDING';
 
-    switch (status) {
-      case 'sending':
-        return (
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
-      case 'delivered':
-        return (
-          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-          </svg>
-        );
-      case 'read':
-        return (
-          <div className="flex items-center">
-            <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
+  //   switch (status) {
+  //     case 'SENDING':
+  //       return (
+  //         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  //           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  //         </svg>
+  //       );
+  //     case 'DELIVERED':
+  //       return (
+  //         <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+  //           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+  //         </svg>
+  //       );
+  //     case 'READ':
+  //       return (
+  //         <div className="flex items-center">
+  //           <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+  //             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+  //           </svg>
+  //           <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+  //             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+  //           </svg>
+  //         </div>
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   const handleLanguageSelect = (language: string) => {
     setSelectedLanguage(language);
@@ -2051,7 +2186,9 @@ const Messages: React.FC = () => {
       return;
     }
 
-    setIsSending(true);
+    if ((!messageText.trim() && !selectedFiles.length) || !currentConversation?.id) {
+      return;
+    }
 
     if (socket && activeConversationId) {
       socket.emit('typing_stop', {
@@ -2060,6 +2197,8 @@ const Messages: React.FC = () => {
     }
 
     try {
+      setIsSending(true);
+
       const filesToSend = [...selectedFiles];
       let messageSent = false;
 
@@ -2169,6 +2308,10 @@ const Messages: React.FC = () => {
         }
       }
 
+      if (replyingTo) {
+        setReplyingTo(null);
+      }
+
       const hasSentFilesOrVoice = filesToSend.length > 0 || voiceBlob;
       const textIsFileDescription =
         textToSend === `Sent ${filesToSend[0]?.name}` ||
@@ -2233,6 +2376,29 @@ const Messages: React.FC = () => {
     }
     setSocket(contextSocket);
   }, [contextSocket]);
+
+  // Clean up product inquiry state when component unmounts
+  useEffect(() => {
+    return () => {
+
+      if (isMessageSent) {
+        localStorage.removeItem("productInquiryData");
+      }
+    };
+  }, [isMessageSent]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleMessageSent = (message: any) => {
+      setMessages(prev => prev.map(msg =>
+        msg.tempId === message.tempId ? { ...msg, ...message } : msg
+      ));
+    };
+    socket.on('message_sent', handleMessageSent);
+    return () => {
+      socket.off('message_sent', handleMessageSent);
+    };
+  }, [socket]);
 
   // Auto-show mobile conversation view when product data is present
   useEffect(() => {
@@ -2679,24 +2845,24 @@ const Messages: React.FC = () => {
       setRecordingTime(0);
       setIsMessageSent(true);
 
-      // Set initial status as 'sending'
-      setMessageStatuses(prev => ({
+      // Set initial status as 'SENDING'
+      setMessageStatus(prev => ({
         ...prev,
-        [newMessage.id]: 'sending'
+        [newMessage.id]: 'SENDING'
       }));
 
       // Simulate status progression
       setTimeout(() => {
-        setMessageStatuses(prev => ({
+        setMessageStatus(prev => ({
           ...prev,
-          [newMessage.id]: 'delivered'
+          [newMessage.id]: 'DELIVERED'
         }));
       }, 2000);
 
       setTimeout(() => {
-        setMessageStatuses(prev => ({
+        setMessageStatus(prev => ({
           ...prev,
-          [newMessage.id]: 'read'
+          [newMessage.id]: 'READ'
         }));
 
         // Show typing indicator after voice message is read
@@ -3651,20 +3817,20 @@ const Messages: React.FC = () => {
 
                           <div className={`flex items-center mt-1 space-x-1 text-xs ${message.isIncoming ? 'justify-start' : 'justify-end'}`} style={{ color: '#6A6A6A' }}>
                             <span>{message.timeString}</span>
-                            {!message.isIncoming && messageStatuses[message.id] && (
+                            {!message.isIncoming && messageStatus[message.id] && (
                               <div className="flex items-center">
-                                {messageStatuses[message.id] === 'sending' && (
+                                {messageStatus[message.id] === 'SENDING' && (
                                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#9E9E9E' }}>
                                     <circle cx="12" cy="12" r="10" strokeWidth="2" />
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
                                   </svg>
                                 )}
-                                {messageStatuses[message.id] === 'delivered' && (
+                                {messageStatus[message.id] === 'DELIVERED' && (
                                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#9E9E9E' }}>
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                   </svg>
                                 )}
-                                {messageStatuses[message.id] === 'read' && (
+                                {messageStatus[message.id] === 'READ' && (
                                   <div className="flex items-center" style={{ position: 'relative' }}>
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -4796,10 +4962,12 @@ const Messages: React.FC = () => {
                           }`.trim()
                         : otherParticipant?.email?.split("@")[0] ||
                         "Unknown User";
+                      // console.log(conversation.participants);
 
                       if (chatSearchQuery) {
                         const lastMessage =
                           conversation.lastMessage?.content || "";
+                        // console.log("last message is", lastMessage);
                         return (
                           participantName
                             .toLowerCase()
@@ -6208,6 +6376,17 @@ const Messages: React.FC = () => {
                                       : undefined
                                   }
                                 >
+                                  {/* reply display preview */}
+                                  {message.replyTo && (
+                                    <div className="mb-2 pl-2 border-l-2 border-gray-300">
+                                      <div className={`text-xs font-medium ${message.isIncoming ? 'text-gray-700' : 'text-white'}`}>
+                                        Replying to {message.replyTo.sender?.firstName || 'User'}
+                                      </div>
+                                      <div className={`text-sm truncate ${message.isIncoming ? 'text-gray-600' : 'text-white'}`}>
+                                        {message.replyTo.content || 'Media message'}
+                                      </div>
+                                    </div>
+                                  )}
                                   {message.type === "audio" || message.messageType === "AUDIO" ? (
                                     // Voice Message Display
                                     <div className="space-y-2">
@@ -7135,6 +7314,25 @@ const Messages: React.FC = () => {
                   )}
                 </div>
                 {/* End Scrollable Content Area */}
+
+                {replyingTo && (
+                  <div className="flex items-center justify-between bg-gray-100 p-2 rounded-t-lg">
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium">
+                        Replying to {replyingTo.sender?.firstName || 'User'}
+                      </span>
+                      <p className="text-xs truncate">{replyingTo.content}</p>
+                    </div>
+                    <button
+                      onClick={() => setReplyingTo(null)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
 
                 {/* Message Input - Fixed at Bottom */}
                 <div

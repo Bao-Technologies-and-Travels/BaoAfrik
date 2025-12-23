@@ -45,9 +45,12 @@ const io = new Server(server, {
     credentials: true,
   },
   transports: ['websocket', 'polling'],
-  allowEIO3: true
+  allowEIO3: true,
+   pingTimeout: 60000,
+  pingInterval: 25000,
 });
 
+// initialize WebSocket service
 new WebSocketService(io);
 
 gcpStorageService.configureCors().catch(console.error);

@@ -89,7 +89,7 @@ model Product {
   publishedAt       DateTime?     @map("published_at")
 
   // Relations
-  seller        User           @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  seller        User            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   likes         ProductLike[]
   saves         ProductSave[]
   reviews       ProductReview[]
@@ -140,7 +140,6 @@ model ProductReview {
   @@unique([productId, userId])
   @@map("product_reviews")
 }
-
 
 model Message {
   id              String      @id @default(uuid())

@@ -83,74 +83,105 @@ export class ChatService {
     }
 
     async getUserConversations(userId: string) {
-    try {
-        const conversations = await prisma.conversation.findMany({
-            where: {
-                participants: {
-                    some: {
-                        userId: userId,
-                    }
-                }
-            },
-            include: {
-                participants: {
-                    where: {
-                    },
-                    include: {
-                        user: {
-                            select: {
-                                id: true,
-                                firstName: true,
-                                lastName: true,
-                                profileImage: true
-                            }
+        let decryptedContent = '';
+        try {
+            const conversations = await prisma.conversation.findMany({
+                where: {
+                    participants: {
+                        some: {
+                            userId: userId,
                         }
                     }
                 },
-                messages: {
-                    orderBy: {
-                        createdAt: 'desc'
+                include: {
+                    participants: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                    profileImage: true,
+                                    email: true
+                                }
+                            }
+                        }
                     },
-                    take: 1
+                    messages: {
+                        orderBy: {
+                            createdAt: 'desc'
+                        },
+                        take: 1
+                    },
+                    product: {
+                        select: {
+                            id: true,
+                            title: true,
+                            price: true,
+                            currency: true,
+                            images: true,
+                            status: true
+                        }
+                    },
+                    lastMessage: true
                 },
-                product: {
-                    select: {
-                        id: true,
-                        title: true,
-                        price: true,
-                        currency: true,
-                        images: true,
-                        status: true
+                orderBy: {
+                    updatedAt: 'desc'
+                }
+            });
+
+            return conversations.map(conversation => {
+                const otherParticipant = conversation.participants.find(
+                    p => p.userId !== userId
+                )?.user;
+
+                const lastMessage = conversation.lastMessage || conversation.messages[0] || null;
+
+                let decryptedContent = '';
+                if (lastMessage) {
+                    try {
+                        // Check if the message has the encrypted fields
+                        if (lastMessage.dbEncryptedContent && lastMessage.encryptionIv && lastMessage.encryptionAuthTag) {
+                            decryptedContent = this.decryptMessage(
+                                lastMessage.dbEncryptedContent,
+                                lastMessage.encryptionIv,
+                                lastMessage.encryptionAuthTag
+                            );
+                        } else if (lastMessage.content) {
+                            // If not encrypted, use the content as is
+                            decryptedContent = lastMessage.content;
+                        } else {
+                            decryptedContent = 'Encrypted message';
+                        }
+                    } catch (error) {
+                        console.error('Error decrypting message: ', error);
+                        decryptedContent = 'Encrypted message';
                     }
-                },
-                lastMessage: true
-            },
-            orderBy: {
-                updatedAt: 'desc'
-            }
-        });
+                }
 
-        return conversations.map(conversation => {
-            const otherParticipant = conversation.participants.find(
-                p => p.userId !== userId
-            )?.user;
-
-            const lastMessage = conversation.lastMessage || conversation.messages[0] || null;
-
-            return {
-                id: conversation.id,
-                product: conversation.product,
-                otherParticipant,
-                lastMessage,
-                unreadCount: 0, // This would be calculated based on message status
-                updatedAt: conversation.updatedAt
-            };
-        });
-    } catch (error) {
-        console.error('Error fetching user conversations:', error);
-        throw new Error('Failed to fetch conversations');
+                return {
+                    id: conversation.id,
+                    product: conversation.product,
+                    otherParticipant: otherParticipant || {
+                        id: 'unknown',
+                        firstName: 'Unknown',
+                        lastName: 'User',
+                        profileImage: null,
+                        email: 'unknown@example.com'
+                    },
+                    lastMessage: lastMessage ? {
+                        ...lastMessage,
+                        content: decryptedContent
+                    } : null,
+                    unreadCount: 0,
+                    updatedAt: conversation.updatedAt
+                };
+            });
+        } catch (error) {
+            console.error('Error fetching user conversations:', error);
+            throw new Error('Failed to fetch conversations');
+        }
     }
-}
 
     async getConversationMessages(conversationId: string, userId: string) {
         // Verify user has access to this conversation
@@ -170,7 +201,9 @@ export class ChatService {
         }
 
         const messages = await prisma.message.findMany({
-            where: { conversationId },
+            where: {
+                conversationId: conversationId
+            },
             include: {
                 sender: {
                     select: {
@@ -187,7 +220,8 @@ export class ChatService {
                             select: {
                                 id: true,
                                 firstName: true,
-                                lastName: true
+                                lastName: true,
+                                profileImage: true
                             }
                         }
                     }
@@ -198,7 +232,9 @@ export class ChatService {
                     }
                 }
             },
-            orderBy: { createdAt: 'asc' }
+            orderBy: {
+                createdAt: 'asc'
+            }
         });
 
         const now = new Date();
@@ -262,6 +298,26 @@ export class ChatService {
         return processedMessages;
     }
 
+    async getConversationById(conversationId: string) {
+        return await prisma.conversation.findUnique({
+            where: { id: conversationId },
+            include: {
+                participants: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                firstName: true,
+                                lastName: true,
+                                profileImage: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
     private async checkDbEncryptAvailable() {
         try {
             await prisma.$queryRaw`SELECT db_encrypt('test')`;
@@ -507,7 +563,7 @@ export class ChatService {
                     audioUrl: data.audioUrl,
                     replyToId: data.replyToId,
                     productData: data.productData ? JSON.stringify(data.productData) : null,
-                    createdAt: now
+                    createdAt: now,
                 },
                 include: {
                     sender: {
@@ -519,7 +575,20 @@ export class ChatService {
                             isVerifiedSeller: true
                         }
                     },
-                }
+                    replyTo: {
+                        include: {
+                            sender: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                    profileImage: true
+                                }
+                            }
+                        }
+                    }
+                },
+
             });
 
             // Update conversation with last message
@@ -722,33 +791,39 @@ export class ChatService {
         };
     }
 
-    async updateMessageStatus(messageId: string, userId: string, status: 'sent' | 'delivered' | 'read') {
-        const now = new Date();
-
-        const messageStatus = await prisma.messageStatus.upsert({
-            where: {
-                messageId_userId: {
+    async updateMessageStatus(messageId: string, userId: string, status: 'SENDING' | 'SENT' | 'DELIVERED' | 'READ') {
+        try {
+            // update or create messsage status
+            await prisma.messageStatus.upsert({
+                where: {
+                    messageId_userId: {
+                        messageId,
+                        userId
+                    }
+                },
+                update: {
+                    status,
+                    updatedAt: new Date()
+                },
+                create: {
                     messageId,
-                    userId
+                    userId,
+                    status,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
                 }
-            },
-            update: {
-                status,
-                updatedAt: now
-            },
-            create: {
-                messageId,
-                userId,
-                status,
-                createdAt: now,
-                updatedAt: now
-            }
-        });
+            });
 
-        return {
-            ...messageStatus,
-            formattedCreatedAt: this.formatTo12HourTime(messageStatus.createdAt),
-            formattedUpdatedAt: this.formatTo12HourTime(messageStatus.updatedAt)
-        };
+            // get updated message with status
+            const message = await prisma.message.findUnique({
+                where: { id: messageId },
+                include: {
+                    statuses: true
+                }
+            });
+            return message;
+        } catch (error) {
+            throw new Error('Failed to update message status');
+        }
     }
 }

@@ -16,7 +16,8 @@ export class NotificationService {
                 actorId: data.actorId ?? null,
                 type: data.type,
                 message: data.message ?? null,
-                metadata: data.metadata ?? null
+                metadata: data.metadata ?? null,
+                isRead: false
             },
             include: {
                 actor: {

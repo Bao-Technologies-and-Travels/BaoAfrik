@@ -2,8 +2,6 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import { ChatService } from '../services/chatService';
 import jwt from 'jsonwebtoken';
 import prisma from '@/config/database';
-import { notificationService } from '@/services/notificationService';
-
 interface AuthenticatedSocket extends Socket {
   user?: {
     id: string;
@@ -82,14 +80,17 @@ export class WebSocketService {
       } else {
         return next(new Error('Websocket Authentication error:'));
       }
-
-      // allow connection without user data, don't throw any error to prevent socket disconnection
-      next();
     }
   }
 
   private setupEventHandlers() {
     this.io.on('connection', (socket: AuthenticatedSocket) => {
+      if (!socket.user) {
+        console.log('Unauthenticated socket connected');
+        return;
+      }
+      console.log(`User ${socket.user.id} connected`);
+
       const authenticatedSocket = socket as AuthenticatedSocket;
 
       if (!authenticatedSocket.user) {
@@ -108,6 +109,38 @@ export class WebSocketService {
         });
 
         socket.on('disconnect', (reason) => {
+        });
+
+        socket.on('message_status_update', async (data: { messageId: string, status: 'SENT' | 'DELIVERED' | 'READ' }) => {
+          try {
+            if (!socket.user) {
+              throw new Error('Not authenticated');
+            }
+
+            const { messageId, status } = data;
+
+            // update the message status
+            const updatedMessage = await this.chatService.updateMessageStatus(
+              messageId,
+              socket.user.id,
+              status
+            );
+
+            // notify sender about status update
+            if (updatedMessage) {
+              const senderId = updatedMessage.senderId;
+              const senderSocketId = this.userSockets.get(senderId);
+              if (senderSocketId) {
+                this.io.to(senderSocketId).emit('message_status_updated', {
+                  messageId,
+                  status,
+                  updatedAt: new Date()
+                });
+              }
+            }
+          } catch (error) {
+            socket.emit('error', { message: 'Failed to update message status' });
+          }
         });
 
         return;
@@ -178,14 +211,13 @@ export class WebSocketService {
 
   private async joinUserConversations(socket: AuthenticatedSocket, userId: string) {
     try {
-        const conversations = await this.chatService.getUserConversations(userId);
-        conversations.forEach(conversation => {
-            socket.join(`conversation_${conversation.id}`);
-        });
-        console.log(`User ${userId} joined ${conversations.length} conversations`);
+      const conversations = await this.chatService.getUserConversations(userId);
+      conversations.forEach(conversation => {
+        socket.join(`conversation:${conversation.id}`);
+      });
     } catch (error: any) {
-        console.error('Error joining conversations for user', userId, ':', error);
-        throw new Error(`Error joining conversations: ${error.message}`);
+      console.error('Error joining conversations for user', userId, ':', error);
+      throw new Error(`Error joining conversations: ${error.message}`);
     }
   }
 
@@ -212,6 +244,10 @@ export class WebSocketService {
             firstName: p.firstName,
             lastName: p.lastName
           }))
+        });
+
+        socket.on('join_user_room', (userId: string) => {
+          socket.join(`user_${userId}`);
         });
       } else {
         socket.emit('conversation_join_error', { error: 'Access denied' });
@@ -240,7 +276,11 @@ export class WebSocketService {
 
       // Notify seller about new conversation
       const sellerSocketId = this.userSockets.get(sellerId);
+      // Ensure buyer joins the new conversation room
+      socket.join(`conversation:${conversation.id}`);
+      // Ask seller to join as well if they are connected
       if (sellerSocketId) {
+        this.io.to(sellerSocketId).emit('join_conversation', conversation.id);
         this.io.to(sellerSocketId).emit('new_conversation', {
           conversation,
           buyer: {
@@ -281,152 +321,103 @@ export class WebSocketService {
 
   private async handleSendMessage(socket: AuthenticatedSocket, data: any, callback?: Function) {
     try {
-      const { conversationId, content, messageType, fileUrl, fileName, fileSize, replyTo, tempId } = data;
+      const { conversationId, content, messageType, fileUrl, fileName, fileSize, replyToId, tempId } = data;
       const senderId = socket.user!.id;
-      const senderEmail = socket.user!.email;
 
       // Validate required fields
-      if (!conversationId) {
-        throw new Error('Conversation ID is required');
+      if (!conversationId || (!content && !fileUrl)) {
+        throw new Error('Missing required message fields');
       }
 
-      if (!content?.trim() && !fileUrl) {
-        throw new Error('Message content or file is required');
+      // Get conversation with participants
+      const conversation = await this.chatService.getConversationById(conversationId);
+      if (!conversation) {
+        throw new Error('Conversation not found');
       }
 
-      // Normalize messageType to uppercase
-      const normalizedMessageType = this.normalizeMessageType(messageType);
+      // Create message
+      // Parse productData if present and serialize as JSON to backend
+      let normalizedProductData = null;
+      if (typeof data.productData === 'string') {
+        try {
+          normalizedProductData = JSON.parse(data.productData);
+        } catch (_) {
+          normalizedProductData = data.productData;
+        }
+      } else if (data.productData) {
+        normalizedProductData = data.productData;
+      }
 
-      const messageData = {
+      const message = await this.chatService.sendMessage({
+        content,
         conversationId,
         senderId,
-        content: content?.trim() || `Sent ${fileName || 'file'}`,
-        messageType: normalizedMessageType,
-        fileUrl: fileUrl || undefined,
-        fileName: fileName || undefined,
-        fileSize: fileSize || undefined,
-        replyToId: replyTo || undefined,
-        imageUrl: data.imageUrl || undefined,
-        audioUrl: data.audioUrl || undefined,
-        productData: data.productData || undefined
-      };
+        messageType,
+        fileUrl,
+        fileName,
+        fileSize,
+        replyToId,
+        productData: normalizedProductData
+      });
 
-      // Save message to database
-      const message = await this.chatService.sendMessage(messageData);
-
-      // Get conversation participants
-      const participantsResult = await this.chatService.getConversationParticipants(conversationId);
-      const participants = participantsResult.participants; // Extract the participants array
-
-      // Prepare message response with proper structure
+      // Prepare the message response
       const messageResponse = {
         ...message,
         tempId,
-        sender: {
-          id: socket.user!.id,
-          email: socket.user!.email,
-          firstName: socket.user!.firstName,
-          lastName: socket.user!.lastName,
-          profileImage: socket.user!.profileImage,
-          isVerifiedSeller: socket.user!.isVerifiedSeller
-        }
+        status: 'DELIVERED',
+        replyTo: message.replyTo ? {
+          id: message.replyTo.id,
+          content: message.replyTo.content,
+          sender: {
+            id: message.replyTo.sender.id,
+            firstName: message.replyTo.sender.firstName,
+            lastName: message.replyTo.sender.lastName,
+            profileImage: message.replyTo.sender.profileImage
+          }
+        } : null,
+        productData: message.productData ? JSON.parse(message.productData) : null
       };
 
-      if (callback) {
-        callback({
-          success: true,
-          data: messageResponse,
-          message: 'Message sent successfully'
-        });
-      }
+      // Find all participants except sender
+      const participants = (conversation.participants || []).map((p: any) => p.user).filter(Boolean);
+      const recipientIds = participants.map((u: any) => u.id).filter((id: string) => id && id !== senderId);
 
-      // emit to sender
-      socket.emit('message_sent', messageResponse);
-
-      // Emit to all participants in the conversation
-      socket.to(`conversation:${conversationId}`).emit('new_message', messageResponse);
-
-      // Send notifications to other participants
-      participants.forEach(async (participant: any) => {
-        if (participant.id !== senderId) {
-          const participantSocketId = this.userSockets.get(participant.id);
-          if (!participantSocketId) {
-            this.sendPushNotification(participant.id, {
-              title: `${socket.user!.firstName} ${socket.user!.lastName}`.trim() || socket.user!.email,
-              body: content?.substring(0, 100) || 'Sent a file',
-              conversationId,
-              messageId: message.id
-            });
-          }
-
-          // Emit new message notification
-          this.io.to(participant.id).emit('new_message_notification', {
+      // Emit to recipients: receive_message, notification, notification_count
+      for (const recipientId of recipientIds) {
+        this.io.to(recipientId).emit('receive_message', { ...messageResponse, isIncoming: true });
+        try {
+          const senderName = `${socket.user?.firstName || ''} ${socket.user?.lastName || ''}`.trim() || socket.user?.email || 'Someone';
+          const preview = (content || '').toString().slice(0, 120);
+          this.io.to(recipientId).emit('new_message_notification', {
             conversationId,
             messageId: message.id,
-            senderName: `${socket.user!.firstName || ''} ${socket.user!.lastName || ''}`.trim() || socket.user!.email,
-            preview: content.substring(0, 100) || 'Sent a file',
-            unreadCount: 1
+            preview,
+            senderName,
+            senderId,
+            senderImage: socket.user?.profileImage || null
           });
-
-          try {
-            const notifPayload = {
-              type: 'NEW_MESSAGE',
-              title: `${socket.user!.firstName} ${socket.user!.lastName}`.trim() || socket.user!.email,
-              body: content?.substring(0, 100) || 'Sent a file',
-              conversationId,
-              messageId: message.id,
-              timestamp: new Date().toISOString()
-            };
-
-            let createdNotif: any = null;
-            try {
-              createdNotif = await notificationService.createNotification({
-                userId: participant.id,
-                actorId: socket.user!.id,
-                type: 'NEW_MESSAGE',
-                message: `${socket.user!.firstName || ''} ${socket.user!.lastName || ''}`.trim() + ': ' + (content?.substring(0, 100) || 'Sent a file'),
-                metadata: {
-                  conversationId,
-                  messageId: message.id,
-                  type: 'NEW_MESSAGE'
-                }
-              });
-
-              this.io.to(participant.id).emit('notification', createdNotif);
-            } catch (e) {
-              console.warn('Failed to persist  or emit persisted notification', e);
-              this.io.to(participant.id).emit('notification', notifPayload);
-            }
-
-            this.io.to(participant.id).emit('notification_count', { totalUnread: await this.chatService.getUnreadCounts(participant.id).then(c => c.reduce((s: any, v: any) => s + v.unreadCount, 0)) });
-
-            try {
-              const counts = await this.chatService.getUnreadCounts(participant.id);
-              const totalUnread = (counts || []).reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
-              this.io.to(participant.id).emit('notification_count', { totalUnread });
-            } catch (e) {
-              console.warn('Failed to compute unread counts for notification_count emit', e);
-            }
-          } catch (e) {
-            console.warn('Failed to emit notification to participant', e);
-          }
+          const counts = await this.chatService.getUnreadCounts(recipientId);
+          const totalUnread = (counts || []).reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
+          this.io.to(recipientId).emit('notification_count', { totalUnread });
+        } catch (e) {
+          console.warn('Failed to emit message notification/count', e);
         }
-      });
+      }
 
+      // Emit to sender: message_sent
+      socket.emit('message_sent', { ...messageResponse, isIncoming: false, status: 'SENT' });
+
+      if (callback) {
+        callback({ success: true, message: messageResponse });
+      }
     } catch (error: any) {
-
+      console.error('Error sending message:', error);
       if (callback) {
         callback({
           success: false,
-          error: error.message || 'Failed to send message',
-          tempId: data.tempId
+          error: error.message || 'Failed to send message'
         });
       }
-
-      socket.emit('message_error', {
-        error: error.message || 'Failed to send message',
-        tempId: data.tempId
-      });
     }
   }
 
