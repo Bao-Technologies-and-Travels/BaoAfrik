@@ -4280,8 +4280,258 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Request Modal Overlay */}
-      {showRequestModal && (
+      {/* Request Modal/Form - Mobile: Full Page, Desktop: Modal */}
+      {showRequestModal && isMobile ? (
+        // Mobile: Full Page Form
+        <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          {/* Mobile Header */}
+          <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between mb-16">
+            <button
+              type="button"
+              onClick={() => setShowRequestModal(false)}
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="Back"
+            >
+              <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="Search"
+              >
+                <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                aria-label="More options"
+              >
+                <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                  <circle cx="4" cy="2" r="2" fill="#171717" />
+                  <circle cx="12" cy="2" r="2" fill="#171717" />
+                  <circle cx="20" cy="2" r="2" fill="#171717" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Title */}
+          <div className="pt-20 px-4 mb-6">
+            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Do a request
+            </h1>
+          </div>
+
+          {/* Form Content */}
+          <div className="flex-1 overflow-y-auto px-4 pb-6">
+
+            {/* Product Name Input */}
+            <div style={{ marginBottom: '10px' }}>
+              <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
+                Product name
+              </label>
+              <input 
+                type="text"
+                value={requestProductName}
+                onChange={(e) => setRequestProductName(e.target.value)}
+                placeholder="Enter product name"
+                style={{
+                  width: '100%',
+                  padding: '6px 10px',
+                  borderRadius: '8px',
+                  border: '1px solid #E4E4E4',
+                  fontSize: '10px',
+                  fontFamily: 'Poppins, sans-serif',
+                  outline: 'none'
+                }}
+              />
+            </div>
+
+            {/* Product Origin Input */}
+            <div style={{ marginBottom: '10px' }}>
+              <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
+                Product Origin
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="text"
+                  value={requestProductOrigin}
+                  onChange={(e) => setRequestProductOrigin(e.target.value)}
+                  placeholder="Choose a location"
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    borderRadius: '8px',
+                    border: '1px solid #E4E4E4',
+                    fontSize: '10px',
+                    fontFamily: 'Poppins, sans-serif',
+                    outline: 'none',
+                    color: requestProductOrigin ? '#212121' : '#D9D9D9'
+                  }}
+                />
+                <svg 
+                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '12px', height: '12px' }}
+                  fill="none" 
+                  stroke="#6A6A6A" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Description Input */}
+            <div style={{ marginBottom: '10px' }}>
+              <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
+                Description
+              </label>
+              <textarea 
+                value={requestDescription}
+                onChange={(e) => setRequestDescription(e.target.value)}
+                placeholder="Add an description"
+                rows={2}
+                style={{
+                  width: '100%',
+                  padding: '6px 10px',
+                  borderRadius: '8px',
+                  border: '1px solid #E4E4E4',
+                  fontSize: '9px',
+                  fontFamily: 'Poppins, sans-serif',
+                  outline: 'none',
+                  resize: 'none',
+                  color: requestDescription ? '#212121' : '#D9D9D9'
+                }}
+              />
+            </div>
+
+            {/* Location Section */}
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '-2px' }}>
+                Your location
+              </label>
+              <div className="flex items-center justify-between">
+                <span style={{ fontSize: '10px', color: '#64B5F6' }}>
+                  London, United Kingdom
+                </span>
+                <button 
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: '8px',
+                    backgroundColor: '#F0F8FE',
+                    color: '#64B5F6',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '9px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  Change location
+                </button>
+              </div>
+            </div>
+
+            {/* Price Range Section */}
+            <div style={{ marginBottom: '12px' }}>
+              <h3 style={{ fontSize: '11px', color: '#212121', marginBottom: '8px', fontWeight: '500' }}>
+                How much would you like to pay for the product?
+              </h3>
+              <div className="flex gap-2" style={{ marginBottom: '6px', flexWrap: 'wrap' }}>
+                {['Less than 10 USD', '10 - 50 USD', '50 - 100 USD', '100 - 200 USD'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setRequestPriceRange(range)}
+                    style={{
+                      width: 'calc(50% - 4px)',
+                      padding: '6px 8px',
+                      borderRadius: '8px',
+                      border: `1px solid ${requestPriceRange === range ? '#64B5F6' : '#E4E4E4'}`,
+                      backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFF',
+                      color: requestPriceRange === range ? '#64B5F6' : '#6A6A6A',
+                      cursor: 'pointer',
+                      fontSize: '9px',
+                      fontFamily: 'Poppins, sans-serif',
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setRequestPriceRange('More than 200 USD')}
+                style={{
+                  width: '100%',
+                  padding: '6px 8px',
+                  borderRadius: '8px',
+                  border: `1px solid ${requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#E4E4E4'}`,
+                  backgroundColor: requestPriceRange === 'More than 200 USD' ? '#F0F8FE' : '#FFF',
+                  color: requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#6A6A6A',
+                  cursor: 'pointer',
+                  fontSize: '9px',
+                  fontFamily: 'Poppins, sans-serif',
+                  textAlign: 'center'
+                }}
+              >
+                More than 200 USD
+              </button>
+            </div>
+
+            {/* Create Request Button */}
+            <button
+              style={{
+                display: 'flex',
+                width: '100%',
+                height: '36px',
+                padding: '8px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                flexShrink: 0,
+                borderRadius: '8px',
+                backgroundColor: '#F9A825',
+                color: '#FFF',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '11px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: '400',
+                margin: '0 auto'
+              }}
+              onClick={async () => {
+                // Validate form
+                if (!requestProductName || !requestProductOrigin || !requestDescription || !requestPriceRange) {
+                  alert('Please fill all fields');
+                  return;
+                }
+                
+                setIsSubmittingRequest(true);
+                
+                // Simulate API call with loading state
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                setIsSubmittingRequest(false);
+                setShowRequestModal(false);
+                setShowConfirmationModal(true);
+                
+                // Reset form
+                setRequestProductName('');
+                setRequestProductOrigin('');
+                setRequestDescription('');
+                setRequestPriceRange('');
+              }}
+              disabled={isSubmittingRequest}
+            >
+              {isSubmittingRequest ? 'Submitting...' : 'Create the request'}
+            </button>
+          </div>
+        </div>
+      ) : showRequestModal && !isMobile ? (
+        // Desktop/Tablet: Modal Overlay
         <div 
           style={{
             position: 'fixed',
@@ -4300,14 +4550,13 @@ const Home: React.FC = () => {
           {/* Request Modal */}
           <div 
             style={{
-              width: window.innerWidth < 640 ? '90%' : '580px',
-              maxWidth: window.innerWidth < 640 ? '360px' : '580px',
+              width: '580px',
               height: 'auto',
               maxHeight: '90vh',
               flexShrink: 0,
-              borderRadius: window.innerWidth < 640 ? '20px' : '30px',
+              borderRadius: '30px',
               background: '#FFF',
-              padding: window.innerWidth < 640 ? '16px 20px' : '24px 32px',
+              padding: '24px 32px',
               position: 'relative',
               fontFamily: 'Poppins, sans-serif',
               overflowY: 'auto'
@@ -4315,20 +4564,20 @@ const Home: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '12px' : '16px' }}>
-              <h2 style={{ fontSize: window.innerWidth < 640 ? '14px' : '18px', color: '#212121', fontWeight: '600' }}>
+            <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '600' }}>
                 Do a request
               </h2>
               <button 
                 onClick={() => setShowRequestModal(false)}
                 style={{
-                  width: window.innerWidth < 640 ? '20px' : '24px',
-                  height: window.innerWidth < 640 ? '20px' : '24px',
+                  width: '24px',
+                  height: '24px',
                   color: '#212121',
                   background: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: window.innerWidth < 640 ? '18px' : '20px',
+                  fontSize: '20px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -4339,8 +4588,8 @@ const Home: React.FC = () => {
             </div>
 
             {/* Product Name Input */}
-            <div style={{ marginBottom: window.innerWidth < 640 ? '10px' : '12px' }}>
-              <label style={{ fontSize: window.innerWidth < 640 ? '10px' : '12px', color: '#6A6A6A', display: 'block', marginBottom: window.innerWidth < 640 ? '4px' : '6px' }}>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
                 Product name
               </label>
               <input 
@@ -4350,10 +4599,10 @@ const Home: React.FC = () => {
                 placeholder="Enter product name"
                 style={{
                   width: '100%',
-                  padding: window.innerWidth < 640 ? '6px 10px' : '8px 12px',
+                  padding: '8px 12px',
                   borderRadius: '8px',
                   border: '1px solid #E4E4E4',
-                  fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                  fontSize: '12px',
                   fontFamily: 'Poppins, sans-serif',
                   outline: 'none'
                 }}
@@ -4361,8 +4610,8 @@ const Home: React.FC = () => {
             </div>
 
             {/* Product Origin Input */}
-            <div style={{ marginBottom: window.innerWidth < 640 ? '10px' : '12px' }}>
-              <label style={{ fontSize: window.innerWidth < 640 ? '10px' : '12px', color: '#6A6A6A', display: 'block', marginBottom: window.innerWidth < 640 ? '4px' : '6px' }}>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
                 Product Origin
               </label>
               <div style={{ position: 'relative' }}>
@@ -4373,17 +4622,17 @@ const Home: React.FC = () => {
                   placeholder="Choose a location"
                   style={{
                     width: '100%',
-                    padding: window.innerWidth < 640 ? '6px 10px' : '8px 12px',
+                    padding: '8px 12px',
                     borderRadius: '8px',
                     border: '1px solid #E4E4E4',
-                    fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                    fontSize: '12px',
                     fontFamily: 'Poppins, sans-serif',
                     outline: 'none',
                     color: requestProductOrigin ? '#212121' : '#D9D9D9'
                   }}
                 />
                 <svg 
-                  style={{ position: 'absolute', right: window.innerWidth < 640 ? '10px' : '12px', top: '50%', transform: 'translateY(-50%)', width: window.innerWidth < 640 ? '12px' : '14px', height: window.innerWidth < 640 ? '12px' : '14px' }}
+                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px' }}
                   fill="none" 
                   stroke="#6A6A6A" 
                   viewBox="0 0 24 24"
@@ -4394,21 +4643,21 @@ const Home: React.FC = () => {
             </div>
 
             {/* Description Input */}
-            <div style={{ marginBottom: window.innerWidth < 640 ? '10px' : '12px' }}>
-              <label style={{ fontSize: window.innerWidth < 640 ? '10px' : '12px', color: '#6A6A6A', display: 'block', marginBottom: window.innerWidth < 640 ? '4px' : '6px' }}>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
                 Description
               </label>
               <textarea 
                 value={requestDescription}
                 onChange={(e) => setRequestDescription(e.target.value)}
                 placeholder="Add an description"
-                rows={window.innerWidth < 640 ? 2 : 3}
+                rows={3}
                 style={{
                   width: '100%',
-                  padding: window.innerWidth < 640 ? '6px 10px' : '8px 12px',
+                  padding: '8px 12px',
                   borderRadius: '8px',
                   border: '1px solid #E4E4E4',
-                  fontSize: window.innerWidth < 640 ? '9px' : '11px',
+                  fontSize: '11px',
                   fontFamily: 'Poppins, sans-serif',
                   outline: 'none',
                   resize: 'none',
@@ -4418,23 +4667,23 @@ const Home: React.FC = () => {
             </div>
 
             {/* Location Section */}
-            <div style={{ marginBottom: window.innerWidth < 640 ? '12px' : '16px' }}>
-              <label style={{ fontSize: window.innerWidth < 640 ? '10px' : '12px', color: '#6A6A6A', display: 'block', marginBottom: window.innerWidth < 640 ? '-2px' : '-4px' }}>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '-4px' }}>
                 Your location
               </label>
               <div className="flex items-center justify-between">
-                <span style={{ fontSize: window.innerWidth < 640 ? '10px' : '12px', color: '#64B5F6' }}>
+                <span style={{ fontSize: '12px', color: '#64B5F6' }}>
                   London, United Kingdom
                 </span>
                 <button 
                   style={{
-                    padding: window.innerWidth < 640 ? '4px 8px' : '6px 12px',
+                    padding: '6px 12px',
                     borderRadius: '8px',
                     backgroundColor: '#F0F8FE',
                     color: '#64B5F6',
                     border: 'none',
                     cursor: 'pointer',
-                    fontSize: window.innerWidth < 640 ? '9px' : '12px',
+                    fontSize: '12px',
                     fontFamily: 'Poppins, sans-serif'
                   }}
                 >
@@ -4444,24 +4693,24 @@ const Home: React.FC = () => {
             </div>
 
             {/* Price Range Section */}
-            <div style={{ marginBottom: window.innerWidth < 640 ? '12px' : '16px' }}>
-              <h3 style={{ fontSize: window.innerWidth < 640 ? '11px' : '14px', color: '#212121', marginBottom: window.innerWidth < 640 ? '8px' : '10px', fontWeight: '500' }}>
+            <div style={{ marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '14px', color: '#212121', marginBottom: '10px', fontWeight: '500' }}>
                 How much would you like to pay for the product?
               </h3>
-              <div className="flex gap-2" style={{ marginBottom: window.innerWidth < 640 ? '6px' : '8px', flexWrap: 'wrap' }}>
+              <div className="flex gap-2" style={{ marginBottom: '8px', flexWrap: 'wrap' }}>
                 {['Less than 10 USD', '10 - 50 USD', '50 - 100 USD', '100 - 200 USD'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setRequestPriceRange(range)}
                     style={{
-                      width: window.innerWidth < 640 ? 'calc(50% - 4px)' : '110px',
-                      padding: window.innerWidth < 640 ? '6px 8px' : '8px 10px',
+                      width: '110px',
+                      padding: '8px 10px',
                       borderRadius: '8px',
                       border: `1px solid ${requestPriceRange === range ? '#64B5F6' : '#E4E4E4'}`,
                       backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFF',
                       color: requestPriceRange === range ? '#64B5F6' : '#6A6A6A',
                       cursor: 'pointer',
-                      fontSize: window.innerWidth < 640 ? '9px' : '12px',
+                      fontSize: '12px',
                       fontFamily: 'Poppins, sans-serif',
                       textAlign: 'center',
                       whiteSpace: 'nowrap'
@@ -4474,14 +4723,14 @@ const Home: React.FC = () => {
               <button
                 onClick={() => setRequestPriceRange('More than 200 USD')}
                 style={{
-                  width: window.innerWidth < 640 ? '100%' : '228px',
-                  padding: window.innerWidth < 640 ? '6px 8px' : '8px 10px',
+                  width: '228px',
+                  padding: '8px 10px',
                   borderRadius: '8px',
                   border: `1px solid ${requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#E4E4E4'}`,
                   backgroundColor: requestPriceRange === 'More than 200 USD' ? '#F0F8FE' : '#FFF',
                   color: requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#6A6A6A',
                   cursor: 'pointer',
-                  fontSize: window.innerWidth < 640 ? '9px' : '12px',
+                  fontSize: '12px',
                   fontFamily: 'Poppins, sans-serif',
                   textAlign: 'center'
                 }}
@@ -4494,9 +4743,9 @@ const Home: React.FC = () => {
             <button
               style={{
                 display: 'flex',
-                width: window.innerWidth < 640 ? '100%' : '480px',
-                height: window.innerWidth < 640 ? '36px' : '40px',
-                padding: window.innerWidth < 640 ? '8px' : '10px',
+                width: '480px',
+                height: '40px',
+                padding: '10px',
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '10px',
@@ -4506,7 +4755,7 @@ const Home: React.FC = () => {
                 color: '#FFF',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: window.innerWidth < 640 ? '11px' : '14px',
+                fontSize: '14px',
                 fontFamily: 'Poppins, sans-serif',
                 fontWeight: '400',
                 margin: '0 auto'
