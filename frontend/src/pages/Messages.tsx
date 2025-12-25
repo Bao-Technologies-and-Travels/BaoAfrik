@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
 import EmojiPicker, { Emoji } from 'emoji-picker-react';
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
@@ -31,11 +33,6 @@ import settingIcon from '../assets/images/pre/setting.svg';
 import reactionIcon from '../assets/images/pre/reaction.svg';
 import optionIcon from '../assets/images/pre/option.svg';
 import notificationIcon from '../assets/images/pre/notification.svg';
-import emoji1 from '../assets/images/pre/s1.svg';
-import emoji2 from '../assets/images/pre/s2.svg';
-import emoji3 from '../assets/images/pre/s3.svg';
-import emoji4 from '../assets/images/pre/s4.svg';
-import emoji5 from '../assets/images/pre/s5.svg';
 import emoji6 from '../assets/images/pre/s6.svg';
 import actionIcon01 from '../assets/images/pre/01.svg';
 import actionIcon02 from '../assets/images/pre/02.svg';
@@ -58,18 +55,19 @@ import amIcon from '../assets/images/pre/AM.svg';
 import pinBadgeIcon from '../assets/images/pre/pn.svg';
 import documentIcon from '../assets/images/pre/do.svg';
 import photoIcon from '../assets/images/pre/ph.svg';
-import closeIcon from '../assets/images/pre/cc.svg';
-import svgIcon from '../assets/images/pre/svg.svg';
 import avatar from "../assets/images/logos/avatar.png";
 import logoIcon from "../assets/images/logos/ba-brand-icon-colored.png";
 import messageAvatarIcon from '../assets/images/pre/main.png';
 import appNotificationIcon from '../assets/images/pre/nof.svg';
 
-import { io, Socket } from "socket.io-client";
-import { useSocket } from '../contexts/socketContext'
-import { useToast } from "../contexts/ToastContext";
-import { useAuth } from "../contexts/AuthContext";
-import { gcpStorageService } from "../services/gcpStorageService";
+import { useSocket } from '../contexts/socketContext';
+import { gcpStorageService } from '../services/gcpStorageService';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import closeIcon from '../assets/images/pre/cc.svg';
+import svgIcon from '../assets/images/pre/svg.svg';
 
 // PDF Icon Component
 const PDFIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
@@ -100,46 +98,36 @@ const PNGIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
   </svg>
 );
 
-interface User {
-  id: string;
-  firstName?: string;
-  lastName?: string;
-  profileImage?: string | null;
-  email?: string;
-}
 interface Message {
   id: string;
   content: string;
-  sender: User;
+  senderId: string;
+  receiverId: string;
   timestamp: string;
-  status: 'SENDING' | 'SENT' | 'DELIVERED' | 'READ';
-  isIncoming: boolean;
-  replyTo?: {
-    id: string;
-    content: string;
-    sender: User;
-  } | null;
-  timeString?: string;
-  dateString?: string;
-  messageType?: string;
-  fileUrl?: string | null;
-  fileName?: string | null;
-  fileSize?: number | null;
-  tempId?: string;
-  isProductInquiry?: boolean;
+  status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+  conversationId?: string;
+  readAt?: string | null;
 }
 
-const Messages: React.FC = () => {
+const Messages: React.FC = (): JSX.Element => {
+  useEffect(() => { toast.dismiss(); }, []);
+
+  const socket = useSocket();
+  const API_BASE = process.env.REACT_APP_API_URL;
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [productData, setProductData] = useState<any>(null);
   const [preFilledMessage, setPreFilledMessage] = useState('');
   const [messageText, setMessageText] = useState('');
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messagesPage, setMessagesPage] = useState(0);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [messagesError, setMessagesError] = useState<string | null>(null);
   const [isMessageSent, setIsMessageSent] = useState(false);
-  const [conversation, setconversation] = useState<any>(null);
+  const [chatEntry, setChatEntry] = useState<any>(null);
   const [selectedTab, setSelectedTab] = useState('All');
-  const [messageStatus, setMessageStatus] = useState<Record<string, 'SENDING' | 'SENT' | 'DELIVERED' | 'READ'>>({});
+  type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+  const [messageStatuses, setMessageStatuses] = useState<{ [key: string]: MessageStatus }>({});
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null);
@@ -152,7 +140,7 @@ const Messages: React.FC = () => {
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
-  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const [playingMessageId, setPlayingMessageId] = useState<number | null>(null);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const [audioPlaybackTime, setAudioPlaybackTime] = useState<{ [key: number]: number }>({});
   const [audioPlaybackProgress, setAudioPlaybackProgress] = useState<{ [key: number]: number }>({});
@@ -171,17 +159,17 @@ const Messages: React.FC = () => {
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
   const [isUserTyping, setIsUserTyping] = useState(false);
   const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout | null>(null);
-  const [clickedMessageId, setClickedMessageId] = useState<string | null>(null);
+  const [clickedMessageId, setClickedMessageId] = useState<number | null>(null);
   const [isReplyRead, setIsReplyRead] = useState(false);
   const [isSellerTyping, setIsSellerTyping] = useState(false);
   const [hasIncomingReply, setHasIncomingReply] = useState(false);
-  const [activeconversationId, setActiveconversationId] = useState<number | null>(null);
-  const [actionsMenuOpen, setActionsMenuOpen] = useState<string | null>(null);
+  const [activeChatId, setActiveChatId] = useState<number | null>(null);
+  const [actionsMenuOpen, setActionsMenuOpen] = useState<number | null>(null);
   const [chatSearchQuery, setChatSearchQuery] = useState('');
   const [showCondensedHeader, setShowCondensedHeader] = useState(false);
   const [visibleMessages, setVisibleMessages] = useState<any[]>([]);
   const [fadingOutMessageIds, setFadingOutMessageIds] = useState<number[]>([]);
-  const [activeReactionMessageId, setActiveReactionMessageId] = useState<string | null>(null);
+  const [activeReactionMessageId, setActiveReactionMessageId] = useState<number | null>(null);
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [activeMessageOptionsId, setActiveMessageOptionsId] = useState<number | null>(null);
   const [showMobileArchiveModal, setShowMobileArchiveModal] = useState(false);
@@ -199,49 +187,23 @@ const Messages: React.FC = () => {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const chatListRef = React.useRef<HTMLDivElement>(null);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
-  const { addToast } = useToast();
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [currentConversation, setCurrentConversation] = useState<any>(null);
-  const [joinedRooms, setJoinedRooms] = useState<Set<string>>(new Set());
-  const [socketInitialized, setSocketInitialized] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isProductInquiry, setIsProductInquiry] = useState(false);
   const { user, logout } = useAuth();
-  const [connectionStatus, setConnectionStatus] = useState<"connecting" | "connected" | "disconnected">("connecting");
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [lastLoadedConversationId, setLastLoadedConversationId] = useState<string | null>(null);
-  const [hasSentInitialProductMessage, setHasSentInitialProductMessage] = useState(false);
-  const [hasSentProductData, setHasSentProductData] = useState(false);
-  const hasProcessedLocationState = useRef(false);
-  const currentMessageIdRef = useRef<string | null>(null);
-  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
-  const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [lastTypingTime, setLastTypingTime] = useState<number>(0);
-  const [isLoadingConversations, setIsLoadingConversations] = useState(false);
-  const photoFileInputRef = useRef<HTMLInputElement>(null);
-  const documentFileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const inquiryRef = useRef<{ productData: any, preFilledMessage: string } | null>(null);
-  const contextSocket = useSocket();
+  const navState = location.state as { conversationId?: string; productData?: any } | undefined;
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [participantId, setParticipantId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
   const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
-  const messageInputRef = useRef<HTMLTextAreaElement>(null);
-
-  const formatTime = (date: Date | string) => {
-    const d = new Date(date);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+  const [currentConversation, setCurrentConversation] = useState<any>(null);
+  const [conversations, setConversations] = useState<any[]>([]);
 
   // fetch notifications on mount
   useEffect(() => {
@@ -280,6 +242,38 @@ const Messages: React.FC = () => {
     load();
     return () => { mounted = false; };
   }, []);
+
+  // Load conversation list for sidebar
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.get(
+          `${API_BASE}/chat/conversations`,
+          { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
+        );
+        const convos = res.data?.data || [];
+        setConversations(convos);
+
+        // Update current conversation if we have one
+        if (conversationId) {
+          const current = convos.find((c: any) => c.id === conversationId);
+          if (current) {
+            setCurrentConversation(current);
+          }
+        } else if (convos.length > 0 && !conversationId) {
+          // If no active conversation, set the first one as active
+          const first = convos[0];
+          setConversationId(first.id);
+          setParticipantId(first.otherParticipant?.id || null);
+          loadMessages(first.id, 1, true);
+        }
+      } catch (err) {
+        console.warn('Failed to load conversations', err);
+      }
+    };
+    fetchConversations();
+  }, [API_BASE]);
 
   // fetch unread counts
   useEffect(() => {
@@ -458,87 +452,345 @@ const Messages: React.FC = () => {
     return avatar;
   };
 
-  // Load persisted product inquiry state on mount
-  useEffect(() => {
-    const savedProductInquiry = localStorage.getItem("productInquiryData");
-    if (savedProductInquiry) {
-      try {
-        const inquiryData = JSON.parse(savedProductInquiry);
-        if (inquiryData?.productData) {
-          setProductData(inquiryData.productData);
-          setPreFilledMessage(inquiryData.preFilledMessage || "");
-          setMessageText(inquiryData.preFilledMessage || "");
-          setIsProductInquiry(true);
-          setIsMessageSent(inquiryData.isMessageSent || false);
+  // Helper function to check if a message already exists in the array
+  const messageExists = (messagesArray: any[], message: any): boolean => {
+    return messagesArray.some(m => {
+      // If both have real IDs, compare them
+      if (m.id && message.id && m.id === message.id) return true;
+      // If both have tempIds, compare them
+      if (m.tempId && message.tempId && m.tempId === message.tempId) return true;
+      // If one has tempId and the other has the same id, they're the same message
+      if (m.tempId && message.id && m.tempId === message.id) return true;
+      if (m.id && message.tempId && m.id === message.tempId) return true;
+      return false;
+    });
+  };
+
+  // Helper function to deduplicate messages array
+  const deduplicateMessages = (messagesArray: any[]): any[] => {
+    const seen = new Set<string>();
+    return messagesArray.filter(msg => {
+      const key = msg.id || msg.tempId;
+      if (!key) return true;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+
+  // Normalize messages to ensure UI fields exist
+  const normalizeMessage = (msg: any, currentUserId?: string | null) => {
+    const text = msg?.text ?? msg?.content ?? '';
+    const isIncoming = msg?.isIncoming !== undefined
+      ? msg.isIncoming
+      : (msg?.senderId && currentUserId ? msg.senderId !== currentUserId : false);
+    // Ensure reaction is preserved if it exists
+    const reaction = msg?.reaction || null;
+    return { ...msg, text, isIncoming, reaction };
+  };
+
+  // Normalize status to lowercase for UI
+  const normalizeStatus = (status: string | undefined): MessageStatus => {
+    if (!status) return 'sent';
+    const s = status.toString().toLowerCase();
+    if (s === 'failed') return 'failed';
+    if (s === 'sending') return 'sending';
+    if (s === 'delivered') return 'delivered';
+    if (s === 'read') return 'read';
+    if (s === 'sent') return 'sent';
+    return 'sent';
+  };
+
+  // Upsert message statuses into state map
+  const upsertMessageStatuses = (msgs: any[]) => {
+    setMessageStatuses(prev => {
+      const next = { ...prev };
+      msgs.forEach(m => {
+        if (m?.id) {
+          const normalized: MessageStatus = normalizeStatus(m.status as any);
+          next[String(m.id)] = normalized;
         }
-      } catch (error) {
-        console.error("Error parsing product inquiry data:", error);
-        localStorage.removeItem("productInquiryData");
+      });
+      return next;
+    });
+  };
+
+  // Join conversation room when conversationId is set
+  useEffect(() => {
+    if (!socket || !conversationId) return;
+
+    // Join the conversation room
+    socket.emit('join_conversation', conversationId);
+
+    return () => {
+      socket.emit('leave_conversation', conversationId);
+    };
+  }, [socket, conversationId]);
+
+  // Socket event listeners for real-time updates
+  useEffect(() => {
+    if (!socket) return;
+
+    function handleReceiveMessage(msg: any) {
+      const normalized = normalizeMessage(msg, user?.id);
+
+      // Update messages if this is the active conversation
+      if (!conversationId || normalized.conversationId === conversationId) {
+        setMessages(prev => {
+          if (messageExists(prev, normalized)) {
+            return prev.map(m => {
+              if (m.id && normalized.id && m.id === normalized.id) return { ...m, ...normalized };
+              if (m.tempId && normalized.tempId && m.tempId === normalized.tempId) return { ...m, ...normalized };
+              if (m.tempId && normalized.id && m.tempId === normalized.id) return { ...m, ...normalized, tempId: undefined };
+              if (m.id && normalized.tempId && m.id === normalized.tempId) return { ...m, ...normalized };
+              return m;
+            });
+          }
+          // Deduplicate after adding to ensure no duplicates
+          const merged = deduplicateMessages([...prev, normalized]);
+          upsertMessageStatuses([normalized]);
+          return merged;
+        });
+      }
+
+      // Always refresh conversations list to update last message and unread counts
+      const refreshConversations = async () => {
+        try {
+          const token = localStorage.getItem("accessToken");
+          const res = await axios.get(
+            `${API_BASE}/chat/conversations`,
+            { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
+          );
+          const convos = res.data?.data || [];
+          setConversations(convos);
+        } catch (err) {
+          console.warn('Failed to refresh conversations on receive message', err);
+        }
+      };
+      refreshConversations();
+    }
+    socket.on('receive_message', handleReceiveMessage);
+
+    // Handle message sent confirmation (for sender's own messages)
+    function handleMessageSent(data: any) {
+      const normalized = normalizeMessage(data, user?.id);
+      if (!conversationId || normalized.conversationId === conversationId) {
+        setMessages(prev => {
+          // Check if message already exists (avoid duplicates)
+          if (messageExists(prev, normalized)) {
+            // Update existing message instead of adding duplicate
+            return prev.map(m => {
+              if (normalized.id && m.id === normalized.id) return { ...normalized, status: 'sent' };
+              if (normalized.tempId && (m.tempId === normalized.tempId || m.id === normalized.tempId)) {
+                return { ...normalized, status: 'sent' };
+              }
+              return m;
+            });
+          }
+
+          // Remove temp message and any existing message with the same id
+          const filtered = prev.filter(m => {
+            // Keep messages that don't match the tempId or the real id
+            if (normalized.tempId && (m.tempId === normalized.tempId || m.id === normalized.tempId)) return false;
+            if (normalized.id && m.id === normalized.id) return false;
+            return true;
+          });
+          // Add the real message from backend and deduplicate
+          const merged = deduplicateMessages([...filtered, { ...normalized, status: 'sent' }]);
+          upsertMessageStatuses([{ ...normalized, status: 'sent' }]);
+          return merged;
+        });
       }
     }
-  }, []);
+    socket.on('message_sent', handleMessageSent);
 
-  useEffect(() => {
-    // Persist product inquiry state (forever, only remove on logout or explicit clear)
-    if (productData) {
-      localStorage.setItem(
-        "productInquiryData",
-        JSON.stringify({
-          productData,
-          preFilledMessage,
-          isMessageSent
-        })
+    // Handle typing indicators
+    function handleUserTyping(data: any) {
+      if (!conversationId || data.conversationId === conversationId) {
+        setShowTypingIndicator(true);
+      }
+    }
+    function handleUserStopTyping(data: any) {
+      if (!conversationId || data.conversationId === conversationId) {
+        setShowTypingIndicator(false);
+      }
+    }
+    socket.on('user_typing', handleUserTyping);
+    socket.on('user_stop_typing', handleUserStopTyping);
+
+    // Handle message status updates (delivered, read)
+    function handleStatusUpdate(data: any) {
+      const statusKey = String(data.messageId);
+      const normalizedStatus = normalizeStatus(data.status);
+      setMessageStatuses(prev => ({ ...prev, [statusKey]: normalizedStatus }));
+      // Also update message in messages array
+      setMessages(prev =>
+        prev.map(msg =>
+          String(msg.id) === statusKey
+            ? { ...msg, status: normalizedStatus }
+            : msg
+        )
       );
     }
-    // Do NOT clear on just blank productData—leave for explicit removal
-  }, [productData, preFilledMessage, isMessageSent]);
+    socket.on('message_status_updated', handleStatusUpdate);
 
-  // When opening a conversation, check if it's from a product inquiry
-  useEffect(() => {
-    // Only set productData if navigating from Contact Seller
-    if (location.state?.isProductInquiry === true && location.state?.productData) {
-      setProductData(location.state.productData);
-      setIsProductInquiry(true);
-      setPreFilledMessage(location.state.preFilledMessage || "")
-      inquiryRef.current = {
-        productData: location.state.productData,
-        preFilledMessage: location.state.preFilledMessage || ""
+    // Handle messages read event (when recipient reads messages)
+    function handleMessagesRead(data: any) {
+      if (!conversationId || data.conversationId === conversationId) {
+        setMessages(prev =>
+          prev.map(msg =>
+            data.messageIds.includes(msg.id)
+              ? { ...msg, readAt: new Date().toISOString(), status: 'read' }
+              : msg
+          )
+        );
+      }
+    }
+    socket.on('messages_read', handleMessagesRead);
+
+    // Handle new message notifications (for conversation list updates)
+    function handleNewMessageNotif(data: any) {
+      // Refresh conversations list to update last message and unread counts
+      const refreshConversations = async () => {
+        try {
+          const token = localStorage.getItem("accessToken");
+          const res = await axios.get(
+            `${API_BASE}/chat/conversations`,
+            { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
+          );
+          const convos = res.data?.data || [];
+          setConversations(convos);
+        } catch (err) {
+          console.warn('Failed to refresh conversations on new message', err);
+        }
       };
-    } else if (inquiryRef.current) {
-      setProductData(inquiryRef.current.productData);
-      setIsProductInquiry(true);
-      setPreFilledMessage(inquiryRef.current.preFilledMessage);
+      refreshConversations();
+    }
+    socket.on('new_message_notification', handleNewMessageNotif);
+
+    return () => {
+      socket.off('receive_message', handleReceiveMessage);
+      socket.off('message_sent', handleMessageSent);
+      socket.off('user_typing', handleUserTyping);
+      socket.off('user_stop_typing', handleUserStopTyping);
+      socket.off('message_status_updated', handleStatusUpdate);
+      socket.off('messages_read', handleMessagesRead);
+      socket.off('new_message_notification', handleNewMessageNotif);
+    };
+  }, [socket, conversationId]);
+
+  // websocket connection setup
+  // useEffect(() => {
+  //   if (socket) {
+  //     socket.on('connect', () => {
+  //       console.log('Socket connected!');
+  //     });
+  //     socket.on('disconnect', () => {
+  //       console.log('Socket disconnected!');
+  //     });
+  //   }
+  // }, [socket]);
+
+  // Initialize conversation from navigation state
+  useEffect(() => {
+    const state = location.state as {
+      conversationId?: string;
+      productData?: any;
+      sellerId?: string;
+    } | undefined;
+    if (state?.conversationId) {
+      setConversationId(state.conversationId);
+      if (state.sellerId) {
+        setParticipantId(state.sellerId);
+      }
+      // Load initial messages
+      loadMessages(state.conversationId, 1);
     }
   }, [location.state]);
 
-  // clear product inquiry state when closing a conversation or navigating away.
-  useEffect(() => {
-    return () => {
-      setProductData(undefined);
-      setIsProductInquiry(false);
-    };
-  }, []);
+  // Load messages from backend
+  const loadMessages = async (conversationId: string, pageNum: number, reset = false) => {
+    if (isLoading) return;
 
-  // Helper to resolve product / attachment image URLs robustly
-  const resolveImageUrl = (obj: any, index = 0) => {
-    if (!obj) return productImage1;
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.get(
+        `${API_BASE}/chat/conversations/${conversationId}/messages`,
+        {
+          params: { page: pageNum, limit: pageSize },
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      const rawMessages = response.data.data || [];
+      const newMessages = rawMessages.map((m: any) => normalizeMessage(m, user?.id));
 
-    const candidates: (string | undefined)[] = [];
-    candidates.push(obj.image);
-    candidates.push(obj.imageUrl);
-    if (Array.isArray(obj.images) && obj.images.length > index) {
-      const item = obj.images[index];
-      if (typeof item === "string") candidates.push(item);
-      else if (item && typeof item === "object") {
-        candidates.push(item.url || item.imageUrl || item.path);
+      setMessages(prev => {
+        if (reset) {
+          const deduped = deduplicateMessages(newMessages);
+          upsertMessageStatuses(deduped);
+          return deduped;
+        } else {
+          const merged = deduplicateMessages([...prev, ...newMessages]);
+          upsertMessageStatuses(merged);
+          return merged;
+        }
+      });
+      setHasMore(newMessages.length === pageSize);
+      setPage(pageNum);
+
+      // Mark messages as read
+      if (newMessages.length > 0) {
+        markMessagesAsRead(conversationId, newMessages);
       }
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      toast.error('Failed to load messages');
+    } finally {
+      setIsLoading(false);
     }
-
-    const url = candidates.find(Boolean) as string | undefined;
-    if (!url) return productImage1;
-    if (url.startsWith("/")) return `${process.env.REACT_APP_API_URL}${url}`;
-    return url;
   };
+
+  // Mark messages as read
+  const markMessagesAsRead = async (conversationId: string, messages: any[]) => {
+    try {
+      const unreadMessages = messages.filter(
+        msg => !msg.readAt && msg.senderId !== user?.id
+      );
+
+      if (unreadMessages.length === 0) return;
+      const token = localStorage.getItem("accessToken");
+      await axios.post(
+        `${API_BASE}/chat/conversations/${conversationId}/read`,
+        { messageIds: unreadMessages.map(m => m.id) },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Don't update local state here - wait for messages_read socket event from backend
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (!conversationId) return;
+    // Strictly load from backend 
+    const fetchMessages = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.get(
+          `${API_BASE}/chat/conversations/${conversationId}/messages`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const normalized = (res.data.data || []).map((m: any) => normalizeMessage(m, user?.id));
+        const deduped = deduplicateMessages(normalized);
+        setMessages(deduped);
+        upsertMessageStatuses(deduped);
+      } catch (err) {
+        // Handle error
+      }
+    };
+    fetchMessages();
+  }, [conversationId]);
 
   useEffect(() => {
     const updateViewport = () => {
@@ -555,672 +807,23 @@ const Messages: React.FC = () => {
     };
   }, []);
 
-  // Get current user on component mount
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        const userData = {
-          id: payload.userId || payload.sub,
-          email: payload.email,
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-        };
-        setCurrentUser(userData);
-      } catch (error) {
-        throw new Error('Failed to decode user from token');
-      }
-    }
-  }, []);
-
-  // WebSocket useEffect connection plus cleanup
-  useEffect(() => {
-    if (!contextSocket) {
-      return
-    }
-
-    setSocket(contextSocket);
-    setIsSocketConnected(contextSocket.connected);
-
-    // register handlers
-    const handleConnect = () => {
-      setIsSocketConnected(true);
-      setConnectionStatus("connected");
-      contextSocket.emit("join_conversations");
-
-      if (activeConversationId) {
-        contextSocket.emit("join_conversation", activeConversationId);
-      }
-    };
-
-    const handleDisconnect = () => {
-      setIsSocketConnected(false);
-      setConnectionStatus("disconnected");
-    };
-
-    const handleConnectError = () => {
-      setIsSocketConnected(false);
-      setConnectionStatus("disconnected");
-    };
-
-    const handleNewMessage = (serverMessage: any) => {
-      const senderId = serverMessage.senderId || serverMessage.sender?.id;
-      const isIncoming = senderId !== currentUser?.id;
-      if (!isIncoming) return;
-
-      let normalizedProductData: any = null;
-      if (serverMessage.productData) {
-        try {
-          normalizedProductData = typeof serverMessage.productData === 'string'
-            ? JSON.parse(serverMessage.productData)
-            : serverMessage.productData;
-        } catch (_) {
-          normalizedProductData = serverMessage.productData;
-        }
-      }
-
-      setMessages((prev) => {
-        const existingMessageIds = new Set(prev.map(msg => msg.id || msg.tempId));
-        if (existingMessageIds.has(serverMessage.id || serverMessage.tempId)) {
-          return prev;
-        }
-
-        const timeString = formatTime(serverMessage.createdAt || new Date());
-
-        const newMessage = {
-          ...serverMessage,
-          id: serverMessage.id || serverMessage.tempId,
-          isIncoming,
-          status: 'DELIVERED',
-          timeStamp: serverMessage.createdAt || new Date(),
-          timeString,
-          productData: normalizedProductData,
-          isProductInquiry: !!normalizedProductData,
-          sender: serverMessage.sender || {
-            id: serverMessage.senderId,
-            firstName: 'Unknown',
-            lastName: 'User'
-          }
-        };
-        return [...prev, newMessage];
-      });
-    };
-
-    const handleMessageStatusUpdate = (data: any) => {
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === data.messageId ? { ...msg, status: 'DELIVERED' } : msg
-        )
-      );
-    };
-
-    const handleMessageSent = (data: any) => {
-      setIsSending(false);
-      setMessages((prev) =>
-        prev.map((msg) => {
-          if (msg.id === `temp-${data.tempId}` || msg.tempId === data.tempId) {
-            return {
-              ...msg,
-              ...data,
-              status: 'SENT',
-              tempId: undefined
-            };
-          }
-          return msg;
-        })
-      );
-    };
-
-    const handleMessageDelivered = (data: any) => {
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === data.messageId ? { ...msg, status: 'DELIVERED' } : msg
-        )
-      )
-    };
-
-    const handleMessageRead = (data: any) => {
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === data.messageId ? { ...msg, status: 'READ' } : msg))
-    };
-
-    const handleUserTyping = (data: any) => {
-      if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
-        setIsSellerTyping(true);
-        setShowTypingIndicator(true);
-        if (typingTimeout) {
-          clearTimeout(typingTimeout);
-        }
-        const t = window.setTimeout(() => {
-          setShowTypingIndicator(false);
-          setIsSellerTyping(false);
-        }, 3000);
-        setTypingTimeout(t as any);
-      }
-    };
-
-    const handleUserStopTyping = (data: any) => {
-      if (data.conversationId === activeConversationId && data.userId !== currentUser?.id) {
-        setShowTypingIndicator(false);
-        setIsSellerTyping(false);
-        if (typingTimeout) {
-          clearTimeout(typingTimeout);
-          setTypingTimeout(null);
-        }
-      }
-    };
-
-    contextSocket.on("connect", handleConnect);
-    contextSocket.on("disconnect", handleDisconnect);
-    contextSocket.on("connect_error", handleConnectError);
-
-    contextSocket.on("new_message", handleNewMessage);
-    contextSocket.on("receive_message", handleNewMessage);
-    contextSocket.on("message_status_update", handleMessageStatusUpdate);
-    contextSocket.on("message_sent", handleMessageSent);
-    contextSocket.on("message_delivered", handleMessageDelivered);
-    contextSocket.on("message_read", handleMessageRead);
-
-    contextSocket.on("user_typing", handleUserTyping);
-    contextSocket.on("user_stop_typing", handleUserStopTyping);
-
-    contextSocket.on("connected", () => { });
-    contextSocket.on("conversation_joined", () => { });
-
-    return () => {
-      contextSocket.off("connect", handleConnect);
-      contextSocket.off("disconnect", handleDisconnect);
-      contextSocket.off("connect_error", handleConnectError);
-
-      contextSocket.off("new_message", handleNewMessage);
-      contextSocket.off("message_status_update", handleMessageStatusUpdate);
-      contextSocket.off("message_sent", handleMessageSent);
-      contextSocket.off("message_delivered", handleMessageDelivered);
-      contextSocket.off("message_read", handleMessageRead);
-
-      contextSocket.off("user_typing", handleUserTyping);
-      contextSocket.off("user_stop_typing", handleUserStopTyping);
-
-      contextSocket.off("connected");
-      contextSocket.off("conversation_joined");
-    };
-  }, [contextSocket, activeConversationId, currentUser?.id, typingTimeout]);
-
-  useEffect(() => {
-    if (!socket) return;
-    const handleReconnect = (attemptNumber: number) => {
-      console.log(`Attempting to reconnect (${attemptNumber})...`);
-    };
-    const handleReconnectError = (error: Error) => {
-      console.error('Reconnection error:', error);
-    };
-    const handleReconnectFailed = () => {
-      console.error('Failed to reconnect');
-    };
-    socket.on('reconnect_attempt', handleReconnect);
-    socket.on('reconnect_error', handleReconnectError);
-    socket.on('reconnect_failed', handleReconnectFailed);
-    return () => {
-      socket.off('reconnect_attempt', handleReconnect);
-      socket.off('reconnect_error', handleReconnectError);
-      socket.off('reconnect_failed', handleReconnectFailed);
-    };
-  }, [socket]);
-
-  const fetchConversations = useCallback(async () => {
-    if (isLoadingConversations) {
-      return;
-    }
-
-    try {
-      setIsLoadingConversations(true);
-      const token = localStorage.getItem("accessToken");
-
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      }
-      );
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Authentication failed. Please log in again.");
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setConversations(data.data || []);
-
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        !error.message.includes("Authentication") &&
-        !error.message.includes("token") &&
-        !error.message.includes("No token")
-      ) {
-        addToast({
-          type: 'error',
-          title: 'Connection Error',
-          message: "Unable to load messages. Please try again.",
-          duration: 2500,
-        });
-      }
-    } finally {
-      setIsLoadingConversations(false);
-    }
-  }, [addToast]);
-
-  useEffect(() => {
-    if (!activeConversationId || isLoadingMessages) {
-      return;
-    }
-
-    fetchConversationMessages(activeConversationId);
-  }, [activeConversationId]);
-
-  // initialization useEffect
-  useEffect(() => {
-    const loadInitialData = async () => {
-
-      if (isLoading) {
-        return;
-      }
-
-      setIsLoading(true);
-
-      try {
-        // Load conversations
-        await fetchConversations();
-
-        const locationState = location.state;
-
-        // handle location once
-        if (locationState && !hasProcessedLocationState.current) {
-          hasProcessedLocationState.current = true;
-
-          if (locationState.conversationId) {
-            setActiveConversationId(locationState.conversationId);
-            if (locationState.productData) {
-              setProductData(locationState.productData);
-              setIsProductInquiry(true);
-              setPreFilledMessage(locationState.preFilledMessage || "");
-            }
-          }
-        }
-      } catch (error) {
-        throw new Error("Error loading initial data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadInitialData();
-  }, [location.state]);
-
-  // seller typing
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on("user_typing", (data) => {
-      if (
-        data.conversationId === activeConversationId &&
-        data.userId !== currentUser?.id
-      ) {
-        setShowTypingIndicator(true);
-        setIsSellerTyping(true);
-      }
-    });
-
-    socket.on("user_stop_typing", (data) => {
-      if (
-        data.conversationId === activeConversationId &&
-        data.userId !== currentUser?.id
-      ) {
-        setShowTypingIndicator(false);
-        setIsSellerTyping(false);
-      }
-    });
-
-    return () => {
-      socket.off("user_typing");
-      socket.off("user_stop_typing");
-    };
-  }, [socket, activeConversationId, currentUser?.id]);
-
-  const fetchConversationMessages = useCallback(
-    async (conversationId: string) => {
-      if (!conversationId) {
-        setActiveConversationId(null);
-        setCurrentConversation(null);
-        setMessages([]);
-        return;
-      }
-
-      // Prevent if actively loading, but allow same conversation clicks for refresh
-      if (isLoadingMessages && lastLoadedConversationId === conversationId) {
-        return;
-      }
-
-      try {
-        setIsLoadingMessages(true);
-
-        const token = localStorage.getItem("accessToken");
-
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/messages`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        const getMessageStatus = (message: any, currentUserId: string) => {
-          // For sent messages
-          if (message.senderId === currentUserId) {
-            return MessageStatus || "sent";
-          }
-
-          return "read";
-        };
-
-        const transformedMessages = (data.data || []).map((message: any) => {
-          const timeString = message.createdAt
-            ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
-            : (message.timeString || '');
-          return ({
-            ...message,
-            text: message.content || "",
-            content: message.content || "",
-            isIncoming: message.senderId !== currentUser?.id,
-            timestamp: message.createdAt,
-            timeString,
-            dateString: new Date(message.createdAt).toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            }),
-            type: message.messageType?.toLowerCase() || "text",
-            status: getMessageStatus(message, currentUser?.id),
-            productData: message.productData || null,
-            isProductInquiry: !!message.productData,
-          });
-        });
-
-        setMessages(transformedMessages);
-        setActiveConversationId(conversationId);
-
-        // Find and set current conversation from conversations list
-        const currentConv = conversations.find((c) => c.id === conversationId);
-        if (currentConv) {
-          setCurrentConversation(currentConv);
-          const navIsInquiry = !!location.state?.isProductInquiry;
-          if (!navIsInquiry && !hasProcessedLocationState.current) {
-            setProductData(undefined);
-            setIsProductInquiry(false);
-            setPreFilledMessage("");
-          }
-        }
-
-        // save to localStorage
-        localStorage.setItem("activeConversationId", conversationId);
-        if (currentConv) {
-          localStorage.setItem(
-            "currentConversation",
-            JSON.stringify(currentConv)
-          );
-        }
-
-        // join socket room
-        if (socket?.connected) {
-          socket.emit("join_conversation", conversationId);
-        }
-
-        // Mark as read when opening conversation
-        if (socket?.connected) {
-          socket.emit("mark_as_read", conversationId);
-        }
-
-        // Auto-scroll to bottom
-        setTimeout(() => {
-          if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({
-              behavior: 'smooth',
-              block: 'end'
-            });
-          }
-        }, 300);
-
-      } catch (error) {
-        addToast({
-          type: 'error',
-          title: "Error",
-          message: "Failed to load messages",
-          duration: 2000,
-        });
-      } finally {
-        setIsLoadingMessages(false);
-      }
-    },
-    [isLoadingMessages, currentUser?.id, addToast, productData, conversations, socket]
-  );
-
-  const closeActiveConversation = () => {
-    setActiveConversationId(null);
-    setCurrentConversation(null);
-    setMessages([]);
-    setReplyToMessage(null);
-
-    // clear product inquiry data
-    setProductData(null);
-    setPreFilledMessage("");
-    setMessageText("");
-    setIsProductInquiry(false);
-    setIsMessageSent(false);
-
-    // Clear from localStorage as well
-    localStorage.removeItem("activeConversationId");
-    localStorage.removeItem("currentConversation");
-    localStorage.removeItem("productInquiryData");
-  };
-
-  const getMessageDisplayText = (message: any) => {
-    return message.content || message.text || "";
-  };
-
-  // Send message function
-  const sendMessageViaSocket = useCallback(
-    (conversationId: string, messageData: any) => {
-      if (!socket || !isSocketConnected) {
-        addToast({
-          type: 'error',
-          title: 'Connection Error',
-          message: 'Unable to send message. Please check your connection.',
-          duration: 2000,
-        });
-        return false;
-      }
-
-      const tempId = Date.now().toString();
-
-      const tempMessage = {
-        id: `temp-${tempId}`,
-        tempId: tempId,
-        conversationId,
-        content: messageData.content,
-        messageType: messageData.messageType,
-        fileUrl: messageData.fileUrl,
-        fileName: messageData.fileName,
-        fileSize: messageData.fileSize,
-        replyToId: messageData.replyToId,
-        senderId: currentUser?.id,
-        sender: {
-          id: currentUser?.id,
-          firstName: "You",
-          lastName: "",
-          profileImage: null,
-          isVerifiedSeller: false,
-        },
-        isIncoming: false,
-        timestamp: new Date().toISOString(),
-        timeString: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
-        dateString: "Just now",
-        type: messageData.messageType?.toLowerCase() || "text",
-        status: "sending",
-        text: messageData.content,
-        productData: messageData.productData,
-        isProductInquiry: !!messageData.productData,
-      };
-
-      // Add message immediately to UI
-      setMessages((prev) => {
-        const existingIndex = prev.findIndex((msg) => msg.tempId === tempId);
-        if (existingIndex >= 0) {
-          return prev;
-        }
-        return [...prev, tempMessage];
-      });
-
-      const timeout = setTimeout(() => {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.tempId === tempId
-              ? {
-                ...msg,
-                status: "Failed",
-                error: "send timeout",
-              }
-              : msg
-          )
-        );
-      }, 10000);
-
-      socket.emit("send_message", {
-        ...messageData,
-        tempId: tempId,
-        conversationId,
-      },
-        (response: any) => {
-          clearTimeout(timeout);
-
-          if (response && response.success) {
-            // do nothing
-          } else {
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.tempId === tempId
-                  ? {
-                    ...msg,
-                    status: "failed",
-                    error: response?.error || "Failed to send",
-                  }
-                  : msg
-              )
-            );
-          }
-        });
-
-      return true;
-    },
-    [socket, isSocketConnected, currentUser, addToast]
-  );
-
-  // handle message status updates
-  useEffect(() => {
-    if (!socket) return;
-    const handleMessageStatusUpdate = (data: {
-      messageId: string;
-      status: 'SENT' | 'DELIVERED' | 'READ';
-      updatedAt: string;
-    }) => {
-      setMessageStatus(prev => ({
-        ...prev,
-        [data.messageId]: data.status
-      }));
-      // Update the message in the messages list
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === data.messageId
-            ? {
-              ...msg,
-              status: data.status,
-              updatedAt: data.updatedAt
-            }
-            : msg
-        )
-      );
-    };
-    socket.on('message_status_updated', handleMessageStatusUpdate);
-    return () => {
-      socket.off('message_status_updated', handleMessageStatusUpdate);
-    };
-  }, [socket]);
-
-  // Add this function to update message status
-  const updateMessageStatus = useCallback((messageId: string, status: 'SENT' | 'DELIVERED' | 'READ') => {
-    if (!socket || !activeConversationId) return;
-    socket.emit('message_status_update', {
-      messageId,
-      status
-    });
-  }, [socket, activeConversationId]);
-
-  // Update your message rendering to show status icons
-  const renderMessageStatus = (message: any) => {
-    const status = messageStatus[message.id] || message.status;
-
-    switch (status) {
-      case 'SENDING':
-        return (
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
-      case 'SENT':
-        return <span>✓</span>; // Single tick
-      case 'DELIVERED':
-        // return <span>✓✓</span>; // Double grey ticks
-        return (
-          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-          </svg>
-        );
-      case 'READ':
-        // return <span style={{ color: '#4CAF50' }}>✓✓</span>; // Double blue ticks
-        return (
-          <div className="flex items-center">
-            <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
+  // useEffect(() => {
+  //   const userId = 'CURRENT_USER_ID';
+  //   async function fetchConvos() {
+  //     try {
+  //       const { data: convos } = await axios.get(`${API_BASE}/chat/conversations`/*, {headers: {Authorization: `Bearer ${token}`}}*/);
+  //       if (convos.length) {
+  //         const convoId = convos[0].id;
+  //         loadMessages(convoId, 0, true);
+  //       }
+  //     } catch (err) { toast.error('Conversation load error: ' + (err)); }
+  //   }
+  //   fetchConvos();
+  // }, [API_BASE]);
+
+  const PAGE_SIZE = 20;
 
   const handleHomepageClick = () => {
-    // Navigate to home page while preserving login state
     navigate('/', { replace: false });
   };
 
@@ -1233,36 +836,6 @@ const Messages: React.FC = () => {
         highlightChats: true
       }
     });
-  };
-
-  const handleConversationClick = async (conversationId: string) => {
-    // Prevent rapid consecutive clicks on same conversation
-    if (isLoadingMessages) {
-      return;
-    }
-
-    setProductData(undefined);
-    setIsProductInquiry(false);
-    setPreFilledMessage("");
-
-    // Close any active menus
-    setActionsMenuOpen(null);
-
-    // Set active conversation immediately for UI feedback
-    setActiveConversationId(conversationId);
-    setLastLoadedConversationId(conversationId);
-
-    // Load conversation messages
-    await fetchConversationMessages(conversationId);
-
-    // Mark as read when opening conversation
-    if (socket?.connected) {
-      socket.emit("mark_as_read", conversationId);
-    }
-
-    if (isMobileViewport) {
-      setShowMobileConversation(true);
-    }
   };
 
   // Limit visible messages to last 3 with smooth fade-out (unless showing all)
@@ -1325,6 +898,7 @@ const Messages: React.FC = () => {
 
   // File attachment handlers
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMessagesError(null);
     const files = event.target.files;
 
     if (files && files.length > 0) {
@@ -1353,14 +927,6 @@ const Messages: React.FC = () => {
     }
   };
 
-  // const handleAddPhotosClick = () => {
-  //   photoFileInputRef.current?.click();
-  // };
-
-  // const handleAddDocumentsClick = () => {
-  //   documentFileInputRef.current?.click();
-  // };
-
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     if (selectedFiles.length === 1) {
@@ -1379,7 +945,6 @@ const Messages: React.FC = () => {
   const handleFileClick = (file: any) => {
     // For now, we'll create a download link since we don't have the actual file data
     // In a real app, you would fetch the file from the server
-    // TODO fetch real file from server
     const link = document.createElement('a');
     link.href = '#'; // Placeholder - in real app this would be the file URL
     link.download = file.name;
@@ -1389,7 +954,7 @@ const Messages: React.FC = () => {
     alert(`Opening file: ${file.name} (${formatFileSize(file.size)})`);
   };
 
-  const handleIncomingMessageClick = (messageId: string) => {
+  const handleIncomingMessageClick = (messageId: number) => {
     // Toggle the clicked message - if already clicked, hide icons; if not clicked, show icons
     setClickedMessageId(clickedMessageId === messageId ? null : messageId);
 
@@ -1432,12 +997,12 @@ const Messages: React.FC = () => {
     }
   };
 
-  const handleActionsMenuClick = (conversationId: string, event: React.MouseEvent) => {
+  const handleActionsMenuClick = (chatId: number, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent chat selection
-    const isOpening = actionsMenuOpen !== conversationId;
+    const isOpening = actionsMenuOpen !== chatId;
 
     if (isOpening) {
-      setActionsMenuOpen(conversationId);
+      setActionsMenuOpen(chatId);
 
       if (isMobileViewport && chatListRef.current) {
         const buttonElement = event.currentTarget as HTMLElement;
@@ -1456,175 +1021,8 @@ const Messages: React.FC = () => {
     }
   };
 
-  const archiveConversation = async (conversationId: string) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/archive`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.ok) {
-        // Update local state
-        setConversations((prev) =>
-          prev.map((conv) =>
-            conv.id === conversationId ? { ...conv, isArchived: true } : conv
-          )
-        );
-
-        // If currently viewing archived conversation, close it
-        if (activeConversationId === conversationId) {
-          closeActiveConversation();
-        }
-
-        addToast({
-          type: "success",
-          title: "Conversation Archived",
-          message: "The conversation has been moved to archives",
-          duration: 2000,
-        });
-      }
-    } catch (error) {
-      addToast({
-        type: 'error',
-        title: "Archive Failed",
-        message: "Failed to archive conversation",
-        duration: 2000,
-      });
-    }
-  };
-
-  // Mute conversation
-  const muteConversation = async (conversationId: string) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/mute`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        addToast({
-          type: "success",
-          title: "Conversation Muted",
-          message: "You will no longer receive notifications from this chat",
-          duration: 2000,
-        });
-      }
-    } catch (error) {
-      addToast({
-        type: 'error',
-        title: "Mute Failed",
-        message: "Failed to mute conversation",
-        duration: 2000,
-      });
-    }
-  };
-
-  // Pin conversation
-  const pinConversation = async (conversationId: string) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}/pin`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        // Re-fetch conversations to get updated order
-        await fetchConversations();
-        addToast({
-          type: "success",
-          title: "Conversation Pinned",
-          message: "Conversation pinned to top",
-          duration: 2000,
-        });
-      }
-    } catch (error) {
-      addToast({
-        type: 'error',
-        title: "Pin Failed",
-        message: "Failed to pin conversation",
-        duration: 2000,
-      });
-    }
-  };
-
-  // Delete conversation function
-  const deleteConversation = async (conversationId: string) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations/${conversationId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        // Remove from local state
-        setConversations((prev) =>
-          prev.filter((conv) => conv.id !== conversationId)
-        );
-
-        // If currently viewing deleted conversation, close it
-        if (activeConversationId === conversationId) {
-          closeActiveConversation();
-        }
-
-        addToast({
-          type: "success",
-          title: "Conversation Deleted",
-          message: "The conversation has been deleted",
-          duration: 2000,
-        });
-      } else {
-        throw new Error("Delete failed");
-      }
-    } catch (error) {
-      addToast({
-        type: 'error',
-        title: "Delete Failed",
-        message: "Failed to delete conversation",
-        duration: 2000,
-      });
-    }
-  };
-
-  // Makr conversation as read
-  const markConversationAsRead = useCallback(
-    (conversationId: string) => {
-      if (!socket) return;
-
-      // Update local state
-      setConversations((prev) =>
-        prev.map((conv) =>
-          conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv
-        )
-      );
-
-      // Emit to server
-      socket.emit("mark_as_read", conversationId);
-    },
-    [socket]
-  );
-
-  const handleActionSelect = async (action: string, conversationId: string) => {
+  const handleActionSelect = (action: string, chatId: number) => {
+    console.log(`Action: ${action} for chat: ${chatId}`);
 
     if (action === 'Pin the chat') {
       setIsChatPinned(true);
@@ -1634,30 +1032,7 @@ const Messages: React.FC = () => {
 
     setActionsMenuOpen(null);
     setActionsMenuCoords(null);
-
-    switch (action) {
-      case "Mark as read":
-        markConversationAsRead(conversationId);
-        break;
-      case "Add label":
-        // Implement label functionality
-        console.log("Add label to:", conversationId);
-        break;
-      case "Mute the chat":
-        await muteConversation(conversationId);
-        break;
-      case "Pin the chat":
-        await pinConversation(conversationId);
-        break;
-      case "Archive the chat":
-        await archiveConversation(conversationId);
-        break;
-      case "Delete the chat":
-        await deleteConversation(conversationId);
-        break;
-      default:
-        console.log("Unknown action:", action);
-    }
+    // Here you would implement the actual action logic
   };
 
   // Emoji picker handlers
@@ -1674,158 +1049,41 @@ const Messages: React.FC = () => {
     handleTypingDetection();
   };
 
-  // reply click
-  const handleReplyClick = (message: any) => {
-    if (!message) return;
-
-    const replyMessage: Message = {
-      id: message.id,
-      content: message.content || '',
-      sender: {
-        id: message.sender?.id || 'unknown',
-        firstName: message.sender?.firstName || 'User',
-        lastName: message.sender?.lastName || '',
-        profileImage: message.sender?.profileImage || null
-      },
-      timestamp: message.timestamp || new Date().toISOString(),
-      status: message.status || 'SENT',
-      isIncoming: message.isIncoming || false
-    };
-    setReplyingTo(replyMessage);
-
-    messageInputRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   // Typing detection logic
-  const handleTypingDetection = useCallback(() => {
-    if (!currentConversation?.id || !socket || !isSocketConnected) {
-      return;
-    };
+  const handleTypingDetection = () => {
+    setIsUserTyping(true);
 
-    const now = Date.now();
-
-    if (now - lastTypingTime < 500) {
-      return;
+    // Clear existing timer
+    if (typingTimer) {
+      clearTimeout(typingTimer);
     }
 
-    // Send typing start eent
-    socket.emit("typing_start", {
-      conversationId: currentConversation.id,
-      userId: currentUser?.id,
-    });
-
-    setLastTypingTime(now);
-
-    // clear existing timer
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
-    }
-
-    // set new timer to stop typing indicator after 2 seconds of inactivity
+    // Set new timer to stop typing indicator after 1.5 seconds of inactivity
     const timer = setTimeout(() => {
-      socket.emit("typing_stop", {
-        conversationId: currentConversation.id,
-        userId: currentUser?.id,
-      });
-    }, 3000);
+      setIsUserTyping(false);
+    }, 1500);
 
-    setTypingTimeout(timer);
-  }, [
-    currentConversation?.id,
-    socket,
-    isSocketConnected,
-    typingTimeout,
-    lastTypingTime,
-    currentUser?.id,
-  ]);
-
-  // Cleanup when conversation changes
-  useEffect(() => {
-    return () => {
-      // Clear file preview when switching conversations
-      setSelectedFiles([]);
-      setShowFilePreview(false);
-    };
-  }, [activeConversationId]);
-
-  const startChatByEmail = async (
-    sellerEmail: string,
-    initialMessage?: string
-  ) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/chat/conversations/email`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            participantEmail: sellerEmail,
-            initialMessage: "",
-            productData: productData,
-            productId: productData?.id,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      const conversation = result.data;
-
-      setConversations((prev) => [conversation, ...prev]);
-      setActiveConversationId(conversation.id); // trigger loading messages
-      setCurrentConversation(conversation);
-
-      await fetchConversations();
-      return conversation;
-    } catch (error) {
-
-      let errorMessage = "Failed to start conversation. Please try again.";
-      if (error instanceof Error) {
-        if (error.message.includes("User not found")) {
-          errorMessage = "Seller not found. Please try again later.";
-        } else if (error.message.includes("Cannot create conversation with yourself")) {
-          errorMessage = "You cannot contact yourself.";
-        } else if (error.message.includes("HTTP error")) {
-          errorMessage = "Server connection failed. Please check your internet connection";
-        }
-      }
-
-      addToast({
-        type: 'error',
-        title: "Connection failed",
-        message: errorMessage,
-        duration: 2000,
-      });
-      return null;
-    }
+    setTypingTimer(timer);
   };
 
   // Render sidebar status indicator
-  const renderSidebarStatus = (messageId: any) => {
-    const status = messageStatus[messageId] || 'SENDING';
+  const renderSidebarStatus = (messageId: string | number) => {
+    const status = messageStatuses[String(messageId)] || 'sending';
 
     switch (status) {
-      case 'SENDING':
+      case 'sending':
         return (
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
-      case 'DELIVERED':
+      case 'delivered':
         return (
           <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
           </svg>
         );
-      case 'READ':
+      case 'read':
         return (
           <div className="flex items-center">
             <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
@@ -1842,7 +1100,7 @@ const Messages: React.FC = () => {
   };
 
   // Handle reaction button click
-  const handleReactionClick = (messageId: string, event: React.MouseEvent) => {
+  const handleReactionClick = (messageId: number, event: React.MouseEvent) => {
     event.stopPropagation();
     // Close message options popup if open
     setActiveMessageOptionsId(null);
@@ -1852,10 +1110,14 @@ const Messages: React.FC = () => {
 
   // Handle reaction selection
   const handleReactionSelect = (reaction: string) => {
-    if (activeReactionMessageId !== null) {
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.id === activeReactionMessageId ? { ...msg, reaction } : msg
+    const messageId = activeReactionMessageId !== null ? activeReactionMessageId : mobileMessageOptionsId;
+
+    if (messageId !== null) {
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
+          msg.id === messageId
+            ? { ...msg, reaction }
+            : msg
         )
       );
     }
@@ -1868,7 +1130,7 @@ const Messages: React.FC = () => {
   };
 
   // Handle reaction removal
-  const handleRemoveReaction = (messageId: string) => {
+  const handleRemoveReaction = (messageId: number) => {
     setMessages(prevMessages =>
       prevMessages.map(msg =>
         msg.id === messageId
@@ -1889,20 +1151,21 @@ const Messages: React.FC = () => {
   };
 
   // Handle message option selection
-  const handleMessageOptionSelect = (action: string, messageId?: number) => {
+  const handleMessageOptionSelect = (action: string, message?: { id: number }) => {
+    const messageId = message?.id;
+    console.log('Selected action:', action);
+
     if (action === 'reply' && messageId) {
       // Find the message to reply to
       const message = messages.find(m => m.id === messageId);
       if (message) {
-        handleReplyClick({
-          ...message,
-          sender: message.sender || {
-            id: 'unknown',
-            firstName: 'User',
-            lastName: '',
-            profileImage: null
-          }
+        console.log('Setting reply to message:', {
+          type: message.type,
+          duration: message.duration,
+          waveformDataLength: message.waveformData?.length || 0,
+          hasAudioUrl: !!message.audioUrl
         });
+        setReplyToMessage(message);
       }
     }
 
@@ -1957,7 +1220,7 @@ const Messages: React.FC = () => {
   };
 
   // Handle important badge removal
-  const handleRemoveImportant = (messageId: string) => {
+  const handleRemoveImportant = (messageId: number) => {
     setMessages(prevMessages =>
       prevMessages.map(msg =>
         msg.id === messageId
@@ -1968,7 +1231,7 @@ const Messages: React.FC = () => {
   };
 
   // Handle pin badge removal
-  const handleRemovePin = (messageId: string) => {
+  const handleRemovePin = (messageId: number) => {
     setMessages(prevMessages =>
       prevMessages.map(msg =>
         msg.id === messageId
@@ -2022,38 +1285,92 @@ const Messages: React.FC = () => {
     };
   }, [activeMessageOptionsId]);
 
-  // Render message status indicator
-  // const renderMessageStatus = (messageId: any) => {
-  //   const status = messageStatus[messageId] || 'SENDING';
+  // Close chat on Escape key (desktop only)
+  useEffect(() => {
+    const handleEscapeChat = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && conversationId && window.innerWidth >= 768) {
+        setConversationId(null);
+        setParticipantId(null);
+        setCurrentConversation(null);
+        setMessages([]);
+        setActiveChatId(null);
+      }
+    };
 
-  //   switch (status) {
-  //     case 'SENDING':
-  //       return (
-  //         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-  //           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-  //         </svg>
-  //       );
-  //     case 'DELIVERED':
-  //       return (
-  //         <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-  //           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-  //         </svg>
-  //       );
-  //     case 'READ':
-  //       return (
-  //         <div className="flex items-center">
-  //           <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
-  //             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-  //           </svg>
-  //           <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
-  //             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-  //           </svg>
-  //         </div>
-  //       );
-  //     default:
-  //       return null;
-  //   }
-  // };
+    document.addEventListener('keydown', handleEscapeChat);
+    return () => {
+      document.removeEventListener('keydown', handleEscapeChat);
+    };
+  }, [conversationId]);
+
+  const MessageStatus = ({ status }: { status: string }) => {
+    switch (status) {
+      case 'sending':
+        return <span className="text-gray-400 text-xs">Sending...</span>;
+      case 'sent':
+        return <span className="text-gray-400 text-xs">Sent</span>;
+      case 'delivered':
+        return <span className="text-gray-400 text-xs">Delivered</span>;
+      case 'read':
+        return <span className="text-blue-500 text-xs">Read</span>;
+      case 'failed':
+        return <span className="text-red-500 text-xs">Failed</span>;
+      default:
+        return null;
+    }
+  };
+
+  // Render message status indicator
+  const renderMessageStatus = (messageId: string | number) => {
+    const status = messageStatuses[String(messageId)] || 'sending';
+
+    switch (status) {
+      case 'sending':
+        return (
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case 'delivered':
+        return (
+          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        );
+      case 'read':
+        return (
+          <div className="flex items-center">
+            <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // conversation click handler
+  const handleConversationClick = useCallback((conv: any) => {
+    setCurrentConversation(conv);
+    setConversationId(conv.id);
+    setParticipantId(conv.otherParticipant?.id || null);
+
+    // Load messages for this conversation
+    loadMessages(conv.id, 1, true).then(() => {
+      // Mark messages as read when conversation is opened
+      if (conv.unreadCount > 0) {
+        markMessagesAsRead(conv.id, []);
+      }
+    });
+    // Mobile: Open conversation view
+    if (window.innerWidth < 768) {
+      setShowMobileConversation(true);
+    }
+  }, [loadMessages, markMessagesAsRead]);
 
   const handleLanguageSelect = (language: string) => {
     setSelectedLanguage(language);
@@ -2062,457 +1379,186 @@ const Messages: React.FC = () => {
 
   // Handle incoming product data from Product Detail page
   useEffect(() => {
-    if (location.state && Object.keys(location.state).length > 0 && !hasProcessedLocationState.current) {
-      const {
-        productData: stateProductData,
-        preFilledMessage: statePreFilledMessage,
-        conversationId,
-        isProductInquiry,
-      } = location.state;
-
-      if (stateProductData) {
-        setProductData(stateProductData);
-        setPreFilledMessage(statePreFilledMessage || '');
+    if (location.state) {
+      const { productData, preFilledMessage } = location.state;
+      if (productData) {
+        setProductData(productData);
+        setPreFilledMessage(preFilledMessage || '');
+        // Only set messageText if no messages have been sent yet
         if (!isMessageSent) {
-          setMessageText(statePreFilledMessage || '');
+          setMessageText(preFilledMessage || '');
         }
-        setIsProductInquiry(true);
-
-        hasProcessedLocationState.current = true;
+        // Show mobile conversation view when coming from product detail
+        setShowMobileConversation(true);
       }
-
-      if (conversationId && conversationId !== activeConversationId) {
-        setShouldAutoOpenConversation(true);
-        setActiveConversationId(conversationId);
-      }
-
-      // Clear location state to prevent re-triggering on refresh
-      setTimeout(() => {
-        navigate(location.pathname, { replace: true, state: {} });
-      }, 100);
     }
-  }, [location.state]);
+  }, [location.state, isMessageSent]);
 
-  // Cleanup for audio URLs
-  useEffect(() => {
-    return () => {
-      // Clean up audio URLs to prevent memory leaks
-      if (previewAudio) {
-        previewAudio.pause();
-        URL.revokeObjectURL(previewAudio.src);
-      }
-      if (currentAudio) {
-        currentAudio.pause();
-        URL.revokeObjectURL(currentAudio.src);
-      }
-
-      // Clean up any audio URLs in messages
-      messages.forEach((message) => {
-        if (message.fileUrl && message.fileUrl.startsWith("blob:")) {
-          URL.revokeObjectURL(message.fileUrl);
-        }
-      });
-    };
-  }, [previewAudio, currentAudio, messages]);
-
-  // Scroll when sending a new message
-  useEffect(() => {
-    if (isSending && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-      });
-    }
-  }, [isSending]);
-
-  // check socket connection
-  const checkConnection = () => {
-    if (!socket || !isSocketConnected) {
-      addToast({
-        type: 'error',
-        title: "Connection Lost",
-        message: "Please check your internet connection and try again.",
-        duration: 2000,
-      });
-      return false;
-    }
-    return true;
-  };
-
-  const handleSendMessage = async (voiceBlob?: Blob) => {
-    if (!checkConnection()) return;
-    // Check if user has typed additional text beyond the prefilled message
-    const userTypedText = messageText.trim();
-
-    const textToSend = isProductInquiry && !isMessageSent ? preFilledMessage : userTypedText;
-    if (isSending) {
+  const handleSendMessage = async (content: string) => {
+    if (!socket || !conversationId || (!content.trim() && selectedFiles.length === 0)) {
+      console.error('Cannot send message:', { socket: !!socket, conversationId, hasContent: !!content.trim(), hasFiles: selectedFiles.length > 0 });
       return;
     }
 
-    // create new conversation if we have product data but no conversation exists
-    if (!currentConversation?.id && productData) {
-      const sellerEmail = productData.seller?.email;
-      if (sellerEmail) {
-        const newConversation = await startChatByEmail(sellerEmail, textToSend || preFilledMessage);
-
-        if (newConversation) {
-          setCurrentConversation(newConversation);
-          setActiveConversationId(newConversation.id);
-
-          setTimeout(() => {
-            sendMessageViaSocket(newConversation.id, {
-              content: textToSend || preFilledMessage,
-              messageType: "TEXT",
-              productData: productData
-            });
-            setHasSentProductData(true);
-          }, 500);
-
-          setIsSending(false);
-          return;
-        }
-      }
-    }
-
-    if (!textToSend && selectedFiles.length === 0 && !voiceBlob) {
+    setMessagesError(null);
+    if (!user?.id || !conversationId) {
+      toast.error("User not authenticated or no active chat.");
       return;
     }
 
-    if (!socket || !isSocketConnected) {
-      addToast({
-        type: 'error',
-        title: 'Connection Error',
-        message: "Unable to connect. Please check your internet and try again.",
-        duration: 2000,
-      });
+    // Don't send empty messages unless there are files
+    if (!content.trim() && selectedFiles.length === 0) {
+      toast.info("Cannot send empty message.");
       return;
     }
 
-    if ((!messageText.trim() && !selectedFiles.length) || !currentConversation?.id) {
+    if (!socket) {
+      toast.error('WebSocket not connected. Please refresh the page.');
       return;
-    }
-
-    if (socket && activeConversationId) {
-      socket.emit('typing_stop', {
-        conversationId: activeConversationId
-      });
     }
 
     try {
-      setIsSending(true);
+      let filePayloads: { fileName: string; fileUrl: string; fileType: string; fileSize: number; }[] = [];
 
-      const filesToSend = [...selectedFiles];
-      let messageSent = false;
-
-      // Clear input immediately
-      setMessageText("");
-      setPreFilledMessage("");
-      setReplyToMessage(null);
-
-      const shouldSendProductData = isProductInquiry && productData && !hasSentProductData;
-
-      // Handle voice message first (if any)
-      if (voiceBlob) {
-        try {
-          // Convert blob to file
-          const voiceFile = new File(
-            [voiceBlob],
-            `voice-message-${Date.now()}.webm`,
-            {
-              type: "audio/webm",
-            }
-          );
-
-          const { uploadUrl, fileUrl } = await gcpStorageService.getPresignedUrlForChat(
-            voiceFile,
-            user!.id
-          );
-
-          // Upload voice file
-          await gcpStorageService.uploadFile(voiceFile, uploadUrl);
-
-          // Send voice message
-          sendMessageViaSocket(currentConversation.id, {
-            content: "",
-            messageType: "AUDIO",
-            fileUrl: fileUrl,
-            fileName: voiceFile.name,
-            fileSize: voiceFile.size,
-            duration: 0,
-            productData: shouldSendProductData ? productData : null,
-          });
-
-          messageSent = true;
-          if (shouldSendProductData) {
-            setHasSentProductData(true);
-          }
-
-        } catch (error: any) {
-          addToast({
-            type: 'error',
-            title: "Voice message failed",
-            message: "Unable to send voice message. Please try again",
-            duration: 2000,
-          });
-        }
-      }
-
-      // Handle file attachments
-      if (filesToSend.length > 0) {
-        for (const file of filesToSend) {
+      // Handle file uploads first
+      if (selectedFiles.length > 0) {
+        for (const file of selectedFiles) {
           try {
-            if (!user?.id) {
-              addToast({
-                type: 'error',
-                title: "Authentication Error",
-                message: "User not authenticated",
-                duration: 2000,
-              });
-              setIsSending(false);
-              return;
-            }
-            const { uploadUrl, fileUrl } =
-              await gcpStorageService.getPresignedUrlForChat(file, user!.id);
+            const token = localStorage.getItem("accessToken");
+            const { uploadUrl, key, viewUrl } = (await axios.post(`${API_BASE}/upload/chat`, {
+              fileName: file.name,
+              fileType: file.type,
+              fileSize: file.size,
+              userId: user.id
+            }, {
+              headers: { Authorization: `Bearer ${token}` }
+            })).data;
 
             await gcpStorageService.uploadFile(file, uploadUrl);
-
-            let messageType = "FILE";
-            if (file.type.startsWith("image/")) messageType = "IMAGE";
-            if (file.type.startsWith("audio/")) messageType = "AUDIO";
-            if (file.type.startsWith("video/")) messageType = "VIDEO";
-
-            // Send message with file reference
-            sendMessageViaSocket(currentConversation.id, {
-              content: textToSend || `Sent ${file.name}`,
-              messageType: messageType,
-              fileUrl: fileUrl,
+            filePayloads.push({
               fileName: file.name,
-              fileSize: file.size,
-              productData: shouldSendProductData ? productData : null,
+              fileUrl: viewUrl,
+              fileType: file.type,
+              fileSize: file.size
             });
-
-            messageSent = true;
-            if (shouldSendProductData) {
-              setHasSentProductData(true);
-            }
-
-          } catch (error: any) {
-            addToast({
-              type: 'error',
-              title: "File upload failed",
-              message:
-                error.message ||
-                "Unable to upload attachment. Please try again",
-              duration: 2000,
-            });
-            continue;
+          } catch (err: any) {
+            toast.error('File upload failed: ' + (err?.response?.data?.message || err.message || err));
+            setMessagesError('File upload failed.');
+            return; // Stop sending message if file upload fails
           }
         }
       }
 
-      if (replyingTo) {
-        setReplyingTo(null);
-      }
+      const messageContent = content.trim() || preFilledMessage.trim();
+      const tempId = `temp_${Date.now()}_${Math.random()}`;
 
-      const hasSentFilesOrVoice = filesToSend.length > 0 || voiceBlob;
-      const textIsFileDescription =
-        textToSend === `Sent ${filesToSend[0]?.name}` ||
-        textToSend === "Voice message";
+      // Create temporary message for optimistic UI (will be replaced by backend response)
+      const tempMessage = {
+        id: tempId,
+        tempId,
+        content: messageContent,
+        text: messageContent,
+        conversationId,
+        senderId: user.id,
+        isIncoming: false,
+        status: 'sending' as const,
+        timestamp: new Date().toISOString(),
+        timeString: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        sender: {
+          id: user.id,
+          firstName: user.firstName || 'You',
+          lastName: user.lastName || '',
+          profileImage: user.profileImage || null
+        },
+        files: filePayloads,
+        messageType: filePayloads.length > 0 ? 'FILE' : 'TEXT'
+      };
 
-      if (textToSend && (!hasSentFilesOrVoice || !textIsFileDescription)) {
-        // Send text message
-        sendMessageViaSocket(currentConversation.id, {
-          content: textToSend,
-          messageType: "TEXT",
-          replyToId: replyingTo?.id,
-          productData: shouldSendProductData ? productData : undefined,
-        });
-
-        messageSent = true;
-        if (shouldSendProductData) {
-          setHasSentProductData(true);
+      // Add temp message to UI (will be replaced by real message from backend)
+      // Check if message already exists before adding (shouldn't happen, but safe)
+      setMessages(prev => {
+        if (messageExists(prev, tempMessage)) {
+          return prev; // Don't add if already exists
         }
-      }
+        return deduplicateMessages([...prev, tempMessage]);
+      });
+      // Set temp status to sending
+      setMessageStatuses(prev => ({ ...prev, [tempId]: 'sending' }));
 
-      // Mark as message sent after successful sending
-      if (messageSent) {
-        setSelectedFiles([]);
-        setShowFilePreview(false);
-        setIsMessageSent(true);
-        setProductData(undefined);
-        setIsProductInquiry(false);
-        setPreFilledMessage("");
-        inquiryRef.current = null;
+      // Clear input fields
+      setMessageText('');
+      setPreFilledMessage('');
+      setSelectedFiles([]);
+      setShowFilePreview(false);
+      setReplyToMessage(null);
+      setHasIncomingReply(false);
+      setIsReplyRead(false);
 
-      } else {
-        setIsMessageSent(false);
-      }
-    } catch (error: any) {
-      console.error('Couldn\'t send message', error);
-    } finally {
-      setIsSending(false);
+      // Emit socket event to send message
+      socket.emit('send_message', {
+        tempId,
+        conversationId,
+        senderId: user.id,
+        receiverId: participantId || undefined,
+        content: messageContent,
+        messageType: filePayloads.length > 0 ? 'FILE' : 'TEXT',
+        files: filePayloads,
+        replyToId: replyToMessage?.id,
+        productData: productData && !isMessageSent ? productData : null
+      }, (response: any) => {
+        if (!response?.success) {
+          // Remove temp message and show error
+          setMessages(prev => prev.filter(msg => msg.tempId !== tempId));
+          toast.error('Failed to send message: ' + (response?.error || 'Unknown error'));
+        }
+        // If success, the message_sent or receive_message event will update the UI
+      });
+
+      setIsMessageSent(true);
+
+    } catch (err: any) {
+      console.error('Error in handleSendMessage:', err);
+      toast.error('An error occurred while sending your message: ' + (err?.response?.data?.message || err.message || err));
+      setMessagesError('Failed to send message.');
     }
   };
 
-  // check socket connection
-  useEffect(() => {
-    if (!socket) return;
-
-    const checkConnection = () => {
-      if (!socket.connected && !socketInitialized) {
-        setSocketInitialized(false);
-      }
-    };
-
-    // check connection status periodically
-    const interval = setInterval(checkConnection, 5000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [socket, socketInitialized]);
-
-  // keep socket in sync with context socket
-  useEffect(() => {
-    if (!contextSocket) {
-      return;
+  const handleSendButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (messageText.trim()) {
+      handleSendMessage(messageText);
+    } else if (selectedFiles.length > 0) {
+      // Handle file upload
+      handleSendMessage('');
+    } else {
+      handleAudioRecord();
     }
-    setSocket(contextSocket);
-  }, [contextSocket]);
+  };
 
-  // Clean up product inquiry state when component unmounts
+  // Auto-mark messages as read when conversation is opened
   useEffect(() => {
-    return () => {
+    if (!conversationId || !user?.id || messages.length === 0) return;
 
-      if (isMessageSent) {
-        localStorage.removeItem("productInquiryData");
-      }
-    };
-  }, [isMessageSent]);
+    const unreadMessages = messages.filter(
+      msg => !msg.readAt && msg.senderId !== user.id
+    );
 
-  useEffect(() => {
-    if (!socket) return;
-    const handleMessageSent = (message: any) => {
-      setMessages(prev => prev.map(msg =>
-        msg.tempId === message.tempId ? { ...msg, ...message } : msg
-      ));
-    };
-    socket.on('message_sent', handleMessageSent);
-    return () => {
-      socket.off('message_sent', handleMessageSent);
-    };
-  }, [socket]);
-
-  // Auto-show mobile conversation view when product data is present
-  useEffect(() => {
-    if (isMobileViewport && productData && activeConversationId) {
-      setShowMobileConversation(true);
+    if (unreadMessages.length > 0) {
+      markMessagesAsRead(conversationId, unreadMessages);
     }
-  }, [isMobileViewport, productData, activeConversationId]);
+  }, [conversationId, messages, user?.id]);
 
-  // Auto-open conversation when coming from ProductDetail
-  useEffect(() => {
-    const openConversationFromState = async () => {
-
-      if (location.state?.conversationId && !isLoadingMessages) {
-        const { conversationId, productData, preFilledMessage, isProductInquiry, shouldOpenConversation } = location.state;
-
-        // Only proceed if we should open the conversation
-        if (!shouldOpenConversation && activeConversationId === conversationId) {
-          return;
-        }
-
-        // Set product data first
-        if (productData) {
-          setProductData(productData);
-          setPreFilledMessage(preFilledMessage || '');
-          setIsProductInquiry(true);
-        }
-
-        // Set active conversation
-        setActiveConversationId(conversationId);
-        setLastLoadedConversationId(conversationId);
-
-        // Load conversation messages
-        await fetchConversationMessages(conversationId);
-
-        // Clear location state to prevent re-triggering
-        setTimeout(() => {
-          navigate(location.pathname, {
-            replace: true,
-            state: {}
-          });
-        }, 1000);
-      }
-    };
-
-    openConversationFromState();
-  }, [location.state, navigate, isLoadingMessages]);
-
-  // Track when we should auto-open
-  const [shouldAutoOpenConversation, setShouldAutoOpenConversation] = useState(false);
-
-  // Auto-open conversation when the flag is set and we're not loading
-  useEffect(() => {
-    const autoOpenConversation = async () => {
-      if (shouldAutoOpenConversation && activeConversationId && !isLoadingMessages) {
-        await fetchConversationMessages(activeConversationId);
-        setShouldAutoOpenConversation(false);
-
-        // Show mobile conversation view if on mobile
-        if (isMobileViewport && productData) {
-          setShowMobileConversation(true);
-        }
-      }
-    };
-
-    autoOpenConversation();
-  }, [shouldAutoOpenConversation, activeConversationId, isLoadingMessages]);
-
-  // manually open conversation from location state if not already opened
-  const openConversationFromState = useCallback(async () => {
-    if (location.state?.conversation && !currentConversation) {
-      const conversationId = location.state.conversation.id;
-      await fetchConversationMessages(conversationId);
-    }
-  }, [location.state, currentConversation, fetchConversationMessages]);
-
-  useEffect(() => {
-    openConversationFromState();
-  }, [openConversationFromState]);
-
-  // Update when new incoming messages arrive
-  useEffect(() => {
-    const lastIncomingMessage = messages.filter((msg) => msg.isIncoming).pop();
-
-    if (lastIncomingMessage) {
-      setIsReplyRead(false);
-      setHasIncomingReply(true);
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    if (activeConversationId) {
-      markConversationAsRead(activeConversationId);
-    }
-  }, [activeConversationId, markConversationAsRead]);
-
-  const handleAudioRecord = async (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
+  const handleAudioRecord = async () => {
     setIsRecording(true);
     setRecordingTime(0);
     setSoundDetected(false);
 
-    // Initialize waveform with 20 bars
-    setAudioLevels(Array(20).fill(0.1));
+    // Start with empty waveform - bars will be added progressively
+    setAudioLevels([]);
 
     // Start recording timer
     const timer = setInterval(() => {
-      setRecordingTime((prev) => prev + 1);
+      setRecordingTime(prev => prev + 1);
     }, 1000);
 
     setRecordingTimer(timer);
@@ -2532,39 +1578,20 @@ const Messages: React.FC = () => {
         }
       };
 
-      recorder.onstop = async () => {
+      recorder.onstop = () => {
         setAudioChunks(chunks);
-
-        // autosend the recorded audio
-        if (chunks.length > 0) {
-          try {
-            const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-
-            // Send the voice message
-            await handleSendMessage(audioBlob);
-
-            // Clear the audio chunks after sending
-            setAudioChunks([]);
-            setRecordingTime(0); // Reset recording time
-          } catch (error) {
-            throw new Error(" Failed to send voice message:");
-          }
-        } else {
-          console.warn("No audio chunks recorded");
-        }
       };
 
       recorder.start();
       setMediaRecorder(recorder);
 
       // Create audio context and analyser for visualization
-      const audioCtx = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const analyserNode = audioCtx.createAnalyser();
       const source = audioCtx.createMediaStreamSource(stream);
 
       analyserNode.fftSize = 256;
-      analyserNode.smoothingTimeConstant = 0.8;
+      analyserNode.smoothingTimeConstant = 0.3; // Lower for more responsive waveforms
       source.connect(analyserNode);
 
       setAudioContext(audioCtx);
@@ -2574,48 +1601,41 @@ const Messages: React.FC = () => {
       const bufferLength = analyserNode.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
 
-      // Start waveform animation timer using real audio data
+      // Progressive waveform building - Instagram style
       const waveformTimer = setInterval(() => {
-        analyserNode.getByteFrequencyData(dataArray);
+        analyserNode.getByteTimeDomainData(dataArray);
 
-        // Calculate average volume and create waveform
-        const newLevels = Array(20)
-          .fill(0)
-          .map((_, index) => {
-            // Sample different frequency ranges for each bar
-            const startIndex = Math.floor((index / 20) * bufferLength);
-            const endIndex = Math.floor(((index + 1) / 20) * bufferLength);
+        // Calculate current audio level (amplitude)
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const value = dataArray[i] - 128; // Convert to signed
+          sum += Math.abs(value);
+        }
+        const averageLevel = sum / bufferLength;
 
-            // Get average amplitude for this frequency range
-            let sum = 0;
-            for (let i = startIndex; i < endIndex; i++) {
-              sum += dataArray[i];
-            }
-            const average = sum / (endIndex - startIndex);
+        // Normalize to get bar height (0.2-1.0 range)
+        // Short bars when quiet, tall bars when loud
+        const barHeight = Math.max(0.15, Math.min(1.0, (averageLevel / 128) * 3));
 
-            // Normalize to 0.1-1.0 range (0-255 -> 0.1-1.0)
-            const normalized = Math.max(
-              0.1,
-              Math.min(1.0, (average / 255) * 1.2 + 0.1)
-            );
+        // Detect if voice/sound is present (threshold ~0.3)
+        const hasVoice = barHeight > 0.3;
+        setSoundDetected(hasVoice);
 
-            return normalized;
-          });
+        // Add new bar to the waveform array (Instagram style - left to right)
+        setAudioLevels(prev => {
+          const newLevels = [...prev, barHeight];
+          // Limit to 50 bars max (will scroll effect naturally)
+          return newLevels.slice(-50);
+        });
 
-        setAudioLevels(newLevels);
-
-        // Update sound detection based on overall volume
-        const averageVolume =
-          newLevels.reduce((a, b) => a + b, 0) / newLevels.length;
-        setSoundDetected(averageVolume > 0.3);
-      }, 50);
+      }, 100); // Add new bar every 100ms
 
       setWaveformTimer(waveformTimer);
+
     } catch (error) {
+      console.error('Error accessing microphone:', error);
       // Fallback to visual-only recording if mic access fails
-      alert(
-        "Could not access microphone. Recording will continue without audio visualization."
-      );
+      alert('Could not access microphone. Recording will continue without audio visualization.');
     }
   };
 
@@ -2659,8 +1679,133 @@ const Messages: React.FC = () => {
 
     setAnalyser(null);
 
-    // Reset waveform to flat line
-    setAudioLevels(Array(20).fill(0.1));
+    // Keep the recorded waveforms for preview (don't reset)
+    // Keep the recording time for display purposes
+  };
+
+  const handleSendVoiceMessage = () => {
+    if (recordingTime > 0) {
+      // Clear any incoming reply state when sending a new message
+      setHasIncomingReply(false);
+      setIsReplyRead(false);
+      setIsSellerTyping(false);
+
+      const currentTime = new Date();
+      const timeString = currentTime.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+      const dateString = currentTime.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // Create audio blob from recorded chunks
+      const audioBlob = audioChunks.length > 0 ? new Blob(audioChunks, { type: 'audio/webm' }) : null;
+      const audioUrl = audioBlob ? URL.createObjectURL(audioBlob) : null;
+
+      const newMessage = {
+        id: Date.now(),
+        type: 'voice',
+        duration: recordingTime,
+        timestamp: timeString,
+        timeString: timeString,
+        dateString: `Today, ${timeString}`,
+        sentAt: currentTime,
+        audioUrl: audioUrl,
+        waveformData: [...recordedWaveforms],
+        replyTo: replyToMessage ? {
+          text: replyToMessage.text,
+          sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You',
+          type: replyToMessage.type,
+          duration: replyToMessage.duration,
+          waveformData: replyToMessage.waveformData,
+          audioUrl: replyToMessage.audioUrl
+        } : null
+      };
+
+      console.log('Sending voice note with waveformData:', recordedWaveforms.length, 'bars');
+
+      setMessages(prev => [...prev, newMessage]);
+      setRecordingTime(0);
+      setIsMessageSent(true);
+
+      // Set initial status as 'sending'
+      setMessageStatuses(prev => ({
+        ...prev,
+        [newMessage.id]: 'sending'
+      }));
+
+      // Simulate status progression
+      setTimeout(() => {
+        setMessageStatuses(prev => ({
+          ...prev,
+          [newMessage.id]: 'delivered'
+        }));
+      }, 2000);
+
+      setTimeout(() => {
+        setMessageStatuses(prev => ({
+          ...prev,
+          [newMessage.id]: 'read'
+        }));
+
+        // Show typing indicator after voice message is read
+        setIsSellerTyping(true);
+        setHasIncomingReply(false);
+
+        setTimeout(() => {
+          setIsSellerTyping(false);
+          setHasIncomingReply(true);
+          setIsReplyRead(false);
+
+          // Add incoming reply message
+          const replyTime = new Date();
+          const replyTimeString = replyTime.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          });
+
+          setMessages(prev => [...prev, {
+            id: Date.now(),
+            text: "Thanks for the voice note! I'll review it and get back to you shortly.",
+            timestamp: replyTimeString,
+            timeString: replyTimeString,
+            dateString: `Today, ${replyTimeString}`,
+            isIncoming: true,
+            sentAt: replyTime
+          }]);
+
+          // Auto-transition to read state after 3 seconds since chat is open
+          setTimeout(() => {
+            setIsReplyRead(true);
+          }, 3000);
+        }, 2000); // 2 seconds of typing indicator
+      }, 5000); // 5 seconds for read
+
+      // Voice message sent - conversation will update via socket events
+
+      // Clear reply preview and audio chunks after sending voice message
+      setReplyToMessage(null);
+      setAudioChunks([]);
+      setMediaRecorder(null);
+      setRecordedWaveforms([]);
+      setAudioLevels([]);
+
+      // Clean up preview audio if playing
+      if (previewAudio) {
+        previewAudio.pause();
+        setPreviewAudio(null);
+      }
+      setIsPreviewPlaying(false);
+      setPreviewPlaybackTime(0);
+
+      // No seller reply for voice messages - voice messages don't trigger responses
+    }
   };
 
   // Handle audio preview playback (before sending)
@@ -2712,235 +1857,89 @@ const Messages: React.FC = () => {
   };
 
   // Handle audio playback with play/pause toggle and countdown
-  const handleAudioPlayback = (
-    messageId: string,
-    audioUrl: string,
-    duration: number
-  ) => {
+  const handleAudioPlayback = (messageId: number, audioUrl: string, duration: number) => {
     // If this message is already playing, pause it
-    if (playingMessageId === messageId && currentAudioRef.current) {
-      currentAudioRef.current.pause();
+    if (playingMessageId === messageId && currentAudio) {
+      currentAudio.pause();
       setPlayingMessageId(null);
-      currentMessageIdRef.current = null;
-      if (updateTimerRef.current) {
-        clearInterval(updateTimerRef.current);
-        updateTimerRef.current = null;
-      }
+      setCurrentAudio(null);
       return;
     }
 
     // Stop any currently playing audio
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause();
-      currentAudioRef.current.currentTime = 0;
-      if (updateTimerRef.current) {
-        clearInterval(updateTimerRef.current);
-        updateTimerRef.current = null;
-      }
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
     }
 
     // Create and play new audio
     const audio = new Audio(audioUrl);
-    currentAudioRef.current = audio;
-    currentMessageIdRef.current = messageId;
+    setCurrentAudio(audio);
     setPlayingMessageId(messageId);
 
-    // Initialize playback time to 0
-    setAudioPlaybackTime((prev) => ({
+    // Initialize playback time to full duration
+    setAudioPlaybackTime(prev => ({
       ...prev,
-      [messageId]: 0,
+      [messageId]: duration
     }));
 
-    // Update playback time - using refs to avoid closure issues
-    updateTimerRef.current = setInterval(() => {
-      if (currentAudioRef.current && currentMessageIdRef.current) {
-        const currentTime = Math.floor(currentAudioRef.current.currentTime);
+    // Initialize progress to 0
+    setAudioPlaybackProgress(prev => ({
+      ...prev,
+      [messageId]: 0
+    }));
 
-        setAudioPlaybackTime((prev) => ({
+    // Update countdown timer and progress
+    const updateTimer = setInterval(() => {
+      if (audio.currentTime && duration > 0) {
+        const progress = (audio.currentTime / duration) * 100;
+        setAudioPlaybackProgress(prev => ({
           ...prev,
-          [currentMessageIdRef.current!]: currentTime,
+          [messageId]: progress
         }));
       }
-    }, 100);
+
+      setAudioPlaybackTime(prev => {
+        const remaining = Math.max(0, (prev[messageId] || duration) - 1);
+        if (remaining === 0) {
+          clearInterval(updateTimer);
+        }
+        return {
+          ...prev,
+          [messageId]: remaining
+        };
+      });
+    }, 1000);
 
     // Handle audio end
     audio.onended = () => {
       setPlayingMessageId(null);
-      currentMessageIdRef.current = null;
-      currentAudioRef.current = null;
-      if (updateTimerRef.current) {
-        clearInterval(updateTimerRef.current);
-        updateTimerRef.current = null;
-      }
-      setAudioPlaybackTime((prev) => ({
+      setCurrentAudio(null);
+      clearInterval(updateTimer);
+      setAudioPlaybackTime(prev => ({
         ...prev,
-        [messageId]: 0,
+        [messageId]: duration
+      }));
+      setAudioPlaybackProgress(prev => ({
+        ...prev,
+        [messageId]: 0
       }));
     };
 
-    // Handle audio errors
-    audio.onerror = () => {
-      setPlayingMessageId(null);
-      currentMessageIdRef.current = null;
-      currentAudioRef.current = null;
-      if (updateTimerRef.current) {
-        clearInterval(updateTimerRef.current);
-        updateTimerRef.current = null;
-      }
+    // Handle audio pause
+    audio.onpause = () => {
+      clearInterval(updateTimer);
     };
 
-    audio.play().catch(error => {
-      setPlayingMessageId(null);
-      currentMessageIdRef.current = null;
-      currentAudioRef.current = null;
-      if (updateTimerRef.current) {
-        clearInterval(updateTimerRef.current);
-        updateTimerRef.current = null;
-      }
-    });
-  };
+    // Apply playback speed if set
+    const currentSpeed = audioPlaybackSpeed[messageId] || 1;
+    audio.playbackRate = currentSpeed;
 
-  const handleSendVoiceMessage = () => {
-    if (recordingTime > 0) {
-      // Clear any incoming reply state when sending a new message
-      setHasIncomingReply(false);
-      setIsReplyRead(false);
-      setIsSellerTyping(false);
-
-      const currentTime = new Date();
-      const timeString = currentTime.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
-      const dateString = currentTime.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-
-      // Create audio blob from recorded chunks
-      const audioBlob = audioChunks.length > 0 ? new Blob(audioChunks, { type: 'audio/webm' }) : null;
-      const audioUrl = audioBlob ? URL.createObjectURL(audioBlob) : null;
-
-      const newMessage = {
-        id: Date.now(),
-        type: 'voice',
-        duration: recordingTime,
-        timestamp: timeString,
-        timeString: timeString,
-        dateString: `Today, ${timeString}`,
-        sentAt: currentTime,
-        audioUrl: audioUrl,
-        waveformData: [...recordedWaveforms],
-        replyTo: replyToMessage ? {
-          text: replyToMessage.text,
-          sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You',
-          type: replyToMessage.type,
-          duration: replyToMessage.duration,
-          waveformData: replyToMessage.waveformData,
-          audioUrl: replyToMessage.audioUrl
-        } : null
-      };
-
-      setMessages(prev => [...prev, newMessage]);
-      setRecordingTime(0);
-      setIsMessageSent(true);
-
-      // Set initial status as 'SENDING'
-      setMessageStatus(prev => ({
-        ...prev,
-        [newMessage.id]: 'SENDING'
-      }));
-
-      // Simulate status progression
-      setTimeout(() => {
-        setMessageStatus(prev => ({
-          ...prev,
-          [newMessage.id]: 'DELIVERED'
-        }));
-      }, 2000);
-
-      setTimeout(() => {
-        setMessageStatus(prev => ({
-          ...prev,
-          [newMessage.id]: 'READ'
-        }));
-
-        // Show typing indicator after voice message is read
-        setIsSellerTyping(true);
-        setHasIncomingReply(false);
-
-        setTimeout(() => {
-          setIsSellerTyping(false);
-          setHasIncomingReply(true);
-          setIsReplyRead(false);
-
-          // Add incoming reply message
-          const replyTime = new Date();
-          const replyTimeString = replyTime.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-          });
-
-          setMessages(prev => [...prev, {
-            id: Date.now(),
-            text: "Thanks for the voice note! I'll review it and get back to you shortly.",
-            timestamp: replyTimeString,
-            timeString: replyTimeString,
-            dateString: `Today, ${replyTimeString}`,
-            isIncoming: true,
-            sentAt: replyTime
-          }]);
-
-          // Auto-transition to read state after 3 seconds since chat is open
-          setTimeout(() => {
-            setIsReplyRead(true);
-          }, 3000);
-        }, 2000); // 2 seconds of typing indicator
-      }, 5000); // 5 seconds for read
-
-      // Update chat entry with latest message
-      const conversationId = conversation?.id || Date.now();
-      const voiceDuration = `${Math.floor(recordingTime / 60).toString().padStart(2, '0')} : ${(recordingTime % 60).toString().padStart(2, '0')} - Audio`;
-      setconversation({
-        id: conversationId,
-        name: 'Joaquin EDIMO',
-        avatar: eboAvatar,
-        lastMessage: voiceDuration,
-        timestamp: `Today, ${timeString}`,
-        isRead: false,
-        isActive: true,
-        sentByUser: true,
-        hasVoiceNote: true,
-        voiceDuration: recordingTime,
-        messageId: newMessage.id
-      });
-      setActiveconversationId(conversationId); // Set as active chat
-
-      // Clear reply preview and audio chunks after sending voice message
-      setReplyToMessage(null);
-      setAudioChunks([]);
-      setMediaRecorder(null);
-      setRecordedWaveforms([]);
-      setAudioLevels([]);
-
-      // Clean up preview audio if playing
-      if (previewAudio) {
-        previewAudio.pause();
-        setPreviewAudio(null);
-      }
-      setIsPreviewPlaying(false);
-      setPreviewPlaybackTime(0);
-
-      // No seller reply for voice messages - voice messages don't trigger responses
-    }
+    audio.play();
   };
 
   // Handle playback speed change
-  const handleSpeedChange = (messageId: any) => {
+  const handleSpeedChange = (messageId: number) => {
     const currentSpeed = audioPlaybackSpeed[messageId] || 1;
     let newSpeed = 1;
 
@@ -3034,141 +2033,14 @@ const Messages: React.FC = () => {
     }
   }, [activeReactionMessageId]);
 
-  // Refresh conversations when new messages arrive
-  useEffect(() => {
-    if (messages.length > 0 && activeConversationId) {
-      // Refresh conversations to update last message previews
-      const refreshConversations = async () => {
-        await fetchConversations();
-      };
-      refreshConversations();
-    }
-  }, [messages.length, activeConversationId]);
-
   // Cleanup typing timer on unmount
   useEffect(() => {
     return () => {
-      if (typingTimeout) {
-        clearTimeout(typingTimeout);
-      }
-
-      if (socket && isSocketConnected && currentConversation?.id) {
-        socket.emit("typing_stop", {
-          conversationId: currentConversation.id,
-          userId: currentUser?.id
-        });
+      if (typingTimer) {
+        clearTimeout(typingTimer);
       }
     };
-  }, [typingTimeout, socket, isSocketConnected, currentConversation?.id, currentUser?.id]);
-
-  // format message time
-  const formatMessageTime = (timestamp: any): string => {
-    if (!timestamp) return '--:--';
-
-    try {
-      let date: Date;
-
-      if (timestamp instanceof Date) {
-        date = timestamp;
-      } else if (typeof timestamp === 'string') {
-        // Handle ISO strings, timestamps, and your custom formats
-        if (timestamp.includes('T')) {
-          date = new Date(timestamp);
-        } else if (timestamp === 'Just now') {
-          return 'Just now';
-        } else {
-          // Try to parse as date, if fails return original
-          date = new Date(timestamp);
-          if (isNaN(date.getTime())) {
-            return timestamp; // Return original if can't parse
-          }
-        }
-      } else if (typeof timestamp === 'number') {
-        date = new Date(timestamp);
-      } else {
-        return '--:--';
-      }
-
-      if (isNaN(date.getTime())) {
-        return '--:--';
-      }
-
-      return date.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
-    } catch (error) {
-      return '--:--';
-    }
-  };
-
-  const MessageStatus = ({
-    status,
-    timestamp,
-    isIncoming = false
-  }: {
-    status: string;
-    timestamp: string;
-    isIncoming?: boolean
-  }) => {
-    const getStatusIcon = () => {
-      if (isIncoming) return null;
-
-      switch (status) {
-        case "sending":
-          return (
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          );
-        case "sent":
-          return (
-            <svg
-              className="w-4 h-4 text-gray-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          );
-        case "delivered":
-          return (
-            <div className="flex items-center">
-              <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-          );
-        case "read":
-          return (
-            <div className="flex items-center">
-              <svg className="w-4 h-4" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              <svg className="w-4 h-4 -ml-2.5" style={{ color: '#64B5F6' }} fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-          );
-        default:
-          return null;
-      }
-    };
-
-    return (
-      <div className="flex items-center space-x-1 mt-2">
-        <span className="text-xs mr-1 text-gray-500">
-          {formatMessageTime(timestamp)}
-        </span>
-        {getStatusIcon()}
-      </div>
-    );
-  };
+  }, [typingTimer]);
 
   return (
     <>
@@ -3206,6 +2078,8 @@ const Messages: React.FC = () => {
         }
       `}</style>
 
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+
       <div className="h-screen bg-gray-50 flex overflow-hidden" style={{ fontFamily: 'Poppins, sans-serif' }}>
         {/* Hidden file input for file attachments */}
         <input
@@ -3235,7 +2109,7 @@ const Messages: React.FC = () => {
           style={{ display: 'none' }}
         />
         {/* Mobile Conversation View - Full Screen on Mobile */}
-        {showMobileConversation && (productData || activeConversationId) && (
+        {showMobileConversation && productData && (
           <div className="md:hidden w-full bg-white flex flex-col h-screen overflow-hidden">
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto">
@@ -3271,24 +2145,28 @@ const Messages: React.FC = () => {
                     {/* Avatar - overlapping into header */}
                     <div className="flex justify-center -mt-8 mb-2">
                       <img
-                        src={user?.profileImage || eboAvatar}
-                        alt="Joaquin EDIMO"
-                        className="w-16 h-16 rounded-full object-cover border-4 border-white"
+                        src={
+                          currentConversation?.otherParticipant?.profileImage ||
+                          eboAvatar
+                        }
+                        alt={
+                          currentConversation?.otherParticipant?.firstName ||
+                          "Seller"
+                        }
+                        className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
                       />
                     </div>
 
                     {/* Name and Rating */}
                     <div className="flex items-center justify-center space-x-1.5 mb-2">
                       <h3 className="text-base font-medium text-gray-900">
-                        {user?.firstName && user?.lastName
-                          ? `${user.firstName} ${user.lastName}`
-                          : user?.firstName
-                            ? user.firstName
-                            : user?.lastName
-                              ? user.lastName
-                              : user?.email
-                                ? user.email.split("@")[0]
-                                : "User"}
+                        {currentConversation?.otherParticipant
+                          ? `${currentConversation.otherParticipant.firstName ||
+                            ""
+                            } ${currentConversation.otherParticipant.lastName ||
+                            ""
+                            }`.trim()
+                          : "Unknown User"}
                       </h3>
                       <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -3329,8 +2207,8 @@ const Messages: React.FC = () => {
                     </div>
 
                     {/* Bio - Shortened */}
-                    <p className="text-xs text-center mb-3" style={{ color: '#BABABA' }}>
-                      Passionate about discovering unique products and always on the lookout for great deals.
+                    <p className="text-xs text-center mb-3" style={{ color: '#BABABA', justifyContent: 'center' }}>
+                      {currentConversation?.otherParticipant?.bio || 'Passionate about discovering unique products and always on the lookout for great deals. I enjoy exploring new brands, trying out innovative items, and supporting businesses that deliver quality and creativity.'}
                     </p>
 
                     {/* See User Profile Button */}
@@ -3377,22 +2255,12 @@ const Messages: React.FC = () => {
                     {/* Left: Avatar + Name + Rating */}
                     <div className="flex items-center space-x-2 flex-1">
                       <img
-                        src={user?.profileImage || eboAvatar}
+                        src={eboAvatar}
                         alt="Joaquin EDIMO"
                         className="w-10 h-10 rounded-full object-cover"
                       />
                       <div className="flex flex-col">
-                        <h3 className="text-sm font-medium text-gray-900">
-                          {user?.firstName && user?.lastName
-                            ? `${user.firstName} ${user.lastName}`
-                            : user?.firstName
-                              ? user.firstName
-                              : user?.lastName
-                                ? user.lastName
-                                : user?.email
-                                  ? user.email.split("@")[0]
-                                  : "User"}
-                        </h3>
+                        <h3 className="text-sm font-medium text-gray-900">Joaquin EDIMO</h3>
                         <div className="flex items-center space-x-1">
                           <svg className="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -3477,9 +2345,11 @@ const Messages: React.FC = () => {
                   {visibleMessages.map((message, index) => {
                     const isFadingOut = fadingOutMessageIds.includes(message.id);
                     const isReactionActive = activeReactionMessageId === message.id;
+                    // Use id if available, otherwise use tempId, fallback to index for uniqueness
+                    const messageKey = message.id || message.tempId || `msg-${index}-${message.timestamp || Date.now()}`;
                     return (
                       <div
-                        key={message.id}
+                        key={messageKey}
                         className={`mobile-message-wrapper flex mb-3 ${message.isIncoming ? 'justify-start' : 'justify-end'} ${isFadingOut ? 'message-fade-out' : ''}`}
                         style={{
                           animation: isFadingOut ? 'fadeOutUp 0.5s ease-in-out forwards' : 'fadeIn 0.5s ease-in-out',
@@ -3490,9 +2360,9 @@ const Messages: React.FC = () => {
                       >
                         <div className="max-w-[75%] relative">
                           {/* Images (if present) - NO bubble */}
-                          {Array.isArray(message.images) && message.images.length > 0 && (
+                          {message.images && message.images.length > 0 && (
                             <div className={`flex flex-wrap gap-1 mb-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
-                              {Array.isArray(message.images) && message.images.map((image: File, imgIndex: number) => (
+                              {message.images.map((image: File, imgIndex: number) => (
                                 <img
                                   key={imgIndex}
                                   src={URL.createObjectURL(image)}
@@ -3509,7 +2379,7 @@ const Messages: React.FC = () => {
                           )}
 
                           {/* Message bubble with text and/or product card and/or documents and/or voice */}
-                          {(message.text || (!Array.isArray(message.images) || message.images.length === 0) && message.isProductInquiry && message.productData || (Array.isArray(message.documents) && message.documents.length > 0) || message.type === 'voice') && (
+                          {(message.text || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0) || message.type === 'voice') && (
                             <div
                               className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md' : 'rounded-br-md'} cursor-pointer`}
                               style={{
@@ -3782,8 +2652,8 @@ const Messages: React.FC = () => {
                                         <div className="relative">
                                           <div className="absolute -left-1.5 top-0 w-0.5 h-12" style={{ backgroundColor: '#FFFFFF' }}></div>
                                           <img
-                                            src={resolveImageUrl(message.productData)}
-                                            alt={message.productData?.name}
+                                            src={message.productData.image}
+                                            alt={message.productData.name}
                                             className="w-12 h-12 object-cover rounded"
                                           />
                                         </div>
@@ -3802,19 +2672,20 @@ const Messages: React.FC = () => {
                                             </div>
                                           </div>
                                           <p style={{ fontSize: '5.5px', marginTop: '2px', lineHeight: '1.3', color: '#B8DDFB' }}>
-                                            {message.productData.description}
+                                            Premium White Pepper sourced from the fertile soils of Africa. Known for its smooth, aromatic heat and rich flavor...
                                           </p>
                                           <a href="#" style={{ fontSize: '6px', marginTop: '2px', display: 'block', color: '#1976D2' }}>
-                                            baoafrik.com/{message.productData.name}
+                                            baoafrik.com/product-id-link?
                                           </a>
                                         </div>
                                       </div>
                                     </div>
                                   )}
+
                                   {/* Document Display in Message */}
-                                  {Array.isArray(message.documents) && message.documents.length > 0 && (
+                                  {message.documents && message.documents.length > 0 && (
                                     <div className={message.text ? 'mt-2' : ''}>
-                                      {Array.isArray(message.documents) && message.documents && message.documents.map((doc: any, docIndex: number) => {
+                                      {message.documents.map((doc: File, docIndex: number) => {
                                         const fileName = doc.name.split('.');
                                         const extension = fileName.pop() || '';
                                         const nameWithoutExt = fileName.join('.');
@@ -3845,20 +2716,20 @@ const Messages: React.FC = () => {
 
                           <div className={`flex items-center mt-1 space-x-1 text-xs ${message.isIncoming ? 'justify-start' : 'justify-end'}`} style={{ color: '#6A6A6A' }}>
                             <span>{message.timeString}</span>
-                            {!message.isIncoming && messageStatus[message.id] && (
+                            {!message.isIncoming && message.id && messageStatuses[String(message.id)] && (
                               <div className="flex items-center">
-                                {messageStatus[message.id] === 'SENDING' && (
+                                {messageStatuses[message.id] === 'sending' && (
                                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#9E9E9E' }}>
                                     <circle cx="12" cy="12" r="10" strokeWidth="2" />
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
                                   </svg>
                                 )}
-                                {messageStatus[message.id] === 'DELIVERED' && (
+                                {messageStatuses[message.id] === 'delivered' && (
                                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#9E9E9E' }}>
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                   </svg>
                                 )}
-                                {messageStatus[message.id] === 'READ' && (
+                                {messageStatuses[message.id] === 'read' && (
                                   <div className="flex items-center" style={{ position: 'relative' }}>
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -4066,7 +2937,7 @@ const Messages: React.FC = () => {
                         {/* Menu Items */}
                         <div className="py-1">
                           <button
-                            onClick={() => handleMessageOptionSelect('reply', mobileMessageOptionsId)}
+                            onClick={() => mobileMessageOptionsId !== undefined && handleMessageOptionSelect('reply', { id: mobileMessageOptionsId })}
                             className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                           >
                             <img src={replyIcon} alt="Reply" className="w-3.5 h-3.5 mr-2" />
@@ -4074,7 +2945,7 @@ const Messages: React.FC = () => {
                           </button>
 
                           <button
-                            onClick={() => handleMessageOptionSelect('important', mobileMessageOptionsId)}
+                            onClick={() => mobileMessageOptionsId !== undefined && handleMessageOptionSelect('important', { id: mobileMessageOptionsId })}
                             className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                           >
                             <img src={starIcon} alt="Star" className="w-3.5 h-3.5 mr-2" />
@@ -4082,7 +2953,7 @@ const Messages: React.FC = () => {
                           </button>
 
                           <button
-                            onClick={() => handleMessageOptionSelect('copy', mobileMessageOptionsId)}
+                            onClick={() => mobileMessageOptionsId !== undefined && handleMessageOptionSelect('copy', { id: mobileMessageOptionsId })}
                             className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                           >
                             <img src={copyIcon} alt="Copy" className="w-3.5 h-3.5 mr-2" />
@@ -4090,7 +2961,7 @@ const Messages: React.FC = () => {
                           </button>
 
                           <button
-                            onClick={() => handleMessageOptionSelect('select', mobileMessageOptionsId)}
+                            onClick={() => mobileMessageOptionsId !== undefined && handleMessageOptionSelect('select', { id: mobileMessageOptionsId })}
                             className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                           >
                             <img src={tickIcon} alt="Select" className="w-3.5 h-3.5 mr-2" />
@@ -4098,7 +2969,7 @@ const Messages: React.FC = () => {
                           </button>
 
                           <button
-                            onClick={() => handleMessageOptionSelect('pin', mobileMessageOptionsId)}
+                            onClick={() => mobileMessageOptionsId !== undefined && handleMessageOptionSelect('pin', { id: mobileMessageOptionsId })}
                             className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                           >
                             <img src={pinMenuIcon} alt="Pin" className="w-3.5 h-3.5 mr-2" />
@@ -4108,7 +2979,7 @@ const Messages: React.FC = () => {
                           </button>
 
                           <button
-                            onClick={() => handleMessageOptionSelect('delete', mobileMessageOptionsId)}
+                            onClick={() => mobileMessageOptionsId !== undefined && handleMessageOptionSelect('delete', { id: mobileMessageOptionsId })}
                             className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                           >
                             <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5 mr-2" />
@@ -4202,9 +3073,9 @@ const Messages: React.FC = () => {
                     <div className="relative">
                       <div className="absolute -left-1.5 top-0 w-0.5 h-20" style={{ backgroundColor: '#83C4F8' }}></div>
                       <img
-                        src={resolveImageUrl(productData)}
-                        alt={productData?.name}
-                        className="w-24 h-24 object-cover"
+                        src={productData.image}
+                        alt={productData.name}
+                        className="w-20 h-20 object-cover"
                       />
                     </div>
                     <div className="flex-1">
@@ -4222,10 +3093,11 @@ const Messages: React.FC = () => {
                         </div>
                       </div>
                       <p style={{ fontSize: '8px', marginTop: '4px', lineHeight: '1.4', color: '#6A6A6A' }}>
-                        {productData.description}
+                        Premium White Pepper sourced from the fertile soils of Africa.<br />
+                        Known for its smooth, aromatic heat and rich flavor...
                       </p>
                       <a href="#" style={{ fontSize: '9px', marginTop: '4px', display: 'block', color: '#83C4F8' }}>
-                        baoafrik.com/{productData.name}
+                        baoafrik.com/product-id-link?
                       </a>
                     </div>
                   </div>
@@ -4318,7 +3190,7 @@ const Messages: React.FC = () => {
                       {/* Content */}
                       <div className="flex-1">
                         <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                          {replyToMessage.isIncoming ? `${currentConversation?.otherParticipant?.firstName || ""} ${currentConversation?.otherParticipant?.lastName || ""}`.trim() : 'You'}
+                          {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
                         </div>
                         <div className="text-xs" style={{ color: '#6A6A6A' }}>
                           {replyToMessage.text}
@@ -4430,30 +3302,164 @@ const Messages: React.FC = () => {
               )}
 
               {isRecording ? (
-                // Recording Interface with inline file attachment
-                <div className="space-y-3">
-                  {/* Main Recording Interface */}
+                // Recording Interface for Mobile
+                <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
                   <div
-                    className="flex items-center"
+                    className="rounded-full px-4 py-1 flex items-center flex-1 mr-1"
                     style={{
-                      backgroundColor: "#F5F5F5",
-                      borderRadius: "12px",
-                      padding: "6px",
+                      background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
+                      maxWidth: 'calc(100% - 32px)'
                     }}
                   >
+                    <div className="flex items-center space-x-2 flex-shrink-0">
+                      <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" style={{ boxShadow: '0 0 6px rgba(239, 68, 68, 0.6)' }}></div>
+                      <span className="text-white text-xs">
+                        {Math.floor(recordingTime / 60).toString().padStart(2, '0')}:
+                        {(recordingTime % 60).toString().padStart(2, '0')} - Audio recording
+                      </span>
+                    </div>
+                    <div className="flex space-x-0.5 ml-3 items-end flex-1 justify-end">
+                      {audioLevels.map((level, i) => {
+                        const height = `${level * 16}px`;
+                        const minHeight = '2px';
+                        return (
+                          <div
+                            key={i}
+                            className="w-0.5 bg-white rounded-full transition-all duration-150 ease-out"
+                            style={{
+                              height: Math.max(parseFloat(height), parseFloat(minHeight)) + 'px',
+                              minHeight: minHeight
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleStopRecording}
+                    className="w-7 h-7 border-2 border-red-500 rounded-full flex items-center justify-center hover:bg-red-50 transition-colors flex-shrink-0"
+                    style={{ backgroundColor: '#F5F5F5' }}
+                  >
+                    <div className="w-2.5 h-2.5 bg-red-500 rounded-sm"></div>
+                  </button>
+                </div>
+              ) : recordingTime > 0 ? (
+                // Audio Preview for Mobile - After Recording
+                <div className="space-y-2">
+                  {/* Audio Preview Bubble */}
+                  <div
+                    className="flex items-center px-3 py-2"
+                    style={{
+                      background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
+                      borderRadius: '12px',
+                      maxWidth: '85%'
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        if (isPreviewPlaying) {
+                          if (previewAudio) {
+                            previewAudio.pause();
+                            setIsPreviewPlaying(false);
+                          }
+                        } else {
+                          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                          const audioUrl = URL.createObjectURL(audioBlob);
+                          const audio = new Audio(audioUrl);
+
+                          audio.addEventListener('timeupdate', () => {
+                            setPreviewPlaybackTime(Math.floor(audio.currentTime));
+                          });
+
+                          audio.addEventListener('ended', () => {
+                            setIsPreviewPlaying(false);
+                            setPreviewPlaybackTime(0);
+                          });
+
+                          audio.play();
+                          setPreviewAudio(audio);
+                          setIsPreviewPlaying(true);
+                        }
+                      }}
+                      className="hover:opacity-80 transition-opacity flex-shrink-0"
+                    >
+                      {isPreviewPlaying ? (
+                        <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
+                          <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" style={{ fillRule: 'evenodd' }} />
+                        </svg>
+                      ) : (
+                        <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }} />
+                        </svg>
+                      )}
+                    </button>
+                    <span className="text-white text-xs mx-2 flex-shrink-0">
+                      {Math.floor((isPreviewPlaying ? previewPlaybackTime : recordingTime) / 60).toString().padStart(2, '0')} : {((isPreviewPlaying ? previewPlaybackTime : recordingTime) % 60).toString().padStart(2, '0')} - Audio
+                    </span>
+                    <div className="flex space-x-0.5 items-end flex-1 mx-2">
+                      {recordedWaveforms.length > 0 ? (
+                        recordedWaveforms.slice(-20).map((level, i) => (
+                          <div
+                            key={i}
+                            className="w-0.5 bg-white rounded-full"
+                            style={{ height: `${Math.max(2, level * 15)}px`, minHeight: '2px' }}
+                          />
+                        ))
+                      ) : (
+                        [3, 5, 3, 6, 9, 11, 13, 11, 9, 6, 5, 3, 6, 8, 9, 8, 6, 5, 3, 5].map((h, i) => (
+                          <div
+                            key={i}
+                            className="w-0.5 bg-white rounded-full"
+                            style={{ height: `${h}px`, minHeight: '2px' }}
+                          />
+                        ))
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        setRecordingTime(0);
+                        setAudioChunks([]);
+                        setAudioLevels([]);
+                        setRecordedWaveforms([]);
+                        setIsPreviewPlaying(false);
+                        setPreviewPlaybackTime(0);
+                        if (previewAudio) {
+                          previewAudio.pause();
+                          setPreviewAudio(null);
+                        }
+                      }}
+                      className="hover:opacity-80 transition-opacity flex-shrink-0"
+                      style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                        borderRadius: '50%',
+                        width: '18px',
+                        height: '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Message Input Bar */}
+                  <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
+                    {/* Emoji Icon */}
                     <div className="relative emoji-picker-container">
                       <button
                         onClick={handleEmojiClick}
-                        className="p-1.5 hover:text-gray-600 opacity-0 pointer-events-none"
+                        className="p-1 hover:text-gray-600"
                       >
                         <img
                           src={faceIcon}
                           alt="emoji"
-                          className="w-6 h-6"
+                          className="w-5 h-5"
                           style={{
-                            filter: showEmojiPicker
-                              ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                              : "none",
+                            filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
                           }}
                         />
                       </button>
@@ -4461,234 +3467,85 @@ const Messages: React.FC = () => {
                       {/* Emoji Picker */}
                       {showEmojiPicker && (
                         <div className="absolute bottom-full left-0 mb-2 z-50">
-                          <style>{`
-                                .emoji-picker-react {
-                                  border: none !important;
-                                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-                                }
-                                .emoji-picker-react .emoji-search {
-                                  border: 1px solid #e5e5e5 !important;
-                                  box-shadow: none !important;
-                                  outline: none !important;
-                                  background-color: #f8f8f8 !important;
-                                }
-                                .emoji-picker-react .emoji-search:focus {
-                                  border: 1px solid #e5e5e5 !important;
-                                  box-shadow: none !important;
-                                  outline: none !important;
-                                }
-                                .emoji-picker-react .emoji-group:before {
-                                  color: #666 !important;
-                                  font-weight: bold !important;
-                                  font-size: 12px !important;
-                                }
-                                .emoji-picker-react .emoji-categories button {
-                                  border-radius: 50% !important;
-                                  width: 32px !important;
-                                  height: 32px !important;
-                                  margin: 2px !important;
-                                }
-                                .emoji-picker-react .emoji-categories button.active {
-                                  background-color: #64B5F6 !important;
-                                }
-                                .emoji-picker-react .emoji-categories button svg {
-                                  width: 16px !important;
-                                  height: 16px !important;
-                                }
-                              `}</style>
                           <EmojiPicker
                             onEmojiClick={onEmojiClick}
-                            width={350}
-                            height={450}
+                            width={280}
+                            height={350}
                             searchDisabled={false}
                             skinTonesDisabled={true}
                             previewConfig={{
-                              showPreview: false,
+                              showPreview: false
                             }}
                             searchPlaceHolder="Search Emoji"
                           />
                         </div>
                       )}
                     </div>
+
+                    {/* Attachment Icon */}
                     <button
                       onClick={handleAttachClick}
-                      className="p-1.5 text-gray-400 hover:text-gray-600"
+                      className="p-1.5 transition-colors focus:outline-none"
+                      style={{ outline: 'none' }}
                     >
                       <img
                         src={pinIcon}
                         alt="attachment"
-                        className="w-6 h-6"
+                        className="w-5 h-5"
                         style={{
-                          filter: isAttachActive
-                            ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                            : "none",
+                          filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
                         }}
                       />
                     </button>
-                    <div className="flex-1 flex justify-start">
-                      <div
-                        className="rounded-full px-6 py-0.5 flex items-center -ml-12 relative"
-                        style={{
-                          background:
-                            "linear-gradient(to right, #DBEAFE, #64B5F6)",
-                          width: "550px",
-                          height: "28px", // Fixed height to prevent container movement
+
+                    {/* Text Input */}
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={messageText}
+                        onChange={(e) => {
+                          setMessageText(e.target.value);
+                          handleTypingDetection();
                         }}
-                      >
-                        <div className="flex items-center space-x-2 flex-shrink-0">
-                          <div
-                            className="w-2 h-2 bg-red-500 rounded-full animate-pulse"
-                            style={{
-                              boxShadow: "0 0 8px rgba(239, 68, 68, 0.6)",
-                            }}
-                          ></div>
-                          <span className="text-white text-sm">
-                            {Math.floor(recordingTime / 60)
-                              .toString()
-                              .padStart(2, "0")}
-                            :
-                            {(recordingTime % 60)
-                              .toString()
-                              .padStart(2, "0")}{" "}
-                            - Audio recording
-                          </span>
-                        </div>
-                        <div className="flex space-x-0.5 absolute right-8 top-1/2 transform -translate-y-1/2 items-end">
-                          {audioLevels.map((level, i) => {
-                            // Convert audio level (0.1 to 1.0) to height (2px to 24px)
-                            const height = `${level * 24}px`;
-                            const minHeight = "2px";
-
-                            return (
-                              <div
-                                key={i}
-                                className="w-0.5 bg-white rounded-full transition-all duration-150 ease-out"
-                                style={{
-                                  height:
-                                    Math.max(
-                                      parseFloat(height),
-                                      parseFloat(minHeight)
-                                    ) + "px",
-                                  minHeight: minHeight,
-                                }}
-                              />
-                            );
-                          })}
-                        </div>
-                      </div>
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSendMessage(messageText);
+                          }
+                        }}
+                        placeholder="...Write a message"
+                        className="w-full px-2 py-1.5 focus:outline-none bg-transparent"
+                        style={{
+                          border: 'none',
+                          caretColor: '#64B5F6',
+                          fontSize: '11px'
+                        }}
+                      />
                     </div>
 
+                    {/* Send Button */}
                     <button
-                      onClick={handleStopRecording}
-                      className="w-8 h-8 border-2 border-red-500 rounded-full flex items-center justify-center hover:bg-red-50 transition-colors"
-                      style={{ backgroundColor: "#F5F5F5" }}
+                      onClick={handleSendVoiceMessage}
+                      className="p-1.5 text-blue-600 hover:text-blue-800"
                     >
-                      <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
+                      <img src={bluIcon} alt="send" className="w-6 h-6" />
                     </button>
-                  </div>
-
-                  {/* File Attachment Indicator - Inline with Recording */}
-                  {selectedFiles.length > 0 && (
-                    <div className="flex items-center space-x-2">
-                      <div
-                        className="flex items-center space-x-2 px-3 py-2 rounded-lg"
-                        style={{ backgroundColor: "#F0F8FE" }}
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          style={{ color: "#64B5F6" }}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                          />
-                        </svg>
-                        <div className="flex flex-col">
-                          <span
-                            className="text-sm font-medium"
-                            style={{ color: "#64B5F6" }}
-                          >
-                            {selectedFiles.length} file
-                            {selectedFiles.length > 1 ? "s" : ""} attached
-                          </span>
-                          <div
-                            className="text-xs"
-                            style={{ color: "#64B5F6" }}
-                          >
-                            {selectedFiles.map((file, index) => (
-                              <span key={index}>
-                                {file.name} ({formatFileSize(file.size)})
-                                {index < selectedFiles.length - 1
-                                  ? ", "
-                                  : ""}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setSelectedFiles([]);
-                            setShowFilePreview(false);
-                          }}
-                          className="ml-2 hover:opacity-70"
-                          style={{ color: "#64B5F6" }}
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : recordingTime > 0 && audioChunks.length > 0 ? (
-                // Show sending state after recording
-                <div className="flex items-center justify-center py-4">
-                  <div className="flex items-center space-x-3 text-blue-600">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    <span className="text-sm">
-                      Sending voice message...
-                    </span>
                   </div>
                 </div>
               ) : (
-                // Normal Message Input
-                <div
-                  className="flex items-center"
-                  style={{
-                    backgroundColor: "#F5F5F5",
-                    borderRadius: "12px",
-                    padding: "6px",
-                  }}
-                >
+                // Normal Message Input for Mobile
+                <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
+                  {/* Emoji Icon */}
                   <div className="relative emoji-picker-container">
                     <button
                       onClick={handleEmojiClick}
-                      className="p-1.5 hover:text-gray-600"
+                      className="p-1 hover:text-gray-600"
                     >
                       <img
                         src={faceIcon}
                         alt="emoji"
-                        className="w-6 h-6"
+                        className="w-5 h-5"
                         style={{
-                          filter: showEmojiPicker
-                            ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                            : "none",
+                          filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
                         }}
                       />
                     </button>
@@ -4696,83 +3553,38 @@ const Messages: React.FC = () => {
                     {/* Emoji Picker */}
                     {showEmojiPicker && (
                       <div className="absolute bottom-full left-0 mb-2 z-50">
-                        <style>{`
-                              .emoji-picker-react {
-                                border: none !important;
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-                              }
-                              .emoji-picker-react .emoji-search {
-                                border: 1px solid #e5e5e5 !important;
-                                box-shadow: none !important;
-                                outline: none !important;
-                                background-color: #f8f8f8 !important;
-                              }
-                              .emoji-picker-react .emoji-search:focus {
-                                border: 1px solid #e5e5e5 !important;
-                                box-shadow: none !important;
-                                outline: none !important;
-                              }
-                              .emoji-picker-react .emoji-group:before {
-                                color: #666 !important;
-                                font-weight: bold !important;
-                                font-size: 12px !important;
-                              }
-                              .emoji-picker-react .emoji-categories button {
-                                border-radius: 0 !important;
-                                width: 32px !important;
-                                height: 32px !important;
-                                margin: 2px !important;
-                                border: none !important;
-                                outline: none !important;
-                              }
-                              .emoji-picker-react .emoji-categories button.active {
-                                background-color: #64B5F6 !important;
-                                border: none !important;
-                                border-radius: 0 !important;
-                                outline: none !important;
-                              }
-                              .emoji-picker-react .emoji-categories button:hover {
-                                border-radius: 0 !important;
-                                outline: none !important;
-                              }
-                              .emoji-picker-react .emoji-categories button:focus {
-                                border-radius: 0 !important;
-                                outline: none !important;
-                              }
-                              .emoji-picker-react .emoji-categories button svg {
-                                width: 16px !important;
-                                height: 16px !important;
-                              }
-                            `}</style>
                         <EmojiPicker
                           onEmojiClick={onEmojiClick}
-                          width={350}
-                          height={450}
+                          width={280}
+                          height={350}
                           searchDisabled={false}
                           skinTonesDisabled={true}
                           previewConfig={{
-                            showPreview: false,
+                            showPreview: false
                           }}
                           searchPlaceHolder="Search Emoji"
                         />
                       </div>
                     )}
                   </div>
+
+                  {/* Attachment Icon */}
                   <button
                     onClick={handleAttachClick}
-                    className="p-1.5 text-gray-400 hover:text-gray-600"
+                    className="p-1.5 transition-colors focus:outline-none"
+                    style={{ outline: 'none' }}
                   >
                     <img
                       src={pinIcon}
                       alt="attachment"
-                      className="w-6 h-6"
+                      className="w-5 h-5"
                       style={{
-                        filter: isAttachActive
-                          ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                          : "none",
+                        filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
                       }}
                     />
                   </button>
+
+                  {/* Text Input */}
                   <div className="flex-1">
                     <input
                       type="text"
@@ -4782,37 +3594,29 @@ const Messages: React.FC = () => {
                         handleTypingDetection();
                       }}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          handleSendMessage();
+                        if (e.key === 'Enter') {
+                          handleSendMessage(messageText);
                         }
                       }}
                       placeholder="...Write your message"
-                      className="w-full px-3 py-2 focus:outline-none bg-transparent"
+                      className="w-full px-2 py-1.5 focus:outline-none bg-transparent"
                       style={{
-                        border: "none",
-                        caretColor: "#64B5F6",
+                        border: 'none',
+                        caretColor: '#64B5F6',
+                        fontSize: '11px'
                       }}
                     />
                   </div>
 
+                  {/* Voice/Send Button */}
                   <button
-                    onClick={(e) => {
-                      if (messageText.trim() || selectedFiles.length > 0) {
-                        handleSendMessage();
-                      } else {
-                        handleAudioRecord(e);
-                      }
-                    }}
-                    className="p-2 text-blue-600 hover:text-blue-800"
+                    onClick={handleSendButtonClick}
+                    className="p-1.5 text-blue-600 hover:text-blue-800"
                   >
                     {messageText.trim() || selectedFiles.length > 0 ? (
-                      <img src={bluIcon} alt="send" className="w-7 h-7" />
+                      <img src={bluIcon} alt="send" className="w-6 h-6" />
                     ) : (
-                      <img
-                        src={audioIcon}
-                        alt="audio"
-                        className="w-7 h-7"
-                      />
+                      <img src={audioIcon} alt="audio" className="w-6 h-6" />
                     )}
                   </button>
                 </div>
@@ -4834,7 +3638,7 @@ const Messages: React.FC = () => {
         {/* Left Sidebar - Full Height */}
         <div
           ref={chatListRef}
-          className={`${showMobileConversation ? 'hidden md:flex' : 'flex'} w-full md:w-1/4 bg-white md:border-r-2 border-gray-300 flex-col h-screen sticky top-0`}
+          className={`${showMobileConversation && productData ? 'hidden md:flex' : 'flex'} w-full md:w-1/4 bg-white md:border-r-2 border-gray-300 flex-col h-screen top-0 relative`}
         >
           {/* Header */}
           <header className="bg-white">
@@ -4868,7 +3672,7 @@ const Messages: React.FC = () => {
                         className="w-5 h-5"
                       />
                     </button>
-                    <button className="p-2 hover:bg-gray-100 rounded" onClick={() => navigate("/")}>
+                    <button className="p-2 hover:bg-gray-100 rounded">
                       <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
@@ -4914,7 +3718,7 @@ const Messages: React.FC = () => {
                 <div className="px-4 py-3">
                   <div className="relative">
                     {/* Gray baseline */}
-                    <div className="absolute bottom-0 left-4 right-4 h-px bg-gray-200"></div>
+                    <div className="absolute bottom-0 -left-4 -right-4 md:left-0 md:right-0 h-px bg-gray-200"></div>
 
                     <div className="flex items-center justify-between">
                       <div className="flex space-x-6 relative">
@@ -4955,7 +3759,7 @@ const Messages: React.FC = () => {
                               border: '1px solid white'
                             }}
                           >
-                            3
+                            {conversations.filter((c: any) => c.unreadCount > 0).length}
                           </span>
                           {selectedTab === 'Unreads' && (
                             <div
@@ -4977,139 +3781,103 @@ const Messages: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Conversations List */}
+                {/* Chat Entries */}
                 <div className="flex-1 overflow-y-auto p-1">
                   {conversations
-                    .filter((conversation) => {
-                      // Get other participant for search
-                      const otherParticipant = conversation.participants?.find(
-                        (p: any) => p.userId !== currentUser?.id
-                      );
-                      const participantName = otherParticipant
-                        ? `${otherParticipant.firstName || ""} ${otherParticipant.lastName || ""
-                          }`.trim()
-                        : otherParticipant?.email?.split("@")[0] ||
-                        "Unknown User";
-
-                      // Format last message with proper sender indication
-                      const formatLastMessage = () => {
-                        if (!conversation.lastMessage) return "No messages yet";
-
-                        const isOutgoing = conversation.lastMessage.senderId === currentUser?.id;
-                        const content = conversation.lastMessage.content || "";
-
-                        if (isOutgoing) {
-                          return `You: ${content}`;
-                        } else {
-                          return content;
-                        }
-                      };
-
-                      if (chatSearchQuery) {
-                        const lastMessage = formatLastMessage();
-                        return (
-                          participantName
-                            .toLowerCase()
-                            .includes(chatSearchQuery.toLowerCase()) ||
-                          lastMessage
-                            .toLowerCase()
-                            .includes(chatSearchQuery.toLowerCase())
-                        );
+                    .filter((conv: any) => {
+                      if (selectedTab === 'Unreads') {
+                        return conv.unreadCount > 0;
                       }
-                      return true;
+                      if (!chatSearchQuery) return true;
+                      const name = `${conv.otherParticipant?.firstName || ''} ${conv.otherParticipant?.lastName || ''}`.trim();
+                      const lastMsg = conv.lastMessage?.content || '';
+                      return name.toLowerCase().includes(chatSearchQuery.toLowerCase()) ||
+                        lastMsg.toLowerCase().includes(chatSearchQuery.toLowerCase());
                     })
-                    .filter((conversation) => {
-                      // Filter by selected tab
-                      if (selectedTab === "Unreads") {
-                        return conversation.unreadCount > 0;
-                      }
-                      return true;
-                    })
-                    .map((conversation) => {
-                      // Get the other participant - use otherParticipant from backend
-                      const participant = conversation.otherParticipant;
-                      const displayName = participant
-                        ? `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Unknown User"
-                        : "Unknown User";
-                      const profileImage = participant?.profileImage;
-
-                      // Format last message with proper sender indication
-                      const formatLastMessage = () => {
-                        if (!conversation.lastMessage) return "No messages yet";
-
-                        const isOutgoing = conversation.lastMessage.senderId === currentUser?.id;
-                        const content = conversation.lastMessage.content || "";
-
-                        if (isOutgoing) {
-                          return `You: ${content}`;
-                        } else {
-                          return content;
-                        }
-                      };
+                    .map((conv: any) => {
+                      const otherParticipant = conv.otherParticipant;
+                      const participantName = `${otherParticipant?.firstName || ''} ${otherParticipant?.lastName || ''}`.trim() || 'Unknown User';
+                      const participantAvatar = otherParticipant?.profileImage || eboAvatar;
+                      const lastMessage = conv.lastMessage;
+                      const lastMessageText = lastMessage?.content || '';
+                      const lastMessageTime = lastMessage?.createdAt
+                        ? new Date(lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : (conv.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
+                      const isIncoming = lastMessage && lastMessage.senderId !== user?.id;
+                      const unreadCount = conv.unreadCount || 0;
+                      const isActive = conversationId === conv.id;
 
                       return (
                         <div
-                          key={conversation.id}
-                          className={`p-2 rounded-lg cursor-pointer hover:bg-gray-50 ${activeConversationId === conversation.id
-                            ? "bg-gray-100"
-                            : "hover:bg-gray-50"
-                            }`}
+                          key={conv.id}
+                          className={`p-2 rounded-lg cursor-pointer transition-colors md:hover:bg-gray-50 mb-1`}
                           style={{
                             backgroundColor: window.innerWidth >= 768
-                              ? (actionsMenuOpen === conversation.id
+                              ? (actionsMenuOpen === conv.id
                                 ? '#FFFFFF'
-                                : activeConversationId === conversation.id
+                                : isActive
                                   ? '#F5F5F5'
                                   : '#FFFFFF')
                               : '#FFFFFF',
-                            boxShadow: actionsMenuOpen === conversation.id
+                            boxShadow: actionsMenuOpen === conv.id
                               ? '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                               : 'none',
-                            zIndex: actionsMenuOpen === conversation.id ? 45 : 'auto',
-                            position: actionsMenuOpen === conversation.id ? 'relative' : 'static'
+                            zIndex: actionsMenuOpen === conv.id ? 45 : 'auto',
+                            position: actionsMenuOpen === conv.id ? 'relative' : 'static'
                           }}
                           onClick={async () => {
-                            await handleConversationClick(conversation.id);
+                            setActiveChatId(conv.id);
+                            setConversationId(conv.id);
+                            setParticipantId(otherParticipant?.id || null);
+                            setCurrentConversation(conv);
+                            // Load messages for this conversation
+                            await loadMessages(conv.id, 1, true);
+                            // Refresh conversations to update unread counts
+                            try {
+                              const token = localStorage.getItem("accessToken");
+                              const res = await axios.get(
+                                `${API_BASE}/chat/conversations`,
+                                { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
+                              );
+                              const convos = res.data?.data || [];
+                              setConversations(convos);
+                              // Update current conversation if it's still active
+                              const updated = convos.find((c: any) => c.id === conv.id);
+                              if (updated) {
+                                setCurrentConversation(updated);
+                              }
+                            } catch (err) {
+                              console.warn('Failed to refresh conversations', err);
+                            }
+                            // Mobile: Open conversation view
+                            if (window.innerWidth < 768) {
+                              setShowMobileConversation(true);
+                            }
                           }}
                         >
                           <div className="flex items-center space-x-2">
                             <div className="relative">
                               <img
-                                src={profileImage || eboAvatar}
-                                alt={displayName}
+                                src={participantAvatar}
+                                alt={participantName}
                                 className="w-10 h-10 rounded-full object-cover"
-                                crossOrigin="anonymous"
                               />
-                              {isChatPinned && (
-                                <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
-                                  <img src={pinBadgeIcon} alt="Pinned" className="w-3 h-3" />
+                              {unreadCount > 0 && (
+                                <div className="absolute -top-1 -right-1 min-w-[20px] h-5 rounded-full flex items-center justify-center text-xs font-semibold text-white px-1" style={{ backgroundColor: '#64B5F6' }}>
+                                  {unreadCount > 9 ? '9+' : String(unreadCount)}
                                 </div>
                               )}
                             </div>
-
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
-                                <h3 className="text-sm md:text-base font-medium md:font-semibold text-gray-900 truncate">
-                                  {displayName}
-                                </h3>
+                                <h3 className="text-sm md:text-base font-medium md:font-semibold text-gray-900 truncate">{participantName}</h3>
                                 <div className="flex items-center space-x-1">
-                                  <span className="text-xs text-gray-500">
-                                    {new Date(conversation.updatedAt).toLocaleTimeString([], {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                      hour12: true
-                                    })}
-                                  </span>
+                                  <span className="text-xs text-gray-500">{lastMessageTime}</span>
                                   <button
-                                    onClick={(e) =>
-                                      handleActionsMenuClick(conversation.id, e)
-                                    }
+                                    onClick={(e) => handleActionsMenuClick(conv.id, e)}
                                     className="p-1 rounded transition-colors"
                                     style={{
-                                      color:
-                                        actionsMenuOpen === conversation.id
-                                          ? "#64B5F6"
-                                          : "#000000",
+                                      color: actionsMenuOpen === conv.id ? '#64B5F6' : '#000000'
                                     }}
                                   >
                                     <span className="text-lg">⋯</span>
@@ -5117,19 +3885,37 @@ const Messages: React.FC = () => {
                                 </div>
                               </div>
                               <div className="flex items-center justify-between -mt-1">
-                                <p className="text-sm text-gray-600 truncate">
-                                  {formatLastMessage()}
+                                <p className="text-xs md:text-sm truncate">
+                                  {lastMessageText ? (
+                                    <>
+                                      {isIncoming ? null : (
+                                        <span
+                                          className="px-1 py-0.5 rounded text-xs font-medium mr-1"
+                                          style={{
+                                            backgroundColor: '#E3F2FD',
+                                            color: '#64B5F6'
+                                          }}
+                                        >
+                                          You
+                                        </span>
+                                      )}
+                                      <span style={{ color: '#4D4D4D' }}>{lastMessageText}</span>
+                                    </>
+                                  ) : (
+                                    <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>No messages yet</span>
+                                  )}
                                 </p>
-                                {conversation.unreadCount > 0 && (
-                                  <div className="flex items-center space-x-1">
-                                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                                    {conversation.unreadCount > 1 && (
-                                      <span className="text-xs text-blue-500 font-medium">
-                                        {conversation.unreadCount}
-                                      </span>
-                                    )}
-                                  </div>
-                                )}
+                                <div className="flex items-center ml-2">
+                                  {isIncoming && unreadCount > 0 ? (
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#64B5F6' }}></div>
+                                  ) : lastMessage && !isIncoming ? (
+                                    lastMessage.id ? renderSidebarStatus(lastMessage.id) : (
+                                      <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    )
+                                  ) : null}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -5148,26 +3934,14 @@ const Messages: React.FC = () => {
                     className="w-12 h-12"
                   />
                 </div>
-                <p className="text-center mb-2" style={{ color: "#999999" }}>
-                  {currentUser
-                    ? "No conversations yet"
-                    : "Please log in to see your conversations"}
-                </p>
-                <p className="text-center mb-2" style={{ color: "#999999" }}>
-                  Your chats will appear here
-                </p>
+                <p className="text-center mb-2" style={{ color: '#999999' }}>Your chats will appear here</p>
                 <p className="text-sm text-center flex items-start justify-center">
                   <img
                     src={ssIcon}
                     alt="Search status"
                     className="w-4 h-4 mr-0.5 mt-0.5"
                   />
-                  <span style={{ color: "#64B5F6" }}>
-                    Love what you see?{" "}
-                    <span className="cursor-pointer">
-                      Reach out to the seller and make it yours.
-                    </span>
-                  </span>
+                  <span style={{ color: '#64B5F6' }}>Love what you see? <span className="cursor-pointer">Reach out to the seller and make it yours.</span></span>
                 </p>
               </div>
             )}
@@ -5273,52 +4047,21 @@ const Messages: React.FC = () => {
             <div className="hidden md:block mt-auto bg-white px-4 py-3">
               <div className="border-t border-gray-300 mx-1 mb-3"></div>
               {/* Archived */}
-              <div
-                className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors"
-                onClick={() => {
-                  setSelectedTab("Archived");
-                }}
-              >
+              <div className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors">
                 <div className="flex items-center space-x-3">
-                  <img
-                    src={archiveIcon}
-                    alt="Archived"
-                    className="w-5 h-5"
-                    style={{ color: "#6A6A6A" }}
-                  />
-                  <span className="text-sm" style={{ color: "#6A6A6A" }}>
-                    Archived
-                  </span>
+                  <img src={archiveIcon} alt="Archived" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>Archived</span>
                 </div>
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: "#F5F5F5", color: "#6A6A6A" }}
-                >
-                  {/* Calculate archived conversations count here */}
-                  {conversations.filter((conv) => conv.isArchived).length}
-                </span>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>4</span>
               </div>
 
               {/* Mark as important */}
               <div className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors">
                 <div className="flex items-center space-x-3">
-                  <img
-                    src={starIcon}
-                    alt="Mark as important"
-                    className="w-5 h-5"
-                    style={{ color: "#6A6A6A" }}
-                  />
-                  <span className="text-sm" style={{ color: "#6A6A6A" }}>
-                    Mark as important
-                  </span>
+                  <img src={starIcon} alt="Mark as important" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>Mark as important</span>
                 </div>
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: "#F5F5F5", color: "#6A6A6A" }}
-                >
-                  {/* You can calculate important conversations count here */}
-                  {conversations.filter((conv) => conv.isImportant).length}
-                </span>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>+9</span>
               </div>
             </div>
           )}
@@ -5454,18 +4197,18 @@ const Messages: React.FC = () => {
 
                   {/* Become Seller Button */}
                   {/* <Link
-                    to="/register"
-                    className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
-                    style={{ backgroundColor: '#FEF6E9' }}
-                  >
-                    <img
-                      src={basketIcon}
-                      alt="Basket"
-                      className="w-5 h-5"
-                      style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)' }}
-                    />
-                    <span className="text-sm font-normal" style={{ color: '#F9A825' }}>Start Selling</span>
-                  </Link> */}
+                              to="/register"
+                              className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
+                              style={{ backgroundColor: '#FEF6E9' }}
+                            >
+                              <img
+                                src={basketIcon}
+                                alt="Basket"
+                                className="w-5 h-5"
+                                style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(94%) saturate(423%) hue-rotate(359deg) brightness(98%) contrast(98%)' }}
+                              />
+                              <span className="text-sm font-normal" style={{ color: '#F9A825' }}>Start Selling</span>
+                            </Link> */}
 
                   {/* Notification Icon */}
                   <button
@@ -5561,10 +4304,10 @@ const Messages: React.FC = () => {
                       >
                         <style>
                           {`
-                            .notification-dropdown::-webkit-scrollbar {
-                              display: none;
-                            }
-                          `}
+                                      .notification-dropdown::-webkit-scrollbar {
+                                        display: none;
+                                      }
+                                    `}
                         </style>
                         {/* Render notifications grouped by day */}
                         {['Today', 'Yesterday'].map(day => {
@@ -5670,32 +4413,32 @@ const Messages: React.FC = () => {
                       <div className="fixed right-8 top-0 w-64 bg-white rounded-2xl shadow-lg border border-gray-200 py-3 z-50 max-h-screen overflow-y-auto custom-scrollbar" style={{ scrollbarWidth: 'thin', scrollbarColor: 'white #f3f4f6' }}>
                         {/* Start selling button with exit */}
                         {/* <div className="px-3 pb-3 flex items-center justify-between">
-                          <Link
-                            to="/register"
-                            className="inline-flex items-center px-3 py-1.5 rounded-lg font-normal text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                            style={{ backgroundColor: '#FFF8F0', color: '#F9A822' }}
-                            onMouseEnter={(e) => {
-                              (e.target as HTMLElement).style.backgroundColor = '#FFF0E6';
-                            }}
-                            onMouseLeave={(e) => {
-                              (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
-                            }}
-                            onClick={() => setIsMenuDropdownOpen(false)}
-                          >
-                            <svg className="w-3 h-3 mr-1.5 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#F9A822' }}>
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-                            </svg>
-                            Start selling
-                          </Link>
-                          <button
-                            onClick={() => setIsMenuDropdownOpen(false)}
-                            className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div> */}
+                                    <Link
+                                      to="/register"
+                                      className="inline-flex items-center px-3 py-1.5 rounded-lg font-normal text-xs transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                      style={{ backgroundColor: '#FFF8F0', color: '#F9A822' }}
+                                      onMouseEnter={(e) => {
+                                        (e.target as HTMLElement).style.backgroundColor = '#FFF0E6';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        (e.target as HTMLElement).style.backgroundColor = '#FFF8F0';
+                                      }}
+                                      onClick={() => setIsMenuDropdownOpen(false)}
+                                    >
+                                      <svg className="w-3 h-3 mr-1.5 border border-orange-500 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#F9A822' }}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
+                                      </svg>
+                                      Start selling
+                                    </Link>
+                                    <button
+                                      onClick={() => setIsMenuDropdownOpen(false)}
+                                      className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                      </svg>
+                                    </button>
+                                  </div> */}
 
                         {/* Profile Section */}
                         <div className="flex items-center justify-around">
@@ -5881,53 +4624,29 @@ const Messages: React.FC = () => {
 
           {/* Main Content Area */}
           <div className="flex-1 bg-white border border-gray-200 rounded-2xl mx-8 my-8 flex flex-col" style={{ height: 'calc(100vh - 8rem)' }}>
-            {currentConversation && activeConversationId ? (
+            {(productData || conversationId) ? (
               // Product Inquiry View
               <div className="flex flex-col h-full relative">
                 {/* Dimmed Overlay when reaction or message options popup is active */}
-                {(activeReactionMessageId !== null ||
-                  activeMessageOptionsId !== null) && (
-                    <div className="absolute inset-0 bg-black bg-opacity-10 z-40 pointer-events-none rounded-2xl"></div>
-                  )}
+                {(activeReactionMessageId !== null || activeMessageOptionsId !== null) && (
+                  <div className="absolute inset-0 bg-black bg-opacity-10 z-40 pointer-events-none rounded-2xl"></div>
+                )}
 
                 {/* Scrollable Content Area (Profile + Product + Messages) */}
-                <div
-                  className="flex-1 overflow-y-auto"
-                  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                >
+                <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                   {/* Seller Profile Header - Conditional Rendering */}
                   {!showCondensedHeader ? (
                     // Full Profile Header
                     <div className="p-6 transition-all duration-500 ease-in-out">
                       {/* Top Right Icons */}
                       <div className="flex justify-end space-x-3 mb-6">
-                        {/* close conversation button */}
-                        <button
-                          onClick={closeActiveConversation}
-                          className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm"
-                          title="Close conversation"
-                        >
-                          <svg
-                            className="w-5 h-5 text-gray-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
-
-                        {/* search button */}
                         <button className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
-                          <img src={fiIcon} alt="Search" className="w-6 h-6" />
+                          <img
+                            src={fiIcon}
+                            alt="Search"
+                            className="w-6 h-6"
+                          />
                         </button>
-
-                        {/* settings buton */}
                         <button className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
                           <img
                             src={faIcon}
@@ -5942,14 +4661,8 @@ const Messages: React.FC = () => {
                         <div className="text-center">
                           {/* Avatar */}
                           <img
-                            src={
-                              currentConversation?.otherParticipant?.profileImage ||
-                              eboAvatar
-                            }
-                            alt={
-                              currentConversation?.otherParticipant?.firstName ||
-                              "Seller"
-                            }
+                            src={currentConversation?.otherParticipant?.profileImage || productData?.seller?.profileImage || eboAvatar}
+                            alt={currentConversation?.otherParticipant ? `${currentConversation.otherParticipant.firstName} ${currentConversation.otherParticipant.lastName}` : (productData?.seller?.name || 'User')}
                             className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
                           />
 
@@ -5957,27 +4670,14 @@ const Messages: React.FC = () => {
                           <div className="flex items-center justify-center space-x-2 mb-4">
                             <h3 className="text-xl font-semibold text-gray-900">
                               {currentConversation?.otherParticipant
-                                ? `${currentConversation.otherParticipant.firstName ||
-                                  ""
-                                  } ${currentConversation.otherParticipant.lastName ||
-                                  ""
-                                  }`.trim()
-                                : "Unknown User"}
+                                ? `${currentConversation.otherParticipant.firstName || ''} ${currentConversation.otherParticipant.lastName || ''}`.trim() || 'User'
+                                : (productData?.seller?.name || 'User')}
                             </h3>
                             <div className="flex items-center space-x-2">
-                              <svg
-                                className="w-6 h-6 text-yellow-400"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
+                              <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
-                              <span
-                                className="text-lg"
-                                style={{ color: "#BABABA" }}
-                              >
-                                4.3
-                              </span>
+                              <span className="text-lg" style={{ color: '#BABABA' }}>4.3</span>
                             </div>
                           </div>
 
@@ -6023,13 +4723,9 @@ const Messages: React.FC = () => {
                           <div className="text-left">
                             <p
                               className="text-sm leading-relaxed mb-4 text-justify"
-                              style={{ color: "#BABABA" }}
+                              style={{ color: "#BABABA", justifyContent: "center" }}
                             >
-                              Passionate about discovering unique products and
-                              always on the lookout for great deals. I enjoy
-                              exploring new brands, trying out innovative items,
-                              and supporting businesses that deliver quality and
-                              creativity.
+                              {currentConversation?.otherParticipant?.bio || 'Passionate about discovering unique products and always on the lookout for great deals. I enjoy exploring new brands, trying out innovative items, and supporting businesses that deliver quality and creativity.'}
                             </p>
                           </div>
 
@@ -6063,64 +4759,39 @@ const Messages: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    // Condensed Header Bar
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 transition-all duration-500 ease-in-out">
+                    // Condensed Header Bar - Sticky
+                    <div className="sticky top-0 z-30 bg-white flex items-center justify-between px-6 py-4 border-b border-gray-200 transition-all duration-500 ease-in-out rounded-t-2xl">
                       <div className="flex items-center space-x-3">
                         {/* Profile Picture */}
                         <img
-                          src={eboAvatar}
-                          alt="Joaquin EDIMO"
+                          src={currentConversation?.otherParticipant?.profileImage || productData?.seller?.profileImage || eboAvatar}
+                          alt={currentConversation?.otherParticipant ? `${currentConversation.otherParticipant.firstName} ${currentConversation.otherParticipant.lastName}` : (productData?.seller?.name || 'User')}
                           className="w-12 h-12 rounded-full object-cover"
                         />
                         {/* Name and Rating */}
                         <div>
                           <h3 className="text-base font-semibold text-gray-900">
-                            Joaquin EDIMO
+                            {currentConversation?.otherParticipant
+                              ? `${currentConversation.otherParticipant.firstName || ''} ${currentConversation.otherParticipant.lastName || ''}`.trim() || 'User'
+                              : (productData?.seller?.name || 'User')}
                           </h3>
                           <div className="flex items-center space-x-1">
-                            <svg
-                              className="w-4 h-4 text-yellow-400"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
+                            <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
-                            <span
-                              className="text-sm"
-                              style={{ color: "#BABABA" }}
-                            >
-                              4.3
-                            </span>
+                            <span className="text-sm" style={{ color: '#BABABA' }}>4.3</span>
                           </div>
                         </div>
                       </div>
                       {/* Right Icons */}
-                      <div className="flex items-center space-x-2">
-                        {/* close conversation button */}
-                        <button
-                          onClick={closeActiveConversation}
-                          className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm"
-                          title="Close conversation"
-                        >
-                          <svg
-                            className="w-5 h-5 text-gray-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
-
+                      <div className="flex space-x-2">
                         <button className="p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                          <img src={fiIcon} alt="Search" className="w-5 h-5" />
+                          <img
+                            src={fiIcon}
+                            alt="Search"
+                            className="w-5 h-5"
+                          />
                         </button>
-
                         <button className="p-2 rounded-lg hover:bg-gray-50 transition-colors">
                           <img
                             src={faIcon}
@@ -6132,36 +4803,32 @@ const Messages: React.FC = () => {
                     </div>
                   )}
 
-                  {/* When messages are still loading */}
-                  {isLoadingMessages &&
-                    activeConversationId &&
-                    visibleMessages.length === 0 && (
-                      <div className="flex-1 flex flex-col items-center justify-center p-8">
-                        <div className="flex flex-col items-center space-y-3">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
-                            <div
-                              className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.1s" }}
-                            ></div>
-                            <div
-                              className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.2s" }}
-                            ></div>
-                          </div>
-                          <span className="text-sm text-gray-600">
-                            Loading messages...
-                          </span>
+                  {/* Pinned Message Preview - Shows when message is pinned and condensed header is shown */}
+                  {pinnedMessage && showCondensedHeader && (
+                    <div className="sticky top-20 z-20 px-6 py-3" style={{ backgroundColor: '#F1F1F1' }}>
+                      <div className="flex items-center space-x-3">
+                        <img
+                          src={pinBadgeIcon}
+                          alt="Pin"
+                          className="w-6 h-6 flex-shrink-0 cursor-pointer hover:opacity-70 transition-opacity"
+                          style={{ filter: 'brightness(0) saturate(100%) invert(71%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(92%) contrast(86%)' }}
+                          onClick={handleUnpinMessage}
+                        />
+                        <div className="px-3 py-2" style={{ backgroundColor: '#FFFFFF', borderRadius: '6px', maxWidth: '70%' }}>
+                          <p className="text-sm truncate" style={{ color: '#6A6A6A' }}>
+                            {pinnedMessage.text}
+                          </p>
                         </div>
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   {/* Chat Messages Area */}
                   {visibleMessages.length > 0 && (
                     <div
                       ref={messagesContainerRef}
                       className="flex-1 px-6 py-4 overflow-y-auto scroll-smooth"
-                      style={{ scrollBehavior: "smooth", overflowX: "visible" }}
+                      style={{ scrollBehavior: 'smooth', overflowX: 'visible' }}
                     >
                       {/* View Older Messages Button */}
                       {messages.length > 10 && !showAllMessages && (
@@ -6170,8 +4837,8 @@ const Messages: React.FC = () => {
                             onClick={() => setShowAllMessages(true)}
                             className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors hover:opacity-80"
                             style={{
-                              backgroundColor: "#E3F2FD",
-                              color: "#64B5F6",
+                              backgroundColor: '#E3F2FD',
+                              color: '#64B5F6'
                             }}
                           >
                             View older messages
@@ -6183,9 +4850,7 @@ const Messages: React.FC = () => {
                       <div className="flex items-center justify-center mb-6">
                         <div className="flex items-center">
                           <div className="w-16 h-px bg-gray-300"></div>
-                          <span className="px-4 text-sm text-gray-500">
-                            {visibleMessages[0]?.dateString}
-                          </span>
+                          <span className="px-4 text-sm text-gray-500">{visibleMessages[0]?.dateString}</span>
                           <div className="w-16 h-px bg-gray-300"></div>
                         </div>
                       </div>
@@ -6194,47 +4859,17 @@ const Messages: React.FC = () => {
                       {visibleMessages.map((message, index) => {
                         const isFadingOut = fadingOutMessageIds.includes(message.id);
                         const isReactionActive = activeReactionMessageId === message.id;
-                        const isSystemMessage = message.messageType === 'SYSTEM' || message.isSystemMessage;
-
-                        // Handle system messages (safety disclaimer)
-                        if (isSystemMessage) {
-                          return (
-                            <div key={message.id} className="flex justify-center mb-4">
-                              <div className="max-w-md w-full">
-                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-                                  <div className="flex items-center justify-center mb-2">
-                                    <svg className="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                    </svg>
-                                    <span className="text-sm font-medium text-yellow-800">Safety Notice</span>
-                                  </div>
-                                  <p className="text-sm text-yellow-700 leading-relaxed">
-                                    {message.content}
-                                  </p>
-                                  <div className="mt-2 pt-2 border-t border-yellow-200">
-                                    <span className="text-xs text-yellow-600">
-                                      {formatMessageTime(message.timestamp)}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        }
-
+                        // Use id if available, otherwise use tempId, fallback to index for uniqueness
+                        const messageKey = message.id || message.tempId || `msg-${index}-${message.timestamp || Date.now()}`;
                         return (
                           <div
-                            key={message.id}
-                            className={`flex mb-4 ${message.isIncoming ? "justify-start" : "justify-end"} ${isFadingOut ? "message-fade-out" : ""}`}
+                            key={messageKey}
+                            className={`flex mb-4 ${message.isIncoming ? 'justify-start' : 'justify-end'} ${isFadingOut ? 'message-fade-out' : ''}`}
                             style={{
-                              animation: isFadingOut
-                                ? "fadeOutUp 0.5s ease-in-out forwards"
-                                : "fadeIn 0.5s ease-in-out",
+                              animation: isFadingOut ? 'fadeOutUp 0.5s ease-in-out forwards' : 'fadeIn 0.5s ease-in-out',
                               opacity: isFadingOut ? 0 : 1,
-                              position: isReactionActive
-                                ? "relative"
-                                : "static",
-                              zIndex: isReactionActive ? 50 : "auto",
+                              position: isReactionActive ? 'relative' : 'static',
+                              zIndex: isReactionActive ? 50 : 'auto'
                             }}
                           >
                             {/* Reaction and Option Icons - LEFT side for outgoing messages */}
@@ -6359,7 +4994,7 @@ const Messages: React.FC = () => {
 
                                       <div className="space-y-0.5">
                                         <button
-                                          onClick={() => handleMessageOptionSelect('reply', message.id)}
+                                          onClick={() => mobileMessageOptionsId !== undefined && handleMessageOptionSelect('reply', message.id)}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={replyIcon} alt="Reply" className="w-4 h-4 mr-2" />
@@ -6367,7 +5002,11 @@ const Messages: React.FC = () => {
                                         </button>
 
                                         <button
-                                          onClick={() => handleMessageOptionSelect('important', activeMessageOptionsId || undefined)}
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                            }
+                                          }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={starIcon} alt="Star" className="w-4 h-4 mr-2" />
@@ -6375,7 +5014,11 @@ const Messages: React.FC = () => {
                                         </button>
 
                                         <button
-                                          onClick={() => handleMessageOptionSelect('copy', activeMessageOptionsId || undefined)}
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                            }
+                                          }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={copyIcon} alt="Copy" className="w-4 h-4 mr-2" />
@@ -6383,7 +5026,11 @@ const Messages: React.FC = () => {
                                         </button>
 
                                         <button
-                                          onClick={() => handleMessageOptionSelect('select', activeMessageOptionsId || undefined)}
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                            }
+                                          }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={tickIcon} alt="Select" className="w-4 h-4 mr-2" />
@@ -6391,7 +5038,11 @@ const Messages: React.FC = () => {
                                         </button>
 
                                         <button
-                                          onClick={() => handleMessageOptionSelect('pin', activeMessageOptionsId || undefined)}
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                            }
+                                          }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={pinMenuIcon} alt="Pin" className="w-4 h-4 mr-2" />
@@ -6401,7 +5052,11 @@ const Messages: React.FC = () => {
                                         </button>
 
                                         <button
-                                          onClick={() => handleMessageOptionSelect('delete', activeMessageOptionsId || undefined)}
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                            }
+                                          }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={trashIcon} alt="Delete" className="w-4 h-4 mr-2" />
@@ -6416,9 +5071,9 @@ const Messages: React.FC = () => {
 
                             <div className="max-w-xs lg:max-w-md relative">
                               {/* Images (if present) - NO bubble */}
-                              {Array.isArray(message.images) && message.images.length > 0 && (
+                              {message.images && message.images.length > 0 && (
                                 <div className={`flex flex-wrap gap-2 mb-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
-                                  {Array.isArray(message.images) && message.images.map((image: File, imgIndex: number) => (
+                                  {message.images.map((image: File, imgIndex: number) => (
                                     <img
                                       key={imgIndex}
                                       src={URL.createObjectURL(image)}
@@ -6435,36 +5090,15 @@ const Messages: React.FC = () => {
                               )}
 
                               {/* Message bubble (only if there's text or voice or documents) */}
-                              {((!message.images || message.images.length === 0) && (message.text || message.type === 'audio' || message.type === 'AUDIO' || (message.documents.length > 0))) && (
+                              {((!message.images || message.images.length === 0) && (message.text || message.type === 'voice' || (message.documents && message.documents.length > 0))) && (
                                 <div
-                                  className={`rounded-2xl p-4 ${message.isIncoming
-                                    ? "rounded-bl-md cursor-pointer"
-                                    : "rounded-br-md"
-                                    }`}
+                                  className={`rounded-2xl p-4 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`}
                                   style={{
-                                    backgroundColor: message.isIncoming
-                                      ? "#F0F8FE"
-                                      : "#64B5F6",
+                                    backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
                                   }}
-                                  onClick={
-                                    message.isIncoming
-                                      ? () =>
-                                        handleIncomingMessageClick(message.id)
-                                      : undefined
-                                  }
+                                  onClick={() => handleIncomingMessageClick(message.id)}
                                 >
-                                  {/* reply display preview */}
-                                  {message.replyTo && (
-                                    <div className="mb-2 pl-2 border-l-2 border-gray-300">
-                                      <div className={`text-xs font-medium ${message.isIncoming ? 'text-gray-700' : 'text-white'}`}>
-                                        Replying to {message.replyTo.sender?.firstName || 'User'}
-                                      </div>
-                                      <div className={`text-sm truncate ${message.isIncoming ? 'text-gray-600' : 'text-white'}`}>
-                                        {message.replyTo.content || 'Media message'}
-                                      </div>
-                                    </div>
-                                  )}
-                                  {message.type === "audio" || message.messageType === "AUDIO" ? (
+                                  {message.type === 'voice' ? (
                                     // Voice Message Display
                                     <div className="space-y-2">
                                       {/* Reply Preview for Voice Messages */}
@@ -6473,25 +5107,15 @@ const Messages: React.FC = () => {
                                           <div
                                             className="rounded-full mr-2"
                                             style={{
-                                              width: "2px",
-                                              backgroundColor: "#FFFFFF",
+                                              width: '2px',
+                                              backgroundColor: '#FFFFFF'
                                             }}
                                           ></div>
                                           <div className="flex-1">
-                                            <p
-                                              className="text-xs font-medium"
-                                              style={{
-                                                color: "rgba(255, 255, 255, 0.9)",
-                                              }}
-                                            >
+                                            <p className="text-xs font-medium" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
                                               {message.replyTo.sender}
                                             </p>
-                                            <p
-                                              className="text-xs"
-                                              style={{
-                                                color: "rgba(255, 255, 255, 0.6)",
-                                              }}
-                                            >
+                                            <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
                                               {message.replyTo.text}
                                             </p>
                                           </div>
@@ -6594,75 +5218,6 @@ const Messages: React.FC = () => {
                                         </div>
                                       </div>
                                     </div>
-                                  ) : message.attachments &&
-                                    message.attachments.length > 0 ? (
-                                    // File Attachment Message Display
-                                    <div className="space-y-2">
-                                      {message.text && (
-                                        <p
-                                          className="text-sm"
-                                          style={{
-                                            color: message.isIncoming
-                                              ? "#6A6A6A"
-                                              : "#FFFFFF",
-                                          }}
-                                        >
-                                          {message.text}
-                                        </p>
-                                      )}
-                                      <div className="space-y-2">
-                                        {message.attachments.map(
-                                          (file: any, index: number) => (
-                                            <div
-                                              key={index}
-                                              onClick={() =>
-                                                handleFileClick(file)
-                                              }
-                                              className="flex items-center space-x-3 p-3 bg-white/20 rounded-lg cursor-pointer hover:bg-white/30 transition-colors"
-                                            >
-                                              <div className="w-10 h-10 bg-white/30 rounded-lg flex items-center justify-center">
-                                                <svg
-                                                  className="w-5 h-5 text-white"
-                                                  fill="none"
-                                                  stroke="currentColor"
-                                                  viewBox="0 0 24 24"
-                                                >
-                                                  <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                                                  />
-                                                </svg>
-                                              </div>
-                                              <div className="flex-1">
-                                                <p className="text-white text-sm font-medium">
-                                                  {file.name}
-                                                </p>
-                                                <p className="text-white/80 text-xs">
-                                                  {formatFileSize(file.size)}
-                                                </p>
-                                              </div>
-                                              <div className="w-6 h-6 bg-white/30 rounded flex items-center justify-center">
-                                                <svg
-                                                  className="w-3 h-3 text-white"
-                                                  fill="none"
-                                                  stroke="currentColor"
-                                                  viewBox="0 0 24 24"
-                                                >
-                                                  <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                                                  />
-                                                </svg>
-                                              </div>
-                                            </div>
-                                          )
-                                        )}
-                                      </div>
-                                    </div>
                                   ) : (
                                     // Text Message Display
                                     <>
@@ -6670,47 +5225,150 @@ const Messages: React.FC = () => {
                                       {message.replyTo && (
                                         <div className="mb-3">
                                           {/* User's reply text at top */}
-                                          <p
-                                            className="text-sm mb-2"
-                                            style={{ color: "#FFFFFF" }}
-                                          >
+                                          <p className="text-sm mb-2" style={{ color: '#FFFFFF' }}>
                                             {message.text}
                                           </p>
 
-                                          {/* White line and quoted message */}
-                                          <div className="flex items-stretch">
-                                            {/* Vertical white line */}
-                                            <div
-                                              className="rounded-full mr-2"
-                                              style={{
-                                                width: "2px",
-                                                backgroundColor: "#FFFFFF",
-                                                flexShrink: 0,
-                                              }}
-                                            ></div>
+                                          {message.replyTo.type === 'voice' ? (
+                                            /* Voice Note Reply - Screenshot Structure - TWO LINES */
+                                            <div className="flex items-start">
+                                              {/* White vertical line on LEFT */}
+                                              <div
+                                                className="rounded-full mr-2"
+                                                style={{
+                                                  width: '2px',
+                                                  backgroundColor: '#FFFFFF',
+                                                  height: '38px',
+                                                  flexShrink: 0
+                                                }}
+                                              ></div>
 
-                                            {/* Quoted message info */}
-                                            <div className="flex-1">
-                                              <p
-                                                className="text-xs font-medium mb-0.5"
-                                                style={{
-                                                  color:
-                                                    "rgba(255, 255, 255, 0.9)",
-                                                }}
-                                              >
-                                                {message.replyTo.sender}
-                                              </p>
-                                              <p
-                                                className="text-xs"
-                                                style={{
-                                                  color:
-                                                    "rgba(255, 255, 255, 0.6)",
-                                                }}
-                                              >
-                                                {message.replyTo.text}
-                                              </p>
+                                              <div className="flex-1">
+                                                {/* "You" text in light blue - ABOVE */}
+                                                <div className="text-xs font-medium mb-1" style={{ color: '#CFE8FC' }}>
+                                                  {message.replyTo.sender}
+                                                </div>
+
+                                                {/* Audio preview - BELOW "You" */}
+                                                <div className="flex items-center">
+                                                  {/* Speed button - appears when playing */}
+                                                  {playingMessageId === message.id && (
+                                                    <button
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSpeedChange(message.id);
+                                                      }}
+                                                      className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
+                                                      style={{
+                                                        backgroundColor: '#4781AF',
+                                                        borderRadius: '10px',
+                                                        width: '32px',
+                                                        height: '22px',
+                                                        padding: '0 8px',
+                                                        marginRight: '8px'
+                                                      }}
+                                                    >
+                                                      <span className="text-white" style={{ fontSize: '10px', fontWeight: 500 }}>
+                                                        {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
+                                                      </span>
+                                                    </button>
+                                                  )}
+
+                                                  {/* Duration */}
+                                                  <span className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)', marginRight: '8px' }}>
+                                                    {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
+                                                  </span>
+
+                                                  {/* Waveform */}
+                                                  <div className="flex items-center space-x-0.5 flex-1">
+                                                    {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ?
+                                                      message.replyTo.waveformData.slice(-20).map((level: number, i: number) => {
+                                                        const progress = audioPlaybackProgress[message.id] || 0;
+                                                        const totalBars = Math.min(20, message.replyTo.waveformData.length);
+                                                        const isPlayed = playingMessageId === message.id && (i / totalBars) * 100 <= progress;
+                                                        return (
+                                                          <div
+                                                            key={i}
+                                                            style={{
+                                                              width: '2px',
+                                                              height: `${Math.max(3, level * 10)}px`,
+                                                              backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC',
+                                                              borderRadius: '1px'
+                                                            }}
+                                                          />
+                                                        );
+                                                      })
+                                                      :
+                                                      [3, 4, 3, 5, 8, 10, 12, 10, 8, 5, 4, 3, 6, 8, 9, 8, 6, 5, 3, 5].map((h, i) => {
+                                                        const progress = audioPlaybackProgress[message.id] || 0;
+                                                        const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
+                                                        return (
+                                                          <div
+                                                            key={i}
+                                                            style={{
+                                                              width: '2px',
+                                                              height: `${h}px`,
+                                                              backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC',
+                                                              borderRadius: '1px'
+                                                            }}
+                                                          />
+                                                        );
+                                                      })
+                                                    )}
+                                                  </div>
+
+                                                  {/* Play/Pause button - far right */}
+                                                  <button
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      if (message.replyTo.audioUrl) {
+                                                        handleAudioPlayback(message.id, message.replyTo.audioUrl, message.replyTo.duration);
+                                                      }
+                                                    }}
+                                                    className="ml-4 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity"
+                                                    style={{
+                                                      width: '22px',
+                                                      height: '22px',
+                                                      backgroundColor: '#FFFFFF'
+                                                    }}
+                                                  >
+                                                    {playingMessageId === message.id ? (
+                                                      <svg style={{ width: '14px', height: '14px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                                                      </svg>
+                                                    ) : (
+                                                      <svg style={{ width: '14px', height: '14px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M8 5v14l11-7z" />
+                                                      </svg>
+                                                    )}
+                                                  </button>
+                                                </div>
+                                              </div>
                                             </div>
-                                          </div>
+                                          ) : (
+                                            /* Text Reply */
+                                            <div className="flex items-stretch">
+                                              {/* Vertical white line */}
+                                              <div
+                                                className="rounded-full mr-2"
+                                                style={{
+                                                  width: '2px',
+                                                  backgroundColor: '#FFFFFF',
+                                                  flexShrink: 0
+                                                }}
+                                              ></div>
+
+                                              {/* Quoted message info */}
+                                              <div className="flex-1">
+                                                <p className="text-xs font-medium mb-0.5" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                                                  {message.replyTo.sender}
+                                                </p>
+                                                <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                                  {message.replyTo.text}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          )}
                                         </div>
                                       )}
 
@@ -6718,649 +5376,501 @@ const Messages: React.FC = () => {
                                       {!message.replyTo && (
                                         <p
                                           className="text-sm mb-3"
-                                          style={{
-                                            color: message.isIncoming
-                                              ? "#6A6A6A"
-                                              : "#FFFFFF",
-                                          }}
+                                          style={{ color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
                                         >
-                                          {getMessageDisplayText(message)}
+                                          {message.text}
                                         </p>
                                       )}
 
                                       {/* Product Card in Message - Only for first message */}
-                                      {message.productData &&
-                                        message.isProductInquiry && (
-                                          <div className="rounded-lg p-3 mt-3">
-                                            <div className="flex space-x-4">
-                                              <div className="relative">
-                                                <div
-                                                  className="absolute -left-3 top-0 w-0.5 h-24"
-                                                  style={{
-                                                    backgroundColor:
-                                                      message.isIncoming
-                                                        ? "#FFFFFF"
-                                                        : "#B8DDFB",
-                                                  }}
-                                                ></div>
-                                                <img
-                                                  src={resolveImageUrl(message.productData)}
-                                                  alt={message.productData?.name}
-                                                  className="w-24 h-24 object-cover"
-                                                />
-                                              </div>
-                                              <div className="flex-1">
-                                                <div className="flex items-center justify-between">
-                                                  <div
-                                                    className="text-xl font-semibold"
-                                                    style={{
-                                                      color: message.isIncoming
-                                                        ? "#FFFFFF"
-                                                        : "#B8DDFB",
-                                                    }}
-                                                  >
-                                                    ${message.productData?.price}
-                                                  </div>
-                                                  <div
-                                                    className="flex items-center space-x-2 text-[10px]"
-                                                    style={{
-                                                      color: message.isIncoming
-                                                        ? "#FFFFFF"
-                                                        : "#B8DDFB",
-                                                    }}
-                                                  >
-                                                    <img
-                                                      src={locIcon}
-                                                      alt="Location"
-                                                      className="w-4 h-4"
-                                                    />
-                                                    <span>
-                                                      {
-                                                        message.productData
-                                                          .location
-                                                      }
-                                                    </span>
-                                                  </div>
+                                      {message.isProductInquiry && message.productData && (
+                                        <div className="rounded-lg p-3 mt-3">
+                                          <div className="flex space-x-4">
+                                            <div className="relative">
+                                              <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#FFFFFF' }}></div>
+                                              <img
+                                                src={message.productData.image}
+                                                alt={message.productData.name}
+                                                className="w-24 h-24 object-cover"
+                                              />
+                                            </div>
+                                            <div className="flex-1">
+                                              <div className="flex items-center justify-between">
+                                                <div className="text-xl font-semibold" style={{ color: '#B8DDFB' }}>${message.productData.price}</div>
+                                                <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#B8DDFB' }}>
+                                                  <img src={locIcon} alt="Location" className="w-4 h-4" />
+                                                  <span>{message.productData.location}</span>
                                                 </div>
-                                                <div className="flex items-center justify-between -mt-0.5">
-                                                  <h4
-                                                    className="text-xs font-medium"
-                                                    style={{
-                                                      color: message.isIncoming
-                                                        ? "#FFFFFF"
-                                                        : "#B8DDFB",
-                                                    }}
-                                                  >
-                                                    {message.productData?.name}
-                                                  </h4>
-                                                  <div
-                                                    className="text-[10px]"
-                                                    style={{
-                                                      color: message.isIncoming
-                                                        ? "#FFFFFF"
-                                                        : "#B8DDFB",
-                                                    }}
-                                                  >
-                                                    <span>
-                                                      Category:{" "}
-                                                      {
-                                                        message.productData
-                                                          .category
-                                                      }
-                                                    </span>
-                                                  </div>
-                                                </div>
-                                                <p
-                                                  className="text-[10px] mt-2 leading-relaxed line-clamp-2"
-                                                  style={{
-                                                    color: message.isIncoming
-                                                      ? "#FFFFFF"
-                                                      : "#B8DDFB",
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: 2,
-                                                    WebkitBoxOrient: 'vertical',
-                                                    overflow: 'hidden'
-                                                  }}
-                                                >
-                                                  {
-                                                    message.productData
-                                                      ?.description
-                                                  }
-                                                </p>
-                                                <a
-                                                  href="#"
-                                                  className="text-xs mt-1 block font-medium hover:underline"
-                                                  style={{
-                                                    color: message.isIncoming
-                                                      ? "#182073"
-                                                      : "#182073",
-                                                  }}
-                                                  onClick={(e) => {
-                                                    e.preventDefault();
-                                                    navigate(`/product/${productData.id}`);
-                                                  }}
-                                                >
-                                                  baoafrik.com/{message.productData.name}
-                                                </a>
                                               </div>
+                                              <div className="flex items-center justify-between -mt-0.5">
+                                                <h4 className="text-xs font-medium" style={{ color: '#B8DDFB' }}>{message.productData.name}</h4>
+                                                <div className="text-[10px]" style={{ color: '#B8DDFB' }}>
+                                                  <span>Category: {message.productData.category}</span>
+                                                </div>
+                                              </div>
+                                              <p className="text-[10px] mt-2 leading-relaxed" style={{ color: '#B8DDFB' }}>
+                                                Premium White Pepper sourced from the fertile soils of Africa.<br />
+                                                Known for its smooth, aromatic heat and rich flavor...
+                                              </p>
+                                              <a href="#" className="text-xs mt-1 block" style={{ color: '#182073' }}>
+                                                baoafrik.com/product-id-link?
+                                              </a>
                                             </div>
                                           </div>
-                                        )}
+                                        </div>
+                                      )}
+
+                                      {/* Document Display */}
+                                      {message.documents && message.documents.length > 0 && (
+                                        <div className={message.text || message.replyTo ? 'mt-3' : ''}>
+                                          {message.documents.map((doc: File, docIndex: number) => {
+                                            const fileName = doc.name.split('.');
+                                            const extension = fileName.pop() || '';
+                                            const nameWithoutExt = fileName.join('.');
+                                            const fileSizeMB = doc.size / (1024 * 1024);
+                                            const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
+                                            const extensionLower = extension.toLowerCase();
+                                            const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
+                                            return (
+                                              <div key={docIndex} className="flex items-center space-x-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                                                <DocumentIcon size={40} />
+                                                <div className="flex-1 min-w-0">
+                                                  <p className="text-sm truncate" style={{ color: '#FFFFFF', fontWeight: '400' }}>
+                                                    {nameWithoutExt} · {extension}
+                                                  </p>
+                                                  <p className="text-xs" style={{ color: '#B8DDFB' }}>
+                                                    {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      )}
                                     </>
                                   )}
                                 </div>
                               )}
 
                               {/* Bottom Timestamp */}
-                              <div
-                                className={`flex items-center mt-2 ${message.isIncoming
-                                  ? "justify-start"
-                                  : "justify-end"
-                                  }`}
-                              >
-                                {message.isIncoming ? (
-                                  <span className="text-xs mr-1" style={{ color: "#6A6A6A" }}>
-                                    {formatMessageTime(message.timestamp)}
-                                  </span>
-                                ) : (
-                                  <MessageStatus
-                                    status={message.status}
-                                    timestamp={message.timestamp}
-                                    isIncoming={message.isIncoming}
-                                  />
+                              <div className={`flex items-center mt-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
+                                {/* For outgoing messages: Badges BEFORE timestamp */}
+                                {!message.isIncoming && (
+                                  <>
+                                    {/* Reaction Display - LEFT of timestamp */}
+                                    {message.reaction && (
+                                      <div
+                                        className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={() => handleRemoveReaction(message.id)}
+                                        style={{
+                                          backgroundColor: '#FFFFFF',
+                                          border: '1px solid #F1F1F1',
+                                          borderRadius: '20px',
+                                          padding: '2px 12px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
+                                          minWidth: '60px',
+                                          height: '22px',
+                                          marginTop: '-2px',
+                                          gap: '8px'
+                                        }}
+                                      >
+                                        <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <span style={{ fontSize: '14px', lineHeight: 1 }}>
+                                          {message.reaction}
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {/* Important Badge - LEFT of timestamp */}
+                                    {message.isImportant && (
+                                      <div
+                                        className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={() => handleRemoveImportant(message.id)}
+                                        style={{
+                                          backgroundColor: '#FFFFFF',
+                                          border: '1px solid #F1F1F1',
+                                          borderRadius: '20px',
+                                          padding: '2px 12px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
+                                          minWidth: '60px',
+                                          height: '22px',
+                                          marginTop: '-2px',
+                                          gap: '8px'
+                                        }}
+                                      >
+                                        <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                      </div>
+                                    )}
+
+                                    {/* Pin Badge - LEFT of timestamp */}
+                                    {message.isPinned && (
+                                      <div
+                                        className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={() => handleRemovePin(message.id)}
+                                        style={{
+                                          backgroundColor: '#FFFFFF',
+                                          border: '1px solid #F1F1F1',
+                                          borderRadius: '20px',
+                                          padding: '2px 12px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
+                                          minWidth: '60px',
+                                          height: '22px',
+                                          marginTop: '-2px',
+                                          gap: '8px'
+                                        }}
+                                      >
+                                        <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <img src={pinBadgeIcon} alt="Pin" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' }} />
+                                      </div>
+                                    )}
+                                  </>
                                 )}
 
-                                {/* Reaction Display - left after timestamp */}
-                                {message.reaction && (
-                                  <div
-                                    className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
-                                    onClick={() =>
-                                      handleRemoveReaction(message.id)
-                                    }
-                                    style={{
-                                      backgroundColor: '#FFFFFF',
-                                      border: '1px solid #F1F1F1',
-                                      borderRadius: '20px',
-                                      padding: '2px 12px',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      minWidth: '60px',
-                                      height: '22px',
-                                      marginTop: '-2px',
-                                      gap: '8px'
-                                    }}
-                                  >
-                                    <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    <span style={{ fontSize: '14px', lineHeight: 1 }}>
-                                      {message.reaction}
-                                    </span>
-                                  </div>
-                                )}
+                                <span
+                                  className="text-xs mr-1"
+                                  style={{ color: '#6A6A6A' }}
+                                >
+                                  {message.timestamp}
+                                </span>
+                                {!message.isIncoming && message.id && renderMessageStatus(String(message.id))}
 
-                                {/* Important Badge - LEFT of timestamp */}
-                                {message.isImportant && (
-                                  <div
-                                    className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
-                                    onClick={() => handleRemoveImportant(message.id)}
-                                    style={{
-                                      backgroundColor: '#FFFFFF',
-                                      border: '1px solid #F1F1F1',
-                                      borderRadius: '20px',
-                                      padding: '2px 12px',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      minWidth: '60px',
-                                      height: '22px',
-                                      marginTop: '-2px',
-                                      gap: '8px'
-                                    }}
-                                  >
-                                    <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                  </div>
-                                )}
+                                {/* For incoming messages: Badges AFTER timestamp */}
+                                {message.isIncoming && (
+                                  <>
+                                    {/* Reaction Display - RIGHT of timestamp */}
+                                    {message.reaction && (
+                                      <div
+                                        className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={() => handleRemoveReaction(message.id)}
+                                        style={{
+                                          backgroundColor: '#FFFFFF',
+                                          border: '1px solid #F1F1F1',
+                                          borderRadius: '20px',
+                                          padding: '2px 12px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
+                                          minWidth: '60px',
+                                          height: '22px',
+                                          marginTop: '-2px',
+                                          gap: '8px'
+                                        }}
+                                      >
+                                        <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <span style={{ fontSize: '14px', lineHeight: 1 }}>
+                                          {message.reaction}
+                                        </span>
+                                      </div>
+                                    )}
 
-                                {/* Pin Badge - LEFT of timestamp */}
-                                {message.isPinned && (
-                                  <div
-                                    className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
-                                    onClick={() => handleRemovePin(message.id)}
-                                    style={{
-                                      backgroundColor: '#FFFFFF',
-                                      border: '1px solid #F1F1F1',
-                                      borderRadius: '20px',
-                                      padding: '2px 12px',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      minWidth: '60px',
-                                      height: '22px',
-                                      marginTop: '-2px',
-                                      gap: '8px'
-                                    }}
-                                  >
-                                    <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    <img src={pinBadgeIcon} alt="Pin" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' }} />
-                                  </div>
+                                    {/* Important Badge - RIGHT of timestamp */}
+                                    {message.isImportant && (
+                                      <div
+                                        className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={() => handleRemoveImportant(message.id)}
+                                        style={{
+                                          backgroundColor: '#FFFFFF',
+                                          border: '1px solid #F1F1F1',
+                                          borderRadius: '20px',
+                                          padding: '2px 12px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
+                                          minWidth: '60px',
+                                          height: '22px',
+                                          marginTop: '-2px',
+                                          gap: '8px'
+                                        }}
+                                      >
+                                        <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                      </div>
+                                    )}
+
+                                    {/* Pin Badge - RIGHT of timestamp */}
+                                    {message.isPinned && (
+                                      <div
+                                        className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={() => handleRemovePin(message.id)}
+                                        style={{
+                                          backgroundColor: '#FFFFFF',
+                                          border: '1px solid #F1F1F1',
+                                          borderRadius: '20px',
+                                          padding: '2px 12px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
+                                          minWidth: '60px',
+                                          height: '22px',
+                                          marginTop: '-2px',
+                                          gap: '8px'
+                                        }}
+                                      >
+                                        <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <img src={pinBadgeIcon} alt="Pin" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)' }} />
+                                      </div>
+                                    )}
+                                  </>
                                 )}
                               </div>
                             </div>
 
-                            {/* Reaction and Option Icons for Incoming Messages - Outside the message bubble */}
-                            {message.isIncoming &&
-                              clickedMessageId === message.id && (
-                                <div
-                                  className="flex items-center ml-1 self-center reaction-container relative"
-                                  style={{
-                                    zIndex:
-                                      activeReactionMessageId === message.id ||
-                                        activeMessageOptionsId === message.id
-                                        ? 999
-                                        : "auto",
-                                  }}
+                            {/* Reaction and Option Icons - RIGHT side for incoming messages only */}
+                            {message.isIncoming && clickedMessageId === message.id && (
+                              <div className="flex items-center ml-1 self-center reaction-container relative" style={{ zIndex: (activeReactionMessageId === message.id || activeMessageOptionsId === message.id) ? 999 : 'auto' }}>
+                                <button
+                                  className="p-1 hover:opacity-70 transition-opacity"
+                                  onClick={(e) => handleReactionClick(message.id, e)}
                                 >
-                                  <button
-                                    className="p-1 hover:opacity-70 transition-opacity"
-                                    onClick={(e) =>
-                                      handleReactionClick(message.id, e)
-                                    }
-                                  >
-                                    <img
-                                      src={reactionIcon}
-                                      alt="Reaction"
-                                      className="w-6 h-6"
-                                      style={{
-                                        filter:
-                                          activeReactionMessageId === message.id
-                                            ? "brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)"
-                                            : "none",
-                                      }}
-                                    />
-                                  </button>
-                                  <button
-                                    className="p-1 hover:opacity-70 transition-opacity"
-                                    onClick={(e) =>
-                                      handleMessageOptionsClick(message.id, e)
-                                    }
-                                  >
-                                    <img
-                                      src={optionIcon}
-                                      alt="Options"
-                                      className="w-6 h-6"
-                                      style={{
-                                        filter:
-                                          activeMessageOptionsId === message.id
-                                            ? "brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)"
-                                            : "none",
-                                      }}
-                                    />
-                                  </button>
+                                  <img
+                                    src={reactionIcon}
+                                    alt="Reaction"
+                                    className="w-6 h-6"
+                                    style={{
+                                      filter: activeReactionMessageId === message.id
+                                        ? 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)'
+                                        : 'none'
+                                    }}
+                                  />
+                                </button>
+                                <button
+                                  className="p-1 hover:opacity-70 transition-opacity"
+                                  onClick={(e) => handleMessageOptionsClick(message.id, e)}
+                                >
+                                  <img
+                                    src={optionIcon}
+                                    alt="Options"
+                                    className="w-6 h-6"
+                                    style={{
+                                      filter: activeMessageOptionsId === message.id
+                                        ? 'brightness(0) saturate(100%) invert(64%) sepia(49%) saturate(2012%) hue-rotate(176deg) brightness(95%) contrast(93%)'
+                                        : 'none'
+                                    }}
+                                  />
+                                </button>
 
-                                  {/* Reaction Popup */}
-                                  {activeReactionMessageId === message.id && (
-                                    <div
-                                      className="absolute bottom-full mb-2"
-                                      style={{
-                                        left: "-24px",
-                                        right: "-24px",
-                                        zIndex: 999,
-                                      }}
-                                    >
-                                      {/* Speech bubble with tail */}
-                                      <div
-                                        className="relative bg-white shadow-lg px-4 py-2.5 flex items-center justify-center space-x-1.5 border border-gray-200"
-                                        style={{
-                                          borderRadius: "20px",
-                                          minWidth: "280px",
+                                {/* Reaction Popup */}
+                                {activeReactionMessageId === message.id && (
+                                  <div className="absolute bottom-full mb-2" style={{ left: '-24px', right: '-24px', zIndex: 999 }}>
+                                    {/* Speech bubble with tail */}
+                                    <div className="relative bg-white shadow-lg px-4 py-2.5 flex items-center justify-center space-x-1.5 border border-gray-200" style={{ borderRadius: '20px', minWidth: '280px' }}>
+                                      <button onClick={() => handleReactionSelect('👍')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                        <Emoji unified="1f44d" size={24} />
+                                      </button>
+                                      <button onClick={() => handleReactionSelect('❤️')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                        <Emoji unified="2764-fe0f" size={24} />
+                                      </button>
+                                      <button onClick={() => handleReactionSelect('✅')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                        <Emoji unified="2705" size={24} />
+                                      </button>
+                                      <button onClick={() => handleReactionSelect('😂')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                        <Emoji unified="1f602" size={24} />
+                                      </button>
+                                      <button onClick={() => handleReactionSelect('😊')} className="hover:scale-110 transition-transform flex items-center justify-center" style={{ width: '32px', height: '32px' }}>
+                                        <Emoji unified="1f60a" size={24} />
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setShowReactionEmojiPicker(!showReactionEmojiPicker);
                                         }}
+                                        className="hover:scale-110 transition-transform flex items-center justify-center"
+                                        style={{ width: '32px', height: '32px' }}
                                       >
-                                        <button
-                                          onClick={() =>
-                                            handleReactionSelect("👍")
-                                          }
-                                          className="hover:scale-110 transition-transform flex items-center justify-center"
-                                          style={{
-                                            width: "32px",
-                                            height: "32px",
-                                          }}
-                                        >
-                                          <Emoji unified="1f44d" size={24} />
-                                        </button>
-                                        <button
-                                          onClick={() =>
-                                            handleReactionSelect("❤️")
-                                          }
-                                          className="hover:scale-110 transition-transform flex items-center justify-center"
-                                          style={{
-                                            width: "32px",
-                                            height: "32px",
-                                          }}
-                                        >
-                                          <Emoji
-                                            unified="2764-fe0f"
-                                            size={24}
-                                          />
-                                        </button>
-                                        <button
-                                          onClick={() =>
-                                            handleReactionSelect("")
-                                          }
-                                          className="hover:scale-110 transition-transform flex items-center justify-center"
-                                          style={{
-                                            width: "32px",
-                                            height: "32px",
-                                          }}
-                                        >
-                                          <Emoji unified="2705" size={24} />
-                                        </button>
-                                        <button
-                                          onClick={() =>
-                                            handleReactionSelect("😂")
-                                          }
-                                          className="hover:scale-110 transition-transform flex items-center justify-center"
-                                          style={{
-                                            width: "32px",
-                                            height: "32px",
-                                          }}
-                                        >
-                                          <Emoji unified="1f602" size={24} />
-                                        </button>
-                                        <button
-                                          onClick={() =>
-                                            handleReactionSelect("😊")
-                                          }
-                                          className="hover:scale-110 transition-transform flex items-center justify-center"
-                                          style={{
-                                            width: "32px",
-                                            height: "32px",
-                                          }}
-                                        >
-                                          <Emoji unified="1f60a" size={24} />
-                                        </button>
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setShowReactionEmojiPicker(
-                                              !showReactionEmojiPicker
-                                            );
-                                          }}
-                                          className="hover:scale-110 transition-transform flex items-center justify-center"
-                                          style={{
-                                            width: "32px",
-                                            height: "32px",
-                                          }}
-                                        >
-                                          <img
-                                            src={emoji6}
-                                            alt="More reactions"
-                                            style={{
-                                              width: "24px",
-                                              height: "24px",
-                                              objectFit: "contain",
-                                            }}
-                                          />
-                                        </button>
-                                        {/* Triangle tail pointing to reaction button */}
-                                        <div
-                                          style={{
-                                            position: "absolute",
-                                            left: "calc(16px + 4px + 16px)", // px-4 (16px) + space-x-1.5 (6px) + half button width (16px)
-                                            bottom: "-6px",
-                                            width: 0,
-                                            height: 0,
-                                            borderLeft: "6px solid transparent",
-                                            borderRight:
-                                              "6px solid transparent",
-                                            borderTop: "6px solid white",
-                                          }}
-                                        ></div>
-                                      </div>
-
-                                      {/* Emoji Picker for Reactions */}
-                                      {showReactionEmojiPicker && (
-                                        <div
-                                          className="absolute top-full mt-2 z-50"
-                                          style={{
-                                            left: "50%",
-                                            transform: "translateX(-50%)",
-                                          }}
-                                          onClick={(e) => e.stopPropagation()}
-                                        >
-                                          <EmojiPicker
-                                            onEmojiClick={(emojiObject) => {
-                                              handleReactionSelect(
-                                                emojiObject.emoji
-                                              );
-                                              setShowReactionEmojiPicker(false);
-                                            }}
-                                            width={300}
-                                            height={400}
-                                          />
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {/* Message Options Popup */}
-                                  {activeMessageOptionsId === message.id && (
-                                    <div
-                                      className="absolute -left-12"
-                                      style={{
-                                        zIndex: 999,
-                                        top: index <= 1 ? "-200px" : "auto",
-                                        bottom: index > 1 ? "100%" : "auto",
-                                        marginBottom: index > 1 ? "8px" : "0",
-                                      }}
-                                    >
+                                        <img src={emoji6} alt="More reactions" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+                                      </button>
+                                      {/* Triangle tail pointing to reaction button */}
                                       <div
-                                        className="relative bg-white rounded-2xl shadow-xl py-2 px-1 border border-gray-200"
-                                        style={{ minWidth: "180px" }}
+                                        style={{
+                                          position: 'absolute',
+                                          left: 'calc(16px + 4px + 16px)', // px-4 (16px) + space-x-1.5 (6px) + half button width (16px)
+                                          bottom: '-6px',
+                                          width: 0,
+                                          height: 0,
+                                          borderLeft: '6px solid transparent',
+                                          borderRight: '6px solid transparent',
+                                          borderTop: '6px solid white',
+                                        }}
+                                      ></div>
+                                    </div>
+
+                                    {/* Emoji Picker for Reactions */}
+                                    {showReactionEmojiPicker && (
+                                      <div
+                                        className="absolute top-full mt-2 z-50"
+                                        style={{ left: '50%', transform: 'translateX(-50%)' }}
+                                        onClick={(e) => e.stopPropagation()}
                                       >
-                                        {/* Header */}
-                                        <div className="flex items-center justify-between px-3 mb-1">
-                                          <span
-                                            className="font-medium"
-                                            style={{
-                                              color: "#9CA3AF",
-                                              fontSize: "10px",
-                                            }}
-                                          >
-                                            Actions
+                                        <EmojiPicker
+                                          onEmojiClick={(emojiObject) => {
+                                            handleReactionSelect(emojiObject.emoji);
+                                            setShowReactionEmojiPicker(false);
+                                          }}
+                                          width={300}
+                                          height={400}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Message Options Popup */}
+                                {activeMessageOptionsId === message.id && (
+                                  <div
+                                    className="absolute -left-12"
+                                    style={{
+                                      zIndex: 999,
+                                      top: index <= 1 ? '-200px' : 'auto',
+                                      bottom: index > 1 ? '100%' : 'auto',
+                                      marginBottom: index > 1 ? '8px' : '0'
+                                    }}
+                                  >
+                                    <div className="relative bg-white rounded-2xl shadow-xl py-2 px-1 border border-gray-200" style={{ minWidth: '180px' }}>
+                                      {/* Header */}
+                                      <div className="flex items-center justify-between px-3 mb-1">
+                                        <span className="font-medium" style={{ color: '#9CA3AF', fontSize: '10px' }}>Actions</span>
+                                        <button
+                                          onClick={() => setActiveMessageOptionsId(null)}
+                                          className="text-gray-500 hover:text-gray-700"
+                                        >
+                                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                            <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                          </svg>
+                                        </button>
+                                      </div>
+
+                                      {/* Menu Items */}
+                                      <div className="space-y-0.5">
+                                        <button
+                                          onClick={() => handleMessageOptionSelect('reply', message.id)}
+                                          className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                        >
+                                          <img src={replyIcon} alt="Reply" className="w-4 h-4 mr-2" />
+                                          <span className="text-xs" style={{ color: '#6B7280' }}>Reply the message</span>
+                                        </button>
+
+                                        <button
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                            }
+                                          }}
+                                          className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                        >
+                                          <img src={starIcon} alt="Star" className="w-4 h-4 mr-2" />
+                                          <span className="text-xs" style={{ color: '#6B7280' }}>Mark as important</span>
+                                        </button>
+
+                                        <button
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                            }
+                                          }}
+                                          className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                        >
+                                          <img src={copyIcon} alt="Copy" className="w-4 h-4 mr-2" />
+                                          <span className="text-xs" style={{ color: '#6B7280' }}>Copy the message</span>
+                                        </button>
+
+                                        <button
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                            }
+                                          }}
+                                          className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                        >
+                                          <img src={tickIcon} alt="Select" className="w-4 h-4 mr-2" />
+                                          <span className="text-xs" style={{ color: '#6B7280' }}>Select the message</span>
+                                        </button>
+
+                                        <button
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                            }
+                                          }}
+                                          className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                        >
+                                          <img src={pinMenuIcon} alt="Pin" className="w-4 h-4 mr-2" />
+                                          <span className="text-xs" style={{ color: '#6B7280' }}>
+                                            {messages.find(m => m.id === activeMessageOptionsId)?.isPinned ? 'Unpin the message' : 'Pin the message'}
                                           </span>
-                                          <button
-                                            onClick={() =>
-                                              setActiveMessageOptionsId(null)
-                                            }
-                                            className="text-gray-500 hover:text-gray-700"
-                                          >
-                                            <svg
-                                              width="14"
-                                              height="14"
-                                              viewBox="0 0 16 16"
-                                              fill="none"
-                                            >
-                                              <path
-                                                d="M12 4L4 12M4 4L12 12"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                              />
-                                            </svg>
-                                          </button>
-                                        </div>
+                                        </button>
 
-                                        {/* Menu Items */}
-                                        <div className="space-y-0.5">
-                                          <button
-                                            onClick={() =>
-                                              handleMessageOptionSelect(
-                                                "reply",
-                                                message.id
-                                              )
+                                        <button
+                                          onClick={() => {
+                                            if (activeMessageOptionsId != null) {
+                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
                                             }
-                                            className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
-                                          >
-                                            <img
-                                              src={replyIcon}
-                                              alt="Reply"
-                                              className="w-4 h-4 mr-2"
-                                            />
-                                            <span
-                                              className="text-xs"
-                                              style={{ color: "#6B7280" }}
-                                            >
-                                              Reply the message
-                                            </span>
-                                          </button>
-
-                                          <button
-                                            onClick={() =>
-                                              handleMessageOptionSelect(
-                                                "important"
-                                              )
-                                            }
-                                            className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
-                                          >
-                                            <img
-                                              src={starIcon}
-                                              alt="Star"
-                                              className="w-4 h-4 mr-2"
-                                            />
-                                            <span
-                                              className="text-xs"
-                                              style={{ color: "#6B7280" }}
-                                            >
-                                              Mark as important
-                                            </span>
-                                          </button>
-
-                                          <button
-                                            onClick={() =>
-                                              handleMessageOptionSelect("copy")
-                                            }
-                                            className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
-                                          >
-                                            <img
-                                              src={copyIcon}
-                                              alt="Copy"
-                                              className="w-4 h-4 mr-2"
-                                            />
-                                            <span
-                                              className="text-xs"
-                                              style={{ color: "#6B7280" }}
-                                            >
-                                              Copy the message
-                                            </span>
-                                          </button>
-
-                                          <button
-                                            onClick={() =>
-                                              handleMessageOptionSelect(
-                                                "select"
-                                              )
-                                            }
-                                            className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
-                                          >
-                                            <img
-                                              src={tickIcon}
-                                              alt="Select"
-                                              className="w-4 h-4 mr-2"
-                                            />
-                                            <span
-                                              className="text-xs"
-                                              style={{ color: "#6B7280" }}
-                                            >
-                                              Select the message
-                                            </span>
-                                          </button>
-
-                                          <button
-                                            onClick={() =>
-                                              handleMessageOptionSelect("pin")
-                                            }
-                                            className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
-                                          >
-                                            <img
-                                              src={pinMenuIcon}
-                                              alt="Pin"
-                                              className="w-4 h-4 mr-2"
-                                            />
-                                            <span
-                                              className="text-xs"
-                                              style={{ color: "#6B7280" }}
-                                            >
-                                              Pin the message
-                                            </span>
-                                          </button>
-
-                                          <button
-                                            onClick={() =>
-                                              handleMessageOptionSelect(
-                                                "delete"
-                                              )
-                                            }
-                                            className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
-                                          >
-                                            <img
-                                              src={trashIcon}
-                                              alt="Delete"
-                                              className="w-4 h-4 mr-2"
-                                            />
-                                            <span
-                                              className="text-xs"
-                                              style={{ color: "#6B7280" }}
-                                            >
-                                              Delete for me
-                                            </span>
-                                          </button>
-                                        </div>
+                                          }}
+                                          className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
+                                        >
+                                          <img src={trashIcon} alt="Delete" className="w-4 h-4 mr-2" />
+                                          <span className="text-xs" style={{ color: '#6B7280' }}>Delete for me</span>
+                                        </button>
                                       </div>
                                     </div>
-                                  )}
-                                </div>
-                              )}
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         );
                       })}
 
                       {/* Typing Indicator */}
-                      {isSellerTyping && showTypingIndicator && (
-                        <div className="flex justify-start mb-4 animate-fade-in  relative z-10">
+                      {isSellerTyping && (
+                        <div className="flex justify-start mb-4">
                           <div className="max-w-20">
                             <div
                               className="rounded-2xl rounded-bl-md px-3 py-2 flex items-center"
-                              style={{ backgroundColor: "#F0F8FE" }}
+                              style={{ backgroundColor: '#F0F8FE' }}
                             >
                               <div className="flex space-x-1">
                                 <div
                                   className="w-1.5 h-1.5 rounded-full animate-bounce"
                                   style={{
-                                    backgroundColor: "#64B5F6",
-                                    animationDelay: "0ms",
+                                    backgroundColor: '#64B5F6',
+                                    animationDelay: '0ms'
                                   }}
                                 ></div>
                                 <div
                                   className="w-1.5 h-1.5 rounded-full animate-bounce"
                                   style={{
-                                    backgroundColor: "#64B5F6",
-                                    animationDelay: "150ms",
+                                    backgroundColor: '#64B5F6',
+                                    animationDelay: '150ms'
                                   }}
                                 ></div>
                                 <div
                                   className="w-1.5 h-1.5 rounded-full animate-bounce"
                                   style={{
-                                    backgroundColor: "#64B5F6",
-                                    animationDelay: "300ms",
+                                    backgroundColor: '#64B5F6',
+                                    animationDelay: '300ms'
                                   }}
                                 ></div>
                               </div>
@@ -7376,8 +5886,8 @@ const Messages: React.FC = () => {
                             onClick={() => setShowAllMessages(false)}
                             className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors hover:opacity-80"
                             style={{
-                              backgroundColor: "#E3F2FD",
-                              color: "#64B5F6",
+                              backgroundColor: '#E3F2FD',
+                              color: '#64B5F6'
                             }}
                           >
                             View latest messages
@@ -7392,39 +5902,14 @@ const Messages: React.FC = () => {
                 </div>
                 {/* End Scrollable Content Area */}
 
-                {replyingTo && (
-                  <div className="flex items-center justify-between bg-gray-100 p-2 rounded-t-lg">
-                    <div className="text-sm text-gray-600">
-                      <span className="font-medium">
-                        Replying to {replyingTo.sender?.firstName || 'User'}
-                      </span>
-                      <p className="text-xs truncate">{replyingTo.content}</p>
-                    </div>
-                    <button
-                      onClick={() => setReplyingTo(null)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-
                 {/* Message Input - Fixed at Bottom */}
-                <div
-                  className={`px-6 pb-6 flex-shrink-0 ${messages.length > 0 ? "py-2" : "-mt-2"
-                    }`}
-                >
+                <div className={`px-6 pb-6 flex-shrink-0 ${messages.length > 0 ? 'py-2' : '-mt-2'}`}>
                   {/* Permanent Gray Separator Line */}
                   <div className="mb-3 -mx-6">
-                    <div
-                      className="w-full bg-gray-200 rounded-full"
-                      style={{ height: "0.5px" }}
-                    ></div>
+                    <div className="w-full bg-gray-200 rounded-full" style={{ height: '0.5px' }}></div>
                   </div>
 
-                  {/* Reply Preview */}
+                  {/* Reply Preview - Desktop */}
                   {replyToMessage && (
                     <div className="mb-2 relative">
                       {replyToMessage.type === 'voice' ? (
@@ -7499,7 +5984,7 @@ const Messages: React.FC = () => {
                           {/* Content */}
                           <div className="flex-1">
                             <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                              {replyToMessage.isIncoming ? `${currentConversation?.otherParticipant?.firstName || ""} ${currentConversation?.otherParticipant?.lastName || ""}`.trim() : 'You'}
+                              {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
                             </div>
                             <div className="text-xs" style={{ color: '#6A6A6A' }}>
                               {replyToMessage.text}
@@ -7518,269 +6003,63 @@ const Messages: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Product Inquiry Card - Only show before sending first message (desktop view) */}
-                  {productData && isProductInquiry && (
+                  {/* Product Inquiry Card - Only show before sending first message */}
+                  {!isMessageSent && productData && (
                     <div className="mb-3">
                       <div className="flex items-start space-x-3">
                         {/* Product Detail Card */}
                         <div className="bg-gray-50 rounded-xl p-3 flex-1 max-w-lg">
                           <div className="flex items-start justify-between mb-1">
-                            <span
-                              className="text-xs font-medium"
-                              style={{ color: "#83C4F8" }}
-                            >
-                              From Bao'Afrik
-                            </span>
-                            <button
-                              className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
-                              style={{ backgroundColor: "#6A6A6A" }}
-                              onClick={() => {
-                                setProductData(null);
-                                setIsProductInquiry(false);
-                              }}
-                            >
-                              <svg
-                                className="w-2 h-2"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                style={{ color: "#000000" }}
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
+                            <span className="text-xs font-medium" style={{ color: '#83C4F8' }}>From Bao'Afrik</span>
+                            <button className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" style={{ backgroundColor: '#6A6A6A' }}>
+                              <svg className="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#000000' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                               </svg>
                             </button>
                           </div>
                           <div className="flex space-x-4">
                             <div className="relative">
-                              <div
-                                className="absolute -left-3 top-0 w-0.5 h-24"
-                                style={{ backgroundColor: "#83C4F8" }}
-                              ></div>
+                              <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#83C4F8' }}></div>
                               <img
-                                src={resolveImageUrl(productData)}
-                                alt={productData?.name}
+                                src={productImage1}
+                                alt={productData.name}
                                 className="w-24 h-24 object-cover"
                               />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
-                                <div
-                                  className="text-xl font-semibold"
-                                  style={{ color: "#6A6A6A" }}
-                                >
-                                  ${productData?.price}
-                                </div>
-                                <div
-                                  className="flex items-center space-x-2 text-[10px]"
-                                  style={{ color: "#BABABA" }}
-                                >
-                                  <img
-                                    src={locIcon}
-                                    alt="Location"
-                                    className="w-4 h-4"
-                                  />
-                                  <span>{productData?.location}</span>
+                                <div className="text-xl font-semibold" style={{ color: '#6A6A6A' }}>${productData.price}</div>
+                                <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#BABABA' }}>
+                                  <img src={locIcon} alt="Location" className="w-4 h-4" />
+                                  <span>{productData.location}</span>
                                 </div>
                               </div>
                               <div className="flex items-center justify-between -mt-0.5">
-                                <h4
-                                  className="text-xs font-medium"
-                                  style={{ color: "#6A6A6A" }}
-                                >
-                                  {productData?.name}
-                                </h4>
-                                <div
-                                  className="text-[10px]"
-                                  style={{ color: "#BABABA" }}
-                                >
-                                  <span>Category: {productData?.category}</span>
+                                <h4 className="text-xs font-medium" style={{ color: '#6A6A6A' }}>{productData.name}</h4>
+                                <div className="text-[10px]" style={{ color: '#BABABA' }}>
+                                  <span>Category: {productData.category}</span>
                                 </div>
                               </div>
-                              <p
-                                className="text-[8px] mt-2 leading-relaxed line-clamp-2"
-                                style={{
-                                  color: "#6A6A6A",
-                                  display: '-webkit-box',
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: 'vertical',
-                                  overflow: 'hidden'
-                                }}
-                              >
-                                {productData?.description}
+                              <p className="text-[10px] mt-2 leading-relaxed" style={{ color: '#6A6A6A' }}>
+                                Premium White Pepper sourced from the fertile soils of Africa.<br />
+                                Known for its smooth, aromatic heat and rich flavor...
                               </p>
-                              <a
-                                href={`product/${productData.id}`}
-                                className="text-xs mt-1 block font-medium hover:underline"
-                                style={{ color: "#83C4F8" }}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  navigate(`/product/${productData.id}`);
-                                }}
-                              >
-                                baoafrik.com/{productData?.name}
+                              <a href="#" className="text-xs mt-1 block" style={{ color: '#83C4F8' }}>
+                                baoafrik.com/product-id-link?
                               </a>
                             </div>
                           </div>
                         </div>
-
-                        {/* File Attachment Indicator - Inline with Product Card */}
-                        {selectedFiles.length > 0 && (
-                          <div className="flex items-center space-x-2">
-                            <div
-                              className="flex items-center space-x-2 px-3 py-2 rounded-lg"
-                              style={{ backgroundColor: "#F0F8FE" }}
-                            >
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                style={{ color: "#64B5F6" }}
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                                />
-                              </svg>
-                              <div className="flex flex-col">
-                                <span
-                                  className="text-sm font-medium"
-                                  style={{ color: "#64B5F6" }}
-                                >
-                                  {selectedFiles.length} file
-                                  {selectedFiles.length > 1 ? "s" : ""} attached
-                                </span>
-                                <div
-                                  className="text-xs"
-                                  style={{ color: "#64B5F6" }}
-                                >
-                                  {selectedFiles.map((file, index) => (
-                                    <span key={index}>
-                                      {file.name} ({formatFileSize(file.size)})
-                                      {index < selectedFiles.length - 1
-                                        ? ", "
-                                        : ""}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  setSelectedFiles([]);
-                                  setShowFilePreview(false);
-                                }}
-                                className="ml-2 hover:opacity-70"
-                                style={{ color: "#64B5F6" }}
-                              >
-                                <svg
-                                  className="w-4 h-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}
 
-                  {/* File Attachment Indicator - Only show when no product detail popup */}
-                  {selectedFiles.length > 0 && isMessageSent && (
-                    <div className="mb-3">
-                      <div className="flex items-center space-x-2">
-                        <div
-                          className="flex items-center space-x-2 px-3 py-2 rounded-lg"
-                          style={{ backgroundColor: "#F0F8FE" }}
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            style={{ color: "#64B5F6" }}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                            />
-                          </svg>
-                          <div className="flex flex-col">
-                            <span
-                              className="text-sm font-medium"
-                              style={{ color: "#64B5F6" }}
-                            >
-                              {selectedFiles.length} file
-                              {selectedFiles.length > 1 ? "s" : ""} attached
-                            </span>
-                            <div
-                              className="text-xs"
-                              style={{ color: "#64B5F6" }}
-                            >
-                              {selectedFiles.map((file, index) => (
-                                <span key={index}>
-                                  {file.name} ({formatFileSize(file.size)})
-                                  {index < selectedFiles.length - 1 ? ", " : ""}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setSelectedFiles([]);
-                              setShowFilePreview(false);
-                            }}
-                            className="ml-2 hover:opacity-70"
-                            style={{ color: "#64B5F6" }}
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {isRecording ? (
                     // Recording Interface with inline file attachment
                     <div className="space-y-3">
                       {/* Main Recording Interface */}
-                      <div
-                        className="flex items-center"
-                        style={{
-                          backgroundColor: "#F5F5F5",
-                          borderRadius: "12px",
-                          padding: "6px",
-                        }}
-                      >
+                      <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '6px' }}>
                         <div className="relative emoji-picker-container">
                           <button
                             onClick={handleEmojiClick}
@@ -7791,9 +6070,7 @@ const Messages: React.FC = () => {
                               alt="emoji"
                               className="w-6 h-6"
                               style={{
-                                filter: showEmojiPicker
-                                  ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                                  : "none",
+                                filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
                               }}
                             />
                           </button>
@@ -7843,7 +6120,7 @@ const Messages: React.FC = () => {
                                 searchDisabled={false}
                                 skinTonesDisabled={true}
                                 previewConfig={{
-                                  showPreview: false,
+                                  showPreview: false
                                 }}
                                 searchPlaceHolder="Search Emoji"
                               />
@@ -7852,16 +6129,15 @@ const Messages: React.FC = () => {
                         </div>
                         <button
                           onClick={handleAttachClick}
-                          className="p-1.5 text-gray-400 hover:text-gray-600"
+                          className="p-2 transition-colors focus:outline-none"
+                          style={{ outline: 'none' }}
                         >
                           <img
                             src={pinIcon}
                             alt="attachment"
                             className="w-6 h-6"
                             style={{
-                              filter: isAttachActive
-                                ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                                : "none",
+                              filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
                             }}
                           />
                         </button>
@@ -7869,47 +6145,31 @@ const Messages: React.FC = () => {
                           <div
                             className="rounded-full px-6 py-0.5 flex items-center -ml-12 relative"
                             style={{
-                              background:
-                                "linear-gradient(to right, #DBEAFE, #64B5F6)",
-                              width: "550px",
-                              height: "28px", // Fixed height to prevent container movement
+                              background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
+                              width: '550px',
+                              height: '28px' // Fixed height to prevent container movement
                             }}
                           >
                             <div className="flex items-center space-x-2 flex-shrink-0">
-                              <div
-                                className="w-2 h-2 bg-red-500 rounded-full animate-pulse"
-                                style={{
-                                  boxShadow: "0 0 8px rgba(239, 68, 68, 0.6)",
-                                }}
-                              ></div>
+                              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)' }}></div>
                               <span className="text-white text-sm">
-                                {Math.floor(recordingTime / 60)
-                                  .toString()
-                                  .padStart(2, "0")}
-                                :
-                                {(recordingTime % 60)
-                                  .toString()
-                                  .padStart(2, "0")}{" "}
-                                - Audio recording
+                                {Math.floor(recordingTime / 60).toString().padStart(2, '0')}:
+                                {(recordingTime % 60).toString().padStart(2, '0')} - Audio recording
                               </span>
                             </div>
                             <div className="flex space-x-0.5 absolute right-8 top-1/2 transform -translate-y-1/2 items-end">
                               {audioLevels.map((level, i) => {
                                 // Convert audio level (0.1 to 1.0) to height (2px to 24px)
                                 const height = `${level * 24}px`;
-                                const minHeight = "2px";
+                                const minHeight = '2px';
 
                                 return (
                                   <div
                                     key={i}
                                     className="w-0.5 bg-white rounded-full transition-all duration-150 ease-out"
                                     style={{
-                                      height:
-                                        Math.max(
-                                          parseFloat(height),
-                                          parseFloat(minHeight)
-                                        ) + "px",
-                                      minHeight: minHeight,
+                                      height: Math.max(parseFloat(height), parseFloat(minHeight)) + 'px',
+                                      minHeight: minHeight
                                     }}
                                   />
                                 );
@@ -7921,122 +6181,318 @@ const Messages: React.FC = () => {
                         <button
                           onClick={handleStopRecording}
                           className="w-8 h-8 border-2 border-red-500 rounded-full flex items-center justify-center hover:bg-red-50 transition-colors"
-                          style={{ backgroundColor: "#F5F5F5" }}
+                          style={{ backgroundColor: '#F5F5F5' }}
                         >
                           <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
                         </button>
                       </div>
 
-                      {/* File Attachment Indicator - Inline with Recording */}
-                      {selectedFiles.length > 0 && (
-                        <div className="flex items-center space-x-2">
-                          <div
-                            className="flex items-center space-x-2 px-3 py-2 rounded-lg"
-                            style={{ backgroundColor: "#F0F8FE" }}
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              style={{ color: "#64B5F6" }}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                              />
-                            </svg>
-                            <div className="flex flex-col">
-                              <span
-                                className="text-sm font-medium"
-                                style={{ color: "#64B5F6" }}
-                              >
-                                {selectedFiles.length} file
-                                {selectedFiles.length > 1 ? "s" : ""} attached
-                              </span>
-                              <div
-                                className="text-xs"
-                                style={{ color: "#64B5F6" }}
-                              >
-                                {selectedFiles.map((file, index) => (
-                                  <span key={index}>
-                                    {file.name} ({formatFileSize(file.size)})
-                                    {index < selectedFiles.length - 1
-                                      ? ", "
-                                      : ""}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
+                    </div>
+                  ) : recordingTime > 0 ? (
+                    // Show audio preview bubble and send button after recording
+                    <div className="flex flex-col">
+
+                      {/* Audio Preview Bubble - Outside message input */}
+                      <div className="mb-3">
+                        <div
+                          className="flex items-center justify-between rounded-md px-4 py-2"
+                          style={{
+                            background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
+                            borderRadius: '12px',
+                            width: '300px'
+                          }}
+                        >
+                          <div className="flex items-center space-x-3">
                             <button
-                              onClick={() => {
-                                setSelectedFiles([]);
-                                setShowFilePreview(false);
-                              }}
-                              className="ml-2 hover:opacity-70"
-                              style={{ color: "#64B5F6" }}
+                              onClick={handlePreviewPlayback}
+                              className="hover:opacity-80 transition-opacity"
                             >
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                              </svg>
+                              {isPreviewPlaying ? (
+                                // Pause icon
+                                <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" style={{ fillRule: 'evenodd' }} />
+                                </svg>
+                              ) : (
+                                // Play icon
+                                <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                  <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }} />
+                                </svg>
+                              )}
                             </button>
+                            <span className="text-white text-sm">
+                              {(() => {
+                                const time = previewPlaybackTime > 0 ? previewPlaybackTime : recordingTime;
+                                return `${Math.floor(time / 60).toString().padStart(2, '0')} : ${(time % 60).toString().padStart(2, '0')}`;
+                              })()}
+                            </span>
+                            <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
+                            <span className="text-white text-sm">Audio</span>
+                            <div className="flex items-center justify-center space-x-0.5">
+                              {recordedWaveforms.length > 0 ? (
+                                recordedWaveforms.slice(-20).map((level, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-0.5 bg-white rounded-full"
+                                    style={{ height: `${Math.max(4, level * 18)}px` }}
+                                  />
+                                ))
+                              ) : (
+                                [6, 8, 4, 6, 12, 16, 14, 18, 20, 16, 12, 8, 6, 10, 14, 12, 8, 6, 4, 8].map((h, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-0.5 bg-white rounded-full"
+                                    style={{ height: `${h}px` }}
+                                  />
+                                ))
+                              )}
+                            </div>
                           </div>
+                          <button
+                            onClick={() => {
+                              // Stop preview audio if playing
+                              if (previewAudio) {
+                                previewAudio.pause();
+                                setPreviewAudio(null);
+                              }
+                              setIsPreviewPlaying(false);
+                              setPreviewPlaybackTime(0);
+                              setRecordingTime(0);
+                              setAudioChunks([]);
+                              setRecordedWaveforms([]);
+                              setAudioLevels([]);
+                            }}
+                            className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+                            style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
+                          >
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
                         </div>
-                      )}
-                    </div>
-                  ) : recordingTime > 0 && audioChunks.length > 0 ? (
-                    // Show sending state after recording
-                    <div className="flex items-center justify-center py-4">
-                      <div className="flex items-center space-x-3 text-blue-600">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                        <span className="text-sm">
-                          Sending voice message...
-                        </span>
                       </div>
-                    </div>
-                  ) : (
-                    // Normal Message Input
-                    <div
-                      className="flex items-center"
-                      style={{
-                        backgroundColor: "#F5F5F5",
-                        borderRadius: "12px",
-                        padding: "6px",
-                      }}
-                    >
-                      <div className="relative emoji-picker-container">
+
+                      {/* Message Input with Send Button */}
+                      <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '6px' }}>
+                        <div className="relative emoji-picker-container">
+                          <button
+                            onClick={handleEmojiClick}
+                            className="p-1.5 hover:text-gray-600"
+                          >
+                            <img
+                              src={faceIcon}
+                              alt="emoji"
+                              className="w-6 h-6"
+                              style={{
+                                filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
+                              }}
+                            />
+                          </button>
+
+                          {/* Emoji Picker */}
+                          {showEmojiPicker && (
+                            <div className="absolute bottom-full left-0 mb-2 z-50">
+                              <style>{`
+                                .emoji-picker-react {
+                                  border: none !important;
+                                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                                }
+                                .emoji-picker-react .emoji-search {
+                                  border: 1px solid #e5e5e5 !important;
+                                  box-shadow: none !important;
+                                  outline: none !important;
+                                  background-color: #f8f8f8 !important;
+                                }
+                                .emoji-picker-react .emoji-search:focus {
+                                  border: 1px solid #e5e5e5 !important;
+                                  box-shadow: none !important;
+                                  outline: none !important;
+                                }
+                                .emoji-picker-react .emoji-group:before {
+                                  color: #666 !important;
+                                  font-weight: bold !important;
+                                  font-size: 12px !important;
+                                }
+                                .emoji-picker-react .emoji-categories button {
+                                  border-radius: 50% !important;
+                                  width: 32px !important;
+                                  height: 32px !important;
+                                  margin: 2px !important;
+                                }
+                                .emoji-picker-react .emoji-categories button.active {
+                                  background-color: #64B5F6 !important;
+                                }
+                                .emoji-picker-react .emoji-categories button svg {
+                                  width: 16px !important;
+                                  height: 16px !important;
+                                }
+                              `}</style>
+                              <EmojiPicker
+                                onEmojiClick={onEmojiClick}
+                                width={350}
+                                height={450}
+                                searchDisabled={false}
+                                skinTonesDisabled={true}
+                                previewConfig={{
+                                  showPreview: false
+                                }}
+                                searchPlaceHolder="Search Emoji"
+                              />
+                            </div>
+                          )}
+                        </div>
                         <button
-                          onClick={handleEmojiClick}
-                          className="p-1.5 hover:text-gray-600"
+                          onClick={handleAttachClick}
+                          className="p-2 transition-colors focus:outline-none"
+                          style={{ outline: 'none' }}
                         >
                           <img
-                            src={faceIcon}
-                            alt="emoji"
+                            src={pinIcon}
+                            alt="attachment"
                             className="w-6 h-6"
                             style={{
-                              filter: showEmojiPicker
-                                ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                                : "none",
+                              filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'none'
                             }}
                           />
                         </button>
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            placeholder="...Write your message"
+                            className="w-full px-3 py-2 focus:outline-none bg-transparent"
+                            style={{
+                              border: 'none',
+                              caretColor: '#64B5F6'
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleSendVoiceMessage();
+                              }
+                            }}
+                          />
+                        </div>
+                        <button
+                          onClick={handleSendVoiceMessage}
+                          className="p-2 text-blue-600 hover:text-blue-800"
+                        >
+                          <img src={bluIcon} alt="send" className="w-7 h-7" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Attachment Badges - Above Message Input Bar (Only show when no files selected) */}
+                      {showAttachmentBadges && selectedFiles.length === 0 && (
+                        <div className="pl-2 pr-4 pb-3 flex items-center space-x-3">
+                          <button onClick={handleAddDocumentsClick} className="flex items-center space-x-2 px-4 py-2" style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}>
+                            <img src={documentIcon} alt="Document" className="w-4 h-4" />
+                            <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>Add documents</span>
+                          </button>
+                          <button onClick={handleAddPhotosClick} className="flex items-center space-x-2 px-4 py-2" style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}>
+                            <img src={photoIcon} alt="Photo" className="w-4 h-4" />
+                            <span className="text-sm font-medium" style={{ color: '#64B5F6' }}>Add photos</span>
+                          </button>
+                        </div>
+                      )}
 
-                        {/* Emoji Picker */}
-                        {showEmojiPicker && (
-                          <div className="absolute bottom-full left-0 mb-2 z-50">
-                            <style>{`
+                      {/* Files Display */}
+                      {selectedFiles.length > 0 && (
+                        <div className="pt-3 pl-2 pr-6 pb-3">
+                          {selectedFiles.map((file, index) => {
+                            const isImage = file.type.startsWith('image/');
+                            if (isImage) {
+                              return (
+                                <div key={index} className="inline-block relative mr-3 mb-3">
+                                  <img
+                                    src={URL.createObjectURL(file)}
+                                    alt={file.name}
+                                    className="w-24 h-24 object-cover"
+                                    style={{ borderRadius: '12px' }}
+                                  />
+                                  <button
+                                    onClick={() => removeFile(index)}
+                                    className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center"
+                                    style={{ backgroundColor: '#4D4D4D', border: '2px solid #FFFFFF' }}
+                                  >
+                                    <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              );
+                            } else {
+                              // Document preview
+                              const fileName = file.name.split('.');
+                              const extension = fileName.pop() || '';
+                              const nameWithoutExt = fileName.join('.');
+                              const fileSizeMB = file.size / (1024 * 1024);
+                              const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
+                              const extensionLower = extension.toLowerCase();
+                              const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
+                              return (
+                                <div key={index} className="relative mb-3 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', fontFamily: 'Poppins, sans-serif', maxWidth: '400px' }}>
+                                  <DocumentIcon size={48} />
+                                  <div className="flex-1">
+                                    <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>
+                                      {nameWithoutExt} · {extension}
+                                    </p>
+                                    <p className="text-xs" style={{ color: '#B0B0B0' }}>
+                                      {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
+                                    </p>
+                                  </div>
+                                  <button
+                                    onClick={() => removeFile(index)}
+                                    className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center hover:opacity-70"
+                                  >
+                                    <img src={closeIcon} alt="Close" className="w-5 h-5" />
+                                  </button>
+                                </div>
+                              );
+                            }
+                          })}
+                          {/* Add More Button - Only show for images */}
+                          {selectedFiles.some(f => f.type.startsWith('image/')) && (
+                            <button
+                              onClick={handleAddPhotosClick}
+                              className="inline-block w-24 h-24 flex-shrink-0"
+                              style={{
+                                backgroundColor: '#F0F8FE',
+                                border: '2px dashed #64B5F6',
+                                borderRadius: '12px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                verticalAlign: 'top'
+                              }}
+                            >
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Normal Message Input */}
+                      <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '6px' }}>
+                        <div className="relative emoji-picker-container">
+                          <button
+                            onClick={handleEmojiClick}
+                            className="p-1.5 hover:text-gray-600"
+                          >
+                            <img
+                              src={faceIcon}
+                              alt="emoji"
+                              className="w-6 h-6"
+                              style={{
+                                filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
+                              }}
+                            />
+                          </button>
+
+                          {/* Emoji Picker */}
+                          {showEmojiPicker && (
+                            <div className="absolute bottom-full left-0 mb-2 z-50">
+                              <style>{`
                               .emoji-picker-react {
                                 border: none !important;
                                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
@@ -8084,84 +6540,74 @@ const Messages: React.FC = () => {
                                 height: 16px !important;
                               }
                             `}</style>
-                            <EmojiPicker
-                              onEmojiClick={onEmojiClick}
-                              width={350}
-                              height={450}
-                              searchDisabled={false}
-                              skinTonesDisabled={true}
-                              previewConfig={{
-                                showPreview: false,
-                              }}
-                              searchPlaceHolder="Search Emoji"
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        onClick={handleAttachClick}
-                        className="p-1.5 text-gray-400 hover:text-gray-600"
-                      >
-                        <img
-                          src={pinIcon}
-                          alt="attachment"
-                          className="w-6 h-6"
-                          style={{
-                            filter: isAttachActive
-                              ? "brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)"
-                              : "none",
-                          }}
-                        />
-                      </button>
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={messageText}
-                          onChange={(e) => {
-                            setMessageText(e.target.value);
-                            handleTypingDetection();
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              handleSendMessage();
-                            }
-                          }}
-                          placeholder="...Write your message"
-                          className="w-full px-3 py-2 focus:outline-none bg-transparent"
-                          style={{
-                            border: "none",
-                            caretColor: "#64B5F6",
-                          }}
-                        />
-                      </div>
-
-                      <button
-                        onClick={(e) => {
-                          if (messageText.trim() || selectedFiles.length > 0) {
-                            handleSendMessage();
-                          } else {
-                            handleAudioRecord(e);
-                          }
-                        }}
-                        className="p-2 text-blue-600 hover:text-blue-800"
-                      >
-                        {messageText.trim() || selectedFiles.length > 0 ? (
-                          <img src={bluIcon} alt="send" className="w-7 h-7" />
-                        ) : (
+                              <EmojiPicker
+                                onEmojiClick={onEmojiClick}
+                                width={350}
+                                height={450}
+                                searchDisabled={false}
+                                skinTonesDisabled={true}
+                                previewConfig={{
+                                  showPreview: false
+                                }}
+                                searchPlaceHolder="Search Emoji"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          onClick={handleAttachClick}
+                          className="p-2 transition-colors focus:outline-none"
+                          style={{ outline: 'none' }}
+                        >
                           <img
-                            src={audioIcon}
-                            alt="audio"
-                            className="w-7 h-7"
+                            src={pinIcon}
+                            alt="attachment"
+                            className="w-6 h-6"
+                            style={{
+                              filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
+                            }}
                           />
-                        )}
-                      </button>
-                    </div>
+                        </button>
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={messageText}
+                            onChange={(e) => {
+                              setMessageText(e.target.value);
+                              handleTypingDetection();
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleSendMessage(messageText);
+                              }
+                            }}
+                            placeholder="...Write your message"
+                            className="w-full px-3 py-2 focus:outline-none bg-transparent"
+                            style={{
+                              border: 'none',
+                              caretColor: '#64B5F6'
+                            }}
+                          />
+                        </div>
+
+                        <button
+                          onClick={handleSendButtonClick}
+                          className="p-2 text-blue-600 hover:text-blue-800"
+                        >
+                          {messageText.trim() || selectedFiles.length > 0 ? (
+                            <img src={bluIcon} alt="send" className="w-7 h-7" />
+                          ) : (
+                            <img src={audioIcon} alt="audio" className="w-7 h-7" />
+                          )}
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
             ) : (
               // Default Secure Messaging View - Empty State with Fixed Height
-              <div className="flex flex-col items-center justify-center p-8">
+              <div className="flex flex-col items-center justify-center p-8" style={{ height: 'calc(50vh - 4rem)' }}>
                 {/* Secure Messaging Icon */}
                 <div className="flex items-center justify-center mb-6">
                   <img
@@ -8175,32 +6621,13 @@ const Messages: React.FC = () => {
                 <h2 className="text-2xl text-black mb-4">Secure Messaging</h2>
                 <div className="max-w-md text-center">
                   <div className="flex items-start space-x-2 mb-4">
-                    <svg
-                      className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                    <svg className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
                     </svg>
                     <p className="text-gray-500 text-sm leading-relaxed">
-                      End-to-end encryption: Only the sender and recipient can
-                      read messages, not the service provider.{" "}
-                      <span
-                        className="underline cursor-pointer"
-                        style={{ color: "#64B5F6" }}
-                      >
-                        Learn more
-                      </span>
+                      End-to-end encryption: Only the sender and recipient can read messages, not the service provider. <span className="underline cursor-pointer" style={{ color: '#64B5F6' }}>Learn more</span>
                     </p>
                   </div>
-                  {conversations.length > 0 && (
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                      <p className="text-blue-800 text-sm">
-                        <strong>Select a conversation</strong> from the sidebar
-                        to start messaging
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -8233,6 +6660,7 @@ const Messages: React.FC = () => {
           </footer>
         </div>
       </div>
+      <ToastContainer position="bottom-right" autoClose={4000} />
     </>
   );
 };

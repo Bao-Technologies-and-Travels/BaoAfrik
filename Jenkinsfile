@@ -154,6 +154,8 @@ EOF
                     string(credentialsId: 'gcp_client_email',    variable: 'GCP_CLIENT_EMAIL'),
                     string(credentialsId: 'gcp_private_key',     variable: 'GCP_PRIVATE_KEY'),
                     string(credentialsId: 'gcp_storage_bucket',  variable: 'GCP_STORAGE_BUCKET'),
+                    string(credentialsId: 'email_from_address',  variable: 'EMAIL_FROM_ADDRESS'),
+                    string(credentialsId: 'email_password',  variable: 'EMAIL_PASSWORD'),
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
                         sh """
@@ -174,9 +176,17 @@ JWT_SECRET="${JWT_SECRET}"
 JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}"
 JWT_EXPIRE_TIME=30m
 JWT_REFRESH_EXPIRE_TIME=7d
-EMAIL_SERVICE=resend
 
-RESEND_API_KEY="${RESEND_API_KEY}"
+# EMAIL_SERVICE=resend
+# RESEND_API_KEY="${RESEND_API_KEY}"
+# EMAIL_FROM_NAME="BaoAfrik Team"
+
+EMAIL_SERVICE="gmail"
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_SECURE="false"
+EMAIL_FROM_ADDRESS="${EMAIL_FROM_ADDRESS}"
+EMAIL_PASSWORD="${EMAIL_PASSWORD}"
 EMAIL_FROM_NAME="BaoAfrik Team"
 
 GCP_PROJECT_ID="${GCP_PROJECT_ID}"
@@ -282,29 +292,29 @@ EOF
                     )
             }
         }
-        // success {
-        //     script {
-        //         emailext(
-        //         subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
-        //         to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
-        //         from: 'jenkins.baoafrik.com',
-        //         replyTo: 'no-reply@baoafrik.com',
-        //         body: """
-        //             <html>
-        //                 <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-        //                     <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
-        //                     <p><strong>Job:</strong> ${env.JOB_NAME}</p>
-        //                     <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-        //                     <p><strong>Changes made:</strong>Fetch and display requests from API. Global helper for getting product country flags</p>
-        //                     <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
-        //                     <hr>
-        //                     <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
-        //                 </body>
-        //             </html>
-        //         """,
-        //         mimeType: 'text/html'
-        //         )
-        //     }
-        // }
+        success {
+            script {
+                emailext(
+                subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
+                to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
+                from: 'jenkins.baoafrik.com',
+                replyTo: 'no-reply@baoafrik.com',
+                body: """
+                    <html>
+                        <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+                            <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
+                            <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+                            <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
+                            <p><strong>Changes made:</strong>Fixed bugs with sending/receiving messages, displaying messages in the UI</p>
+                            <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
+                            <hr>
+                            <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>
+                        </body>
+                    </html>
+                """,
+                mimeType: 'text/html'
+                )
+            }
+        }
     }
 }

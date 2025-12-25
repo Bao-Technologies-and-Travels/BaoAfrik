@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import axios from "axios";
 
 // Import product images
 import mainImage from "../assets/images/logos/0.png";
@@ -329,6 +330,8 @@ const ProductDetail: React.FC = () => {
   const [reviewsSummary, setReviewsSummary] = useState<ProductReviewsSummary | null>(null);
   const [isLoadingReviews, setIsLoadingReviews] = useState(false);
   const { addToast } = useToast();
+
+  const API_BASE = process.env.REACT_APP_API_URL;
 
   // Mobile detection
   useEffect(() => {
@@ -987,120 +990,210 @@ const ProductDetail: React.FC = () => {
     }
   };
 
+  // const handleContactSeller = async () => {
+  //   if (!user || !product) return;
+
+  //   try {
+  //     setIsContactingSeller(true);
+
+  //     // check for existing conversation with this seller
+  //     const existingConversation = conversations.find(conv =>
+  //       conv.participant?.id === product.seller.id
+  //     );
+
+  //     const productDataToSend = {
+  //       id: product.id,
+  //       name: product.title,
+  //       price: product.price,
+  //       location: product.location,
+  //       category: product.category,
+  //       description: product.description,
+  //       images: getProductImages(product),
+  //       seller: {
+  //         id: product.seller.id,
+  //         name: getSellerName(product.seller),
+  //         email: product.seller.email,
+  //         avatar: getSellerProfileImage(product.seller),
+  //         rating: getSellerRating(product.seller),
+  //         location: getSellerLocation(product.seller),
+  //       },
+  //     };
+
+  //     let targetConversationId: string;
+
+  //     if (existingConversation) {
+  //       targetConversationId = existingConversation.id;
+  //     } else {
+  //       const token = localStorage.getItem("accessToken");
+
+  //       const response = await fetch(
+  //         `${process.env.REACT_APP_API_URL}/chat/contact-seller`,
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //           body: JSON.stringify({
+  //             productId: product.id,
+  //             sellerId: product.seller.id
+  //           }),
+  //         }
+  //       );
+
+  //       const result = await response.json();
+
+  //       if (!response.ok) {
+  //         const errorMessage =
+  //           result?.error ||
+  //           result?.message ||
+  //           result?.data?.error ||
+  //           'Failed to contact seller';
+  //         throw new Error(errorMessage);
+  //       }
+
+  //       if (result.success) {
+  //         targetConversationId = result.data.conversation.id;
+  //       } else {
+  //         const errorMessage =
+  //           result?.error ||
+  //           result?.message ||
+  //           'Failed to contact seller';
+  //         throw new Error(errorMessage);
+  //       }
+  //     }
+
+  //     navigate("/messages", {
+  //       state: {
+  //         conversationId: targetConversationId,
+  //         productData: productDataToSend,
+  //         preFilledMessage: `Hi, I'm interested in your product "${product.title}". Is it still available?`,
+  //         isProductInquiry: true,
+  //         shouldOpenConversation: true
+  //       },
+  //       replace: false
+  //     });
+
+  //   } catch (error: any) {
+  //     if (
+  //       error.message.includes("Authentication failed") ||
+  //       error.message.includes("Please log in again")
+  //     ) {
+  //       return;
+  //     }
+
+  //     let errorMessage = "Failed to contact seller. Please try again.";
+
+  //     if (error.message.includes("User not found")) {
+  //       errorMessage = "Seller not found. Please try again later.";
+  //     } else if (error.message.includes("Cannot create conversation with yourself")) {
+  //       errorMessage = "You cannot contact yourself.";
+  //     } else if (error.message.includes("Invalid access token")) {
+  //       errorMessage = "You need to login to chat with a seller."
+  //     }
+
+  //     addToast({
+  //       type: 'error',
+  //       title: "Cannot contact seller",
+  //       message: errorMessage,
+  //       duration: 2000,
+  //     });
+  //   } finally {
+  //     setIsContactingSeller(false);
+  //   }
+  // };
+
   const handleContactSeller = async () => {
-    if (!product || !product.seller) {
+    if (!user || !product) {
       addToast({
         type: 'error',
         title: "Error",
-        message: "Seller information not available",
+        message: "User not authenticated or product information not available.",
         duration: 2000
       });
       return;
     }
 
+    if (user.id === product.seller.id) {
+      addToast({
+        type: 'info',
+        title: "Cannot contact yourself",
+        message: "You cannot create a conversation with yourself.",
+        duration: 2000
+      });
+      return;
+    }
+
+    setIsContactingSeller(true);
+
     try {
-      setIsContactingSeller(true);
-
-      // check for existing conversation with this seller
-      const existingConversation = conversations.find(conv =>
-        conv.participant?.id === product.seller.id
-      );
-
-      const productDataToSend = {
-        id: product.id,
-        name: product.title,
-        price: product.price,
-        location: product.location,
-        category: product.category,
-        description: product.description,
-        images: getProductImages(product),
-        seller: {
-          id: product.seller.id,
-          name: getSellerName(product.seller),
-          email: product.seller.email,
-          avatar: getSellerProfileImage(product.seller),
-          rating: getSellerRating(product.seller),
-          location: getSellerLocation(product.seller),
-        },
-      };
-
-      let targetConversationId: string;
-
-      if (existingConversation) {
-        targetConversationId = existingConversation.id;
-      } else {
-        const token = localStorage.getItem("accessToken");
-
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/chat/contact-seller`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              productId: product.id,
-              sellerId: product.seller.id
-            }),
-          }
-        );
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          const errorMessage =
-            result?.error ||
-            result?.message ||
-            result?.data?.error ||
-            'Failed to contact seller';
-          throw new Error(errorMessage);
-        }
-
-        if (result.success) {
-          targetConversationId = result.data.conversation.id;
-        } else {
-          const errorMessage =
-            result?.error ||
-            result?.message ||
-            'Failed to contact seller';
-          throw new Error(errorMessage);
-        }
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        addToast({
+          type: 'error',
+          title: "Authentication Required",
+          message: "Please log in to contact the seller.",
+          duration: 2000
+        });
+        navigate('/login');
+        return;
       }
 
-      navigate("/messages", {
+      // Call backend to create or get a conversation
+      const response = await axios.post(
+        `${API_BASE}/chat/conversations`,
+        {
+          participantId: product.seller.id,
+          productId: product.id,
+          initialMessage: `Hi, I'm interested in your product "${product.title}". Is it still available?`,
+          productData: {
+            id: product.id,
+            name: product.title,
+            price: product.price,
+            currency: product.currency,
+            description: product.description,
+            images: product.images,
+            category: product.category,
+            location: product.location,
+            seller: {
+              id: product.seller.id,
+              firstName: product.seller.firstName,
+              lastName: product.seller.lastName,
+              email: product.seller.email,
+              profileImage: product.seller.profileImage
+            }
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to create conversation');
+      }
+
+      const conversation = response.data.data;
+
+      // Navigate to messages with conversationId and productData
+      navigate('/messages', {
         state: {
-          conversationId: targetConversationId,
-          productData: productDataToSend,
+          conversationId: conversation.id,
+          productData: product,
           preFilledMessage: `Hi, I'm interested in your product "${product.title}". Is it still available?`,
-          isProductInquiry: true,
-          shouldOpenConversation: true
         },
         replace: false
       });
 
     } catch (error: any) {
-      if (
-        error.message.includes("Authentication failed") ||
-        error.message.includes("Please log in again")
-      ) {
-        return;
-      }
-
-      let errorMessage = "Failed to contact seller. Please try again.";
-
-      if (error.message.includes("User not found")) {
-        errorMessage = "Seller not found. Please try again later.";
-      } else if (error.message.includes("Cannot create conversation with yourself")) {
-        errorMessage = "You cannot contact yourself.";
-      } else if (error.message.includes("Invalid access token")) {
-        errorMessage = "You need to login to chat with a seller."
-      }
-
+      console.error('Error contacting seller:', error);
       addToast({
         type: 'error',
         title: "Cannot contact seller",
-        message: errorMessage,
+        message: error.response?.data?.error || error.message || "Failed to contact seller. Please try again.",
         duration: 2000,
       });
     } finally {
