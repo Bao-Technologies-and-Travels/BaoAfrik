@@ -159,6 +159,7 @@ model Message {
   messageType     MessageType @default(INQUIRY) @map("message_type")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
+  readAt          DateTime?
 
   // app level encryption
   content           String @db.Text

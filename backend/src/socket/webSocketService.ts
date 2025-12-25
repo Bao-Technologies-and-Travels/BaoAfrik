@@ -31,6 +31,109 @@ export class WebSocketService {
     this.io.use(this.authenticateSocket.bind(this));
   }
 
+  private setupMessageHandlers(socket: AuthenticatedSocket) {
+    // Handle sending messages
+    socket.on('send_message', async (data) => {
+      try {
+        const { conversationId, content, senderId, receiverId } = data;
+
+        // Save message to database
+        const message = await this.chatService.createMessage({
+          conversationId,
+          senderId,
+          content,
+          messageType: 'TEXT'
+        });
+        // Emit to sender (confirmation)
+        socket.emit('message_status', {
+          messageId: message.id,
+          status: 'delivered'
+        });
+        // Emit to receiver if online
+        const receiverSocketId = this.userSockets.get(receiverId);
+        if (receiverSocketId) {
+          this.io.to(receiverSocketId).emit('receive_message', message);
+
+          // Mark as delivered
+          this.io.to(receiverSocketId).emit('message_status', {
+            messageId: message.id,
+            status: 'delivered'
+          });
+        }
+      } catch (error) {
+        console.error('Error handling send_message:', error);
+        socket.emit('error', { message: 'Failed to send message' });
+      }
+    });
+    // Handle typing indicators
+    socket.on('typing', (data) => {
+      const { conversationId, userId, isTyping } = data;
+      const userSocket = this.connectedUsers.get(userId);
+
+      if (userSocket) {
+        socket.broadcast.to(conversationId).emit('user_typing', {
+          userId,
+          isTyping,
+          conversationId
+        });
+      }
+    });
+    // Handle message read receipts
+    socket.on('mark_as_read', async (data) => {
+      try {
+        const { messageIds, conversationId, userId } = data;
+
+        // Update in database
+        await this.chatService.markMessagesAsRead({
+          messageIds,
+          conversationId,
+          userId
+        });
+        // Notify other participants
+        socket.broadcast.to(conversationId).emit('messages_read', {
+          messageIds,
+          conversationId,
+          userId
+        });
+      } catch (error) {
+        console.error('Error marking messages as read:', error);
+      }
+    });
+  }
+
+  private handleIncomingMessage(socket: AuthenticatedSocket, data: any) {
+    if (!socket.user) return;
+    const { conversationId, content, receiverId } = data;
+
+    // Save message to database
+    this.chatService.createMessage({
+      conversationId,
+      senderId: socket.user.id,
+      content,
+      messageType: 'TEXT'
+    }).then(savedMessage => {
+      // Emit to sender
+      socket.emit('message_sent', {
+        ...savedMessage,
+        status: 'delivered'
+      });
+      // Emit to receiver
+      const receiverSocketId = this.userSockets.get(receiverId);
+      if (receiverSocketId) {
+        this.io.to(receiverSocketId).emit('new_message', {
+          ...savedMessage,
+          status: 'delivered'
+        });
+      }
+    }).catch(error => {
+      console.error('Error saving message:', error);
+      socket.emit('message_error', {
+        messageId: data.messageId,
+        error: 'Failed to send message'
+      });
+    });
+  }
+
   private async authenticateSocket(socket: AuthenticatedSocket, next: any) {
     try {
       const token = socket.handshake.auth.token;
@@ -124,12 +227,21 @@ export class WebSocketService {
               status
             );
 
-            // notify sender about status update
+            // notify ALL participants about status update
             if (updatedMessage) {
               const senderId = updatedMessage.senderId;
+              // 1. Notify sender
               const senderSocketId = this.userSockets.get(senderId);
               if (senderSocketId) {
                 this.io.to(senderSocketId).emit('message_status_updated', {
+                  messageId,
+                  status,
+                  updatedAt: new Date()
+                });
+              }
+              // 2. Notify all participants (in convo room)
+              if (updatedMessage.conversationId) {
+                this.io.to(`conversation:${updatedMessage.conversationId}`).emit('message_status_updated', {
                   messageId,
                   status,
                   updatedAt: new Date()
@@ -373,7 +485,11 @@ export class WebSocketService {
             profileImage: message.replyTo.sender.profileImage
           }
         } : null,
-        productData: message.productData ? JSON.parse(message.productData) : null
+        productData: message.productData
+          ? typeof message.productData === 'string'
+            ? JSON.parse(message.productData)
+            : message.productData
+          : null
       };
 
       // Find all participants except sender
@@ -382,6 +498,27 @@ export class WebSocketService {
 
       // Broadcast message to all in the conversation room except sender
       socket.to(`conversation:${conversationId}`).emit('receive_message', { ...messageResponse, isIncoming: true });
+
+      // Notify sender of delivered status
+      socket.emit('message_status_updated', {
+        messageId: message.id,
+        status: 'DELIVERED',
+        updatedAt: new Date()
+      });
+
+      // Also deliver directly to each recipient socket (in case they haven't joined the room yet)
+      for (const recipientId of recipientIds) {
+        const recipientSocketId = this.userSockets.get(recipientId);
+        if (recipientSocketId) {
+          this.io.to(recipientSocketId).emit('receive_message', { ...messageResponse, isIncoming: true });
+          // Deliver status to recipient
+          this.io.to(recipientSocketId).emit('message_status_updated', {
+            messageId: message.id,
+            status: 'DELIVERED',
+            updatedAt: new Date()
+          });
+        }
+      }
 
       // Also send notifications and counts to each recipient's personal room
       for (const recipientId of recipientIds) {
@@ -458,35 +595,24 @@ export class WebSocketService {
 
   private async handleMarkAsRead(socket: AuthenticatedSocket, data: any) {
     try {
-      let conversationId: string;
+      const { messageIds, conversationId } = data;
+      const userId = socket.user?.id;
 
-      // Handle both string and object formats
-      if (typeof data === 'string') {
-        conversationId = data;
-      } else if (typeof data === 'object' && data.conversationId) {
-        conversationId = data.conversationId;
-      } else {
-        throw new Error('Conversation ID is required');
-      }
-
-      const userId = socket.user!.id;
-
-      if (!conversationId) {
-        throw new Error('Conversation ID is required');
-      }
-
-      const result = await this.chatService.markMessagesAsRead(conversationId, userId);
-      const updatedMessages = result.unreadMessages; // Extract the unreadMessages array
-
-      // Notify other participants that messages were read
-      socket.to(`conversation:${conversationId}`).emit('messages_read', {
+      if (!userId) return;
+      await this.chatService.markMessagesAsRead({
+        messageIds,
         conversationId,
-        readerId: userId,
-        messageIds: updatedMessages.map((m: any) => m.id)
+        userId
       });
-
+      // Notify other participants
+      socket.to(conversationId).emit('messages_read', {
+        messageIds,
+        conversationId,
+        readBy: userId
+      });
     } catch (error) {
-      socket.emit('read_error', { error: 'Failed to mark messages as read' });
+      console.error('Error marking messages as read:', error);
+      socket.emit('error', { message: 'Failed to mark messages as read' });
     }
   }
 

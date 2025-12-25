@@ -26,6 +26,32 @@ export class ChatController {
         }
     };
 
+    // Get messages for a conversation
+    getMessages = async (req: Request, res: Response) => {
+        try {
+            const { conversationId } = req.params;
+            const page = typeof req.query.page === 'string' ? parseInt(req.query.page, 10) : 1;
+            const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 20;
+            if (!conversationId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Conversation ID is required'
+                });
+            }
+            const messages = await this.chatService.getMessages(conversationId, page, limit);
+            return res.json({
+                success: true,
+                data: messages
+            });
+        } catch (error) {
+            console.error('Error getting messages:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to get messages'
+            });
+        }
+    };
+
     contactRequest = async (req: Request, res: Response) => {
         try {
             const { requestId, message, productData } = req.body;
@@ -458,6 +484,28 @@ export class ChatController {
         }
     };
 
+    // Mark messages as read
+    markAsRead = async (req: Request, res: Response) => {
+        try {
+            const { conversationId } = req.params;
+            const { messageIds } = req.body;
+            const userId = req.user!.id;
+
+            await this.chatService.markMessagesAsRead({
+                messageIds,
+                conversationId,
+                userId
+            });
+
+            res.json({ success: true });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: 'Failed to mark messages as read'
+            });
+        }
+    };
+
     // generate pre-signed URL for file upload
     generatePresignedUrl = async (req: Request, res: Response) => {
         try {
@@ -502,35 +550,6 @@ export class ChatController {
             return res.status(500).json({
                 success: false,
                 error: 'Failed to generate upload URL'
-            });
-        }
-    };
-
-    // mark messages as read
-    markAsRead = async (req: Request, res: Response) => {
-        try {
-            const { conversationId } = req.params;
-            const userId = req.user!.id;
-
-            if (!conversationId) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'Conversation ID is required'
-                });
-            }
-
-            const result = await this.chatService.markMessagesAsRead(conversationId, userId);
-            return res.json({
-                success: true,
-                data: {
-                    updatedCount: result.unreadMessages.length,
-                    markReadAt: result.markReadAt
-                }
-            });
-        } catch (error) {
-            return res.status(500).json({
-                success: false,
-                error: 'Failed to mark messages as read'
             });
         }
     };

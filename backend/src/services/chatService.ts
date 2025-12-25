@@ -42,28 +42,28 @@ export class ChatService {
     }
 
     // app level encryption
-    private encryptMessage(content: string): { encrypted: string, iv: string, authTag: string } {
-        const iv = crypto.randomBytes(16);
-        const cipher: crypto.CipherGCM = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv) as crypto.CipherGCM;
+    private encryptMessage(content: string): { encrypted: string, encryptionIv: string, encryptionAuthTag: string } {
+        const encryptionIv = crypto.randomBytes(16);
+        const cipher: crypto.CipherGCM = crypto.createCipheriv(this.algorithm, this.encryptionKey, encryptionIv) as crypto.CipherGCM;
 
         let encrypted = cipher.update(content, 'utf8', 'hex');
         encrypted += cipher.final('hex');
 
-        const authTag = cipher.getAuthTag().toString('hex');
+        const encryptionAuthTag = cipher.getAuthTag().toString('hex');
 
-        return { encrypted, iv: iv.toString('hex'), authTag };
+        return { encrypted, encryptionIv: encryptionIv.toString('hex'), encryptionAuthTag };
     }
 
     // app level decryption
-    private decryptMessage(encryptedData: string, iv: string, authTag: string): string {
+    private decryptMessage(encryptedData: string, encryptionIv: string, encryptionAuthTag: string): string {
         try {
             const decipher: crypto.DecipherGCM = crypto.createDecipheriv(
                 this.algorithm,
                 this.encryptionKey,
-                Buffer.from(iv, 'hex')
+                Buffer.from(encryptionIv, 'hex')
             ) as crypto.DecipherGCM;
 
-            decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+            decipher.setAuthTag(Buffer.from(encryptionAuthTag, 'hex'));
 
             let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
             decrypted += decipher.final('utf8');
@@ -132,6 +132,24 @@ export class ChatService {
                 }
             });
 
+            // Get unread counts for all conversations
+            const conversationIds = conversations.map(c => c.id);
+            const unreadCounts = await prisma.message.groupBy({
+                by: ['conversationId'],
+                where: {
+                    conversationId: { in: conversationIds },
+                    senderId: { not: userId },
+                    readAt: null
+                },
+                _count: {
+                    id: true
+                }
+            });
+
+            const unreadCountMap = new Map(
+                unreadCounts.map(uc => [uc.conversationId, uc._count.id])
+            );
+
             return conversations.map(conversation => {
                 const otherParticipant = conversation.participants.find(
                     p => p.userId !== userId
@@ -142,16 +160,20 @@ export class ChatService {
                 let decryptedContent = '';
                 if (lastMessage) {
                     try {
-                        // Check if the message has the encrypted fields
-                        if (lastMessage.dbEncryptedContent && lastMessage.encryptionIv && lastMessage.encryptionAuthTag) {
+                        // Always decrypt the content field (it's app-level encrypted)
+                        if (lastMessage.encryptionIv && lastMessage.encryptionAuthTag && lastMessage.content) {
+                            decryptedContent = this.decryptMessage(
+                                lastMessage.content,
+                                lastMessage.encryptionIv,
+                                lastMessage.encryptionAuthTag
+                            );
+                        } else if (lastMessage.dbEncryptedContent && lastMessage.encryptionIv && lastMessage.encryptionAuthTag) {
+                            // Fallback to dbEncryptedContent if available
                             decryptedContent = this.decryptMessage(
                                 lastMessage.dbEncryptedContent,
                                 lastMessage.encryptionIv,
                                 lastMessage.encryptionAuthTag
                             );
-                        } else if (lastMessage.content) {
-                            // If not encrypted, use the content as is
-                            decryptedContent = lastMessage.content;
                         } else {
                             decryptedContent = 'Encrypted message';
                         }
@@ -175,7 +197,7 @@ export class ChatService {
                         ...lastMessage,
                         content: decryptedContent
                     } : null,
-                    unreadCount: 0,
+                    unreadCount: unreadCountMap.get(conversation.id) || 0,
                     updatedAt: conversation.updatedAt
                 };
             });
@@ -320,15 +342,79 @@ export class ChatService {
         });
     }
 
-    private async checkDbEncryptAvailable() {
-        try {
-            await prisma.$queryRaw`SELECT db_encrypt('test')`;
-            return true;
-        } catch (error) {
-            console.warn('Database encryption function not available, using app-level encryption only');
-            return false;
-        }
+    async createMessage(data: {
+        conversationId: string;
+        senderId: string;
+        content: string;
+        messageType: string;
+    }) {
+        const { conversationId, senderId, content, messageType } = data;
+
+        // Encrypt message content
+        const { encrypted, encryptionIv, encryptionAuthTag } = this.encryptMessage(content);
+
+        const message = await prisma.message.create({
+            data: {
+                content: encrypted,
+                encryptionIv: encryptionIv,
+                encryptionAuthTag: encryptionAuthTag,
+                messageType: messageType as any,
+                conversation: { connect: { id: conversationId } },
+                sender: { connect: { id: senderId } },
+            },
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        profileImage: true
+                    }
+                }
+            }
+        });
+
+        return {
+            ...message,
+            content
+        };
     }
+
+    async markMessagesAsRead(data: {
+        messageIds: string[];
+        conversationId: string | undefined;
+        userId: string;
+    }) {
+        const { messageIds, conversationId, userId } = data;
+
+        await prisma.message.updateMany({
+            where: {
+                id: { in: messageIds },
+                conversationId,
+                senderId: { not: userId },
+                readAt: null
+            },
+            data: {
+                readAt: new Date()
+            }
+        });
+    }
+
+    private async checkDbEncryptAvailable(): Promise<boolean> {
+    try {
+        const testMessage = 'test-' + Date.now();
+        const result = await prisma.$queryRaw<Array<{ encrypted: string }>>`SELECT db_encrypt(${testMessage}) as encrypted`;
+        const encrypted = result[0]?.encrypted;
+        if (!encrypted) {
+            throw new Error('No result from db_encrypt');
+        }
+        console.log('Database encryption test successful');
+        return true;
+    } catch (error) {
+        console.warn('Database encryption function error:', error);
+        return false;
+    }
+}
 
     async createConversation(data: CreateConversationData) {
         // Check if db_encrypt function exists (outside transaction)
@@ -452,8 +538,8 @@ export class ChatService {
                         senderId: data.creatorId,
                         content: appEncrypted.encrypted,
                         dbEncryptedContent: dbEncryptedContent,
-                        encryptionIv: appEncrypted.iv,
-                        encryptionAuthTag: appEncrypted.authTag,
+                        encryptionIv: appEncrypted.encryptionIv,
+                        encryptionAuthTag: appEncrypted.encryptionAuthTag,
                         messageType: MessageType.TEXT,
                         productData: data.productData ? JSON.stringify(data.productData) : null,
                         createdAt: now
@@ -555,8 +641,8 @@ export class ChatService {
                     senderId: data.senderId,
                     content: appEncrypted.encrypted,
                     dbEncryptedContent: null,
-                    encryptionIv: appEncrypted.iv,
-                    encryptionAuthTag: appEncrypted.authTag,
+                    encryptionIv: appEncrypted.encryptionIv,
+                    encryptionAuthTag: appEncrypted.encryptionAuthTag,
                     messageType: normalizedMessageType,
                     fileUrl: data.fileUrl,
                     fileName: data.fileName,
@@ -664,75 +750,6 @@ export class ChatService {
             generatedAt: this.formatTo12HourTime(new Date())
         };
     }
-
-    async markMessagesAsRead(conversationId: string, userId: string) {
-        // get unread messages in conversation
-        const unreadMessages = await prisma.message.findMany({
-            where: {
-                conversationId,
-                senderId: { not: userId },
-                isRead: false
-            },
-            select: {
-                id: true
-            }
-        });
-
-        const now = new Date();
-
-        // Update messages as read
-        await prisma.message.updateMany({
-            where: {
-                conversationId,
-                senderId: { not: userId },
-                isRead: false
-            },
-            data: {
-                isRead: true,
-                updatedAt: now
-            }
-        });
-
-        // update message status for each message
-        for (const message of unreadMessages) {
-            await prisma.messageStatus.upsert({
-                where: {
-                    messageId_userId: {
-                        messageId: message.id,
-                        userId: userId
-                    }
-                },
-                update: {
-                    status: 'read',
-                    updatedAt: now
-                },
-                create: {
-                    messageId: message.id,
-                    userId: userId,
-                    status: 'read',
-                    createdAt: now,
-                    updatedAt: now
-                }
-            });
-        }
-
-        // update participant's last read time
-        await prisma.conversationParticipant.updateMany({
-            where: {
-                conversationId,
-                userId
-            },
-            data: {
-                lastReadAt: now
-            }
-        });
-
-        return {
-            unreadMessages,
-            markReadAt: this.formatTo12HourTime(now)
-        };
-    }
-
     async getUnreadCounts(userId: string) {
         const conversations = await prisma.conversation.findMany({
             where: {
@@ -760,6 +777,32 @@ export class ChatService {
             conversationId: conv.id,
             unreadCount: conv.messages.length,
             checkedAt: this.formatTo12HourTime(new Date())
+        }));
+    }
+
+    async getMessages(conversationId: string, page: number, limit: number) {
+        const skip = (page - 1) * limit;
+
+        const messages = await prisma.message.findMany({
+            where: { conversationId },
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit,
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        profileImage: true
+                    }
+                }
+            }
+        });
+        // Decrypt messages
+        return messages.map(msg => ({
+            ...msg,
+            content: this.decryptMessage(msg.content, msg.encryptionIv, msg.encryptionAuthTag)
         }));
     }
 

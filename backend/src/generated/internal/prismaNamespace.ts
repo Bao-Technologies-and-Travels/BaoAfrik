@@ -1613,6 +1613,7 @@ export const MessageScalarFieldEnum = {
   messageType: 'messageType',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  readAt: 'readAt',
   content: 'content',
   encryptionIv: 'encryptionIv',
   encryptionAuthTag: 'encryptionAuthTag',

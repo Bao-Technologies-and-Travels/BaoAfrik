@@ -25,21 +25,25 @@ export interface PresignedUrlResponse {
 }
 
 export class GCPStorageService {
-  private validateFile(fileType: string, fileSize?: number): void {
-    const allowedTypes = [
+  private validateFile(fileType: string, fileSize?: number, uploadType?: 'product'|'profile'|'chat'): void {
+    let allowedTypes = [
       'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
       'audio/webm', 'audio/mpeg', 'audio/wav',
-      'video/mp4', 'video/mpeg', 'video/quicktime',
       'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     ];
-
-    if (!allowedTypes.includes(fileType.toLowerCase())) {
-      throw new Error(`Invalid file type: ${fileType}. Allowed types: images, audio, video, PDF, Word documents.`);
+    let maxSize = 10 * 1024 * 1024; // 10MB default for chat
+    if (uploadType !== 'chat') {
+      // For product or profile, allow video etc, up to 50MB
+      allowedTypes = allowedTypes.concat(['video/mp4', 'video/mpeg', 'video/quicktime']);
+      maxSize = 50 * 1024 * 1024;
     }
 
-    const maxSize = 50 * 1024 * 1024; // 50MB
+    if (!allowedTypes.includes(fileType.toLowerCase())) {
+      throw new Error(`Invalid file type: ${fileType}. Allowed types: images, audio, PDF, Word documents.` + (uploadType !== 'chat' ? ' (product/profile allows video)' : ''));
+    }
+
     if (fileSize && fileSize > maxSize) {
-      throw new Error(`File too large: ${(fileSize / 1024 / 1024).toFixed(2)}MB. Maximum size is 50MB.`);
+      throw new Error(`File too large: ${(fileSize / 1024 / 1024).toFixed(2)}MB. Maximum size is ${(maxSize/1024/1024)}MB.`);
     }
   }
   async configureCors() {
@@ -75,7 +79,7 @@ export class GCPStorageService {
     fileSize?: number
   ): Promise<PresignedUrlResponse> {
     try {
-      this.validateFile(fileType, fileSize);
+      this.validateFile(fileType, fileSize, uploadType);
 
       const fileExtension = fileName.split('.').pop()?.toLowerCase() || 'bin';
       const prefix = STORAGE_PREFIXES[uploadType];

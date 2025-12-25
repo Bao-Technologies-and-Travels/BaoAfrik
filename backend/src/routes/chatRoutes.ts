@@ -17,4 +17,9 @@ router.get('/unread-counts', chatController.getUnreadCounts);
 router.post('/contact-seller', chatController.contactSeller);
 router.post('/contact-request', chatController.contactRequest);
 
+// In chatRoutes.ts
+router.post('/conversations/:conversationId/messages', chatController.sendMessage);
+router.get('/conversations/:conversationId/messages', chatController.getMessages);
+router.post('/conversations/:conversationId/read', chatController.markAsRead);
+
 export default router;

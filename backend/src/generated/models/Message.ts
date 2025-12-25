@@ -51,6 +51,7 @@ export type MessageMinAggregateOutputType = {
   messageType: $Enums.MessageType | null
   createdAt: Date | null
   updatedAt: Date | null
+  readAt: Date | null
   content: string | null
   encryptionIv: string | null
   encryptionAuthTag: string | null
@@ -78,6 +79,7 @@ export type MessageMaxAggregateOutputType = {
   messageType: $Enums.MessageType | null
   createdAt: Date | null
   updatedAt: Date | null
+  readAt: Date | null
   content: string | null
   encryptionIv: string | null
   encryptionAuthTag: string | null
@@ -106,6 +108,7 @@ export type MessageCountAggregateOutputType = {
   messageType: number
   createdAt: number
   updatedAt: number
+  readAt: number
   content: number
   encryptionIv: number
   encryptionAuthTag: number
@@ -143,6 +146,7 @@ export type MessageMinAggregateInputType = {
   messageType?: true
   createdAt?: true
   updatedAt?: true
+  readAt?: true
   content?: true
   encryptionIv?: true
   encryptionAuthTag?: true
@@ -170,6 +174,7 @@ export type MessageMaxAggregateInputType = {
   messageType?: true
   createdAt?: true
   updatedAt?: true
+  readAt?: true
   content?: true
   encryptionIv?: true
   encryptionAuthTag?: true
@@ -198,6 +203,7 @@ export type MessageCountAggregateInputType = {
   messageType?: true
   createdAt?: true
   updatedAt?: true
+  readAt?: true
   content?: true
   encryptionIv?: true
   encryptionAuthTag?: true
@@ -313,6 +319,7 @@ export type MessageGroupByOutputType = {
   messageType: $Enums.MessageType
   createdAt: Date
   updatedAt: Date
+  readAt: Date | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -364,6 +371,7 @@ export type MessageWhereInput = {
   messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
+  readAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
   content?: Prisma.StringFilter<"Message"> | string
   encryptionIv?: Prisma.StringFilter<"Message"> | string
   encryptionAuthTag?: Prisma.StringFilter<"Message"> | string
@@ -399,6 +407,7 @@ export type MessageOrderByWithRelationInput = {
   messageType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrderInput | Prisma.SortOrder
   content?: Prisma.SortOrder
   encryptionIv?: Prisma.SortOrder
   encryptionAuthTag?: Prisma.SortOrder
@@ -437,6 +446,7 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
+  readAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
   content?: Prisma.StringFilter<"Message"> | string
   encryptionIv?: Prisma.StringFilter<"Message"> | string
   encryptionAuthTag?: Prisma.StringFilter<"Message"> | string
@@ -472,6 +482,7 @@ export type MessageOrderByWithAggregationInput = {
   messageType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrderInput | Prisma.SortOrder
   content?: Prisma.SortOrder
   encryptionIv?: Prisma.SortOrder
   encryptionAuthTag?: Prisma.SortOrder
@@ -508,6 +519,7 @@ export type MessageScalarWhereWithAggregatesInput = {
   messageType?: Prisma.EnumMessageTypeWithAggregatesFilter<"Message"> | $Enums.MessageType
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
+  readAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Message"> | Date | string | null
   content?: Prisma.StringWithAggregatesFilter<"Message"> | string
   encryptionIv?: Prisma.StringWithAggregatesFilter<"Message"> | string
   encryptionAuthTag?: Prisma.StringWithAggregatesFilter<"Message"> | string
@@ -532,6 +544,7 @@ export type MessageCreateInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -567,6 +580,7 @@ export type MessageUncheckedCreateInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -594,6 +608,7 @@ export type MessageUpdateInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -629,6 +644,7 @@ export type MessageUncheckedUpdateInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -660,6 +676,7 @@ export type MessageCreateManyInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -684,6 +701,7 @@ export type MessageUpdateManyMutationInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -712,6 +730,7 @@ export type MessageUncheckedUpdateManyInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -755,6 +774,7 @@ export type MessageCountOrderByAggregateInput = {
   messageType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrder
   content?: Prisma.SortOrder
   encryptionIv?: Prisma.SortOrder
   encryptionAuthTag?: Prisma.SortOrder
@@ -786,6 +806,7 @@ export type MessageMaxOrderByAggregateInput = {
   messageType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrder
   content?: Prisma.SortOrder
   encryptionIv?: Prisma.SortOrder
   encryptionAuthTag?: Prisma.SortOrder
@@ -813,6 +834,7 @@ export type MessageMinOrderByAggregateInput = {
   messageType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  readAt?: Prisma.SortOrder
   content?: Prisma.SortOrder
   encryptionIv?: Prisma.SortOrder
   encryptionAuthTag?: Prisma.SortOrder
@@ -1072,6 +1094,7 @@ export type MessageCreateWithoutSenderInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1105,6 +1128,7 @@ export type MessageUncheckedCreateWithoutSenderInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1165,6 +1189,7 @@ export type MessageScalarWhereInput = {
   messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
+  readAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
   content?: Prisma.StringFilter<"Message"> | string
   encryptionIv?: Prisma.StringFilter<"Message"> | string
   encryptionAuthTag?: Prisma.StringFilter<"Message"> | string
@@ -1189,6 +1214,7 @@ export type MessageCreateWithoutProductInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1222,6 +1248,7 @@ export type MessageUncheckedCreateWithoutProductInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1275,6 +1302,7 @@ export type MessageCreateWithoutRepliesInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1309,6 +1337,7 @@ export type MessageUncheckedCreateWithoutRepliesInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1340,6 +1369,7 @@ export type MessageCreateWithoutReplyToInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1373,6 +1403,7 @@ export type MessageUncheckedCreateWithoutReplyToInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1421,6 +1452,7 @@ export type MessageUpdateWithoutRepliesInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1455,6 +1487,7 @@ export type MessageUncheckedUpdateWithoutRepliesInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1497,6 +1530,7 @@ export type MessageCreateWithoutStatusesInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1531,6 +1565,7 @@ export type MessageUncheckedCreateWithoutStatusesInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1573,6 +1608,7 @@ export type MessageUpdateWithoutStatusesInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1607,6 +1643,7 @@ export type MessageUncheckedUpdateWithoutStatusesInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1633,6 +1670,7 @@ export type MessageCreateWithoutConversationAsLastMessageInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1667,6 +1705,7 @@ export type MessageUncheckedCreateWithoutConversationAsLastMessageInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1698,6 +1737,7 @@ export type MessageCreateWithoutConversationInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1731,6 +1771,7 @@ export type MessageUncheckedCreateWithoutConversationInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1779,6 +1820,7 @@ export type MessageUpdateWithoutConversationAsLastMessageInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1813,6 +1855,7 @@ export type MessageUncheckedUpdateWithoutConversationAsLastMessageInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1858,6 +1901,7 @@ export type MessageCreateManySenderInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1882,6 +1926,7 @@ export type MessageUpdateWithoutSenderInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1915,6 +1960,7 @@ export type MessageUncheckedUpdateWithoutSenderInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1945,6 +1991,7 @@ export type MessageUncheckedUpdateManyWithoutSenderInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1972,6 +2019,7 @@ export type MessageCreateManyProductInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -1996,6 +2044,7 @@ export type MessageUpdateWithoutProductInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2029,6 +2078,7 @@ export type MessageUncheckedUpdateWithoutProductInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2059,6 +2109,7 @@ export type MessageUncheckedUpdateManyWithoutProductInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2086,6 +2137,7 @@ export type MessageCreateManyReplyToInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -2110,6 +2162,7 @@ export type MessageUpdateWithoutReplyToInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2143,6 +2196,7 @@ export type MessageUncheckedUpdateWithoutReplyToInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2173,6 +2227,7 @@ export type MessageUncheckedUpdateManyWithoutReplyToInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2200,6 +2255,7 @@ export type MessageCreateManyConversationInput = {
   messageType?: $Enums.MessageType
   createdAt?: Date | string
   updatedAt?: Date | string
+  readAt?: Date | string | null
   content: string
   encryptionIv: string
   encryptionAuthTag: string
@@ -2224,6 +2280,7 @@ export type MessageUpdateWithoutConversationInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2257,6 +2314,7 @@ export type MessageUncheckedUpdateWithoutConversationInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2287,6 +2345,7 @@ export type MessageUncheckedUpdateManyWithoutConversationInput = {
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
   encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2364,6 +2423,7 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   messageType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  readAt?: boolean
   content?: boolean
   encryptionIv?: boolean
   encryptionAuthTag?: boolean
@@ -2400,6 +2460,7 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   messageType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  readAt?: boolean
   content?: boolean
   encryptionIv?: boolean
   encryptionAuthTag?: boolean
@@ -2432,6 +2493,7 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   messageType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  readAt?: boolean
   content?: boolean
   encryptionIv?: boolean
   encryptionAuthTag?: boolean
@@ -2464,6 +2526,7 @@ export type MessageSelectScalar = {
   messageType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  readAt?: boolean
   content?: boolean
   encryptionIv?: boolean
   encryptionAuthTag?: boolean
@@ -2474,7 +2537,7 @@ export type MessageSelectScalar = {
   tamperDetected?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "senderId" | "productId" | "conversationId" | "imageUrl" | "audioUrl" | "fileUrl" | "fileName" | "fileSize" | "replyToId" | "productData" | "productSnapshot" | "subject" | "isRead" | "messageType" | "createdAt" | "updatedAt" | "content" | "encryptionIv" | "encryptionAuthTag" | "dbEncryptedContent" | "encryptedAt" | "encryptedVersion" | "integrityHash" | "tamperDetected", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "senderId" | "productId" | "conversationId" | "imageUrl" | "audioUrl" | "fileUrl" | "fileName" | "fileSize" | "replyToId" | "productData" | "productSnapshot" | "subject" | "isRead" | "messageType" | "createdAt" | "updatedAt" | "readAt" | "content" | "encryptionIv" | "encryptionAuthTag" | "dbEncryptedContent" | "encryptedAt" | "encryptedVersion" | "integrityHash" | "tamperDetected", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   product?: boolean | Prisma.Message$productArgs<ExtArgs>
@@ -2527,6 +2590,7 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     messageType: $Enums.MessageType
     createdAt: Date
     updatedAt: Date
+    readAt: Date | null
     content: string
     encryptionIv: string
     encryptionAuthTag: string
@@ -2982,6 +3046,7 @@ export interface MessageFieldRefs {
   readonly messageType: Prisma.FieldRef<"Message", 'MessageType'>
   readonly createdAt: Prisma.FieldRef<"Message", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Message", 'DateTime'>
+  readonly readAt: Prisma.FieldRef<"Message", 'DateTime'>
   readonly content: Prisma.FieldRef<"Message", 'String'>
   readonly encryptionIv: Prisma.FieldRef<"Message", 'String'>
   readonly encryptionAuthTag: Prisma.FieldRef<"Message", 'String'>
