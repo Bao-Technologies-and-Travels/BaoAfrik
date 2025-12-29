@@ -51,6 +51,9 @@ const Requests: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
   const [goToPage, setGoToPage] = useState<number>(1);
+  const [mobileMessageCoords, setMobileMessageCoords] = useState<{ top: number; left: number } | null>(null);
+  const [pinnedMessage, setPinnedMessage] = useState<any>(null);
+  const [isManagingRequest, setIsManagingRequest] = useState(false);
 
   // check for mobile
   useEffect(() => {
@@ -90,6 +93,89 @@ const Requests: React.FC = () => {
     const start = (page - 1) * pageSize;
     return array.slice(start, start + pageSize);
   }
+
+  const handleManageRequest = async (request: ProductRequest) => {
+    try {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+
+      // If current user is the request creator, navigate to request details
+      if (request.userId === user.id) {
+        navigate(`/requests/${request.id}`);
+        return;
+      }
+
+      setIsManagingRequest(true);
+      const token = localStorage.getItem('accessToken');
+
+      // Create product data from request
+      const productData = {
+        id: request.id,
+        name: request.productName,
+        description: request.description,
+        origin: request.origin,
+        sellerLocation: request.sellerLocation,
+        price: request.minPrice || 0,
+        currency: request.currency || 'USD',
+        isRequest: true,
+        requestData: {
+          minPrice: request.minPrice,
+          maxPrice: request.maxPrice,
+          status: request.status
+        },
+        seller: request.user ? {
+          id: request.user.id,
+          email: request.user.email,
+          name: `${request.user.firstName} ${request.user.lastName}`.trim(),
+          profileImage: request.user.profileImage
+        } : null
+      };
+
+      // Start a conversation with the request creator using the contact-request endpoint
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/chat/contact-request`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            requestId: request.id,
+            message: `Hi, I have this product you requested for: ${request.productName}`,
+            productData: productData
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to start conversation');
+      }
+
+      // Navigate to messages with the new conversation
+      navigate('/messages', {
+        state: {
+          conversationId: result.data.conversation.id,
+          productData: productData,
+          preFilledMessage: `Hi, I have this product you requested for: ${request.productName}`,
+          isProductInquiry: true,
+          shouldOpenConversation: true
+        },
+        replace: false
+      });
+
+    } catch (error: any) {
+      console.error('Error managing request:', error);
+      // Show error toast or alert
+      alert(error.message || 'Failed to manage request. Please try again.');
+    } finally {
+      setIsManagingRequest(false);
+    }
+  };
 
   const fetchMyRequests = async () => {
     try {
@@ -394,16 +480,34 @@ const Requests: React.FC = () => {
           ) : (
             <div className="flex items-center gap-2">
               <button
-                className="px-3 py-1 rounded-lg border"
+                className="px-3 py-1 rounded-lg border flex items-center justify-center gap-2"
                 style={{
                   backgroundColor: '#FFFFFF',
                   borderColor: '#F9A825',
                   color: '#F9A825',
                   fontWeight: 'normal',
-                  fontSize: '12px'
+                  fontSize: '12px',
+                  minWidth: '110px',
+                  opacity: isManagingRequest ? 0.7 : 1,
+                  cursor: isManagingRequest ? 'not-allowed' : 'pointer'
                 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!isManagingRequest && req) {
+                    handleManageRequest(req);
+                  }
+                }}
+                disabled={isManagingRequest}
               >
-                Manage request
+                {isManagingRequest ? (
+                  <>
+                    <svg className="animate-spin h-3 w-3 text-current" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </>
+                ) : 'Manage request'}
               </button>
               <img src={bellIcon} alt="Bell" style={{ width: '16px', height: '16px' }} />
             </div>
@@ -629,7 +733,7 @@ const Requests: React.FC = () => {
       {/* Respond to the request button - Mobile only */}
       {isMobile && (
         <button
-          className="w-full mt-3 text-white"
+          className="w-full mt-3 text-white flex items-center justify-center gap-2"
           style={{
             backgroundColor: '#F9A825',
             fontWeight: 'normal',
@@ -637,10 +741,26 @@ const Requests: React.FC = () => {
             padding: '6px 10px',
             borderRadius: '6px',
             border: 'none',
-            cursor: 'pointer'
+            cursor: isManagingRequest ? 'not-allowed' : 'pointer',
+            opacity: isManagingRequest ? 0.7 : 1
           }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!isManagingRequest && req) {
+              handleManageRequest(req);
+            }
+          }}
+          disabled={isManagingRequest}
         >
-          Respond to the request
+          {isManagingRequest ? (
+            <>
+              <svg className="animate-spin h-3 w-3 text-current" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Processing...
+            </>
+          ) : 'Respond to the request'}
         </button>
       )}
     </div>
@@ -930,4 +1050,3 @@ const Requests: React.FC = () => {
 };
 
 export default Requests;
-

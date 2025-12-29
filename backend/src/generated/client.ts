@@ -78,6 +78,16 @@ export type Message = Prisma.MessageModel
  */
 export type MessageStatus = Prisma.MessageStatusModel
 /**
+ * Model MessageReaction
+ * 
+ */
+export type MessageReaction = Prisma.MessageReactionModel
+/**
+ * Model MessageMetadata
+ * 
+ */
+export type MessageMetadata = Prisma.MessageMetadataModel
+/**
  * Model Category
  * 
  */

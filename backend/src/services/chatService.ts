@@ -254,6 +254,23 @@ export class ChatService {
                     where: {
                         userId: userId
                     }
+                },
+                reactions: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                firstName: true,
+                                lastName: true,
+                                profileImage: true
+                            }
+                        }
+                    }
+                },
+                metadata: {
+                    where: {
+                        userId: userId
+                    }
                 }
             },
             orderBy: {
@@ -291,6 +308,11 @@ export class ChatService {
                     message.encryptionAuthTag!
                 );
 
+                // Get user's reaction if exists
+                const userReaction = message.reactions?.find((r: any) => r.userId === userId);
+                // Get user's metadata if exists
+                const userMetadata = message.metadata?.find((m: any) => m.userId === userId);
+
                 return {
                     ...message,
                     content: plainText,
@@ -300,6 +322,12 @@ export class ChatService {
                     fileSize: message.fileSize,
                     imageUrl: message.imageUrl,
                     audioUrl: message.audioUrl,
+                    reaction: userReaction?.reaction || null,
+                    reactions: message.reactions || [],
+                    isPinned: userMetadata?.isPinned || false,
+                    isArchived: userMetadata?.isArchived || false,
+                    isImportant: userMetadata?.isImportant || false,
+                    label: userMetadata?.label || null,
                     formattedTime: this.formatTo12HourTime(message.createdAt)
                 };
 
@@ -314,6 +342,12 @@ export class ChatService {
                     fileSize: message.fileSize,
                     imageUrl: message.imageUrl,
                     audioUrl: message.audioUrl,
+                    reaction: null,
+                    reactions: [],
+                    isPinned: false,
+                    isArchived: false,
+                    isImportant: false,
+                    label: null,
                     formattedTime: this.formatTo12HourTime(message.createdAt)
                 };
             }
@@ -869,6 +903,124 @@ export class ChatService {
             return message;
         } catch (error) {
             throw new Error('Failed to update message status');
+        }
+    }
+
+    async addReaction(messageId: string, userId: string, reaction: string) {
+        try {
+            const messageReaction = await prisma.messageReaction.upsert({
+                where: {
+                    messageId_userId: {
+                        messageId,
+                        userId
+                    }
+                },
+                update: {
+                    reaction,
+                    updatedAt: new Date()
+                },
+                create: {
+                    messageId,
+                    userId,
+                    reaction,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true
+                        }
+                    },
+                    message: {
+                        include: {
+                            reactions: {
+                                include: {
+                                    user: {
+                                        select: {
+                                            id: true,
+                                            firstName: true,
+                                            lastName: true,
+                                            profileImage: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            return messageReaction;
+        } catch (error) {
+            throw new Error('Failed to add reaction');
+        }
+    }
+
+    async removeReaction(messageId: string, userId: string) {
+        try {
+            await prisma.messageReaction.deleteMany({
+                where: {
+                    messageId,
+                    userId
+                }
+            });
+            return { success: true };
+        } catch (error) {
+            throw new Error('Failed to remove reaction');
+        }
+    }
+
+    async updateMessageMetadata(messageId: string, userId: string, data: {
+        isPinned?: boolean;
+        isArchived?: boolean;
+        isImportant?: boolean;
+        label?: string | null;
+    }) {
+        try {
+            const metadata = await prisma.messageMetadata.upsert({
+                where: {
+                    messageId_userId: {
+                        messageId,
+                        userId
+                    }
+                },
+                update: {
+                    ...data,
+                    updatedAt: new Date()
+                },
+                create: {
+                    messageId,
+                    userId,
+                    isPinned: data.isPinned || false,
+                    isArchived: data.isArchived || false,
+                    isImportant: data.isImportant || false,
+                    label: data.label || null,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            });
+            return metadata;
+        } catch (error) {
+            throw new Error('Failed to update message metadata');
+        }
+    }
+
+    async getMessageMetadata(messageId: string, userId: string) {
+        try {
+            const metadata = await prisma.messageMetadata.findUnique({
+                where: {
+                    messageId_userId: {
+                        messageId,
+                        userId
+                    }
+                }
+            });
+            return metadata;
+        } catch (error) {
+            throw new Error('Failed to get message metadata');
         }
     }
 }

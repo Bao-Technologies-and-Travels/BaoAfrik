@@ -478,15 +478,52 @@ const Messages: React.FC = (): JSX.Element => {
     });
   };
 
+  // Helper to safely get a sender label from a reply sender field (can be string or object)
+  const getReplySenderLabel = (sender: any, isIncoming: boolean) => {
+    if (!sender) {
+      return isIncoming ? 'User' : 'You';
+    }
+    if (typeof sender === 'string') {
+      return sender;
+    }
+    const first = sender.firstName || '';
+    const last = sender.lastName || '';
+    const name = `${first} ${last}`.trim();
+    if (name) return name;
+    return isIncoming ? 'User' : 'You';
+  };
+
   // Normalize messages to ensure UI fields exist
   const normalizeMessage = (msg: any, currentUserId?: string | null) => {
     const text = msg?.text ?? msg?.content ?? '';
     const isIncoming = msg?.isIncoming !== undefined
       ? msg.isIncoming
       : (msg?.senderId && currentUserId ? msg.senderId !== currentUserId : false);
-    // Ensure reaction is preserved if it exists
+    // Ensure reaction, metadata fields, and replyTo are preserved
     const reaction = msg?.reaction || null;
-    return { ...msg, text, isIncoming, reaction };
+    const isPinned = msg?.isPinned || false;
+    const isArchived = msg?.isArchived || false;
+    const isImportant = msg?.isImportant || false;
+    const label = msg?.label || null;
+    const replyTo = msg?.replyTo || null;
+    const productData = msg?.productData || null;
+    const isProductInquiry = msg?.isProductInquiry !== undefined
+      ? Boolean(msg.isProductInquiry)
+      : Boolean(productData);
+
+    return {
+      ...msg,
+      text,
+      isIncoming,
+      reaction,
+      isPinned,
+      isArchived,
+      isImportant,
+      label,
+      replyTo,
+      productData,
+      isProductInquiry
+    };
   };
 
   // Normalize status to lowercase for UI
@@ -668,6 +705,64 @@ const Messages: React.FC = (): JSX.Element => {
     }
     socket.on('new_message_notification', handleNewMessageNotif);
 
+    // Handle reaction events
+    function handleReactionAdded(data: any) {
+      if (data.messageId && conversationId) {
+        setMessages(prevMessages =>
+          prevMessages.map(msg => {
+            if (String(msg.id) === String(data.messageId)) {
+              // Update reactions array if available, or set user's reaction
+              if (data.allReactions) {
+                const userReaction = data.allReactions.find((r: any) => r.userId === user?.id);
+                return { ...msg, reaction: userReaction?.reaction || null, reactions: data.allReactions };
+              }
+              return { ...msg, reaction: data.reaction };
+            }
+            return msg;
+          })
+        );
+      }
+    }
+
+    function handleReactionRemoved(data: any) {
+      if (data.messageId && conversationId) {
+        setMessages(prevMessages =>
+          prevMessages.map(msg => {
+            if (String(msg.id) === String(data.messageId)) {
+              // Remove reaction if it's the current user's reaction
+              if (String(data.userId) === String(user?.id)) {
+                return { ...msg, reaction: undefined };
+              }
+            }
+            return msg;
+          })
+        );
+      }
+    }
+
+    function handleMessageMetadataUpdated(data: any) {
+      if (data.messageId && conversationId) {
+        setMessages(prevMessages =>
+          prevMessages.map(msg => {
+            if (String(msg.id) === String(data.messageId)) {
+              return {
+                ...msg,
+                isPinned: data.metadata?.isPinned || false,
+                isArchived: data.metadata?.isArchived || false,
+                isImportant: data.metadata?.isImportant || false,
+                label: data.metadata?.label || null
+              };
+            }
+            return msg;
+          })
+        );
+      }
+    }
+
+    socket.on('reaction_added', handleReactionAdded);
+    socket.on('reaction_removed', handleReactionRemoved);
+    socket.on('message_metadata_updated', handleMessageMetadataUpdated);
+
     return () => {
       socket.off('receive_message', handleReceiveMessage);
       socket.off('message_sent', handleMessageSent);
@@ -676,8 +771,11 @@ const Messages: React.FC = (): JSX.Element => {
       socket.off('message_status_updated', handleStatusUpdate);
       socket.off('messages_read', handleMessagesRead);
       socket.off('new_message_notification', handleNewMessageNotif);
+      socket.off('reaction_added', handleReactionAdded);
+      socket.off('reaction_removed', handleReactionRemoved);
+      socket.off('message_metadata_updated', handleMessageMetadataUpdated);
     };
-  }, [socket, conversationId]);
+  }, [socket, conversationId, user?.id]);
 
   // websocket connection setup
   // useEffect(() => {
@@ -1109,10 +1207,11 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   // Handle reaction selection
-  const handleReactionSelect = (reaction: string) => {
+  const handleReactionSelect = async (reaction: string) => {
     const messageId = activeReactionMessageId !== null ? activeReactionMessageId : mobileMessageOptionsId;
 
-    if (messageId !== null) {
+    if (messageId !== null && socket) {
+      // Optimistically update UI
       setMessages(prevMessages =>
         prevMessages.map(msg =>
           msg.id === messageId
@@ -1120,6 +1219,12 @@ const Messages: React.FC = (): JSX.Element => {
             : msg
         )
       );
+
+      // Emit to socket to persist and sync
+      socket.emit('add_reaction', {
+        messageId: String(messageId),
+        reaction
+      });
     }
 
     setActiveReactionMessageId(null);
@@ -1130,14 +1235,22 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   // Handle reaction removal
-  const handleRemoveReaction = (messageId: number) => {
-    setMessages(prevMessages =>
-      prevMessages.map(msg =>
-        msg.id === messageId
-          ? { ...msg, reaction: undefined }
-          : msg
-      )
-    );
+  const handleRemoveReaction = async (messageId: number) => {
+    if (socket) {
+      // Optimistically update UI
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
+          msg.id === messageId
+            ? { ...msg, reaction: undefined }
+            : msg
+        )
+      );
+
+      // Emit to socket to persist and sync
+      socket.emit('remove_reaction', {
+        messageId: String(messageId)
+      });
+    }
   };
 
   // Handle message options click
@@ -1151,64 +1264,94 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   // Handle message option selection
-  const handleMessageOptionSelect = (action: string, message?: { id: number }) => {
-    const messageId = message?.id;
+  const handleMessageOptionSelect = (action: string, messageOrId?: { id: number } | number | string) => {
+    // Support being called with either a message object ({ id }) or a raw id (number/string)
+    const rawId = typeof messageOrId === 'object' && messageOrId !== null
+      ? (messageOrId as any).id
+      : messageOrId;
+    const messageId = rawId !== undefined && rawId !== null ? String(rawId) : undefined;
     console.log('Selected action:', action);
 
     if (action === 'reply' && messageId) {
       // Find the message to reply to
-      const message = messages.find(m => m.id === messageId);
-      if (message) {
-        console.log('Setting reply to message:', {
-          type: message.type,
-          duration: message.duration,
-          waveformDataLength: message.waveformData?.length || 0,
-          hasAudioUrl: !!message.audioUrl
+      const messageToReply = messages.find(m => String(m.id) === messageId);
+      if (messageToReply) {
+        // Set reply to message - this will show the reply preview above the input
+        setReplyToMessage({
+          id: messageToReply.id,
+          text: messageToReply.text || messageToReply.content || '',
+          content: messageToReply.content || messageToReply.text || '',
+          isIncoming: messageToReply.isIncoming,
+          // Prefer full sender object if available; otherwise fall back to a minimal shape
+          sender: messageToReply.sender || {
+            id: messageToReply.senderId,
+            firstName: messageToReply.isIncoming ? 'User' : 'You',
+            lastName: '',
+            profileImage: null
+          },
+          type: messageToReply.type,
+          duration: messageToReply.duration,
+          waveformData: messageToReply.waveformData,
+          audioUrl: messageToReply.audioUrl
         });
-        setReplyToMessage(message);
+        // Scroll to input area to show reply preview
+        setTimeout(() => {
+          const inputElement = document.querySelector('input[placeholder*="Write your message"]');
+          if (inputElement) {
+            inputElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 100);
       }
     }
 
-    if (action === 'important' && messageId) {
-      // Toggle important status for the message
-      setMessages(prevMessages =>
-        prevMessages.map(msg =>
-          msg.id === messageId
-            ? { ...msg, isImportant: !msg.isImportant }
-            : msg
-        )
-      );
-    }
-
-    if (action === 'pin' && messageId) {
+    if (action === 'important' && messageId && socket) {
       // Find the message
       const message = messages.find(m => m.id === messageId);
       if (message) {
-        if (message.isPinned) {
-          // Unpin the message
-          setMessages(prevMessages =>
-            prevMessages.map(msg =>
-              msg.id === messageId
-                ? { ...msg, isPinned: false }
-                : msg
-            )
-          );
+        const newImportantStatus = !message.isImportant;
+        // Optimistically update UI
+        setMessages(prevMessages =>
+          prevMessages.map(msg =>
+            msg.id === messageId
+              ? { ...msg, isImportant: newImportantStatus }
+              : msg
+          )
+        );
+        // Emit to socket to persist
+        socket.emit('update_message_metadata', {
+          messageId: String(messageId),
+          isImportant: newImportantStatus
+        });
+      }
+    }
+
+    if (action === 'pin' && messageId && socket) {
+      // Find the message
+      const message = messages.find(m => m.id === messageId);
+      if (message) {
+        const newPinnedStatus = !message.isPinned;
+        if (newPinnedStatus) {
+          // Pin the message
+          setPinnedMessage(message);
+        } else {
           // Clear pinned message preview if this was the pinned message
           if (pinnedMessage && pinnedMessage.id === messageId) {
             setPinnedMessage(null);
           }
-        } else {
-          // Pin the message
-          setPinnedMessage(message);
-          // Also mark message as pinned
-          setMessages(prevMessages =>
-            prevMessages.map(msg =>
-              msg.id === messageId
-                ? { ...msg, isPinned: true }
-                : msg
-            )
-          );
         }
+        // Optimistically update UI
+        setMessages(prevMessages =>
+          prevMessages.map(msg =>
+            msg.id === messageId
+              ? { ...msg, isPinned: newPinnedStatus }
+              : msg
+          )
+        );
+        // Emit to socket to persist
+        socket.emit('update_message_metadata', {
+          messageId: String(messageId),
+          isPinned: newPinnedStatus
+        });
       }
     }
 
@@ -1220,28 +1363,44 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   // Handle important badge removal
-  const handleRemoveImportant = (messageId: number) => {
-    setMessages(prevMessages =>
-      prevMessages.map(msg =>
-        msg.id === messageId
-          ? { ...msg, isImportant: false }
-          : msg
-      )
-    );
+  const handleRemoveImportant = async (messageId: number) => {
+    if (socket) {
+      // Optimistically update UI
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
+          msg.id === messageId
+            ? { ...msg, isImportant: false }
+            : msg
+        )
+      );
+      // Emit to socket to persist
+      socket.emit('update_message_metadata', {
+        messageId: String(messageId),
+        isImportant: false
+      });
+    }
   };
 
   // Handle pin badge removal
-  const handleRemovePin = (messageId: number) => {
-    setMessages(prevMessages =>
-      prevMessages.map(msg =>
-        msg.id === messageId
-          ? { ...msg, isPinned: false }
-          : msg
-      )
-    );
-    // Clear pinned message preview if this was the pinned message
-    if (pinnedMessage && pinnedMessage.id === messageId) {
-      setPinnedMessage(null);
+  const handleRemovePin = async (messageId: number) => {
+    if (socket) {
+      // Optimistically update UI
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
+          msg.id === messageId
+            ? { ...msg, isPinned: false }
+            : msg
+        )
+      );
+      // Clear pinned message preview if this was the pinned message
+      if (pinnedMessage && pinnedMessage.id === messageId) {
+        setPinnedMessage(null);
+      }
+      // Emit to socket to persist
+      socket.emit('update_message_metadata', {
+        messageId: String(messageId),
+        isPinned: false
+      });
     }
   };
 
@@ -1382,7 +1541,30 @@ const Messages: React.FC = (): JSX.Element => {
     if (location.state) {
       const { productData, preFilledMessage } = location.state;
       if (productData) {
-        setProductData(productData);
+        // Normalize productData to ensure all fields are included
+        const normalizedProductData = {
+          id: productData.id,
+          name: productData.name || productData.title,
+          title: productData.title || productData.name,
+          price: productData.price,
+          currency: productData.currency || 'USD',
+          description: productData.description || '',
+          // Extract image URLs from images array if needed
+          image: productData.image || (Array.isArray(productData.images) && productData.images.length > 0
+            ? (typeof productData.images[0] === 'string' ? productData.images[0] : productData.images[0]?.url)
+            : null),
+          images: Array.isArray(productData.images)
+            ? productData.images.map((img: any) => typeof img === 'string' ? img : img?.url).filter(Boolean)
+            : (productData.image ? [productData.image] : []),
+          category: productData.category,
+          location: productData.location,
+          origin: productData.origin,
+          quantity: productData.quantity,
+          saleType: productData.saleType,
+          deliveryAvailable: productData.deliveryAvailable,
+          seller: productData.seller
+        };
+        setProductData(normalizedProductData);
         setPreFilledMessage(preFilledMessage || '');
         // Only set messageText if no messages have been sent yet
         if (!isMessageSent) {
@@ -1452,6 +1634,32 @@ const Messages: React.FC = (): JSX.Element => {
       const messageContent = content.trim() || preFilledMessage.trim();
       const tempId = `temp_${Date.now()}_${Math.random()}`;
 
+      // Prepare productData for sending - ensure it includes all required fields
+      let productDataToSend: any = null;
+      if (productData && !isMessageSent) {
+        productDataToSend = {
+          id: productData.id,
+          name: productData.name || productData.title,
+          title: productData.title || productData.name,
+          price: productData.price,
+          currency: productData.currency || 'USD',
+          description: productData.description || '',
+          image: productData.image || (Array.isArray(productData.images) && productData.images.length > 0
+            ? (typeof productData.images[0] === 'string' ? productData.images[0] : productData.images[0]?.url)
+            : null),
+          images: Array.isArray(productData.images)
+            ? productData.images.map((img: any) => typeof img === 'string' ? img : img?.url).filter(Boolean)
+            : (productData.image ? [productData.image] : []),
+          category: productData.category,
+          location: productData.location,
+          origin: productData.origin,
+          quantity: productData.quantity,
+          saleType: productData.saleType,
+          deliveryAvailable: productData.deliveryAvailable,
+          seller: productData.seller
+        };
+      }
+
       // Create temporary message for optimistic UI (will be replaced by backend response)
       const tempMessage = {
         id: tempId,
@@ -1471,7 +1679,9 @@ const Messages: React.FC = (): JSX.Element => {
           profileImage: user.profileImage || null
         },
         files: filePayloads,
-        messageType: filePayloads.length > 0 ? 'FILE' : 'TEXT'
+        messageType: filePayloads.length > 0 ? 'FILE' : 'TEXT',
+        productData: productDataToSend,
+        isProductInquiry: !!productDataToSend
       };
 
       // Add temp message to UI (will be replaced by real message from backend)
@@ -1504,7 +1714,7 @@ const Messages: React.FC = (): JSX.Element => {
         messageType: filePayloads.length > 0 ? 'FILE' : 'TEXT',
         files: filePayloads,
         replyToId: replyToMessage?.id,
-        productData: productData && !isMessageSent ? productData : null
+        productData: productDataToSend
       }, (response: any) => {
         if (!response?.success) {
           // Remove temp message and show error
@@ -1717,14 +1927,17 @@ const Messages: React.FC = (): JSX.Element => {
         sentAt: currentTime,
         audioUrl: audioUrl,
         waveformData: [...recordedWaveforms],
-        replyTo: replyToMessage ? {
-          text: replyToMessage.text,
-          sender: replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You',
-          type: replyToMessage.type,
-          duration: replyToMessage.duration,
-          waveformData: replyToMessage.waveformData,
-          audioUrl: replyToMessage.audioUrl
-        } : null
+        replyTo: replyToMessage
+          ? {
+            text: replyToMessage.text,
+            // Store a simple label; rendering code will handle string vs object uniformly
+            sender: getReplySenderLabel(replyToMessage.sender, replyToMessage.isIncoming),
+            type: replyToMessage.type,
+            duration: replyToMessage.duration,
+            waveformData: replyToMessage.waveformData,
+            audioUrl: replyToMessage.audioUrl
+          }
+          : null
       };
 
       console.log('Sending voice note with waveformData:', recordedWaveforms.length, 'bars');
@@ -2488,11 +2701,6 @@ const Messages: React.FC = (): JSX.Element => {
                                   {/* Reply Section - Mobile */}
                                   {message.replyTo && (
                                     <div className="mb-2">
-                                      {/* User's reply text at top */}
-                                      <p style={{ fontSize: '12px', marginBottom: '6px', color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}>
-                                        {message.text}
-                                      </p>
-
                                       {message.replyTo.type === 'voice' ? (
                                         /* Voice Note Reply - Screenshot Structure - TWO LINES */
                                         <div className="flex items-start">
@@ -2508,9 +2716,9 @@ const Messages: React.FC = (): JSX.Element => {
                                           ></div>
 
                                           <div className="flex-1">
-                                            {/* "You" text in light blue - ABOVE */}
+                                            {/* Sender label in light blue - ABOVE */}
                                             <div style={{ fontSize: '10px', color: message.isIncoming ? '#64B5F6' : '#CFE8FC', fontWeight: 500, marginBottom: '4px' }}>
-                                              {message.replyTo.sender}
+                                              {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
                                             </div>
 
                                             {/* Audio preview - BELOW "You" */}
@@ -2625,7 +2833,7 @@ const Messages: React.FC = (): JSX.Element => {
                                           {/* Quoted message info */}
                                           <div className="flex-1">
                                             <p style={{ fontSize: '10px', fontWeight: 500, marginBottom: '2px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
-                                              {message.replyTo.sender}
+                                              {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
                                             </p>
                                             <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
                                               {message.replyTo.text}
@@ -2715,7 +2923,7 @@ const Messages: React.FC = (): JSX.Element => {
                           )}
 
                           <div className={`flex items-center mt-1 space-x-1 text-xs ${message.isIncoming ? 'justify-start' : 'justify-end'}`} style={{ color: '#6A6A6A' }}>
-                            <span>{message.timeString}</span>
+                            <span>{message.timeString || message.formattedTime || message.timestamp || new Date(message.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             {!message.isIncoming && message.id && messageStatuses[String(message.id)] && (
                               <div className="flex items-center">
                                 {messageStatuses[message.id] === 'sending' && (
@@ -3101,111 +3309,6 @@ const Messages: React.FC = (): JSX.Element => {
                       </a>
                     </div>
                   </div>
-                </div>
-              )}
-
-              {/* Reply Preview - Mobile */}
-              {replyToMessage && (
-                <div className="mb-2 relative">
-                  {replyToMessage.type === 'voice' ? (
-                    /* Voice Note Reply Preview - Matches Audio Preview Style */
-                    <div
-                      className="flex items-center rounded-md p-2"
-                      style={{
-                        background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
-                        borderRadius: '12px',
-                        maxWidth: '85%'
-                      }}
-                    >
-                      {/* Play icon */}
-                      <button className="hover:opacity-80 transition-opacity flex-shrink-0">
-                        <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }} />
-                        </svg>
-                      </button>
-
-                      {/* Duration text */}
-                      <span className="text-white text-xs mx-2 flex-shrink-0">
-                        {Math.floor((replyToMessage.duration || 0) / 60).toString().padStart(2, '0')} : {((replyToMessage.duration || 0) % 60).toString().padStart(2, '0')} - Audio
-                      </span>
-
-                      {/* Waveform */}
-                      <div className="flex space-x-0.5 items-end flex-1 mx-2">
-                        {(replyToMessage.waveformData && replyToMessage.waveformData.length > 0 ?
-                          replyToMessage.waveformData.slice(-20).map((level: number, i: number) => (
-                            <div
-                              key={i}
-                              className="w-0.5 bg-white rounded-full"
-                              style={{ height: `${Math.max(2, level * 15)}px`, minHeight: '2px' }}
-                            />
-                          ))
-                          :
-                          [3, 5, 3, 6, 9, 11, 13, 11, 9, 6, 5, 3].map((h, i) => (
-                            <div
-                              key={i}
-                              className="w-0.5 bg-white rounded-full"
-                              style={{ height: `${h}px`, minHeight: '2px' }}
-                            />
-                          ))
-                        )}
-                      </div>
-
-                      {/* Close button */}
-                      <button
-                        onClick={() => setReplyToMessage(null)}
-                        className="hover:opacity-80 transition-opacity flex-shrink-0"
-                        style={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                          borderRadius: '50%',
-                          width: '18px',
-                          height: '18px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  ) : (
-                    /* Text Reply Preview */
-                    <div
-                      className="rounded-lg p-2 pl-4 pr-8 relative flex"
-                      style={{
-                        backgroundColor: '#FAFAFA'
-                      }}
-                    >
-                      {/* Blue line inside */}
-                      <div
-                        className="rounded-full mr-3"
-                        style={{
-                          width: '2px',
-                          backgroundColor: '#64B5F6',
-                          flexShrink: 0
-                        }}
-                      ></div>
-
-                      {/* Content */}
-                      <div className="flex-1">
-                        <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                          {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
-                        </div>
-                        <div className="text-xs" style={{ color: '#6A6A6A' }}>
-                          {replyToMessage.text}
-                        </div>
-                      </div>
-
-                      {/* Close button */}
-                      <button
-                        onClick={() => setReplyToMessage(null)}
-                        className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
-                      >
-                        <img src={replyCloseIcon} alt="Close" className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -5113,7 +5216,7 @@ const Messages: React.FC = (): JSX.Element => {
                                           ></div>
                                           <div className="flex-1">
                                             <p className="text-xs font-medium" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                                              {message.replyTo.sender}
+                                              {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
                                             </p>
                                             <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
                                               {message.replyTo.text}
@@ -5244,9 +5347,9 @@ const Messages: React.FC = (): JSX.Element => {
                                               ></div>
 
                                               <div className="flex-1">
-                                                {/* "You" text in light blue - ABOVE */}
+                                                {/* Sender label in light blue - ABOVE */}
                                                 <div className="text-xs font-medium mb-1" style={{ color: '#CFE8FC' }}>
-                                                  {message.replyTo.sender}
+                                                  {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
                                                 </div>
 
                                                 {/* Audio preview - BELOW "You" */}
@@ -5361,7 +5464,7 @@ const Messages: React.FC = (): JSX.Element => {
                                               {/* Quoted message info */}
                                               <div className="flex-1">
                                                 <p className="text-xs font-medium mb-0.5" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                                                  {message.replyTo.sender}
+                                                  {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
                                                 </p>
                                                 <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
                                                   {message.replyTo.text}
@@ -5545,7 +5648,7 @@ const Messages: React.FC = (): JSX.Element => {
                                   className="text-xs mr-1"
                                   style={{ color: '#6A6A6A' }}
                                 >
-                                  {message.timestamp}
+                                  {message.timeString || message.formattedTime || message.timestamp || new Date(message.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                                 {!message.isIncoming && message.id && renderMessageStatus(String(message.id))}
 
@@ -5908,100 +6011,6 @@ const Messages: React.FC = (): JSX.Element => {
                   <div className="mb-3 -mx-6">
                     <div className="w-full bg-gray-200 rounded-full" style={{ height: '0.5px' }}></div>
                   </div>
-
-                  {/* Reply Preview - Desktop */}
-                  {replyToMessage && (
-                    <div className="mb-2 relative">
-                      {replyToMessage.type === 'voice' ? (
-                        /* Voice Note Reply Preview - Matches Audio Preview Style */
-                        <div
-                          className="flex items-center justify-between rounded-md px-4 py-2"
-                          style={{
-                            background: 'linear-gradient(to right, #DBEAFE, #64B5F6)',
-                            borderRadius: '12px',
-                            width: '300px'
-                          }}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <button className="hover:opacity-80 transition-opacity">
-                              <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
-                                <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }} />
-                              </svg>
-                            </button>
-                            <span className="text-white text-sm">
-                              {Math.floor((replyToMessage.duration || 0) / 60).toString().padStart(2, '0')} : {((replyToMessage.duration || 0) % 60).toString().padStart(2, '0')}
-                            </span>
-                            <div className="w-2 h-0.5 bg-white/70 rounded-full mx-0.5"></div>
-                            <span className="text-white text-sm">Audio</span>
-                            <div className="flex items-center justify-center space-x-0.5">
-                              {(replyToMessage.waveformData && replyToMessage.waveformData.length > 0 ?
-                                replyToMessage.waveformData.slice(-20).map((level: number, i: number) => (
-                                  <div
-                                    key={i}
-                                    className="w-0.5 bg-white rounded-full"
-                                    style={{ height: `${Math.max(4, level * 18)}px` }}
-                                  />
-                                ))
-                                :
-                                [6, 8, 4, 6, 12, 16, 14, 18, 20, 16, 12, 8, 6, 10, 14, 12, 8, 6, 4, 8].map((h, i) => (
-                                  <div
-                                    key={i}
-                                    className="w-0.5 bg-white rounded-full"
-                                    style={{ height: `${h}px` }}
-                                  />
-                                ))
-                              )}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => setReplyToMessage(null)}
-                            className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
-                            style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
-                          >
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      ) : (
-                        /* Text Reply Preview */
-                        <div
-                          className="rounded-lg p-2 pl-4 pr-8 relative flex"
-                          style={{
-                            backgroundColor: '#FAFAFA'
-                          }}
-                        >
-                          {/* Blue line inside */}
-                          <div
-                            className="rounded-full mr-3"
-                            style={{
-                              width: '2px',
-                              backgroundColor: '#64B5F6',
-                              flexShrink: 0
-                            }}
-                          ></div>
-
-                          {/* Content */}
-                          <div className="flex-1">
-                            <div className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                              {replyToMessage.isIncoming ? 'Joaquin EDIMO' : 'You'}
-                            </div>
-                            <div className="text-xs" style={{ color: '#6A6A6A' }}>
-                              {replyToMessage.text}
-                            </div>
-                          </div>
-
-                          {/* Close button */}
-                          <button
-                            onClick={() => setReplyToMessage(null)}
-                            className="absolute top-1.5 right-1.5 hover:opacity-70 transition-opacity"
-                          >
-                            <img src={replyCloseIcon} alt="Close" className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
 
                   {/* Product Inquiry Card - Only show before sending first message */}
                   {!isMessageSent && productData && (

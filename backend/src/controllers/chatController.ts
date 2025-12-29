@@ -12,11 +12,21 @@ export class ChatController {
     // Get user's conversations
     getConversations = async (req: Request, res: Response) => {
         try {
-            const userId = req.user!.id;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
+            const page = typeof req.query.page === 'string' ? Math.max(1, parseInt(req.query.page, 10) || 1) : 1;
+            const limitRaw = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 20;
+            const limit = Math.min(100, Math.max(1, limitRaw || 20));
+
             const conversations = await this.chatService.getUserConversations(userId);
+            const start = (page - 1) * limit;
+            const paged = conversations.slice(start, start + limit);
+
             return res.json({
                 success: true,
-                data: conversations
+                data: paged
             });
         } catch (error) {
             return res.status(500).json({
@@ -29,9 +39,13 @@ export class ChatController {
     // Get messages for a conversation
     getMessages = async (req: Request, res: Response) => {
         try {
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
             const { conversationId } = req.params;
-            const page = typeof req.query.page === 'string' ? parseInt(req.query.page, 10) : 1;
-            const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 20;
+            const page = typeof req.query.page === 'string' ? Math.max(1, parseInt(req.query.page, 10) || 1) : 1;
+            const limitRaw = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 20;
+            const limit = Math.min(100, Math.max(1, limitRaw || 20));
             if (!conversationId) {
                 return res.status(400).json({
                     success: false,
@@ -147,7 +161,7 @@ export class ChatController {
 
     contactSeller = async (req: Request, res: Response) => {
         try {
-            const { productId } = req.body;
+            const { productId, initialMessage, productData: requestProductData } = req.body;
             const buyerId = req.user!.id;
 
             if (!productId) {
@@ -187,15 +201,48 @@ export class ChatController {
                 });
             }
 
+            // Extract image URLs from product.images
+            let imageUrls: string[] = [];
+            let primaryImage: string | null = null;
+
+            try {
+                if (product.images) {
+                    const imagesArray = typeof product.images === 'string'
+                        ? JSON.parse(product.images)
+                        : product.images;
+
+                    if (Array.isArray(imagesArray) && imagesArray.length > 0) {
+                        imageUrls = imagesArray
+                            .map((img: any) => {
+                                if (typeof img === 'string') {
+                                    return img;
+                                }
+                                return img?.url || img?.key || null;
+                            })
+                            .filter((img): img is string => img !== null);
+
+                        // Get primary image (first image)
+                        primaryImage = imageUrls[0] ?? null;
+                    }
+                }
+            } catch (error) {
+                console.error('Error parsing product images:', error);
+            }
+
             const productData = {
                 id: product.id,
                 name: product.title,
+                title: product.title,
                 price: product.price,
-                currency: 'USD',
+                currency: product.currency || 'USD',
                 location: product.location,
                 category: product.category,
-                description: product.description,
-                images: product.images,
+                description: product.description || '',
+                image: primaryImage, // Primary image URL
+                images: imageUrls, // All image URLs array
+                origin: product.origin,
+                quantity: product.quantity,
+                deliveryAvailable: product.deliveryAvailable,
                 seller: {
                     id: product.seller.id,
                     email: product.seller.email,
@@ -205,13 +252,16 @@ export class ChatController {
                 }
             };
 
+            // Use productData from request if provided, otherwise use the one we constructed
+            const finalProductData = requestProductData || productData;
+
             // Create conversation
             const conversation = await this.chatService.createConversation({
                 creatorId: buyerId,
                 participantId: product.seller.id,
                 productId: product.id,
-                initialMessage: "",
-                productData: productData
+                initialMessage: initialMessage || `Hi, I'm interested in your product "${product.title}". Is it still available?`,
+                productData: finalProductData
             });
 
             return res.json({
@@ -252,7 +302,7 @@ export class ChatController {
 
             return res.status(500).json({
                 success: false,
-                error: 'Internal server error' + error.message
+                error: 'Internal server error'
             });
         }
     };
@@ -260,7 +310,10 @@ export class ChatController {
     getConversationDetails = async (req: Request, res: Response) => {
         try {
             const { conversationId } = req.params;
-            const userId = req.user!.id;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
 
             if (!conversationId) {
                 return res.status(400).json({
@@ -270,7 +323,7 @@ export class ChatController {
             }
 
             // Check if user is a participant in this conversation
-            const conversation = await prisma.conversation.findUnique({
+            const conversation = await prisma.conversation.findFirst({
                 where: {
                     id: conversationId,
                     participants: {
@@ -356,7 +409,10 @@ export class ChatController {
     getConversationMessages = async (req: Request, res: Response) => {
         try {
             const { conversationId } = req.params;
-            const userId = req.user!.id;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
 
             if (!conversationId) {
                 return res.status(400).json({
@@ -392,7 +448,10 @@ export class ChatController {
     // Create new conversation
     createConversation = async (req: Request, res: Response) => {
         try {
-            const creatorId = req.user!.id;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const creatorId = req.user.id;
             const { participantId, productId, initialMessage, productData } = req.body;
 
             if (!participantId) {
@@ -434,12 +493,17 @@ export class ChatController {
     sendMessage = async (req: Request, res: Response) => {
         try {
             const { conversationId, content, messageType, fileUrl, fileName, fileSize, replyToId, imageUrl, audioUrl, productData } = req.body;
-            const senderId = req.user!.id;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const senderId = req.user.id;
 
-            if (!conversationId || !content) {
-                return res.status(422).json({
+            const hasText = typeof content === 'string' && content.trim().length > 0;
+            const hasMedia = Boolean(fileUrl || imageUrl || audioUrl);
+            if (!conversationId || (!hasText && !hasMedia)) {
+                return res.status(400).json({
                     success: false,
-                    error: 'Conversation ID and content are required'
+                    error: 'conversationId and at least one of content or media (file/image/audio) is required'
                 });
             }
 
@@ -489,7 +553,10 @@ export class ChatController {
         try {
             const { conversationId } = req.params;
             const { messageIds } = req.body;
-            const userId = req.user!.id;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
 
             await this.chatService.markMessagesAsRead({
                 messageIds,
@@ -497,9 +564,9 @@ export class ChatController {
                 userId
             });
 
-            res.json({ success: true });
+            return res.json({ success: true });
         } catch (error) {
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
                 error: 'Failed to mark messages as read'
             });
@@ -509,20 +576,21 @@ export class ChatController {
     // generate pre-signed URL for file upload
     generatePresignedUrl = async (req: Request, res: Response) => {
         try {
-            const { fileName, fileType } = req.body;
-            const userId = req.user!.id;
+            const { fileName, fileType, fileSize } = req.body;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
 
             if (!fileName || !fileType) {
-                return res.status(422).json({
+                return res.status(400).json({
                     success: false,
                     error: 'File name and type are required'
                 });
             }
 
-            const contentLength = parseInt(req.headers['content-length'] || '0');
             const maxSize = 50 * 1024 * 1024; // 50MB
-
-            if (contentLength > maxSize) {
+            if (typeof fileSize === 'number' && fileSize > maxSize) {
                 return res.status(413).json({
                     success: false,
                     error: 'File size exceeds 50MB limit'
@@ -557,7 +625,10 @@ export class ChatController {
     // Get Unread Count
     getUnreadCounts = async (req: Request, res: Response) => {
         try {
-            const userId = req.user!.id;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
             const unreadCounts = await this.chatService.getUnreadCounts(userId);
 
             return res.json({
@@ -576,7 +647,10 @@ export class ChatController {
     getConversationParticipants = async (req: Request, res: Response) => {
         try {
             const { conversationId } = req.params;
-            const userId = req.user!.id;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
 
             if (!conversationId) {
                 return res.status(400).json({
@@ -621,6 +695,130 @@ export class ChatController {
             return res.status(500).json({
                 success: false,
                 error: 'Failed to get conversation participants'
+            });
+        }
+    };
+
+    // Add reaction to message
+    addReaction = async (req: Request, res: Response) => {
+        try {
+            const { messageId } = req.params;
+            const { reaction } = req.body;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
+
+            if (!messageId || !reaction) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Message ID and reaction are required'
+                });
+            }
+
+            const result = await this.chatService.addReaction(messageId, userId, reaction);
+            return res.json({
+                success: true,
+                data: result
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                error: error.message || 'Failed to add reaction'
+            });
+        }
+    };
+
+    // Remove reaction from message
+    removeReaction = async (req: Request, res: Response) => {
+        try {
+            const { messageId } = req.params;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
+
+            if (!messageId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Message ID is required'
+                });
+            }
+
+            await this.chatService.removeReaction(messageId, userId);
+            return res.json({
+                success: true,
+                message: 'Reaction removed'
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                error: error.message || 'Failed to remove reaction'
+            });
+        }
+    };
+
+    // Update message metadata (pin, archive, important, label)
+    updateMessageMetadata = async (req: Request, res: Response) => {
+        try {
+            const { messageId } = req.params;
+            const { isPinned, isArchived, isImportant, label } = req.body;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
+
+            if (!messageId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Message ID is required'
+                });
+            }
+
+            const metadata = await this.chatService.updateMessageMetadata(messageId, userId, {
+                isPinned,
+                isArchived,
+                isImportant,
+                label
+            });
+
+            return res.json({
+                success: true,
+                data: metadata
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                error: error.message || 'Failed to update message metadata'
+            });
+        }
+    };
+
+    // Get message metadata
+    getMessageMetadata = async (req: Request, res: Response) => {
+        try {
+            const { messageId } = req.params;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
+
+            if (!messageId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Message ID is required'
+                });
+            }
+
+            const metadata = await this.chatService.getMessageMetadata(messageId, userId);
+            return res.json({
+                success: true,
+                data: metadata
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                error: error.message || 'Failed to get message metadata'
             });
         }
     };

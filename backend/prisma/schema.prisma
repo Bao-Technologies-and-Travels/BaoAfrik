@@ -47,6 +47,8 @@ model User {
   refreshTokens            RefreshToken[]
   conversationParticipants ConversationParticipant[]
   sentMessageStatuses      MessageStatus[]
+  messageReactions          MessageReaction[]
+  messageMetadata          MessageMetadata[]
   notifications            Notification[]
   productRequests          ProductRequest[]
 
@@ -184,6 +186,8 @@ model Message {
   replyTo                   Message?        @relation("MessageReplies", fields: [replyToId], references: [id])
   replies                   Message[]       @relation("MessageReplies")
   statuses                  MessageStatus[]
+  reactions                 MessageReaction[]
+  metadata                  MessageMetadata[]
   conversationAsLastMessage Conversation[]  @relation("ConversationLastMessage")
 
   @@index([encryptedAt])
@@ -203,6 +207,39 @@ model MessageStatus {
 
   @@unique([messageId, userId])
   @@map("message_status")
+}
+
+model MessageReaction {
+  id        String   @id @default(uuid())
+  messageId String   @map("message_id")
+  userId    String   @map("user_id")
+  reaction  String   // emoji string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@map("message_reactions")
+}
+
+model MessageMetadata {
+  id        String   @id @default(uuid())
+  messageId String   @map("message_id")
+  userId    String   @map("user_id")
+  isPinned  Boolean  @default(false) @map("is_pinned")
+  isArchived Boolean @default(false) @map("is_archived")
+  isImportant Boolean @default(false) @map("is_important")
+  label     String?  // label name or null
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@map("message_metadata")
 }
 
 model Category {

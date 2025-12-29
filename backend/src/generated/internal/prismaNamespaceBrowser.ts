@@ -59,6 +59,8 @@ export const ModelName = {
   ProductReview: 'ProductReview',
   Message: 'Message',
   MessageStatus: 'MessageStatus',
+  MessageReaction: 'MessageReaction',
+  MessageMetadata: 'MessageMetadata',
   Category: 'Category',
   Country: 'Country',
   Conversation: 'Conversation',
@@ -228,6 +230,33 @@ export const MessageStatusScalarFieldEnum = {
 } as const
 
 export type MessageStatusScalarFieldEnum = (typeof MessageStatusScalarFieldEnum)[keyof typeof MessageStatusScalarFieldEnum]
+
+
+export const MessageReactionScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  userId: 'userId',
+  reaction: 'reaction',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessageReactionScalarFieldEnum = (typeof MessageReactionScalarFieldEnum)[keyof typeof MessageReactionScalarFieldEnum]
+
+
+export const MessageMetadataScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  userId: 'userId',
+  isPinned: 'isPinned',
+  isArchived: 'isArchived',
+  isImportant: 'isImportant',
+  label: 'label',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessageMetadataScalarFieldEnum = (typeof MessageMetadataScalarFieldEnum)[keyof typeof MessageMetadataScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {

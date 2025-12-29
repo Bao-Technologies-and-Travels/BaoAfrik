@@ -1139,6 +1139,25 @@ const ProductDetail: React.FC = () => {
         return;
       }
 
+      // Extract image URLs from product.images
+      let imageUrls: string[] = [];
+      try {
+        const imagesArray: ProductImage[] = typeof product.images === 'string'
+          ? JSON.parse(product.images)
+          : product.images;
+        
+        if (Array.isArray(imagesArray) && imagesArray.length > 0) {
+          imageUrls = imagesArray.map((img: ProductImage) => img.url);
+        } else if (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) {
+          imageUrls = product.imageUrls;
+        }
+      } catch (error) {
+        console.error('Error parsing product images:', error);
+      }
+
+      // Get primary image (first image or first URL)
+      const primaryImage = imageUrls.length > 0 ? imageUrls[0] : null;
+
       // Call backend to create or get a conversation
       const response = await axios.post(
         `${API_BASE}/chat/conversations`,
@@ -1149,12 +1168,18 @@ const ProductDetail: React.FC = () => {
           productData: {
             id: product.id,
             name: product.title,
+            title: product.title, // Also include title for consistency
             price: product.price,
-            currency: product.currency,
-            description: product.description,
-            images: product.images,
+            currency: product.currency || 'USD',
+            description: product.description || '',
+            image: primaryImage, // Primary image URL
+            images: imageUrls, // All image URLs array
             category: product.category,
             location: product.location,
+            origin: product.origin,
+            quantity: product.quantity,
+            saleType: product.saleType,
+            deliveryAvailable: product.deliveryAvailable,
             seller: {
               id: product.seller.id,
               firstName: product.seller.firstName,

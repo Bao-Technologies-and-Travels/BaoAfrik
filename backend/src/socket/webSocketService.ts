@@ -301,6 +301,18 @@ export class WebSocketService {
         await this.handleContactSeller(authenticatedSocket, data);
       });
 
+      socket.on('add_reaction', async (data) => {
+        await this.handleAddReaction(authenticatedSocket, data);
+      });
+
+      socket.on('remove_reaction', async (data) => {
+        await this.handleRemoveReaction(authenticatedSocket, data);
+      });
+
+      socket.on('update_message_metadata', async (data) => {
+        await this.handleUpdateMessageMetadata(authenticatedSocket, data);
+      });
+
       socket.on('disconnect', (reason) => {
         this.userSockets.delete(userId);
         this.connectedUsers.delete(userId);
@@ -633,5 +645,117 @@ export class WebSocketService {
 
   getIO(): SocketIOServer {
     return this.io;
+  }
+
+  private async handleAddReaction(socket: AuthenticatedSocket, data: any) {
+    try {
+      const { messageId, reaction } = data;
+      const userId = socket.user!.id;
+
+      if (!messageId || !reaction) {
+        socket.emit('reaction_error', { error: 'Message ID and reaction are required' });
+        return;
+      }
+
+      const result = await this.chatService.addReaction(messageId, userId, reaction);
+      
+      // Get conversation ID from message
+      const message = await prisma.message.findUnique({
+        where: { id: messageId },
+        select: { conversationId: true }
+      });
+
+      if (message?.conversationId) {
+        // Broadcast reaction to all participants in the conversation
+        this.io.to(`conversation:${message.conversationId}`).emit('reaction_added', {
+          messageId,
+          reaction: result.reaction,
+          user: {
+            id: result.user.id,
+            firstName: result.user.firstName,
+            lastName: result.user.lastName,
+            profileImage: result.user.profileImage
+          },
+          allReactions: result.message.reactions
+        });
+      }
+
+      socket.emit('reaction_added_success', { messageId, reaction: result.reaction });
+    } catch (error: any) {
+      console.error('Error adding reaction:', error);
+      socket.emit('reaction_error', { error: error.message || 'Failed to add reaction' });
+    }
+  }
+
+  private async handleRemoveReaction(socket: AuthenticatedSocket, data: any) {
+    try {
+      const { messageId } = data;
+      const userId = socket.user!.id;
+
+      if (!messageId) {
+        socket.emit('reaction_error', { error: 'Message ID is required' });
+        return;
+      }
+
+      await this.chatService.removeReaction(messageId, userId);
+
+      // Get conversation ID from message
+      const message = await prisma.message.findUnique({
+        where: { id: messageId },
+        select: { conversationId: true }
+      });
+
+      if (message?.conversationId) {
+        // Broadcast reaction removal to all participants
+        this.io.to(`conversation:${message.conversationId}`).emit('reaction_removed', {
+          messageId,
+          userId
+        });
+      }
+
+      socket.emit('reaction_removed_success', { messageId });
+    } catch (error: any) {
+      console.error('Error removing reaction:', error);
+      socket.emit('reaction_error', { error: error.message || 'Failed to remove reaction' });
+    }
+  }
+
+  private async handleUpdateMessageMetadata(socket: AuthenticatedSocket, data: any) {
+    try {
+      const { messageId, isPinned, isArchived, isImportant, label } = data;
+      const userId = socket.user!.id;
+
+      if (!messageId) {
+        socket.emit('metadata_error', { error: 'Message ID is required' });
+        return;
+      }
+
+      const metadata = await this.chatService.updateMessageMetadata(messageId, userId, {
+        isPinned,
+        isArchived,
+        isImportant,
+        label
+      });
+
+      // Get conversation ID from message
+      const message = await prisma.message.findUnique({
+        where: { id: messageId },
+        select: { conversationId: true }
+      });
+
+      if (message?.conversationId) {
+        // Broadcast metadata update to all participants
+        this.io.to(`conversation:${message.conversationId}`).emit('message_metadata_updated', {
+          messageId,
+          userId,
+          metadata
+        });
+      }
+
+      socket.emit('metadata_updated_success', { messageId, metadata });
+    } catch (error: any) {
+      console.error('Error updating message metadata:', error);
+      socket.emit('metadata_error', { error: error.message || 'Failed to update message metadata' });
+    }
   }
 }

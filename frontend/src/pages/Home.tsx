@@ -162,9 +162,9 @@ const Home: React.FC = () => {
 
     const fetchWithTimeout = async () => {
       try {
-        await fetchProducts();
+        await fetchProducts(controller.signal);
       } catch (err: any) {
-        if (err.name === 'AbortError') {
+        if (err?.name === 'AbortError') {
           setError('Request timeout - using local data');
         }
       } finally {
@@ -181,7 +181,7 @@ const Home: React.FC = () => {
   }, []);
 
   // fetch products from API
-  const fetchProducts = async () => {
+  const fetchProducts = async (signal?: AbortSignal) => {
 
     setIsLoading(true);
     setError(null);
@@ -192,6 +192,7 @@ const Home: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        signal
       });
 
       if (!response.ok) {
@@ -209,7 +210,11 @@ const Home: React.FC = () => {
         }
       }
 
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.name === 'AbortError') {
+        // silently ignore aborted requests
+        return;
+      }
       setError(`API connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
@@ -218,6 +223,7 @@ const Home: React.FC = () => {
 
   // useEffect for fetching requests from API
   useEffect(() => {
+    const controller = new AbortController();
     const fetchRequests = async () => {
       try {
         setIsLoadingRequests(true);
@@ -230,7 +236,8 @@ const Home: React.FC = () => {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          signal: controller.signal
         });
 
         if (!response.ok) {
@@ -240,7 +247,8 @@ const Home: React.FC = () => {
         const result = await response.json();
         setRequests(Array.isArray(result.data) ? result.data : []);
 
-      } catch (error) {
+      } catch (error: any) {
+        if (error?.name === 'AbortError') return;
         console.error('Error fetching requests:', error);
         setRequestsError('Failed to load requests. Please try again later.');
       } finally {
@@ -248,6 +256,7 @@ const Home: React.FC = () => {
       }
     };
     fetchRequests();
+    // return () => controller.abort();
   }, []);
 
   const getDefaultProductImage = (category: string | undefined): any => {
@@ -428,121 +437,7 @@ const Home: React.FC = () => {
     { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png' }
   ].sort((a, b) => a.name.localeCompare(b.name));
 
-  // Country mapping for products
-  // replaced by shared util
-
-  // removed: countries array now provided by shared util
-  // const countries = [
-  // { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
-  // { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },
-  // { name: 'Benin', code: 'bj', flag: 'https://flagcdn.com/w20/bj.png', abbreviation: 'BEN' },
-  // { name: 'Botswana', code: 'bw', flag: 'https://flagcdn.com/w20/bw.png', abbreviation: 'BWA' },
-  // { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
-  // { name: 'Burundi', code: 'bi', flag: 'https://flagcdn.com/w20/bi.png', abbreviation: 'BDI' },
-  // { name: 'Cabo Verde', code: 'cv', flag: 'https://flagcdn.com/w20/cv.png', abbreviation: 'CPV' },
-  // { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
-  // { name: 'Central African Republic', code: 'cf', flag: 'https://flagcdn.com/w20/cf.png', abbreviation: 'CAF' },
-  // { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
-  // { name: 'Comoros', code: 'km', flag: 'https://flagcdn.com/w20/km.png', abbreviation: 'COM' },
-  // { name: 'Congo (Congo-Brazzaville)', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
-  // { name: 'Côte d\'Ivoire', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
-  // { name: 'Democratic Republic of the Congo', code: 'cd', flag: 'https://flagcdn.com/w20/cd.png', abbreviation: 'COD' },
-  // { name: 'Djibouti', code: 'dj', flag: 'https://flagcdn.com/w20/dj.png', abbreviation: 'DJI' },
-  // { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
-  // { name: 'Equatorial Guinea', code: 'gq', flag: 'https://flagcdn.com/w20/gq.png', abbreviation: 'GNQ' },
-  // { name: 'Eritrea', code: 'er', flag: 'https://flagcdn.com/w20/er.png', abbreviation: 'ERI' },
-  // { name: 'Eswatini', code: 'sz', flag: 'https://flagcdn.com/w20/sz.png', abbreviation: 'SWZ' },
-  // { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
-  // { name: 'Gabon', code: 'ga', flag: 'https://flagcdn.com/w20/ga.png', abbreviation: 'GAB' },
-  // { name: 'Gambia', code: 'gm', flag: 'https://flagcdn.com/w20/gm.png', abbreviation: 'GMB' },
-  // { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
-  // { name: 'Guinea', code: 'gn', flag: 'https://flagcdn.com/w20/gn.png', abbreviation: 'GIN' },
-  // { name: 'Guinea-Bissau', code: 'gw', flag: 'https://flagcdn.com/w20/gw.png', abbreviation: 'GNB' },
-  // { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
-  // { name: 'Lesotho', code: 'ls', flag: 'https://flagcdn.com/w20/ls.png', abbreviation: 'LSO' },
-  // { name: 'Liberia', code: 'lr', flag: 'https://flagcdn.com/w20/lr.png', abbreviation: 'LBR' },
-  // { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' },
-  // { name: 'Madagascar', code: 'mg', flag: 'https://flagcdn.com/w20/mg.png', abbreviation: 'MDG' },
-  // { name: 'Malawi', code: 'mw', flag: 'https://flagcdn.com/w20/mw.png', abbreviation: 'MWI' },
-  // { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
-  // { name: 'Mauritania', code: 'mr', flag: 'https://flagcdn.com/w20/mr.png', abbreviation: 'MRT' },
-  // { name: 'Mauritius', code: 'mu', flag: 'https://flagcdn.com/w20/mu.png', abbreviation: 'MUS' },
-  // { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
-  // { name: 'Mozambique', code: 'mz', flag: 'https://flagcdn.com/w20/mz.png', abbreviation: 'MOZ' },
-  // { name: 'Namibia', code: 'na', flag: 'https://flagcdn.com/w20/na.png', abbreviation: 'NAM' },
-  // { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
-  // { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGA' },
-  // { name: 'Rwanda', code: 'rw', flag: 'https://flagcdn.com/w20/rw.png', abbreviation: 'RWA' },
-  // { name: 'Sao Tome and Principe', code: 'st', flag: 'https://flagcdn.com/w20/st.png', abbreviation: 'STP' },
-  // { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
-  // { name: 'Seychelles', code: 'sc', flag: 'https://flagcdn.com/w20/sc.png', abbreviation: 'SYC' },
-  // { name: 'Sierra Leone', code: 'sl', flag: 'https://flagcdn.com/w20/sl.png', abbreviation: 'SLE' },
-  // { name: 'Somalia', code: 'so', flag: 'https://flagcdn.com/w20/so.png', abbreviation: 'SOM' },
-  // { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
-  // { name: 'South Sudan', code: 'ss', flag: 'https://flagcdn.com/w20/ss.png', abbreviation: 'SSD' },
-  // { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
-  // { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
-  // { name: 'Togo', code: 'tg', flag: 'https://flagcdn.com/w20/tg.png', abbreviation: 'TGO' },
-  // { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
-  // { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
-  // { name: 'Zambia', code: 'zm', flag: 'https://flagcdn.com/w20/zm.png', abbreviation: 'ZMB' },
-  // { name: 'Zimbabwe', code: 'zw', flag: 'https://flagcdn.com/w20/zw.png', abbreviation: 'ZWE' }
-  // ];
-
-  // if (!productOrigin) {
-  //   const defaultCountryIndex = productId % countries.length;
-  //   return countries[defaultCountryIndex] || countries[0];
-  // }
-
-  // normalize the input
-  // const normalizedOrigin = productOrigin.trim().toLowerCase();
-
-  // Add common alternative names for some countries
-  const alternativeNames: Record<string, string> = {
-    'gambia': 'Gambia',
-    'ivory coast': 'Côte d\'Ivoire',
-    'cote divoire': 'Côte d\'Ivoire',
-    'côte d\'ivoire': 'Côte d\'Ivoire',
-    'swaziland': 'Eswatini',
-    'congo': 'Congo (Congo-Brazzaville)',
-    'congo brazzaville': 'Congo (Congo-Brazzaville)',
-    'dr congo': 'Democratic Republic of the Congo',
-    'drc': 'Democratic Republic of the Congo',
-    'congo kinshasa': 'Democratic Republic of the Congo',
-    'cape verde': 'Cabo Verde',
-    'sao tome': 'Sao Tome and Principe',
-    'são tomé': 'Sao Tome and Principe',
-    'são tomé and príncipe': 'Sao Tome and Principe',
-    'sao tome & principe': 'Sao Tome and Principe'
-  };
-
-  // const standardName = alternativeNames[normalizedOrigin] || normalizedOrigin;
-
-  // let country = countries.find(c =>
-  //   c.name.toLowerCase() === standardName.toLowerCase() ||
-  //   c.code.toLowerCase() === normalizedOrigin.toLowerCase() ||
-  //   c.abbreviation.toLowerCase() === normalizedOrigin.toLowerCase()
-  // );
-
-  // if (country) {
-  //   return country;
-  // };
-
-  // // Try partial matches
-  // country = countries.find(c =>
-  //   c.name.toLowerCase().includes(standardName) ||
-  //   standardName.toLowerCase().includes(c.name.toLowerCase())
-  // );
-
-  // if (country) {
-  //   return country;
-  // }
-
-  // // Fallback to default based on productId
-  // const defaultCountryIndex = productId % countries.length;
-  // return countries[defaultCountryIndex] || countries[0];
-  // };
-
+  
   const formatPrice = (amount: number | string, currencyCode: string = 'USD'): string => {
     const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
     const currencyCode_ = (currencyCode || 'USD').toUpperCase();
@@ -1804,7 +1699,7 @@ const Home: React.FC = () => {
                     maskComposite: 'intersect',
                     WebkitMaskComposite: 'source-in'
                   }}
-                  loading="eager"
+                  loading="lazy"
                   width="320"
                   height="192"
                 />

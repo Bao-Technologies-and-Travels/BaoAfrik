@@ -386,6 +386,8 @@ export type MessageWhereInput = {
   replyTo?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   replies?: Prisma.MessageListRelationFilter
   statuses?: Prisma.MessageStatusListRelationFilter
+  reactions?: Prisma.MessageReactionListRelationFilter
+  metadata?: Prisma.MessageMetadataListRelationFilter
   conversationAsLastMessage?: Prisma.ConversationListRelationFilter
 }
 
@@ -422,6 +424,8 @@ export type MessageOrderByWithRelationInput = {
   replyTo?: Prisma.MessageOrderByWithRelationInput
   replies?: Prisma.MessageOrderByRelationAggregateInput
   statuses?: Prisma.MessageStatusOrderByRelationAggregateInput
+  reactions?: Prisma.MessageReactionOrderByRelationAggregateInput
+  metadata?: Prisma.MessageMetadataOrderByRelationAggregateInput
   conversationAsLastMessage?: Prisma.ConversationOrderByRelationAggregateInput
 }
 
@@ -461,6 +465,8 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   replyTo?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   replies?: Prisma.MessageListRelationFilter
   statuses?: Prisma.MessageStatusListRelationFilter
+  reactions?: Prisma.MessageReactionListRelationFilter
+  metadata?: Prisma.MessageMetadataListRelationFilter
   conversationAsLastMessage?: Prisma.ConversationListRelationFilter
 }, "id">
 
@@ -559,6 +565,8 @@ export type MessageCreateInput = {
   replyTo?: Prisma.MessageCreateNestedOneWithoutRepliesInput
   replies?: Prisma.MessageCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationCreateNestedManyWithoutLastMessageInput
 }
 
@@ -591,6 +599,8 @@ export type MessageUncheckedCreateInput = {
   tamperDetected?: boolean
   replies?: Prisma.MessageUncheckedCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedCreateNestedManyWithoutLastMessageInput
 }
 
@@ -623,6 +633,8 @@ export type MessageUpdateInput = {
   replyTo?: Prisma.MessageUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.MessageUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -655,6 +667,8 @@ export type MessageUncheckedUpdateInput = {
   tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replies?: Prisma.MessageUncheckedUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -1022,6 +1036,34 @@ export type MessageUpdateOneRequiredWithoutStatusesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutStatusesInput, Prisma.MessageUpdateWithoutStatusesInput>, Prisma.MessageUncheckedUpdateWithoutStatusesInput>
 }
 
+export type MessageCreateNestedOneWithoutReactionsInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutReactionsInput, Prisma.MessageUncheckedCreateWithoutReactionsInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutReactionsInput
+  connect?: Prisma.MessageWhereUniqueInput
+}
+
+export type MessageUpdateOneRequiredWithoutReactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutReactionsInput, Prisma.MessageUncheckedCreateWithoutReactionsInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutReactionsInput
+  upsert?: Prisma.MessageUpsertWithoutReactionsInput
+  connect?: Prisma.MessageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutReactionsInput, Prisma.MessageUpdateWithoutReactionsInput>, Prisma.MessageUncheckedUpdateWithoutReactionsInput>
+}
+
+export type MessageCreateNestedOneWithoutMetadataInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutMetadataInput, Prisma.MessageUncheckedCreateWithoutMetadataInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutMetadataInput
+  connect?: Prisma.MessageWhereUniqueInput
+}
+
+export type MessageUpdateOneRequiredWithoutMetadataNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutMetadataInput, Prisma.MessageUncheckedCreateWithoutMetadataInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutMetadataInput
+  upsert?: Prisma.MessageUpsertWithoutMetadataInput
+  connect?: Prisma.MessageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutMetadataInput, Prisma.MessageUpdateWithoutMetadataInput>, Prisma.MessageUncheckedUpdateWithoutMetadataInput>
+}
+
 export type MessageCreateNestedOneWithoutConversationAsLastMessageInput = {
   create?: Prisma.XOR<Prisma.MessageCreateWithoutConversationAsLastMessageInput, Prisma.MessageUncheckedCreateWithoutConversationAsLastMessageInput>
   connectOrCreate?: Prisma.MessageCreateOrConnectWithoutConversationAsLastMessageInput
@@ -1108,6 +1150,8 @@ export type MessageCreateWithoutSenderInput = {
   replyTo?: Prisma.MessageCreateNestedOneWithoutRepliesInput
   replies?: Prisma.MessageCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1139,6 +1183,8 @@ export type MessageUncheckedCreateWithoutSenderInput = {
   tamperDetected?: boolean
   replies?: Prisma.MessageUncheckedCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1228,6 +1274,8 @@ export type MessageCreateWithoutProductInput = {
   replyTo?: Prisma.MessageCreateNestedOneWithoutRepliesInput
   replies?: Prisma.MessageCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1259,6 +1307,8 @@ export type MessageUncheckedCreateWithoutProductInput = {
   tamperDetected?: boolean
   replies?: Prisma.MessageUncheckedCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1316,6 +1366,8 @@ export type MessageCreateWithoutRepliesInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutMessagesInput
   replyTo?: Prisma.MessageCreateNestedOneWithoutRepliesInput
   statuses?: Prisma.MessageStatusCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1347,6 +1399,8 @@ export type MessageUncheckedCreateWithoutRepliesInput = {
   integrityHash?: string | null
   tamperDetected?: boolean
   statuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1383,6 +1437,8 @@ export type MessageCreateWithoutReplyToInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutMessagesInput
   replies?: Prisma.MessageCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1414,6 +1470,8 @@ export type MessageUncheckedCreateWithoutReplyToInput = {
   tamperDetected?: boolean
   replies?: Prisma.MessageUncheckedCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1466,6 +1524,8 @@ export type MessageUpdateWithoutRepliesInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutMessagesNestedInput
   replyTo?: Prisma.MessageUpdateOneWithoutRepliesNestedInput
   statuses?: Prisma.MessageStatusUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -1497,6 +1557,8 @@ export type MessageUncheckedUpdateWithoutRepliesInput = {
   integrityHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
   statuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -1544,6 +1606,8 @@ export type MessageCreateWithoutStatusesInput = {
   conversation?: Prisma.ConversationCreateNestedOneWithoutMessagesInput
   replyTo?: Prisma.MessageCreateNestedOneWithoutRepliesInput
   replies?: Prisma.MessageCreateNestedManyWithoutReplyToInput
+  reactions?: Prisma.MessageReactionCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1575,6 +1639,8 @@ export type MessageUncheckedCreateWithoutStatusesInput = {
   integrityHash?: string | null
   tamperDetected?: boolean
   replies?: Prisma.MessageUncheckedCreateNestedManyWithoutReplyToInput
+  reactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1622,6 +1688,8 @@ export type MessageUpdateWithoutStatusesInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutMessagesNestedInput
   replyTo?: Prisma.MessageUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.MessageUpdateManyWithoutReplyToNestedInput
+  reactions?: Prisma.MessageReactionUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -1653,6 +1721,304 @@ export type MessageUncheckedUpdateWithoutStatusesInput = {
   integrityHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replies?: Prisma.MessageUncheckedUpdateManyWithoutReplyToNestedInput
+  reactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutMessageNestedInput
+  conversationAsLastMessage?: Prisma.ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
+}
+
+export type MessageCreateWithoutReactionsInput = {
+  id?: string
+  imageUrl?: string | null
+  audioUrl?: string | null
+  fileUrl?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  productData?: string | null
+  productSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  subject?: string | null
+  isRead?: boolean
+  messageType?: $Enums.MessageType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  readAt?: Date | string | null
+  content: string
+  encryptionIv: string
+  encryptionAuthTag: string
+  dbEncryptedContent?: string | null
+  encryptedAt?: Date | string
+  encryptedVersion?: string
+  integrityHash?: string | null
+  tamperDetected?: boolean
+  sender: Prisma.UserCreateNestedOneWithoutSentMessagesInput
+  product?: Prisma.ProductCreateNestedOneWithoutMessagesInput
+  conversation?: Prisma.ConversationCreateNestedOneWithoutMessagesInput
+  replyTo?: Prisma.MessageCreateNestedOneWithoutRepliesInput
+  replies?: Prisma.MessageCreateNestedManyWithoutReplyToInput
+  statuses?: Prisma.MessageStatusCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataCreateNestedManyWithoutMessageInput
+  conversationAsLastMessage?: Prisma.ConversationCreateNestedManyWithoutLastMessageInput
+}
+
+export type MessageUncheckedCreateWithoutReactionsInput = {
+  id?: string
+  senderId: string
+  productId?: string | null
+  conversationId?: string | null
+  imageUrl?: string | null
+  audioUrl?: string | null
+  fileUrl?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  replyToId?: string | null
+  productData?: string | null
+  productSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  subject?: string | null
+  isRead?: boolean
+  messageType?: $Enums.MessageType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  readAt?: Date | string | null
+  content: string
+  encryptionIv: string
+  encryptionAuthTag: string
+  dbEncryptedContent?: string | null
+  encryptedAt?: Date | string
+  encryptedVersion?: string
+  integrityHash?: string | null
+  tamperDetected?: boolean
+  replies?: Prisma.MessageUncheckedCreateNestedManyWithoutReplyToInput
+  statuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutMessageInput
+  conversationAsLastMessage?: Prisma.ConversationUncheckedCreateNestedManyWithoutLastMessageInput
+}
+
+export type MessageCreateOrConnectWithoutReactionsInput = {
+  where: Prisma.MessageWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageCreateWithoutReactionsInput, Prisma.MessageUncheckedCreateWithoutReactionsInput>
+}
+
+export type MessageUpsertWithoutReactionsInput = {
+  update: Prisma.XOR<Prisma.MessageUpdateWithoutReactionsInput, Prisma.MessageUncheckedUpdateWithoutReactionsInput>
+  create: Prisma.XOR<Prisma.MessageCreateWithoutReactionsInput, Prisma.MessageUncheckedCreateWithoutReactionsInput>
+  where?: Prisma.MessageWhereInput
+}
+
+export type MessageUpdateToOneWithWhereWithoutReactionsInput = {
+  where?: Prisma.MessageWhereInput
+  data: Prisma.XOR<Prisma.MessageUpdateWithoutReactionsInput, Prisma.MessageUncheckedUpdateWithoutReactionsInput>
+}
+
+export type MessageUpdateWithoutReactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
+  dbEncryptedContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  encryptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  encryptedVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  integrityHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sender?: Prisma.UserUpdateOneRequiredWithoutSentMessagesNestedInput
+  product?: Prisma.ProductUpdateOneWithoutMessagesNestedInput
+  conversation?: Prisma.ConversationUpdateOneWithoutMessagesNestedInput
+  replyTo?: Prisma.MessageUpdateOneWithoutRepliesNestedInput
+  replies?: Prisma.MessageUpdateManyWithoutReplyToNestedInput
+  statuses?: Prisma.MessageStatusUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUpdateManyWithoutMessageNestedInput
+  conversationAsLastMessage?: Prisma.ConversationUpdateManyWithoutLastMessageNestedInput
+}
+
+export type MessageUncheckedUpdateWithoutReactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  senderId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  replyToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
+  dbEncryptedContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  encryptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  encryptedVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  integrityHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replies?: Prisma.MessageUncheckedUpdateManyWithoutReplyToNestedInput
+  statuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutMessageNestedInput
+  conversationAsLastMessage?: Prisma.ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
+}
+
+export type MessageCreateWithoutMetadataInput = {
+  id?: string
+  imageUrl?: string | null
+  audioUrl?: string | null
+  fileUrl?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  productData?: string | null
+  productSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  subject?: string | null
+  isRead?: boolean
+  messageType?: $Enums.MessageType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  readAt?: Date | string | null
+  content: string
+  encryptionIv: string
+  encryptionAuthTag: string
+  dbEncryptedContent?: string | null
+  encryptedAt?: Date | string
+  encryptedVersion?: string
+  integrityHash?: string | null
+  tamperDetected?: boolean
+  sender: Prisma.UserCreateNestedOneWithoutSentMessagesInput
+  product?: Prisma.ProductCreateNestedOneWithoutMessagesInput
+  conversation?: Prisma.ConversationCreateNestedOneWithoutMessagesInput
+  replyTo?: Prisma.MessageCreateNestedOneWithoutRepliesInput
+  replies?: Prisma.MessageCreateNestedManyWithoutReplyToInput
+  statuses?: Prisma.MessageStatusCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionCreateNestedManyWithoutMessageInput
+  conversationAsLastMessage?: Prisma.ConversationCreateNestedManyWithoutLastMessageInput
+}
+
+export type MessageUncheckedCreateWithoutMetadataInput = {
+  id?: string
+  senderId: string
+  productId?: string | null
+  conversationId?: string | null
+  imageUrl?: string | null
+  audioUrl?: string | null
+  fileUrl?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  replyToId?: string | null
+  productData?: string | null
+  productSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  subject?: string | null
+  isRead?: boolean
+  messageType?: $Enums.MessageType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  readAt?: Date | string | null
+  content: string
+  encryptionIv: string
+  encryptionAuthTag: string
+  dbEncryptedContent?: string | null
+  encryptedAt?: Date | string
+  encryptedVersion?: string
+  integrityHash?: string | null
+  tamperDetected?: boolean
+  replies?: Prisma.MessageUncheckedCreateNestedManyWithoutReplyToInput
+  statuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutMessageInput
+  conversationAsLastMessage?: Prisma.ConversationUncheckedCreateNestedManyWithoutLastMessageInput
+}
+
+export type MessageCreateOrConnectWithoutMetadataInput = {
+  where: Prisma.MessageWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageCreateWithoutMetadataInput, Prisma.MessageUncheckedCreateWithoutMetadataInput>
+}
+
+export type MessageUpsertWithoutMetadataInput = {
+  update: Prisma.XOR<Prisma.MessageUpdateWithoutMetadataInput, Prisma.MessageUncheckedUpdateWithoutMetadataInput>
+  create: Prisma.XOR<Prisma.MessageCreateWithoutMetadataInput, Prisma.MessageUncheckedCreateWithoutMetadataInput>
+  where?: Prisma.MessageWhereInput
+}
+
+export type MessageUpdateToOneWithWhereWithoutMetadataInput = {
+  where?: Prisma.MessageWhereInput
+  data: Prisma.XOR<Prisma.MessageUpdateWithoutMetadataInput, Prisma.MessageUncheckedUpdateWithoutMetadataInput>
+}
+
+export type MessageUpdateWithoutMetadataInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
+  dbEncryptedContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  encryptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  encryptedVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  integrityHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sender?: Prisma.UserUpdateOneRequiredWithoutSentMessagesNestedInput
+  product?: Prisma.ProductUpdateOneWithoutMessagesNestedInput
+  conversation?: Prisma.ConversationUpdateOneWithoutMessagesNestedInput
+  replyTo?: Prisma.MessageUpdateOneWithoutRepliesNestedInput
+  replies?: Prisma.MessageUpdateManyWithoutReplyToNestedInput
+  statuses?: Prisma.MessageStatusUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUpdateManyWithoutMessageNestedInput
+  conversationAsLastMessage?: Prisma.ConversationUpdateManyWithoutLastMessageNestedInput
+}
+
+export type MessageUncheckedUpdateWithoutMetadataInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  senderId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  conversationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  replyToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productSnapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  subject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  readAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptionIv?: Prisma.StringFieldUpdateOperationsInput | string
+  encryptionAuthTag?: Prisma.StringFieldUpdateOperationsInput | string
+  dbEncryptedContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  encryptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  encryptedVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  integrityHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replies?: Prisma.MessageUncheckedUpdateManyWithoutReplyToNestedInput
+  statuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -1685,6 +2051,8 @@ export type MessageCreateWithoutConversationAsLastMessageInput = {
   replyTo?: Prisma.MessageCreateNestedOneWithoutRepliesInput
   replies?: Prisma.MessageCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataCreateNestedManyWithoutMessageInput
 }
 
 export type MessageUncheckedCreateWithoutConversationAsLastMessageInput = {
@@ -1716,6 +2084,8 @@ export type MessageUncheckedCreateWithoutConversationAsLastMessageInput = {
   tamperDetected?: boolean
   replies?: Prisma.MessageUncheckedCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutMessageInput
 }
 
 export type MessageCreateOrConnectWithoutConversationAsLastMessageInput = {
@@ -1751,6 +2121,8 @@ export type MessageCreateWithoutConversationInput = {
   replyTo?: Prisma.MessageCreateNestedOneWithoutRepliesInput
   replies?: Prisma.MessageCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1782,6 +2154,8 @@ export type MessageUncheckedCreateWithoutConversationInput = {
   tamperDetected?: boolean
   replies?: Prisma.MessageUncheckedCreateNestedManyWithoutReplyToInput
   statuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutMessageInput
+  reactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutMessageInput
+  metadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutMessageInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedCreateNestedManyWithoutLastMessageInput
 }
 
@@ -1835,6 +2209,8 @@ export type MessageUpdateWithoutConversationAsLastMessageInput = {
   replyTo?: Prisma.MessageUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.MessageUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUpdateManyWithoutMessageNestedInput
 }
 
 export type MessageUncheckedUpdateWithoutConversationAsLastMessageInput = {
@@ -1866,6 +2242,8 @@ export type MessageUncheckedUpdateWithoutConversationAsLastMessageInput = {
   tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replies?: Prisma.MessageUncheckedUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutMessageNestedInput
 }
 
 export type MessageUpsertWithWhereUniqueWithoutConversationInput = {
@@ -1940,6 +2318,8 @@ export type MessageUpdateWithoutSenderInput = {
   replyTo?: Prisma.MessageUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.MessageUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -1971,6 +2351,8 @@ export type MessageUncheckedUpdateWithoutSenderInput = {
   tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replies?: Prisma.MessageUncheckedUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -2058,6 +2440,8 @@ export type MessageUpdateWithoutProductInput = {
   replyTo?: Prisma.MessageUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.MessageUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -2089,6 +2473,8 @@ export type MessageUncheckedUpdateWithoutProductInput = {
   tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replies?: Prisma.MessageUncheckedUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -2176,6 +2562,8 @@ export type MessageUpdateWithoutReplyToInput = {
   conversation?: Prisma.ConversationUpdateOneWithoutMessagesNestedInput
   replies?: Prisma.MessageUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -2207,6 +2595,8 @@ export type MessageUncheckedUpdateWithoutReplyToInput = {
   tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replies?: Prisma.MessageUncheckedUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -2294,6 +2684,8 @@ export type MessageUpdateWithoutConversationInput = {
   replyTo?: Prisma.MessageUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.MessageUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -2325,6 +2717,8 @@ export type MessageUncheckedUpdateWithoutConversationInput = {
   tamperDetected?: Prisma.BoolFieldUpdateOperationsInput | boolean
   replies?: Prisma.MessageUncheckedUpdateManyWithoutReplyToNestedInput
   statuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutMessageNestedInput
+  reactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutMessageNestedInput
+  metadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutMessageNestedInput
   conversationAsLastMessage?: Prisma.ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
 }
 
@@ -2364,12 +2758,16 @@ export type MessageUncheckedUpdateManyWithoutConversationInput = {
 export type MessageCountOutputType = {
   replies: number
   statuses: number
+  reactions: number
+  metadata: number
   conversationAsLastMessage: number
 }
 
 export type MessageCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   replies?: boolean | MessageCountOutputTypeCountRepliesArgs
   statuses?: boolean | MessageCountOutputTypeCountStatusesArgs
+  reactions?: boolean | MessageCountOutputTypeCountReactionsArgs
+  metadata?: boolean | MessageCountOutputTypeCountMetadataArgs
   conversationAsLastMessage?: boolean | MessageCountOutputTypeCountConversationAsLastMessageArgs
 }
 
@@ -2395,6 +2793,20 @@ export type MessageCountOutputTypeCountRepliesArgs<ExtArgs extends runtime.Types
  */
 export type MessageCountOutputTypeCountStatusesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.MessageStatusWhereInput
+}
+
+/**
+ * MessageCountOutputType without action
+ */
+export type MessageCountOutputTypeCountReactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageReactionWhereInput
+}
+
+/**
+ * MessageCountOutputType without action
+ */
+export type MessageCountOutputTypeCountMetadataArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageMetadataWhereInput
 }
 
 /**
@@ -2438,6 +2850,8 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   replyTo?: boolean | Prisma.Message$replyToArgs<ExtArgs>
   replies?: boolean | Prisma.Message$repliesArgs<ExtArgs>
   statuses?: boolean | Prisma.Message$statusesArgs<ExtArgs>
+  reactions?: boolean | Prisma.Message$reactionsArgs<ExtArgs>
+  metadata?: boolean | Prisma.Message$metadataArgs<ExtArgs>
   conversationAsLastMessage?: boolean | Prisma.Message$conversationAsLastMessageArgs<ExtArgs>
   _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
@@ -2545,6 +2959,8 @@ export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   replyTo?: boolean | Prisma.Message$replyToArgs<ExtArgs>
   replies?: boolean | Prisma.Message$repliesArgs<ExtArgs>
   statuses?: boolean | Prisma.Message$statusesArgs<ExtArgs>
+  reactions?: boolean | Prisma.Message$reactionsArgs<ExtArgs>
+  metadata?: boolean | Prisma.Message$metadataArgs<ExtArgs>
   conversationAsLastMessage?: boolean | Prisma.Message$conversationAsLastMessageArgs<ExtArgs>
   _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2570,6 +2986,8 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     replyTo: Prisma.$MessagePayload<ExtArgs> | null
     replies: Prisma.$MessagePayload<ExtArgs>[]
     statuses: Prisma.$MessageStatusPayload<ExtArgs>[]
+    reactions: Prisma.$MessageReactionPayload<ExtArgs>[]
+    metadata: Prisma.$MessageMetadataPayload<ExtArgs>[]
     conversationAsLastMessage: Prisma.$ConversationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2999,6 +3417,8 @@ export interface Prisma__MessageClient<T, Null = never, ExtArgs extends runtime.
   replyTo<T extends Prisma.Message$replyToArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$replyToArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   replies<T extends Prisma.Message$repliesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$repliesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   statuses<T extends Prisma.Message$statusesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$statusesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageStatusPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reactions<T extends Prisma.Message$reactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageReactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  metadata<T extends Prisma.Message$metadataArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$metadataArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageMetadataPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversationAsLastMessage<T extends Prisma.Message$conversationAsLastMessageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$conversationAsLastMessageArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3553,6 +3973,54 @@ export type Message$statusesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.MessageStatusScalarFieldEnum | Prisma.MessageStatusScalarFieldEnum[]
+}
+
+/**
+ * Message.reactions
+ */
+export type Message$reactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessageReaction
+   */
+  select?: Prisma.MessageReactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessageReaction
+   */
+  omit?: Prisma.MessageReactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageReactionInclude<ExtArgs> | null
+  where?: Prisma.MessageReactionWhereInput
+  orderBy?: Prisma.MessageReactionOrderByWithRelationInput | Prisma.MessageReactionOrderByWithRelationInput[]
+  cursor?: Prisma.MessageReactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageReactionScalarFieldEnum | Prisma.MessageReactionScalarFieldEnum[]
+}
+
+/**
+ * Message.metadata
+ */
+export type Message$metadataArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessageMetadata
+   */
+  select?: Prisma.MessageMetadataSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessageMetadata
+   */
+  omit?: Prisma.MessageMetadataOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageMetadataInclude<ExtArgs> | null
+  where?: Prisma.MessageMetadataWhereInput
+  orderBy?: Prisma.MessageMetadataOrderByWithRelationInput | Prisma.MessageMetadataOrderByWithRelationInput[]
+  cursor?: Prisma.MessageMetadataWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageMetadataScalarFieldEnum | Prisma.MessageMetadataScalarFieldEnum[]
 }
 
 /**

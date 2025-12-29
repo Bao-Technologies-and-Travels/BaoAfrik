@@ -22,4 +22,12 @@ router.post('/conversations/:conversationId/messages', chatController.sendMessag
 router.get('/conversations/:conversationId/messages', chatController.getMessages);
 router.post('/conversations/:conversationId/read', chatController.markAsRead);
 
+// Message reactions
+router.post('/messages/:messageId/reactions', chatController.addReaction);
+router.delete('/messages/:messageId/reactions', chatController.removeReaction);
+
+// Message metadata (pin, archive, important, label)
+router.patch('/messages/:messageId/metadata', chatController.updateMessageMetadata);
+router.get('/messages/:messageId/metadata', chatController.getMessageMetadata);
+
 export default router;
