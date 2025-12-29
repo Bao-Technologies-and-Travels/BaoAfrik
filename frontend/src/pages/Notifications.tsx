@@ -15,11 +15,12 @@ interface NotificationActor {
   firstName?: string;
   lastName?: string;
   profileImage?: string;
+  avatar?: string;
 }
 
 interface Notification {
   id: string;
-  userId: string;
+  userId?: string;
   actorId?: string;
   actor?: NotificationActor;
   type: string;
@@ -27,10 +28,13 @@ interface Notification {
   body?: string;
   meta?: any;
   isRead: boolean;
-  createdAt: string;
+  createdAt?: string;
   day?: string;
   time?: string;
   _actor?: NotificationActor;
+  senderAvatar?: string;
+  senderImage?: string;
+  sellerImage?: string;
 }
 
 const Notifications: React.FC = () => {
@@ -118,6 +122,19 @@ const Notifications: React.FC = () => {
   useEffect(() => {
     if (!socket) return;
 
+    const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const getDayLabel = (date: Date) => {
+      const d = new Date(date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      d.setHours(0, 0, 0, 0);
+      if (d.getTime() === today.getTime()) return 'Today';
+      if (d.getTime() === yesterday.getTime()) return 'Yesterday';
+      return d.toLocaleDateString();
+    };
+
     const onNotification = async (payload: any) => {
       const newNotification = formatNotificationData([payload])[0];
 
@@ -127,16 +144,100 @@ const Notifications: React.FC = () => {
       }
     };
 
+    const onNewMessageNotification = (payload: any) => {
+      setNotifications(prev => {
+        if (payload?.messageId) {
+          const has = prev.some(n => n.meta?.messageId === payload.messageId);
+          if (has) return prev;
+        }
+
+        const created = new Date();
+        const actor = payload.actor ?? payload._actor ?? payload.meta?.actor ?? (payload.senderImage ? {
+          id: payload.senderId || payload.userId,
+          firstName: payload.senderName?.split(' ')[0] || '',
+          lastName: payload.senderName?.split(' ').slice(1).join(' ') || '',
+          profileImage: payload.senderImage || payload.senderAvatar
+        } : null);
+
+        const normalized: Notification = {
+          id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
+          userId: payload.userId || '',
+          day: getDayLabel(created),
+          time: payload.time || formatTime(created),
+          title: payload.senderName || payload.title || 'Someone',
+          body: payload.preview || payload.body || '',
+          meta: {
+            conversationId: payload.conversationId,
+            messageId: payload.messageId,
+            senderImage: payload.senderImage || payload.senderAvatar
+          },
+          type: 'NEW_MESSAGE',
+          isRead: false,
+          createdAt: created.toISOString(),
+          actor,
+          senderAvatar: payload.senderAvatar,
+          senderImage: payload.senderImage
+        };
+
+        return [normalized, ...prev];
+      });
+      setUnreadCount(prev => prev + 1);
+    };
+
+    const onNewProductNotification = (payload: any) => {
+      setNotifications(prev => {
+        if (payload?.productId) {
+          const has = prev.some(n => n.meta?.productId === payload.productId);
+          if (has) return prev;
+        }
+
+        const created = new Date();
+        const normalized: Notification = {
+          id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
+          userId: payload.userId || '',
+          day: getDayLabel(created),
+          time: payload.time || formatTime(created),
+          title: payload.sellerName || 'A seller',
+          body: `just listed "${payload.productTitle || 'a new product'}"`,
+          meta: {
+            productId: payload.productId,
+            productTitle: payload.productTitle,
+            productImage: payload.productImage,
+            sellerId: payload.sellerId,
+            sellerName: payload.sellerName,
+            sellerImage: payload.sellerImage
+          },
+          type: 'product',
+          isRead: false,
+          createdAt: created.toISOString(),
+          actor: payload.sellerImage ? {
+            id: payload.sellerId,
+            firstName: payload.sellerName?.split(' ')[0] || '',
+            lastName: payload.sellerName?.split(' ').slice(1).join(' ') || '',
+            profileImage: payload.sellerImage
+          } : undefined,
+          sellerImage: payload.sellerImage
+        };
+
+        return [normalized, ...prev];
+      });
+      setUnreadCount(prev => prev + 1);
+    };
+
     const onCount = (payload: any) => {
       const count = (payload && (payload.totalUnread ?? payload.unreadCount)) as number | undefined;
       if (typeof count === 'number') setUnreadCount(count);
     };
 
     socket.on('notification', onNotification);
+    socket.on('new_message_notification', onNewMessageNotification);
+    socket.on('new_product_notification', onNewProductNotification);
     socket.on('notification_count', onCount);
 
     return () => {
       socket.off('notification', onNotification);
+      socket.off('new_message_notification', onNewMessageNotification);
+      socket.off('new_product_notification', onNewProductNotification);
       socket.off('notification_count', onCount);
     };
   }, [socket]);
@@ -190,8 +291,11 @@ const Notifications: React.FC = () => {
         }
         break;
       case 'view':
-        if (notif.type === 'message') {
+        if (notif.type === 'message' || notif.type === 'NEW_MESSAGE') {
           handleViewMessage(notif);
+        } else if (notif.type === 'product' && notif.meta?.productId) {
+          // Navigate to product page
+          navigate(`/product/${notif.meta.productId}`);
         }
         break;
       default:
@@ -246,18 +350,47 @@ const Notifications: React.FC = () => {
 
   // Get display name for actor
   const getActorName = (notif: Notification) => {
-
-    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title && notif.title !== 'Notification') {
-      return notif.title;
+    // Parse meta if it's a string (should already be parsed, but just in case)
+    let meta = notif.meta;
+    if (typeof meta === 'string') {
+      try {
+        meta = JSON.parse(meta);
+      } catch (e) {
+        meta = null;
+      }
     }
 
-    if ((notif.type === 'message' || notif.type === 'NEW_MESSAGE') && notif.body) {
-      if (notif.body.includes(':')) {
+    // For product notifications, use the seller name from meta or title
+    if (notif.type === 'product') {
+      const sellerName = meta?.sellerName || notif.meta?.sellerName || notif.title;
+      if (sellerName && sellerName !== 'A seller' && sellerName !== 'Notification') {
+        return sellerName;
+      }
+      // Try to get from actor if available
+      const actor = getActorData(notif);
+      if (actor?.firstName || actor?.lastName) {
+        return `${actor.firstName || ''} ${actor.lastName || ''}`.trim() || 'A seller';
+      }
+      return 'A seller';
+    }
+
+    // For message notifications
+    if (notif.type === 'NEW_MESSAGE' || notif.type === 'message') {
+      if (notif.title && notif.title !== 'Notification' && notif.title !== 'Someone') {
+        return notif.title;
+      }
+      // Try to get from actor
+      const actor = getActorData(notif);
+      if (actor?.firstName || actor?.lastName) {
+        return `${actor.firstName || ''} ${actor.lastName || ''}`.trim() || 'Someone';
+      }
+      if (notif.body && notif.body.includes(':')) {
         const namePart = notif.body.split(':')[0];
         if (namePart.length < 50) {
           return namePart;
         }
       }
+      return 'Someone';
     }
 
     return 'Someone';
@@ -265,17 +398,72 @@ const Notifications: React.FC = () => {
 
   // Get actor profile image
   const getActorImage = (notif: Notification) => {
+    const tryUrl = (u?: string | null) => {
+      if (!u) return null;
+      // if relative path, prefix with API url
+      if (!/^https?:\/\//i.test(u) && process.env.REACT_APP_API_URL) {
+        return `${process.env.REACT_APP_API_URL.replace(/\/$/, '')}/${u.replace(/^\//, '')}`;
+      }
+      return u;
+    };
+
+    // Parse meta if it's a string (should already be parsed, but just in case)
+    let meta = notif.meta;
+    if (typeof meta === 'string') {
+      try {
+        meta = JSON.parse(meta);
+      } catch (e) {
+        meta = null;
+      }
+    }
+
+    // For message notifications, show sender's profile image
+    if (notif.type === 'message' || notif.type === 'NEW_MESSAGE') {
+      const actor = getActorData(notif);
+      const srcCandidates = [
+        actor?.profileImage,
+        actor?.avatar,
+        notif.senderAvatar,
+        notif.senderImage,
+        meta?.senderImage,
+        meta?.actorImage,
+        notif.meta?.senderImage,
+        notif.meta?.actorImage
+      ];
+
+      for (const c of srcCandidates) {
+        const resolved = tryUrl(c);
+        if (resolved) return resolved;
+      }
+      return avatar; // Fallback to default avatar for messages
+    }
+
+    // For product notifications, show seller's image if available, otherwise return null for logo
+    if (notif.type === 'product') {
+      const sellerImage = meta?.sellerImage || notif.meta?.sellerImage || getActorData(notif)?.profileImage || notif.sellerImage;
+      const resolved = tryUrl(sellerImage);
+      if (resolved) return resolved;
+      return null; // Return null to show logo
+    }
+
+    // For other notifications, try to get actor image
     const actor = getActorData(notif);
+    const srcCandidates = [
+      actor?.profileImage,
+      actor?.avatar,
+      notif.senderAvatar,
+      meta?.senderImage,
+      meta?.actorImage,
+      notif.meta?.senderImage,
+      notif.meta?.actorImage
+    ];
 
-    if (actor?.profileImage) {
-      return actor.profileImage;
+    for (const c of srcCandidates) {
+      const resolved = tryUrl(c);
+      if (resolved) return resolved;
     }
 
-    if (notif.type === 'NEW_MESSAGE' && notif.title && notif.title !== 'Notification') {
-      return avatar;
-    }
-
-    return avatar;
+    return null; // Return null to show logo for non-message notifications
   };
 
   return (
@@ -418,15 +606,48 @@ const Notifications: React.FC = () => {
                           <div
                             className="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden"
                             style={{
-                              backgroundColor: (notif.type === 'message' || notif.type === 'NEW-MESSAGE') ? '#E3F2FD' : '#F9A825',
+                              backgroundColor: (notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? '#E3F2FD' : '#F9A825',
                               border: '2px solid white'
                             }}
                           >
-                            <img
-                              src={getActorImage(notif)}
-                              alt="Avatar"
-                              className="w-full h-full object-cover"
-                            />
+                            {(() => {
+                              const actorImage = getActorImage(notif);
+                              const isMessage = notif.type === 'message' || notif.type === 'NEW_MESSAGE';
+
+                              // For messages, always show sender's image (or fallback avatar)
+                              if (isMessage) {
+                                return (
+                                  <img
+                                    src={actorImage || avatar}
+                                    alt="Avatar"
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = avatar; }}
+                                  />
+                                );
+                              }
+
+                              // For product notifications, show seller image if available
+                              if (notif.type === 'product' && actorImage) {
+                                return (
+                                  <img
+                                    src={actorImage}
+                                    alt="Seller"
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = logoIcon; }}
+                                  />
+                                );
+                              }
+
+                              // For all other cases, show logo
+                              return (
+                                <img
+                                  src={logoIcon}
+                                  alt="Logo"
+                                  className="w-10 h-10"
+                                  style={{ filter: 'brightness(0) invert(1)' }}
+                                />
+                              );
+                            })()}
                           </div>
                           <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
                             <img

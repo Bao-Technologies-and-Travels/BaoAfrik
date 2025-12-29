@@ -1,7 +1,23 @@
 import { Request, Response } from 'express';
-import { ProductService } from '../services/productService';
+import { ProductService, ProductImage } from '../services/productService';
 import { gcpStorageService } from '../services/gcpStorageService';
 import { validationResult } from 'express-validator';
+import { notificationService } from '../services/notificationService';
+import { webSocketService } from '../server';
+import { Prisma } from '../generated/client';
+
+// Type for product with seller relation
+type ProductWithSeller = {
+  id: string;
+  title: string;
+  images?: Prisma.JsonValue;
+  seller?: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    profileImage: string | null;
+  } | null;
+};
 
 const productService = new ProductService();
 
@@ -38,7 +54,7 @@ export class ProductController {
           message: 'User not authenticated'
         });
       }
-    
+
       const productData = {
         title,
         description,
@@ -441,12 +457,75 @@ export class ProductController {
         });
       }
 
-      const product = await productService.updateProductStatus(id, userId, status);
+      const product: any = await productService.updateProductStatus(id, userId, status);
+
+      // If product was newly published, create notifications and broadcast
+      if (product._newlyPublished && status === 'PUBLISHED') {
+        try {
+          // Get product with seller info for notification
+          const productWithSeller = await productService.getProductById(id) as ProductWithSeller | null;
+
+          if (productWithSeller && productWithSeller.seller) {
+            const seller = productWithSeller.seller;
+            const sellerName = `${seller.firstName || ''} ${seller.lastName || ''}`.trim() || 'A seller';
+
+            // Get product image (primary image or first image)
+            let productImage: string | null = null;
+            if (productWithSeller.images) {
+              // Parse images from JSON if needed
+              let images: ProductImage[] = [];
+              if (Array.isArray(productWithSeller.images)) {
+                images = productWithSeller.images as unknown as ProductImage[];
+              } else if (typeof productWithSeller.images === 'string') {
+                images = JSON.parse(productWithSeller.images) as ProductImage[];
+              } else {
+                images = productWithSeller.images as unknown as ProductImage[];
+              }
+
+              if (Array.isArray(images) && images.length > 0) {
+                const primaryImage = images.find((img: ProductImage) => img.isPrimary);
+                productImage = primaryImage?.url || images[0]?.url || null;
+              }
+            }
+
+            // Create notifications for all users
+            await notificationService.createNotificationsForAllUsers({
+              actorId: seller.id,
+              type: 'product',
+              message: `${sellerName} just listed "${productWithSeller.title}"`,
+              metadata: {
+                productId: productWithSeller.id,
+                productTitle: productWithSeller.title,
+                productImage: productImage,
+                sellerId: seller.id,
+                sellerName: sellerName,
+                sellerImage: seller.profileImage
+              }
+            });
+
+            // Broadcast via WebSocket
+            webSocketService.broadcastProductNotification({
+              productId: productWithSeller.id,
+              productTitle: productWithSeller.title,
+              sellerId: seller.id,
+              sellerName: sellerName,
+              sellerImage: seller.profileImage || null,
+              productImage: productImage
+            });
+          }
+        } catch (notifError: any) {
+          // Log error but don't fail the request
+          console.error('Error creating product notifications:', notifError);
+        }
+      }
+
+      // Remove the internal flag before sending response
+      const { _newlyPublished, ...productData } = product;
 
       return res.json({
         success: true,
         message: `Product ${status.toLowerCase()} successfully`,
-        data: product
+        data: productData
       });
     } catch (error: any) {
       if (error.message === 'Product not found or unauthorized') {

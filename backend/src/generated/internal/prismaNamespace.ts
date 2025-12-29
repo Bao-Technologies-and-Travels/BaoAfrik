@@ -398,6 +398,7 @@ export const ModelName = {
   Country: 'Country',
   Conversation: 'Conversation',
   ConversationParticipant: 'ConversationParticipant',
+  ConversationMetadata: 'ConversationMetadata',
   ProductRequest: 'ProductRequest',
   Notification: 'Notification'
 } as const
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "product" | "productLike" | "productSave" | "productReview" | "message" | "messageStatus" | "messageReaction" | "messageMetadata" | "category" | "country" | "conversation" | "conversationParticipant" | "productRequest" | "notification"
+    modelProps: "user" | "refreshToken" | "product" | "productLike" | "productSave" | "productReview" | "message" | "messageStatus" | "messageReaction" | "messageMetadata" | "category" | "country" | "conversation" | "conversationParticipant" | "conversationMetadata" | "productRequest" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1455,6 +1456,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ConversationMetadata: {
+      payload: Prisma.$ConversationMetadataPayload<ExtArgs>
+      fields: Prisma.ConversationMetadataFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ConversationMetadataFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ConversationMetadataFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload>
+        }
+        findFirst: {
+          args: Prisma.ConversationMetadataFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ConversationMetadataFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload>
+        }
+        findMany: {
+          args: Prisma.ConversationMetadataFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload>[]
+        }
+        create: {
+          args: Prisma.ConversationMetadataCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload>
+        }
+        createMany: {
+          args: Prisma.ConversationMetadataCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ConversationMetadataCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload>[]
+        }
+        delete: {
+          args: Prisma.ConversationMetadataDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload>
+        }
+        update: {
+          args: Prisma.ConversationMetadataUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload>
+        }
+        deleteMany: {
+          args: Prisma.ConversationMetadataDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ConversationMetadataUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ConversationMetadataUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload>[]
+        }
+        upsert: {
+          args: Prisma.ConversationMetadataUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationMetadataPayload>
+        }
+        aggregate: {
+          args: Prisma.ConversationMetadataAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateConversationMetadata>
+        }
+        groupBy: {
+          args: Prisma.ConversationMetadataGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConversationMetadataGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ConversationMetadataCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConversationMetadataCountAggregateOutputType> | number
+        }
+      }
+    }
     ProductRequest: {
       payload: Prisma.$ProductRequestPayload<ExtArgs>
       fields: Prisma.ProductRequestFieldRefs
@@ -1870,6 +1945,21 @@ export const ConversationParticipantScalarFieldEnum = {
 export type ConversationParticipantScalarFieldEnum = (typeof ConversationParticipantScalarFieldEnum)[keyof typeof ConversationParticipantScalarFieldEnum]
 
 
+export const ConversationMetadataScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  userId: 'userId',
+  isPinned: 'isPinned',
+  isArchived: 'isArchived',
+  isMuted: 'isMuted',
+  label: 'label',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationMetadataScalarFieldEnum = (typeof ConversationMetadataScalarFieldEnum)[keyof typeof ConversationMetadataScalarFieldEnum]
+
+
 export const ProductRequestScalarFieldEnum = {
   id: 'id',
   productName: 'productName',
@@ -2177,6 +2267,7 @@ export type GlobalOmitConfig = {
   country?: Prisma.CountryOmit
   conversation?: Prisma.ConversationOmit
   conversationParticipant?: Prisma.ConversationParticipantOmit
+  conversationMetadata?: Prisma.ConversationMetadataOmit
   productRequest?: Prisma.ProductRequestOmit
   notification?: Prisma.NotificationOmit
 }

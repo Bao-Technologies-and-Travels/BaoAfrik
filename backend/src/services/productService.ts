@@ -480,7 +480,17 @@ export class ProductService {
             }
 
             const existingProduct = await prisma.product.findFirst({
-                where: { id: productId, sellerId }
+                where: { id: productId, sellerId },
+                include: {
+                    seller: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true
+                        }
+                    }
+                }
             });
 
             if (!existingProduct) {
@@ -488,17 +498,29 @@ export class ProductService {
             }
 
             const updateData: any = { status };
+            const isNewlyPublished = status === ProductStatus.PUBLISHED && existingProduct!.status !== ProductStatus.PUBLISHED;
 
-            if (status === ProductStatus.PUBLISHED && existingProduct!.status !== ProductStatus.PUBLISHED) {
+            if (isNewlyPublished) {
                 updateData.publishedAt = new Date();
             }
 
             const product = await prisma.product.update({
                 where: { id: productId },
-                data: updateData
+                data: updateData,
+                include: {
+                    seller: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true
+                        }
+                    }
+                }
             });
 
-            return product;
+            // Return product with a flag indicating if it was newly published
+            return { ...product, _newlyPublished: isNewlyPublished } as any;
         } catch (error: any) {
             throw new Error(`Error updating product status: ${error.message}`);
         }

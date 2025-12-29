@@ -11,7 +11,7 @@ import filterIcon from '../assets/images/pre/filter.png';
 import ssIcon from '../assets/images/pre/ss.png';
 import mainIcon from '../assets/images/pre/main.png';
 import avatarIcon from '../assets/images/pre/avatar.png';
-import basketIcon from '../assets/images/pre/basket.png';
+// import basketIcon from '../assets/images/pre/basket.png';
 import leftIcon from '../assets/images/pre/left.png';
 import fiIcon from '../assets/images/pre/fi.png';
 import faIcon from '../assets/images/pre/fa.png';
@@ -43,7 +43,7 @@ import actionIcon06 from '../assets/images/pre/06.svg';
 import muteArrowIcon from '../assets/images/pre/mute.svg';
 import archiveIcon from '../assets/images/pre/archive.svg';
 import starIcon from '../assets/images/pre/star.svg';
-import translationToggleIcon from '../assets/images/pre/tt.svg';
+// import translationToggleIcon from '../assets/images/pre/tt.svg';
 import replyIcon from '../assets/images/pre/reply.svg';
 import copyIcon from '../assets/images/pre/copy.svg';
 import tickIcon from '../assets/images/pre/tick.svg';
@@ -67,7 +67,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import closeIcon from '../assets/images/pre/cc.svg';
-import svgIcon from '../assets/images/pre/svg.svg';
 
 // PDF Icon Component
 const PDFIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
@@ -98,17 +97,6 @@ const PNGIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
   </svg>
 );
 
-interface Message {
-  id: string;
-  content: string;
-  senderId: string;
-  receiverId: string;
-  timestamp: string;
-  status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
-  conversationId?: string;
-  readAt?: string | null;
-}
-
 const Messages: React.FC = (): JSX.Element => {
   useEffect(() => { toast.dismiss(); }, []);
 
@@ -119,12 +107,8 @@ const Messages: React.FC = (): JSX.Element => {
   const [productData, setProductData] = useState<any>(null);
   const [preFilledMessage, setPreFilledMessage] = useState('');
   const [messageText, setMessageText] = useState('');
-  const [messagesPage, setMessagesPage] = useState(0);
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [messagesError, setMessagesError] = useState<string | null>(null);
   const [isMessageSent, setIsMessageSent] = useState(false);
-  const [chatEntry, setChatEntry] = useState<any>(null);
   const [selectedTab, setSelectedTab] = useState('All');
   type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
   const [messageStatuses, setMessageStatuses] = useState<{ [key: string]: MessageStatus }>({});
@@ -184,9 +168,15 @@ const Messages: React.FC = (): JSX.Element => {
   const [showMobileReactionPicker, setShowMobileReactionPicker] = useState(false);
   const [mobileMessageCoords, setMobileMessageCoords] = useState<{ top: number; left: number } | null>(null);
   const [pinnedMessage, setPinnedMessage] = useState<any>(null);
+  const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
+  const [showLabelModal, setShowLabelModal] = useState(false);
+  const [labelInput, setLabelInput] = useState('');
+  const [labelConversationId, setLabelConversationId] = useState<number | null>(null);
+  const [archivedCount, setArchivedCount] = useState(0);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const chatListRef = React.useRef<HTMLDivElement>(null);
+  const messageRefs = React.useRef<Map<string | number, HTMLDivElement>>(new Map());
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -253,7 +243,15 @@ const Messages: React.FC = (): JSX.Element => {
           { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
         );
         const convos = res.data?.data || [];
-        setConversations(convos);
+        // Sort: pinned first, then by lastMessageAt
+        const sorted = convos.sort((a: any, b: any) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+          const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+          return bTime - aTime;
+        });
+        setConversations(sorted);
 
         // Update current conversation if we have one
         if (conversationId) {
@@ -275,26 +273,44 @@ const Messages: React.FC = (): JSX.Element => {
     fetchConversations();
   }, [API_BASE]);
 
-  // fetch unread counts
+  // fetch unread counts function - shared between useEffects
+  const fetchUnread = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) return;
+      const json = await res.json();
+      if (json.success && json.data) {
+        setNotificationCount(json.data.unreadCount ?? 0);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [setNotificationCount]);
+
+  // fetch unread counts and archived count
   useEffect(() => {
-    const fetchUnread = async () => {
+    const fetchArchivedCount = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) return;
-        const json = await res.json();
-        if (json.success && json.data) {
-          setNotificationCount(json.data.unreadCount ?? 0);
+        const res = await axios.get(
+          `${API_BASE}/chat/conversations/archived/count`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.data?.success && res.data?.data?.count !== undefined) {
+          setArchivedCount(res.data.data.count);
         }
       } catch (e) {
         // ignore
       }
     }
+
     fetchUnread();
-  }, []);
+    fetchArchivedCount();
+  }, [API_BASE]);
 
   // socket events
   useEffect(() => {
@@ -360,6 +376,44 @@ const Messages: React.FC = (): JSX.Element => {
       setNotificationCount(prev => prev + 1);
     };
 
+    const onNewProductNotification = (payload: any) => {
+      if (payload?.productId) {
+        const has = notifications.some(n => n.meta?.productId === payload.productId);
+        if (has) return;
+      }
+
+      const created = new Date();
+      const normalized = {
+        id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
+        day: getDayLabel(created),
+        time: payload.time || formatTime(created),
+        title: payload.sellerName || 'A seller',
+        body: `just listed "${payload.productTitle || 'a new product'}"`,
+        meta: {
+          productId: payload.productId,
+          productTitle: payload.productTitle,
+          productImage: payload.productImage,
+          sellerId: payload.sellerId,
+          sellerName: payload.sellerName,
+          sellerImage: payload.sellerImage
+        },
+        isRead: false,
+        actor: payload.sellerImage ? {
+          id: payload.sellerId,
+          firstName: payload.sellerName?.split(' ')[0] || '',
+          lastName: payload.sellerName?.split(' ').slice(1).join(' ') || '',
+          profileImage: payload.sellerImage
+        } : null
+      };
+
+      setNotifications(prev => {
+        const existsByMeta = payload?.productId ? prev.some(n => n.meta?.productId === payload.productId) : false;
+        if (existsByMeta) return prev;
+        return [normalized, ...prev];
+      });
+      setNotificationCount(prev => prev + 1);
+    };
+
     const onNotificationCount = (payload: any) => {
       const count = (payload && (payload.totalUnread ?? payload.unreadCount ?? payload.total)) as number | undefined;
       if (typeof count === 'number') {
@@ -369,12 +423,19 @@ const Messages: React.FC = (): JSX.Element => {
 
     socket.on('notification', onNotification);
     socket.on('new_message_notification', onNewMessageNotification);
+    socket.on('new_product_notification', onNewProductNotification);
     socket.on('notification_count', onNotificationCount);
+    socket.on('notification_count_updated', () => {
+      // Refresh notification count when it's updated
+      fetchUnread();
+    });
 
     return () => {
       socket.off('notification', onNotification);
       socket.off('new_message_notification', onNewMessageNotification);
+      socket.off('new_product_notification', onNewProductNotification);
       socket.off('notification_count', onNotificationCount);
+      socket.off('notification_count_updated');
     };
   }, [socket]);
 
@@ -707,16 +768,27 @@ const Messages: React.FC = (): JSX.Element => {
 
     // Handle reaction events
     function handleReactionAdded(data: any) {
-      if (data.messageId && conversationId) {
+      if (data.messageId && conversationId && String(data.conversationId) === String(conversationId)) {
         setMessages(prevMessages =>
           prevMessages.map(msg => {
             if (String(msg.id) === String(data.messageId)) {
               // Update reactions array if available, or set user's reaction
               if (data.allReactions) {
                 const userReaction = data.allReactions.find((r: any) => r.userId === user?.id);
-                return { ...msg, reaction: userReaction?.reaction || null, reactions: data.allReactions };
+                return {
+                  ...msg,
+                  reaction: userReaction?.reaction || null,
+                  reactions: data.allReactions,
+                  // Also update for the sender if it's their reaction
+                  ...(data.userId === user?.id ? { reaction: data.reaction } : {})
+                };
               }
-              return { ...msg, reaction: data.reaction };
+              // If it's the current user's reaction, update it
+              if (String(data.userId) === String(user?.id)) {
+                return { ...msg, reaction: data.reaction };
+              }
+              // For other users' reactions, we still need to update if we have reactions array
+              return { ...msg, reactions: data.reactions || msg.reactions };
             }
             return msg;
           })
@@ -763,6 +835,30 @@ const Messages: React.FC = (): JSX.Element => {
     socket.on('reaction_removed', handleReactionRemoved);
     socket.on('message_metadata_updated', handleMessageMetadataUpdated);
 
+    // Handle conversation metadata updates
+    function handleConversationMetadataUpdated(data: any) {
+      const { conversationId, metadata } = data;
+      setConversations(prev => prev.map(conv => {
+        if (String(conv.id) === String(conversationId)) {
+          return { ...conv, ...metadata };
+        }
+        return conv;
+      }));
+    }
+
+    // Handle conversation deletion
+    function handleConversationDeleted(data: any) {
+      const { conversationId } = data;
+      setConversations(prev => prev.filter(conv => String(conv.id) !== String(conversationId)));
+      if (String(conversationId) === String(conversationId)) {
+        setConversationId(null);
+        setMessages([]);
+      }
+    }
+
+    socket.on('conversation_metadata_updated', handleConversationMetadataUpdated);
+    socket.on('conversation_deleted', handleConversationDeleted);
+
     return () => {
       socket.off('receive_message', handleReceiveMessage);
       socket.off('message_sent', handleMessageSent);
@@ -772,6 +868,8 @@ const Messages: React.FC = (): JSX.Element => {
       socket.off('messages_read', handleMessagesRead);
       socket.off('new_message_notification', handleNewMessageNotif);
       socket.off('reaction_added', handleReactionAdded);
+      socket.off('conversation_metadata_updated', handleConversationMetadataUpdated);
+      socket.off('conversation_deleted', handleConversationDeleted);
       socket.off('reaction_removed', handleReactionRemoved);
       socket.off('message_metadata_updated', handleMessageMetadataUpdated);
     };
@@ -1119,18 +1217,154 @@ const Messages: React.FC = (): JSX.Element => {
     }
   };
 
-  const handleActionSelect = (action: string, chatId: number) => {
-    console.log(`Action: ${action} for chat: ${chatId}`);
+  const handleSaveLabel = async () => {
+    if (!labelConversationId || !socket || !user) return;
 
-    if (action === 'Pin the chat') {
-      setIsChatPinned(true);
-    } else if (action === 'Unpin the chat') {
-      setIsChatPinned(false);
+    const conversationId = String(labelConversationId);
+    const token = localStorage.getItem('accessToken');
+
+    try {
+      // Optimistically update UI
+      setConversations(prev => prev.map(conv => {
+        if (String(conv.id) === conversationId) {
+          return { ...conv, label: labelInput.trim() || null };
+        }
+        return conv;
+      }));
+
+      // Emit to socket
+      socket.emit('update_conversation_metadata', {
+        conversationId,
+        label: labelInput.trim() || null
+      });
+
+      // Also update via API
+      await axios.patch(
+        `${API_BASE}/chat/conversations/${conversationId}/metadata`,
+        { label: labelInput.trim() || null },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success('Label saved');
+      setShowLabelModal(false);
+      setLabelInput('');
+      setLabelConversationId(null);
+    } catch (error: any) {
+      console.error('Error saving label:', error);
+      toast.error(error.response?.data?.error || 'Failed to save label');
     }
+  };
 
-    setActionsMenuOpen(null);
-    setActionsMenuCoords(null);
-    // Here you would implement the actual action logic
+  const handleActionSelect = async (action: string, chatId: number) => {
+    if (!socket || !user) return;
+
+    const conversationId = String(chatId);
+    const token = localStorage.getItem('accessToken');
+
+    try {
+      if (action === 'Add label') {
+        // Open label modal
+        setLabelConversationId(chatId);
+        setShowLabelModal(true);
+        setActionsMenuOpen(null);
+        setActionsMenuCoords(null);
+        return;
+      }
+
+      if (action === 'Pin the chat' || action === 'Unpin the chat') {
+        const isPinned = action === 'Pin the chat';
+        // Optimistically update UI
+        setConversations(prev => prev.map(conv => {
+          if (String(conv.id) === conversationId) {
+            return { ...conv, isPinned };
+          }
+          return conv;
+        }));
+        // Emit to socket
+        socket.emit('update_conversation_metadata', {
+          conversationId,
+          isPinned
+        });
+        // Also update via API
+        await axios.patch(
+          `${API_BASE}/chat/conversations/${conversationId}/metadata`,
+          { isPinned },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+
+      if (action === 'Mute the chat') {
+        // Optimistically update UI
+        setConversations(prev => prev.map(conv => {
+          if (String(conv.id) === conversationId) {
+            return { ...conv, isMuted: true };
+          }
+          return conv;
+        }));
+        // Emit to socket
+        socket.emit('update_conversation_metadata', {
+          conversationId,
+          isMuted: true
+        });
+        // Also update via API
+        await axios.patch(
+          `${API_BASE}/chat/conversations/${conversationId}/metadata`,
+          { isMuted: true },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast.success('Chat muted');
+      }
+
+      if (action === 'Archive the chat') {
+        // Optimistically update UI - remove from list
+        setConversations(prev => prev.filter(conv => String(conv.id) !== conversationId));
+        // Update archived count
+        setArchivedCount(prev => prev + 1);
+        // Emit to socket
+        socket.emit('update_conversation_metadata', {
+          conversationId,
+          isArchived: true
+        });
+        // Also update via API
+        await axios.patch(
+          `${API_BASE}/chat/conversations/${conversationId}/metadata`,
+          { isArchived: true },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast.success('Chat archived');
+        // If this was the active conversation, clear it
+        if (String(chatId) === String(conversationId)) {
+          setConversationId(null);
+          setMessages([]);
+        }
+      }
+
+      if (action === 'Delete the chat') {
+        if (window.confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+          // Optimistically update UI - remove from list
+          setConversations(prev => prev.filter(conv => String(conv.id) !== conversationId));
+          // Emit to socket
+          socket.emit('delete_conversation', { conversationId });
+          // Also delete via API
+          await axios.delete(
+            `${API_BASE}/chat/conversations/${conversationId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          toast.success('Conversation deleted');
+          // If this was the active conversation, clear it
+          if (String(chatId) === String(conversationId)) {
+            setConversationId(null);
+            setMessages([]);
+          }
+        }
+      }
+
+      setActionsMenuOpen(null);
+      setActionsMenuCoords(null);
+    } catch (error: any) {
+      console.error('Error performing action:', error);
+      toast.error(error.response?.data?.error || 'Failed to perform action');
+    }
   };
 
   // Emoji picker handlers
@@ -1355,6 +1589,54 @@ const Messages: React.FC = (): JSX.Element => {
       }
     }
 
+    if (action === 'copy' && messageId) {
+      // Find the message
+      const message = messages.find(m => String(m.id) === messageId);
+      if (message) {
+        const textToCopy = message.text || message.content || '';
+        if (textToCopy) {
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            toast.success('Message copied to clipboard');
+          }).catch(() => {
+            toast.error('Failed to copy message');
+          });
+        }
+      }
+    }
+
+    if (action === 'select' && messageId) {
+      // Toggle message selection (for bulk actions)
+      setSelectedMessages(prev => {
+        const messageIdNum = Number(messageId);
+        if (prev.has(messageIdNum)) {
+          const newSet = new Set(prev);
+          newSet.delete(messageIdNum);
+          return newSet;
+        } else {
+          const newSet = new Set(prev);
+          newSet.add(messageIdNum);
+          return newSet;
+        }
+      });
+    }
+
+    if (action === 'delete' && messageId && socket) {
+      // Delete message for current user (soft delete - archive it)
+      const message = messages.find(m => String(m.id) === messageId);
+      if (message) {
+        // Optimistically update UI - remove from view
+        setMessages(prevMessages =>
+          prevMessages.filter(msg => String(msg.id) !== messageId)
+        );
+        // Emit to socket to persist
+        socket.emit('update_message_metadata', {
+          messageId: String(messageId),
+          isArchived: true
+        });
+        toast.success('Message deleted');
+      }
+    }
+
     // Close the options menu (both desktop and mobile)
     setActiveMessageOptionsId(null);
     setMobileMessageOptionsId(null);
@@ -1512,6 +1794,19 @@ const Messages: React.FC = (): JSX.Element => {
     }
   };
 
+  // Function to scroll to a specific message
+  const scrollToMessage = useCallback((messageId: string | number) => {
+    const messageElement = messageRefs.current.get(messageId);
+    if (messageElement) {
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Highlight the message briefly
+      messageElement.style.backgroundColor = 'rgba(100, 181, 246, 0.2)';
+      setTimeout(() => {
+        messageElement.style.backgroundColor = '';
+      }, 2000);
+    }
+  }, []);
+
   // conversation click handler
   const handleConversationClick = useCallback((conv: any) => {
     setCurrentConversation(conv);
@@ -1550,12 +1845,58 @@ const Messages: React.FC = (): JSX.Element => {
           currency: productData.currency || 'USD',
           description: productData.description || '',
           // Extract image URLs from images array if needed
-          image: productData.image || (Array.isArray(productData.images) && productData.images.length > 0
-            ? (typeof productData.images[0] === 'string' ? productData.images[0] : productData.images[0]?.url)
-            : null),
-          images: Array.isArray(productData.images)
-            ? productData.images.map((img: any) => typeof img === 'string' ? img : img?.url).filter(Boolean)
-            : (productData.image ? [productData.image] : []),
+          image: (() => {
+            // Try imageUrls first (from ProductDetail)
+            if (productData.imageUrls && productData.imageUrls.length > 0) {
+              return productData.imageUrls[0];
+            }
+            // Try direct image property
+            if (productData.image) {
+              return productData.image;
+            }
+            // Try images array
+            if (productData.images) {
+              try {
+                // Handle JSON string
+                const imagesArray = typeof productData.images === 'string'
+                  ? JSON.parse(productData.images)
+                  : productData.images;
+
+                if (Array.isArray(imagesArray) && imagesArray.length > 0) {
+                  const firstImg = imagesArray[0];
+                  return typeof firstImg === 'string' ? firstImg : firstImg?.url || firstImg?.key;
+                }
+              } catch (e) {
+                console.warn('Error parsing product images:', e);
+              }
+            }
+            return null;
+          })(),
+          images: (() => {
+            // Try imageUrls first
+            if (productData.imageUrls && productData.imageUrls.length > 0) {
+              return productData.imageUrls;
+            }
+            // Try images array
+            if (productData.images) {
+              try {
+                const imagesArray = typeof productData.images === 'string'
+                  ? JSON.parse(productData.images)
+                  : productData.images;
+
+                if (Array.isArray(imagesArray) && imagesArray.length > 0) {
+                  return imagesArray.map((img: any) => {
+                    if (typeof img === 'string') return img;
+                    return img?.url || img?.key;
+                  }).filter(Boolean);
+                }
+              } catch (e) {
+                console.warn('Error parsing product images:', e);
+              }
+            }
+            // Fallback to image property
+            return productData.image ? [productData.image] : [];
+          })(),
           category: productData.category,
           location: productData.location,
           origin: productData.origin,
@@ -1577,7 +1918,8 @@ const Messages: React.FC = (): JSX.Element => {
   }, [location.state, isMessageSent]);
 
   const handleSendMessage = async (content: string) => {
-    if (!socket || !conversationId || (!content.trim() && selectedFiles.length === 0)) {
+    // Allow sending if there are files even without text content
+    if (!socket || !conversationId || (!content.trim() && selectedFiles.length === 0 && !replyToMessage)) {
       console.error('Cannot send message:', { socket: !!socket, conversationId, hasContent: !!content.trim(), hasFiles: selectedFiles.length > 0 });
       return;
     }
@@ -1588,8 +1930,8 @@ const Messages: React.FC = (): JSX.Element => {
       return;
     }
 
-    // Don't send empty messages unless there are files
-    if (!content.trim() && selectedFiles.length === 0) {
+    // Allow sending attachments without text, but not completely empty messages
+    if (!content.trim() && selectedFiles.length === 0 && !replyToMessage) {
       toast.info("Cannot send empty message.");
       return;
     }
@@ -1607,24 +1949,34 @@ const Messages: React.FC = (): JSX.Element => {
         for (const file of selectedFiles) {
           try {
             const token = localStorage.getItem("accessToken");
-            const { uploadUrl, key, viewUrl } = (await axios.post(`${API_BASE}/upload/chat`, {
+            const response = await axios.post(`${API_BASE}/upload/chat`, {
               fileName: file.name,
               fileType: file.type,
               fileSize: file.size,
               userId: user.id
             }, {
               headers: { Authorization: `Bearer ${token}` }
-            })).data;
+            });
+
+            // Handle different response structures
+            const responseData = response.data?.data || response.data;
+            const uploadUrl = responseData?.uploadUrl || responseData?.url;
+            const viewUrl = responseData?.viewUrl || responseData?.fileUrl || uploadUrl;
+
+            if (!uploadUrl) {
+              throw new Error('Upload URL not received from server');
+            }
 
             await gcpStorageService.uploadFile(file, uploadUrl);
             filePayloads.push({
               fileName: file.name,
-              fileUrl: viewUrl,
+              fileUrl: viewUrl || uploadUrl,
               fileType: file.type,
               fileSize: file.size
             });
           } catch (err: any) {
-            toast.error('File upload failed: ' + (err?.response?.data?.message || err.message || err));
+            console.error('File upload error:', err);
+            toast.error('File upload failed: ' + (err?.response?.data?.message || err?.message || 'Unknown error'));
             setMessagesError('File upload failed.');
             return; // Stop sending message if file upload fails
           }
@@ -1644,12 +1996,8 @@ const Messages: React.FC = (): JSX.Element => {
           price: productData.price,
           currency: productData.currency || 'USD',
           description: productData.description || '',
-          image: productData.image || (Array.isArray(productData.images) && productData.images.length > 0
-            ? (typeof productData.images[0] === 'string' ? productData.images[0] : productData.images[0]?.url)
-            : null),
-          images: Array.isArray(productData.images)
-            ? productData.images.map((img: any) => typeof img === 'string' ? img : img?.url).filter(Boolean)
-            : (productData.image ? [productData.image] : []),
+          image: productData.image || null,
+          images: productData.images || (productData.image ? [productData.image] : []),
           category: productData.category,
           location: productData.location,
           origin: productData.origin,
@@ -2563,6 +2911,11 @@ const Messages: React.FC = (): JSX.Element => {
                     return (
                       <div
                         key={messageKey}
+                        ref={(el) => {
+                          if (el && message.id) {
+                            messageRefs.current.set(message.id, el);
+                          }
+                        }}
                         className={`mobile-message-wrapper flex mb-3 ${message.isIncoming ? 'justify-start' : 'justify-end'} ${isFadingOut ? 'message-fade-out' : ''}`}
                         style={{
                           animation: isFadingOut ? 'fadeOutUp 0.5s ease-in-out forwards' : 'fadeIn 0.5s ease-in-out',
@@ -2701,145 +3054,165 @@ const Messages: React.FC = (): JSX.Element => {
                                   {/* Reply Section - Mobile */}
                                   {message.replyTo && (
                                     <div className="mb-2">
-                                      {message.replyTo.type === 'voice' ? (
-                                        /* Voice Note Reply - Screenshot Structure - TWO LINES */
-                                        <div className="flex items-start">
-                                          {/* White vertical line on LEFT */}
-                                          <div
-                                            className="rounded-full mr-1.5"
-                                            style={{
-                                              width: '2px',
-                                              backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
-                                              height: '32px',
-                                              flexShrink: 0
-                                            }}
-                                          ></div>
+                                      {/* Replied Message Text Above */}
+                                      <div
+                                        className="cursor-pointer hover:opacity-80 transition-opacity mb-2"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (message.replyTo?.id) {
+                                            scrollToMessage(message.replyTo.id);
+                                          }
+                                        }}
+                                      >
+                                        {message.replyTo.type === 'voice' ? (
+                                          /* Voice Note Reply - Screenshot Structure - TWO LINES */
+                                          <div className="flex items-start">
+                                            {/* White vertical line on LEFT - spans both sender label and audio preview */}
+                                            <div
+                                              className="rounded-full mr-1.5"
+                                              style={{
+                                                width: '2px',
+                                                backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                                flexShrink: 0,
+                                                alignSelf: 'stretch'
+                                              }}
+                                            ></div>
 
-                                          <div className="flex-1">
-                                            {/* Sender label in light blue - ABOVE */}
-                                            <div style={{ fontSize: '10px', color: message.isIncoming ? '#64B5F6' : '#CFE8FC', fontWeight: 500, marginBottom: '4px' }}>
-                                              {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
-                                            </div>
+                                            <div className="flex-1">
+                                              {/* Sender label */}
+                                              <div style={{ fontSize: '10px', color: message.isIncoming ? '#64B5F6' : '#CFE8FC', fontWeight: 500, marginBottom: '4px' }}>
+                                                {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
+                                              </div>
+                                              {/* Audio preview */}
+                                              <div className="flex items-center">
+                                                {/* Speed button - appears when playing */}
+                                                {playingMessageId === message.id && (
+                                                  <button
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      handleSpeedChange(message.id);
+                                                    }}
+                                                    className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
+                                                    style={{
+                                                      backgroundColor: '#4781AF',
+                                                      borderRadius: '8px',
+                                                      width: '28px',
+                                                      height: '20px',
+                                                      padding: '0 6px',
+                                                      marginRight: '6px'
+                                                    }}
+                                                  >
+                                                    <span className="text-white" style={{ fontSize: '9px', fontWeight: 500 }}>
+                                                      {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
+                                                    </span>
+                                                  </button>
+                                                )}
 
-                                            {/* Audio preview - BELOW "You" */}
-                                            <div className="flex items-center">
-                                              {/* Speed button - appears when playing */}
-                                              {playingMessageId === message.id && (
+                                                {/* Duration */}
+                                                <span style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)', marginRight: '6px' }}>
+                                                  {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
+                                                </span>
+
+                                                {/* Waveform */}
+                                                <div className="flex items-center space-x-0.5 flex-1">
+                                                  {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ?
+                                                    message.replyTo.waveformData.slice(-20).map((level: number, i: number) => {
+                                                      const progress = audioPlaybackProgress[message.id] || 0;
+                                                      const totalBars = Math.min(20, message.replyTo.waveformData.length);
+                                                      const isPlayed = playingMessageId === message.id && (i / totalBars) * 100 <= progress;
+                                                      return (
+                                                        <div
+                                                          key={i}
+                                                          style={{
+                                                            width: '1.5px',
+                                                            height: `${Math.max(2, level * 8)}px`,
+                                                            backgroundColor: isPlayed ? '#FFFFFF' : (message.isIncoming ? '#6A6A6A' : '#CFE8FC'),
+                                                            borderRadius: '1px'
+                                                          }}
+                                                        />
+                                                      );
+                                                    })
+                                                    :
+                                                    [2, 3, 2, 4, 6, 7, 8, 7, 6, 4, 6, 5, 3, 6, 8, 9, 8, 6, 5, 3].map((h, i) => {
+                                                      const progress = audioPlaybackProgress[message.id] || 0;
+                                                      const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
+                                                      return (
+                                                        <div
+                                                          key={i}
+                                                          style={{
+                                                            width: '1.5px',
+                                                            height: `${h}px`,
+                                                            backgroundColor: isPlayed ? '#FFFFFF' : (message.isIncoming ? '#6A6A6A' : '#CFE8FC'),
+                                                            borderRadius: '1px'
+                                                          }}
+                                                        />
+                                                      );
+                                                    })
+                                                  )}
+                                                </div>
+
+                                                {/* Play/Pause button - far right */}
                                                 <button
                                                   onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleSpeedChange(message.id);
+                                                    if (message.replyTo.audioUrl) {
+                                                      handleAudioPlayback(message.id, message.replyTo.audioUrl, message.replyTo.duration);
+                                                    }
                                                   }}
-                                                  className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
+                                                  className="ml-3 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity"
                                                   style={{
-                                                    backgroundColor: '#4781AF',
-                                                    borderRadius: '8px',
-                                                    width: '28px',
-                                                    height: '20px',
-                                                    padding: '0 6px',
-                                                    marginRight: '6px'
+                                                    width: '18px',
+                                                    height: '18px',
+                                                    backgroundColor: '#FFFFFF'
                                                   }}
                                                 >
-                                                  <span className="text-white" style={{ fontSize: '9px', fontWeight: 500 }}>
-                                                    {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
-                                                  </span>
+                                                  {playingMessageId === message.id ? (
+                                                    <svg style={{ width: '12px', height: '12px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                      <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                                                    </svg>
+                                                  ) : (
+                                                    <svg style={{ width: '12px', height: '12px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                      <path d="M8 5v14l11-7z" />
+                                                    </svg>
+                                                  )}
                                                 </button>
-                                              )}
-
-                                              {/* Duration */}
-                                              <span style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)', marginRight: '6px' }}>
-                                                {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
-                                              </span>
-
-                                              {/* Waveform */}
-                                              <div className="flex items-center space-x-0.5 flex-1">
-                                                {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ?
-                                                  message.replyTo.waveformData.slice(-20).map((level: number, i: number) => {
-                                                    const progress = audioPlaybackProgress[message.id] || 0;
-                                                    const totalBars = Math.min(20, message.replyTo.waveformData.length);
-                                                    const isPlayed = playingMessageId === message.id && (i / totalBars) * 100 <= progress;
-                                                    return (
-                                                      <div
-                                                        key={i}
-                                                        style={{
-                                                          width: '1.5px',
-                                                          height: `${Math.max(2, level * 8)}px`,
-                                                          backgroundColor: isPlayed ? '#FFFFFF' : (message.isIncoming ? '#6A6A6A' : '#CFE8FC'),
-                                                          borderRadius: '1px'
-                                                        }}
-                                                      />
-                                                    );
-                                                  })
-                                                  :
-                                                  [2, 3, 2, 4, 6, 7, 8, 7, 6, 4, 6, 5, 3, 6, 8, 9, 8, 6, 5, 3].map((h, i) => {
-                                                    const progress = audioPlaybackProgress[message.id] || 0;
-                                                    const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
-                                                    return (
-                                                      <div
-                                                        key={i}
-                                                        style={{
-                                                          width: '1.5px',
-                                                          height: `${h}px`,
-                                                          backgroundColor: isPlayed ? '#FFFFFF' : (message.isIncoming ? '#6A6A6A' : '#CFE8FC'),
-                                                          borderRadius: '1px'
-                                                        }}
-                                                      />
-                                                    );
-                                                  })
-                                                )}
                                               </div>
-
-                                              {/* Play/Pause button - far right */}
-                                              <button
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  if (message.replyTo.audioUrl) {
-                                                    handleAudioPlayback(message.id, message.replyTo.audioUrl, message.replyTo.duration);
-                                                  }
-                                                }}
-                                                className="ml-3 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity"
-                                                style={{
-                                                  width: '18px',
-                                                  height: '18px',
-                                                  backgroundColor: '#FFFFFF'
-                                                }}
-                                              >
-                                                {playingMessageId === message.id ? (
-                                                  <svg style={{ width: '12px', height: '12px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                                                  </svg>
-                                                ) : (
-                                                  <svg style={{ width: '12px', height: '12px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M8 5v14l11-7z" />
-                                                  </svg>
-                                                )}
-                                              </button>
                                             </div>
                                           </div>
-                                        </div>
-                                      ) : (
-                                        /* Text Reply */
-                                        <div className="flex items-stretch">
-                                          {/* Vertical line */}
-                                          <div
-                                            className="rounded-full mr-1.5"
-                                            style={{
-                                              width: '2px',
-                                              backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
-                                              flexShrink: 0
-                                            }}
-                                          ></div>
+                                        ) : (
+                                          /* Text Reply - Show replied message text */
+                                          <div className="flex items-stretch">
+                                            {/* Vertical line - spans both sender label and message text */}
+                                            <div
+                                              className="rounded-full mr-1.5"
+                                              style={{
+                                                width: '2px',
+                                                backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                                flexShrink: 0,
+                                                alignSelf: 'stretch'
+                                              }}
+                                            ></div>
 
-                                          {/* Quoted message info */}
-                                          <div className="flex-1">
-                                            <p style={{ fontSize: '10px', fontWeight: 500, marginBottom: '2px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
-                                              {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
-                                            </p>
-                                            <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
-                                              {message.replyTo.text}
-                                            </p>
+                                            {/* Quoted message info */}
+                                            <div className="flex-1">
+                                              <p style={{ fontSize: '10px', fontWeight: 500, marginBottom: '2px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
+                                                {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
+                                              </p>
+                                              <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                                {message.replyTo.text}
+                                              </p>
+                                            </div>
                                           </div>
-                                        </div>
+                                        )}
+                                      </div>
+
+                                      {/* Reply Text Below */}
+                                      {message.text && (
+                                        <p
+                                          style={{ fontSize: '12px', marginBottom: 0, color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                                        >
+                                          {message.text}
+                                        </p>
                                       )}
                                     </div>
                                   )}
@@ -3635,94 +4008,130 @@ const Messages: React.FC = (): JSX.Element => {
                   </div>
                 </div>
               ) : (
-                // Normal Message Input for Mobile
-                <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
-                  {/* Emoji Icon */}
-                  <div className="relative emoji-picker-container">
+                <>
+                  {/* Reply Preview - Mobile */}
+                  {replyToMessage && (
+                    <div className="mb-2 px-2 py-1.5 rounded-lg" style={{ backgroundColor: '#F0F8FE', border: '1px solid #64B5F6' }}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-stretch">
+                            <div
+                              className="rounded-full mr-1.5"
+                              style={{
+                                width: '2px',
+                                backgroundColor: '#64B5F6',
+                                flexShrink: 0,
+                                alignSelf: 'stretch'
+                              }}
+                            ></div>
+                            <div className="flex-1">
+                              <p className="text-[10px] font-medium mb-0.5" style={{ color: '#64B5F6' }}>
+                                {getReplySenderLabel(replyToMessage.sender, replyToMessage.isIncoming)}
+                              </p>
+                              <p className="text-[10px] truncate" style={{ color: '#6A6A6A' }}>
+                                {replyToMessage.text || replyToMessage.content || (replyToMessage.type === 'voice' ? 'Voice message' : '')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setReplyToMessage(null)}
+                          className="ml-1.5 flex-shrink-0 hover:opacity-70"
+                        >
+                          <img src={replyCloseIcon} alt="Close" className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {/* Normal Message Input for Mobile */}
+                  <div className="flex items-center" style={{ backgroundColor: '#F5F5F5', borderRadius: '12px', padding: '4px' }}>
+                    {/* Emoji Icon */}
+                    <div className="relative emoji-picker-container">
+                      <button
+                        onClick={handleEmojiClick}
+                        className="p-1 hover:text-gray-600"
+                      >
+                        <img
+                          src={faceIcon}
+                          alt="emoji"
+                          className="w-5 h-5"
+                          style={{
+                            filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
+                          }}
+                        />
+                      </button>
+
+                      {/* Emoji Picker */}
+                      {showEmojiPicker && (
+                        <div className="absolute bottom-full left-0 mb-2 z-50">
+                          <EmojiPicker
+                            onEmojiClick={onEmojiClick}
+                            width={280}
+                            height={350}
+                            searchDisabled={false}
+                            skinTonesDisabled={true}
+                            previewConfig={{
+                              showPreview: false
+                            }}
+                            searchPlaceHolder="Search Emoji"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Attachment Icon */}
                     <button
-                      onClick={handleEmojiClick}
-                      className="p-1 hover:text-gray-600"
+                      onClick={handleAttachClick}
+                      className="p-1.5 transition-colors focus:outline-none"
+                      style={{ outline: 'none' }}
                     >
                       <img
-                        src={faceIcon}
-                        alt="emoji"
+                        src={pinIcon}
+                        alt="attachment"
                         className="w-5 h-5"
                         style={{
-                          filter: showEmojiPicker ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
+                          filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
                         }}
                       />
                     </button>
 
-                    {/* Emoji Picker */}
-                    {showEmojiPicker && (
-                      <div className="absolute bottom-full left-0 mb-2 z-50">
-                        <EmojiPicker
-                          onEmojiClick={onEmojiClick}
-                          width={280}
-                          height={350}
-                          searchDisabled={false}
-                          skinTonesDisabled={true}
-                          previewConfig={{
-                            showPreview: false
-                          }}
-                          searchPlaceHolder="Search Emoji"
-                        />
-                      </div>
-                    )}
+                    {/* Text Input */}
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={messageText}
+                        onChange={(e) => {
+                          setMessageText(e.target.value);
+                          handleTypingDetection();
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSendMessage(messageText);
+                          }
+                        }}
+                        placeholder="...Write your message"
+                        className="w-full px-2 py-1.5 focus:outline-none bg-transparent"
+                        style={{
+                          border: 'none',
+                          caretColor: '#64B5F6',
+                          fontSize: '11px'
+                        }}
+                      />
+                    </div>
+
+                    {/* Voice/Send Button */}
+                    <button
+                      onClick={handleSendButtonClick}
+                      className="p-1.5 text-blue-600 hover:text-blue-800"
+                    >
+                      {messageText.trim() || selectedFiles.length > 0 ? (
+                        <img src={bluIcon} alt="send" className="w-6 h-6" />
+                      ) : (
+                        <img src={audioIcon} alt="audio" className="w-6 h-6" />
+                      )}
+                    </button>
                   </div>
-
-                  {/* Attachment Icon */}
-                  <button
-                    onClick={handleAttachClick}
-                    className="p-1.5 transition-colors focus:outline-none"
-                    style={{ outline: 'none' }}
-                  >
-                    <img
-                      src={pinIcon}
-                      alt="attachment"
-                      className="w-5 h-5"
-                      style={{
-                        filter: isAttachActive ? 'brightness(0) saturate(100%) invert(52%) sepia(99%) saturate(1553%) hue-rotate(195deg) brightness(102%) contrast(95%)' : 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%)'
-                      }}
-                    />
-                  </button>
-
-                  {/* Text Input */}
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={messageText}
-                      onChange={(e) => {
-                        setMessageText(e.target.value);
-                        handleTypingDetection();
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          handleSendMessage(messageText);
-                        }
-                      }}
-                      placeholder="...Write your message"
-                      className="w-full px-2 py-1.5 focus:outline-none bg-transparent"
-                      style={{
-                        border: 'none',
-                        caretColor: '#64B5F6',
-                        fontSize: '11px'
-                      }}
-                    />
-                  </div>
-
-                  {/* Voice/Send Button */}
-                  <button
-                    onClick={handleSendButtonClick}
-                    className="p-1.5 text-blue-600 hover:text-blue-800"
-                  >
-                    {messageText.trim() || selectedFiles.length > 0 ? (
-                      <img src={bluIcon} alt="send" className="w-6 h-6" />
-                    ) : (
-                      <img src={audioIcon} alt="audio" className="w-6 h-6" />
-                    )}
-                  </button>
-                </div>
+                </>
               )}
             </div>
 
@@ -3888,6 +4297,8 @@ const Messages: React.FC = (): JSX.Element => {
                 <div className="flex-1 overflow-y-auto p-1">
                   {conversations
                     .filter((conv: any) => {
+                      // Exclude archived conversations
+                      if (conv.isArchived) return false;
                       if (selectedTab === 'Unreads') {
                         return conv.unreadCount > 0;
                       }
@@ -3973,7 +4384,17 @@ const Messages: React.FC = (): JSX.Element => {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
-                                <h3 className="text-sm md:text-base font-medium md:font-semibold text-gray-900 truncate">{participantName}</h3>
+                                <div className="flex items-center space-x-1 flex-1 min-w-0">
+                                  {conv.isPinned && (
+                                    <img src={pinBadgeIcon} alt="Pinned" className="w-3 h-3 flex-shrink-0" />
+                                  )}
+                                  {conv.label && (
+                                    <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}>
+                                      {conv.label}
+                                    </span>
+                                  )}
+                                  <h3 className="text-sm md:text-base font-medium md:font-semibold text-gray-900 truncate">{participantName}</h3>
+                                </div>
                                 <div className="flex items-center space-x-1">
                                   <span className="text-xs text-gray-500">{lastMessageTime}</span>
                                   <button
@@ -4155,7 +4576,7 @@ const Messages: React.FC = (): JSX.Element => {
                   <img src={archiveIcon} alt="Archived" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
                   <span className="text-sm" style={{ color: '#6A6A6A' }}>Archived</span>
                 </div>
-                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>4</span>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>{archivedCount}</span>
               </div>
 
               {/* Mark as important */}
@@ -4209,7 +4630,7 @@ const Messages: React.FC = (): JSX.Element => {
                     <img src={archiveIcon} alt="Archived" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
                     <span className="text-sm" style={{ color: '#6A6A6A' }}>Archived</span>
                   </div>
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>4</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>{archivedCount}</span>
                 </div>
 
                 {/* Mark as important */}
@@ -4219,6 +4640,87 @@ const Messages: React.FC = (): JSX.Element => {
                     <span className="text-sm" style={{ color: '#6A6A6A' }}>Mark as important</span>
                   </div>
                   <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>+9</span>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Label Modal */}
+          {showLabelModal && (
+            <>
+              {/* Overlay */}
+              <div
+                className="fixed inset-0 bg-black bg-opacity-20 z-50"
+                onClick={() => {
+                  setShowLabelModal(false);
+                  setLabelInput('');
+                  setLabelConversationId(null);
+                }}
+              ></div>
+
+              {/* Modal */}
+              <div
+                className="fixed bg-white p-4 shadow-lg rounded-lg z-50"
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  minWidth: '300px',
+                  maxWidth: '90%'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-base font-semibold" style={{ color: '#212121' }}>Add Label</h3>
+                  <button
+                    onClick={() => {
+                      setShowLabelModal(false);
+                      setLabelInput('');
+                      setLabelConversationId(null);
+                    }}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Input */}
+                <input
+                  type="text"
+                  value={labelInput}
+                  onChange={(e) => setLabelInput(e.target.value)}
+                  placeholder="Enter label name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSaveLabel();
+                    }
+                  }}
+                  autoFocus
+                />
+
+                {/* Buttons */}
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => {
+                      setShowLabelModal(false);
+                      setLabelInput('');
+                      setLabelConversationId(null);
+                    }}
+                    className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveLabel}
+                    className="px-4 py-2 text-sm text-white rounded-lg"
+                    style={{ backgroundColor: '#64B5F6' }}
+                  >
+                    Save
+                  </button>
                 </div>
               </div>
             </>
@@ -4260,7 +4762,7 @@ const Messages: React.FC = (): JSX.Element => {
                 {/* Right side - Language, button, profile, notifications */}
                 <div className="flex items-center space-x-4 bg-gray-50 px-4 py-2 rounded-lg">
                   {/* Language Selector */}
-                  <div className="relative language-selector">
+                  {/* <div className="relative language-selector">
                     <button
                       onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                       className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
@@ -4269,7 +4771,6 @@ const Messages: React.FC = (): JSX.Element => {
                       <img src={translationToggleIcon} alt="Toggle" className="w-4 h-4" />
                     </button>
 
-                    {/* Dropdown Menu */}
                     {isLanguageDropdownOpen && (
                       <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                         <div className="py-1">
@@ -4296,7 +4797,7 @@ const Messages: React.FC = (): JSX.Element => {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Become Seller Button */}
                   {/* <Link
@@ -4967,6 +5468,11 @@ const Messages: React.FC = (): JSX.Element => {
                         return (
                           <div
                             key={messageKey}
+                            ref={(el) => {
+                              if (el && message.id) {
+                                messageRefs.current.set(message.id, el);
+                              }
+                            }}
                             className={`flex mb-4 ${message.isIncoming ? 'justify-start' : 'justify-end'} ${isFadingOut ? 'message-fade-out' : ''}`}
                             style={{
                               animation: isFadingOut ? 'fadeOutUp 0.5s ease-in-out forwards' : 'fadeIn 0.5s ease-in-out',
@@ -5211,14 +5717,16 @@ const Messages: React.FC = (): JSX.Element => {
                                             className="rounded-full mr-2"
                                             style={{
                                               width: '2px',
-                                              backgroundColor: '#FFFFFF'
+                                              backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                              flexShrink: 0,
+                                              alignSelf: 'stretch'
                                             }}
                                           ></div>
                                           <div className="flex-1">
-                                            <p className="text-xs font-medium" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                                            <p className="text-xs font-medium mb-0.5" style={{ color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
                                               {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
                                             </p>
-                                            <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                            <p className="text-xs" style={{ color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
                                               {message.replyTo.text}
                                             </p>
                                           </div>
@@ -5327,150 +5835,166 @@ const Messages: React.FC = (): JSX.Element => {
                                       {/* Reply Section */}
                                       {message.replyTo && (
                                         <div className="mb-3">
-                                          {/* User's reply text at top */}
-                                          <p className="text-sm mb-2" style={{ color: '#FFFFFF' }}>
-                                            {message.text}
-                                          </p>
+                                          {/* Replied Message Text Above */}
+                                          <div
+                                            className="cursor-pointer hover:opacity-80 transition-opacity mb-2"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (message.replyTo?.id) {
+                                                scrollToMessage(message.replyTo.id);
+                                              }
+                                            }}
+                                          >
+                                            {message.replyTo.type === 'voice' ? (
+                                              /* Voice Note Reply - Screenshot Structure - TWO LINES */
+                                              <div className="flex items-start">
+                                                {/* White vertical line on LEFT - spans both sender label and audio preview */}
+                                                <div
+                                                  className="rounded-full mr-2"
+                                                  style={{
+                                                    width: '2px',
+                                                    backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                                    flexShrink: 0,
+                                                    alignSelf: 'stretch'
+                                                  }}
+                                                ></div>
 
-                                          {message.replyTo.type === 'voice' ? (
-                                            /* Voice Note Reply - Screenshot Structure - TWO LINES */
-                                            <div className="flex items-start">
-                                              {/* White vertical line on LEFT */}
-                                              <div
-                                                className="rounded-full mr-2"
-                                                style={{
-                                                  width: '2px',
-                                                  backgroundColor: '#FFFFFF',
-                                                  height: '38px',
-                                                  flexShrink: 0
-                                                }}
-                                              ></div>
+                                                <div className="flex-1">
+                                                  {/* Sender label */}
+                                                  <div className="text-xs font-medium mb-1" style={{ color: '#CFE8FC' }}>
+                                                    {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
+                                                  </div>
+                                                  {/* Audio preview */}
+                                                  <div className="flex items-center">
+                                                    {/* Speed button - appears when playing */}
+                                                    {playingMessageId === message.id && (
+                                                      <button
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          handleSpeedChange(message.id);
+                                                        }}
+                                                        className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
+                                                        style={{
+                                                          backgroundColor: '#4781AF',
+                                                          borderRadius: '10px',
+                                                          width: '32px',
+                                                          height: '22px',
+                                                          padding: '0 8px',
+                                                          marginRight: '8px'
+                                                        }}
+                                                      >
+                                                        <span className="text-white" style={{ fontSize: '10px', fontWeight: 500 }}>
+                                                          {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
+                                                        </span>
+                                                      </button>
+                                                    )}
 
-                                              <div className="flex-1">
-                                                {/* Sender label in light blue - ABOVE */}
-                                                <div className="text-xs font-medium mb-1" style={{ color: '#CFE8FC' }}>
-                                                  {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
-                                                </div>
+                                                    {/* Duration */}
+                                                    <span className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)', marginRight: '8px' }}>
+                                                      {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
+                                                    </span>
 
-                                                {/* Audio preview - BELOW "You" */}
-                                                <div className="flex items-center">
-                                                  {/* Speed button - appears when playing */}
-                                                  {playingMessageId === message.id && (
+                                                    {/* Waveform */}
+                                                    <div className="flex items-center space-x-0.5 flex-1">
+                                                      {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ?
+                                                        message.replyTo.waveformData.slice(-20).map((level: number, i: number) => {
+                                                          const progress = audioPlaybackProgress[message.id] || 0;
+                                                          const totalBars = Math.min(20, message.replyTo.waveformData.length);
+                                                          const isPlayed = playingMessageId === message.id && (i / totalBars) * 100 <= progress;
+                                                          return (
+                                                            <div
+                                                              key={i}
+                                                              style={{
+                                                                width: '2px',
+                                                                height: `${Math.max(3, level * 10)}px`,
+                                                                backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC',
+                                                                borderRadius: '1px'
+                                                              }}
+                                                            />
+                                                          );
+                                                        })
+                                                        :
+                                                        [3, 4, 3, 5, 8, 10, 12, 10, 8, 5, 4, 3, 6, 8, 9, 8, 6, 5, 3, 5].map((h, i) => {
+                                                          const progress = audioPlaybackProgress[message.id] || 0;
+                                                          const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
+                                                          return (
+                                                            <div
+                                                              key={i}
+                                                              style={{
+                                                                width: '2px',
+                                                                height: `${h}px`,
+                                                                backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC',
+                                                                borderRadius: '1px'
+                                                              }}
+                                                            />
+                                                          );
+                                                        })
+                                                      )}
+                                                    </div>
+
+                                                    {/* Play/Pause button - far right */}
                                                     <button
                                                       onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleSpeedChange(message.id);
+                                                        if (message.replyTo.audioUrl) {
+                                                          handleAudioPlayback(message.id, message.replyTo.audioUrl, message.replyTo.duration);
+                                                        }
                                                       }}
-                                                      className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
+                                                      className="ml-4 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity"
                                                       style={{
-                                                        backgroundColor: '#4781AF',
-                                                        borderRadius: '10px',
-                                                        width: '32px',
+                                                        width: '22px',
                                                         height: '22px',
-                                                        padding: '0 8px',
-                                                        marginRight: '8px'
+                                                        backgroundColor: '#FFFFFF'
                                                       }}
                                                     >
-                                                      <span className="text-white" style={{ fontSize: '10px', fontWeight: 500 }}>
-                                                        {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
-                                                      </span>
+                                                      {playingMessageId === message.id ? (
+                                                        <svg style={{ width: '14px', height: '14px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                          <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                                                        </svg>
+                                                      ) : (
+                                                        <svg style={{ width: '14px', height: '14px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
+                                                          <path d="M8 5v14l11-7z" />
+                                                        </svg>
+                                                      )}
                                                     </button>
-                                                  )}
-
-                                                  {/* Duration */}
-                                                  <span className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)', marginRight: '8px' }}>
-                                                    {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
-                                                  </span>
-
-                                                  {/* Waveform */}
-                                                  <div className="flex items-center space-x-0.5 flex-1">
-                                                    {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ?
-                                                      message.replyTo.waveformData.slice(-20).map((level: number, i: number) => {
-                                                        const progress = audioPlaybackProgress[message.id] || 0;
-                                                        const totalBars = Math.min(20, message.replyTo.waveformData.length);
-                                                        const isPlayed = playingMessageId === message.id && (i / totalBars) * 100 <= progress;
-                                                        return (
-                                                          <div
-                                                            key={i}
-                                                            style={{
-                                                              width: '2px',
-                                                              height: `${Math.max(3, level * 10)}px`,
-                                                              backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC',
-                                                              borderRadius: '1px'
-                                                            }}
-                                                          />
-                                                        );
-                                                      })
-                                                      :
-                                                      [3, 4, 3, 5, 8, 10, 12, 10, 8, 5, 4, 3, 6, 8, 9, 8, 6, 5, 3, 5].map((h, i) => {
-                                                        const progress = audioPlaybackProgress[message.id] || 0;
-                                                        const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
-                                                        return (
-                                                          <div
-                                                            key={i}
-                                                            style={{
-                                                              width: '2px',
-                                                              height: `${h}px`,
-                                                              backgroundColor: isPlayed ? '#FFFFFF' : '#CFE8FC',
-                                                              borderRadius: '1px'
-                                                            }}
-                                                          />
-                                                        );
-                                                      })
-                                                    )}
                                                   </div>
-
-                                                  {/* Play/Pause button - far right */}
-                                                  <button
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      if (message.replyTo.audioUrl) {
-                                                        handleAudioPlayback(message.id, message.replyTo.audioUrl, message.replyTo.duration);
-                                                      }
-                                                    }}
-                                                    className="ml-4 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity"
-                                                    style={{
-                                                      width: '22px',
-                                                      height: '22px',
-                                                      backgroundColor: '#FFFFFF'
-                                                    }}
-                                                  >
-                                                    {playingMessageId === message.id ? (
-                                                      <svg style={{ width: '14px', height: '14px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
-                                                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                                                      </svg>
-                                                    ) : (
-                                                      <svg style={{ width: '14px', height: '14px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
-                                                        <path d="M8 5v14l11-7z" />
-                                                      </svg>
-                                                    )}
-                                                  </button>
                                                 </div>
                                               </div>
-                                            </div>
-                                          ) : (
-                                            /* Text Reply */
-                                            <div className="flex items-stretch">
-                                              {/* Vertical white line */}
-                                              <div
-                                                className="rounded-full mr-2"
-                                                style={{
-                                                  width: '2px',
-                                                  backgroundColor: '#FFFFFF',
-                                                  flexShrink: 0
-                                                }}
-                                              ></div>
+                                            ) : (
+                                              /* Text Reply - Show replied message text */
+                                              <div className="flex items-stretch">
+                                                {/* Vertical line - spans both sender label and message text */}
+                                                <div
+                                                  className="rounded-full mr-2"
+                                                  style={{
+                                                    width: '2px',
+                                                    backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                                    flexShrink: 0,
+                                                    alignSelf: 'stretch'
+                                                  }}
+                                                ></div>
 
-                                              {/* Quoted message info */}
-                                              <div className="flex-1">
-                                                <p className="text-xs font-medium mb-0.5" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                                                  {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
-                                                </p>
-                                                <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                                                  {message.replyTo.text}
-                                                </p>
+                                                {/* Quoted message info */}
+                                                <div className="flex-1">
+                                                  <p className="text-xs font-medium mb-0.5" style={{ color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
+                                                    {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
+                                                  </p>
+                                                  <p className="text-xs" style={{ color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                                    {message.replyTo.text}
+                                                  </p>
+                                                </div>
                                               </div>
-                                            </div>
+                                            )}
+                                          </div>
+
+                                          {/* Reply Text Below */}
+                                          {message.text && (
+                                            <p
+                                              className="text-sm mb-3"
+                                              style={{ color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                                            >
+                                              {message.text}
+                                            </p>
                                           )}
                                         </div>
                                       )}
@@ -6478,6 +7002,41 @@ const Messages: React.FC = (): JSX.Element => {
                               </svg>
                             </button>
                           )}
+                        </div>
+                      )}
+
+                      {/* Reply Preview */}
+                      {replyToMessage && (
+                        <div className="mb-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#F0F8FE', border: '1px solid #64B5F6' }}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-stretch">
+                                <div
+                                  className="rounded-full mr-2"
+                                  style={{
+                                    width: '2px',
+                                    backgroundColor: '#64B5F6',
+                                    flexShrink: 0,
+                                    alignSelf: 'stretch'
+                                  }}
+                                ></div>
+                                <div className="flex-1">
+                                  <p className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
+                                    {getReplySenderLabel(replyToMessage.sender, replyToMessage.isIncoming)}
+                                  </p>
+                                  <p className="text-xs truncate" style={{ color: '#6A6A6A' }}>
+                                    {replyToMessage.text || replyToMessage.content || (replyToMessage.type === 'voice' ? 'Voice message' : '')}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => setReplyToMessage(null)}
+                              className="ml-2 flex-shrink-0 hover:opacity-70"
+                            >
+                              <img src={replyCloseIcon} alt="Close" className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                       )}
 

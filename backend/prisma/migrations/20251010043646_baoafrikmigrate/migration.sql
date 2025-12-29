@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS "products" (
     "specifications" JSONB,
     "availability" BOOLEAN NOT NULL DEFAULT true,
     "quantity" INTEGER NOT NULL DEFAULT 0,
-    "status" TEXT NOT NULL DEFAULT 'DRAFT'
+    "status" TEXT NOT NULL DEFAULT 'DRAFT',
     "tags" JSONB,
     "view_count" INTEGER NOT NULL DEFAULT 0,
     "like_count" INTEGER NOT NULL DEFAULT 0,
@@ -188,6 +188,21 @@ CREATE TABLE IF NOT EXISTS "message_status" (
     CONSTRAINT "message_status_message_id_user_id_key" UNIQUE ("message_id", "user_id")
 );
 
+CREATE TABLE IF NOT EXISTS "conversation_metadata" (
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+    "conversation_id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "is_pinned" BOOLEAN NOT NULL DEFAULT false,
+    "is_archived" BOOLEAN NOT NULL DEFAULT false,
+    "is_muted" BOOLEAN NOT NULL DEFAULT false,
+    "label" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT "conversation_metadata_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "conversation_metadata_conversation_id_user_id_key" UNIQUE ("conversation_id", "user_id")
+);
+
 -- 4. Create indexes (idempotent)
 CREATE UNIQUE INDEX IF NOT EXISTS "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX IF NOT EXISTS "refresh_tokens_token_key" ON "refresh_tokens"("token");
@@ -218,6 +233,11 @@ CREATE INDEX IF NOT EXISTS "messages_unread_idx" ON "messages"("conversation_id"
 CREATE INDEX IF NOT EXISTS "message_status_message_id_idx" ON "message_status"("message_id");
 CREATE INDEX IF NOT EXISTS "message_status_user_id_idx" ON "message_status"("user_id");
 CREATE INDEX IF NOT EXISTS "message_status_status_idx" ON "message_status"("status");
+
+CREATE INDEX IF NOT EXISTS "conversation_metadata_conversation_id_idx" ON "conversation_metadata"("conversation_id");
+CREATE INDEX IF NOT EXISTS "conversation_metadata_user_id_idx" ON "conversation_metadata"("user_id");
+CREATE INDEX IF NOT EXISTS "conversation_metadata_is_archived_idx" ON "conversation_metadata"("is_archived") WHERE "is_archived" = true;
+CREATE INDEX IF NOT EXISTS "conversation_metadata_is_pinned_idx" ON "conversation_metadata"("is_pinned") WHERE "is_pinned" = true;
 
 -- 5. Add foreign keys (idempotent)
 DO $$ BEGIN
@@ -289,6 +309,14 @@ DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'message_status_user_id_fkey') THEN
         ALTER TABLE "message_status" ADD CONSTRAINT "message_status_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
     END IF;
+
+    -- Conversation metadata foreign keys
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'conversation_metadata_conversation_id_fkey') THEN
+        ALTER TABLE "conversation_metadata" ADD CONSTRAINT "conversation_metadata_conversation_id_fkey" FOREIGN KEY ("conversation_id") REFERENCES "conversations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'conversation_metadata_user_id_fkey') THEN
+        ALTER TABLE "conversation_metadata" ADD CONSTRAINT "conversation_metadata_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
 END $$;
 
 -- 6. Create functions and triggers
@@ -326,6 +354,20 @@ CREATE TRIGGER trigger_initialize_message_status
     FOR EACH ROW
     EXECUTE FUNCTION initialize_message_status();
 
+CREATE OR REPLACE FUNCTION update_conversation_metadata_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW."updated_at" = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_update_conversation_metadata_updated_at ON "conversation_metadata";
+CREATE TRIGGER trigger_update_conversation_metadata_updated_at
+    BEFORE UPDATE ON "conversation_metadata"
+    FOR EACH ROW
+    EXECUTE FUNCTION update_conversation_metadata_updated_at();
+
 -- 7. Create views
 CREATE OR REPLACE VIEW conversation_details AS
 SELECT 
@@ -343,7 +385,7 @@ SELECT
     u2.first_name as user2_first_name,
     u2.last_name as user2_last_name,
     u2.profile_image as user2_profile_image,
-    prod.name as product_name,
+    prod.title as product_name,
     prod.price as product_price,
     prod.images as product_images,
     lm.content as last_message_content,
@@ -432,7 +474,7 @@ $$ LANGUAGE plpgsql;
 
 -- Database level encryption
 CREATE OR REPLACE FUNCTION db_encrypt(data TEXT)
-RETURN TEXT AS $$
+RETURNS TEXT AS $$
 DECLARE
     encryption_key TEXT;
 BEGIN
@@ -447,13 +489,13 @@ BEGIN
     -- Encrypt the data
     RETURN encode(
         encrypt(
-            convert_to(data, 'UTF8');
-            db_key,
+            convert_to(data, 'UTF8'),
+            encryption_key,
             'aes'
         ),
         'base64'
     );
-END
+END;
 $$ LANGUAGE plpgsql;
 
 -- Database level decryption  

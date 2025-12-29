@@ -88,6 +88,11 @@ export type Conversation = Prisma.ConversationModel
  */
 export type ConversationParticipant = Prisma.ConversationParticipantModel
 /**
+ * Model ConversationMetadata
+ * 
+ */
+export type ConversationMetadata = Prisma.ConversationMetadataModel
+/**
  * Model ProductRequest
  * 
  */

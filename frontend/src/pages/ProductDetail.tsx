@@ -2152,7 +2152,7 @@ const ProductDetail: React.FC = () => {
                       <span className="font-medium text-sm" style={{ color: '#212121' }}>
                         {`${product?.seller.firstName} ${product?.seller.lastName}`}
                       </span>
-                      {isSellerVerified(product.seller) ? (
+                      {/* {isSellerVerified(product.seller) ? (
                         <div className="flex items-center bg-green-50 rounded" style={{ padding: '1px 4px', gap: '1px', fontSize: '9px', color: '#45C55B' }}>
                           <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
                           <span>Verified seller</span>
@@ -2162,7 +2162,7 @@ const ProductDetail: React.FC = () => {
                           <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
                           <span>Unverified Seller</span>
                         </div>
-                      )}
+                      )} */}
                     </div>
                     <div className="flex items-center gap-0.5">
                       {/* Rating Stars */}
@@ -3195,7 +3195,7 @@ const ProductDetail: React.FC = () => {
                   <span className="font-medium text-sm" style={{ color: '#212121' }}>
                     {getSellerName(product.seller)}
                   </span>
-                  {product.seller.verified ? (
+                  {/* {product.seller.verified ? (
                     <div className="inline-flex items-center gap-1 bg-green-50 rounded-full mt-1" style={{ padding: '2px 6px', fontSize: '10px', color: '#45C55B' }}>
                       <img src={verifyIcon} alt="Verified" className="w-3 h-3" />
                       <span>Verified Seller</span>
@@ -3205,7 +3205,7 @@ const ProductDetail: React.FC = () => {
                       <img src={unverifyIcon} alt="Unverified" className="w-3 h-3 mr-1" />
                       <span>Unverified Seller</span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
               <button

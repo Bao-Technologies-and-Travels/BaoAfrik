@@ -30,4 +30,10 @@ router.delete('/messages/:messageId/reactions', chatController.removeReaction);
 router.patch('/messages/:messageId/metadata', chatController.updateMessageMetadata);
 router.get('/messages/:messageId/metadata', chatController.getMessageMetadata);
 
+// Conversation metadata (pin, archive, mute, label)
+router.patch('/conversations/:conversationId/metadata', chatController.updateConversationMetadata);
+router.get('/conversations/:conversationId/metadata', chatController.getConversationMetadata);
+router.delete('/conversations/:conversationId', chatController.deleteConversation);
+router.get('/conversations/archived/count', chatController.getArchivedCount);
+
 export default router;

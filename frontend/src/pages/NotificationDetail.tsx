@@ -6,8 +6,10 @@ import trashIcon from '../assets/images/pre/trash.svg';
 import shareIcon from '../assets/images/pre/Share.svg';
 import lilLogo from '../assets/images/pre/lil.png';
 import avatar from '../assets/images/logos/avatar.png';
-import starIcon from '../assets/images/pre/star.svg';
+import logoIcon from '../assets/images/logos/ba-brand-icon-colored.png';
+// import starIcon from '../assets/images/pre/star.svg';
 import messageAvatarIcon from '../assets/images/pre/main.png';
+import appNotificationIcon from '../assets/images/pre/nof.svg';
 
 const NotificationDetail: React.FC = () => {
   const navigate = useNavigate();
@@ -54,6 +56,16 @@ const NotificationDetail: React.FC = () => {
   };
 
   const getActorName = (notif: any) => {
+    // For product notifications, use seller name from meta or title
+    if (notif?.type === 'product') {
+      return notif.meta?.sellerName || notif.title || 'A seller';
+    }
+
+    // For message notifications
+    if ((notif?.type === 'message' || notif?.type === 'NEW_MESSAGE') && notif?.title) {
+      return notif.title;
+    }
+
     if (notif?.actor) {
       const { firstName, lastName } = notif.actor;
       if (firstName && lastName) return `${firstName} ${lastName}`;
@@ -74,7 +86,42 @@ const NotificationDetail: React.FC = () => {
   };
 
   const getActorImage = (notif: any) => {
-    return notif?.actor?.profileImage || notif?.senderAvatar || avatar;
+    const tryUrl = (u?: string | null) => {
+      if (!u) return null;
+      // if relative path, prefix with API url
+      if (!/^https?:\/\//i.test(u) && process.env.REACT_APP_API_URL) {
+        return `${process.env.REACT_APP_API_URL.replace(/\/$/, '')}/${u.replace(/^\//, '')}`;
+      }
+      return u;
+    };
+
+    // For message notifications, show sender's profile image
+    if (notif?.type === 'message' || notif?.type === 'NEW_MESSAGE') {
+      const srcCandidates = [
+        notif.actor?.profileImage,
+        notif.senderAvatar,
+        notif.meta?.senderImage
+      ];
+
+      for (const c of srcCandidates) {
+        const resolved = tryUrl(c);
+        if (resolved) return resolved;
+      }
+      return avatar;
+    }
+
+    // For product notifications, show seller's image if available
+    if (notif?.type === 'product') {
+      const sellerImage = notif.meta?.sellerImage || notif.actor?.profileImage;
+      const resolved = tryUrl(sellerImage);
+      if (resolved) return resolved;
+      return null; // Return null to show logo
+    }
+
+    // For other notifications
+    const resolved = tryUrl(notif?.actor?.profileImage || notif?.senderAvatar);
+    if (resolved) return resolved;
+    return null; // Return null to show logo
   };
 
   const getTimeAgo = (createdAt: string) => {
@@ -222,10 +269,46 @@ const NotificationDetail: React.FC = () => {
               {/* Avatar with badge */}
               <div className="relative mb-6">
                 <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '64px', height: '64px', backgroundColor: isMessageNotification ? '#E3F2FD' : '#F9A825', border: '2px solid white' }}>
-                  <img src={getActorImage(notification)} alt={getActorName(notification)} className="w-full h-full object-cover" />
+                  {(() => {
+                    const actorImage = getActorImage(notification);
+                    
+                    // For messages, always show sender's image (or fallback avatar)
+                    if (isMessageNotification) {
+                      return (
+                        <img 
+                          src={actorImage || avatar} 
+                          alt={getActorName(notification)} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).src = avatar; }}
+                        />
+                      );
+                    }
+                    
+                    // For product notifications, show seller image if available
+                    if (notification.type === 'product' && actorImage) {
+                      return (
+                        <img 
+                          src={actorImage} 
+                          alt={getActorName(notification)} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).src = logoIcon; }}
+                        />
+                      );
+                    }
+                    
+                    // For all other cases, show logo
+                    return (
+                      <img 
+                        src={logoIcon} 
+                        alt="Logo" 
+                        className="w-12 h-12"
+                        style={{ filter: 'brightness(0) invert(1)' }}
+                      />
+                    );
+                  })()}
                 </div>
                 <div className="absolute" style={{ bottom: '-2px', right: '-2px', width: '24px', height: '24px', backgroundColor: '#FFF', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <img src={messageAvatarIcon} alt="Badge" className="w-6 h-6" />
+                  <img src={isMessageNotification ? messageAvatarIcon : appNotificationIcon} alt="Badge" className="w-6 h-6" />
                 </div>
               </div>
 

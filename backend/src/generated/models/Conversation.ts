@@ -211,6 +211,7 @@ export type ConversationWhereInput = {
   lastMessage?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   participants?: Prisma.ConversationParticipantListRelationFilter
   messages?: Prisma.MessageListRelationFilter
+  metadata?: Prisma.ConversationMetadataListRelationFilter
 }
 
 export type ConversationOrderByWithRelationInput = {
@@ -227,6 +228,7 @@ export type ConversationOrderByWithRelationInput = {
   lastMessage?: Prisma.MessageOrderByWithRelationInput
   participants?: Prisma.ConversationParticipantOrderByRelationAggregateInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
+  metadata?: Prisma.ConversationMetadataOrderByRelationAggregateInput
 }
 
 export type ConversationWhereUniqueInput = Prisma.AtLeast<{
@@ -246,6 +248,7 @@ export type ConversationWhereUniqueInput = Prisma.AtLeast<{
   lastMessage?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
   participants?: Prisma.ConversationParticipantListRelationFilter
   messages?: Prisma.MessageListRelationFilter
+  metadata?: Prisma.ConversationMetadataListRelationFilter
 }, "id">
 
 export type ConversationOrderByWithAggregationInput = {
@@ -287,6 +290,7 @@ export type ConversationCreateInput = {
   lastMessage?: Prisma.MessageCreateNestedOneWithoutConversationAsLastMessageInput
   participants?: Prisma.ConversationParticipantCreateNestedManyWithoutConversationInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateInput = {
@@ -300,6 +304,7 @@ export type ConversationUncheckedCreateInput = {
   productData?: string | null
   participants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutConversationInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUpdateInput = {
@@ -313,6 +318,7 @@ export type ConversationUpdateInput = {
   lastMessage?: Prisma.MessageUpdateOneWithoutConversationAsLastMessageNestedInput
   participants?: Prisma.ConversationParticipantUpdateManyWithoutConversationNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateInput = {
@@ -326,6 +332,7 @@ export type ConversationUncheckedUpdateInput = {
   productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   participants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutConversationNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationCreateManyInput = {
@@ -525,6 +532,20 @@ export type ConversationUpdateOneRequiredWithoutParticipantsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutParticipantsInput, Prisma.ConversationUpdateWithoutParticipantsInput>, Prisma.ConversationUncheckedUpdateWithoutParticipantsInput>
 }
 
+export type ConversationCreateNestedOneWithoutMetadataInput = {
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutMetadataInput, Prisma.ConversationUncheckedCreateWithoutMetadataInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutMetadataInput
+  connect?: Prisma.ConversationWhereUniqueInput
+}
+
+export type ConversationUpdateOneRequiredWithoutMetadataNestedInput = {
+  create?: Prisma.XOR<Prisma.ConversationCreateWithoutMetadataInput, Prisma.ConversationUncheckedCreateWithoutMetadataInput>
+  connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutMetadataInput
+  upsert?: Prisma.ConversationUpsertWithoutMetadataInput
+  connect?: Prisma.ConversationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ConversationUpdateToOneWithWhereWithoutMetadataInput, Prisma.ConversationUpdateWithoutMetadataInput>, Prisma.ConversationUncheckedUpdateWithoutMetadataInput>
+}
+
 export type ConversationCreateNestedManyWithoutRequestInput = {
   create?: Prisma.XOR<Prisma.ConversationCreateWithoutRequestInput, Prisma.ConversationUncheckedCreateWithoutRequestInput> | Prisma.ConversationCreateWithoutRequestInput[] | Prisma.ConversationUncheckedCreateWithoutRequestInput[]
   connectOrCreate?: Prisma.ConversationCreateOrConnectWithoutRequestInput | Prisma.ConversationCreateOrConnectWithoutRequestInput[]
@@ -577,6 +598,7 @@ export type ConversationCreateWithoutProductInput = {
   lastMessage?: Prisma.MessageCreateNestedOneWithoutConversationAsLastMessageInput
   participants?: Prisma.ConversationParticipantCreateNestedManyWithoutConversationInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutProductInput = {
@@ -589,6 +611,7 @@ export type ConversationUncheckedCreateWithoutProductInput = {
   productData?: string | null
   participants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutConversationInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutProductInput = {
@@ -641,6 +664,7 @@ export type ConversationCreateWithoutMessagesInput = {
   request?: Prisma.ProductRequestCreateNestedOneWithoutConversationsInput
   lastMessage?: Prisma.MessageCreateNestedOneWithoutConversationAsLastMessageInput
   participants?: Prisma.ConversationParticipantCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutMessagesInput = {
@@ -653,6 +677,7 @@ export type ConversationUncheckedCreateWithoutMessagesInput = {
   updatedAt?: Date | string
   productData?: string | null
   participants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutMessagesInput = {
@@ -670,6 +695,7 @@ export type ConversationCreateWithoutLastMessageInput = {
   request?: Prisma.ProductRequestCreateNestedOneWithoutConversationsInput
   participants?: Prisma.ConversationParticipantCreateNestedManyWithoutConversationInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutLastMessageInput = {
@@ -682,6 +708,7 @@ export type ConversationUncheckedCreateWithoutLastMessageInput = {
   productData?: string | null
   participants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutConversationInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutLastMessageInput = {
@@ -715,6 +742,7 @@ export type ConversationUpdateWithoutMessagesInput = {
   request?: Prisma.ProductRequestUpdateOneWithoutConversationsNestedInput
   lastMessage?: Prisma.MessageUpdateOneWithoutConversationAsLastMessageNestedInput
   participants?: Prisma.ConversationParticipantUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutMessagesInput = {
@@ -727,6 +755,7 @@ export type ConversationUncheckedUpdateWithoutMessagesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   participants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUpsertWithWhereUniqueWithoutLastMessageInput = {
@@ -755,6 +784,7 @@ export type ConversationCreateWithoutParticipantsInput = {
   request?: Prisma.ProductRequestCreateNestedOneWithoutConversationsInput
   lastMessage?: Prisma.MessageCreateNestedOneWithoutConversationAsLastMessageInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutParticipantsInput = {
@@ -767,6 +797,7 @@ export type ConversationUncheckedCreateWithoutParticipantsInput = {
   updatedAt?: Date | string
   productData?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutParticipantsInput = {
@@ -795,6 +826,7 @@ export type ConversationUpdateWithoutParticipantsInput = {
   request?: Prisma.ProductRequestUpdateOneWithoutConversationsNestedInput
   lastMessage?: Prisma.MessageUpdateOneWithoutConversationAsLastMessageNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutParticipantsInput = {
@@ -806,6 +838,75 @@ export type ConversationUncheckedUpdateWithoutParticipantsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUncheckedUpdateManyWithoutConversationNestedInput
+}
+
+export type ConversationCreateWithoutMetadataInput = {
+  id?: string
+  lastMessageAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  productData?: string | null
+  product?: Prisma.ProductCreateNestedOneWithoutConversationsInput
+  request?: Prisma.ProductRequestCreateNestedOneWithoutConversationsInput
+  lastMessage?: Prisma.MessageCreateNestedOneWithoutConversationAsLastMessageInput
+  participants?: Prisma.ConversationParticipantCreateNestedManyWithoutConversationInput
+  messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+}
+
+export type ConversationUncheckedCreateWithoutMetadataInput = {
+  id?: string
+  productId?: string | null
+  requestId?: string | null
+  lastMessageId?: string | null
+  lastMessageAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  productData?: string | null
+  participants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutConversationInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+}
+
+export type ConversationCreateOrConnectWithoutMetadataInput = {
+  where: Prisma.ConversationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ConversationCreateWithoutMetadataInput, Prisma.ConversationUncheckedCreateWithoutMetadataInput>
+}
+
+export type ConversationUpsertWithoutMetadataInput = {
+  update: Prisma.XOR<Prisma.ConversationUpdateWithoutMetadataInput, Prisma.ConversationUncheckedUpdateWithoutMetadataInput>
+  create: Prisma.XOR<Prisma.ConversationCreateWithoutMetadataInput, Prisma.ConversationUncheckedCreateWithoutMetadataInput>
+  where?: Prisma.ConversationWhereInput
+}
+
+export type ConversationUpdateToOneWithWhereWithoutMetadataInput = {
+  where?: Prisma.ConversationWhereInput
+  data: Prisma.XOR<Prisma.ConversationUpdateWithoutMetadataInput, Prisma.ConversationUncheckedUpdateWithoutMetadataInput>
+}
+
+export type ConversationUpdateWithoutMetadataInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  product?: Prisma.ProductUpdateOneWithoutConversationsNestedInput
+  request?: Prisma.ProductRequestUpdateOneWithoutConversationsNestedInput
+  lastMessage?: Prisma.MessageUpdateOneWithoutConversationAsLastMessageNestedInput
+  participants?: Prisma.ConversationParticipantUpdateManyWithoutConversationNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+}
+
+export type ConversationUncheckedUpdateWithoutMetadataInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastMessageAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  participants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutConversationNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -819,6 +920,7 @@ export type ConversationCreateWithoutRequestInput = {
   lastMessage?: Prisma.MessageCreateNestedOneWithoutConversationAsLastMessageInput
   participants?: Prisma.ConversationParticipantCreateNestedManyWithoutConversationInput
   messages?: Prisma.MessageCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationUncheckedCreateWithoutRequestInput = {
@@ -831,6 +933,7 @@ export type ConversationUncheckedCreateWithoutRequestInput = {
   productData?: string | null
   participants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutConversationInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutConversationInput
+  metadata?: Prisma.ConversationMetadataUncheckedCreateNestedManyWithoutConversationInput
 }
 
 export type ConversationCreateOrConnectWithoutRequestInput = {
@@ -879,6 +982,7 @@ export type ConversationUpdateWithoutProductInput = {
   lastMessage?: Prisma.MessageUpdateOneWithoutConversationAsLastMessageNestedInput
   participants?: Prisma.ConversationParticipantUpdateManyWithoutConversationNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutProductInput = {
@@ -891,6 +995,7 @@ export type ConversationUncheckedUpdateWithoutProductInput = {
   productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   participants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutConversationNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateManyWithoutProductInput = {
@@ -923,6 +1028,7 @@ export type ConversationUpdateWithoutLastMessageInput = {
   request?: Prisma.ProductRequestUpdateOneWithoutConversationsNestedInput
   participants?: Prisma.ConversationParticipantUpdateManyWithoutConversationNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutLastMessageInput = {
@@ -935,6 +1041,7 @@ export type ConversationUncheckedUpdateWithoutLastMessageInput = {
   productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   participants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutConversationNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateManyWithoutLastMessageInput = {
@@ -967,6 +1074,7 @@ export type ConversationUpdateWithoutRequestInput = {
   lastMessage?: Prisma.MessageUpdateOneWithoutConversationAsLastMessageNestedInput
   participants?: Prisma.ConversationParticipantUpdateManyWithoutConversationNestedInput
   messages?: Prisma.MessageUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateWithoutRequestInput = {
@@ -979,6 +1087,7 @@ export type ConversationUncheckedUpdateWithoutRequestInput = {
   productData?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   participants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutConversationNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutConversationNestedInput
+  metadata?: Prisma.ConversationMetadataUncheckedUpdateManyWithoutConversationNestedInput
 }
 
 export type ConversationUncheckedUpdateManyWithoutRequestInput = {
@@ -999,11 +1108,13 @@ export type ConversationUncheckedUpdateManyWithoutRequestInput = {
 export type ConversationCountOutputType = {
   participants: number
   messages: number
+  metadata: number
 }
 
 export type ConversationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participants?: boolean | ConversationCountOutputTypeCountParticipantsArgs
   messages?: boolean | ConversationCountOutputTypeCountMessagesArgs
+  metadata?: boolean | ConversationCountOutputTypeCountMetadataArgs
 }
 
 /**
@@ -1030,6 +1141,13 @@ export type ConversationCountOutputTypeCountMessagesArgs<ExtArgs extends runtime
   where?: Prisma.MessageWhereInput
 }
 
+/**
+ * ConversationCountOutputType without action
+ */
+export type ConversationCountOutputTypeCountMetadataArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConversationMetadataWhereInput
+}
+
 
 export type ConversationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1045,6 +1163,7 @@ export type ConversationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   lastMessage?: boolean | Prisma.Conversation$lastMessageArgs<ExtArgs>
   participants?: boolean | Prisma.Conversation$participantsArgs<ExtArgs>
   messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs>
+  metadata?: boolean | Prisma.Conversation$metadataArgs<ExtArgs>
   _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["conversation"]>
 
@@ -1094,6 +1213,7 @@ export type ConversationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   lastMessage?: boolean | Prisma.Conversation$lastMessageArgs<ExtArgs>
   participants?: boolean | Prisma.Conversation$participantsArgs<ExtArgs>
   messages?: boolean | Prisma.Conversation$messagesArgs<ExtArgs>
+  metadata?: boolean | Prisma.Conversation$metadataArgs<ExtArgs>
   _count?: boolean | Prisma.ConversationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ConversationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1115,6 +1235,7 @@ export type $ConversationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     lastMessage: Prisma.$MessagePayload<ExtArgs> | null
     participants: Prisma.$ConversationParticipantPayload<ExtArgs>[]
     messages: Prisma.$MessagePayload<ExtArgs>[]
+    metadata: Prisma.$ConversationMetadataPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1524,6 +1645,7 @@ export interface Prisma__ConversationClient<T, Null = never, ExtArgs extends run
   lastMessage<T extends Prisma.Conversation$lastMessageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$lastMessageArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   participants<T extends Prisma.Conversation$participantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messages<T extends Prisma.Conversation$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  metadata<T extends Prisma.Conversation$metadataArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Conversation$metadataArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationMetadataPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2059,6 +2181,30 @@ export type Conversation$messagesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * Conversation.metadata
+ */
+export type Conversation$metadataArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ConversationMetadata
+   */
+  select?: Prisma.ConversationMetadataSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ConversationMetadata
+   */
+  omit?: Prisma.ConversationMetadataOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConversationMetadataInclude<ExtArgs> | null
+  where?: Prisma.ConversationMetadataWhereInput
+  orderBy?: Prisma.ConversationMetadataOrderByWithRelationInput | Prisma.ConversationMetadataOrderByWithRelationInput[]
+  cursor?: Prisma.ConversationMetadataWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversationMetadataScalarFieldEnum | Prisma.ConversationMetadataScalarFieldEnum[]
 }
 
 /**

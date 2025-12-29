@@ -822,4 +822,119 @@ export class ChatController {
             });
         }
     };
+
+    // Update conversation metadata (pin, archive, mute, label)
+    updateConversationMetadata = async (req: Request, res: Response) => {
+        try {
+            const { conversationId } = req.params;
+            const { isPinned, isArchived, isMuted, label } = req.body;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
+
+            if (!conversationId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Conversation ID is required'
+                });
+            }
+
+            const metadata = await this.chatService.updateConversationMetadata(conversationId, userId, {
+                isPinned,
+                isArchived,
+                isMuted,
+                label
+            });
+
+            return res.json({
+                success: true,
+                data: metadata
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                error: error.message || 'Failed to update conversation metadata'
+            });
+        }
+    };
+
+    // Get conversation metadata
+    getConversationMetadata = async (req: Request, res: Response) => {
+        try {
+            const { conversationId } = req.params;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
+
+            if (!conversationId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Conversation ID is required'
+                });
+            }
+
+            const metadata = await this.chatService.getConversationMetadata(conversationId, userId);
+            return res.json({
+                success: true,
+                data: metadata
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                error: error.message || 'Failed to get conversation metadata'
+            });
+        }
+    };
+
+    // Delete conversation
+    deleteConversation = async (req: Request, res: Response) => {
+        try {
+            const { conversationId } = req.params;
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
+
+            if (!conversationId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Conversation ID is required'
+                });
+            }
+
+            await this.chatService.deleteConversation(conversationId, userId);
+            return res.json({
+                success: true,
+                message: 'Conversation deleted successfully'
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                error: error.message || 'Failed to delete conversation'
+            });
+        }
+    };
+
+    // Get archived conversations count
+    getArchivedCount = async (req: Request, res: Response) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const userId = req.user.id;
+
+            const count = await this.chatService.getArchivedConversationsCount(userId);
+            return res.json({
+                success: true,
+                data: { count }
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                error: error.message || 'Failed to get archived count'
+            });
+        }
+    };
 }

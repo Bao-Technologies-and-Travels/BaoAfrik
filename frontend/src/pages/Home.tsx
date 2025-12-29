@@ -88,17 +88,6 @@ interface Notification {
   type: 'success' | 'error';
 }
 
-interface Request {
-  id: string;
-  productName: string;
-  description: string;
-  minPrice?: number;
-  maxPrice?: number;
-  currency?: string;
-  origin?: string;
-
-}
-
 const Home: React.FC = () => {
   const productGridRef = React.useRef<HTMLDivElement>(null);
   const categoryRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
@@ -137,7 +126,6 @@ const Home: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<FrontendProduct[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const [requests, setRequests] = useState<any[]>([]);
@@ -437,7 +425,7 @@ const Home: React.FC = () => {
     { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png' }
   ].sort((a, b) => a.name.localeCompare(b.name));
 
-  
+
   const formatPrice = (amount: number | string, currencyCode: string = 'USD'): string => {
     const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
     const currencyCode_ = (currencyCode || 'USD').toUpperCase();
@@ -2211,7 +2199,7 @@ const Home: React.FC = () => {
                                   {/* {formatPrice(product.price, product.currency)} */}
                                   {product.currency} {product.price}
                                 </div>
-                                {product.verified ? (
+                                {/* {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                     display: 'flex',
                                     padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
@@ -2235,7 +2223,7 @@ const Home: React.FC = () => {
                                     <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                     <span>Unverified Seller</span>
                                   </div>
-                                )}
+                                )} */}
                               </div>
 
                               {/* Product Name */}
@@ -2388,7 +2376,7 @@ const Home: React.FC = () => {
                                       {/* {formatPrice(product.price, product.currency)} */}
                                       {product.currency} {product.price}
                                     </div>
-                                    {product.verified ? (
+                                    {/* {product.verified ? (
                                       <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                         display: 'flex',
                                         padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
@@ -2412,7 +2400,7 @@ const Home: React.FC = () => {
                                         <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                         <span>Unverified Seller</span>
                                       </div>
-                                    )}
+                                    )} */}
                                   </div>
 
                                   {/* Product Name */}
@@ -2627,7 +2615,7 @@ const Home: React.FC = () => {
                                 {/* {formatPrice(product.price, product.currency)} */}
                                 {product.currency} {product.price}
                               </div>
-                              {product.verified ? (
+                              {/* {product.verified ? (
                                 <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                   display: 'flex',
                                   padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
@@ -2651,7 +2639,7 @@ const Home: React.FC = () => {
                                   <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                   <span>Unverified Seller</span>
                                 </div>
-                              )}
+                              )} */}
                             </div>
 
                             {/* Product Name */}
@@ -3699,51 +3687,51 @@ const Home: React.FC = () => {
 
             {/* Location Section */}
             <div className="relative location-dropdown-container">
-                  <div className="flex items-start justify-between mt-4" style={{ maxWidth: '560px' }}>
-                    <div className="flex flex-col">
-                      <div className="flex items-center space-x-1.5 mb-1">
-                        <img src={locIcon} alt="Location" className="w-4 h-4" />
-                        <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
-                      </div>
-                      <input
-                        type="text"
-                        value={location}
-                        readOnly
-                        className="text-xs font-medium border-none focus:outline-none ml-6 cursor-default"
-                        style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
-                      className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
-                      style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
-                    >
-                      Change location
-                    </button>
+              <div className="flex items-start justify-between mt-4" style={{ maxWidth: '560px' }}>
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-1.5 mb-1">
+                    <img src={locIcon} alt="Location" className="w-4 h-4" />
+                    <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
                   </div>
-                  {/* Location Dropdown */}
-                  {isLocationDropdownOpen && (
-                    <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200">
-                      <div className="p-2 max-h-60 overflow-auto">
-                        <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
-                        {ukCities.map((city) => (
-                          <button
-                            key={city}
-                            type="button"
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
-                            onClick={() => {
-                              setLocation(`${city} | United Kingdom`);
-                              setIsLocationDropdownOpen(false);
-                            }}
-                          >
-                            {city}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <input
+                    type="text"
+                    value={location}
+                    readOnly
+                    className="text-xs font-medium border-none focus:outline-none ml-6 cursor-default"
+                    style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
+                  />
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+                  className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
+                  style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                >
+                  Change location
+                </button>
+              </div>
+              {/* Location Dropdown */}
+              {isLocationDropdownOpen && (
+                <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200">
+                  <div className="p-2 max-h-60 overflow-auto">
+                    <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
+                    {ukCities.map((city) => (
+                      <button
+                        key={city}
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
+                        onClick={() => {
+                          setLocation(`${city} | United Kingdom`);
+                          setIsLocationDropdownOpen(false);
+                        }}
+                      >
+                        {city}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Price Range Section */}
             <div style={{ marginBottom: window.innerWidth < 640 ? '12px' : '16px' }}>

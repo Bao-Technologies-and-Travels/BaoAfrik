@@ -313,6 +313,14 @@ export class WebSocketService {
         await this.handleUpdateMessageMetadata(authenticatedSocket, data);
       });
 
+      socket.on('update_conversation_metadata', async (data) => {
+        await this.handleUpdateConversationMetadata(authenticatedSocket, data);
+      });
+
+      socket.on('delete_conversation', async (data) => {
+        await this.handleDeleteConversation(authenticatedSocket, data);
+      });
+
       socket.on('disconnect', (reason) => {
         this.userSockets.delete(userId);
         this.connectedUsers.delete(userId);
@@ -647,6 +655,34 @@ export class WebSocketService {
     return this.io;
   }
 
+  // Broadcast product notification to all connected users
+  broadcastProductNotification(data: {
+    productId: string;
+    productTitle: string;
+    sellerId: string;
+    sellerName: string;
+    sellerImage: string | null;
+    productImage?: string | null;
+  }) {
+    try {
+      // Broadcast to all connected users
+      this.io.emit('new_product_notification', {
+        productId: data.productId,
+        productTitle: data.productTitle,
+        sellerId: data.sellerId,
+        sellerName: data.sellerName,
+        sellerImage: data.sellerImage,
+        productImage: data.productImage,
+        timestamp: new Date().toISOString()
+      });
+
+      // Also update notification counts for all connected users
+      this.io.emit('notification_count_updated');
+    } catch (error) {
+      console.error('Error broadcasting product notification:', error);
+    }
+  }
+
   private async handleAddReaction(socket: AuthenticatedSocket, data: any) {
     try {
       const { messageId, reaction } = data;
@@ -756,6 +792,79 @@ export class WebSocketService {
     } catch (error: any) {
       console.error('Error updating message metadata:', error);
       socket.emit('metadata_error', { error: error.message || 'Failed to update message metadata' });
+    }
+  }
+
+  private async handleUpdateConversationMetadata(socket: AuthenticatedSocket, data: any) {
+    try {
+      const { conversationId, isPinned, isArchived, isMuted, label } = data;
+      const userId = socket.user!.id;
+
+      if (!conversationId) {
+        socket.emit('conversation_metadata_error', { error: 'Conversation ID is required' });
+        return;
+      }
+
+      const metadata = await this.chatService.updateConversationMetadata(conversationId, userId, {
+        isPinned,
+        isArchived,
+        isMuted,
+        label
+      });
+
+      // Broadcast metadata update to all participants
+      this.io.to(`conversation:${conversationId}`).emit('conversation_metadata_updated', {
+        conversationId,
+        userId,
+        metadata
+      });
+
+      socket.emit('conversation_metadata_updated_success', { conversationId, metadata });
+    } catch (error: any) {
+      console.error('Error updating conversation metadata:', error);
+      socket.emit('conversation_metadata_error', { error: error.message || 'Failed to update conversation metadata' });
+    }
+  }
+
+  private async handleDeleteConversation(socket: AuthenticatedSocket, data: any) {
+    try {
+      const { conversationId } = data;
+      const userId = socket.user!.id;
+
+      if (!conversationId) {
+        socket.emit('conversation_delete_error', { error: 'Conversation ID is required' });
+        return;
+      }
+
+      // Get participants before deletion
+      const conversation = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+        include: {
+          participants: {
+            select: { userId: true }
+          }
+        }
+      });
+
+      if (!conversation) {
+        socket.emit('conversation_delete_error', { error: 'Conversation not found' });
+        return;
+      }
+
+      await this.chatService.deleteConversation(conversationId, userId);
+
+      // Notify all participants
+      const participantIds = conversation.participants.map(p => p.userId);
+      participantIds.forEach(participantId => {
+        this.io.to(`user:${participantId}`).emit('conversation_deleted', {
+          conversationId
+        });
+      });
+
+      socket.emit('conversation_delete_success', { conversationId });
+    } catch (error: any) {
+      console.error('Error deleting conversation:', error);
+      socket.emit('conversation_delete_error', { error: error.message || 'Failed to delete conversation' });
     }
   }
 }

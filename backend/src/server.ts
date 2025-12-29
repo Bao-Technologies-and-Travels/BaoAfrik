@@ -51,7 +51,7 @@ const io = new Server(server, {
 });
 
 // initialize WebSocket service
-new WebSocketService(io);
+export const webSocketService = new WebSocketService(io);
 
 gcpStorageService.configureCors().catch(console.error);
 

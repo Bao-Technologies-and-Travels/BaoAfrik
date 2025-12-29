@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
+
 import logo from '../assets/images/pre/logo.png';
 import shippxIcon from '../assets/images/pre/shippx.svg';
 import locIcon from '../assets/images/pre/Loc.svg';
@@ -11,7 +12,7 @@ import flyIcon from '../assets/images/pre/fly.svg';
 // import basketIcon from '../assets/images/pre/basket.png';
 import avatarIcon from '../assets/images/pre/avatar.png';
 import notificationIcon from '../assets/images/pre/notification.svg';
-import translationToggleIcon from '../assets/images/pre/tt.svg';
+// import translationToggleIcon from '../assets/images/pre/tt.svg';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
 import backArrowIcon from '../assets/images/pre/back arrow.svg';
 import pencilIcon from '../assets/images/pre/pencil.svg';
@@ -23,8 +24,8 @@ import groupIcon from '../assets/images/pre/group.svg';
 import frameIcon from '../assets/images/pre/frame.svg';
 import podsIcon from '../assets/images/pre/pods.svg';
 import settingIcon from '../assets/images/pre/setting.svg';
-import pathIcon from '../assets/images/pre/Path.svg';
-import path2Icon from '../assets/images/pre/path2.svg';
+// import pathIcon from '../assets/images/pre/Path.svg';
+// import path2Icon from '../assets/images/pre/path2.svg';
 import loadIcon from '../assets/images/pre/load.svg';
 import a1 from '../assets/images/pre/a1.png';
 import verityIcon from '../assets/images/pre/verity.svg';
@@ -37,7 +38,6 @@ import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
 import { Socket } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from '../contexts/ToastContext';
-import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 interface DraftListing {
   id: string;
@@ -61,7 +61,6 @@ const CreateListing: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [category, setCategory] = useState('');
   const [origin, setOrigin] = useState('');
-  const [saleType, setSaleType] = useState('Default');
   const [deliveryAvailable, setDeliveryAvailable] = useState(false);
   const [location, setLocation] = useState('London |  United Kingdom');
   const [images, setImages] = useState<File[]>([]);
@@ -138,6 +137,24 @@ const CreateListing: React.FC = () => {
     }
   }, [isEditMode, id]);
 
+  // fetch unread counts function
+  const fetchUnread = React.useCallback(async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) return;
+      const json = await res.json();
+      if (json.success && json.data) {
+        setNotificationCount(json.data.unreadCount ?? 0);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
   // fetch notifications on mount
   useEffect(() => {
     let mounted = true;
@@ -176,26 +193,10 @@ const CreateListing: React.FC = () => {
     return () => { mounted = false; };
   }, []);
 
-  // fetch unread counts
+  // fetch unread counts on mount
   useEffect(() => {
-    const fetchUnread = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) return;
-        const json = await res.json();
-        if (json.success && json.data) {
-          setNotificationCount(json.data.unreadCount ?? 0);
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
     fetchUnread();
-  }, []);
+  }, [fetchUnread]);
 
   // socket events
   useEffect(() => {
@@ -261,6 +262,44 @@ const CreateListing: React.FC = () => {
       setNotificationCount(prev => prev + 1);
     };
 
+    const onNewProductNotification = (payload: any) => {
+      if (payload?.productId) {
+        const has = notifications.some(n => n.meta?.productId === payload.productId);
+        if (has) return;
+      }
+
+      const created = new Date();
+      const normalized = {
+        id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
+        day: getDayLabel(created),
+        time: payload.time || formatTime(created),
+        title: payload.sellerName || 'A seller',
+        body: `just listed "${payload.productTitle || 'a new product'}"`,
+        meta: {
+          productId: payload.productId,
+          productTitle: payload.productTitle,
+          productImage: payload.productImage,
+          sellerId: payload.sellerId,
+          sellerName: payload.sellerName,
+          sellerImage: payload.sellerImage
+        },
+        isRead: false,
+        actor: payload.sellerImage ? {
+          id: payload.sellerId,
+          firstName: payload.sellerName?.split(' ')[0] || '',
+          lastName: payload.sellerName?.split(' ').slice(1).join(' ') || '',
+          profileImage: payload.sellerImage
+        } : null
+      };
+
+      setNotifications(prev => {
+        const existsByMeta = payload?.productId ? prev.some(n => n.meta?.productId === payload.productId) : false;
+        if (existsByMeta) return prev;
+        return [normalized, ...prev];
+      });
+      setNotificationCount(prev => prev + 1);
+    };
+
     const onNotificationCount = (payload: any) => {
       const count = (payload && (payload.totalUnread ?? payload.unreadCount ?? payload.total)) as number | undefined;
       if (typeof count === 'number') {
@@ -270,14 +309,21 @@ const CreateListing: React.FC = () => {
 
     socket.on('notification', onNotification);
     socket.on('new_message_notification', onNewMessageNotification);
+    socket.on('new_product_notification', onNewProductNotification);
     socket.on('notification_count', onNotificationCount);
+    socket.on('notification_count_updated', () => {
+      // Refresh notification count when it's updated
+      fetchUnread();
+    });
 
     return () => {
       socket.off('notification', onNotification);
       socket.off('new_message_notification', onNewMessageNotification);
+      socket.off('new_product_notification', onNewProductNotification);
       socket.off('notification_count', onNotificationCount);
+      socket.off('notification_count_updated');
     };
-  }, [socket]);
+  }, [socket, fetchUnread]);
 
   const markAllAsRead = async () => {
     try {
@@ -4097,7 +4143,7 @@ const CreateListing: React.FC = () => {
                         <input
                           type="number"
                           value={quantity}
-                          onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                          onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
                           className="px-4 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           style={{ width: '140px' }}
                         />

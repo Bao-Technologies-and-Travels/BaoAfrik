@@ -1023,4 +1023,98 @@ export class ChatService {
             throw new Error('Failed to get message metadata');
         }
     }
+
+    async updateConversationMetadata(conversationId: string, userId: string, data: {
+        isPinned?: boolean;
+        isArchived?: boolean;
+        isMuted?: boolean;
+        label?: string | null;
+    }) {
+        try {
+            const metadata = await prisma.conversationMetadata.upsert({
+                where: {
+                    conversationId_userId: {
+                        conversationId,
+                        userId
+                    }
+                },
+                update: {
+                    ...data,
+                    updatedAt: new Date()
+                },
+                create: {
+                    conversationId,
+                    userId,
+                    isPinned: data.isPinned || false,
+                    isArchived: data.isArchived || false,
+                    isMuted: data.isMuted || false,
+                    label: data.label || null,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            });
+            return metadata;
+        } catch (error) {
+            throw new Error('Failed to update conversation metadata');
+        }
+    }
+
+    async getConversationMetadata(conversationId: string, userId: string) {
+        try {
+            const metadata = await prisma.conversationMetadata.findUnique({
+                where: {
+                    conversationId_userId: {
+                        conversationId,
+                        userId
+                    }
+                }
+            });
+            return metadata;
+        } catch (error) {
+            throw new Error('Failed to get conversation metadata');
+        }
+    }
+
+    async deleteConversation(conversationId: string, userId: string) {
+        try {
+            // Check if user is a participant
+            const participant = await prisma.conversationParticipant.findUnique({
+                where: {
+                    conversationId_userId: {
+                        conversationId,
+                        userId
+                    }
+                }
+            });
+
+            if (!participant) {
+                throw new Error('User is not a participant in this conversation');
+            }
+
+            // Delete the conversation (cascade will handle related records)
+            await prisma.conversation.delete({
+                where: {
+                    id: conversationId
+                }
+            });
+
+            return { success: true };
+        } catch (error) {
+            throw new Error('Failed to delete conversation');
+        }
+    }
+
+    async getArchivedConversationsCount(userId: string) {
+        try {
+            const count = await prisma.conversationMetadata.count({
+                where: {
+                    userId,
+                    isArchived: true
+                }
+            });
+            return count;
+        } catch (error) {
+            throw new Error('Failed to get archived conversations count');
+        }
+    }
 }

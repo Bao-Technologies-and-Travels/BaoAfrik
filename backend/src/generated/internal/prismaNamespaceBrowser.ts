@@ -65,6 +65,7 @@ export const ModelName = {
   Country: 'Country',
   Conversation: 'Conversation',
   ConversationParticipant: 'ConversationParticipant',
+  ConversationMetadata: 'ConversationMetadata',
   ProductRequest: 'ProductRequest',
   Notification: 'Notification'
 } as const
@@ -311,6 +312,21 @@ export const ConversationParticipantScalarFieldEnum = {
 } as const
 
 export type ConversationParticipantScalarFieldEnum = (typeof ConversationParticipantScalarFieldEnum)[keyof typeof ConversationParticipantScalarFieldEnum]
+
+
+export const ConversationMetadataScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  userId: 'userId',
+  isPinned: 'isPinned',
+  isArchived: 'isArchived',
+  isMuted: 'isMuted',
+  label: 'label',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationMetadataScalarFieldEnum = (typeof ConversationMetadataScalarFieldEnum)[keyof typeof ConversationMetadataScalarFieldEnum]
 
 
 export const ProductRequestScalarFieldEnum = {

@@ -47,12 +47,9 @@ const Requests: React.FC = () => {
   const [filteredRequests, setFilteredRequests] = useState<ProductRequest[]>([]);
   const [pendingRequests, setPendingRequests] = useState<ProductRequest[]>([]);
   const [nearYouRequests, setNearYouRequests] = useState<ProductRequest[]>([]);
-  const [selectedRequest, setSelectedRequest] = useState<ProductRequest | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
   const [goToPage, setGoToPage] = useState<number>(1);
-  const [mobileMessageCoords, setMobileMessageCoords] = useState<{ top: number; left: number } | null>(null);
-  const [pinnedMessage, setPinnedMessage] = useState<any>(null);
   const [isManagingRequest, setIsManagingRequest] = useState(false);
 
   // check for mobile

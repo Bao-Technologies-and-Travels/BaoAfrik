@@ -102,6 +102,49 @@ export class NotificationService {
         });
         return count;
     }
+
+    async createNotificationsForAllUsers(data: {
+        actorId: string;
+        type: string;
+        message: string;
+        metadata?: any;
+    }) {
+        try {
+            // Get all active users except the actor (seller)
+            const users = await prisma.user.findMany({
+                where: {
+                    id: { not: data.actorId },
+                    isActive: true
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (users.length === 0) {
+                return { count: 0, userIds: [] };
+            }
+
+            // Create notifications in batch using createMany
+            const result = await prisma.notification.createMany({
+                data: users.map(user => ({
+                    userId: user.id,
+                    actorId: data.actorId,
+                    type: data.type,
+                    message: data.message,
+                    metadata: data.metadata ?? null,
+                    isRead: false
+                }))
+            });
+
+            return {
+                count: result.count,
+                userIds: users.map(u => u.id)
+            };
+        } catch (error: any) {
+            throw new Error(`Error creating notifications for all users: ${error.message}`);
+        }
+    }
 }
 
 export const notificationService = new NotificationService();
