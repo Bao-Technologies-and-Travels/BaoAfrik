@@ -98,7 +98,17 @@ const PNGIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
 );
 
 const Messages: React.FC = (): JSX.Element => {
-  useEffect(() => { toast.dismiss(); }, []);
+  useEffect(() => {
+    // Only dismiss toasts on mount, not on every render
+    const timer = setTimeout(() => {
+      try {
+        toast.dismiss();
+      } catch (e) {
+        // Ignore errors if toast is already dismissed
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const socket = useSocket();
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -541,17 +551,25 @@ const Messages: React.FC = (): JSX.Element => {
 
   // Helper to safely get a sender label from a reply sender field (can be string or object)
   const getReplySenderLabel = (sender: any, isIncoming: boolean) => {
+    // If I'm the sender (not incoming), show "You"
+    if (!isIncoming) {
+      return 'You';
+    }
     if (!sender) {
-      return isIncoming ? 'User' : 'You';
+      return 'User';
     }
     if (typeof sender === 'string') {
       return sender;
+    }
+    // Check if sender is the current user
+    if (sender.id && user?.id && String(sender.id) === String(user.id)) {
+      return 'You';
     }
     const first = sender.firstName || '';
     const last = sender.lastName || '';
     const name = `${first} ${last}`.trim();
     if (name) return name;
-    return isIncoming ? 'User' : 'You';
+    return 'User';
   };
 
   // Normalize messages to ensure UI fields exist
@@ -572,6 +590,47 @@ const Messages: React.FC = (): JSX.Element => {
       ? Boolean(msg.isProductInquiry)
       : Boolean(productData);
 
+    // Preserve files/images from backend (fileUrl, fileName, etc.)
+    // If message has files array from backend, preserve it
+    // If message has fileUrl/fileName, convert to files array format
+    let files = msg?.files || [];
+    let images: any[] = [];
+    let documents: any[] = [];
+
+    // If files is an array of file objects with URLs, preserve them
+    if (Array.isArray(files) && files.length > 0) {
+      files.forEach((file: any) => {
+        if (file.fileUrl || file.url) {
+          if (file.fileType?.startsWith('image/') || file.fileUrl?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+            images.push(file);
+          } else {
+            documents.push(file);
+          }
+        }
+      });
+    }
+
+    // Also check for direct fileUrl/fileName properties (single file)
+    if (msg?.fileUrl && !files.length) {
+      const fileObj = {
+        fileUrl: msg.fileUrl,
+        fileName: msg.fileName || 'file',
+        fileType: msg.fileType || 'application/octet-stream',
+        fileSize: msg.fileSize || 0
+      };
+      if (msg.fileType?.startsWith('image/') || msg.fileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        images.push(fileObj);
+      } else {
+        documents.push(fileObj);
+      }
+      files = [fileObj];
+    }
+
+    // Preserve existing images/documents if they're File objects (from temp messages)
+    // Only replace if we have URL-based files from backend
+    const finalImages = images.length > 0 ? images : (msg?.images || []);
+    const finalDocuments = documents.length > 0 ? documents : (msg?.documents || []);
+
     return {
       ...msg,
       text,
@@ -583,7 +642,10 @@ const Messages: React.FC = (): JSX.Element => {
       label,
       replyTo,
       productData,
-      isProductInquiry
+      isProductInquiry,
+      files,
+      images: finalImages,
+      documents: finalDocuments
     };
   };
 
@@ -673,14 +735,23 @@ const Messages: React.FC = (): JSX.Element => {
     function handleMessageSent(data: any) {
       const normalized = normalizeMessage(data, user?.id);
       if (!conversationId || normalized.conversationId === conversationId) {
+        // Preserve files from backend response
+        const filesFromBackend = data.files || normalized.files;
+
         setMessages(prev => {
           // Check if message already exists (avoid duplicates)
           if (messageExists(prev, normalized)) {
             // Update existing message instead of adding duplicate
             return prev.map(m => {
-              if (normalized.id && m.id === normalized.id) return { ...normalized, status: 'sent' };
+              if (normalized.id && m.id === normalized.id) {
+                const updated = { ...normalized, status: 'sent' };
+                if (filesFromBackend) updated.files = filesFromBackend;
+                return updated;
+              }
               if (normalized.tempId && (m.tempId === normalized.tempId || m.id === normalized.tempId)) {
-                return { ...normalized, status: 'sent' };
+                const updated = { ...normalized, status: 'sent' };
+                if (filesFromBackend) updated.files = filesFromBackend;
+                return updated;
               }
               return m;
             });
@@ -694,8 +765,10 @@ const Messages: React.FC = (): JSX.Element => {
             return true;
           });
           // Add the real message from backend and deduplicate
-          const merged = deduplicateMessages([...filtered, { ...normalized, status: 'sent' }]);
-          upsertMessageStatuses([{ ...normalized, status: 'sent' }]);
+          const messageToAdd = { ...normalized, status: 'sent' };
+          if (filesFromBackend) messageToAdd.files = filesFromBackend;
+          const merged = deduplicateMessages([...filtered, messageToAdd]);
+          upsertMessageStatuses([{ ...messageToAdd, status: 'sent' }]);
           return merged;
         });
       }
@@ -718,16 +791,25 @@ const Messages: React.FC = (): JSX.Element => {
 
     // Handle message status updates (delivered, read)
     function handleStatusUpdate(data: any) {
+      // Don't filter by conversationId - status updates should work for all messages
+      // The messageId is unique enough to identify the message
       const statusKey = String(data.messageId);
       const normalizedStatus = normalizeStatus(data.status);
-      setMessageStatuses(prev => ({ ...prev, [statusKey]: normalizedStatus }));
-      // Also update message in messages array
+
+      // Update messageStatuses state
+      setMessageStatuses(prev => {
+        const updated = { ...prev, [statusKey]: normalizedStatus };
+        return updated;
+      });
+
+      // Also update message in messages array (check both id and tempId)
       setMessages(prev =>
-        prev.map(msg =>
-          String(msg.id) === statusKey
-            ? { ...msg, status: normalizedStatus }
-            : msg
-        )
+        prev.map(msg => {
+          if (String(msg.id) === statusKey || String(msg.tempId) === statusKey) {
+            return { ...msg, status: normalizedStatus };
+          }
+          return msg;
+        })
       );
     }
     socket.on('message_status_updated', handleStatusUpdate);
@@ -736,11 +818,15 @@ const Messages: React.FC = (): JSX.Element => {
     function handleMessagesRead(data: any) {
       if (!conversationId || data.conversationId === conversationId) {
         setMessages(prev =>
-          prev.map(msg =>
-            data.messageIds.includes(msg.id)
-              ? { ...msg, readAt: new Date().toISOString(), status: 'read' }
-              : msg
-          )
+          prev.map(msg => {
+            if (data.messageIds.includes(msg.id)) {
+              const updated = { ...msg, readAt: new Date().toISOString(), status: 'read' };
+              // Update message statuses
+              setMessageStatuses(prevStatuses => ({ ...prevStatuses, [String(msg.id)]: 'read' }));
+              return updated;
+            }
+            return msg;
+          })
         );
       }
     }
@@ -1280,6 +1366,11 @@ const Messages: React.FC = (): JSX.Element => {
           }
           return conv;
         }));
+        // Update current conversation and isChatPinned state
+        if (String(currentConversation?.id) === conversationId) {
+          setCurrentConversation((prev: any) => ({ ...prev, isPinned }));
+          setIsChatPinned(isPinned);
+        }
         // Emit to socket
         socket.emit('update_conversation_metadata', {
           conversationId,
@@ -1396,6 +1487,47 @@ const Messages: React.FC = (): JSX.Element => {
     }, 1500);
 
     setTypingTimer(timer);
+  };
+
+  // Function to format last message text for sidebar
+  const formatLastMessageText = (message: any, isIncoming: boolean = false): string => {
+    if (!message) return '';
+
+    // Check for audio message
+    if (message.audioUrl || message.messageType === 'AUDIO' || message.type === 'voice') {
+      return 'sent an audio';
+    }
+
+    // Check for image(s)
+    const hasImages = message.imageUrl ||
+      (message.files && Array.isArray(message.files) && message.files.some((f: any) =>
+        f.fileType?.startsWith('image/') || f.fileUrl?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+      )) ||
+      (message.fileUrl && message.fileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i));
+
+    if (hasImages) {
+      return 'sent a photo';
+    }
+
+    // Check for file(s) - documents
+    const hasFiles = message.fileUrl ||
+      (message.files && Array.isArray(message.files) && message.files.length > 0) ||
+      (message.messageType === 'FILE');
+
+    if (hasFiles && !hasImages) {
+      return 'sent a file';
+    }
+
+    // If there's text content and it's not encrypted-looking, show it
+    const content = message.content || message.text || '';
+    if (content && content.trim() && !content.match(/^[A-Za-z0-9+/=]{20,}$/)) {
+      // Not encrypted-looking, show the content (don't add prefix for text messages)
+      return content;
+    }
+
+    // Default fallback - if content looks encrypted or is empty, return empty
+    // The UI will show "No messages yet" if empty
+    return '';
   };
 
   // Render sidebar status indicator
@@ -1763,13 +1895,21 @@ const Messages: React.FC = (): JSX.Element => {
 
   // Render message status indicator
   const renderMessageStatus = (messageId: string | number) => {
-    const status = messageStatuses[String(messageId)] || 'sending';
+    // Check both messageStatuses and message.status
+    const message = messages.find(m => String(m.id) === String(messageId) || String(m.tempId) === String(messageId));
+    const status = messageStatuses[String(messageId)] || message?.status || 'sending';
 
     switch (status) {
       case 'sending':
         return (
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case 'sent':
+        return (
+          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
           </svg>
         );
       case 'delivered':
@@ -1812,6 +1952,7 @@ const Messages: React.FC = (): JSX.Element => {
     setCurrentConversation(conv);
     setConversationId(conv.id);
     setParticipantId(conv.otherParticipant?.id || null);
+    setIsChatPinned(conv.isPinned || false);
 
     // Load messages for this conversation
     loadMessages(conv.id, 1, true).then(() => {
@@ -1834,7 +1975,21 @@ const Messages: React.FC = (): JSX.Element => {
   // Handle incoming product data from Product Detail page
   useEffect(() => {
     if (location.state) {
-      const { productData, preFilledMessage } = location.state;
+      const { productData, preFilledMessage, conversationId: stateConversationId } = location.state;
+
+      // Set conversationId from state if provided
+      if (stateConversationId && !conversationId) {
+        setConversationId(stateConversationId);
+        // Find and set the conversation
+        const conv = conversations.find((c: any) => String(c.id) === String(stateConversationId));
+        if (conv) {
+          setCurrentConversation(conv);
+          setParticipantId(conv.otherParticipant?.id || null);
+          setIsChatPinned(conv.isPinned || false);
+          loadMessages(conv.id, 1, true);
+        }
+      }
+
       if (productData) {
         // Normalize productData to ensure all fields are included
         const normalizedProductData = {
@@ -1918,14 +2073,30 @@ const Messages: React.FC = (): JSX.Element => {
   }, [location.state, isMessageSent]);
 
   const handleSendMessage = async (content: string) => {
+    // Ensure conversationId is set
+    let activeConversationId = conversationId;
+    if (!activeConversationId) {
+      // Try to get it from currentConversation
+      if (currentConversation?.id) {
+        activeConversationId = currentConversation.id;
+        setConversationId(activeConversationId);
+      } else if (location.state?.conversationId) {
+        activeConversationId = location.state.conversationId;
+        setConversationId(activeConversationId);
+      } else {
+        toast.error("Please select a conversation first.");
+        return;
+      }
+    }
+
     // Allow sending if there are files even without text content
-    if (!socket || !conversationId || (!content.trim() && selectedFiles.length === 0 && !replyToMessage)) {
-      console.error('Cannot send message:', { socket: !!socket, conversationId, hasContent: !!content.trim(), hasFiles: selectedFiles.length > 0 });
+    if (!socket || !activeConversationId || (!content.trim() && selectedFiles.length === 0 && !replyToMessage)) {
+      console.error('Cannot send message:', { socket: !!socket, conversationId: activeConversationId, hasContent: !!content.trim(), hasFiles: selectedFiles.length > 0 });
       return;
     }
 
     setMessagesError(null);
-    if (!user?.id || !conversationId) {
+    if (!user?.id || !activeConversationId) {
       toast.error("User not authenticated or no active chat.");
       return;
     }
@@ -1983,7 +2154,8 @@ const Messages: React.FC = (): JSX.Element => {
         }
       }
 
-      const messageContent = content.trim() || preFilledMessage.trim();
+      // Allow empty content if files are present
+      const messageContent = (content.trim() || preFilledMessage.trim() || '');
       const tempId = `temp_${Date.now()}_${Math.random()}`;
 
       // Prepare productData for sending - ensure it includes all required fields
@@ -2009,12 +2181,23 @@ const Messages: React.FC = (): JSX.Element => {
       }
 
       // Create temporary message for optimistic UI (will be replaced by backend response)
+      // Include selected files for preview while uploading
+      const images: File[] = [];
+      const documents: File[] = [];
+      selectedFiles.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          images.push(file);
+        } else {
+          documents.push(file);
+        }
+      });
+
       const tempMessage = {
         id: tempId,
         tempId,
         content: messageContent,
         text: messageContent,
-        conversationId,
+        conversationId: activeConversationId,
         senderId: user.id,
         isIncoming: false,
         status: 'sending' as const,
@@ -2027,9 +2210,17 @@ const Messages: React.FC = (): JSX.Element => {
           profileImage: user.profileImage || null
         },
         files: filePayloads,
+        images: images.length > 0 ? images : undefined,
+        documents: documents.length > 0 ? documents : undefined,
         messageType: filePayloads.length > 0 ? 'FILE' : 'TEXT',
         productData: productDataToSend,
-        isProductInquiry: !!productDataToSend
+        isProductInquiry: !!productDataToSend,
+        replyTo: replyToMessage ? {
+          id: replyToMessage.id,
+          text: replyToMessage.text || replyToMessage.content,
+          sender: replyToMessage.sender,
+          type: replyToMessage.type
+        } : undefined
       };
 
       // Add temp message to UI (will be replaced by real message from backend)
@@ -2051,16 +2242,20 @@ const Messages: React.FC = (): JSX.Element => {
       setReplyToMessage(null);
       setHasIncomingReply(false);
       setIsReplyRead(false);
+      // Clear productData after sending
+      if (productDataToSend) {
+        setProductData(null);
+      }
 
       // Emit socket event to send message
       socket.emit('send_message', {
         tempId,
-        conversationId,
+        conversationId: activeConversationId,
         senderId: user.id,
         receiverId: participantId || undefined,
-        content: messageContent,
+        content: messageContent || '', // Ensure content is always a string
         messageType: filePayloads.length > 0 ? 'FILE' : 'TEXT',
-        files: filePayloads,
+        files: filePayloads.length > 0 ? filePayloads : undefined, // Only send files if there are any
         replyToId: replyToMessage?.id,
         productData: productDataToSend
       }, (response: any) => {
@@ -2928,19 +3123,68 @@ const Messages: React.FC = (): JSX.Element => {
                           {/* Images (if present) - NO bubble */}
                           {message.images && message.images.length > 0 && (
                             <div className={`flex flex-wrap gap-1 mb-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
-                              {message.images.map((image: File, imgIndex: number) => (
-                                <img
-                                  key={imgIndex}
-                                  src={URL.createObjectURL(image)}
-                                  alt={image.name}
-                                  className="object-cover"
-                                  style={{
-                                    borderRadius: '12px',
-                                    maxWidth: '160px',
-                                    maxHeight: '160px'
-                                  }}
-                                />
-                              ))}
+                              {message.images.map((image: any, imgIndex: number) => {
+                                // Handle both File objects and URL objects from backend
+                                let imageUrl: string;
+                                if (image instanceof File || image instanceof Blob) {
+                                  imageUrl = URL.createObjectURL(image);
+                                } else if (typeof image === 'string') {
+                                  imageUrl = image;
+                                } else {
+                                  imageUrl = image.fileUrl || image.url || '';
+                                }
+                                const imageName = image.name || image.fileName || `image-${imgIndex}`;
+                                return (
+                                  <a
+                                    key={imgIndex}
+                                    href={imageUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download={imageName}
+                                    className="cursor-pointer hover:opacity-90 transition-opacity"
+                                  >
+                                    <img
+                                      src={imageUrl}
+                                      alt={imageName}
+                                      className="object-cover"
+                                      style={{
+                                        borderRadius: '12px',
+                                        maxWidth: '160px',
+                                        maxHeight: '160px'
+                                      }}
+                                    />
+                                  </a>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* Files from backend (files array with URLs) */}
+                          {message.files && message.files.length > 0 && !message.images?.length && (
+                            <div className={`flex flex-wrap gap-1 mb-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
+                              {message.files
+                                .filter((file: any) => file.fileType?.startsWith('image/') || file.fileUrl?.match(/\.(jpg|jpeg|png|gif|webp)$/i))
+                                .map((file: any, imgIndex: number) => (
+                                  <a
+                                    key={imgIndex}
+                                    href={file.fileUrl || file.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download={file.fileName || `image-${imgIndex}`}
+                                    className="cursor-pointer hover:opacity-90 transition-opacity"
+                                  >
+                                    <img
+                                      src={file.fileUrl || file.url}
+                                      alt={file.fileName || `image-${imgIndex}`}
+                                      className="object-cover"
+                                      style={{
+                                        borderRadius: '12px',
+                                        maxWidth: '160px',
+                                        maxHeight: '160px'
+                                      }}
+                                    />
+                                  </a>
+                                ))}
                             </div>
                           )}
 
@@ -3198,7 +3442,7 @@ const Messages: React.FC = (): JSX.Element => {
                                               <p style={{ fontSize: '10px', fontWeight: 500, marginBottom: '2px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
                                                 {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
                                               </p>
-                                              <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                              <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: '1.3' }}>
                                                 {message.replyTo.text}
                                               </p>
                                             </div>
@@ -3266,16 +3510,27 @@ const Messages: React.FC = (): JSX.Element => {
                                   {/* Document Display in Message */}
                                   {message.documents && message.documents.length > 0 && (
                                     <div className={message.text ? 'mt-2' : ''}>
-                                      {message.documents.map((doc: File, docIndex: number) => {
-                                        const fileName = doc.name.split('.');
+                                      {message.documents.map((doc: any, docIndex: number) => {
+                                        // Handle both File objects and URL objects from backend
+                                        const fileName = (doc.name || doc.fileName || 'file').split('.');
                                         const extension = fileName.pop() || '';
                                         const nameWithoutExt = fileName.join('.');
-                                        const fileSizeMB = doc.size / (1024 * 1024);
+                                        const fileSize = doc.size || doc.fileSize || 0;
+                                        const fileSizeMB = fileSize / (1024 * 1024);
                                         const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
                                         const extensionLower = extension.toLowerCase();
                                         const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
+                                        const fileUrl = doc.fileUrl || doc.url || (doc instanceof File ? URL.createObjectURL(doc) : null);
                                         return (
-                                          <div key={docIndex} className="flex items-center space-x-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                                          <a
+                                            key={docIndex}
+                                            href={fileUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            download={doc.name || doc.fileName || `file-${docIndex}`}
+                                            className="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity"
+                                            style={{ fontFamily: 'Poppins, sans-serif' }}
+                                          >
                                             <DocumentIcon size={32} />
                                             <div className="flex-1 min-w-0">
                                               <p className="text-xs truncate" style={{ color: '#FFFFFF', fontWeight: '400' }}>
@@ -3285,9 +3540,47 @@ const Messages: React.FC = (): JSX.Element => {
                                                 {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
                                               </p>
                                             </div>
-                                          </div>
+                                          </a>
                                         );
                                       })}
+                                    </div>
+                                  )}
+
+                                  {/* Files from backend (files array with URLs) - documents */}
+                                  {message.files && message.files.length > 0 && !message.documents?.length && (
+                                    <div className={message.text ? 'mt-2' : ''}>
+                                      {message.files
+                                        .filter((file: any) => !file.fileType?.startsWith('image/') && !file.fileUrl?.match(/\.(jpg|jpeg|png|gif|webp)$/i))
+                                        .map((file: any, docIndex: number) => {
+                                          const fileName = (file.fileName || 'file').split('.');
+                                          const extension = fileName.pop() || '';
+                                          const nameWithoutExt = fileName.join('.');
+                                          const fileSizeMB = (file.fileSize || 0) / (1024 * 1024);
+                                          const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
+                                          const extensionLower = extension.toLowerCase();
+                                          const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
+                                          return (
+                                            <a
+                                              key={docIndex}
+                                              href={file.fileUrl || file.url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              download={file.fileName || `file-${docIndex}`}
+                                              className="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity"
+                                              style={{ fontFamily: 'Poppins, sans-serif' }}
+                                            >
+                                              <DocumentIcon size={32} />
+                                              <div className="flex-1 min-w-0">
+                                                <p className="text-xs truncate" style={{ color: '#FFFFFF', fontWeight: '400' }}>
+                                                  {nameWithoutExt} · {extension}
+                                                </p>
+                                                <p style={{ fontSize: '10px', color: '#B8DDFB' }}>
+                                                  {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
+                                                </p>
+                                              </div>
+                                            </a>
+                                          );
+                                        })}
                                     </div>
                                   )}
                                 </>
@@ -3297,31 +3590,7 @@ const Messages: React.FC = (): JSX.Element => {
 
                           <div className={`flex items-center mt-1 space-x-1 text-xs ${message.isIncoming ? 'justify-start' : 'justify-end'}`} style={{ color: '#6A6A6A' }}>
                             <span>{message.timeString || message.formattedTime || message.timestamp || new Date(message.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            {!message.isIncoming && message.id && messageStatuses[String(message.id)] && (
-                              <div className="flex items-center">
-                                {messageStatuses[message.id] === 'sending' && (
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#9E9E9E' }}>
-                                    <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
-                                  </svg>
-                                )}
-                                {messageStatuses[message.id] === 'delivered' && (
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#9E9E9E' }}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                )}
-                                {messageStatuses[message.id] === 'read' && (
-                                  <div className="flex items-center" style={{ position: 'relative' }}>
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6', marginLeft: '-6px' }}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                            {!message.isIncoming && message.id && renderMessageStatus(String(message.id))}
 
                             {/* Reaction Display - inline after timestamp */}
                             {message.reaction && (
@@ -4009,6 +4278,52 @@ const Messages: React.FC = (): JSX.Element => {
                 </div>
               ) : (
                 <>
+                  {/* Product Card Preview - Mobile */}
+                  {productData && (
+                    <div className="mb-2 px-2 py-1.5 rounded-lg relative" style={{ backgroundColor: '#F0F8FE', border: '1px solid #64B5F6' }}>
+                      <button
+                        onClick={() => setProductData(null)}
+                        className="absolute top-1.5 right-1.5 w-4 h-4 flex items-center justify-center hover:opacity-70 z-10"
+                      >
+                        <img src={replyCloseIcon} alt="Close" className="w-3 h-3" />
+                      </button>
+                      <div className="flex space-x-2 pr-5">
+                        <div className="relative flex-shrink-0">
+                          <img
+                            src={productData.image || productData.images?.[0] || ''}
+                            alt={productData.name || productData.title}
+                            className="w-10 h-10 object-cover rounded"
+                            onError={(e) => {
+                              // Fallback if image fails to load
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-0.5">
+                            <div style={{ fontSize: '9px', fontWeight: 600, color: '#64B5F6' }}>
+                              {productData.currency || 'USD'} {productData.price}
+                            </div>
+                            {productData.location && (
+                              <div className="flex items-center space-x-0.5" style={{ fontSize: '7px', color: '#64B5F6' }}>
+                                <img src={locIcon} alt="Location" className="w-1.5 h-1.5" />
+                                <span>{productData.location}</span>
+                              </div>
+                            )}
+                          </div>
+                          <h4 className="text-[9px] font-medium truncate" style={{ color: '#64B5F6', marginBottom: '1px' }}>
+                            {productData.name || productData.title}
+                          </h4>
+                          {productData.category && (
+                            <p style={{ fontSize: '7px', color: '#64B5F6' }}>
+                              Category: {productData.category}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Reply Preview - Mobile */}
                   {replyToMessage && (
                     <div className="mb-2 px-2 py-1.5 rounded-lg" style={{ backgroundColor: '#F0F8FE', border: '1px solid #64B5F6' }}>
@@ -4313,11 +4628,11 @@ const Messages: React.FC = (): JSX.Element => {
                       const participantName = `${otherParticipant?.firstName || ''} ${otherParticipant?.lastName || ''}`.trim() || 'Unknown User';
                       const participantAvatar = otherParticipant?.profileImage || eboAvatar;
                       const lastMessage = conv.lastMessage;
-                      const lastMessageText = lastMessage?.content || '';
+                      const isIncoming = lastMessage && lastMessage.senderId !== user?.id;
+                      const lastMessageText = formatLastMessageText(lastMessage, isIncoming);
                       const lastMessageTime = lastMessage?.createdAt
                         ? new Date(lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                         : (conv.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
-                      const isIncoming = lastMessage && lastMessage.senderId !== user?.id;
                       const unreadCount = conv.unreadCount || 0;
                       const isActive = conversationId === conv.id;
 
@@ -5682,19 +5997,39 @@ const Messages: React.FC = (): JSX.Element => {
                               {/* Images (if present) - NO bubble */}
                               {message.images && message.images.length > 0 && (
                                 <div className={`flex flex-wrap gap-2 mb-2 ${message.isIncoming ? 'justify-start' : 'justify-end'}`}>
-                                  {message.images.map((image: File, imgIndex: number) => (
-                                    <img
-                                      key={imgIndex}
-                                      src={URL.createObjectURL(image)}
-                                      alt={image.name}
-                                      className="object-cover"
-                                      style={{
-                                        borderRadius: '12px',
-                                        maxWidth: '300px',
-                                        maxHeight: '300px'
-                                      }}
-                                    />
-                                  ))}
+                                  {message.images.map((image: any, imgIndex: number) => {
+                                    // Handle both File objects and URL objects from backend
+                                    let imageUrl: string;
+                                    if (image instanceof File || image instanceof Blob) {
+                                      imageUrl = URL.createObjectURL(image);
+                                    } else if (typeof image === 'string') {
+                                      imageUrl = image;
+                                    } else {
+                                      imageUrl = image.fileUrl || image.url || '';
+                                    }
+                                    const imageName = image.name || image.fileName || `image-${imgIndex}`;
+                                    return (
+                                      <a
+                                        key={imgIndex}
+                                        href={imageUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        download={imageName}
+                                        className="cursor-pointer hover:opacity-90 transition-opacity"
+                                      >
+                                        <img
+                                          src={imageUrl}
+                                          alt={imageName}
+                                          className="object-cover"
+                                          style={{
+                                            borderRadius: '12px',
+                                            maxWidth: '300px',
+                                            maxHeight: '300px'
+                                          }}
+                                        />
+                                      </a>
+                                    );
+                                  })}
                                 </div>
                               )}
 
@@ -5726,7 +6061,7 @@ const Messages: React.FC = (): JSX.Element => {
                                             <p className="text-xs font-medium mb-0.5" style={{ color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
                                               {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
                                             </p>
-                                            <p className="text-xs" style={{ color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                            <p className="text-xs" style={{ color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: '1.3' }}>
                                               {message.replyTo.text}
                                             </p>
                                           </div>
@@ -5979,7 +6314,7 @@ const Messages: React.FC = (): JSX.Element => {
                                                   <p className="text-xs font-medium mb-0.5" style={{ color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
                                                     {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
                                                   </p>
-                                                  <p className="text-xs" style={{ color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                                  <p className="text-xs" style={{ color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: '1.3' }}>
                                                     {message.replyTo.text}
                                                   </p>
                                                 </div>
@@ -6050,16 +6385,37 @@ const Messages: React.FC = (): JSX.Element => {
                                       {/* Document Display */}
                                       {message.documents && message.documents.length > 0 && (
                                         <div className={message.text || message.replyTo ? 'mt-3' : ''}>
-                                          {message.documents.map((doc: File, docIndex: number) => {
-                                            const fileName = doc.name.split('.');
+                                          {message.documents.map((doc: any, docIndex: number) => {
+                                            // Handle both File objects and URL objects from backend
+                                            const fileName = (doc.name || doc.fileName || 'file').split('.');
                                             const extension = fileName.pop() || '';
                                             const nameWithoutExt = fileName.join('.');
-                                            const fileSizeMB = doc.size / (1024 * 1024);
+                                            const fileSize = doc.size || doc.fileSize || 0;
+                                            const fileSizeMB = fileSize / (1024 * 1024);
                                             const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
                                             const extensionLower = extension.toLowerCase();
                                             const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
+                                            // Handle both File objects and URL objects from backend
+                                            let fileUrl: string | undefined = undefined;
+                                            if (doc instanceof File || doc instanceof Blob) {
+                                              fileUrl = URL.createObjectURL(doc);
+                                            } else if (typeof doc === 'string') {
+                                              fileUrl = doc;
+                                            } else {
+                                              fileUrl = doc.fileUrl || doc.url || undefined;
+                                            }
+                                            // Skip rendering if no valid URL
+                                            if (!fileUrl) return null;
                                             return (
-                                              <div key={docIndex} className="flex items-center space-x-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                                              <a
+                                                key={docIndex}
+                                                href={fileUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                download={doc.name || doc.fileName || `file-${docIndex}`}
+                                                className="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition-opacity"
+                                                style={{ fontFamily: 'Poppins, sans-serif' }}
+                                              >
                                                 <DocumentIcon size={40} />
                                                 <div className="flex-1 min-w-0">
                                                   <p className="text-sm truncate" style={{ color: '#FFFFFF', fontWeight: '400' }}>
@@ -6069,9 +6425,47 @@ const Messages: React.FC = (): JSX.Element => {
                                                     {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
                                                   </p>
                                                 </div>
-                                              </div>
+                                              </a>
                                             );
                                           })}
+                                        </div>
+                                      )}
+
+                                      {/* Files from backend (files array with URLs) - documents */}
+                                      {message.files && message.files.length > 0 && !message.documents?.length && (
+                                        <div className={message.text || message.replyTo ? 'mt-3' : ''}>
+                                          {message.files
+                                            .filter((file: any) => !file.fileType?.startsWith('image/') && !file.fileUrl?.match(/\.(jpg|jpeg|png|gif|webp)$/i))
+                                            .map((file: any, docIndex: number) => {
+                                              const fileName = (file.fileName || 'file').split('.');
+                                              const extension = fileName.pop() || '';
+                                              const nameWithoutExt = fileName.join('.');
+                                              const fileSizeMB = (file.fileSize || 0) / (1024 * 1024);
+                                              const estimatedPages = Math.max(1, Math.ceil(fileSizeMB / 0.1));
+                                              const extensionLower = extension.toLowerCase();
+                                              const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
+                                              return (
+                                                <a
+                                                  key={docIndex}
+                                                  href={file.fileUrl || file.url}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  download={file.fileName || `file-${docIndex}`}
+                                                  className="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition-opacity"
+                                                  style={{ fontFamily: 'Poppins, sans-serif' }}
+                                                >
+                                                  <DocumentIcon size={40} />
+                                                  <div className="flex-1 min-w-0">
+                                                    <p className="text-sm truncate" style={{ color: '#FFFFFF', fontWeight: '400' }}>
+                                                      {nameWithoutExt} · {extension}
+                                                    </p>
+                                                    <p className="text-xs" style={{ color: '#B8DDFB' }}>
+                                                      {estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'} - {fileSizeMB >= 1 ? fileSizeMB.toFixed(1) : fileSizeMB.toFixed(2)} MB
+                                                    </p>
+                                                  </div>
+                                                </a>
+                                              );
+                                            })}
                                         </div>
                                       )}
                                     </>
@@ -7002,6 +7396,52 @@ const Messages: React.FC = (): JSX.Element => {
                               </svg>
                             </button>
                           )}
+                        </div>
+                      )}
+
+                      {/* Product Card Preview */}
+                      {productData && (
+                        <div className="mb-2 px-3 py-2 rounded-lg relative" style={{ backgroundColor: '#F0F8FE', border: '1px solid #64B5F6' }}>
+                          <button
+                            onClick={() => setProductData(null)}
+                            className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center hover:opacity-70 z-10"
+                          >
+                            <img src={replyCloseIcon} alt="Close" className="w-4 h-4" />
+                          </button>
+                          <div className="flex space-x-2 pr-6">
+                            <div className="relative flex-shrink-0">
+                              <img
+                                src={productData.image || productData.images?.[0] || ''}
+                                alt={productData.name || productData.title}
+                                className="w-12 h-12 object-cover rounded"
+                                onError={(e) => {
+                                  // Fallback if image fails to load
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <div style={{ fontSize: '10px', fontWeight: 600, color: '#64B5F6' }}>
+                                  {productData.currency || 'USD'} {productData.price}
+                                </div>
+                                {productData.location && (
+                                  <div className="flex items-center space-x-0.5" style={{ fontSize: '8px', color: '#64B5F6' }}>
+                                    <img src={locIcon} alt="Location" className="w-2 h-2" />
+                                    <span>{productData.location}</span>
+                                  </div>
+                                )}
+                              </div>
+                              <h4 className="text-xs font-medium truncate" style={{ color: '#64B5F6', marginBottom: '2px' }}>
+                                {productData.name || productData.title}
+                              </h4>
+                              {productData.category && (
+                                <p style={{ fontSize: '8px', color: '#64B5F6' }}>
+                                  Category: {productData.category}
+                                </p>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       )}
 

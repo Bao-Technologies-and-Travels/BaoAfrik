@@ -451,11 +451,15 @@ export class WebSocketService {
 
   private async handleSendMessage(socket: AuthenticatedSocket, data: any, callback?: Function) {
     try {
-      const { conversationId, content, messageType, fileUrl, fileName, fileSize, replyToId, tempId } = data;
+      const { conversationId, content, messageType, fileUrl, fileName, fileSize, files, replyToId, tempId } = data;
       const senderId = socket.user!.id;
 
-      // Validate required fields
-      if (!conversationId || (!content && !fileUrl)) {
+      // Validate required fields - allow sending if there are files even without content
+      const hasFiles = files && Array.isArray(files) && files.length > 0;
+      const hasFileUrl = !!fileUrl;
+      const hasContent = !!content && content.trim().length > 0;
+      
+      if (!conversationId || (!hasContent && !hasFileUrl && !hasFiles)) {
         throw new Error('Missing required message fields');
       }
 
@@ -463,6 +467,29 @@ export class WebSocketService {
       const conversation = await this.chatService.getConversationById(conversationId);
       if (!conversation) {
         throw new Error('Conversation not found');
+      }
+
+      // Handle files array - use first file for main fields, store all files for response
+      let finalFileUrl = fileUrl;
+      let finalFileName = fileName;
+      let finalFileSize = fileSize;
+      let allFiles: any[] = [];
+
+      if (hasFiles) {
+        // Use first file for main database fields
+        const firstFile = files[0];
+        finalFileUrl = firstFile.fileUrl || firstFile.url;
+        finalFileName = firstFile.fileName || firstFile.name;
+        finalFileSize = firstFile.fileSize || firstFile.size;
+        allFiles = files;
+      } else if (hasFileUrl) {
+        // Single file in main fields
+        allFiles = [{
+          fileUrl: finalFileUrl,
+          fileName: finalFileName,
+          fileSize: finalFileSize,
+          fileType: data.fileType || 'application/octet-stream'
+        }];
       }
 
       // Create message
@@ -478,23 +505,51 @@ export class WebSocketService {
         normalizedProductData = data.productData;
       }
 
+      // Store all files in productData as metadata (temporary solution)
+      // In a real implementation, you might want a separate filesData field
+      if (allFiles.length > 1 && normalizedProductData) {
+        normalizedProductData._files = allFiles;
+      } else if (allFiles.length > 1) {
+        normalizedProductData = { _files: allFiles };
+      }
+
       const message = await this.chatService.sendMessage({
-        content,
+        content: content || '', // Allow empty content if files are present
         conversationId,
         senderId,
-        messageType,
-        fileUrl,
-        fileName,
-        fileSize,
+        messageType: hasFiles ? 'FILE' : messageType,
+        fileUrl: finalFileUrl,
+        fileName: finalFileName,
+        fileSize: finalFileSize,
         replyToId,
         productData: normalizedProductData
       });
 
-      // Prepare the message response
+      // Parse productData to extract files if stored there
+      let parsedProductData = null;
+      let extractedFiles: any[] = [];
+      if (message.productData) {
+        parsedProductData = typeof message.productData === 'string'
+          ? JSON.parse(message.productData)
+          : message.productData;
+        
+        // Extract files from productData if stored there
+        if (parsedProductData._files && Array.isArray(parsedProductData._files)) {
+          extractedFiles = parsedProductData._files;
+          // Remove _files from productData to keep it clean
+          delete parsedProductData._files;
+          if (Object.keys(parsedProductData).length === 0) {
+            parsedProductData = null;
+          }
+        }
+      }
+
+      // Prepare the message response with all files
       const messageResponse = {
         ...message,
         tempId,
         status: 'DELIVERED',
+        files: extractedFiles.length > 0 ? extractedFiles : (allFiles.length > 0 ? allFiles : undefined),
         replyTo: message.replyTo ? {
           id: message.replyTo.id,
           content: message.replyTo.content,
@@ -505,11 +560,7 @@ export class WebSocketService {
             profileImage: message.replyTo.sender.profileImage
           }
         } : null,
-        productData: message.productData
-          ? typeof message.productData === 'string'
-            ? JSON.parse(message.productData)
-            : message.productData
-          : null
+        productData: parsedProductData
       };
 
       // Find all participants except sender
@@ -522,6 +573,7 @@ export class WebSocketService {
       // Notify sender of delivered status
       socket.emit('message_status_updated', {
         messageId: message.id,
+        conversationId: conversationId,
         status: 'DELIVERED',
         updatedAt: new Date()
       });
@@ -534,6 +586,7 @@ export class WebSocketService {
           // Deliver status to recipient
           this.io.to(recipientSocketId).emit('message_status_updated', {
             messageId: message.id,
+            conversationId: conversationId,
             status: 'DELIVERED',
             updatedAt: new Date()
           });
@@ -563,6 +616,14 @@ export class WebSocketService {
 
       // Emit to sender: message_sent
       socket.emit('message_sent', { ...messageResponse, isIncoming: false, status: 'SENT' });
+      
+      // Also emit status update to sender immediately after sending
+      socket.emit('message_status_updated', {
+        messageId: message.id,
+        conversationId: conversationId,
+        status: 'SENT',
+        updatedAt: new Date()
+      });
 
       if (callback) {
         callback({ success: true, message: messageResponse });
