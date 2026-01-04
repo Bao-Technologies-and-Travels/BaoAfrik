@@ -121,6 +121,8 @@ const Home: React.FC = () => {
   const [showSellerLocationSuggestions, setShowSellerLocationSuggestions] = useState(false);
   const [hoveredCategoryOption, setHoveredCategoryOption] = useState<string | null>(null);
   const [hoveredOriginOption, setHoveredOriginOption] = useState<string | null>(null);
+  const [isRequestProductOriginDropdownOpen, setIsRequestProductOriginDropdownOpen] = useState(false);
+  const requestProductOriginDropdownRef = React.useRef<HTMLDivElement>(null);
   
   const locationSuggestions = [
     'Pakse, Laos',
@@ -545,6 +547,9 @@ const Home: React.FC = () => {
       }
       if (productOriginDropdownRef.current && !productOriginDropdownRef.current.contains(target)) {
         setIsProductOriginDropdownOpen(false);
+      }
+      if (requestProductOriginDropdownRef.current && !requestProductOriginDropdownRef.current.contains(target)) {
+        setIsRequestProductOriginDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -4284,53 +4289,27 @@ const Home: React.FC = () => {
       {showRequestModal && isMobile ? (
         // Mobile: Full Page Form
         <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          {/* Mobile Header */}
-          <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between mb-16">
-            <button
-              type="button"
-              onClick={() => setShowRequestModal(false)}
-              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
-              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
-              aria-label="Back"
-            >
-              <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
-            </button>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
-                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
-                aria-label="Search"
-              >
-                <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
-                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
-                aria-label="More options"
-              >
-                <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
-                  <circle cx="4" cy="2" r="2" fill="#171717" />
-                  <circle cx="12" cy="2" r="2" fill="#171717" />
-                  <circle cx="20" cy="2" r="2" fill="#171717" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Title */}
-          <div className="pt-20 px-4 mb-6">
+          {/* Header with Title and X Button */}
+          <div className="flex items-center justify-between px-4 pt-4 pb-3">
             <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Do a request
             </h1>
+            <button
+              onClick={() => setShowRequestModal(false)}
+              style={{ color: '#171717', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
 
           {/* Form Content */}
           <div className="flex-1 overflow-y-auto px-4 pb-6">
 
             {/* Product Name Input */}
-            <div style={{ marginBottom: '10px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
                 Product name
               </label>
@@ -4352,40 +4331,95 @@ const Home: React.FC = () => {
             </div>
 
             {/* Product Origin Input */}
-            <div style={{ marginBottom: '10px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
                 Product Origin
               </label>
-              <div style={{ position: 'relative' }}>
-                <input 
-                  type="text"
-                  value={requestProductOrigin}
-                  onChange={(e) => setRequestProductOrigin(e.target.value)}
-                  placeholder="Choose a location"
+              <div className="relative" ref={requestProductOriginDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsRequestProductOriginDropdownOpen(!isRequestProductOriginDropdownOpen)}
+                  className="w-full px-3 py-2.5 border rounded-lg text-left flex items-center justify-between"
                   style={{
-                    width: '100%',
-                    padding: '6px 10px',
+                    borderColor: '#E4E4E4',
                     borderRadius: '8px',
-                    border: '1px solid #E4E4E4',
-                    fontSize: '10px',
-                    fontFamily: 'Poppins, sans-serif',
-                    outline: 'none',
-                    color: requestProductOrigin ? '#212121' : '#D9D9D9'
+                    backgroundColor: '#FFFFFF',
+                    minHeight: '32px',
+                    padding: '6px 10px'
                   }}
-                />
-                <svg 
-                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '12px', height: '12px' }}
-                  fill="none" 
-                  stroke="#6A6A6A" 
-                  viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                  <div className="flex items-center gap-2 flex-wrap flex-1">
+                    {requestProductOrigin ? (
+                      <div
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded"
+                        style={{
+                          backgroundColor: '#F1F1F1',
+                          borderRadius: '6px'
+                        }}
+                      >
+                        <span style={{ fontSize: '10px', color: '#6A6A6A' }}>
+                          {requestProductOrigin}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRequestProductOrigin('');
+                          }}
+                          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M9 3L3 9M3 3l6 6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: '#D9D9D9', fontSize: '10px' }}>Choose a location</span>
+                    )}
+                  </div>
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#6A6A6A"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isRequestProductOriginDropdownOpen && (
+                  <div
+                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden"
+                    style={{ maxHeight: '200px', overflowY: 'auto' }}
+                  >
+                    {africanCountries.map((country) => (
+                      <button
+                        key={country.code}
+                        type="button"
+                        onClick={() => {
+                          setRequestProductOrigin(country.name);
+                          setIsRequestProductOriginDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 transition-colors flex items-center gap-2 relative"
+                        style={{
+                          color: '#6A6A6A',
+                          fontSize: '10px',
+                          backgroundColor: 'transparent'
+                        }}
+                      >
+                        <img src={country.flag} alt={country.name} style={{ width: '16px', height: '12px', borderRadius: '4px' }} />
+                        <span>{country.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Description Input */}
-            <div style={{ marginBottom: '10px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
                 Description
               </label>
@@ -4393,7 +4427,7 @@ const Home: React.FC = () => {
                 value={requestDescription}
                 onChange={(e) => setRequestDescription(e.target.value)}
                 placeholder="Add an description"
-                rows={2}
+                rows={5}
                 style={{
                   width: '100%',
                   padding: '6px 10px',
@@ -4409,7 +4443,7 @@ const Home: React.FC = () => {
             </div>
 
             {/* Location Section */}
-            <div style={{ marginBottom: '12px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '-2px' }}>
                 Your location
               </label>
@@ -4435,8 +4469,8 @@ const Home: React.FC = () => {
             </div>
 
             {/* Price Range Section */}
-            <div style={{ marginBottom: '12px' }}>
-              <h3 style={{ fontSize: '11px', color: '#212121', marginBottom: '8px', fontWeight: '500' }}>
+            <div style={{ marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '13px', color: '#212121', marginBottom: '8px', fontWeight: '500' }}>
                 How much would you like to pay for the product?
               </h3>
               <div className="flex gap-2" style={{ marginBottom: '6px', flexWrap: 'wrap' }}>
@@ -4448,7 +4482,7 @@ const Home: React.FC = () => {
                       width: 'calc(50% - 4px)',
                       padding: '6px 8px',
                       borderRadius: '8px',
-                      border: `1px solid ${requestPriceRange === range ? '#64B5F6' : '#E4E4E4'}`,
+                      border: `1px solid ${requestPriceRange === range ? 'transparent' : '#E4E4E4'}`,
                       backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFF',
                       color: requestPriceRange === range ? '#64B5F6' : '#6A6A6A',
                       cursor: 'pointer',
@@ -4468,7 +4502,7 @@ const Home: React.FC = () => {
                   width: '100%',
                   padding: '6px 8px',
                   borderRadius: '8px',
-                  border: `1px solid ${requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#E4E4E4'}`,
+                  border: `1px solid ${requestPriceRange === 'More than 200 USD' ? 'transparent' : '#E4E4E4'}`,
                   backgroundColor: requestPriceRange === 'More than 200 USD' ? '#F0F8FE' : '#FFF',
                   color: requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#6A6A6A',
                   cursor: 'pointer',
@@ -4497,6 +4531,7 @@ const Home: React.FC = () => {
                 color: '#FFF',
                 border: 'none',
                 cursor: 'pointer',
+                marginTop: '20px',
                 fontSize: '11px',
                 fontFamily: 'Poppins, sans-serif',
                 fontWeight: '400',
@@ -4788,82 +4823,143 @@ const Home: React.FC = () => {
             </button>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Confirmation Modal */}
       {showConfirmationModal && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: '#0000001A',
-            zIndex: 9998,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-          onClick={() => setShowConfirmationModal(false)}
-        >
-          {/* Confirmation Modal Content */}
-          <div 
-            style={{
-              width: window.innerWidth < 640 ? '90%' : '520px',
-              maxWidth: window.innerWidth < 640 ? '340px' : '520px',
-              height: 'auto',
-              borderRadius: window.innerWidth < 640 ? '20px' : '30px',
-              background: '#FFF',
-              padding: window.innerWidth < 640 ? '24px 28px' : '32px 40px',
-              position: 'relative',
-              fontFamily: 'Poppins, sans-serif',
-              textAlign: 'center'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Verify Icon */}
-            <div style={{ marginBottom: window.innerWidth < 640 ? '12px' : '16px', display: 'flex', justifyContent: 'center' }}>
-              <img src={verifyIcon} alt="Success" style={{ width: window.innerWidth < 640 ? '50px' : '70px', height: window.innerWidth < 640 ? '50px' : '70px' }} />
+        isMobile ? (
+          // Mobile: Full Page Form
+          <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            {/* Header with Title and X Button */}
+            <div className="flex items-center justify-between px-4 pt-4 pb-3">
+              <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Your request has been registered
+              </h1>
+              <button
+                onClick={() => setShowConfirmationModal(false)}
+                style={{ color: '#171717', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
             </div>
 
-            {/* Success Message */}
-            <h2 style={{ fontSize: window.innerWidth < 640 ? '14px' : '18px', color: '#212121', fontWeight: '500', marginBottom: window.innerWidth < 640 ? '8px' : '10px' }}>
-              Your request has been registered
-            </h2>
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-4 pb-6 flex flex-col items-center justify-center">
+              {/* Verify Icon */}
+              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                <img src={verifyIcon} alt="Success" style={{ width: '50px', height: '50px' }} />
+              </div>
 
-            {/* Description */}
-            <p style={{ fontSize: window.innerWidth < 640 ? '10px' : '13px', color: '#6A6A6A', marginBottom: window.innerWidth < 640 ? '16px' : '24px', lineHeight: '1.6' }}>
-              Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing
-            </p>
+              {/* Description */}
+              <p style={{ fontSize: '10px', color: '#6A6A6A', marginBottom: '24px', lineHeight: '1.6', textAlign: 'center' }}>
+                Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing
+              </p>
 
-            {/* Close Button */}
-            <button
-              onClick={() => setShowConfirmationModal(false)}
-              style={{
-                display: 'flex',
-                width: '100%',
-                height: window.innerWidth < 640 ? '36px' : '40px',
-                padding: window.innerWidth < 640 ? '8px' : '10px',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '10px',
-                flexShrink: 0,
-                borderRadius: '8px',
-                backgroundColor: '#F9A825',
-                color: '#FFF',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: window.innerWidth < 640 ? '11px' : '14px',
-                fontFamily: 'Poppins, sans-serif',
-                fontWeight: '400',
-                margin: '0 auto'
-              }}
-            >
-              Close
-            </button>
+              {/* Close Button */}
+              <button
+                onClick={() => setShowConfirmationModal(false)}
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  height: '36px',
+                  padding: '8px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '10px',
+                  flexShrink: 0,
+                  borderRadius: '8px',
+                  backgroundColor: '#F9A825',
+                  color: '#FFF',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '11px',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: '400',
+                  margin: '0 auto'
+                }}
+              >
+                Close
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          // Desktop/Tablet: Modal Overlay
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: '#0000001A',
+              zIndex: 9998,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onClick={() => setShowConfirmationModal(false)}
+          >
+            {/* Confirmation Modal Content */}
+            <div 
+              style={{
+                width: '520px',
+                maxWidth: '520px',
+                height: 'auto',
+                borderRadius: '30px',
+                background: '#FFF',
+                padding: '32px 40px',
+                position: 'relative',
+                fontFamily: 'Poppins, sans-serif',
+                textAlign: 'center'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Verify Icon */}
+              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                <img src={verifyIcon} alt="Success" style={{ width: '70px', height: '70px' }} />
+              </div>
+
+              {/* Success Message */}
+              <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '500', marginBottom: '10px' }}>
+                Your request has been registered
+              </h2>
+
+              {/* Description */}
+              <p style={{ fontSize: '13px', color: '#6A6A6A', marginBottom: '24px', lineHeight: '1.6' }}>
+                Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing
+              </p>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowConfirmationModal(false)}
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  height: '40px',
+                  padding: '10px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '10px',
+                  flexShrink: 0,
+                  borderRadius: '8px',
+                  backgroundColor: '#F9A825',
+                  color: '#FFF',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: '400',
+                  margin: '0 auto'
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )
       )}
 
       {/* Mobile Filter Page */}
