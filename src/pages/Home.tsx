@@ -167,6 +167,7 @@ const Home: React.FC = () => {
   const [changeLocationQuery, setChangeLocationQuery] = useState('');
   const [requestUserLocation, setRequestUserLocation] = useState('London, United Kingdom');
   const [hoveredLocationSuggestion, setHoveredLocationSuggestion] = useState<string | null>(null);
+  const [isChangeLocationInputFocused, setIsChangeLocationInputFocused] = useState(false);
 
   // Banner slides data
   const bannerSlides = [
@@ -4854,19 +4855,19 @@ const Home: React.FC = () => {
           <div
             style={{
               width: '100%',
-              maxHeight: '80vh',
+              height: '500px',
               backgroundColor: '#FFF',
               borderTopLeftRadius: '20px',
               borderTopRightRadius: '20px',
-              padding: '20px',
               fontFamily: 'Poppins, sans-serif',
-              overflowY: 'auto'
+              display: 'flex',
+              flexDirection: 'column'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            {/* Header with background */}
+            <div className="flex items-center justify-between" style={{ padding: '16px 20px', backgroundColor: '#FAFAFA', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }}>
+              <h2 style={{ fontSize: '12px', fontWeight: 600, color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Change location
               </h2>
               <button
@@ -4874,49 +4875,55 @@ const Home: React.FC = () => {
                   setShowChangeLocationModal(false);
                   setChangeLocationQuery('');
                   setHoveredLocationSuggestion(null);
+                  setIsChangeLocationInputFocused(false);
                 }}
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '16px',
+                  height: '16px',
                   borderRadius: '50%',
-                  backgroundColor: '#F5F5F5',
+                  backgroundColor: '#8A8A8A',
                   border: 'none',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  padding: 0
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
             </div>
 
-            {/* Set your location label */}
-            <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '8px' }}>
-              Set your location
-            </label>
+            {/* Content */}
+            <div style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
+              {/* Set your location label */}
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '8px' }}>
+                Set your location
+              </label>
 
-            {/* Location Input */}
-            <input
-              type="text"
-              value={changeLocationQuery}
-              onChange={(e) => setChangeLocationQuery(e.target.value)}
-              placeholder=""
-              autoFocus
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '8px',
-                border: '1px solid #64B5F6',
-                fontSize: '12px',
-                fontFamily: 'Poppins, sans-serif',
-                outline: 'none',
-                marginBottom: '16px'
-              }}
-            />
+              {/* Location Input */}
+              <input
+                type="text"
+                value={changeLocationQuery}
+                onChange={(e) => setChangeLocationQuery(e.target.value)}
+                onFocus={() => setIsChangeLocationInputFocused(true)}
+                onBlur={() => setIsChangeLocationInputFocused(false)}
+                placeholder=""
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  border: `1px solid ${isChangeLocationInputFocused ? '#64B5F6' : '#E9E9E9'}`,
+                  fontSize: '12px',
+                  fontFamily: 'Poppins, sans-serif',
+                  outline: 'none',
+                  marginBottom: '16px'
+                }}
+              />
 
             {/* Location Suggestions List */}
             {changeLocationQuery.trim() && (
@@ -4929,17 +4936,20 @@ const Home: React.FC = () => {
                   .map((location) => (
                     <button
                       key={location}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
                         setRequestUserLocation(location);
                         setShowChangeLocationModal(false);
                         setChangeLocationQuery('');
                         setHoveredLocationSuggestion(null);
+                        setIsChangeLocationInputFocused(false);
                       }}
                       onMouseEnter={() => setHoveredLocationSuggestion(location)}
                       onMouseLeave={() => setHoveredLocationSuggestion(null)}
                       style={{
                         width: '100%',
-                        padding: '12px',
+                        padding: '8px 12px',
+                        marginBottom: '4px',
                         backgroundColor: hoveredLocationSuggestion === location ? '#F0F8FE' : 'transparent',
                         border: 'none',
                         cursor: 'pointer',
@@ -4950,13 +4960,17 @@ const Home: React.FC = () => {
                         fontFamily: 'Poppins, sans-serif'
                       }}
                     >
-                      {/* Orange Location Pin Icon */}
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                        <path
-                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-                          fill="#F9A825"
-                        />
-                      </svg>
+                      {/* Location Icon - Same as home page */}
+                      <img 
+                        src={locationIcon} 
+                        alt="Location"
+                        style={{ 
+                          width: '14px', 
+                          height: '14px',
+                          flexShrink: 0,
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
+                        }}
+                      />
                       <span style={{ fontSize: '12px', color: '#212121' }}>
                         {location}
                       </span>
@@ -4965,38 +4979,42 @@ const Home: React.FC = () => {
               </div>
             )}
 
+            </div>
+
             {/* Save the location Button */}
-            <button
-              onClick={() => {
-                if (changeLocationQuery.trim()) {
-                  const matchingLocation = locationSuggestions.find(loc => 
-                    loc.toLowerCase().includes(changeLocationQuery.toLowerCase())
-                  );
-                  if (matchingLocation) {
-                    setRequestUserLocation(matchingLocation);
+            <div style={{ padding: '20px', paddingTop: '0' }}>
+              <button
+                onClick={() => {
+                  if (changeLocationQuery.trim()) {
+                    const matchingLocation = locationSuggestions.find(loc => 
+                      loc.toLowerCase().includes(changeLocationQuery.toLowerCase())
+                    );
+                    if (matchingLocation) {
+                      setRequestUserLocation(matchingLocation);
+                    }
                   }
-                }
-                setShowChangeLocationModal(false);
-                setChangeLocationQuery('');
-                setHoveredLocationSuggestion(null);
-              }}
-              style={{
-                width: '100%',
-                height: '40px',
-                padding: '10px',
-                borderRadius: '8px',
-                backgroundColor: '#F9A825',
-                color: '#FFF',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontFamily: 'Poppins, sans-serif',
-                fontWeight: '400',
-                marginTop: 'auto'
-              }}
-            >
-              Save the location
-            </button>
+                  setShowChangeLocationModal(false);
+                  setChangeLocationQuery('');
+                  setHoveredLocationSuggestion(null);
+                  setIsChangeLocationInputFocused(false);
+                }}
+                style={{
+                  width: '100%',
+                  height: '40px',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  backgroundColor: '#F9A825',
+                  color: '#FFF',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: '400'
+                }}
+              >
+                Save the location
+              </button>
+            </div>
           </div>
         </div>
       )}
