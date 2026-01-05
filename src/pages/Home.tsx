@@ -163,6 +163,10 @@ const Home: React.FC = () => {
   const [requestPriceRange, setRequestPriceRange] = useState('');
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showChangeLocationModal, setShowChangeLocationModal] = useState(false);
+  const [changeLocationQuery, setChangeLocationQuery] = useState('');
+  const [requestUserLocation, setRequestUserLocation] = useState('London, United Kingdom');
+  const [hoveredLocationSuggestion, setHoveredLocationSuggestion] = useState<string | null>(null);
 
   // Banner slides data
   const bannerSlides = [
@@ -4288,7 +4292,7 @@ const Home: React.FC = () => {
       {/* Request Modal/Form - Mobile: Full Page, Desktop: Modal */}
       {showRequestModal && isMobile ? (
         // Mobile: Full Page Form
-        <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="fixed inset-0 bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif', zIndex: 10000 }}>
           {/* Header with Title and X Button */}
           <div className="flex items-center justify-between px-4 pt-4 pb-3">
             <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
@@ -4449,9 +4453,10 @@ const Home: React.FC = () => {
               </label>
               <div className="flex items-center justify-between">
                 <span style={{ fontSize: '10px', color: '#64B5F6' }}>
-                  London, United Kingdom
+                  {requestUserLocation}
                 </span>
                 <button 
+                  onClick={() => setShowChangeLocationModal(true)}
                   style={{
                     padding: '4px 8px',
                     borderRadius: '8px',
@@ -4825,45 +4830,206 @@ const Home: React.FC = () => {
         </div>
       ) : null}
 
-      {/* Confirmation Modal */}
-      {showConfirmationModal && (
-        isMobile ? (
-          // Mobile: Full Page Form
-          <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            {/* Header with Title and X Button */}
-            <div className="flex items-center justify-between px-4 pt-4 pb-3">
-              <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                Your request has been registered
-              </h1>
+      {/* Change Location Bottom Sheet - Mobile Only */}
+      {showChangeLocationModal && isMobile && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center'
+          }}
+          onClick={() => {
+            setShowChangeLocationModal(false);
+            setChangeLocationQuery('');
+            setHoveredLocationSuggestion(null);
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxHeight: '80vh',
+              backgroundColor: '#FFF',
+              borderTopLeftRadius: '20px',
+              borderTopRightRadius: '20px',
+              padding: '20px',
+              fontFamily: 'Poppins, sans-serif',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Change location
+              </h2>
               <button
-                onClick={() => setShowConfirmationModal(false)}
-                style={{ color: '#171717', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+                onClick={() => {
+                  setShowChangeLocationModal(false);
+                  setChangeLocationQuery('');
+                  setHoveredLocationSuggestion(null);
+                }}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: '#F5F5F5',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
             </div>
 
+            {/* Set your location label */}
+            <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '8px' }}>
+              Set your location
+            </label>
+
+            {/* Location Input */}
+            <input
+              type="text"
+              value={changeLocationQuery}
+              onChange={(e) => setChangeLocationQuery(e.target.value)}
+              placeholder=""
+              autoFocus
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: '8px',
+                border: '1px solid #64B5F6',
+                fontSize: '12px',
+                fontFamily: 'Poppins, sans-serif',
+                outline: 'none',
+                marginBottom: '16px'
+              }}
+            />
+
+            {/* Location Suggestions List */}
+            {changeLocationQuery.trim() && (
+              <div style={{ marginBottom: '20px' }}>
+                {locationSuggestions
+                  .filter(location => 
+                    location.toLowerCase().includes(changeLocationQuery.toLowerCase())
+                  )
+                  .slice(0, 5)
+                  .map((location) => (
+                    <button
+                      key={location}
+                      onClick={() => {
+                        setRequestUserLocation(location);
+                        setShowChangeLocationModal(false);
+                        setChangeLocationQuery('');
+                        setHoveredLocationSuggestion(null);
+                      }}
+                      onMouseEnter={() => setHoveredLocationSuggestion(location)}
+                      onMouseLeave={() => setHoveredLocationSuggestion(null)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: hoveredLocationSuggestion === location ? '#F0F8FE' : 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        textAlign: 'left',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      {/* Orange Location Pin Icon */}
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                        <path
+                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                          fill="#F9A825"
+                        />
+                      </svg>
+                      <span style={{ fontSize: '12px', color: '#212121' }}>
+                        {location}
+                      </span>
+                    </button>
+                  ))}
+              </div>
+            )}
+
+            {/* Save the location Button */}
+            <button
+              onClick={() => {
+                if (changeLocationQuery.trim()) {
+                  const matchingLocation = locationSuggestions.find(loc => 
+                    loc.toLowerCase().includes(changeLocationQuery.toLowerCase())
+                  );
+                  if (matchingLocation) {
+                    setRequestUserLocation(matchingLocation);
+                  }
+                }
+                setShowChangeLocationModal(false);
+                setChangeLocationQuery('');
+                setHoveredLocationSuggestion(null);
+              }}
+              style={{
+                width: '100%',
+                height: '40px',
+                padding: '10px',
+                borderRadius: '8px',
+                backgroundColor: '#F9A825',
+                color: '#FFF',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: '400',
+                marginTop: 'auto'
+              }}
+            >
+              Save the location
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmationModal && (
+        isMobile ? (
+          // Mobile: Full Page Form
+          <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
             {/* Content */}
             <div className="flex-1 overflow-y-auto px-4 pb-6 flex flex-col items-center justify-center">
               {/* Verify Icon */}
               <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-                <img src={verifyIcon} alt="Success" style={{ width: '50px', height: '50px' }} />
+                <img src={verifyIcon} alt="Success" style={{ width: '70px', height: '70px' }} />
               </div>
+
+              {/* Title */}
+              <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '500', marginBottom: '8px', textAlign: 'center' }}>
+                Your request has been registered
+              </h2>
 
               {/* Description */}
               <p style={{ fontSize: '10px', color: '#6A6A6A', marginBottom: '24px', lineHeight: '1.6', textAlign: 'center' }}>
-                Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing
+                Your request has been successfully submitted. We'll notify you when sellers respond to your request.
               </p>
 
-              {/* Close Button */}
+              {/* Back to Homepage Button */}
               <button
                 onClick={() => setShowConfirmationModal(false)}
                 style={{
                   display: 'flex',
-                  width: '100%',
+                  width: 'calc(100% - 32px)',
+                  maxWidth: '400px',
                   height: '36px',
                   padding: '8px',
                   justifyContent: 'center',
@@ -4881,7 +5047,7 @@ const Home: React.FC = () => {
                   margin: '0 auto'
                 }}
               >
-                Close
+                Back to homepage
               </button>
             </div>
           </div>
