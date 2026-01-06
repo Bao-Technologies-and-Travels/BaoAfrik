@@ -337,7 +337,7 @@ const MyListings: React.FC = () => {
   const [mobileSortTertiaryOpen, setMobileSortTertiaryOpen] = useState(false);
   const [mobileSelectedPrimaryKey, setMobileSelectedPrimaryKey] = useState<string | null>(null);
   const [mobileSelectedSecondaryKey, setMobileSelectedSecondaryKey] = useState<string | null>(null);
-  const mobilePlusModalRef = useRef<HTMLDivElement | null>(null);
+  const mobileMoreOptionsModalRef = useRef<HTMLDivElement | null>(null);
 
   // Mock data - replace with actual data from backend
   const initialListings: Listing[] = [
@@ -590,7 +590,7 @@ const MyListings: React.FC = () => {
       if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
         setMoreOptionsOpenFor(null);
       }
-      if (mobilePlusModalRef.current && !mobilePlusModalRef.current.contains(target)) {
+      if (mobileMoreOptionsModalRef.current && !mobileMoreOptionsModalRef.current.contains(target)) {
         setIsMobilePlusModalOpen(false);
         setMobileSortSecondaryOpen(false);
         setMobileSortTertiaryOpen(false);
@@ -2184,243 +2184,33 @@ const MyListings: React.FC = () => {
               >
                 <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
               </button>
-              <button
-                type="button"
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
-                style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
-                aria-label="More options"
-              >
-                <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
-                  <circle cx="4" cy="2" r="2" fill="#171717" />
-                  <circle cx="12" cy="2" r="2" fill="#171717" />
-                  <circle cx="20" cy="2" r="2" fill="#171717" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className="flex-1">
-          <div className="max-w-6xl mx-auto w-full pl-0 pr-0 py-8 flex flex-col lg:flex-row lg:justify-between gap-8">
-            <div className="flex-1 lg:pl-0 lg:-ml-16">
-              {/* Desktop Breadcrumb - Hidden on mobile */}
-              <nav className="hidden lg:flex items-center space-x-2 text-xs sm:text-sm mb-8" style={breadcrumbStyle}>
-                <img
-                  src={arrowLeftIcon}
-                  alt="Back"
-                  className="w-4 h-4 cursor-pointer"
-                  onClick={() => navigate('/')}
-                />
-                <span
-                  className="hover:text-[#64B5F6] cursor-pointer"
-                  onClick={() => navigate('/')}
-                >
-                  Homepage
-                </span>
-                <span style={{ color: '#BABABA' }}>·</span>
-                <span>Menu</span>
-                <span style={{ color: '#BABABA' }}>·</span>
-                <span style={{ color: '#4D4D4D' }}>My listings</span>
-              </nav>
-
-              {/* Mobile Title - Only visible on mobile, below header */}
-              {isMobile && (
-                <div className="lg:hidden pt-8 px-4">
-                  <h1
-                    className="text-base font-semibold"
-                    style={{ color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                  >
-                    Manage your listings
-                  </h1>
-                </div>
-              )}
-
-              {/* Desktop Title - Hidden on mobile */}
-              <div className="hidden lg:block">
-                <h1
-                  className="text-base sm:text-lg font-semibold"
-                  style={{ color: '#1E1E1E', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                >
-                  Manage your listings
-                </h1>
-                <p
-                  className="text-[11px] sm:text-xs mt-2 max-w-3xl leading-relaxed"
-                  style={{ color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}
-                >
-                  Manage product listings easily. Add items, update details, and track metrics
-                  <span className="block">
-                    to improve sales. Start by adding a listing or auditing inventory.
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            {/* Search and View Toggle - Hidden on mobile */}
-            {!isMobile && (
-            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-0">
-              <div
-                className="inline-flex items-center border mb-4 overflow-hidden"
-                style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
-              >
-                {(['list', 'grid'] as ViewMode[]).map((mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    onClick={() => setViewMode(mode)}
-                    className="flex items-center justify-center px-3 py-2 transition-colors flex-1"
-                    style={{
-                      backgroundColor: viewMode === mode ? '#CFE8FC' : 'transparent'
-                    }}
-                  >
-                    <img
-                      src={mode === 'list' ? listIcon : gridIcon}
-                      alt={`${mode} view`}
-                      style={{
-                        filter: viewMode === mode ? toggleIconFilters.active : toggleIconFilters.inactive
-                      }}
-                    />
-                  </button>
-                ))}
-              </div>
-
-              <div className="w-[90%]">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search a listing ?"
-                  style={{
-                    backgroundColor: isSearchFocused ? '#FFFFFF' : '#F1F1F1',
-                    color: '#1E1E1E',
-                    borderRadius: '8px',
-                    border: isSearchFocused ? '1px solid #CFE8FC' : '1px solid transparent',
-                    caretColor: '#64B5F6',
-                    fontFamily: 'Poppins, sans-serif',
-                    fontSize: '13px',
-                    transition: 'all 0.2s ease'
-                  }}
-                  className="w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CFE8FC] placeholder-[#B2B2B2]"
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setIsSearchFocused(false)}
-                />
-              </div>
-            </div>
-            )}
-          </div>
-
-        {/* Mobile All Listings Bar - Only visible on mobile when listings exist */}
-        {isMobile && !shouldShowEmptyState && !isSearchNoResultsState && (
-          <div className="lg:hidden px-4 mt-0 mb-4">
-            <div className="flex items-center justify-between">
-              {/* All listings text or sort/status filter badge */}
-              {selectedSort ? (
-                <button
-                  type="button"
-                  onClick={clearSelectedSort}
-                  className="inline-flex items-center justify-between gap-1.5 px-2.5 py-0.5 rounded-full"
-                  style={{
-                    backgroundColor: '#F0F8FE',
-                    fontFamily: 'Poppins, sans-serif',
-                    color: '#64B5F6',
-                    fontSize: '11px',
-                    minHeight: '24px',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <span className="flex items-center gap-1" style={{ whiteSpace: 'nowrap' }}>
-                    {selectedSortDetails?.primary && (
-                      <span style={{ display: 'flex', alignItems: 'center', transform: 'scale(0.85)' }}>
-                        {renderSortIcon(selectedSortDetails.primary, true)}
-                      </span>
-                    )}
-                    <span style={{ whiteSpace: 'nowrap' }}>{selectedSort.label}</span>
-                  </span>
-                  <span
-                    role="button"
-                    aria-label="Clear sort selection"
-                    className="leading-none cursor-pointer"
-                    style={{ lineHeight: 1, color: '#64B5F6', fontSize: '14px' }}
-                  >
-                    ×
-                  </span>
-                </button>
-              ) : statusFilter === 'All Status' ? (
-                <div className="flex items-center gap-2">
-                  <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                    All listings
-                  </span>
-                  <span
-                    className="px-2 py-0.5 rounded-full font-medium"
-                    style={{
-                      backgroundColor: '#F1F1F1',
-                      color: '#939393',
-                      fontSize: '12px',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                  >
-                    {totalListings}
-                  </span>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={clearStatusFilter}
-                  className="inline-flex items-center justify-between gap-2 px-3 py-1 rounded-full"
-                  style={{
-                    backgroundColor: statusFilter === 'Active' ? '#EDFBF0' : statusFilter === 'Inactive' ? '#FFF5F5' : '#FEF6E9',
-                    fontFamily: 'Poppins, sans-serif',
-                    color: statusFilter === 'Active' ? '#70E183' : statusFilter === 'Inactive' ? '#FF5151' : '#FAB951',
-                    fontSize: '13px',
-                    minHeight: '28px'
-                  }}
-                >
-                  <span className="flex items-center gap-1.5">
-                    {statusFilter === 'Active' && <img src={activeIcon} alt="active" className="w-3 h-3" />}
-                    {statusFilter === 'Inactive' && <img src={inactiveIcon} alt="inactive" className="w-3 h-3" />}
-                    {statusFilter === 'Days left' && (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" fill="#FAB951" />
-                        <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                    <span>{statusFilter}</span>
-                  </span>
-                  <span
-                    role="button"
-                    aria-label="Clear status filter"
-                    className="text-base leading-none cursor-pointer"
-                    style={{ lineHeight: 1 }}
-                  >
-                    ×
-                  </span>
-                </button>
-              )}
-              <div ref={mobilePlusModalRef} className="relative">
+              <div ref={mobileMoreOptionsModalRef} className="relative">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsMobilePlusModalOpen(!isMobilePlusModalOpen);
                   }}
-                  className="flex items-center justify-center"
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    backgroundColor: '#64B5F6',
-                    borderRadius: '8px',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                  aria-label="Add listing"
+                  className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                  style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+                  aria-label="More options"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 5v14M5 12h14" stroke="#F0F8FE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                    <circle cx="4" cy="2" r="2" fill="#171717" />
+                    <circle cx="12" cy="2" r="2" fill="#171717" />
+                    <circle cx="20" cy="2" r="2" fill="#171717" />
                   </svg>
                 </button>
 
-                {/* Mobile Plus Modal - Hidden only when tertiary sort modal is open */}
+                {/* Mobile Plus Modal - Now triggered by More Options button - Hidden only when tertiary sort modal is open */}
                 {isMobilePlusModalOpen && !mobileSortTertiaryOpen && (
                   <div
+                    ref={(el) => {
+                      // Ensure the modal is part of the click-outside detection
+                      if (mobileMoreOptionsModalRef.current && el) {
+                        // The ref is already set on the parent, so this is just for structure
+                      }
+                    }}
                     className="absolute bottom-0 right-0 z-50"
                     style={{
                       backgroundColor: '#FFFFFF',
@@ -2431,6 +2221,7 @@ const MyListings: React.FC = () => {
                       minWidth: '160px',
                       transform: 'translateY(68px)'
                     }}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     {/* Sort by option */}
                     <button
@@ -2524,7 +2315,7 @@ const MyListings: React.FC = () => {
                       <span>All Status</span>
                     </button>
 
-                    {/* Status Dropdown - appears to the left of plus modal */}
+                    {/* Status Dropdown - appears to the left of modal */}
                     {isStatusDropdownOpen && (
                       <div
                         className="absolute top-0 right-full mr-2 z-50"
@@ -2818,85 +2609,85 @@ const MyListings: React.FC = () => {
                           )}
 
                           {primaryOption.children.map((child) => {
-                        if (child.value) {
-                          // Simple option - applies sort directly
-                          return (
-                            <button
-                              key={child.key}
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (child.value) {
-                                  setSelectedSort({ label: `${primaryOption.label}: ${child.label}`, value: child.value });
-                                  setMobileSortTertiaryOpen(false);
-                                  setMobileSortSecondaryOpen(false);
-                                  setIsMobilePlusModalOpen(false);
-                                  setMobileSelectedPrimaryKey(null);
-                                  setMobileSelectedSecondaryKey(null);
-                                }
-                              }}
-                              style={{
-                                color: '#939393',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '12px',
-                                backgroundColor: 'transparent',
-                                borderRadius: '8px',
-                                whiteSpace: 'nowrap',
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '6px 8px',
-                                border: 'none',
-                                cursor: 'pointer'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#FAFAFA';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }}
-                            >
-                              <span style={{ whiteSpace: 'nowrap' }}>{child.label}</span>
-                            </button>
-                          );
-                        } else if (child.subChildren) {
-                          // Has sub-children - opens another level
-                          return (
-                            <button
-                              key={child.key}
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setMobileSelectedSecondaryKey(child.key);
-                              }}
-                              className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded transition-colors"
-                              style={{
-                                color: '#939393',
-                                fontFamily: 'Poppins, sans-serif',
-                                fontSize: '12px',
-                                backgroundColor: 'transparent',
-                                borderRadius: '8px',
-                                whiteSpace: 'nowrap'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#FAFAFA';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }}
-                            >
-                              <span>{child.label}</span>
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </button>
-                          );
-                        }
-                        return null;
-                      })}
-                    </>
-                    );
+                            if (child.value) {
+                              // Simple option - applies sort directly
+                              return (
+                                <button
+                                  key={child.key}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (child.value) {
+                                      setSelectedSort({ label: `${primaryOption.label}: ${child.label}`, value: child.value });
+                                      setMobileSortTertiaryOpen(false);
+                                      setMobileSortSecondaryOpen(false);
+                                      setIsMobilePlusModalOpen(false);
+                                      setMobileSelectedPrimaryKey(null);
+                                      setMobileSelectedSecondaryKey(null);
+                                    }
+                                  }}
+                                  style={{
+                                    color: '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '12px',
+                                    backgroundColor: 'transparent',
+                                    borderRadius: '8px',
+                                    whiteSpace: 'nowrap',
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '6px 8px',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                  }}
+                                >
+                                  <span style={{ whiteSpace: 'nowrap' }}>{child.label}</span>
+                                </button>
+                              );
+                            } else if (child.subChildren) {
+                              // Has sub-children - opens another level
+                              return (
+                                <button
+                                  key={child.key}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setMobileSelectedSecondaryKey(child.key);
+                                  }}
+                                  className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded transition-colors"
+                                  style={{
+                                    color: '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '12px',
+                                    backgroundColor: 'transparent',
+                                    borderRadius: '8px',
+                                    whiteSpace: 'nowrap'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                  }}
+                                >
+                                  <span>{child.label}</span>
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                  </svg>
+                                </button>
+                              );
+                            }
+                            return null;
+                          })}
+                        </>
+                      );
                     })()}
 
                     {/* Fourth level dropdown for Reviews/Messages - appears to the left of tertiary */}
@@ -2961,6 +2752,226 @@ const MyListings: React.FC = () => {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex-1">
+          <div className="max-w-6xl mx-auto w-full pl-0 pr-0 py-8 flex flex-col lg:flex-row lg:justify-between gap-8">
+            <div className="flex-1 lg:pl-0 lg:-ml-16">
+              {/* Desktop Breadcrumb - Hidden on mobile */}
+              <nav className="hidden lg:flex items-center space-x-2 text-xs sm:text-sm mb-8" style={breadcrumbStyle}>
+                <img
+                  src={arrowLeftIcon}
+                  alt="Back"
+                  className="w-4 h-4 cursor-pointer"
+                  onClick={() => navigate('/')}
+                />
+                <span
+                  className="hover:text-[#64B5F6] cursor-pointer"
+                  onClick={() => navigate('/')}
+                >
+                  Homepage
+                </span>
+                <span style={{ color: '#BABABA' }}>·</span>
+                <span>Menu</span>
+                <span style={{ color: '#BABABA' }}>·</span>
+                <span style={{ color: '#4D4D4D' }}>My listings</span>
+              </nav>
+
+              {/* Mobile Title - Only visible on mobile, below header */}
+              {isMobile && (
+                <div className="lg:hidden pt-8 px-4">
+                  <h1
+                    className="text-base font-semibold"
+                    style={{ color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  >
+                    Manage your listings
+                  </h1>
+                </div>
+              )}
+
+              {/* Desktop Title - Hidden on mobile */}
+              <div className="hidden lg:block">
+                <h1
+                  className="text-base sm:text-lg font-semibold"
+                  style={{ color: '#1E1E1E', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                >
+                  Manage your listings
+                </h1>
+                <p
+                  className="text-[11px] sm:text-xs mt-2 max-w-3xl leading-relaxed"
+                  style={{ color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}
+                >
+                  Manage product listings easily. Add items, update details, and track metrics
+                  <span className="block">
+                    to improve sales. Start by adding a listing or auditing inventory.
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {/* Search and View Toggle - Hidden on mobile */}
+            {!isMobile && (
+            <div className="w-full lg:w-80 flex flex-col items-end gap-3 lg:pr-0 lg:-mr-0">
+              <div
+                className="inline-flex items-center border mb-4 overflow-hidden"
+                style={{ borderColor: '#B8DDFB', backgroundColor: '#FFFFFF', borderRadius: '8px' }}
+              >
+                {(['list', 'grid'] as ViewMode[]).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setViewMode(mode)}
+                    className="flex items-center justify-center px-3 py-2 transition-colors flex-1"
+                    style={{
+                      backgroundColor: viewMode === mode ? '#CFE8FC' : 'transparent'
+                    }}
+                  >
+                    <img
+                      src={mode === 'list' ? listIcon : gridIcon}
+                      alt={`${mode} view`}
+                      style={{
+                        filter: viewMode === mode ? toggleIconFilters.active : toggleIconFilters.inactive
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <div className="w-[90%]">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search a listing ?"
+                  style={{
+                    backgroundColor: isSearchFocused ? '#FFFFFF' : '#F1F1F1',
+                    color: '#1E1E1E',
+                    borderRadius: '8px',
+                    border: isSearchFocused ? '1px solid #CFE8FC' : '1px solid transparent',
+                    caretColor: '#64B5F6',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '13px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  className="w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#CFE8FC] placeholder-[#B2B2B2]"
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setIsSearchFocused(false)}
+                />
+              </div>
+            </div>
+            )}
+          </div>
+
+        {/* Mobile All Listings Bar - Only visible on mobile when listings exist */}
+        {isMobile && !shouldShowEmptyState && !isSearchNoResultsState && (
+          <div className="lg:hidden px-4 mt-0 mb-4">
+            <div className="flex items-center justify-between">
+              {/* All listings text or sort/status filter badge */}
+              {selectedSort ? (
+                <button
+                  type="button"
+                  onClick={clearSelectedSort}
+                  className="inline-flex items-center justify-between gap-1.5 px-2.5 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: '#F0F8FE',
+                    fontFamily: 'Poppins, sans-serif',
+                    color: '#64B5F6',
+                    fontSize: '11px',
+                    minHeight: '24px',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <span className="flex items-center gap-1" style={{ whiteSpace: 'nowrap' }}>
+                    {selectedSortDetails?.primary && (
+                      <span style={{ display: 'flex', alignItems: 'center', transform: 'scale(0.85)' }}>
+                        {renderSortIcon(selectedSortDetails.primary, true)}
+                      </span>
+                    )}
+                    <span style={{ whiteSpace: 'nowrap' }}>{selectedSort.label}</span>
+                  </span>
+                  <span
+                    role="button"
+                    aria-label="Clear sort selection"
+                    className="leading-none cursor-pointer"
+                    style={{ lineHeight: 1, color: '#64B5F6', fontSize: '14px' }}
+                  >
+                    ×
+                  </span>
+                </button>
+              ) : statusFilter === 'All Status' ? (
+                <div className="flex items-center gap-2">
+                  <span style={{ color: '#B0B0B0', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
+                    All listings
+                  </span>
+                  <span
+                    className="px-2 py-0.5 rounded-full font-medium"
+                    style={{
+                      backgroundColor: '#F1F1F1',
+                      color: '#939393',
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    {totalListings}
+                  </span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={clearStatusFilter}
+                  className="inline-flex items-center justify-between gap-2 px-3 py-1 rounded-full"
+                  style={{
+                    backgroundColor: statusFilter === 'Active' ? '#EDFBF0' : statusFilter === 'Inactive' ? '#FFF5F5' : '#FEF6E9',
+                    fontFamily: 'Poppins, sans-serif',
+                    color: statusFilter === 'Active' ? '#70E183' : statusFilter === 'Inactive' ? '#FF5151' : '#FAB951',
+                    fontSize: '13px',
+                    minHeight: '28px'
+                  }}
+                >
+                  <span className="flex items-center gap-1.5">
+                    {statusFilter === 'Active' && <img src={activeIcon} alt="active" className="w-3 h-3" />}
+                    {statusFilter === 'Inactive' && <img src={inactiveIcon} alt="inactive" className="w-3 h-3" />}
+                    {statusFilter === 'Days left' && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" fill="#FAB951" />
+                        <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                    <span>{statusFilter}</span>
+                  </span>
+                  <span
+                    role="button"
+                    aria-label="Clear status filter"
+                    className="text-base leading-none cursor-pointer"
+                    style={{ lineHeight: 1 }}
+                  >
+                    ×
+                  </span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/create-listing');
+                }}
+                className="flex items-center justify-center"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  backgroundColor: '#64B5F6',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+                aria-label="Add listing"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5v14M5 12h14" stroke="#F0F8FE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
             </div>
           </div>
         )}
