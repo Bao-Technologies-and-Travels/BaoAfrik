@@ -550,7 +550,12 @@ const Home: React.FC = () => {
     if (state?.selectedImage && state?.selectedImageUrl) {
       setSelectedImage(state.selectedImage);
       setSelectedImageUrl(state.selectedImageUrl);
-      setImageFormData(state.imageFormData);
+      
+      // Recreate FormData since it cannot be cloned in history state
+      const formData = new FormData();
+      formData.append('image', state.selectedImage);
+      formData.append('timestamp', new Date().toISOString());
+      setImageFormData(formData);
       
       // Open mobile search flow if requested
       if (state.openSearchFlow && isMobile) {

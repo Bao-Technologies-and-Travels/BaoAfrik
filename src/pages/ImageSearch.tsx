@@ -9,7 +9,7 @@ const ImageSearch: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const autoCaptureTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hasCapturedRef = useRef<boolean>(false);
-  const [textColor, setTextColor] = useState<'#FFF' | '#000'>('#FFF');
+  const [textColor, setTextColor] = useState<'#FFF' | '#333333'>('#FFF');
   const brightnessCheckCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Check brightness of camera feed to determine text color
@@ -44,8 +44,8 @@ const ImageSearch: React.FC = () => {
         
         const averageBrightness = totalBrightness / (data.length / 4);
         
-        // If brightness is above 0.5 (50%), use black text; otherwise use white
-        setTextColor(averageBrightness > 0.5 ? '#000' : '#FFF');
+        // If brightness is above 0.5 (50%), use dark gray text; otherwise use white
+        setTextColor(averageBrightness > 0.5 ? '#333333' : '#FFF');
       }
     }
   };
@@ -61,26 +61,16 @@ const ImageSearch: React.FC = () => {
         setCameraStream(stream);
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          // Auto-capture after 2 seconds when video is ready
+          // Check brightness periodically when video is ready
           videoRef.current.onloadedmetadata = () => {
-            if (autoCaptureTimerRef.current) {
-              clearTimeout(autoCaptureTimerRef.current);
-            }
-            autoCaptureTimerRef.current = setTimeout(() => {
-              if (!hasCapturedRef.current && videoRef.current && canvasRef.current) {
-                hasCapturedRef.current = true;
-                captureImage();
-              }
-            }, 2000); // Auto-capture after 2 seconds
+            // Check brightness periodically
+            const brightnessInterval = setInterval(() => {
+              checkBrightness();
+            }, 500); // Check every 500ms
+            
+            // Store interval ID for cleanup
+            (videoRef.current as any).brightnessInterval = brightnessInterval;
           };
-          
-          // Check brightness periodically
-          const brightnessInterval = setInterval(() => {
-            checkBrightness();
-          }, 500); // Check every 500ms
-          
-          // Store interval ID for cleanup
-          (videoRef.current as any).brightnessInterval = brightnessInterval;
         }
       } catch (error) {
         console.error('Error accessing camera:', error);
@@ -139,34 +129,71 @@ const ImageSearch: React.FC = () => {
     // Create preview URL
     const imageUrl = URL.createObjectURL(file);
 
-    // Create FormData for future API call
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('timestamp', new Date().toISOString());
-
     // Navigate back to home with image data
+    // Note: FormData cannot be cloned in history state, so we'll recreate it when needed
     navigate('/', {
       state: {
         selectedImage: file,
         selectedImageUrl: imageUrl,
-        imageFormData: formData,
         openSearchFlow: true
       }
     });
   };
 
-  // Capture image from camera
+  // Capture image from camera - only the scan area (280x280px)
   const captureImage = () => {
-    if (videoRef.current && canvasRef.current && !hasCapturedRef.current) {
-      hasCapturedRef.current = true;
+    if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
 
       if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0);
+        const scanAreaSize = 280; // Size of the scan area in pixels
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        // Calculate the scale factor between video and screen
+        // Video uses objectFit: 'cover', so it fills the screen
+        const videoAspect = video.videoWidth / video.videoHeight;
+        const screenAspect = screenWidth / screenHeight;
+        
+        let scaleX, scaleY, offsetX = 0, offsetY = 0;
+        
+        if (videoAspect > screenAspect) {
+          // Video is wider - it's cropped on left/right
+          scaleY = video.videoHeight / screenHeight;
+          scaleX = scaleY;
+          const scaledWidth = screenWidth * scaleX;
+          offsetX = (video.videoWidth - scaledWidth) / 2;
+        } else {
+          // Video is taller - it's cropped on top/bottom
+          scaleX = video.videoWidth / screenWidth;
+          scaleY = scaleX;
+          const scaledHeight = screenHeight * scaleY;
+          offsetY = (video.videoHeight - scaledHeight) / 2;
+        }
+        
+        // Calculate scan area position in video coordinates
+        // Scan area is centered on screen
+        const scanAreaScreenX = (screenWidth - scanAreaSize) / 2;
+        const scanAreaScreenY = (screenHeight - scanAreaSize) / 2;
+        
+        // Convert screen coordinates to video coordinates
+        const scanAreaX = scanAreaScreenX * scaleX + offsetX;
+        const scanAreaY = scanAreaScreenY * scaleY + offsetY;
+        const scanAreaWidth = scanAreaSize * scaleX;
+        const scanAreaHeight = scanAreaSize * scaleY;
+        
+        // Set canvas to scan area size
+        canvas.width = scanAreaSize;
+        canvas.height = scanAreaSize;
+        
+        // Draw only the scan area portion
+        ctx.drawImage(
+          video,
+          scanAreaX, scanAreaY, scanAreaWidth, scanAreaHeight,
+          0, 0, scanAreaSize, scanAreaSize
+        );
 
         canvas.toBlob((blob) => {
           if (blob) {
@@ -315,7 +342,7 @@ const ImageSearch: React.FC = () => {
         <div
           style={{
             position: 'absolute',
-            bottom: '220px',
+            bottom: '140px',
             left: '50%',
             transform: 'translateX(-50%)',
             textAlign: 'center',
@@ -328,21 +355,13 @@ const ImageSearch: React.FC = () => {
             zIndex: 3
           }}
         >
-          Press the camera icon<br />to start a search for this product
+          Press the camera icon to start a<br />search for this product
         </div>
       </div>
 
       {/* Bottom Button - Overlay on camera */}
       <div className="absolute bottom-0 left-0 right-0 px-4 pb-6" style={{ zIndex: 10, backgroundColor: 'transparent' }}>
         <button
-          onClick={() => {
-            stopCamera();
-            // Trigger file input for gallery
-            const fileInput = document.getElementById('image-upload') as HTMLInputElement;
-            if (fileInput) {
-              fileInput.click();
-            }
-          }}
           style={{
             width: 'auto',
             minWidth: '200px',
@@ -364,6 +383,10 @@ const ImageSearch: React.FC = () => {
           }}
         >
           <div
+            onClick={() => {
+              // Capture image from scan area when camera icon is clicked
+              captureImage();
+            }}
             style={{
               width: '40px',
               height: '40px',
@@ -372,7 +395,8 @@ const ImageSearch: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              flexShrink: 0
+              flexShrink: 0,
+              cursor: 'pointer'
             }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -380,7 +404,20 @@ const ImageSearch: React.FC = () => {
               <circle cx="12" cy="13" r="4"></circle>
             </svg>
           </div>
-          <span style={{ textDecoration: 'underline' }}>Or browse your gallery</span>
+          <span 
+            style={{ textDecoration: 'underline', cursor: 'pointer' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              stopCamera();
+              // Trigger file input for gallery
+              const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+              if (fileInput) {
+                fileInput.click();
+              }
+            }}
+          >
+            Or browse your gallery
+          </span>
         </button>
       </div>
     </div>
