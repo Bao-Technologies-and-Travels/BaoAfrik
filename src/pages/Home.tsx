@@ -88,7 +88,12 @@ const Home: React.FC = () => {
     type: 'success' | 'error';
   }>>([]);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [imageFormData, setImageFormData] = useState<FormData | null>(null);
+  const [showImageSearchModal, setShowImageSearchModal] = useState(false);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const totalPages = 48;
@@ -1686,6 +1691,21 @@ const Home: React.FC = () => {
     console.log('Place of Origin (Country Badge):', selectedPlaceOfOriginText);
     console.log('Seller Location:', location);
     console.log('Selected Country Filter:', selectedCountry);
+    console.log('Selected Image:', selectedImage ? 'Yes' : 'No');
+    
+    // If image is selected, prepare for API call (API-ready)
+    if (selectedImage && imageFormData) {
+      // TODO: API call for image-based search
+      // Example: await fetch('/api/search-by-image', { method: 'POST', body: imageFormData })
+      console.log('Image search - API ready:', {
+        image: selectedImage.name,
+        formData: imageFormData,
+        textQuery: searchQuery,
+        category: selectedCategoryText,
+        placeOfOrigin: selectedPlaceOfOriginText,
+        sellerLocation: location
+      });
+    }
     
     // Get all products
     let products = Object.values(allProducts).flat();
@@ -1698,6 +1718,13 @@ const Home: React.FC = () => {
         product.location.toLowerCase().includes(searchQuery.toLowerCase())
       );
       console.log('After product name/location filter:', products.length);
+    }
+    
+    // If image is selected, filter by similar products (mock implementation)
+    if (selectedImage) {
+      // In real implementation, this would use API results
+      // For now, we'll just show all products (API will handle similarity matching)
+      console.log('Image search active - showing all products (API will filter by similarity)');
     }
     
     // Apply category filter (Categories dropdown)
@@ -1775,9 +1802,105 @@ const Home: React.FC = () => {
 
   // Handle scan functionality - trigger file input
   const handleScan = () => {
-    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
+    if (isMobile) {
+      // Mobile: Open camera interface (camera will start via useEffect)
+      setShowImageSearchModal(true);
+    } else {
+      // Desktop: Open file explorer
+      const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.click();
+      }
+    }
+  };
+
+  // Start camera stream
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' } // Use back camera
+      });
+      setCameraStream(stream);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      // Fallback to file input if camera access fails
+      const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.click();
+      }
+    }
+  };
+
+  // Stop camera stream
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  // Capture image from camera
+  const captureImage = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      
+      if (ctx) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+            handleImageFromFile(file);
+            stopCamera();
+            setShowImageSearchModal(false);
+          }
+        }, 'image/jpeg', 0.9);
+      }
+    }
+  };
+
+  // Handle image from file or camera
+  const handleImageFromFile = (file: File) => {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('Image size must be less than 10MB');
+      return;
+    }
+
+    // Set selected image
+    setSelectedImage(file);
+
+    // Create preview URL
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImageUrl(imageUrl);
+
+    // Create FormData for future API call
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('timestamp', new Date().toISOString());
+    
+    setImageFormData(formData);
+    
+    // Close mobile camera modal if open
+    if (showImageSearchModal) {
+      setShowImageSearchModal(false);
     }
   };
 
@@ -1785,29 +1908,7 @@ const Home: React.FC = () => {
   const handleImageSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
-        return;
-      }
-
-      // Validate file size (max 10MB)
-      const maxSize = 10 * 1024 * 1024; // 10MB
-      if (file.size > maxSize) {
-        alert('Image size must be less than 10MB');
-        return;
-      }
-
-      // Set selected image
-      setSelectedImage(file);
-
-      // Create FormData for future API call
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('timestamp', new Date().toISOString());
-      
-      setImageFormData(formData);
-      
+      handleImageFromFile(file);
       console.log('Image selected:', {
         name: file.name,
         size: file.size,
@@ -1815,6 +1916,8 @@ const Home: React.FC = () => {
         formDataReady: true
       });
     }
+    // Reset input value to allow selecting the same file again
+    event.target.value = '';
   };
 
   // Handle share functionality
@@ -1952,6 +2055,55 @@ const Home: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isFilterDropdownOpen]);
 
+  // Cleanup image URL on unmount or when image changes
+  useEffect(() => {
+    return () => {
+      if (selectedImageUrl) {
+        URL.revokeObjectURL(selectedImageUrl);
+      }
+    };
+  }, [selectedImageUrl]);
+
+  // Start camera when modal opens, cleanup when closes
+  useEffect(() => {
+    if (showImageSearchModal && isMobile) {
+      const initializeCamera = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' }
+          });
+          setCameraStream(stream);
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+          if (fileInput) {
+            fileInput.click();
+          }
+        }
+      };
+      initializeCamera();
+    } else if (!showImageSearchModal && cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    }
+    return () => {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        setCameraStream(null);
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showImageSearchModal, isMobile]);
+
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Header - Only visible on mobile */}
@@ -1961,7 +2113,6 @@ const Home: React.FC = () => {
         id="image-upload"
         type="file"
         accept="image/*"
-        capture="environment"
         onChange={handleImageSelection}
         style={{ display: 'none' }}
       />
@@ -1978,7 +2129,7 @@ const Home: React.FC = () => {
               flexShrink: 0,
               borderRadius: '30px',
               border: '1px solid #E4E4E4',
-              background: focusedSearchSection ? '#F4F4F4' : '#FFF',
+              background: selectedImage ? '#F1F1F1' : (focusedSearchSection ? '#F4F4F4' : '#FFF'),
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
               fontFamily: 'Poppins, sans-serif',
               transition: 'background 0.2s ease'
@@ -1986,7 +2137,7 @@ const Home: React.FC = () => {
           >
             {/* Product Section */}
             <div 
-              className="flex flex-col justify-center px-4 flex-1 relative" 
+              className="flex items-center px-4 flex-1 relative" 
               style={{ 
                 background: focusedSearchSection === 'product' ? '#FFF' : 'transparent',
                 borderTopLeftRadius: '30px',
@@ -1999,41 +2150,45 @@ const Home: React.FC = () => {
                 height: '58px'
               }}
             >
-              {/* Divider */}
-              {!(focusedSearchSection === 'product' || focusedSearchSection === 'categories') && (
-                <div 
-                  style={{ 
-                    position: 'absolute',
-                    right: 0,
-                    top: '12px',
-                    bottom: '12px',
-                    width: '1px',
-                    backgroundColor: '#E4E4E4'
+              {/* Image Thumbnail */}
+              {selectedImageUrl && (
+                <img
+                  src={selectedImageUrl}
+                  alt="Selected product"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '8px',
+                    objectFit: 'cover',
+                    marginRight: '12px',
+                    flexShrink: 0
                   }}
                 />
               )}
-              <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
-              <input
-                type="text"
-                placeholder="Search a product"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={handleSearchKeyPress}
-                onFocus={() => {
-                  setFocusedSearchSection('product');
-                  if (searchHistory.length > 0) {
-                    setShowSearchHistory(true);
-                  }
-                }}
-                onBlur={() => {
-                  setTimeout(() => {
-                    setFocusedSearchSection(null);
-                    setShowSearchHistory(false);
-                  }, 200);
-                }}
-                className="border-0 p-0 focus:outline-none focus:ring-0 product-search-input"
-                style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
-              />
+              <div className="flex flex-col justify-center flex-1">
+                <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
+                <input
+                  type="text"
+                  placeholder={selectedImage ? "Wanna be more specific ?" : "Search a product"}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  onFocus={() => {
+                    setFocusedSearchSection('product');
+                    if (searchHistory.length > 0) {
+                      setShowSearchHistory(true);
+                    }
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => {
+                      setFocusedSearchSection(null);
+                      setShowSearchHistory(false);
+                    }, 200);
+                  }}
+                  className="border-0 p-0 focus:outline-none focus:ring-0 product-search-input"
+                  style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
+                />
+              </div>
               <style>
                 {`
                   .product-search-input::placeholder {
@@ -2184,18 +2339,50 @@ const Home: React.FC = () => {
             />
           </div>
 
-          {/* Scan Icon */}
-          <button 
-            onClick={handleScan}
-            className="flex items-center justify-center px-3 hover:opacity-70 transition-opacity"
-            title="Scan QR code"
-          >
-            <img 
-              src={scanIcon} 
-              alt="Scan QR code" 
-              style={{ width: '20px', height: '20px' }}
-            />
-          </button>
+          {/* Scan Icon or Clear Image Button */}
+          {selectedImage ? (
+            <button 
+              onClick={() => {
+                setSelectedImage(null);
+                setSelectedImageUrl(null);
+                setImageFormData(null);
+                if (selectedImageUrl) {
+                  URL.revokeObjectURL(selectedImageUrl);
+                }
+              }}
+              className="flex items-center justify-center px-3 hover:opacity-70 transition-opacity"
+              title="Clear image"
+            >
+              <div
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  backgroundColor: '#8A8A8A',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </div>
+            </button>
+          ) : (
+            <button 
+              onClick={handleScan}
+              className="flex items-center justify-center px-3 hover:opacity-70 transition-opacity"
+              title="Scan QR code"
+            >
+              <img 
+                src={scanIcon} 
+                alt="Scan QR code" 
+                style={{ width: '20px', height: '20px' }}
+              />
+            </button>
+          )}
               
               {/* Search Button */}
               <button 
@@ -2470,58 +2657,114 @@ const Home: React.FC = () => {
             <div className="flex items-center gap-2">
               {/* Search Input */}
               <div className="flex-1 relative">
-                <input
-                  type="text"
-                  placeholder="What are you looking for today ?"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleSearchKeyPress}
-                  onFocus={() => {
-                    if (isMobile) {
-                      setShowMobileSearchFlow(true);
-                      setMobileSearchQuery(searchQuery);
-                    } else {
-                      setFocusedSearchSection('mobile-search');
-                      if (searchHistory.length > 0) {
-                        setShowSearchHistory(true);
-                      }
-                    }
-                  }}
-                  onBlur={() => {
-                    setTimeout(() => {
-                      setFocusedSearchSection(null);
-                      setShowSearchHistory(false);
-                    }, 200);
-                  }}
-                  className="w-full px-4 py-3 pr-12 focus:outline-none text-sm"
+                <div 
+                  className="flex items-center w-full px-4 py-3 pr-12"
                   style={{
                     borderRadius: '30px',
                     border: '1px solid #E9E9E9',
-                    backgroundColor: '#FFF',
+                    backgroundColor: selectedImage ? '#F1F1F1' : '#FFF',
                     fontFamily: 'Poppins, sans-serif',
-                    color: '#212121',
-                    caretColor: '#64B5F6'
+                    minHeight: '48px'
                   }}
-                />
-                <style>{`
-                  .md\\:hidden input::placeholder {
-                    color: #D9D9D9;
-                    font-size: 12px;
-                  }
-                `}</style>
-                {/* Scan Icon */}
-                <button 
-                  onClick={handleScan}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
-                  title="Scan image to search"
                 >
-                  <img 
-                    src={scanIcon} 
-                    alt="Scan" 
-                    className="w-5 h-5"
-                    style={{ opacity: 0.6 }}
+                  {/* Image Thumbnail */}
+                  {selectedImageUrl && (
+                    <img
+                      src={selectedImageUrl}
+                      alt="Selected product"
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        objectFit: 'cover',
+                        marginRight: '12px',
+                        flexShrink: 0
+                      }}
+                    />
+                  )}
+                  <input
+                    type="text"
+                    placeholder={selectedImage ? "Wanna be more specific ?" : "What are you looking for today ?"}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={handleSearchKeyPress}
+                    onFocus={() => {
+                      if (isMobile) {
+                        setShowMobileSearchFlow(true);
+                        setMobileSearchQuery(searchQuery);
+                      } else {
+                        setFocusedSearchSection('mobile-search');
+                        if (searchHistory.length > 0) {
+                          setShowSearchHistory(true);
+                        }
+                      }
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => {
+                        setFocusedSearchSection(null);
+                        setShowSearchHistory(false);
+                      }, 200);
+                    }}
+                    className="flex-1 focus:outline-none text-sm"
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      fontFamily: 'Poppins, sans-serif',
+                      color: '#212121',
+                      caretColor: '#64B5F6'
+                    }}
                   />
-                </button>
+                  <style>{`
+                    .md\\:hidden input::placeholder {
+                      color: #D9D9D9;
+                      font-size: 12px;
+                    }
+                  `}</style>
+                  {selectedImage ? (
+                    <button 
+                      onClick={() => {
+                        setSelectedImage(null);
+                        setSelectedImageUrl(null);
+                        setImageFormData(null);
+                        if (selectedImageUrl) {
+                          URL.revokeObjectURL(selectedImageUrl);
+                        }
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                      title="Clear image"
+                    >
+                      <div
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '50%',
+                          backgroundColor: '#8A8A8A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </div>
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={handleScan}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                      title="Scan image to search"
+                    >
+                      <img 
+                        src={scanIcon} 
+                        alt="Scan" 
+                        className="w-5 h-5"
+                        style={{ opacity: 0.6 }}
+                      />
+                    </button>
+                  )}
+                </div>
               </div>
               
               {/* Filter Button */}
@@ -5019,6 +5262,174 @@ const Home: React.FC = () => {
         </div>
       )}
 
+      {/* Mobile Image Search Camera Interface */}
+      {showImageSearchModal && isMobile && (
+        <div className="fixed inset-0 bg-black z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          {/* Hidden canvas for image capture */}
+          <canvas ref={canvasRef} style={{ display: 'none' }} />
+          
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 pt-4 pb-3">
+            <h1 style={{ fontSize: '14px', fontWeight: 600, color: '#FFF', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Search by image
+            </h1>
+            <div className="flex items-center gap-3">
+              {/* Flash Icon */}
+              <button
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+              </button>
+              {/* Close Icon */}
+              <button
+                onClick={() => {
+                  stopCamera();
+                  setShowImageSearchModal(false);
+                }}
+                style={{ color: '#FFF', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Camera View Area */}
+          <div className="flex-1 relative" style={{ backgroundColor: '#000', overflow: 'hidden' }}>
+            {/* Video Element */}
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
+            
+            {/* Scan Area Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div
+                style={{
+                  width: '280px',
+                  height: '280px',
+                  border: '2px solid #FFF',
+                  borderRadius: '12px',
+                  position: 'relative',
+                  boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
+                }}
+              />
+            </div>
+            
+            {/* Capture Button */}
+            <button
+              onClick={captureImage}
+              style={{
+                position: 'absolute',
+                bottom: '140px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                backgroundColor: '#FFF',
+                border: '4px solid #000',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10
+              }}
+            >
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: '#FFF',
+                  border: '2px solid #000'
+                }}
+              />
+            </button>
+            
+            {/* Instruction Text */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '80px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                textAlign: 'center',
+                color: '#FFF',
+                fontSize: '11px',
+                fontFamily: 'Poppins, sans-serif',
+                padding: '0 20px',
+                lineHeight: '1.3',
+                maxWidth: '240px'
+              }}
+            >
+              Press the camera<br />icon to start a search for this product
+            </div>
+          </div>
+
+          {/* Bottom Button */}
+          <div className="px-4 pb-6">
+            <button
+              onClick={() => {
+                stopCamera();
+                // Trigger file input for gallery
+                const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+                if (fileInput) {
+                  fileInput.click();
+                }
+              }}
+              style={{
+                width: '100%',
+                height: '48px',
+                borderRadius: '50px',
+                backgroundColor: '#FFF',
+                border: 'none',
+                color: '#000',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 400,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                padding: '0 20px'
+              }}
+            >
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: '#FFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </div>
+              <span style={{ textDecoration: 'underline' }}>Or browse your gallery</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Confirmation Modal */}
       {showConfirmationModal && (
         isMobile ? (
@@ -5488,75 +5899,133 @@ const Home: React.FC = () => {
           <div className="px-4 pb-3 relative">
             <div className="flex items-center gap-2">
               <div className="flex-1 relative">
-                <input
-                  type="text"
-                  placeholder="What are you looking for today ?"
-                  value={mobileSearchQuery}
-                  onChange={(e) => {
-                    setMobileSearchQuery(e.target.value);
-                    if (searchHistory.length > 0) {
-                      setShowMobileSearchHistory(true);
-                    } else {
-                      setShowMobileSearchHistory(false);
-                    }
-                  }}
-                  onFocus={() => {
-                    setIsMobileSearchFocused(true);
-                    if (searchHistory.length > 0) {
-                      setShowMobileSearchHistory(true);
-                    }
-                  }}
-                  onBlur={() => {
-                    setIsMobileSearchFocused(false);
-                    setTimeout(() => {
-                      setShowMobileSearchHistory(false);
-                    }, 200);
-                  }}
-                  className="w-full px-4 py-3 pr-12 focus:outline-none"
+                <div 
+                  className="flex items-center w-full px-4 py-3 pr-12"
                   style={{
                     borderRadius: '30px',
                     border: `1px solid ${isMobileSearchFocused ? '#B8DDFB' : '#E9E9E9'}`,
-                    backgroundColor: '#FFF',
+                    backgroundColor: selectedImage ? '#F1F1F1' : '#FFF',
                     fontFamily: 'Poppins, sans-serif',
-                    color: '#212121',
-                    caretColor: '#64B5F6',
-                    fontSize: '11px'
+                    minHeight: '44px'
                   }}
-                />
-                <style>
-                  {`
-                    input[placeholder="What are you looking for today ?"]::placeholder {
-                      font-size: 11px;
-                      color: #D9D9D9;
-                    }
-                  `}
-                </style>
-                {mobileSearchQuery && (
-                  <button
-                    onClick={() => {
-                      setMobileSearchQuery('');
-                      setMobileSearchSubmitted(false);
-                      setShowMobileSearchHistory(false);
-                    }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2"
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
-                  >
-                    <img src={SDicon} alt="Clear" className="w-4 h-4" />
-                  </button>
-                )}
-                <button 
-                  onClick={handleScan}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
-                  style={{ display: mobileSearchQuery ? 'none' : 'block' }}
-                  title="Scan image to search"
                 >
-                  <img 
-                    src={scanIcon} 
-                    alt="Scan" 
-                    className="w-5 h-5"
-                    style={{ opacity: 0.6 }}
+                  {/* Image Thumbnail */}
+                  {selectedImageUrl && (
+                    <img
+                      src={selectedImageUrl}
+                      alt="Selected product"
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        objectFit: 'cover',
+                        marginRight: '12px',
+                        flexShrink: 0
+                      }}
+                    />
+                  )}
+                  <input
+                    type="text"
+                    placeholder={selectedImage ? "Wanna be more specific ?" : "What are you looking for today ?"}
+                    value={mobileSearchQuery}
+                    onChange={(e) => {
+                      setMobileSearchQuery(e.target.value);
+                      if (searchHistory.length > 0) {
+                        setShowMobileSearchHistory(true);
+                      } else {
+                        setShowMobileSearchHistory(false);
+                      }
+                    }}
+                    onFocus={() => {
+                      setIsMobileSearchFocused(true);
+                      if (searchHistory.length > 0) {
+                        setShowMobileSearchHistory(true);
+                      }
+                    }}
+                    onBlur={() => {
+                      setIsMobileSearchFocused(false);
+                      setTimeout(() => {
+                        setShowMobileSearchHistory(false);
+                      }, 200);
+                    }}
+                    className="flex-1 focus:outline-none"
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      fontFamily: 'Poppins, sans-serif',
+                      color: '#212121',
+                      caretColor: '#64B5F6',
+                      fontSize: '11px'
+                    }}
                   />
-                </button>
+                  <style>
+                    {`
+                      input[placeholder="What are you looking for today ?"]::placeholder,
+                      input[placeholder="Wanna be more specific ?"]::placeholder {
+                        font-size: 11px;
+                        color: #D9D9D9;
+                      }
+                    `}
+                  </style>
+                  {mobileSearchQuery && !selectedImage && (
+                    <button
+                      onClick={() => {
+                        setMobileSearchQuery('');
+                        setMobileSearchSubmitted(false);
+                        setShowMobileSearchHistory(false);
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2"
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+                    >
+                      <img src={SDicon} alt="Clear" className="w-4 h-4" />
+                    </button>
+                  )}
+                  {selectedImage ? (
+                    <button 
+                      onClick={() => {
+                        setSelectedImage(null);
+                        setSelectedImageUrl(null);
+                        setImageFormData(null);
+                        if (selectedImageUrl) {
+                          URL.revokeObjectURL(selectedImageUrl);
+                        }
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                      title="Clear image"
+                    >
+                      <div
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '50%',
+                          backgroundColor: '#8A8A8A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </div>
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={handleScan}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                      style={{ display: mobileSearchQuery ? 'none' : 'block' }}
+                      title="Scan image to search"
+                    >
+                      <img 
+                        src={scanIcon} 
+                        alt="Scan" 
+                        className="w-5 h-5"
+                        style={{ opacity: 0.6 }}
+                      />
+                    </button>
+                  )}
+                </div>
                 
               </div>
               <button
@@ -6067,7 +6536,7 @@ const Home: React.FC = () => {
 
           {/* Search Results or Empty State */}
           <div className="flex-1 overflow-y-auto px-4 pb-24">
-            {mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && (
+            {mobileSearchSubmitted && (mobileSearchQuery.trim() !== '' || selectedImage) && (
               <>
                 {(() => {
                   // Get all products
@@ -6099,9 +6568,14 @@ const Home: React.FC = () => {
                   const filteredProducts = products.filter(product => {
                     const query = mobileSearchQuery.toLowerCase().trim();
                     const productCategory = getProductCategory(product.id);
-                    const matchesSearch = product.name.toLowerCase().includes(query) ||
+                    
+                    // If image is selected, show all products (API will handle similarity matching)
+                    // Otherwise, filter by text query
+                    const matchesSearch = selectedImage ? true : (
+                      product.name.toLowerCase().includes(query) ||
                       productCategory.toLowerCase().includes(query) ||
-                      product.location.toLowerCase().includes(query);
+                      product.location.toLowerCase().includes(query)
+                    );
                     
                     const matchesCategory = !mobileFilterCategory || productCategory === mobileFilterCategory;
                     const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.id).name === mobileFilterProductOrigin;
@@ -6132,7 +6606,10 @@ const Home: React.FC = () => {
                             margin: '0 auto 12px',
                             lineHeight: '1.5'
                           }}>
-                            Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
+                            {selectedImage 
+                              ? "We couldn't find similar products. Don't worry, just ask for it and we will bring it for you."
+                              : "Can't find what you're looking for? don't worry, just ask for it and we will bring it for you."
+                            }
                           </p>
                           <button
                             type="button"
@@ -6309,7 +6786,10 @@ const Home: React.FC = () => {
                     <>
                       <div className="pb-3">
                         <h2 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', color: '#212121', fontWeight: 500 }}>
-                          Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'})</span>
+                          {selectedImage 
+                            ? <>Search results for similar products <span style={{ fontWeight: 400 }}>({filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'})</span></>
+                            : <>Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'})</span></>
+                          }
                         </h2>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
@@ -6446,13 +6926,13 @@ const Home: React.FC = () => {
           </div>
 
           {/* Bottom Search Button */}
-          {(!mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchQuery.trim() === '')) && (
+          {(!mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchQuery.trim() === '' && !selectedImage)) && (
             <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 bg-white" style={{ borderTop: '1px solid #E9E9E9' }}>
               <button
                 type="button"
                 className="w-full py-3 rounded-xl"
                 style={{
-                  backgroundColor: mobileSearchQuery.trim() ? '#F9A825' : '#D9D9D9',
+                  backgroundColor: (mobileSearchQuery.trim() || selectedImage) ? '#F9A825' : '#D9D9D9',
                   color: '#FFFFFF',
                   border: 'none',
                   fontSize: '14px',
@@ -6461,8 +6941,12 @@ const Home: React.FC = () => {
                   cursor: 'pointer'
                 }}
                 onClick={() => {
-                  if (mobileSearchQuery.trim()) {
+                  if (mobileSearchQuery.trim() || selectedImage) {
                     setMobileSearchSubmitted(true);
+                    // Trigger search with image if available
+                    if (selectedImage) {
+                      handleSearch();
+                    }
                   }
                 }}
               >
