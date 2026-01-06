@@ -2205,21 +2205,14 @@ const MyListings: React.FC = () => {
                 {/* Mobile Plus Modal - Now triggered by More Options button - Hidden only when tertiary sort modal is open */}
                 {isMobilePlusModalOpen && !mobileSortTertiaryOpen && (
                   <div
-                    ref={(el) => {
-                      // Ensure the modal is part of the click-outside detection
-                      if (mobileMoreOptionsModalRef.current && el) {
-                        // The ref is already set on the parent, so this is just for structure
-                      }
-                    }}
-                    className="absolute bottom-0 right-0 z-50"
+                    className="absolute top-full right-0 z-50 mt-2"
                     style={{
                       backgroundColor: '#FFFFFF',
                       borderRadius: '12px',
                       border: '1px solid #E9E9E9',
                       boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                       padding: '8px',
-                      minWidth: '160px',
-                      transform: 'translateY(68px)'
+                      minWidth: '160px'
                     }}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -2864,8 +2857,8 @@ const MyListings: React.FC = () => {
             )}
           </div>
 
-        {/* Mobile All Listings Bar - Only visible on mobile when listings exist */}
-        {isMobile && !shouldShowEmptyState && !isSearchNoResultsState && (
+        {/* Mobile All Listings Bar - Visible on mobile when listings exist OR when filters are active (so users can clear them) */}
+        {isMobile && !isSearchNoResultsState && (!shouldShowEmptyState || selectedSort || statusFilter !== 'All Status') && (
           <div className="lg:hidden px-4 mt-0 mb-4">
             <div className="flex items-center justify-between">
               {/* All listings text or sort/status filter badge */}
@@ -2976,8 +2969,8 @@ const MyListings: React.FC = () => {
           </div>
         )}
 
-        {/* Filters and Action Buttons Bar - Desktop only */}
-        {!isMobile && (!shouldShowEmptyState && !isSearchNoResultsState) && (
+        {/* Filters and Action Buttons Bar - Desktop only - Visible when listings exist OR when filters are active (so users can clear them) */}
+        {!isMobile && !isSearchNoResultsState && (!shouldShowEmptyState || selectedSort || statusFilter !== 'All Status') && (
             <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-6 mb-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 w-full">
                 {/* Left Side - Filters */}
