@@ -208,6 +208,34 @@ const Requests: React.FC = () => {
     return format(new Date(dateString), 'MMM dd, yyyy');
   };
 
+  // Format price range for requests (matching the modal logic)
+  const formatPriceRange = (minPrice: number | null | undefined, maxPrice: number | null | undefined, currency: string | null | undefined): string => {
+    const min = minPrice ?? 0;
+    const max = maxPrice ?? 1000;
+    const curr = (currency || 'USD').toUpperCase();
+
+    // Currency symbol mapping
+    const currencySymbols: Record<string, string> = {
+      'USD': '$',
+      'GBP': '£',
+      'CAD': 'C$',
+      'EUR': '€',
+    };
+
+    const symbol = currencySymbols[curr] || curr;
+
+    // Handle different range types
+    if (min === 0 && max >= 1000000) {
+      return `Any price ${curr}`;
+    } else if (min === 0) {
+      return `Less than ${symbol}${max}`;
+    } else if (max >= 1000000) {
+      return `More than ${symbol}${min}`;
+    } else {
+      return `${symbol}${min} - ${symbol}${max} ${curr}`;
+    }
+  };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -561,7 +589,7 @@ const Requests: React.FC = () => {
                   className="w-3 h-3"
                   style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                 />
-                <span style={{ fontSize: '12px', color: '#64B5F6' }}>{req ? `${req.minPrice ?? ''} - ${req.maxPrice ?? ''} ${req.currency ?? ''}` : ''}</span>
+                <span style={{ fontSize: '12px', color: '#64B5F6' }}>{req ? formatPriceRange(req.minPrice, req.maxPrice, req.currency) : ''}</span>
               </div>
 
               {/* Country Tag */}
@@ -576,7 +604,7 @@ const Requests: React.FC = () => {
                       <img
                         src={country.flag}
                         alt={country.name}
-                        className="w-4 h-3 object-cover rounded-sm"
+                        className="w-4 h-4 object-cover rounded-full"
                       />
                       <span style={{ fontSize: '12px', color: '#64B5F6' }}>{country.name}</span>
                     </>
@@ -635,7 +663,7 @@ const Requests: React.FC = () => {
                 filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
               }}
             />
-            <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>London, United Kingdom</span>
+            <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>{req ? req.sellerLocation || 'Location not specified' : ''}</span>
           </div>
 
           {/* Second Row - Price and Country */}
@@ -654,7 +682,7 @@ const Requests: React.FC = () => {
                   filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
                 }}
               />
-              <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>50 ~ 100 USD</span>
+              <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>{req ? formatPriceRange(req.minPrice, req.maxPrice, req.currency) : ''}</span>
             </div>
 
             {/* Country Tag */}
@@ -662,17 +690,24 @@ const Requests: React.FC = () => {
               className="flex items-center gap-1.5 px-3 py-1.5"
               style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
             >
-              <img
-                src={req && req.origin ? `https://flagcdn.com/w20/${req.origin.slice(0, 2).toLowerCase()}.png` : ''}
-                alt={req && req.origin ? req.origin : ''}
-                style={{
-                  width: '11px',
-                  height: '8px',
-                  objectFit: 'cover',
-                  borderRadius: '2px'
-                }}
-              />
-              <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>South Africa</span>
+              {(() => {
+                const country = getProductCountry(req?.origin);
+                return (
+                  <>
+                    <img
+                      src={country.flag}
+                      alt={country.name}
+                      style={{
+                        width: '11px',
+                        height: '8px',
+                        objectFit: 'cover',
+                        borderRadius: '50%'
+                      }}
+                    />
+                    <span style={{ fontSize: '8px', color: '#64B5F6', fontWeight: '300' }}>{country.name}</span>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>

@@ -135,7 +135,7 @@ const Header: React.FC<HeaderProps> = ({
             if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
             return d.toLocaleDateString();
           };
-          
+
           // Parse meta if it's a string
           let meta = n.meta;
           if (typeof meta === 'string') {
@@ -145,12 +145,12 @@ const Header: React.FC<HeaderProps> = ({
               meta = n.meta; // Keep original if parsing fails
             }
           }
-          
-          return { 
-            ...n, 
+
+          return {
+            ...n,
             meta,
-            day: getDayLabel(created), 
-            time: n.time || formatTime(created) 
+            day: getDayLabel(created),
+            time: n.time || formatTime(created)
           };
         });
         setNotifications(items);
@@ -244,15 +244,15 @@ const Header: React.FC<HeaderProps> = ({
         lastName: payload.senderName?.split(' ').slice(1).join(' ') || '',
         profileImage: payload.senderImage || payload.senderAvatar
       } : null);
-      
+
       const normalized = {
         id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
         day: getDayLabel(created),
         time: payload.time || formatTime(created),
         title: payload.senderName || payload.title || 'Someone',
         body: payload.preview || payload.body || '',
-        meta: { 
-          conversationId: payload.conversationId, 
+        meta: {
+          conversationId: payload.conversationId,
           messageId: payload.messageId,
           senderImage: payload.senderImage || payload.senderAvatar
         },
@@ -874,38 +874,38 @@ const Header: React.FC<HeaderProps> = ({
                                           {(() => {
                                             const avatarUrl = getNotificationAvatar(notif);
                                             const isMessage = notif.type === 'message' || notif.type === 'NEW_MESSAGE';
-                                            
+
                                             // For messages, always try to show sender's image
                                             if (isMessage && avatarUrl) {
                                               return (
-                                                <img 
-                                                  src={avatarUrl} 
-                                                  alt="Avatar" 
+                                                <img
+                                                  src={avatarUrl}
+                                                  alt="Avatar"
                                                   className="w-9 h-9 rounded-full object-cover"
-                                                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = avatar; }} 
+                                                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = avatar; }}
                                                 />
                                               );
                                             }
-                                            
+
                                             // For product notifications, show seller image if available
                                             if (notif.type === 'product' && avatarUrl) {
                                               return (
-                                                <img 
-                                                  src={avatarUrl} 
-                                                  alt="Seller" 
+                                                <img
+                                                  src={avatarUrl}
+                                                  alt="Seller"
                                                   className="w-9 h-9 rounded-full object-cover"
-                                                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = logoIcon; }} 
+                                                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = logoIcon; }}
                                                 />
                                               );
                                             }
-                                            
+
                                             // For all other cases, show logo
                                             return (
-                                              <img 
-                                                src={logoIcon} 
-                                                alt="Logo" 
-                                                className="w-7 h-7" 
-                                                style={{ filter: 'brightness(0) invert(1)' }} 
+                                              <img
+                                                src={logoIcon}
+                                                alt="Logo"
+                                                className="w-7 h-7"
+                                                style={{ filter: 'brightness(0) invert(1)' }}
                                               />
                                             );
                                           })()}
@@ -1194,7 +1194,7 @@ const Header: React.FC<HeaderProps> = ({
 
                           {/* My requests */}
                           <Link
-                            to="/requests"
+                            to="/my-requests"
                             className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                             onClick={() => setIsDesktopMenuOpen(false)}
                           >
@@ -1265,7 +1265,7 @@ const Header: React.FC<HeaderProps> = ({
                           </Link>
 
                           {/* Settings */}
-                          <Link
+                          {/* <Link
                             to="/settings"
                             className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                             onClick={() => setIsDesktopMenuOpen(false)}
@@ -1289,7 +1289,31 @@ const Header: React.FC<HeaderProps> = ({
                                 </div>
                               </div>
                             </div>
-                          </Link>
+                          </Link> */}
+                          <div
+                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                            onClick={() => setIsDesktopMenuOpen(false)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={settingIcon}
+                                alt="Setting"
+                                className="w-4 h-4"
+                                style={{ color: "#64B5F6" }}
+                              />
+                              <div>
+                                <div
+                                  className="font-medium text-sm"
+                                  style={{ color: "#6A6A6A" }}
+                                >
+                                  Settings
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Set your account preferences
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
 
                         {/* Logout Button */}
@@ -1579,9 +1603,9 @@ const Header: React.FC<HeaderProps> = ({
                             <img
                               src="https://flagcdn.com/w20/gb.png"
                               alt="UK flag"
-                              className="w-5 h-4 mr-3 object-cover rounded-sm"
+                              className="w-5 h-5 mr-3 object-cover rounded-full"
                               width="20"
-                              height="16"
+                              height="20"
                             />
                             English
                           </button>
@@ -1605,9 +1629,9 @@ const Header: React.FC<HeaderProps> = ({
                             <img
                               src="https://flagcdn.com/w20/de.png"
                               alt="Germany flag"
-                              className="w-5 h-4 mr-3 object-cover rounded-sm"
+                              className="w-5 h-5 mr-3 object-cover rounded-full"
                               width="20"
-                              height="16"
+                              height="20"
                             />
                             Germany
                           </button>
@@ -1622,9 +1646,9 @@ const Header: React.FC<HeaderProps> = ({
                             <img
                               src="https://flagcdn.com/w20/es.png"
                               alt="Spain flag"
-                              className="w-5 h-4 mr-3 object-cover rounded-sm"
+                              className="w-5 h-5 mr-3 object-cover rounded-full"
                               width="20"
-                              height="16"
+                              height="20"
                             />
                             Spanish
                           </button>
@@ -1731,7 +1755,7 @@ const Header: React.FC<HeaderProps> = ({
                             }}
                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center"
                           >
-                            <img src="https://flagcdn.com/w20/gb.png" alt="UK flag" className="w-5 h-4 object-cover rounded-sm mr-3" />
+                            <img src="https://flagcdn.com/w20/gb.png" alt="UK flag" className="w-5 h-5 object-cover rounded-full mr-3" />
                             English
                           </button>
                           <button
@@ -1741,7 +1765,7 @@ const Header: React.FC<HeaderProps> = ({
                             }}
                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center"
                           >
-                            <img src="https://flagcdn.com/w20/fr.png" alt="France flag" className="w-5 h-4 object-cover rounded-sm mr-3" />
+                            <img src="https://flagcdn.com/w20/fr.png" alt="France flag" className="w-5 h-5 object-cover rounded-full mr-3" />
                             France
                           </button>
                           <button
@@ -1751,7 +1775,7 @@ const Header: React.FC<HeaderProps> = ({
                             }}
                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center"
                           >
-                            <img src="https://flagcdn.com/w20/de.png" alt="Germany flag" className="w-5 h-4 object-cover rounded-sm mr-3" />
+                            <img src="https://flagcdn.com/w20/de.png" alt="Germany flag" className="w-5 h-5 object-cover rounded-full mr-3" />
                             Germany
                           </button>
                           <button
@@ -1761,7 +1785,7 @@ const Header: React.FC<HeaderProps> = ({
                             }}
                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center"
                           >
-                            <img src="https://flagcdn.com/w20/es.png" alt="Spain flag" className="w-5 h-4 object-cover rounded-sm mr-3" />
+                            <img src="https://flagcdn.com/w20/es.png" alt="Spain flag" className="w-5 h-5 object-cover rounded-full mr-3" />
                             Spanish
                           </button>
                         </div>
@@ -1883,7 +1907,7 @@ const Header: React.FC<HeaderProps> = ({
 
                       {/* My requests */}
                       <Link
-                        to="/requests"
+                        to="/my-requests"
                         className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
@@ -1924,7 +1948,7 @@ const Header: React.FC<HeaderProps> = ({
                       </Link>
 
                       {/* Settings */}
-                      <Link
+                      {/* <Link
                         to="/settings"
                         className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsMobileMenuOpen(false)}
@@ -1936,7 +1960,19 @@ const Header: React.FC<HeaderProps> = ({
                             <div className="text-xs text-gray-500">Set your account preferences</div>
                           </div>
                         </div>
-                      </Link>
+                      </Link> */}
+                      <div
+                        className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <img src={settingIcon} alt="Setting" className="w-5 h-5" style={{ color: '#64B5F6' }} />
+                          <div>
+                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Settings</div>
+                            <div className="text-xs text-gray-500">Set your account preferences</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Logout Button */}

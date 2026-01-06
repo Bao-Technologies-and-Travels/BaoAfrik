@@ -30,15 +30,6 @@ import {
 import { sendVerificationEmail, sendPasswordResetEmail } from '@/utils/emailService';
 import logger from '@/config/logger';
 
-// const prisma = new PrismaClient({
-//   datasources: {
-//     db: {
-//       url: process.env.DATABASE_URL,
-//     },
-//   },
-// } as any);
-
-
 interface VerifyResetCodeRequest {
   email: string;
   code: string;

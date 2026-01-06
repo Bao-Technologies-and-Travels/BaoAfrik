@@ -766,6 +766,8 @@ export class WebSocketService {
         // Broadcast reaction to all participants in the conversation
         this.io.to(`conversation:${message.conversationId}`).emit('reaction_added', {
           messageId,
+          conversationId: message.conversationId,
+          userId: result.user.id,
           reaction: result.reaction,
           user: {
             id: result.user.id,
@@ -806,6 +808,7 @@ export class WebSocketService {
         // Broadcast reaction removal to all participants
         this.io.to(`conversation:${message.conversationId}`).emit('reaction_removed', {
           messageId,
+          conversationId: message.conversationId,
           userId
         });
       }
@@ -834,21 +837,7 @@ export class WebSocketService {
         label
       });
 
-      // Get conversation ID from message
-      const message = await prisma.message.findUnique({
-        where: { id: messageId },
-        select: { conversationId: true }
-      });
-
-      if (message?.conversationId) {
-        // Broadcast metadata update to all participants
-        this.io.to(`conversation:${message.conversationId}`).emit('message_metadata_updated', {
-          messageId,
-          userId,
-          metadata
-        });
-      }
-
+      // Metadata updates are user-specific, only notify the user who made the change
       socket.emit('metadata_updated_success', { messageId, metadata });
     } catch (error: any) {
       console.error('Error updating message metadata:', error);
@@ -873,13 +862,7 @@ export class WebSocketService {
         label
       });
 
-      // Broadcast metadata update to all participants
-      this.io.to(`conversation:${conversationId}`).emit('conversation_metadata_updated', {
-        conversationId,
-        userId,
-        metadata
-      });
-
+      // Metadata updates are user-specific, only notify the user who made the change
       socket.emit('conversation_metadata_updated_success', { conversationId, metadata });
     } catch (error: any) {
       console.error('Error updating conversation metadata:', error);
@@ -914,14 +897,7 @@ export class WebSocketService {
 
       await this.chatService.deleteConversation(conversationId, userId);
 
-      // Notify all participants
-      const participantIds = conversation.participants.map(p => p.userId);
-      participantIds.forEach(participantId => {
-        this.io.to(`user:${participantId}`).emit('conversation_deleted', {
-          conversationId
-        });
-      });
-
+      // Delete is user-specific, only notify the user who deleted it
       socket.emit('conversation_delete_success', { conversationId });
     } catch (error: any) {
       console.error('Error deleting conversation:', error);

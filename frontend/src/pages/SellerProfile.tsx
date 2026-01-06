@@ -4,6 +4,8 @@ import { useParams, useSearchParams, useNavigate, Link, useLocation } from 'reac
 import { useAuth } from "../contexts/AuthContext";
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+
+import backArrowIcon from '../assets/images/pre/back arrow.svg';
 import sellerAvatar from '../assets/images/logos/avatar.png';
 import defaultCoverImage from '../assets/images/logos/8.png';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
@@ -37,34 +39,6 @@ import pre5 from '../assets/images/pre/5.png';
 import pre6 from '../assets/images/pre/6.png';
 import pre7 from '../assets/images/pre/7.png';
 import pre8 from '../assets/images/pre/8.png';
-
-// Country mapping for products
-// replaced by shared util
-// const getProductCountry = (productId: number) => {
-//   const countryMap: { [key: number]: { name: string; code: string; flag: string; abbreviation: string } } = {
-//     1: { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
-//     2: { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
-//     3: { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
-//     4: { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' },
-//     5: { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
-//     6: { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
-//     7: { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
-//     8: { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
-//     9: { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
-//     10: { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
-//     11: { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
-//     12: { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
-//     13: { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
-//     14: { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
-//     15: { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
-//     16: { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
-//     17: { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
-//     18: { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
-//     19: { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
-//     20: { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' }
-//   };
-//   return countryMap[productId] || { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' };
-// };
 
 const SellerProfile: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -101,6 +75,17 @@ const SellerProfile: React.FC = () => {
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const optionsModalRef = useRef<HTMLDivElement>(null);
   const { sellerId } = useParams<{ sellerId: string }>();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Update active tab when URL parameter changes
   useEffect(() => {
@@ -732,12 +717,14 @@ const SellerProfile: React.FC = () => {
           {/* Back Button - Top Left */}
           <button
             onClick={() => navigate(-1)}
-            className="absolute top-4 left-4 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full border border-gray-300 flex items-center justify-center shadow-sm hover:bg-gray-50 transition-colors"
+            className="absolute top-4 left-4 w-8 h-8 rounded-full bg-white flex items-center justify-center"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+            aria-label="Back"
           >
-            <svg className="w-5 h-5 md:w-6 md:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <img src={backArrowIcon} alt="Back" className="w-3.5 h-3.5" />
           </button>
+
+
         </div>
 
         {/* Profile Content Overlay */}
@@ -752,6 +739,20 @@ const SellerProfile: React.FC = () => {
               />
             </div>
           </div>
+
+          {/* More Options Button - Top Right */}
+          <button
+            onClick={() => setShowOptionsModal(true)}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white flex items-center justify-center"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)', zIndex: 10 }}
+            aria-label="More options"
+          >
+            <svg width="14" height="4" viewBox="0 0 24 4" fill="none">
+              <circle cx="4" cy="2" r="2" fill="#171717" />
+              <circle cx="12" cy="2" r="2" fill="#171717" />
+              <circle cx="20" cy="2" r="2" fill="#171717" />
+            </svg>
+          </button>
 
           {/* Verified Badge - Moved Down */}
           <div className="absolute right-4 md:right-6 top-2">
@@ -1528,10 +1529,10 @@ const SellerProfile: React.FC = () => {
                             src={getProductCountry(product.origin, product.originCode).flag}
                             alt={getProductCountry(product.origin, product.originCode).name}
                             style={{
-                              width: '12px',
-                              height: '8px',
+                              width: '14px',
+                              height: '14px',
                               objectFit: 'cover',
-                              borderRadius: '2px'
+                              borderRadius: '50%'
                             }}
                           />
                           <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>

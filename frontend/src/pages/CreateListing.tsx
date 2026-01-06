@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import logo from '../assets/images/pre/logo.png';
@@ -24,10 +24,13 @@ import groupIcon from '../assets/images/pre/group.svg';
 import frameIcon from '../assets/images/pre/frame.svg';
 import podsIcon from '../assets/images/pre/pods.svg';
 import settingIcon from '../assets/images/pre/setting.svg';
-// import pathIcon from '../assets/images/pre/Path.svg';
-// import path2Icon from '../assets/images/pre/path2.svg';
+import pathIcon from '../assets/images/pre/Path.svg';
+import path2Icon from '../assets/images/pre/path2.svg';
 import loadIcon from '../assets/images/pre/load.svg';
 import a1 from '../assets/images/pre/a1.png';
+import a2 from '../assets/images/pre/a2.png';
+import a3 from '../assets/images/pre/a3.png';
+import a4 from '../assets/images/pre/a4.png';
 import verityIcon from '../assets/images/pre/verity.svg';
 import avatar from "../assets/images/logos/avatar.png";
 import logoIcon from "../assets/images/logos/ba-brand-icon-colored.png";
@@ -518,11 +521,6 @@ const CreateListing: React.FC = () => {
     { value: 'Home & Decor', label: 'Home & Decor' }
   ];
 
-  // const saleTypes = [
-  //   { value: 'Default', label: 'Default' },
-  //   { value: 'Urgent', label: 'Urgent', icon: pathIcon }
-  // ];
-
   const currencies = [
     // { value: 'USD', label: 'US Dollar', flagCode: 'us' },
     // { value: 'CAD', label: 'Canadian Dollar', flagCode: 'ca' },
@@ -967,7 +965,6 @@ const CreateListing: React.FC = () => {
         category: category || '',
         origin: origin || '',
         location: location || '',
-        // saleType,
         deliveryAvailable: Boolean(deliveryAvailable),
         status: 'DRAFT'
       };
@@ -1023,11 +1020,34 @@ const CreateListing: React.FC = () => {
           flag: `https://flagcdn.com/w20/${getCountryFlagCode(savedProduct.origin || origin)}.png`
         };
 
-        if (isEditMode && id) {
-          setDraftListings(prev => prev.map(d => d.id === id ? newDraft : d));
-        } else {
-          setDraftListings(prev => [newDraft, ...prev]);
-        }
+        // Refresh drafts list to update count
+        const refreshDrafts = async () => {
+          try {
+            const token = localStorage.getItem('accessToken');
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const json = await res.json();
+              if (json.success && json.data?.products) {
+                const drafts: DraftListing[] = (json.data.products || []).map((product: any) => ({
+                  id: product.id,
+                  title: product.title || 'Undefined',
+                  price: product.price?.toString() || 'N/A',
+                  currency: product.currency || 'USD',
+                  image: product.images?.[0]?.url || a1,
+                  description: product.description || '',
+                  country: product.origin || 'Cameroon',
+                  flag: `https://flagcdn.com/w20/${getCountryFlagCode(product.origin)}.png`
+                }));
+                setDraftListings(drafts);
+              }
+            }
+          } catch (e) {
+            console.warn('Failed to refresh drafts', e);
+          }
+        };
+        await refreshDrafts();
 
         if (isEditMode && id && productId) {
           sessionStorage.setItem(`draft-status-change-${productId}`, JSON.stringify({
@@ -1039,8 +1059,8 @@ const CreateListing: React.FC = () => {
 
         addToast({
           type: 'success',
-          title: 'Action Completed',
-          message: `${isEditMode ? 'Draft updated' : 'Draft saved'} successfully!`,
+          title: 'Draft Saved',
+          message: `${isEditMode ? 'Draft updated' : 'Draft saved'} successfully! The draft count has been updated.`,
           duration: 2000
         });
         navigate('/my-listings');
@@ -1162,21 +1182,65 @@ const CreateListing: React.FC = () => {
           return;
         }
 
+        const actualProductId = createResult.data?.id || productId;
+
+        // Remove draft from list if it was a draft
         if (editingDraftId) {
           setDraftListings(prev => prev.filter(d => d.id !== editingDraftId));
           setEditingDraftId(null);
         }
 
+        // Refresh drafts list to update count
+        const refreshDrafts = async () => {
+          try {
+            const token = localStorage.getItem('accessToken');
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const json = await res.json();
+              if (json.success && json.data?.products) {
+                const drafts: DraftListing[] = (json.data.products || []).map((product: any) => ({
+                  id: product.id,
+                  title: product.title || 'Undefined',
+                  price: product.price?.toString() || 'N/A',
+                  currency: product.currency || 'USD',
+                  image: product.images?.[0]?.url || a1,
+                  description: product.description || '',
+                  country: product.origin || 'Cameroon',
+                  flag: `https://flagcdn.com/w20/${getCountryFlagCode(product.origin)}.png`
+                }));
+                setDraftListings(drafts);
+              }
+            }
+          } catch (e) {
+            console.warn('Failed to refresh drafts', e);
+          }
+        };
+        refreshDrafts();
+
         addToast({
           type: "success",
-          title: 'Action Completed',
-          message: `Listing ${isEditMode ? 'updated' : 'posted'} successfully!`,
-          duration: 2000
+          title: 'Listing Published',
+          message: `Your listing has been ${isEditMode ? 'updated' : 'published'} successfully!`,
+          duration: 3000
         });
 
         // Ensure MyListings uses fresh data for the newly created/updated product
         clearListingsCache();
-        navigate('/my-listings');
+
+        // Redirect to product details page
+        if (actualProductId) {
+          navigate(`/product/${actualProductId}`, {
+            state: {
+              fromMyListings: true,
+              justPublished: true
+            }
+          });
+        } else {
+          // Fallback to my-listings if productId is not available
+          navigate('/my-listings');
+        }
       }
     } catch (error: any) {
       console.error('Post listing error', error);
@@ -1329,6 +1393,19 @@ const CreateListing: React.FC = () => {
 
   useEffect(() => {
     const stateDraft = (routerLocation.state as { draft?: Record<string, string> } | null)?.draft;
+
+    // mpbile detection
+    useEffect(() => {
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 1024);
+      };
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Removed hardcoded draft initialization - drafts are fetched from backend
+
     if (stateDraft) {
       applyPrefillToForm(stateDraft);
       setIsDraftsModalOpen(true);
@@ -1441,7 +1518,7 @@ const CreateListing: React.FC = () => {
     </div>
   );
 
-  // mobile drafts view
+  // Mobile Drafts View - Exact copy from MyListings
   if (showMobileDrafts && isMobile) {
     return (
       <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -1632,9 +1709,11 @@ const CreateListing: React.FC = () => {
 
   const renderDraftsModal = () => {
     if (!isDraftsModalOpen) return null;
+
+    // Desktop modal view
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center"
+        className="fixed inset-0 z-50 flex items-center justify-center lg:flex"
         style={{ backgroundColor: '#0000001A' }}
         onClick={() => setIsDraftsModalOpen(false)}
       >
@@ -1664,17 +1743,12 @@ const CreateListing: React.FC = () => {
               style={{
                 color: '#BABABA',
                 fontSize: '26px',
-                lineHeight: 1,
-                cursor: 'pointer',
-                background: 'none',
-                border: 'none',
-                padding: 0
+                lineHeight: 1
               }}
             >
               ×
             </button>
           </div>
-
           <div
             className="drafts-scroll"
             style={{
@@ -1686,37 +1760,12 @@ const CreateListing: React.FC = () => {
               paddingRight: '8px'
             }}
           >
-            {draftListings.length === 0 ? (
-              // Empty state
-              <div className="flex flex-col items-center justify-center py-12" style={{ color: '#BABABA' }}>
-                <svg className="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <p style={{ fontSize: '14px' }}>No drafts yet. Start creating a new listing!</p>
-              </div>
-            ) : (
-              // Drafts list
-              <div
-                className="drafts-scroll flex-1"
-                style={{
-                  overflowY: 'auto',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '14px',
-                  paddingRight: '8px'
-                }}
-              >
-                {draftListings.map((draft) => renderDraftCard(draft))}
-              </div>
-            )}
+            {draftListings.map((draft) => renderDraftCard(draft))}
           </div>
         </div>
       </div>
     );
   };
-
-  const pageTitle = editingDraftId ? 'Complete & publish' : (isEditMode ? 'Edit listing' : 'Create a new listing');
-  const postButtonText = editingDraftId ? 'Publish draft' : (isEditMode ? 'Update listing' : 'Post listing');
 
   if (isLoadingProduct) {
     return (
@@ -1818,6 +1867,7 @@ const CreateListing: React.FC = () => {
           box-shadow: none !important;
         }
       `}</style>
+      {/* continue here */}
 
       {/* <Header /> */}
       <header className="hidden lg:block flex-shrink-0 rounded-t-2xl" style={{ backgroundColor: '#F5F5F5' }}>

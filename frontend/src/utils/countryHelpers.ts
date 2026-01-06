@@ -6,6 +6,7 @@ export interface CountryInfo {
   abbreviation: string;
 }
 
+// Standardized country names - these are the canonical names
 const countries: CountryInfo[] = [
   { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
   { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },
@@ -18,7 +19,7 @@ const countries: CountryInfo[] = [
   { name: 'Central African Republic', code: 'cf', flag: 'https://flagcdn.com/w20/cf.png', abbreviation: 'CAF' },
   { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
   { name: 'Comoros', code: 'km', flag: 'https://flagcdn.com/w20/km.png', abbreviation: 'COM' },
-  { name: 'Congo (Congo-Brazzaville)', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
+  { name: 'Congo', code: 'cg', flag: 'https://flagcdn.com/w20/cg.png', abbreviation: 'COG' },
   { name: 'Côte d\'Ivoire', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
   { name: 'Democratic Republic of the Congo', code: 'cd', flag: 'https://flagcdn.com/w20/cd.png', abbreviation: 'COD' },
   { name: 'Djibouti', code: 'dj', flag: 'https://flagcdn.com/w20/dj.png', abbreviation: 'DJI' },
@@ -63,8 +64,21 @@ const countries: CountryInfo[] = [
   { name: 'Zimbabwe', code: 'zw', flag: 'https://flagcdn.com/w20/zw.png', abbreviation: 'ZWE' },
 ];
 
+// Country name aliases - maps alternative names to canonical names
+const countryAliases: Record<string, string> = {
+  'ivory coast': 'Côte d\'Ivoire',
+  'cote d\'ivoire': 'Côte d\'Ivoire',
+  'cape verde': 'Cabo Verde',
+  'cabo verde': 'Cabo Verde',
+  'congo (congo-brazzaville)': 'Congo',
+  'republic of the congo': 'Congo',
+  'democratic republic of congo': 'Democratic Republic of the Congo',
+  'dr congo': 'Democratic Republic of the Congo',
+  'drc': 'Democratic Republic of the Congo',
+};
+
 export function getProductCountry(
-  productOrigin?: string, // e.g. "Nigeria"
+  productOrigin?: string, // e.g. "Nigeria", "Ivory Coast", "Côte d'Ivoire"
   productOriginCode?: string // e.g. "NG" or "NGA"
 ): CountryInfo {
   if (productOriginCode) {
@@ -75,13 +89,33 @@ export function getProductCountry(
     if (c) return c;
   }
   if (productOrigin) {
-    const l = productOrigin.toLowerCase();
+    const normalized = productOrigin.toLowerCase().trim();
+    
+    // First check aliases
+    const canonicalName = countryAliases[normalized];
+    if (canonicalName) {
+      const c = countries.find(c => c.name === canonicalName);
+      if (c) return c;
+    }
+    
+    // Then check direct match
     const c = countries.find(c =>
-      c.name.toLowerCase() === l ||
-      c.code === l
+      c.name.toLowerCase() === normalized ||
+      c.code === normalized
     );
     if (c) return c;
+    
+    // Try partial match for hyphenated names (e.g., "Guinea-Bissau" matches "guinea bissau")
+    const partialMatch = countries.find(c => {
+      const countryNameLower = c.name.toLowerCase().replace(/[-\s]/g, '');
+      const searchLower = normalized.replace(/[-\s]/g, '');
+      return countryNameLower === searchLower;
+    });
+    if (partialMatch) return partialMatch;
   }
   return { name: productOrigin || 'Unknown', code: '', flag: '', abbreviation: '' };
 }
+
+// Export all countries for use in dropdowns, etc.
+export { countries };
 

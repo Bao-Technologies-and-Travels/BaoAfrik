@@ -219,7 +219,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-white flex" style={{ fontFamily: 'Poppins, sans-serif' }}>
       {/* Mobile-first single column layout */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-6 lg:space-y-8">
