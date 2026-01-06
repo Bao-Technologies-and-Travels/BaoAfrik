@@ -1742,8 +1742,18 @@ const Home: React.FC = () => {
     // If image is selected, filter by similar products (mock implementation)
     if (selectedImage) {
       // In real implementation, this would use API results
-      // For now, we'll just show all products (API will handle similarity matching)
-      console.log('Image search active - showing all products (API will filter by similarity)');
+      // When API is integrated, replace this with actual API call results:
+      // const response = await fetch('/api/search-by-image', { method: 'POST', body: imageFormData });
+      // const apiResults = await response.json();
+      // products = apiResults.filter(...);
+      
+      // For now, simulate image search: filter products based on image similarity
+      // In production, this will be replaced with actual API results
+      // For demo purposes, we'll show all products (API will handle similarity matching)
+      // If API returns empty results, products array will be empty and no results state will show
+      console.log('Image search active - API will filter by similarity');
+      // Note: When API is integrated, if no similar products are found, products array will be empty
+      // and shouldShowNoResultsState() will return true, showing the no results state
     }
     
     // Apply category filter (Categories dropdown)
@@ -3455,36 +3465,211 @@ const Home: React.FC = () => {
           ) : (
             // Regular Grid Layout for Specific Category or Search
             <>
-          {/* Section Header - Hide when no search results */}
-          {!shouldShowNoResultsState() && (
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center">
-                <h2 className="text-[20px] font-semibold text-gray-900">
-                  {activeCategory}
-                </h2>
-              <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+          {/* For search results (isSearchActive), group by categories */}
+          {isSearchActive && !shouldShowNoResultsState() ? (
+            <div className="space-y-8">
+              {categories.filter(cat => cat !== 'All').map((category) => {
+                // Get products from this category that are in search results
+                const categoryProducts = (allProducts[category as keyof typeof allProducts] || []);
+                const filteredProducts = searchResults.filter(product => 
+                  categoryProducts.some(cp => cp.id === product.id)
+                );
+                
+                if (filteredProducts.length === 0) return null;
+              
+                return (
+                  <div key={category} className="mb-8">
+                    {/* Category Header - Hidden on Mobile */}
+                    {window.innerWidth >= 640 && (
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center">
+                          <h2 className="text-[20px] font-semibold text-gray-900">{category}</h2>
+                          <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <button
+                            className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                            aria-label="Scroll left"
+                          >
+                            <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                          </button>
+                          <button 
+                            className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                            aria-label="Scroll right"
+                          >
+                            <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Category Products - Horizontal Scroll */}
+                    <div className={filteredProducts.length <= 6 ? '' : 'overflow-x-auto scrollbar-hide'}>
+                      <div className={filteredProducts.length <= 6 ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6' : 'flex gap-5 sm:gap-6'}>
+                        {filteredProducts.slice(0, 12).map((product) => (
+                          <Link key={product.id} to={`/product/${product.id}`} className={`bg-white rounded-lg overflow-hidden transition-all duration-200 block group ${filteredProducts.length > 6 ? 'flex-shrink-0' : ''}`} style={filteredProducts.length > 6 ? { width: '200px' } : {}}>
+                            {/* Product Image - Top */}
+                            <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
+                              <img 
+                                src={product.image} 
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
+                                loading="lazy"
+                                width="200"
+                                height="200"
+                              />
+                              
+                              {/* Country Badge */}
+                              <div className="absolute bg-white rounded-md shadow-sm" style={{ 
+                                display: 'flex', 
+                                padding: window.innerWidth < 640 ? '1px 4px' : '2px 6px', 
+                                justifyContent: 'center', 
+                                alignItems: 'center', 
+                                gap: window.innerWidth < 640 ? '2px' : '4px',
+                                top: window.innerWidth < 640 ? '6px' : '8px',
+                                left: window.innerWidth < 640 ? '6px' : '8px'
+                              }}>
+                                <img 
+                                  src={getProductCountry(product.id).flag} 
+                                  alt={getProductCountry(product.id).name}
+                                  className="rounded-full"
+                                  style={{ 
+                                    width: window.innerWidth < 640 ? '10px' : '12px',
+                                    height: window.innerWidth < 640 ? '10px' : '12px',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                                <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
+                                  {getProductCountry(product.id).abbreviation}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Product Content */}
+                            <div className="flex flex-col" style={{ padding: window.innerWidth < 640 ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
+                              {/* Price and Verified Badge Row */}
+                              <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
+                                <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
+                                  ${product.price}
+                                </div>
+                                {product.verified ? (
+                                  <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ 
+                                    display: 'flex', 
+                                    padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: '1px', 
+                                    fontSize: window.innerWidth < 640 ? '7px' : '9px' 
+                                  }}>
+                                    <img src={verifyIcon} alt="Verified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
+                                    <span>Verified seller</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ 
+                                    display: 'flex', 
+                                    padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: '1px', 
+                                    fontSize: window.innerWidth < 640 ? '7px' : '9px' 
+                                  }}>
+                                    <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
+                                    <span>Unverified Seller</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Product Name */}
+                              <h3 className="line-clamp-2 font-medium" style={{ 
+                                fontSize: window.innerWidth < 640 ? '10px' : '13px', 
+                                color: '#212121',
+                                marginBottom: window.innerWidth < 640 ? '4px' : '4px'
+                              }}>{product.name}</h3>
+                              
+                              {/* Location and Bookmark Row - Below Product Name */}
+                              <div className="flex items-center justify-between">
+                                {/* Location */}
+                                <div className="flex items-center text-gray-500 flex-1">
+                                  <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{ 
+                                    width: window.innerWidth < 640 ? '8px' : '10px',
+                                    height: window.innerWidth < 640 ? '8px' : '10px',
+                                    marginRight: window.innerWidth < 640 ? '3px' : '4px'
+                                  }} />
+                                  <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
+                                </div>
+                                
+                                {/* Bookmark Button */}
+                                <div style={{ marginLeft: window.innerWidth < 640 ? '4px' : '8px' }}>
+                                  <button 
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      handleSave(product.id);
+                                    }}
+                                    className="transition-colors touch-manipulation"
+                                    title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                                    style={{ 
+                                      width: window.innerWidth < 640 ? '16px' : '20px', 
+                                      height: window.innerWidth < 640 ? '16px' : '20px', 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      justifyContent: 'center' 
+                                    }}
+                                  >
+                                    <img src={bookmarkIcon} alt="Bookmark" style={{
+                                      width: window.innerWidth < 640 ? '16px' : '20px',
+                                      height: window.innerWidth < 640 ? '16px' : '20px',
+                                      filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                                    }} />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-              {getProductsToDisplay().length > 0 && (
-                <div className="flex items-center space-x-3">
-                  <button 
-                    onClick={scrollProductsLeft}
-                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                    aria-label="Scroll products left"
-                  >
-                    <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-              </button>
-                  <button 
-                    onClick={scrollProductsRight}
-                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                    aria-label="Scroll products right"
-                  >
-                    <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-              </button>
-            </div>
+          ) : (
+            <>
+              {/* Section Header - Hide when no search results */}
+              {!shouldShowNoResultsState() && (
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center">
+                    <h2 className="text-[20px] font-semibold text-gray-900">
+                      {activeCategory}
+                    </h2>
+                    <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                  {getProductsToDisplay().length > 0 && (
+                    <div className="flex items-center space-x-3">
+                      <button 
+                        onClick={scrollProductsLeft}
+                        className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                        aria-label="Scroll products left"
+                      >
+                        <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                      </button>
+                      <button 
+                        onClick={scrollProductsRight}
+                        className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                        aria-label="Scroll products right"
+                      >
+                        <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
-          </div>
+            </>
           )}
 
           {/* Products Grid */}
@@ -6320,13 +6505,30 @@ const Home: React.FC = () => {
                     const query = mobileSearchQuery.toLowerCase().trim();
                     const productCategory = getProductCategory(product.id);
                     
-                    // If image is selected, show all products (API will handle similarity matching)
-                    // Otherwise, filter by text query
-                    const matchesSearch = selectedImage ? true : (
-                      product.name.toLowerCase().includes(query) ||
-                      productCategory.toLowerCase().includes(query) ||
-                      product.location.toLowerCase().includes(query)
-                    );
+                    // If image is selected, API will handle similarity matching
+                    // For now, if image is selected and no other filters, show empty results to demonstrate no results state
+                    // When API is integrated, replace this with actual API results
+                    // Example: const apiResults = await fetch('/api/search-by-image', { method: 'POST', body: imageFormData });
+                    // Then filter products to only include those in apiResults
+                    let matchesSearch = false;
+                    if (selectedImage) {
+                      // In production, this will be replaced with actual API results
+                      // For now, if no filters are applied, simulate no results
+                      // When API returns empty results, filteredProducts will be empty and no results state will show
+                      if (mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) {
+                        // If filters are applied, show products matching those filters
+                        matchesSearch = true;
+                      } else {
+                        // Simulate: if no filters, no results (API will handle this in production)
+                        // In production, this will be: matchesSearch = apiResults.includes(product.id);
+                        matchesSearch = false; // Simulate no results for image search
+                      }
+                    } else {
+                      // Text search
+                      matchesSearch = product.name.toLowerCase().includes(query) ||
+                        productCategory.toLowerCase().includes(query) ||
+                        product.location.toLowerCase().includes(query);
+                    }
                     
                     const matchesCategory = !mobileFilterCategory || productCategory === mobileFilterCategory;
                     const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.id).name === mobileFilterProductOrigin;

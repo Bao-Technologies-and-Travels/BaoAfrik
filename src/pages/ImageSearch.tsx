@@ -351,11 +351,11 @@ const ImageSearch: React.FC = () => {
             fontFamily: 'Poppins, sans-serif',
             padding: '0 20px',
             lineHeight: '1.3',
-            maxWidth: '240px',
+            maxWidth: '320px',
             zIndex: 3
           }}
         >
-          Press the camera icon to start a<br />search for this product
+          Press the camera icon to start a{' '}<br />search for this product
         </div>
       </div>
 
