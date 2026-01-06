@@ -296,7 +296,7 @@ const MyRequests: React.FC = () => {
                     return;
                 }
 
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/requests?userId=${user.id}`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/requests`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -307,29 +307,22 @@ const MyRequests: React.FC = () => {
                 }
 
                 const result = await response.json();
-                if (result.data && Array.isArray(result.data)) {
-                    const mappedRequests: Request[] = result.data.map((req: any) => {
-                        const createdAt = req.createdAt ? new Date(req.createdAt).getTime() : Date.now();
-                        const country = getProductCountry(req.origin);
-                        return {
-                            id: req.id,
-                            productName: req.productName || 'Untitled Request',
-                            createdAt,
-                            sellerLocation: req.sellerLocation || 'Location not specified',
-                            origin: req.origin || '',
-                            minPrice: req.minPrice,
-                            maxPrice: req.maxPrice,
-                            currency: req.currency || 'USD',
-                            status: mapBackendStatusToFrontend(req.status || 'PENDING'),
-                            description: req.description || ''
-                        };
-                    });
-                    setRequests(mappedRequests);
+
+                // Handle both response formats: { success: true, data: [...] } or { data: [...] }
+                let requestsArray: any[] = [];
+
+                if (result.success && result.data && Array.isArray(result.data)) {
+                    requestsArray = result.data;
+                } else if (result.data && Array.isArray(result.data)) {
+                    requestsArray = result.data;
                 } else if (result.data?.data && Array.isArray(result.data.data)) {
-                    // Handle paginated response
-                    const mappedRequests: Request[] = result.data.data.map((req: any) => {
+                    // Handle nested paginated response
+                    requestsArray = result.data.data;
+                }
+
+                if (requestsArray.length > 0 || result.success !== false) {
+                    const mappedRequests: Request[] = requestsArray.map((req: any) => {
                         const createdAt = req.createdAt ? new Date(req.createdAt).getTime() : Date.now();
-                        const country = getProductCountry(req.origin);
                         return {
                             id: req.id,
                             productName: req.productName || 'Untitled Request',
@@ -344,6 +337,9 @@ const MyRequests: React.FC = () => {
                         };
                     });
                     setRequests(mappedRequests);
+                } else {
+                    // No requests found
+                    setRequests([]);
                 }
             } catch (error: any) {
                 console.error('Error fetching requests:', error);
@@ -394,10 +390,18 @@ const MyRequests: React.FC = () => {
         if (selectedSort) {
             switch (selectedSort.value) {
                 case 'date_recent':
-                    sorted.sort((a, b) => b.createdAt - a.createdAt);
+                    sorted.sort((a, b) => {
+                        const aTime = typeof a.createdAt === 'number' ? a.createdAt : new Date(a.createdAt).getTime();
+                        const bTime = typeof b.createdAt === 'number' ? b.createdAt : new Date(b.createdAt).getTime();
+                        return bTime - aTime;
+                    });
                     break;
                 case 'date_older':
-                    sorted.sort((a, b) => a.createdAt - b.createdAt);
+                    sorted.sort((a, b) => {
+                        const aTime = typeof a.createdAt === 'number' ? a.createdAt : new Date(a.createdAt).getTime();
+                        const bTime = typeof b.createdAt === 'number' ? b.createdAt : new Date(b.createdAt).getTime();
+                        return aTime - bTime;
+                    });
                     break;
                 case 'name_az':
                     sorted.sort((a, b) => a.productName.localeCompare(b.productName));
@@ -494,8 +498,8 @@ const MyRequests: React.FC = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const formatDate = (timestamp: number) => {
-        const date = new Date(timestamp);
+    const formatDate = (timestamp: number | string) => {
+        const date = typeof timestamp === 'number' ? new Date(timestamp) : new Date(timestamp);
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const year = date.getFullYear().toString().slice(-2);
@@ -526,13 +530,21 @@ const MyRequests: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update request status');
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || errorData.message || 'Failed to update request status');
             }
+
+            const result = await response.json();
+            // Backend returns the request object directly, not wrapped
+            const updatedRequest = result.data || result;
 
             // Update local state
             setRequests((prev) =>
                 prev.map((request) =>
-                    request.id === requestId ? { ...request, status: newStatus } : request
+                    request.id === requestId ? {
+                        ...request,
+                        status: mapBackendStatusToFrontend(updatedRequest.status || backendStatus)
+                    } : request
                 )
             );
             setStatusModalOpenFor(null);
@@ -749,8 +761,8 @@ const MyRequests: React.FC = () => {
         );
     };
 
-    const formatDateForGrid = (timestamp: number) => {
-        const date = new Date(timestamp);
+    const formatDateForGrid = (timestamp: number | string) => {
+        const date = typeof timestamp === 'number' ? new Date(timestamp) : new Date(timestamp);
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const year = date.getFullYear().toString().slice(-2);
@@ -2194,6 +2206,11 @@ const MyRequests: React.FC = () => {
                             type="text"
                             value={mobileSearchQuery}
                             onChange={(e) => setMobileSearchQuery(e.target.value)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter' && mobileSearchQuery.trim()) {
+                                    setMobileSearchSubmitted(true);
+                                }
+                            }}
                             className="flex-1 outline-none"
                             style={{ fontFamily: 'Poppins, sans-serif', fontSize: '14px', color: '#212121' }}
                             placeholder="Search requests..."
@@ -3535,7 +3552,7 @@ const MyRequests: React.FC = () => {
                                                         margin: 0
                                                     }}
                                                 >
-                                                    The request "{requestToDelete.title}" has been successfully removed.
+                                                    The request "{requestToDelete.productName}" has been successfully removed.
                                                 </p>
                                             </div>
 

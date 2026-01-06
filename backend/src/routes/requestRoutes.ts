@@ -30,12 +30,12 @@ const handleAuthRoute = (handler: AuthenticatedRequestHandler) => {
 
 const router = Router();
 
-// Public routes
+// Public routes (but getRequests can handle authenticated requests)
 router.get(
     '/',
     getRequestsValidation,
     validate,
-    RequestController.getRequests
+    handleAuthRoute(RequestController.getRequests as AuthenticatedRequestHandler)
 );
 
 router.get(

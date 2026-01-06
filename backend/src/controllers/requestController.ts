@@ -32,19 +32,56 @@ export const RequestController = {
         }
     },
 
-    async getRequests(req: Request, res: Response) {
+    async getRequests(req: AuthenticatedRequest, res: Response) {
         try {
             const { status, userId, page = 1, limit = 10 } = req.query;
+            
+            // Determine target userId:
+            // 1. If userId is explicitly provided in query, use it (but require auth if different from authenticated user)
+            // 2. If authenticated user exists and no userId in query, use authenticated user's ID
+            // 3. Otherwise, no userId filter (public requests)
+            let targetUserId: string | undefined = undefined;
+            
+            if (userId) {
+                // If userId is provided in query
+                if (req.user && req.user.id !== userId) {
+                    // User is trying to access another user's requests - check if admin
+                    // For now, allow if authenticated (can add admin check later)
+                    targetUserId = userId as string;
+                } else if (req.user) {
+                    // Authenticated user requesting their own or another's (allowed)
+                    targetUserId = userId as string;
+                } else {
+                    // No auth but userId in query - require authentication
+                    return res.status(401).json({ 
+                        success: false,
+                        error: 'Authentication required to fetch user requests' 
+                    });
+                }
+            } else if (req.user) {
+                // No userId in query but user is authenticated - fetch their own requests
+                targetUserId = req.user.id;
+            }
+            // If no userId and no auth, targetUserId remains undefined (public requests)
+            
             const result = await requestService.getRequests({
                 status: status as string | undefined,
-                userId: userId as string | undefined,
+                userId: targetUserId,
                 page: Number(page),
                 limit: Number(limit)
             });
-            return res.json(result);
+            
+            return res.json({
+                success: true,
+                data: result.data,
+                pagination: result.pagination
+            });
         } catch (error) {
             console.error('Error fetching requests:', error);
-            return res.status(500).json({ error: 'Failed to fetch requests' });
+            return res.status(500).json({ 
+                success: false,
+                error: 'Failed to fetch requests' 
+            });
         }
     },
 

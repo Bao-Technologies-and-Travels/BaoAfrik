@@ -8,6 +8,7 @@ import buyerIcon from '../assets/images/pre/buyer.svg';
 import locationIcon from '../assets/images/pre/PL.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
 import bellIcon from '../assets/images/pre/bm.svg';
+import bagIcon from '../assets/images/pre/bag.svg';
 
 import { apiClient } from '../services';
 import { getProductCountry } from '../utils/countryHelpers';
@@ -70,8 +71,9 @@ const Requests: React.FC = () => {
   useEffect(() => {
     setFilteredRequests(paginate(requests, currentPage, 9));
     setTotalPages(Math.max(1, Math.ceil(requests.length / 9)));
+    // Filter by backend status 'PENDING' (uppercase)
     setPendingRequests(
-      requests.filter((r) => r.status && r.status.toLowerCase() === 'pending')
+      requests.filter((r) => r.status && (r.status.toUpperCase() === 'PENDING' || r.status.toLowerCase() === 'pending'))
     );
     if (user && user.location) {
       setNearYouRequests(
@@ -177,10 +179,26 @@ const Requests: React.FC = () => {
   const fetchMyRequests = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get<any>('/request');
-      setRequests(response.data || []);
+      const response = await apiClient.get<any>('/requests');
+      // Handle response: apiClient returns { success: true, data: [...] } or { success: true, data: { data: [...], pagination: {...} } }
+      if (response.success && response.data) {
+        if (Array.isArray(response.data)) {
+          setRequests(response.data);
+        } else if (Array.isArray(response.data.data)) {
+          // Handle paginated response
+          setRequests(response.data.data);
+          if (response.data.pagination) {
+            setTotalPages(response.data.pagination.totalPages || 1);
+          }
+        } else {
+          setRequests([]);
+        }
+      } else {
+        setRequests([]);
+      }
     } catch (error) {
       console.error('Error fetching requests:', error);
+      setRequests([]);
     } finally {
       setLoading(false);
     }
@@ -195,7 +213,7 @@ const Requests: React.FC = () => {
     if (!requestToDelete) return;
 
     try {
-      await apiClient.delete(`/request/${requestToDelete}`);
+      await apiClient.delete(`/requests/${requestToDelete}`);
       setRequests(requests.filter(req => req.id !== requestToDelete));
       setShowDeleteModal(false);
       setRequestToDelete(null);
@@ -500,7 +518,9 @@ const Requests: React.FC = () => {
           {isPending ? (
             <div className="flex items-center gap-2 px-3 py-1 rounded-lg" style={{ backgroundColor: '#F5F5F5' }}>
               <div className="w-3 h-3 rounded-full bg-white border border-gray-300"></div>
-              <span style={{ fontSize: '12px', color: '#6A6A6A', fontWeight: 'normal' }}>Pending</span>
+              <span style={{ fontSize: '12px', color: '#6A6A6A', fontWeight: 'normal' }}>
+                {req?.status ? (req.status.toUpperCase() === 'PENDING' ? 'Pending' : req.status.charAt(0).toUpperCase() + req.status.slice(1).toLowerCase()) : 'Pending'}
+              </span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
@@ -945,11 +965,26 @@ const Requests: React.FC = () => {
                 WebkitOverflowScrolling: 'touch'
               } : {}}
             >
-              {nearYouRequests.slice(0, isMobile ? 3 : 9).map((req, idx) => (
-                <React.Fragment key={req.id || idx}>
-                  {renderRequestCard(false, req)}
-                </React.Fragment>
-              ))}
+              {nearYouRequests.length > 0 ? (
+                nearYouRequests.slice(0, isMobile ? 3 : 9).map((req, idx) => (
+                  <React.Fragment key={req.id || idx}>
+                    {renderRequestCard(false, req)}
+                  </React.Fragment>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 px-4" style={{ width: '100%', gridColumn: '1 / -1' }}>
+                  <img src={bagIcon} alt="No requests" style={{ width: '60px', height: '60px', marginBottom: '16px', opacity: 0.3 }} />
+                  <p style={{
+                    color: '#939393',
+                    fontSize: isMobile ? '12px' : '14px',
+                    textAlign: 'center',
+                    lineHeight: '1.5',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    No request near you.<br />Explore other pending requests
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -1005,11 +1040,26 @@ const Requests: React.FC = () => {
                 WebkitOverflowScrolling: 'touch'
               } : {}}
             >
-              {pendingRequests.slice(0, isMobile ? 3 : 9).map((req, idx) => (
-                <React.Fragment key={req.id || idx}>
-                  {renderRequestCard(true, req)}
-                </React.Fragment>
-              ))}
+              {pendingRequests.length > 0 ? (
+                pendingRequests.slice(0, isMobile ? 3 : 9).map((req, idx) => (
+                  <React.Fragment key={req.id || idx}>
+                    {renderRequestCard(true, req)}
+                  </React.Fragment>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 px-4" style={{ width: '100%', gridColumn: '1 / -1' }}>
+                  <img src={bagIcon} alt="No requests" style={{ width: '60px', height: '60px', marginBottom: '16px', opacity: 0.3 }} />
+                  <p style={{
+                    color: '#939393',
+                    fontSize: isMobile ? '12px' : '14px',
+                    textAlign: 'center',
+                    lineHeight: '1.5',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    No pending requests found.<br />Check back later for new requests
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

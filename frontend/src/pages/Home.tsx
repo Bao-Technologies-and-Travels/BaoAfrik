@@ -296,7 +296,7 @@ const Home: React.FC = () => {
 
         const token = localStorage.getItem('accessToken');
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/request?limit=3&page=1`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/requests?limit=3&page=1`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -310,7 +310,14 @@ const Home: React.FC = () => {
         }
 
         const result = await response.json();
-        setRequests(Array.isArray(result.data) ? result.data : []);
+        // Handle both response formats: { success: true, data: [...] } or { data: [...] }
+        if (result.success && Array.isArray(result.data)) {
+          setRequests(result.data);
+        } else if (Array.isArray(result.data)) {
+          setRequests(result.data);
+        } else {
+          setRequests([]);
+        }
 
       } catch (error: any) {
         if (error?.name === 'AbortError') return;
@@ -1352,7 +1359,7 @@ const Home: React.FC = () => {
         status: 'PENDING'
       };
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/request`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/requests`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1375,7 +1382,7 @@ const Home: React.FC = () => {
       setRequestPriceRange('');
 
       // Refresh requests list
-      const refreshResponse = await fetch(`${process.env.REACT_APP_API_URL}/request?limit=3`, {
+      const refreshResponse = await fetch(`${process.env.REACT_APP_API_URL}/requests?limit=3`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1384,7 +1391,14 @@ const Home: React.FC = () => {
       });
       if (refreshResponse.ok) {
         const refreshResult = await refreshResponse.json();
-        setRequests(Array.isArray(refreshResult.data) ? refreshResult.data : []);
+        // Handle both response formats: { success: true, data: [...] } or { data: [...] }
+        if (refreshResult.success && Array.isArray(refreshResult.data)) {
+          setRequests(refreshResult.data);
+        } else if (Array.isArray(refreshResult.data)) {
+          setRequests(refreshResult.data);
+        } else {
+          setRequests([]);
+        }
       }
 
       setShowRequestModal(false);

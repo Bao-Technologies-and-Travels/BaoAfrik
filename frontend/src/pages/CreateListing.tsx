@@ -969,8 +969,10 @@ const CreateListing: React.FC = () => {
         status: 'DRAFT'
       };
 
-      const url = isEditMode && id ? `${process.env.REACT_APP_API_URL}/products/${id}` : `${process.env.REACT_APP_API_URL}/products`;
-      const method = isEditMode && id ? 'PUT' : 'POST';
+      // When editing a draft, use editingDraftId; otherwise use URL param id for edit mode
+      const draftId = editingDraftId || (isEditMode && id ? id : null);
+      const url = draftId ? `${process.env.REACT_APP_API_URL}/products/${draftId}` : `${process.env.REACT_APP_API_URL}/products`;
+      const method = draftId ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method,
@@ -997,7 +999,8 @@ const CreateListing: React.FC = () => {
       }
 
       if (result.success) {
-        const productId = result.data.id || id;
+        // Use editingDraftId if it exists, otherwise use response ID or URL param id
+        const productId = editingDraftId || result.data.id || id;
         const savedProduct = result.data;
 
         // Upload new images if any
@@ -1048,6 +1051,19 @@ const CreateListing: React.FC = () => {
           }
         };
         await refreshDrafts();
+
+        // Notify MyListings to refetch drafts
+        if (editingDraftId) {
+          sessionStorage.setItem('draft-updated', JSON.stringify({
+            productId,
+            timestamp: Date.now()
+          }));
+        } else {
+          sessionStorage.setItem('draft-created', JSON.stringify({
+            productId,
+            timestamp: Date.now()
+          }));
+        }
 
         if (isEditMode && id && productId) {
           sessionStorage.setItem(`draft-status-change-${productId}`, JSON.stringify({
@@ -1158,7 +1174,14 @@ const CreateListing: React.FC = () => {
       }
 
       if (createResult.success) {
-        const productId = createResult.data?.id || id;
+        // Use editingDraftId if it exists, otherwise use the response ID or URL param id
+        const productId = editingDraftId || createResult.data?.id || id;
+
+        if (!productId) {
+          addToast({ type: 'error', title: 'Error', message: 'Product ID not found', duration: 2000 });
+          setIsLoading(false);
+          return;
+        }
 
         // Upload images if present
         if (images.length > 0 && productId) {
@@ -1182,7 +1205,7 @@ const CreateListing: React.FC = () => {
           return;
         }
 
-        const actualProductId = createResult.data?.id || productId;
+        const actualProductId = productId;
 
         // Remove draft from list if it was a draft
         if (editingDraftId) {
@@ -1222,7 +1245,7 @@ const CreateListing: React.FC = () => {
         addToast({
           type: "success",
           title: 'Listing Published',
-          message: `Your listing has been ${isEditMode ? 'updated' : 'published'} successfully!`,
+          message: `Your listing has been ${editingDraftId || isEditMode ? 'updated' : 'published'} successfully!`,
           duration: 3000
         });
 
@@ -1391,20 +1414,18 @@ const CreateListing: React.FC = () => {
     };
   }, [isLanguageDropdownOpen, isMenuDropdownOpen, isCategoryDropdownOpen, isOriginDropdownOpen, isSaleTypeDropdownOpen, isCurrencyDropdownOpen]);
 
+  // mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
     const stateDraft = (routerLocation.state as { draft?: Record<string, string> } | null)?.draft;
-
-    // mpbile detection
-    useEffect(() => {
-      const checkMobile = () => {
-        setIsMobile(window.innerWidth < 1024);
-      };
-      checkMobile();
-      window.addEventListener('resize', checkMobile);
-      return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
-    // Removed hardcoded draft initialization - drafts are fetched from backend
 
     if (stateDraft) {
       applyPrefillToForm(stateDraft);

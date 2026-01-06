@@ -46,7 +46,7 @@ const io = new Server(server, {
   },
   transports: ['websocket', 'polling'],
   allowEIO3: true,
-   pingTimeout: 60000,
+  pingTimeout: 60000,
   pingInterval: 25000,
 });
 
@@ -116,8 +116,8 @@ const corsOptions = {
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
   allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
+    'Content-Type',
+    'Authorization',
     'X-Requested-With',
     'Content-MD5',
     'Content-Disposition',
@@ -189,7 +189,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/countries', countryRoutes);
-app.use('/api/request', requestRoutes);
+app.use('/api/requests', requestRoutes);
 
 // 404 handler
 app.use(notFound);

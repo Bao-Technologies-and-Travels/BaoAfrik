@@ -434,7 +434,13 @@ export const createRequestValidation = [
 export const updateRequestValidation = [
   param('id').isUUID().withMessage('Invalid request ID'),
   body('status').optional().isIn(['PENDING', 'FULFILLED', 'REJECTED']).withMessage('Invalid status'),
-  ...createRequestValidation
+  body('productName').optional().trim().notEmpty().withMessage('Product name cannot be empty'),
+  body('description').optional().trim().notEmpty().withMessage('Description cannot be empty'),
+  body('origin').optional().trim().notEmpty().withMessage('Origin cannot be empty'),
+  body('sellerLocation').optional().trim().notEmpty().withMessage('Seller location cannot be empty'),
+  body('minPrice').optional().isFloat({ min: 0 }).withMessage('Minimum price must be a positive number'),
+  body('maxPrice').optional().isFloat({ min: 0 }).withMessage('Maximum price must be a positive number'),
+  body('currency').optional().isString().isLength({ min: 3, max: 3 }).withMessage('Currency must be a 3-letter code')
 ];
 export const requestIdValidation = [
   param('id').isUUID().withMessage('Invalid request ID')
