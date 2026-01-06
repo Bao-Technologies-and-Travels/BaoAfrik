@@ -94,6 +94,8 @@ const Home: React.FC = () => {
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const autoCaptureTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const hasCapturedRef = React.useRef<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const totalPages = 48;
@@ -1807,9 +1809,9 @@ const Home: React.FC = () => {
       setShowImageSearchModal(true);
     } else {
       // Desktop: Open file explorer
-      const fileInput = document.getElementById('image-upload') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.click();
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
       }
     }
   };
@@ -1847,12 +1849,13 @@ const Home: React.FC = () => {
 
   // Capture image from camera
   const captureImage = () => {
-    if (videoRef.current && canvasRef.current) {
+    if (videoRef.current && canvasRef.current && !hasCapturedRef.current) {
+      hasCapturedRef.current = true;
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       
-      if (ctx) {
+      if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0);
@@ -1861,8 +1864,6 @@ const Home: React.FC = () => {
           if (blob) {
             const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
             handleImageFromFile(file);
-            stopCamera();
-            setShowImageSearchModal(false);
           }
         }, 'image/jpeg', 0.9);
       }
@@ -1871,36 +1872,39 @@ const Home: React.FC = () => {
 
   // Handle image from file or camera
   const handleImageFromFile = (file: File) => {
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
-      return;
-    }
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
-      alert('Image size must be less than 10MB');
-      return;
-    }
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        alert('Image size must be less than 10MB');
+        return;
+      }
 
-    // Set selected image
-    setSelectedImage(file);
+      // Set selected image
+      setSelectedImage(file);
 
     // Create preview URL
     const imageUrl = URL.createObjectURL(file);
     setSelectedImageUrl(imageUrl);
 
-    // Create FormData for future API call
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('timestamp', new Date().toISOString());
-    
-    setImageFormData(formData);
-    
+      // Create FormData for future API call
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('timestamp', new Date().toISOString());
+      
+      setImageFormData(formData);
+      
     // Close mobile camera modal if open
     if (showImageSearchModal) {
+      stopCamera();
       setShowImageSearchModal(false);
+      // Redirect to mobile search flow
+      setShowMobileSearchFlow(true);
     }
   };
 
@@ -2067,6 +2071,7 @@ const Home: React.FC = () => {
   // Start camera when modal opens, cleanup when closes
   useEffect(() => {
     if (showImageSearchModal && isMobile) {
+      hasCapturedRef.current = false;
       const initializeCamera = async () => {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({
@@ -2075,6 +2080,18 @@ const Home: React.FC = () => {
           setCameraStream(stream);
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
+            // Auto-capture after 2 seconds when video is ready
+            videoRef.current.onloadedmetadata = () => {
+              if (autoCaptureTimerRef.current) {
+                clearTimeout(autoCaptureTimerRef.current);
+              }
+              autoCaptureTimerRef.current = setTimeout(() => {
+                if (!hasCapturedRef.current && videoRef.current && canvasRef.current) {
+                  hasCapturedRef.current = true;
+                  captureImage();
+                }
+              }, 2000); // Auto-capture after 2 seconds
+            };
           }
         } catch (error) {
           console.error('Error accessing camera:', error);
@@ -2086,13 +2103,21 @@ const Home: React.FC = () => {
       };
       initializeCamera();
     } else if (!showImageSearchModal && cameraStream) {
+      if (autoCaptureTimerRef.current) {
+        clearTimeout(autoCaptureTimerRef.current);
+        autoCaptureTimerRef.current = null;
+      }
       cameraStream.getTracks().forEach(track => track.stop());
       setCameraStream(null);
       if (videoRef.current) {
         videoRef.current.srcObject = null;
       }
+      hasCapturedRef.current = false;
     }
     return () => {
+      if (autoCaptureTimerRef.current) {
+        clearTimeout(autoCaptureTimerRef.current);
+      }
       if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
         setCameraStream(null);
@@ -2155,7 +2180,7 @@ const Home: React.FC = () => {
                 <img
                   src={selectedImageUrl}
                   alt="Selected product"
-                  style={{
+                  style={{ 
                     width: '40px',
                     height: '40px',
                     borderRadius: '8px',
@@ -2166,28 +2191,28 @@ const Home: React.FC = () => {
                 />
               )}
               <div className="flex flex-col justify-center flex-1">
-                <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
-                <input
-                  type="text"
+              <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
+              <input
+                type="text"
                   placeholder={selectedImage ? "Wanna be more specific ?" : "Search a product"}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleSearchKeyPress}
-                  onFocus={() => {
-                    setFocusedSearchSection('product');
-                    if (searchHistory.length > 0) {
-                      setShowSearchHistory(true);
-                    }
-                  }}
-                  onBlur={() => {
-                    setTimeout(() => {
-                      setFocusedSearchSection(null);
-                      setShowSearchHistory(false);
-                    }, 200);
-                  }}
-                  className="border-0 p-0 focus:outline-none focus:ring-0 product-search-input"
-                  style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
-                />
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                onFocus={() => {
+                  setFocusedSearchSection('product');
+                  if (searchHistory.length > 0) {
+                    setShowSearchHistory(true);
+                  }
+                }}
+                onBlur={() => {
+                  setTimeout(() => {
+                    setFocusedSearchSection(null);
+                    setShowSearchHistory(false);
+                  }, 200);
+                }}
+                className="border-0 p-0 focus:outline-none focus:ring-0 product-search-input"
+                style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
+              />
               </div>
               <style>
                 {`
@@ -2371,17 +2396,17 @@ const Home: React.FC = () => {
               </div>
             </button>
           ) : (
-            <button 
-              onClick={handleScan}
-              className="flex items-center justify-center px-3 hover:opacity-70 transition-opacity"
-              title="Scan QR code"
-            >
-              <img 
-                src={scanIcon} 
-                alt="Scan QR code" 
-                style={{ width: '20px', height: '20px' }}
-              />
-            </button>
+          <button 
+            onClick={handleScan}
+            className="flex items-center justify-center px-3 hover:opacity-70 transition-opacity"
+            title="Scan QR code"
+          >
+            <img 
+              src={scanIcon} 
+              alt="Scan QR code" 
+              style={{ width: '20px', height: '20px' }}
+            />
+          </button>
           )}
               
               {/* Search Button */}
@@ -2682,44 +2707,44 @@ const Home: React.FC = () => {
                       }}
                     />
                   )}
-                  <input
-                    type="text"
+                <input
+                  type="text"
                     placeholder={selectedImage ? "Wanna be more specific ?" : "What are you looking for today ?"}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={handleSearchKeyPress}
-                    onFocus={() => {
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  onFocus={() => {
                       if (isMobile) {
                         setShowMobileSearchFlow(true);
                         setMobileSearchQuery(searchQuery);
                       } else {
-                        setFocusedSearchSection('mobile-search');
-                        if (searchHistory.length > 0) {
-                          setShowSearchHistory(true);
+                    setFocusedSearchSection('mobile-search');
+                    if (searchHistory.length > 0) {
+                      setShowSearchHistory(true);
                         }
-                      }
-                    }}
-                    onBlur={() => {
-                      setTimeout(() => {
-                        setFocusedSearchSection(null);
-                        setShowSearchHistory(false);
-                      }, 200);
-                    }}
+                    }
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => {
+                      setFocusedSearchSection(null);
+                      setShowSearchHistory(false);
+                    }, 200);
+                  }}
                     className="flex-1 focus:outline-none text-sm"
-                    style={{
+                  style={{
                       backgroundColor: 'transparent',
                       border: 'none',
-                      fontFamily: 'Poppins, sans-serif',
-                      color: '#212121',
-                      caretColor: '#64B5F6'
-                    }}
-                  />
-                  <style>{`
-                    .md\\:hidden input::placeholder {
-                      color: #D9D9D9;
-                      font-size: 12px;
-                    }
-                  `}</style>
+                    fontFamily: 'Poppins, sans-serif',
+                    color: '#212121',
+                    caretColor: '#64B5F6'
+                  }}
+                />
+                <style>{`
+                  .md\\:hidden input::placeholder {
+                    color: #D9D9D9;
+                    font-size: 12px;
+                  }
+                `}</style>
                   {selectedImage ? (
                     <button 
                       onClick={() => {
@@ -2751,18 +2776,18 @@ const Home: React.FC = () => {
                       </div>
                     </button>
                   ) : (
-                    <button 
-                      onClick={handleScan}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
-                      title="Scan image to search"
-                    >
-                      <img 
-                        src={scanIcon} 
-                        alt="Scan" 
-                        className="w-5 h-5"
-                        style={{ opacity: 0.6 }}
-                      />
-                    </button>
+                <button 
+                  onClick={handleScan}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                  title="Scan image to search"
+                >
+                  <img 
+                    src={scanIcon} 
+                    alt="Scan" 
+                    className="w-5 h-5"
+                    style={{ opacity: 0.6 }}
+                  />
+                </button>
                   )}
                 </div>
               </div>
@@ -3864,10 +3889,10 @@ const Home: React.FC = () => {
           <div className={`flex flex-col ${isMobile ? 'items-center gap-2' : 'lg:flex-row items-center gap-6'} mt-12 ${isMobile ? 'mb-8' : 'mb-16'} w-full`}>
             <div className={`flex-1 flex justify-center w-full ${isMobile ? '' : ''}`}>
               <div className={`flex items-center ${isMobile ? 'gap-6' : 'gap-6'}`} style={isMobile ? {} : { marginLeft: '80px' }}>
-                <button
+              <button
                   aria-label="Previous page"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
                   style={{
                     width: isMobile ? '24px' : '32px',
                     height: isMobile ? '24px' : '32px',
@@ -3884,12 +3909,12 @@ const Home: React.FC = () => {
                   <svg width={isMobile ? '12' : '16'} height={isMobile ? '12' : '16'} viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M15 18l-6-6 6-6" />
                   </svg>
-                </button>
+              </button>
 
                  <div className="flex items-center" style={{ gap: isMobile ? '24px' : '36px' }}>
                   {paginationNumbers.map((page) => (
                     <span
-                      key={page}
+                            key={page}
                       onClick={() => setCurrentPage(page)}
                       style={{
                         fontFamily: 'Bricolage Grotesque, sans-serif',
@@ -3897,8 +3922,8 @@ const Home: React.FC = () => {
                         color: page === currentPage ? '#212121' : '#B0B0B0',
                         cursor: 'pointer'
                       }}
-                    >
-                      {page}
+                  >
+                    {page}
                     </span>
                   ))}
 
@@ -3914,12 +3939,12 @@ const Home: React.FC = () => {
                   >
                     {totalPages}
                   </span>
-                </div>
+              </div>
 
-                <button
+              <button
                   aria-label="Next page"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
                   style={{
                     width: isMobile ? '24px' : '32px',
                     height: isMobile ? '24px' : '32px',
@@ -3936,10 +3961,10 @@ const Home: React.FC = () => {
                   <svg width={isMobile ? '12' : '16'} height={isMobile ? '12' : '16'} viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 6l6 6-6 6" />
                   </svg>
-                </button>
-              </div>
+              </button>
             </div>
-
+          </div>
+          
             {/* Go to section */}
             <div className={`flex items-center ${isMobile ? 'gap-3 justify-center' : 'gap-2'}`}>
               <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '11px' : '12px' }}>Go to :</span>
@@ -4110,7 +4135,7 @@ const Home: React.FC = () => {
                         Request
                       </span>
                       <div className="flex items-center gap-2">
-                        <button 
+                      <button 
                           className="flex items-center gap-1.5 px-3 py-1 rounded-lg border"
                           style={{ 
                             backgroundColor: '#FFFFFF', 
@@ -4124,8 +4149,8 @@ const Home: React.FC = () => {
                           }}
                         >
                           <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
-                          Manage request
-                        </button>
+                        Manage request
+                      </button>
                         <button
                           className="w-8 h-8 rounded-full flex items-center justify-center"
                           style={{
@@ -4399,14 +4424,14 @@ const Home: React.FC = () => {
                             <span style={{ fontSize: '8px', color: '#212121', fontWeight: '500' }}>Seraphin DIKOUM</span>
                             {/* Rating below name */}
                             <div className="flex items-center gap-0.5 mt-0.5">
-                              <svg 
-                                className="text-yellow-500" 
-                                fill="currentColor" 
-                                viewBox="0 0 20 20"
-                                style={{ width: '8px', height: '8px' }}
-                              >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                              </svg>
+                          <svg 
+                            className="text-yellow-500" 
+                            fill="currentColor" 
+                            viewBox="0 0 20 20"
+                            style={{ width: '8px', height: '8px' }}
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
                               <svg 
                                 className="text-yellow-500" 
                                 fill="currentColor" 
@@ -4450,16 +4475,16 @@ const Home: React.FC = () => {
                   {/* Manage the request button - Mobile only */}
                   {isMobile && (
                     <div className="w-full flex justify-center mt-3">
-                      <button 
+                    <button 
                         className="flex items-center justify-center gap-1.5 mx-auto"
-                        style={{ 
+                      style={{ 
                           backgroundColor: '#FFFFFF', 
                           borderColor: '#F9A825',
                           border: '1px solid #F9A825',
                           color: '#F9A825',
-                          fontWeight: 'normal', 
-                          fontSize: '9px',
-                          padding: '6px 10px',
+                        fontWeight: 'normal', 
+                        fontSize: '9px',
+                        padding: '6px 10px',
                           borderRadius: '6px',
                           cursor: 'pointer',
                           width: 'auto',
@@ -4473,7 +4498,7 @@ const Home: React.FC = () => {
                       >
                         <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
                         Manage the request
-                      </button>
+                    </button>
                     </div>
                   )}
                 </div>
@@ -4507,26 +4532,26 @@ const Home: React.FC = () => {
                 />
               </Link>
               <div className="flex items-center gap-3">
-                <button 
+              <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
                     width: window.innerWidth < 640 ? '20px' : '24px',
                     height: window.innerWidth < 640 ? '20px' : '24px'
                   }}
-                  aria-label="Previous"
-                >
-                  <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                </button>
-                <button 
+                aria-label="Previous"
+              >
+                <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+              </button>
+              <button 
                   className="rounded-full flex items-center justify-center transition-all duration-200"
                   style={{
                     width: window.innerWidth < 640 ? '20px' : '24px',
                     height: window.innerWidth < 640 ? '20px' : '24px'
                   }}
-                  aria-label="Next"
-                >
-                  <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-                </button>
+                aria-label="Next"
+              >
+                <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+              </button>
               </div>
             </div>
           </div>
@@ -5264,12 +5289,12 @@ const Home: React.FC = () => {
 
       {/* Mobile Image Search Camera Interface */}
       {showImageSearchModal && isMobile && (
-        <div className="fixed inset-0 bg-black z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="fixed inset-0 z-[9999] flex flex-col" style={{ fontFamily: 'Poppins, sans-serif', backgroundColor: 'transparent', isolation: 'isolate' }}>
           {/* Hidden canvas for image capture */}
           <canvas ref={canvasRef} style={{ display: 'none' }} />
           
           {/* Header */}
-          <div className="flex items-center justify-between px-4 pt-4 pb-3">
+          <div className="flex items-center justify-between px-4 pt-4 pb-3" style={{ backgroundColor: 'transparent', zIndex: 10 }}>
             <h1 style={{ fontSize: '14px', fontWeight: 600, color: '#FFF', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Search by image
             </h1>
@@ -5299,7 +5324,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Camera View Area */}
-          <div className="flex-1 relative" style={{ backgroundColor: '#000', overflow: 'hidden' }}>
+          <div className="flex-1 relative" style={{ overflow: 'hidden', zIndex: 1 }}>
             {/* Video Element */}
             <video
               ref={videoRef}
@@ -5309,60 +5334,74 @@ const Home: React.FC = () => {
               style={{
                 width: '100%',
                 height: '100%',
-                objectFit: 'cover'
+                objectFit: 'cover',
+                position: 'absolute',
+                top: 0,
+                left: 0
               }}
             />
             
-            {/* Scan Area Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
+            {/* Scan Area Overlay - Corner Brackets */}
+            <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
               <div
                 style={{
                   width: '280px',
                   height: '280px',
-                  border: '2px solid #FFF',
-                  borderRadius: '12px',
-                  position: 'relative',
-                  boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
+                  position: 'relative'
                 }}
-              />
+              >
+                {/* Top-left corner */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '40px',
+                  height: '40px',
+                  borderTop: '3px solid #FFF',
+                  borderLeft: '3px solid #FFF',
+                  borderTopLeftRadius: '8px'
+                }} />
+                {/* Top-right corner */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  width: '40px',
+                  height: '40px',
+                  borderTop: '3px solid #FFF',
+                  borderRight: '3px solid #FFF',
+                  borderTopRightRadius: '8px'
+                }} />
+                {/* Bottom-left corner */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  width: '40px',
+                  height: '40px',
+                  borderBottom: '3px solid #FFF',
+                  borderLeft: '3px solid #FFF',
+                  borderBottomLeftRadius: '8px'
+                }} />
+                {/* Bottom-right corner */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  width: '40px',
+                  height: '40px',
+                  borderBottom: '3px solid #FFF',
+                  borderRight: '3px solid #FFF',
+                  borderBottomRightRadius: '8px'
+                }} />
+              </div>
             </div>
-            
-            {/* Capture Button */}
-            <button
-              onClick={captureImage}
-              style={{
-                position: 'absolute',
-                bottom: '140px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '64px',
-                height: '64px',
-                borderRadius: '50%',
-                backgroundColor: '#FFF',
-                border: '4px solid #000',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 10
-              }}
-            >
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  backgroundColor: '#FFF',
-                  border: '2px solid #000'
-                }}
-              />
-            </button>
             
             {/* Instruction Text */}
             <div
               style={{
                 position: 'absolute',
-                bottom: '80px',
+                bottom: '140px',
                 left: '50%',
                 transform: 'translateX(-50%)',
                 textAlign: 'center',
@@ -5371,7 +5410,8 @@ const Home: React.FC = () => {
                 fontFamily: 'Poppins, sans-serif',
                 padding: '0 20px',
                 lineHeight: '1.3',
-                maxWidth: '240px'
+                maxWidth: '240px',
+                zIndex: 3
               }}
             >
               Press the camera<br />icon to start a search for this product
@@ -5379,7 +5419,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Bottom Button */}
-          <div className="px-4 pb-6">
+          <div className="px-4 pb-6" style={{ backgroundColor: 'transparent', zIndex: 10 }}>
             <button
               onClick={() => {
                 stopCamera();
@@ -5390,12 +5430,13 @@ const Home: React.FC = () => {
                 }
               }}
               style={{
-                width: '100%',
+                width: 'auto',
+                minWidth: '200px',
                 height: '48px',
                 borderRadius: '50px',
-                backgroundColor: '#FFF',
+                backgroundColor: '#000',
                 border: 'none',
-                color: '#000',
+                color: '#FFF',
                 cursor: 'pointer',
                 fontSize: '14px',
                 fontFamily: 'Poppins, sans-serif',
@@ -5404,7 +5445,8 @@ const Home: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '12px',
-                padding: '0 20px'
+                padding: '0 20px',
+                margin: '0 auto'
               }}
             >
               <div
@@ -5482,78 +5524,78 @@ const Home: React.FC = () => {
           </div>
         ) : (
           // Desktop/Tablet: Modal Overlay
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#0000001A',
+            zIndex: 9998,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onClick={() => setShowConfirmationModal(false)}
+        >
+          {/* Confirmation Modal Content */}
           <div 
             style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: '#0000001A',
-              zIndex: 9998,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            onClick={() => setShowConfirmationModal(false)}
-          >
-            {/* Confirmation Modal Content */}
-            <div 
-              style={{
                 width: '520px',
                 maxWidth: '520px',
-                height: 'auto',
+              height: 'auto',
                 borderRadius: '30px',
-                background: '#FFF',
+              background: '#FFF',
                 padding: '32px 40px',
-                position: 'relative',
-                fontFamily: 'Poppins, sans-serif',
-                textAlign: 'center'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Verify Icon */}
+              position: 'relative',
+              fontFamily: 'Poppins, sans-serif',
+              textAlign: 'center'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Verify Icon */}
               <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
                 <img src={verifyIcon} alt="Success" style={{ width: '70px', height: '70px' }} />
-              </div>
+            </div>
 
-              {/* Success Message */}
+            {/* Success Message */}
               <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '500', marginBottom: '10px' }}>
-                Your request has been registered
-              </h2>
+              Your request has been registered
+            </h2>
 
-              {/* Description */}
+            {/* Description */}
               <p style={{ fontSize: '13px', color: '#6A6A6A', marginBottom: '24px', lineHeight: '1.6' }}>
-                Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing
-              </p>
+              Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing
+            </p>
 
-              {/* Close Button */}
-              <button
-                onClick={() => setShowConfirmationModal(false)}
-                style={{
-                  display: 'flex',
-                  width: '100%',
+            {/* Close Button */}
+            <button
+              onClick={() => setShowConfirmationModal(false)}
+              style={{
+                display: 'flex',
+                width: '100%',
                   height: '40px',
                   padding: '10px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '10px',
-                  flexShrink: 0,
-                  borderRadius: '8px',
-                  backgroundColor: '#F9A825',
-                  color: '#FFF',
-                  border: 'none',
-                  cursor: 'pointer',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                flexShrink: 0,
+                borderRadius: '8px',
+                backgroundColor: '#F9A825',
+                color: '#FFF',
+                border: 'none',
+                cursor: 'pointer',
                   fontSize: '14px',
-                  fontFamily: 'Poppins, sans-serif',
-                  fontWeight: '400',
-                  margin: '0 auto'
-                }}
-              >
-                Close
-              </button>
-            </div>
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: '400',
+                margin: '0 auto'
+              }}
+            >
+              Close
+            </button>
           </div>
+        </div>
         )
       )}
 
@@ -5579,7 +5621,7 @@ const Home: React.FC = () => {
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
             </button>
-          </div>
+    </div>
 
           {/* Filter Fields */}
           <div className="px-4 space-y-4 pb-24">
