@@ -33,6 +33,7 @@ import a4 from '../assets/images/pre/a4.png';
 import verityIcon from '../assets/images/pre/verity.svg';
 import avatar from '../assets/images/logos/avatar.png';
 import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 interface DraftListing {
   id: string;
@@ -109,7 +110,15 @@ const CreateListing: React.FC = () => {
     const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
   const [showMobileDrafts, setShowMobileDrafts] = useState(false);
-  const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
+  // Load drafts from localStorage on mount
+  const [draftListings, setDraftListings] = useState<DraftListing[]>(() => {
+    try {
+      const savedDrafts = localStorage.getItem('draftListings');
+      return savedDrafts ? JSON.parse(savedDrafts) : initialDraftListings;
+    } catch {
+      return initialDraftListings;
+    }
+  });
   const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
   const currentDraftSeed = JSON.stringify(initialDraftListings);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -125,6 +134,7 @@ const CreateListing: React.FC = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [countdown, setCountdown] = useState(10);
     const [showNotification, setShowNotification] = useState(false);
+    const [isSavingDraft, setIsSavingDraft] = useState(false);
 
   // Check if all required fields are filled
   const isFormComplete = title.trim() !== '' && 
@@ -274,7 +284,16 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
   };
 
   const handleDraftDelete = (draftId: string) => {
-    setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
+    setDraftListings((prev) => {
+      const updated = prev.filter((draft) => draft.id !== draftId);
+      // Save to localStorage
+      try {
+        localStorage.setItem('draftListings', JSON.stringify(updated));
+      } catch (error) {
+        console.error('Error saving drafts to localStorage:', error);
+      }
+      return updated;
+    });
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -438,9 +457,52 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
     });
   };
 
-  const handleSaveDraft = () => {
-    console.log('Saving as draft...');
-    // TODO: Implement save draft functionality
+  const handleSaveDraft = async () => {
+    if (isSavingDraft) return;
+    
+    setIsSavingDraft(true);
+    
+    try {
+      // Get country info from origin
+      const originOption = countries.find(c => c.value === origin);
+      const countryName = originOption ? originOption.label : '';
+      const flagCode = originOption ? originOption.flagCode : '';
+      const flagUrl = flagCode ? `https://flagcdn.com/w20/${flagCode}.png` : '';
+      
+      // Create draft object
+      const newDraft: DraftListing = {
+        id: `draft-${Date.now()}`,
+        title: title.trim() || 'Untitled Listing',
+        price: price.trim() || 'N/A',
+        currency: currency,
+        image: imageUrls.length > 0 ? imageUrls[0] : '',
+        description: description.trim() || '',
+        country: countryName,
+        flag: flagUrl
+      };
+      
+      // Get existing drafts from localStorage
+      const existingDraftsJson = localStorage.getItem('draftListings');
+      const existingDrafts: DraftListing[] = existingDraftsJson ? JSON.parse(existingDraftsJson) : [];
+      
+      // Add new draft
+      const updatedDrafts = [newDraft, ...existingDrafts];
+      
+      // Save to localStorage
+      localStorage.setItem('draftListings', JSON.stringify(updatedDrafts));
+      
+      // Update local state
+      setDraftListings(updatedDrafts);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log('Draft saved successfully');
+    } catch (error) {
+      console.error('Error saving draft:', error);
+    } finally {
+      setIsSavingDraft(false);
+    }
   };
 
   const handlePostListing = () => {
@@ -588,18 +650,40 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Sync drafts from localStorage
   useEffect(() => {
-    if (draftSeedRef.current !== currentDraftSeed) {
-      draftSeedRef.current = currentDraftSeed;
-      setDraftListings(initialDraftListings);
+    try {
+      const savedDrafts = localStorage.getItem('draftListings');
+      if (savedDrafts) {
+        const parsed = JSON.parse(savedDrafts);
+        setDraftListings(parsed);
+      }
+    } catch (error) {
+      console.error('Error loading drafts from localStorage:', error);
     }
-  }, [currentDraftSeed]);
+  }, []);
+
+  // Listen for storage changes (sync between tabs)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'draftListings' && e.newValue) {
+        try {
+          setDraftListings(JSON.parse(e.newValue));
+        } catch (error) {
+          console.error('Error parsing drafts from storage event:', error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   useEffect(() => {
     const stateDraft = (routerLocation.state as { draft?: Record<string, string> } | null)?.draft;
     if (stateDraft) {
       applyPrefillToForm(stateDraft);
-      setIsDraftsModalOpen(true);
+      // Don't open modal when coming from MyListings - just prefill the form
       navigate(routerLocation.pathname, { replace: true, state: {} });
     }
   }, [routerLocation.state, routerLocation.pathname, navigate]);
@@ -853,7 +937,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                       paddingBottom: '4px'
                     }}
                     onClick={() => {
-                      setDraftListings((prev) => prev.filter((d) => d.id !== draft.id));
+                      handleDraftDelete(draft.id);
                     }}
                   >
                     <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
@@ -2485,10 +2569,22 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                 </button>
                 <button
                   onClick={handleSaveDraft}
+                  disabled={isSavingDraft}
                   className="flex items-center justify-center w-full py-2 rounded-xl font-medium transition-colors text-sm"
-                  style={{ color: '#939393' }}
+                  style={{ 
+                    color: isSavingDraft ? '#BABABA' : '#939393',
+                    cursor: isSavingDraft ? 'not-allowed' : 'pointer',
+                    opacity: isSavingDraft ? 0.7 : 1
+                  }}
                 >
-                  <span>Save as draft</span>
+                  {isSavingDraft ? (
+                    <>
+                      <LoadingSpinner size="sm" color="gray" className="mr-2" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <span>Save as draft</span>
+                  )}
                 </button>
               </div>
             </div>
@@ -3515,11 +3611,30 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                 <div className="flex items-center justify-center space-x-16 mt-16" style={{ maxWidth: '560px' }}>
                   <button
                     onClick={handleSaveDraft}
+                    disabled={isSavingDraft}
                     className="flex items-center space-x-2 rounded-xl border-2 font-medium transition-colors text-sm"
-                    style={{ borderColor: '#F9A825', color: '#F9A825', paddingLeft: '4rem', paddingRight: '4.5rem', paddingTop: '0.625rem', paddingBottom: '0.625rem' }}
+                    style={{ 
+                      borderColor: isSavingDraft ? '#E9E9E9' : '#F9A825', 
+                      color: isSavingDraft ? '#BABABA' : '#F9A825', 
+                      paddingLeft: '4rem', 
+                      paddingRight: '4.5rem', 
+                      paddingTop: '0.625rem', 
+                      paddingBottom: '0.625rem',
+                      cursor: isSavingDraft ? 'not-allowed' : 'pointer',
+                      opacity: isSavingDraft ? 0.7 : 1
+                    }}
                   >
-                    <span>Save as draft</span>
-                    <img src={draft2Icon} alt="Save" className="w-5 h-5" />
+                    {isSavingDraft ? (
+                      <>
+                        <LoadingSpinner size="md" color="orange" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Save as draft</span>
+                        <img src={draft2Icon} alt="Save" className="w-5 h-5" />
+                      </>
+                    )}
                   </button>
                   <button
                     onClick={handlePostListing}

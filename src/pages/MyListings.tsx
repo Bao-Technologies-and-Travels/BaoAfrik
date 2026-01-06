@@ -317,7 +317,15 @@ const MyListings: React.FC = () => {
   const [selectedSort, setSelectedSort] = useState<{ label: string; value: SortValue } | null>(null);
   const sortDropdownRef = useRef<HTMLDivElement | null>(null);
   const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
-  const [draftListings, setDraftListings] = useState<DraftListing[]>(initialDraftListings);
+  // Load drafts from localStorage on mount
+  const [draftListings, setDraftListings] = useState<DraftListing[]>(() => {
+    try {
+      const savedDrafts = localStorage.getItem('draftListings');
+      return savedDrafts ? JSON.parse(savedDrafts) : initialDraftListings;
+    } catch {
+      return initialDraftListings;
+    }
+  });
   const draftSeedRef = useRef(JSON.stringify(initialDraftListings));
   const currentDraftSeed = JSON.stringify(initialDraftListings);
   const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
@@ -464,7 +472,7 @@ const MyListings: React.FC = () => {
   const shouldShowEmptyState = !hasResults;
   const isSearchNoResultsState = shouldShowEmptyState && isSearchActive;
   const totalListings = listings.length;
-  const draftCount = 3;
+  const draftCount = draftListings.length;
   const currentPage = 1;
   const totalPages = 48;
   const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -495,13 +503,28 @@ const MyListings: React.FC = () => {
   };
 
   const handleDraftEdit = (draft: DraftListing) => {
-    const prefillData = buildDraftPrefillPayload(draft);
-    navigate('/create-listing', { state: { draft: prefillData } });
+    // Close modal immediately before navigation
     setIsDraftsModalOpen(false);
+    setShowMobileDrafts(false);
+    
+    // Small delay to ensure modal closes before navigation
+    setTimeout(() => {
+      const prefillData = buildDraftPrefillPayload(draft);
+      navigate('/create-listing', { state: { draft: prefillData } });
+    }, 0);
   };
 
   const handleDraftDelete = (draftId: string) => {
-    setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
+    setDraftListings((prev) => {
+      const updated = prev.filter((draft) => draft.id !== draftId);
+      // Save to localStorage
+      try {
+        localStorage.setItem('draftListings', JSON.stringify(updated));
+      } catch (error) {
+        console.error('Error saving drafts to localStorage:', error);
+      }
+      return updated;
+    });
   };
 
   const handleListingNavigation = (listing: Listing) => {
@@ -589,12 +612,34 @@ const MyListings: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Sync drafts from localStorage
   useEffect(() => {
-    if (draftSeedRef.current !== currentDraftSeed) {
-      draftSeedRef.current = currentDraftSeed;
-      setDraftListings(initialDraftListings);
+    try {
+      const savedDrafts = localStorage.getItem('draftListings');
+      if (savedDrafts) {
+        const parsed = JSON.parse(savedDrafts);
+        setDraftListings(parsed);
+      }
+    } catch (error) {
+      console.error('Error loading drafts from localStorage:', error);
     }
-  }, [currentDraftSeed]);
+  }, []);
+
+  // Listen for storage changes (sync between tabs)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'draftListings' && e.newValue) {
+        try {
+          setDraftListings(JSON.parse(e.newValue));
+        } catch (error) {
+          console.error('Error parsing drafts from storage event:', error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const getSecondaryKeyByValue = (value: SortValue): string | null => {
     for (const option of sortOptions) {
@@ -2049,7 +2094,14 @@ const MyListings: React.FC = () => {
                       paddingBottom: '4px'
                     }}
                     onClick={() => {
-                      navigate('/create-listing', { state: { prefill: buildDraftPrefillPayload(draft) } });
+                      // Close modal immediately before navigation
+                      setIsDraftsModalOpen(false);
+                      setShowMobileDrafts(false);
+                      
+                      // Small delay to ensure modal closes before navigation
+                      setTimeout(() => {
+                        navigate('/create-listing', { state: { prefill: buildDraftPrefillPayload(draft) } });
+                      }, 0);
                     }}
                   >
                     <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
@@ -2069,7 +2121,7 @@ const MyListings: React.FC = () => {
                       paddingBottom: '4px'
                     }}
                     onClick={() => {
-                      setDraftListings((prev) => prev.filter((d) => d.id !== draft.id));
+                      handleDraftDelete(draft.id);
                     }}
                   >
                     <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
