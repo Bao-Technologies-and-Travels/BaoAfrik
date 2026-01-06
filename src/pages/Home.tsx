@@ -90,12 +90,6 @@ const Home: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [imageFormData, setImageFormData] = useState<FormData | null>(null);
-  const [showImageSearchModal, setShowImageSearchModal] = useState(false);
-  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const autoCaptureTimerRef = React.useRef<NodeJS.Timeout | null>(null);
-  const hasCapturedRef = React.useRef<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const totalPages = 48;
@@ -549,6 +543,24 @@ const Home: React.FC = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Handle image data from ImageSearch page
+  useEffect(() => {
+    const state = navigationLocation.state as any;
+    if (state?.selectedImage && state?.selectedImageUrl) {
+      setSelectedImage(state.selectedImage);
+      setSelectedImageUrl(state.selectedImageUrl);
+      setImageFormData(state.imageFormData);
+      
+      // Open mobile search flow if requested
+      if (state.openSearchFlow && isMobile) {
+        setShowMobileSearchFlow(true);
+      }
+      
+      // Clear the state to prevent re-processing
+      window.history.replaceState({}, document.title);
+    }
+  }, [navigationLocation.state, isMobile]);
 
   // Handle click outside for filter dropdowns
   useEffect(() => {
@@ -1805,30 +1817,10 @@ const Home: React.FC = () => {
   // Handle scan functionality - trigger file input
   const handleScan = () => {
     if (isMobile) {
-      // Mobile: Open camera interface (camera will start via useEffect)
-      setShowImageSearchModal(true);
+      // Mobile: Navigate to dedicated image search page
+      navigate('/image-search');
     } else {
       // Desktop: Open file explorer
-    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
-      }
-    }
-  };
-
-  // Start camera stream
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' } // Use back camera
-      });
-      setCameraStream(stream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-      // Fallback to file input if camera access fails
       const fileInput = document.getElementById('image-upload') as HTMLInputElement;
       if (fileInput) {
         fileInput.click();
@@ -1836,76 +1828,34 @@ const Home: React.FC = () => {
     }
   };
 
-  // Stop camera stream
-  const stopCamera = () => {
-    if (cameraStream) {
-      cameraStream.getTracks().forEach(track => track.stop());
-      setCameraStream(null);
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-  };
-
-  // Capture image from camera
-  const captureImage = () => {
-    if (videoRef.current && canvasRef.current && !hasCapturedRef.current) {
-      hasCapturedRef.current = true;
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      
-      if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0);
-        
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
-            handleImageFromFile(file);
-          }
-        }, 'image/jpeg', 0.9);
-      }
-    }
-  };
-
-  // Handle image from file or camera
+  // Handle image from file
   const handleImageFromFile = (file: File) => {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
-        return;
-      }
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
 
-      // Validate file size (max 10MB)
-      const maxSize = 10 * 1024 * 1024; // 10MB
-      if (file.size > maxSize) {
-        alert('Image size must be less than 10MB');
-        return;
-      }
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('Image size must be less than 10MB');
+      return;
+    }
 
-      // Set selected image
-      setSelectedImage(file);
+    // Set selected image
+    setSelectedImage(file);
 
     // Create preview URL
     const imageUrl = URL.createObjectURL(file);
     setSelectedImageUrl(imageUrl);
 
-      // Create FormData for future API call
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('timestamp', new Date().toISOString());
-      
-      setImageFormData(formData);
-      
-    // Close mobile camera modal if open
-    if (showImageSearchModal) {
-      stopCamera();
-      setShowImageSearchModal(false);
-      // Redirect to mobile search flow
-      setShowMobileSearchFlow(true);
-    }
+    // Create FormData for future API call
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('timestamp', new Date().toISOString());
+    
+    setImageFormData(formData);
   };
 
   // Handle image file selection
@@ -2067,67 +2017,6 @@ const Home: React.FC = () => {
       }
     };
   }, [selectedImageUrl]);
-
-  // Start camera when modal opens, cleanup when closes
-  useEffect(() => {
-    if (showImageSearchModal && isMobile) {
-      hasCapturedRef.current = false;
-      const initializeCamera = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment' }
-          });
-          setCameraStream(stream);
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-            // Auto-capture after 2 seconds when video is ready
-            videoRef.current.onloadedmetadata = () => {
-              if (autoCaptureTimerRef.current) {
-                clearTimeout(autoCaptureTimerRef.current);
-              }
-              autoCaptureTimerRef.current = setTimeout(() => {
-                if (!hasCapturedRef.current && videoRef.current && canvasRef.current) {
-                  hasCapturedRef.current = true;
-                  captureImage();
-                }
-              }, 2000); // Auto-capture after 2 seconds
-            };
-          }
-        } catch (error) {
-          console.error('Error accessing camera:', error);
-          const fileInput = document.getElementById('image-upload') as HTMLInputElement;
-          if (fileInput) {
-            fileInput.click();
-          }
-        }
-      };
-      initializeCamera();
-    } else if (!showImageSearchModal && cameraStream) {
-      if (autoCaptureTimerRef.current) {
-        clearTimeout(autoCaptureTimerRef.current);
-        autoCaptureTimerRef.current = null;
-      }
-      cameraStream.getTracks().forEach(track => track.stop());
-      setCameraStream(null);
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
-      hasCapturedRef.current = false;
-    }
-    return () => {
-      if (autoCaptureTimerRef.current) {
-        clearTimeout(autoCaptureTimerRef.current);
-      }
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(track => track.stop());
-        setCameraStream(null);
-      }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showImageSearchModal, isMobile]);
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
@@ -5283,191 +5172,6 @@ const Home: React.FC = () => {
                 Save the location
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Image Search Camera Interface */}
-      {showImageSearchModal && isMobile && (
-        <div className="fixed inset-0 z-[9999] flex flex-col" style={{ fontFamily: 'Poppins, sans-serif', backgroundColor: 'transparent', isolation: 'isolate' }}>
-          {/* Hidden canvas for image capture */}
-          <canvas ref={canvasRef} style={{ display: 'none' }} />
-          
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 pt-4 pb-3" style={{ backgroundColor: 'transparent', zIndex: 10 }}>
-            <h1 style={{ fontSize: '14px', fontWeight: 600, color: '#FFF', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-              Search by image
-            </h1>
-            <div className="flex items-center gap-3">
-              {/* Flash Icon */}
-              <button
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
-              </button>
-              {/* Close Icon */}
-              <button
-                onClick={() => {
-                  stopCamera();
-                  setShowImageSearchModal(false);
-                }}
-                style={{ color: '#FFF', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Camera View Area */}
-          <div className="flex-1 relative" style={{ overflow: 'hidden', zIndex: 1 }}>
-            {/* Video Element */}
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                position: 'absolute',
-                top: 0,
-                left: 0
-              }}
-            />
-            
-            {/* Scan Area Overlay - Corner Brackets */}
-            <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
-              <div
-                style={{
-                  width: '280px',
-                  height: '280px',
-                  position: 'relative'
-                }}
-              >
-                {/* Top-left corner */}
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '40px',
-                  height: '40px',
-                  borderTop: '3px solid #FFF',
-                  borderLeft: '3px solid #FFF',
-                  borderTopLeftRadius: '8px'
-                }} />
-                {/* Top-right corner */}
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  right: 0,
-                  width: '40px',
-                  height: '40px',
-                  borderTop: '3px solid #FFF',
-                  borderRight: '3px solid #FFF',
-                  borderTopRightRadius: '8px'
-                }} />
-                {/* Bottom-left corner */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  width: '40px',
-                  height: '40px',
-                  borderBottom: '3px solid #FFF',
-                  borderLeft: '3px solid #FFF',
-                  borderBottomLeftRadius: '8px'
-                }} />
-                {/* Bottom-right corner */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  width: '40px',
-                  height: '40px',
-                  borderBottom: '3px solid #FFF',
-                  borderRight: '3px solid #FFF',
-                  borderBottomRightRadius: '8px'
-                }} />
-              </div>
-            </div>
-            
-            {/* Instruction Text */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '140px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                textAlign: 'center',
-                color: '#FFF',
-                fontSize: '11px',
-                fontFamily: 'Poppins, sans-serif',
-                padding: '0 20px',
-                lineHeight: '1.3',
-                maxWidth: '240px',
-                zIndex: 3
-              }}
-            >
-              Press the camera<br />icon to start a search for this product
-            </div>
-          </div>
-
-          {/* Bottom Button */}
-          <div className="px-4 pb-6" style={{ backgroundColor: 'transparent', zIndex: 10 }}>
-            <button
-              onClick={() => {
-                stopCamera();
-                // Trigger file input for gallery
-                const fileInput = document.getElementById('image-upload') as HTMLInputElement;
-                if (fileInput) {
-                  fileInput.click();
-                }
-              }}
-              style={{
-                width: 'auto',
-                minWidth: '200px',
-                height: '48px',
-                borderRadius: '50px',
-                backgroundColor: '#000',
-                border: 'none',
-                color: '#FFF',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontFamily: 'Poppins, sans-serif',
-                fontWeight: 400,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px',
-                padding: '0 20px',
-                margin: '0 auto'
-              }}
-            >
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  backgroundColor: '#FFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                  <circle cx="12" cy="13" r="4"></circle>
-                </svg>
-              </div>
-              <span style={{ textDecoration: 'underline' }}>Or browse your gallery</span>
-            </button>
           </div>
         </div>
       )}

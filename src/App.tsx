@@ -35,6 +35,7 @@ import ProfileSettings from './pages/ProfileSettings';
 import MyListings from './pages/MyListings';
 import MyRequests from './pages/MyRequests';
 import Requests from './pages/Requests';
+import ImageSearch from './pages/ImageSearch';
 import './App.css';
 
 function AppContent() {
@@ -42,7 +43,7 @@ function AppContent() {
   const isSellerProfilePage = location.pathname.startsWith('/seller/');
   const isUserAccountPage = location.pathname === '/account';
   const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success', '/two-factor-email', '/two-factor-phone', '/two-factor-code', '/two-factor-success'];
-const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings', '/my-listings', '/my-requests'];
+const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings', '/my-listings', '/my-requests', '/image-search'];
   const isAuthPage = authPages.includes(location.pathname);
   const isCustomLayoutPage = customLayoutPages.includes(location.pathname);
 
@@ -85,6 +86,7 @@ const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/n
           <Route path="/settings" element={<ProfileSettings />} />
           <Route path="/my-listings" element={<MyListings />} />
           <Route path="/my-requests" element={<MyRequests />} />
+          <Route path="/image-search" element={<ImageSearch />} />
         </Routes>
       </div>
     );
