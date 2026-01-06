@@ -7,6 +7,9 @@ interface NotificationData {
   subText?: string;
   subText2?: string;
   sender?: string;
+  onClick?: () => void;
+  clickText?: string;
+  duration?: number;
 }
 
 interface NotificationToastContextType {
@@ -24,10 +27,11 @@ export const NotificationToastProvider: React.FC<{ children: ReactNode }> = ({ c
     setNotification(notificationData);
     setIsVisible(true);
 
-    // Auto-hide after 5 seconds
+    // Auto-hide after specified duration (default 5 seconds)
+    const duration = notificationData.duration || 5000;
     setTimeout(() => {
       hideNotification();
-    }, 5000);
+    }, duration);
   };
 
   const hideNotification = () => {
@@ -49,6 +53,8 @@ export const NotificationToastProvider: React.FC<{ children: ReactNode }> = ({ c
           sender={notification.sender}
           isVisible={isVisible}
           onClose={hideNotification}
+          onClick={notification.onClick}
+          clickText={notification.clickText}
         />
       )}
     </NotificationToastContext.Provider>

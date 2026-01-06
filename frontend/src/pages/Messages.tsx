@@ -585,7 +585,16 @@ const Messages: React.FC = (): JSX.Element => {
     const isImportant = msg?.isImportant || false;
     const label = msg?.label || null;
     const replyTo = msg?.replyTo || null;
-    const productData = msg?.productData || null;
+    // Parse productData if it's a string, otherwise use as-is
+    let productData = msg?.productData || null;
+    if (productData && typeof productData === 'string') {
+      try {
+        productData = JSON.parse(productData);
+      } catch (e) {
+        console.warn('Failed to parse productData:', e);
+        productData = null;
+      }
+    }
     const isProductInquiry = msg?.isProductInquiry !== undefined
       ? Boolean(msg.isProductInquiry)
       : Boolean(productData);
@@ -722,7 +731,15 @@ const Messages: React.FC = (): JSX.Element => {
             { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
           );
           const convos = res.data?.data || [];
-          setConversations(convos);
+          // Sort: pinned first, then by lastMessageAt
+          const sorted = convos.sort((a: any, b: any) => {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+            const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+            return bTime - aTime;
+          });
+          setConversations(sorted);
         } catch (err) {
           console.warn('Failed to refresh conversations on receive message', err);
         }
@@ -772,6 +789,35 @@ const Messages: React.FC = (): JSX.Element => {
           return merged;
         });
       }
+
+      // Clear productData after successful send
+      if (normalized.productData || normalized.isProductInquiry) {
+        setProductData(null);
+      }
+
+      // Always refresh conversations list to update last message and unread counts
+      const refreshConversations = async () => {
+        try {
+          const token = localStorage.getItem("accessToken");
+          const res = await axios.get(
+            `${API_BASE}/chat/conversations`,
+            { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
+          );
+          const convos = res.data?.data || [];
+          // Sort: pinned first, then by lastMessageAt
+          const sorted = convos.sort((a: any, b: any) => {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+            const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+            return bTime - aTime;
+          });
+          setConversations(sorted);
+        } catch (err) {
+          console.warn('Failed to refresh conversations on message sent', err);
+        }
+      };
+      refreshConversations();
     }
     socket.on('message_sent', handleMessageSent);
 
@@ -843,7 +889,15 @@ const Messages: React.FC = (): JSX.Element => {
             { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
           );
           const convos = res.data?.data || [];
-          setConversations(convos);
+          // Sort: pinned first, then by lastMessageAt
+          const sorted = convos.sort((a: any, b: any) => {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+            const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+            return bTime - aTime;
+          });
+          setConversations(sorted);
         } catch (err) {
           console.warn('Failed to refresh conversations on new message', err);
         }
@@ -924,12 +978,22 @@ const Messages: React.FC = (): JSX.Element => {
     // Handle conversation metadata updates
     function handleConversationMetadataUpdated(data: any) {
       const { conversationId, metadata } = data;
-      setConversations(prev => prev.map(conv => {
-        if (String(conv.id) === String(conversationId)) {
-          return { ...conv, ...metadata };
-        }
-        return conv;
-      }));
+      setConversations(prev => {
+        const updated = prev.map(conv => {
+          if (String(conv.id) === String(conversationId)) {
+            return { ...conv, ...metadata };
+          }
+          return conv;
+        });
+        // Sort: pinned first, then by lastMessageAt
+        return updated.sort((a: any, b: any) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+          const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+          return bTime - aTime;
+        });
+      });
     }
 
     // Handle conversation deletion
@@ -1360,12 +1424,22 @@ const Messages: React.FC = (): JSX.Element => {
       if (action === 'Pin the chat' || action === 'Unpin the chat') {
         const isPinned = action === 'Pin the chat';
         // Optimistically update UI
-        setConversations(prev => prev.map(conv => {
-          if (String(conv.id) === conversationId) {
-            return { ...conv, isPinned };
-          }
-          return conv;
-        }));
+        setConversations(prev => {
+          const updated = prev.map(conv => {
+            if (String(conv.id) === conversationId) {
+              return { ...conv, isPinned };
+            }
+            return conv;
+          });
+          // Sort: pinned first, then by lastMessageAt
+          return updated.sort((a: any, b: any) => {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+            const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+            return bTime - aTime;
+          });
+        });
         // Update current conversation and isChatPinned state
         if (String(currentConversation?.id) === conversationId) {
           setCurrentConversation((prev: any) => ({ ...prev, isPinned }));
@@ -1997,7 +2071,7 @@ const Messages: React.FC = (): JSX.Element => {
           name: productData.name || productData.title,
           title: productData.title || productData.name,
           price: productData.price,
-          currency: productData.currency || 'USD',
+          currency: productData.currency || 'GBP',
           description: productData.description || '',
           // Extract image URLs from images array if needed
           image: (() => {
@@ -2160,13 +2234,13 @@ const Messages: React.FC = (): JSX.Element => {
 
       // Prepare productData for sending - ensure it includes all required fields
       let productDataToSend: any = null;
-      if (productData && !isMessageSent) {
+      if (productData) {
         productDataToSend = {
           id: productData.id,
           name: productData.name || productData.title,
           title: productData.title || productData.name,
           price: productData.price,
-          currency: productData.currency || 'USD',
+          currency: productData.currency || 'GBP',
           description: productData.description || '',
           image: productData.image || null,
           images: productData.images || (productData.image ? [productData.image] : []),
@@ -2242,10 +2316,6 @@ const Messages: React.FC = (): JSX.Element => {
       setReplyToMessage(null);
       setHasIncomingReply(false);
       setIsReplyRead(false);
-      // Clear productData after sending
-      if (productDataToSend) {
-        setProductData(null);
-      }
 
       // Emit socket event to send message
       socket.emit('send_message', {
@@ -2262,10 +2332,40 @@ const Messages: React.FC = (): JSX.Element => {
         if (!response?.success) {
           // Remove temp message and show error
           setMessages(prev => prev.filter(msg => msg.tempId !== tempId));
+          setMessageStatuses(prev => {
+            const updated = { ...prev };
+            delete updated[tempId];
+            return updated;
+          });
           toast.error('Failed to send message: ' + (response?.error || 'Unknown error'));
+          // Don't clear productData if sending failed - user can try again
+        } else {
+          // Clear productData only after successful send
+          if (productDataToSend) {
+            setProductData(null);
+          }
         }
         // If success, the message_sent or receive_message event will update the UI
       });
+
+      // Set timeout to handle stuck "sending" status (10 seconds)
+      setTimeout(() => {
+        setMessages(prev => {
+          const stuckMessage = prev.find(msg => msg.tempId === tempId && msg.status === 'sending');
+          if (stuckMessage) {
+            // Update status to failed if still stuck
+            setMessageStatuses(prevStatuses => {
+              const updated = { ...prevStatuses };
+              updated[tempId] = 'failed';
+              return updated;
+            });
+            return prev.map(msg =>
+              msg.tempId === tempId ? { ...msg, status: 'failed' as const } : msg
+            );
+          }
+          return prev;
+        });
+      }, 10000);
 
       setIsMessageSent(true);
 
@@ -3470,38 +3570,66 @@ const Messages: React.FC = (): JSX.Element => {
                                     </p>
                                   )}
 
-                                  {/* Product Card in Message - Only for first message */}
+                                  {/* Product Inquiry Card - Mobile */}
                                   {message.isProductInquiry && message.productData && (
-                                    <div className="rounded-lg p-1.5 mt-2">
-                                      <div className="flex space-x-2">
-                                        <div className="relative">
-                                          <div className="absolute -left-1.5 top-0 w-0.5 h-12" style={{ backgroundColor: '#FFFFFF' }}></div>
-                                          <img
-                                            src={message.productData.image}
-                                            alt={message.productData.name}
-                                            className="w-12 h-12 object-cover rounded"
-                                          />
+                                    <div className={`${message.text ? 'mt-2' : ''}`}>
+                                      <div className="bg-gray-50 rounded-xl p-3">
+                                        <div className="flex items-start justify-between mb-1">
+                                          <span className="text-xs font-medium" style={{ color: '#83C4F8' }}>From Bao'Afrik</span>
                                         </div>
-                                        <div className="flex-1">
-                                          <div className="flex items-center justify-between">
-                                            <div style={{ fontSize: '9px', fontWeight: 600, color: '#B8DDFB' }}>USD {message.productData.price}</div>
-                                            <div className="flex items-center space-x-0.5" style={{ fontSize: '5.5px', color: '#B8DDFB' }}>
-                                              <img src={locIcon} alt="Location" className="w-1.5 h-1.5" />
-                                              <span>{message.productData.location}</span>
-                                            </div>
+                                        <div className="flex space-x-4">
+                                          <div className="relative">
+                                            <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#83C4F8' }}></div>
+                                            <img
+                                              src={message.productData.image || message.productData.images?.[0] || ''}
+                                              alt={message.productData.name || message.productData.title}
+                                              className="w-24 h-24 object-cover"
+                                              onError={(e) => {
+                                                (e.target as HTMLImageElement).style.display = 'none';
+                                              }}
+                                            />
                                           </div>
-                                          <div className="flex items-center justify-between">
-                                            <h4 style={{ fontSize: '7px', fontWeight: 500, color: '#B8DDFB' }}>{message.productData.name}</h4>
-                                            <div style={{ fontSize: '5.5px', color: '#B8DDFB' }}>
-                                              <span>Category: {message.productData.category || 'Spices'}</span>
+                                          <div className="flex-1">
+                                            <div className="flex items-center justify-between">
+                                              <div className="text-xl font-semibold" style={{ color: '#6A6A6A' }}>
+                                                {message.productData.currency || 'GBP'} {message.productData.price}
+                                              </div>
+                                              {message.productData.location && (
+                                                <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#BABABA' }}>
+                                                  <img src={locIcon} alt="Location" className="w-4 h-4" />
+                                                  <span>{message.productData.location}</span>
+                                                </div>
+                                              )}
                                             </div>
+                                            <div className="flex items-center justify-between -mt-0.5">
+                                              <h4 className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                                                {message.productData.name || message.productData.title}
+                                              </h4>
+                                              {message.productData.category && (
+                                                <div className="text-[10px]" style={{ color: '#BABABA' }}>
+                                                  <span>Category: {message.productData.category}</span>
+                                                </div>
+                                              )}
+                                            </div>
+                                            {message.productData.description && (
+                                              <p
+                                                className="text-[10px] mt-2 leading-relaxed"
+                                                style={{
+                                                  color: '#6A6A6A',
+                                                  display: '-webkit-box',
+                                                  WebkitLineClamp: 2,
+                                                  WebkitBoxOrient: 'vertical',
+                                                  overflow: 'hidden',
+                                                  textOverflow: 'ellipsis'
+                                                }}
+                                              >
+                                                {message.productData.description}
+                                              </p>
+                                            )}
+                                            <a href="#" className="text-xs mt-1 block" style={{ color: '#83C4F8' }}>
+                                              baoafrik.com/product-id/
+                                            </a>
                                           </div>
-                                          <p style={{ fontSize: '5.5px', marginTop: '2px', lineHeight: '1.3', color: '#B8DDFB' }}>
-                                            Premium White Pepper sourced from the fertile soils of Africa. Known for its smooth, aromatic heat and rich flavor...
-                                          </p>
-                                          <a href="#" style={{ fontSize: '6px', marginTop: '2px', display: 'block', color: '#1976D2' }}>
-                                            baoafrik.com/product-id-link?
-                                          </a>
                                         </div>
                                       </div>
                                     </div>
@@ -3930,7 +4058,7 @@ const Messages: React.FC = (): JSX.Element => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#6A6A6A' }}>USD {productData.price}</div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#6A6A6A' }}>GBP {productData.price}</div>
                         <div className="flex items-center space-x-0.5" style={{ fontSize: '8px', color: '#BABABA' }}>
                           <img src={locIcon} alt="Location" className="w-2.5 h-2.5" />
                           <span>{productData.location}</span>
@@ -4302,7 +4430,7 @@ const Messages: React.FC = (): JSX.Element => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-0.5">
                             <div style={{ fontSize: '9px', fontWeight: 600, color: '#64B5F6' }}>
-                              {productData.currency || 'USD'} {productData.price}
+                              {productData.currency || 'GBP'} {productData.price}
                             </div>
                             {productData.location && (
                               <div className="flex items-center space-x-0.5" style={{ fontSize: '7px', color: '#64B5F6' }}>
@@ -4499,7 +4627,10 @@ const Messages: React.FC = (): JSX.Element => {
                         className="w-5 h-5"
                       />
                     </button>
-                    <button className="p-2 hover:bg-gray-100 rounded">
+                    <button
+                      onClick={handleHomepageClick}
+                      className="p-2 hover:bg-gray-100 rounded"
+                    >
                       <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
@@ -4654,34 +4785,9 @@ const Messages: React.FC = (): JSX.Element => {
                             zIndex: actionsMenuOpen === conv.id ? 45 : 'auto',
                             position: actionsMenuOpen === conv.id ? 'relative' : 'static'
                           }}
-                          onClick={async () => {
-                            setActiveChatId(conv.id);
-                            setConversationId(conv.id);
-                            setParticipantId(otherParticipant?.id || null);
-                            setCurrentConversation(conv);
-                            // Load messages for this conversation
-                            await loadMessages(conv.id, 1, true);
-                            // Refresh conversations to update unread counts
-                            try {
-                              const token = localStorage.getItem("accessToken");
-                              const res = await axios.get(
-                                `${API_BASE}/chat/conversations`,
-                                { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
-                              );
-                              const convos = res.data?.data || [];
-                              setConversations(convos);
-                              // Update current conversation if it's still active
-                              const updated = convos.find((c: any) => c.id === conv.id);
-                              if (updated) {
-                                setCurrentConversation(updated);
-                              }
-                            } catch (err) {
-                              console.warn('Failed to refresh conversations', err);
-                            }
-                            // Mobile: Open conversation view
-                            if (window.innerWidth < 768) {
-                              setShowMobileConversation(true);
-                            }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleConversationClick(conv);
                           }}
                         >
                           <div className="flex items-center space-x-2">
@@ -6344,39 +6450,66 @@ const Messages: React.FC = (): JSX.Element => {
                                         </p>
                                       )}
 
-                                      {/* Product Card in Message - Only for first message */}
+                                      {/* Product Inquiry Card - Desktop */}
                                       {message.isProductInquiry && message.productData && (
-                                        <div className="rounded-lg p-3 mt-3">
-                                          <div className="flex space-x-4">
-                                            <div className="relative">
-                                              <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#FFFFFF' }}></div>
-                                              <img
-                                                src={message.productData.image}
-                                                alt={message.productData.name}
-                                                className="w-24 h-24 object-cover"
-                                              />
+                                        <div className={`mb-3 ${message.text ? 'mt-3' : ''}`}>
+                                          <div className="bg-gray-50 rounded-xl p-3 flex-1 max-w-lg">
+                                            <div className="flex items-start justify-between mb-1">
+                                              <span className="text-xs font-medium" style={{ color: '#83C4F8' }}>From Bao'Afrik</span>
                                             </div>
-                                            <div className="flex-1">
-                                              <div className="flex items-center justify-between">
-                                                <div className="text-xl font-semibold" style={{ color: '#B8DDFB' }}>${message.productData.price}</div>
-                                                <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#B8DDFB' }}>
-                                                  <img src={locIcon} alt="Location" className="w-4 h-4" />
-                                                  <span>{message.productData.location}</span>
-                                                </div>
+                                            <div className="flex space-x-4">
+                                              <div className="relative">
+                                                <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#83C4F8' }}></div>
+                                                <img
+                                                  src={message.productData.image || message.productData.images?.[0] || ''}
+                                                  alt={message.productData.name || message.productData.title}
+                                                  className="w-24 h-24 object-cover"
+                                                  onError={(e) => {
+                                                    (e.target as HTMLImageElement).style.display = 'none';
+                                                  }}
+                                                />
                                               </div>
-                                              <div className="flex items-center justify-between -mt-0.5">
-                                                <h4 className="text-xs font-medium" style={{ color: '#B8DDFB' }}>{message.productData.name}</h4>
-                                                <div className="text-[10px]" style={{ color: '#B8DDFB' }}>
-                                                  <span>Category: {message.productData.category}</span>
+                                              <div className="flex-1">
+                                                <div className="flex items-center justify-between">
+                                                  <div className="text-xl font-semibold" style={{ color: '#6A6A6A' }}>
+                                                    {message.productData.currency || 'GBP'} {message.productData.price}
+                                                  </div>
+                                                  {message.productData.location && (
+                                                    <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#BABABA' }}>
+                                                      <img src={locIcon} alt="Location" className="w-4 h-4" />
+                                                      <span>{message.productData.location}</span>
+                                                    </div>
+                                                  )}
                                                 </div>
+                                                <div className="flex items-center justify-between -mt-0.5">
+                                                  <h4 className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                                                    {message.productData.name || message.productData.title}
+                                                  </h4>
+                                                  {message.productData.category && (
+                                                    <div className="text-[10px]" style={{ color: '#BABABA' }}>
+                                                      <span>Category: {message.productData.category}</span>
+                                                    </div>
+                                                  )}
+                                                </div>
+                                                {message.productData.description && (
+                                                  <p
+                                                    className="text-[10px] mt-2 leading-relaxed"
+                                                    style={{
+                                                      color: '#6A6A6A',
+                                                      display: '-webkit-box',
+                                                      WebkitLineClamp: 2,
+                                                      WebkitBoxOrient: 'vertical',
+                                                      overflow: 'hidden',
+                                                      textOverflow: 'ellipsis'
+                                                    }}
+                                                  >
+                                                    {message.productData.description}
+                                                  </p>
+                                                )}
+                                                <a href="#" className="text-xs mt-1 block" style={{ color: '#83C4F8' }}>
+                                                  baoafrik.com/product-id/
+                                                </a>
                                               </div>
-                                              <p className="text-[10px] mt-2 leading-relaxed" style={{ color: '#B8DDFB' }}>
-                                                Premium White Pepper sourced from the fertile soils of Africa.<br />
-                                                Known for its smooth, aromatic heat and rich flavor...
-                                              </p>
-                                              <a href="#" className="text-xs mt-1 block" style={{ color: '#182073' }}>
-                                                baoafrik.com/product-id-link?
-                                              </a>
                                             </div>
                                           </div>
                                         </div>
@@ -6938,7 +7071,11 @@ const Messages: React.FC = (): JSX.Element => {
                         <div className="bg-gray-50 rounded-xl p-3 flex-1 max-w-lg">
                           <div className="flex items-start justify-between mb-1">
                             <span className="text-xs font-medium" style={{ color: '#83C4F8' }}>From Bao'Afrik</span>
-                            <button className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" style={{ backgroundColor: '#6A6A6A' }}>
+                            <button
+                              onClick={() => setProductData(null)}
+                              className="w-4 h-4 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+                              style={{ backgroundColor: '#6A6A6A' }}
+                            >
                               <svg className="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#000000' }}>
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                               </svg>
@@ -6948,14 +7085,19 @@ const Messages: React.FC = (): JSX.Element => {
                             <div className="relative">
                               <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#83C4F8' }}></div>
                               <img
-                                src={productImage1}
-                                alt={productData.name}
+                                src={productData.image || productData.images?.[0] || ''}
+                                alt={productData.name || productData.title}
                                 className="w-24 h-24 object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
                               />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
-                                <div className="text-xl font-semibold" style={{ color: '#6A6A6A' }}>${productData.price}</div>
+                                <div className="text-xl font-semibold" style={{ color: '#6A6A6A' }}>
+                                  {productData.currency || 'GBP'} {productData.price}
+                                </div>
                                 <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#BABABA' }}>
                                   <img src={locIcon} alt="Location" className="w-4 h-4" />
                                   <span>{productData.location}</span>
@@ -6967,12 +7109,21 @@ const Messages: React.FC = (): JSX.Element => {
                                   <span>Category: {productData.category}</span>
                                 </div>
                               </div>
-                              <p className="text-[10px] mt-2 leading-relaxed" style={{ color: '#6A6A6A' }}>
-                                Premium White Pepper sourced from the fertile soils of Africa.<br />
-                                Known for its smooth, aromatic heat and rich flavor...
+                              <p
+                                className="text-[10px] mt-2 leading-relaxed"
+                                style={{
+                                  color: '#6A6A6A',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}
+                              >
+                                {productData.description}
                               </p>
                               <a href="#" className="text-xs mt-1 block" style={{ color: '#83C4F8' }}>
-                                baoafrik.com/product-id-link?
+                                baoafrik.com/product-id/
                               </a>
                             </div>
                           </div>
@@ -6980,7 +7131,6 @@ const Messages: React.FC = (): JSX.Element => {
                       </div>
                     </div>
                   )}
-
 
                   {isRecording ? (
                     // Recording Interface with inline file attachment
@@ -7399,51 +7549,6 @@ const Messages: React.FC = (): JSX.Element => {
                         </div>
                       )}
 
-                      {/* Product Card Preview */}
-                      {productData && (
-                        <div className="mb-2 px-3 py-2 rounded-lg relative" style={{ backgroundColor: '#F0F8FE', border: '1px solid #64B5F6' }}>
-                          <button
-                            onClick={() => setProductData(null)}
-                            className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center hover:opacity-70 z-10"
-                          >
-                            <img src={replyCloseIcon} alt="Close" className="w-4 h-4" />
-                          </button>
-                          <div className="flex space-x-2 pr-6">
-                            <div className="relative flex-shrink-0">
-                              <img
-                                src={productData.image || productData.images?.[0] || ''}
-                                alt={productData.name || productData.title}
-                                className="w-12 h-12 object-cover rounded"
-                                onError={(e) => {
-                                  // Fallback if image fails to load
-                                  (e.target as HTMLImageElement).style.display = 'none';
-                                }}
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between mb-1">
-                                <div style={{ fontSize: '10px', fontWeight: 600, color: '#64B5F6' }}>
-                                  {productData.currency || 'USD'} {productData.price}
-                                </div>
-                                {productData.location && (
-                                  <div className="flex items-center space-x-0.5" style={{ fontSize: '8px', color: '#64B5F6' }}>
-                                    <img src={locIcon} alt="Location" className="w-2 h-2" />
-                                    <span>{productData.location}</span>
-                                  </div>
-                                )}
-                              </div>
-                              <h4 className="text-xs font-medium truncate" style={{ color: '#64B5F6', marginBottom: '2px' }}>
-                                {productData.name || productData.title}
-                              </h4>
-                              {productData.category && (
-                                <p style={{ fontSize: '8px', color: '#64B5F6' }}>
-                                  Category: {productData.category}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
 
                       {/* Reply Preview */}
                       {replyToMessage && (

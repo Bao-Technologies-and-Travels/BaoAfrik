@@ -4646,7 +4646,7 @@ const Home: React.FC = () => {
                   margin: '0 auto'
                 }}
               >
-                See all requests
+                Close
               </button>
             </div>
           </div>

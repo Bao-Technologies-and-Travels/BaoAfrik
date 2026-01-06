@@ -539,15 +539,15 @@ const MyRequests: React.FC = () => {
             const updatedRequest = result.data || result;
 
             // Update local state
-            setRequests((prev) =>
-                prev.map((request) =>
+        setRequests((prev) =>
+            prev.map((request) =>
                     request.id === requestId ? {
                         ...request,
                         status: mapBackendStatusToFrontend(updatedRequest.status || backendStatus)
                     } : request
-                )
-            );
-            setStatusModalOpenFor(null);
+            )
+        );
+        setStatusModalOpenFor(null);
 
             addToast({
                 type: 'success',
@@ -1451,12 +1451,12 @@ const MyRequests: React.FC = () => {
                                         const country = getProductCountry(request.origin);
                                         return (
                                             <>
-                                                <img
+                                    <img
                                                     src={country.flag}
                                                     alt={country.name}
-                                                    className="object-cover rounded-full"
-                                                    style={{ width: '16px', height: '16px' }}
-                                                />
+                                        className="object-cover rounded-full"
+                                        style={{ width: '16px', height: '16px' }}
+                                    />
                                                 <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{country.name}</span>
                                             </>
                                         );
@@ -1528,12 +1528,12 @@ const MyRequests: React.FC = () => {
                                     const country = getProductCountry(request.origin);
                                     return (
                                         <>
-                                            <img
+                                <img
                                                 src={country.flag}
                                                 alt={country.name}
-                                                className="object-cover rounded-full"
-                                                style={{ width: '12px', height: '12px' }}
-                                            />
+                                    className="object-cover rounded-full"
+                                    style={{ width: '12px', height: '12px' }}
+                                />
                                             <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{country.name}</span>
                                         </>
                                     );
@@ -1943,30 +1943,30 @@ const MyRequests: React.FC = () => {
                                 const ukCountry = getProductCountry('United Kingdom');
                                 return (
                                     <>
-                                        <img
+                            <img
                                             src={ukCountry.flag}
                                             alt={request.sellerLocation}
-                                            style={{
-                                                width: '16px',
-                                                height: '16px',
-                                                borderRadius: '50%',
-                                                objectFit: 'cover',
-                                                flexShrink: 0
-                                            }}
-                                        />
-                                        <span
-                                            style={{
-                                                color: '#939393',
-                                                fontSize: '12px',
-                                                fontFamily: 'Poppins, sans-serif',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap',
-                                                maxWidth: '120px'
-                                            }}
-                                        >
+                                style={{
+                                    width: '16px',
+                                    height: '16px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover',
+                                    flexShrink: 0
+                                }}
+                            />
+                            <span
+                                style={{
+                                    color: '#939393',
+                                    fontSize: '12px',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    maxWidth: '120px'
+                                }}
+                            >
                                             {request.sellerLocation}
-                                        </span>
+                            </span>
                                     </>
                                 );
                             })()}
@@ -1978,20 +1978,20 @@ const MyRequests: React.FC = () => {
                                 const country = getProductCountry(request.origin);
                                 return (
                                     <>
-                                        <img
+                            <img
                                             src={country.flag}
                                             alt={country.name}
-                                            style={{
-                                                width: '16px',
-                                                height: '16px',
-                                                borderRadius: '50%',
-                                                objectFit: 'cover',
-                                                flexShrink: 0
-                                            }}
-                                        />
-                                        <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
+                                style={{
+                                    width: '16px',
+                                    height: '16px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover',
+                                    flexShrink: 0
+                                }}
+                            />
+                            <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
                                             {country.name}
-                                        </span>
+                            </span>
                                     </>
                                 );
                             })()}
@@ -2943,17 +2943,17 @@ const MyRequests: React.FC = () => {
                                                 {selectedRequestForView.origin && (() => {
                                                     const country = getProductCountry(selectedRequestForView.origin);
                                                     return (
-                                                        <div
-                                                            className="flex items-center gap-1.5 px-3 py-1.5"
-                                                            style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                                                        >
-                                                            <img
+                                                <div
+                                                    className="flex items-center gap-1.5 px-3 py-1.5"
+                                                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                                                >
+                                                    <img
                                                                 src={country.flag}
                                                                 alt={country.name}
-                                                                className="w-4 h-4 object-cover rounded-full"
-                                                            />
+                                                        className="w-4 h-4 object-cover rounded-full"
+                                                    />
                                                             <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{country.name}</span>
-                                                        </div>
+                                                </div>
                                                     );
                                                 })()}
                                             </div>
@@ -3141,17 +3141,17 @@ const MyRequests: React.FC = () => {
                                             {selectedRequestForView.origin && (() => {
                                                 const country = getProductCountry(selectedRequestForView.origin);
                                                 return (
-                                                    <div
-                                                        className="flex items-center gap-1.5 px-3 py-1.5"
-                                                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                                                    >
-                                                        <img
+                                            <div
+                                                className="flex items-center gap-1.5 px-3 py-1.5"
+                                                style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                                            >
+                                                <img
                                                             src={country.flag}
                                                             alt={country.name}
-                                                            className="w-4 h-4 object-cover rounded-full"
-                                                        />
+                                                    className="w-4 h-4 object-cover rounded-full"
+                                                />
                                                         <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{country.name}</span>
-                                                    </div>
+                                            </div>
                                                 );
                                             })()}
                                         </div>

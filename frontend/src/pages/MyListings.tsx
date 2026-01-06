@@ -457,7 +457,7 @@ const MyListings: React.FC = () => {
         const fetchDrafts = async () => {
             try {
                 const token = localStorage.getItem('accessToken');
-                const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/products/my-products?status=DRAFT`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
@@ -571,7 +571,7 @@ const MyListings: React.FC = () => {
                     const fetchDrafts = async () => {
                         try {
                             const token = localStorage.getItem('accessToken');
-                            const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+                            const res = await fetch(`${process.env.REACT_APP_API_URL}/products/my-products?status=DRAFT`, {
                                 headers: { Authorization: `Bearer ${token}` }
                             });
 

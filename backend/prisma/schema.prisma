@@ -90,6 +90,7 @@ model Product {
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
   publishedAt       DateTime?     @map("published_at")
+  expiresAt         DateTime?     @map("expires_at")
 
   // Relations
   seller        User            @relation(fields: [sellerId], references: [id], onDelete: Cascade)

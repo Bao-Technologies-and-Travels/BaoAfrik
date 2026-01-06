@@ -12,6 +12,8 @@ interface NotificationToastProps {
   sender?: string;
   isVisible: boolean;
   onClose: () => void;
+  onClick?: () => void;
+  clickText?: string;
 }
 
 const NotificationToast: React.FC<NotificationToastProps> = ({
@@ -21,7 +23,9 @@ const NotificationToast: React.FC<NotificationToastProps> = ({
   subText2,
   sender,
   isVisible,
-  onClose
+  onClose,
+  onClick,
+  clickText
 }) => {
   if (!isVisible) return null;
 
@@ -80,6 +84,25 @@ const NotificationToast: React.FC<NotificationToastProps> = ({
             <p className="mt-0.5" style={{ color: '#9E9E9E', fontSize: '10px' }}>
               {subText2}
             </p>
+          )}
+          {onClick && clickText && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+                onClose();
+              }}
+              className="mt-1.5 text-left"
+              style={{
+                color: '#64B5F6',
+                fontSize: '11px',
+                fontWeight: 500,
+                textDecoration: 'underline',
+                cursor: 'pointer'
+              }}
+            >
+              {clickText}
+            </button>
           )}
         </div>
 

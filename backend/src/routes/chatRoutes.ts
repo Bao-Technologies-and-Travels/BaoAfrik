@@ -8,6 +8,7 @@ const chatController = new ChatController();
 router.use(authenticateToken);
 
 router.get('/conversations', chatController.getConversations);
+router.get('/conversations/product/:productId', chatController.getProductConversations);
 router.get('/conversations/:conversationId', chatController.getConversationDetails);
 router.get('/conversations/:conversationId/messages', chatController.getConversationMessages);
 router.post('/conversations', chatController.createConversation);
@@ -17,7 +18,6 @@ router.get('/unread-counts', chatController.getUnreadCounts);
 router.post('/contact-seller', chatController.contactSeller);
 router.post('/contact-request', chatController.contactRequest);
 
-// In chatRoutes.ts
 router.post('/conversations/:conversationId/messages', chatController.sendMessage);
 router.get('/conversations/:conversationId/messages', chatController.getMessages);
 router.post('/conversations/:conversationId/read', chatController.markAsRead);

@@ -207,6 +207,152 @@ export class ChatService {
         }
     }
 
+    async getProductConversations(productId: string, sellerId: string) {
+        try {
+            // Verify the product belongs to the seller
+            const product = await prisma.product.findFirst({
+                where: {
+                    id: productId,
+                    sellerId: sellerId
+                }
+            });
+
+            if (!product) {
+                throw new Error('Product not found or unauthorized');
+            }
+
+            // Get all conversations for this product
+            const conversations = await prisma.conversation.findMany({
+                where: {
+                    productId: productId
+                },
+                include: {
+                    participants: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                    profileImage: true,
+                                    rating: true
+                                }
+                            }
+                        }
+                    },
+                    lastMessage: {
+                        include: {
+                            sender: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                    profileImage: true
+                                }
+                            }
+                        }
+                    },
+                    messages: {
+                        orderBy: {
+                            createdAt: 'desc'
+                        },
+                        take: 1,
+                        include: {
+                            sender: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                    profileImage: true
+                                }
+                            }
+                        }
+                    }
+                },
+                orderBy: {
+                    updatedAt: 'desc'
+                }
+            });
+
+            // Process conversations to get unique buyers and their info
+            const processedConversations = conversations.map(conversation => {
+                // Find the buyer (participant who is not the seller)
+                const buyer = conversation.participants.find(
+                    p => p.userId !== sellerId
+                )?.user;
+
+                const lastMessage = conversation.lastMessage || conversation.messages[0] || null;
+                let decryptedContent = '';
+                
+                if (lastMessage) {
+                    try {
+                        if (lastMessage.encryptionIv && lastMessage.encryptionAuthTag && lastMessage.content) {
+                            decryptedContent = this.decryptMessage(
+                                lastMessage.content,
+                                lastMessage.encryptionIv,
+                                lastMessage.encryptionAuthTag
+                            );
+                        } else if (lastMessage.dbEncryptedContent && lastMessage.encryptionIv && lastMessage.encryptionAuthTag) {
+                            decryptedContent = this.decryptMessage(
+                                lastMessage.dbEncryptedContent,
+                                lastMessage.encryptionIv,
+                                lastMessage.encryptionAuthTag
+                            );
+                        } else {
+                            decryptedContent = 'Encrypted message';
+                        }
+                    } catch (error) {
+                        console.error('Error decrypting message:', error);
+                        decryptedContent = 'Encrypted message';
+                    }
+                }
+
+                // Determine message state
+                let messageState: 'new' | 'read' | 'you' = 'read';
+                if (lastMessage) {
+                    if (lastMessage.senderId === sellerId) {
+                        messageState = 'you';
+                    } else if (!lastMessage.isRead) {
+                        messageState = 'new';
+                    }
+                }
+
+                return {
+                    id: conversation.id,
+                    buyer: buyer || null,
+                    lastMessage: lastMessage ? {
+                        ...lastMessage,
+                        content: decryptedContent,
+                        preview: decryptedContent.length > 50 ? decryptedContent.substring(0, 50) + '...' : decryptedContent
+                    } : null,
+                    messageState,
+                    timestamp: lastMessage?.createdAt ? this.formatMessageTimestamp(lastMessage.createdAt) : '',
+                    updatedAt: conversation.updatedAt
+                };
+            }).filter(conv => conv.buyer !== null); // Only return conversations with valid buyers
+
+            return processedConversations;
+        } catch (error: any) {
+            console.error('Error fetching product conversations:', error);
+            throw new Error(`Failed to fetch product conversations: ${error.message}`);
+        }
+    }
+
+    private formatMessageTimestamp(date: Date): string {
+        const now = new Date();
+        const messageDate = new Date(date);
+        const diffTime = Math.abs(now.getTime() - messageDate.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+            return 'Today, ' + messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        } else if (diffDays === 1) {
+            return 'Yesterday, ' + messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        } else {
+            return messageDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+    }
+
     async getConversationMessages(conversationId: string, userId: string) {
         // Verify user has access to this conversation
         const conversation = await prisma.conversation.findFirst({

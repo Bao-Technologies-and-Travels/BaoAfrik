@@ -56,8 +56,12 @@ const NotificationDetail: React.FC = () => {
   };
 
   const getActorName = (notif: any) => {
-    // For product notifications, use seller name from meta or title
+    // For product notifications, check if it's own listing
     if (notif?.type === 'product') {
+      // If title indicates it's own listing, return the title
+      if (notif.title && notif.title.includes('Your listing is available')) {
+        return notif.title;
+      }
       return notif.meta?.sellerName || notif.title || 'A seller';
     }
 

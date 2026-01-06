@@ -499,9 +499,14 @@ export class ProductService {
 
             const updateData: any = { status };
             const isNewlyPublished = status === ProductStatus.PUBLISHED && existingProduct!.status !== ProductStatus.PUBLISHED;
+            const previousStatus = existingProduct!.status;
 
             if (isNewlyPublished) {
                 updateData.publishedAt = new Date();
+                // Set expiresAt to 5 days from now when product is published
+                const expiresAt = new Date();
+                expiresAt.setDate(expiresAt.getDate() + 5);
+                updateData.expiresAt = expiresAt;
             }
 
             const product = await prisma.product.update({
@@ -519,8 +524,8 @@ export class ProductService {
                 }
             });
 
-            // Return product with a flag indicating if it was newly published
-            return { ...product, _newlyPublished: isNewlyPublished } as any;
+            // Return product with flags indicating status changes
+            return { ...product, _newlyPublished: isNewlyPublished, _previousStatus: previousStatus } as any;
         } catch (error: any) {
             throw new Error(`Error updating product status: ${error.message}`);
         }

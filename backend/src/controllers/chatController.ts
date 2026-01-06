@@ -937,4 +937,33 @@ export class ChatController {
             });
         }
     };
+
+    // Get conversations for a specific product (for product owner)
+    getProductConversations = async (req: Request, res: Response) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+            }
+            const { productId } = req.params;
+            const sellerId = req.user.id;
+
+            if (!productId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Product ID is required'
+                });
+            }
+
+            const conversations = await this.chatService.getProductConversations(productId, sellerId);
+            return res.json({
+                success: true,
+                data: conversations
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                success: false,
+                error: error.message || 'Failed to get product conversations'
+            });
+        }
+    };
 }

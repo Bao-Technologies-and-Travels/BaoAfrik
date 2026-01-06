@@ -187,37 +187,86 @@ const Notifications: React.FC = () => {
     const onNewProductNotification = (payload: any) => {
       setNotifications(prev => {
         if (payload?.productId) {
-          const has = prev.some(n => n.meta?.productId === payload.productId);
+          const has = prev.some(n => n.meta?.productId === payload.productId && n.type === 'product');
           if (has) return prev;
         }
 
         const created = new Date();
+        // Check if this is a notification for the user's own listing
+        const isOwnListing = payload.sellerId === payload.userId;
         const normalized: Notification = {
           id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
           userId: payload.userId || '',
           day: getDayLabel(created),
           time: payload.time || formatTime(created),
-          title: payload.sellerName || 'A seller',
-          body: `just listed "${payload.productTitle || 'a new product'}"`,
+          title: isOwnListing ? 'Your listing is available on the platform' : (payload.sellerName || 'A seller'),
+          body: isOwnListing
+            ? `Your listing "${payload.productTitle || 'a new product'}" is now available on the marketplace`
+            : `just listed "${payload.productTitle || 'a new product'}"`,
           meta: {
             productId: payload.productId,
             productTitle: payload.productTitle,
             productImage: payload.productImage,
             sellerId: payload.sellerId,
             sellerName: payload.sellerName,
-            sellerImage: payload.sellerImage
+            sellerImage: isOwnListing ? null : payload.sellerImage // Don't show profile image for own listings
           },
           type: 'product',
           isRead: false,
           createdAt: created.toISOString(),
-          actor: payload.sellerImage ? {
+          actor: isOwnListing ? undefined : (payload.sellerImage ? {
             id: payload.sellerId,
             firstName: payload.sellerName?.split(' ')[0] || '',
             lastName: payload.sellerName?.split(' ').slice(1).join(' ') || '',
             profileImage: payload.sellerImage
-          } : undefined,
-          sellerImage: payload.sellerImage
+          } : undefined),
+          sellerImage: isOwnListing ? null : payload.sellerImage
         };
+
+        return [normalized, ...prev];
+      });
+      setUnreadCount(prev => prev + 1);
+    };
+
+    const onProductStatusChange = (payload: any) => {
+      setNotifications(prev => {
+        if (payload?.productId) {
+          const has = prev.some(n => n.meta?.productId === payload.productId && n.type === 'product_status_change');
+          if (has) return prev;
+        }
+
+        const created = new Date();
+        const statusMessage = payload.previousStatus === 'PUBLISHED' && payload.newStatus === 'DRAFT'
+          ? `Your listing "${payload.productTitle || 'a product'}" has been moved to drafts`
+          : `Your listing "${payload.productTitle || 'a product'}" status changed from ${payload.previousStatus} to ${payload.newStatus}`;
+
+        const normalized: Notification = {
+          id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
+          userId: payload.userId || '',
+          day: getDayLabel(created),
+          time: payload.time || formatTime(created),
+          title: 'Status Change',
+          body: statusMessage,
+          meta: {
+            productId: payload.productId,
+            productTitle: payload.productTitle,
+            previousStatus: payload.previousStatus,
+            newStatus: payload.newStatus
+          },
+          type: 'product_status_change',
+          isRead: false,
+          createdAt: created.toISOString()
+        };
+
+        // Show toast notification for status changes
+        if (payload.previousStatus === 'PUBLISHED' && payload.newStatus === 'DRAFT') {
+          showNotification({
+            type: 'app',
+            mainText: 'Listing moved to drafts',
+            subText: `"${payload.productTitle || 'Your listing'}" has been moved to drafts`,
+            duration: 6000
+          });
+        }
 
         return [normalized, ...prev];
       });
@@ -232,11 +281,13 @@ const Notifications: React.FC = () => {
     socket.on('notification', onNotification);
     socket.on('new_message_notification', onNewMessageNotification);
     socket.on('new_product_notification', onNewProductNotification);
+    socket.on('product_status_change', onProductStatusChange);
     socket.on('notification_count', onCount);
 
     return () => {
       socket.off('notification', onNotification);
       socket.off('new_message_notification', onNewMessageNotification);
+      socket.off('product_status_change', onProductStatusChange);
       socket.off('new_product_notification', onNewProductNotification);
       socket.off('notification_count', onCount);
     };
@@ -360,8 +411,12 @@ const Notifications: React.FC = () => {
       }
     }
 
-    // For product notifications, use the seller name from meta or title
+    // For product notifications, check if it's own listing
     if (notif.type === 'product') {
+      // If title indicates it's own listing, return the title
+      if (notif.title && notif.title.includes('Your listing is available')) {
+        return notif.title;
+      }
       const sellerName = meta?.sellerName || notif.meta?.sellerName || notif.title;
       if (sellerName && sellerName !== 'A seller' && sellerName !== 'Notification') {
         return sellerName;

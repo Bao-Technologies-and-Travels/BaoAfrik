@@ -41,6 +41,7 @@ import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
 import { Socket } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from '../contexts/ToastContext';
+import { useNotificationToast } from '../contexts/NotificationToastContext';
 
 interface DraftListing {
   id: string;
@@ -94,11 +95,14 @@ const CreateListing: React.FC = () => {
   const [showNotification, setShowNotification] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isPostingListing, setIsPostingListing] = useState(false);
   const { id } = useParams<{ id: string }>();
   const isEditMode = Boolean(id);
   const [productData, setProductData] = useState<any>(null);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const { addToast } = useToast();
+  const { showNotification: showNotificationToast } = useNotificationToast();
   const { user } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
@@ -410,7 +414,7 @@ const CreateListing: React.FC = () => {
     const fetchDrafts = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/products/my-products?status=DRAFT`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -947,7 +951,8 @@ const CreateListing: React.FC = () => {
   };
 
   const handleSaveDraft = async () => {
-    setIsLoading(true);
+    setIsSavingDraft(true);
+    setIsPostingListing(false);
 
     try {
       const token = localStorage.getItem('accessToken');
@@ -994,7 +999,7 @@ const CreateListing: React.FC = () => {
           message: serverErrors ? `${serverMsg}: ${JSON.stringify(serverErrors)}` : serverMsg,
           duration: 2500
         });
-        setIsLoading(false);
+        setIsSavingDraft(false);
         return;
       }
 
@@ -1027,7 +1032,7 @@ const CreateListing: React.FC = () => {
         const refreshDrafts = async () => {
           try {
             const token = localStorage.getItem('accessToken');
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/products/my-products?status=DRAFT`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             if (res.ok) {
@@ -1089,6 +1094,7 @@ const CreateListing: React.FC = () => {
         duration: 2000
       });
     } finally {
+      setIsSavingDraft(false);
       // Ensure MyListings uses fresh data next time
       clearListingsCache();
     }
@@ -1096,7 +1102,8 @@ const CreateListing: React.FC = () => {
 
   const handlePostListing = async () => {
     // if (!validateRequiredFields()) return;
-    setIsLoading(true);
+    setIsPostingListing(true);
+    setIsSavingDraft(false);
 
     try {
       const token = localStorage.getItem('accessToken');
@@ -1106,13 +1113,13 @@ const CreateListing: React.FC = () => {
       const priceNum = priceClean === '' || priceClean.toLowerCase() === 'n/a' ? null : Number(priceClean.replace(/,/g, ''));
       if (priceNum !== null && Number.isNaN(priceNum)) {
         addToast({ type: 'error', title: 'Invalid price', message: 'Please enter a valid numeric price or leave blank for N/A', duration: 2000 });
-        setIsLoading(false);
+        setIsPostingListing(false);
         return;
       }
       const qty = Number(quantity) || 0;
       if (!Number.isFinite(qty) || qty < 0) {
         addToast({ type: 'error', title: 'Invalid quantity', message: 'Please enter a valid quantity', duration: 2000 });
-        setIsLoading(false);
+        setIsPostingListing(false);
         return;
       }
 
@@ -1120,14 +1127,14 @@ const CreateListing: React.FC = () => {
       const allowedCategories = categories.map(c => c.value);
       if (!category || !allowedCategories.includes(category)) {
         addToast({ type: 'error', title: 'Invalid category', message: 'Please choose a valid category', duration: 2000 });
-        setIsLoading(false);
+        setIsPostingListing(false);
         return;
       }
 
       // Ensure origin is valid (optional)
       if (origin && !countries.some(c => c.value === origin)) {
         addToast({ type: 'error', title: 'Invalid origin', message: 'Please choose a valid origin country', duration: 2000 });
-        setIsLoading(false);
+        setIsPostingListing(false);
         return;
       }
 
@@ -1169,7 +1176,7 @@ const CreateListing: React.FC = () => {
           message: serverErrors ? `${serverMsg}: ${JSON.stringify(serverErrors)}` : serverMsg,
           duration: 2000
         });
-        setIsLoading(false);
+        setIsPostingListing(false);
         return;
       }
 
@@ -1179,7 +1186,7 @@ const CreateListing: React.FC = () => {
 
         if (!productId) {
           addToast({ type: 'error', title: 'Error', message: 'Product ID not found', duration: 2000 });
-          setIsLoading(false);
+          setIsPostingListing(false);
           return;
         }
 
@@ -1201,11 +1208,12 @@ const CreateListing: React.FC = () => {
         const publishResult = await publishResponse.json().catch(() => ({ success: false, message: 'Invalid publish response' }));
         if (!publishResponse.ok) {
           addToast({ type: 'error', title: 'Publish failed', message: publishResult.message || 'Failed to publish product', duration: 2000 });
-          setIsLoading(false);
+          setIsPostingListing(false);
           return;
         }
 
         const actualProductId = productId;
+        const productTitle = publishResult.data?.title || title || 'Your listing';
 
         // Remove draft from list if it was a draft
         if (editingDraftId) {
@@ -1217,7 +1225,7 @@ const CreateListing: React.FC = () => {
         const refreshDrafts = async () => {
           try {
             const token = localStorage.getItem('accessToken');
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/products?status=DRAFT`, {
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/products/my-products?status=DRAFT`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             if (res.ok) {
@@ -1242,28 +1250,58 @@ const CreateListing: React.FC = () => {
         };
         refreshDrafts();
 
-        addToast({
-          type: "success",
-          title: 'Listing Published',
-          message: `Your listing has been ${editingDraftId || isEditMode ? 'updated' : 'published'} successfully!`,
-          duration: 3000
-        });
-
         // Ensure MyListings uses fresh data for the newly created/updated product
         clearListingsCache();
 
-        // Redirect to product details page
-        if (actualProductId) {
-          navigate(`/product/${actualProductId}`, {
-            state: {
-              fromMyListings: true,
-              justPublished: true
-            }
+        // Get product image for navigation
+        const productImage = publishResult.data?.images?.[0]?.url || imageUrls[primaryImageIndex] || imageUrls[0] || '';
+
+        // Navigate to product details while product is still inactive
+        navigate(`/product/${actualProductId}`, {
+          state: {
+            fromMyListings: true,
+            listing: {
+              id: actualProductId,
+              title: productTitle,
+              price: publishResult.data?.price?.toString() || price || '0',
+              currency: publishResult.data?.currency || currency,
+              image: productImage,
+              status: 'inactive' as const,
+              rating: 0,
+              reviews: 0,
+              createdAt: Date.now(),
+              priceValue: parseFloat(publishResult.data?.price?.toString() || price || '0'),
+              messages: 0,
+              category: publishResult.data?.category || category || '',
+              reviewStatus: 'success' as const
+            },
+            sellerVerified: false
+          }
+        });
+
+        // Show first notification: "under review"
+        showNotificationToast({
+          type: 'app',
+          mainText: 'Your listing is under review',
+          subText: 'Wait while your product is being reviewed.',
+          subText2: 'This usually takes a few minutes.',
+          duration: 10000
+        });
+
+        // After 10 seconds, show second notification: "available on marketplace" and make product active
+        setTimeout(() => {
+          // Update product status to active (simulate by updating the listing state)
+          // The backend will handle the actual status change
+          showNotificationToast({
+            type: 'app',
+            mainText: `Your listing "${productTitle}" is available on the marketplace!`,
+            subText: 'Click to view',
+            onClick: () => navigate('/my-listings'),
+            duration: 8000
           });
-        } else {
-          // Fallback to my-listings if productId is not available
-          navigate('/my-listings');
-        }
+        }, 10000);
+
+        setIsPostingListing(false);
       }
     } catch (error: any) {
       console.error('Post listing error', error);
@@ -1273,8 +1311,7 @@ const CreateListing: React.FC = () => {
         message: (error && (error.message || String(error))) || 'Failed to post listing. Please try again.',
         duration: 2000
       });
-    } finally {
-      setIsLoading(false);
+      setIsPostingListing(false);
     }
   };
 
@@ -3562,17 +3599,17 @@ const CreateListing: React.FC = () => {
                 <div className="flex flex-col items-center space-y-2.5 mt-4">
                   <button
                     onClick={handlePostListing}
-                    disabled={isLoading}
+                    disabled={isSavingDraft || isPostingListing || !isFormComplete}
                     className="flex items-center justify-center space-x-2 w-full py-2 rounded-xl font-medium transition-colors text-sm"
                     style={{
-                      backgroundColor: isFormComplete ? '#F9A825' : '#E9E9E9',
-                      color: isFormComplete ? '#FFFFFF' : '#6A6A6A',
-                      cursor: isFormComplete ? 'pointer' : 'not-allowed',
+                      backgroundColor: (isFormComplete && !isSavingDraft && !isPostingListing) ? '#F9A825' : '#E9E9E9',
+                      color: (isFormComplete && !isSavingDraft && !isPostingListing) ? '#FFFFFF' : '#6A6A6A',
+                      cursor: (isSavingDraft || isPostingListing || !isFormComplete) ? 'not-allowed' : 'pointer',
                       minHeight: '40px',
                       position: 'relative'
                     }}
                   >
-                    {isLoading ? (
+                    {isPostingListing ? (
                       <div className="flex items-center justify-center w-full">
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       </div>
@@ -3584,7 +3621,7 @@ const CreateListing: React.FC = () => {
                           alt="Post"
                           className="w-4 h-4"
                           style={{
-                            filter: isFormComplete ? 'brightness(0) invert(1)' : 'none'
+                            filter: (isFormComplete && !isSavingDraft && !isPostingListing) ? 'brightness(0) invert(1)' : 'none'
                           }}
                         />
                       </>
@@ -3592,11 +3629,20 @@ const CreateListing: React.FC = () => {
                   </button>
                   <button
                     onClick={handleSaveDraft}
-                    disabled={isLoading}
+                    disabled={isSavingDraft || isPostingListing}
                     className="flex items-center justify-center w-full py-2 rounded-xl font-medium transition-colors text-sm"
-                    style={{ color: '#939393' }}
+                    style={{
+                      color: (isSavingDraft || isPostingListing) ? '#B0B0B0' : '#939393',
+                      cursor: (isSavingDraft || isPostingListing) ? 'not-allowed' : 'pointer'
+                    }}
                   >
-                    <span>Save as draft</span>
+                    {isSavingDraft ? (
+                      <div className="flex items-center justify-center w-full">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderColor: '#939393' }}></div>
+                      </div>
+                    ) : (
+                      <span>Save as draft</span>
+                    )}
                   </button>
                 </div>
               </div>
@@ -4610,25 +4656,42 @@ const CreateListing: React.FC = () => {
                   <div className="flex items-center justify-center space-x-16 mt-16" style={{ maxWidth: '560px' }}>
                     <button
                       onClick={handleSaveDraft}
+                      disabled={isSavingDraft || isPostingListing}
                       className="flex items-center space-x-2 rounded-xl border-2 font-medium transition-colors text-sm"
-                      style={{ borderColor: '#F9A825', color: '#F9A825', paddingLeft: '4rem', paddingRight: '4.5rem', paddingTop: '0.625rem', paddingBottom: '0.625rem' }}
+                      style={{
+                        borderColor: (isSavingDraft || isPostingListing) ? '#E9E9E9' : '#F9A825',
+                        color: (isSavingDraft || isPostingListing) ? '#B0B0B0' : '#F9A825',
+                        paddingLeft: '4rem',
+                        paddingRight: '4.5rem',
+                        paddingTop: '0.625rem',
+                        paddingBottom: '0.625rem',
+                        cursor: (isSavingDraft || isPostingListing) ? 'not-allowed' : 'pointer'
+                      }}
                     >
-                      <span>Save as draft</span>
-                      <img src={draft2Icon} alt="Save" className="w-5 h-5" />
+                      {isSavingDraft ? (
+                        <div className="flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2" style={{ borderColor: '#F9A825' }}></div>
+                        </div>
+                      ) : (
+                        <>
+                          <span>Save as draft</span>
+                          <img src={draft2Icon} alt="Save" className="w-5 h-5" />
+                        </>
+                      )}
                     </button>
                     <button
                       onClick={handlePostListing}
-                      disabled={isLoading}
+                      disabled={isSavingDraft || isPostingListing || !isFormComplete}
                       className="flex items-center space-x-2 px-16 py-2.5 rounded-xl font-medium transition-colors text-sm"
                       style={{
-                        backgroundColor: isFormComplete ? '#F9A825' : '#E9E9E9',
-                        color: isFormComplete ? '#FFFFFF' : '#6A6A6A',
-                        cursor: isFormComplete ? 'pointer' : 'not-allowed',
+                        backgroundColor: (isFormComplete && !isSavingDraft && !isPostingListing) ? '#F9A825' : '#E9E9E9',
+                        color: (isFormComplete && !isSavingDraft && !isPostingListing) ? '#FFFFFF' : '#6A6A6A',
+                        cursor: (isSavingDraft || isPostingListing || !isFormComplete) ? 'not-allowed' : 'pointer',
                         minHeight: '40px',
                         position: 'relative'
                       }}
                     >
-                      {isLoading ? (
+                      {isPostingListing ? (
                         <div className="flex items-center justify-center w-full">
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                         </div>
@@ -4640,7 +4703,7 @@ const CreateListing: React.FC = () => {
                             alt="Post"
                             className="w-4 h-4"
                             style={{
-                              filter: isFormComplete ? 'brightness(0) invert(1)' : 'none'
+                              filter: (isFormComplete && !isSavingDraft && !isPostingListing) ? 'brightness(0) invert(1)' : 'none'
                             }}
                           />
                         </>

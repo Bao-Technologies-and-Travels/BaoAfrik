@@ -62,6 +62,7 @@ export type ProductMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   publishedAt: Date | null
+  expiresAt: Date | null
 }
 
 export type ProductMaxAggregateOutputType = {
@@ -84,6 +85,7 @@ export type ProductMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   publishedAt: Date | null
+  expiresAt: Date | null
 }
 
 export type ProductCountAggregateOutputType = {
@@ -107,6 +109,7 @@ export type ProductCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   publishedAt: number
+  expiresAt: number
   _all: number
 }
 
@@ -147,6 +150,7 @@ export type ProductMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   publishedAt?: true
+  expiresAt?: true
 }
 
 export type ProductMaxAggregateInputType = {
@@ -169,6 +173,7 @@ export type ProductMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   publishedAt?: true
+  expiresAt?: true
 }
 
 export type ProductCountAggregateInputType = {
@@ -192,6 +197,7 @@ export type ProductCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   publishedAt?: true
+  expiresAt?: true
   _all?: true
 }
 
@@ -302,6 +308,7 @@ export type ProductGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   publishedAt: Date | null
+  expiresAt: Date | null
   _count: ProductCountAggregateOutputType | null
   _avg: ProductAvgAggregateOutputType | null
   _sum: ProductSumAggregateOutputType | null
@@ -348,6 +355,7 @@ export type ProductWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   publishedAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   likes?: Prisma.ProductLikeListRelationFilter
   saves?: Prisma.ProductSaveListRelationFilter
@@ -377,6 +385,7 @@ export type ProductOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   seller?: Prisma.UserOrderByWithRelationInput
   likes?: Prisma.ProductLikeOrderByRelationAggregateInput
   saves?: Prisma.ProductSaveOrderByRelationAggregateInput
@@ -409,6 +418,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   publishedAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   likes?: Prisma.ProductLikeListRelationFilter
   saves?: Prisma.ProductSaveListRelationFilter
@@ -438,6 +448,7 @@ export type ProductOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ProductCountOrderByAggregateInput
   _avg?: Prisma.ProductAvgOrderByAggregateInput
   _max?: Prisma.ProductMaxOrderByAggregateInput
@@ -469,6 +480,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
   publishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Product"> | Date | string | null
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Product"> | Date | string | null
 }
 
 export type ProductCreateInput = {
@@ -491,6 +503,7 @@ export type ProductCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   seller: Prisma.UserCreateNestedOneWithoutProductsInput
   likes?: Prisma.ProductLikeCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveCreateNestedManyWithoutProductInput
@@ -520,6 +533,7 @@ export type ProductUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   likes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutProductInput
   reviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutProductInput
@@ -547,6 +561,7 @@ export type ProductUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seller?: Prisma.UserUpdateOneRequiredWithoutProductsNestedInput
   likes?: Prisma.ProductLikeUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUpdateManyWithoutProductNestedInput
@@ -576,6 +591,7 @@ export type ProductUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   likes?: Prisma.ProductLikeUncheckedUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUncheckedUpdateManyWithoutProductNestedInput
   reviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutProductNestedInput
@@ -604,6 +620,7 @@ export type ProductCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
 }
 
 export type ProductUpdateManyMutationInput = {
@@ -626,6 +643,7 @@ export type ProductUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProductUncheckedUpdateManyInput = {
@@ -649,6 +667,7 @@ export type ProductUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProductListRelationFilter = {
@@ -682,6 +701,7 @@ export type ProductCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
 }
 
 export type ProductAvgOrderByAggregateInput = {
@@ -712,6 +732,7 @@ export type ProductMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
 }
 
 export type ProductMinOrderByAggregateInput = {
@@ -734,6 +755,7 @@ export type ProductMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
 }
 
 export type ProductSumOrderByAggregateInput = {
@@ -902,6 +924,7 @@ export type ProductCreateWithoutSellerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   likes?: Prisma.ProductLikeCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveCreateNestedManyWithoutProductInput
   reviews?: Prisma.ProductReviewCreateNestedManyWithoutProductInput
@@ -929,6 +952,7 @@ export type ProductUncheckedCreateWithoutSellerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   likes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutProductInput
   reviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutProductInput
@@ -986,6 +1010,7 @@ export type ProductScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   publishedAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
 }
 
 export type ProductCreateWithoutLikesInput = {
@@ -1008,6 +1033,7 @@ export type ProductCreateWithoutLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   seller: Prisma.UserCreateNestedOneWithoutProductsInput
   saves?: Prisma.ProductSaveCreateNestedManyWithoutProductInput
   reviews?: Prisma.ProductReviewCreateNestedManyWithoutProductInput
@@ -1036,6 +1062,7 @@ export type ProductUncheckedCreateWithoutLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   saves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutProductInput
   reviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutProductInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutProductInput
@@ -1078,6 +1105,7 @@ export type ProductUpdateWithoutLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seller?: Prisma.UserUpdateOneRequiredWithoutProductsNestedInput
   saves?: Prisma.ProductSaveUpdateManyWithoutProductNestedInput
   reviews?: Prisma.ProductReviewUpdateManyWithoutProductNestedInput
@@ -1106,6 +1134,7 @@ export type ProductUncheckedUpdateWithoutLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   saves?: Prisma.ProductSaveUncheckedUpdateManyWithoutProductNestedInput
   reviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutProductNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutProductNestedInput
@@ -1132,6 +1161,7 @@ export type ProductCreateWithoutSavesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   seller: Prisma.UserCreateNestedOneWithoutProductsInput
   likes?: Prisma.ProductLikeCreateNestedManyWithoutProductInput
   reviews?: Prisma.ProductReviewCreateNestedManyWithoutProductInput
@@ -1160,6 +1190,7 @@ export type ProductUncheckedCreateWithoutSavesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   likes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutProductInput
   reviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutProductInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutProductInput
@@ -1202,6 +1233,7 @@ export type ProductUpdateWithoutSavesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seller?: Prisma.UserUpdateOneRequiredWithoutProductsNestedInput
   likes?: Prisma.ProductLikeUpdateManyWithoutProductNestedInput
   reviews?: Prisma.ProductReviewUpdateManyWithoutProductNestedInput
@@ -1230,6 +1262,7 @@ export type ProductUncheckedUpdateWithoutSavesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   likes?: Prisma.ProductLikeUncheckedUpdateManyWithoutProductNestedInput
   reviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutProductNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutProductNestedInput
@@ -1256,6 +1289,7 @@ export type ProductCreateWithoutReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   seller: Prisma.UserCreateNestedOneWithoutProductsInput
   likes?: Prisma.ProductLikeCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveCreateNestedManyWithoutProductInput
@@ -1284,6 +1318,7 @@ export type ProductUncheckedCreateWithoutReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   likes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutProductInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutProductInput
@@ -1326,6 +1361,7 @@ export type ProductUpdateWithoutReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seller?: Prisma.UserUpdateOneRequiredWithoutProductsNestedInput
   likes?: Prisma.ProductLikeUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUpdateManyWithoutProductNestedInput
@@ -1354,6 +1390,7 @@ export type ProductUncheckedUpdateWithoutReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   likes?: Prisma.ProductLikeUncheckedUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUncheckedUpdateManyWithoutProductNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutProductNestedInput
@@ -1380,6 +1417,7 @@ export type ProductCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   seller: Prisma.UserCreateNestedOneWithoutProductsInput
   likes?: Prisma.ProductLikeCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveCreateNestedManyWithoutProductInput
@@ -1408,6 +1446,7 @@ export type ProductUncheckedCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   likes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutProductInput
   reviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutProductInput
@@ -1450,6 +1489,7 @@ export type ProductUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seller?: Prisma.UserUpdateOneRequiredWithoutProductsNestedInput
   likes?: Prisma.ProductLikeUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUpdateManyWithoutProductNestedInput
@@ -1478,6 +1518,7 @@ export type ProductUncheckedUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   likes?: Prisma.ProductLikeUncheckedUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUncheckedUpdateManyWithoutProductNestedInput
   reviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutProductNestedInput
@@ -1504,6 +1545,7 @@ export type ProductCreateWithoutConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   seller: Prisma.UserCreateNestedOneWithoutProductsInput
   likes?: Prisma.ProductLikeCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveCreateNestedManyWithoutProductInput
@@ -1532,6 +1574,7 @@ export type ProductUncheckedCreateWithoutConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
   likes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutProductInput
   saves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutProductInput
   reviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutProductInput
@@ -1574,6 +1617,7 @@ export type ProductUpdateWithoutConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seller?: Prisma.UserUpdateOneRequiredWithoutProductsNestedInput
   likes?: Prisma.ProductLikeUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUpdateManyWithoutProductNestedInput
@@ -1602,6 +1646,7 @@ export type ProductUncheckedUpdateWithoutConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   likes?: Prisma.ProductLikeUncheckedUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUncheckedUpdateManyWithoutProductNestedInput
   reviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutProductNestedInput
@@ -1628,6 +1673,7 @@ export type ProductCreateManySellerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  expiresAt?: Date | string | null
 }
 
 export type ProductUpdateWithoutSellerInput = {
@@ -1650,6 +1696,7 @@ export type ProductUpdateWithoutSellerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   likes?: Prisma.ProductLikeUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUpdateManyWithoutProductNestedInput
   reviews?: Prisma.ProductReviewUpdateManyWithoutProductNestedInput
@@ -1677,6 +1724,7 @@ export type ProductUncheckedUpdateWithoutSellerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   likes?: Prisma.ProductLikeUncheckedUpdateManyWithoutProductNestedInput
   saves?: Prisma.ProductSaveUncheckedUpdateManyWithoutProductNestedInput
   reviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutProductNestedInput
@@ -1704,6 +1752,7 @@ export type ProductUncheckedUpdateManyWithoutSellerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1794,6 +1843,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   createdAt?: boolean
   updatedAt?: boolean
   publishedAt?: boolean
+  expiresAt?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   likes?: boolean | Prisma.Product$likesArgs<ExtArgs>
   saves?: boolean | Prisma.Product$savesArgs<ExtArgs>
@@ -1824,6 +1874,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   publishedAt?: boolean
+  expiresAt?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -1848,6 +1899,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   publishedAt?: boolean
+  expiresAt?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -1872,9 +1924,10 @@ export type ProductSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   publishedAt?: boolean
+  expiresAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "title" | "description" | "price" | "currency" | "category" | "origin" | "location" | "deliveryAvailable" | "quantity" | "images" | "status" | "viewCount" | "likeCount" | "saveCount" | "isActive" | "createdAt" | "updatedAt" | "publishedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "title" | "description" | "price" | "currency" | "category" | "origin" | "location" | "deliveryAvailable" | "quantity" | "images" | "status" | "viewCount" | "likeCount" | "saveCount" | "isActive" | "createdAt" | "updatedAt" | "publishedAt" | "expiresAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   likes?: boolean | Prisma.Product$likesArgs<ExtArgs>
@@ -1922,6 +1975,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     createdAt: Date
     updatedAt: Date
     publishedAt: Date | null
+    expiresAt: Date | null
   }, ExtArgs["result"]["product"]>
   composites: {}
 }
@@ -2371,6 +2425,7 @@ export interface ProductFieldRefs {
   readonly createdAt: Prisma.FieldRef<"Product", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Product", 'DateTime'>
   readonly publishedAt: Prisma.FieldRef<"Product", 'DateTime'>
+  readonly expiresAt: Prisma.FieldRef<"Product", 'DateTime'>
 }
     
 

@@ -122,6 +122,7 @@ interface Product {
   status: string;
   createdAt: string;
   updatedAt: string;
+  expiresAt?: string | null;
   images: ProductImage[] | string;
   seller: Seller;
   imageUrls?: string[];
@@ -282,6 +283,8 @@ const ProductDetail: React.FC = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoadingRelated, setIsLoadingRelated] = useState(false);
   const [conversations, setConversations] = useState<any[]>([]);
+  const [productConversations, setProductConversations] = useState<any[]>([]);
+  const [isLoadingConversations, setIsLoadingConversations] = useState(false);
   const [locationFilter, setLocationFilter] = useState('');
   const [sellerProducts, setSellerProducts] = useState<Product[]>([]);
   const [isLoadingSellerProducts, setIsLoadingSellerProducts] = useState(false);
@@ -399,45 +402,65 @@ const ProductDetail: React.FC = () => {
     };
   }, [showMessagesDropdown, showRepostModal]);
 
-  // Mock recent messages data
-  const recentMessages = ownerListing?.messages ? [
-    {
-      id: '1',
-      name: 'Nadine MABE',
-      avatar: sellerAvatar,
-      rating: 4.3,
-      messageState: 'new' as 'new' | 'read' | 'you',
-      messagePreview: 'New message',
-      timestamp: 'Today, 10:52'
-    },
-    {
-      id: '2',
-      name: 'Loïc ABENA',
-      avatar: sellerAvatar,
-      rating: 4.3,
-      messageState: 'read' as 'new' | 'read' | 'you',
-      messagePreview: 'Hello, I am interested by this item is...',
-      timestamp: 'Today, 10:52'
-    },
-    {
-      id: '3',
-      name: 'Ryan MUBOU',
-      avatar: sellerAvatar,
-      rating: 4.3,
-      messageState: 'you' as 'new' | 'read' | 'you',
-      messagePreview: 'Where should I deliver to please...',
-      timestamp: 'Today, 10:52'
-    },
-    {
-      id: '4',
-      name: 'Aïssatou WABE',
-      avatar: sellerAvatar,
-      rating: 4.3,
-      messageState: 'you' as 'new' | 'read' | 'you',
-      messagePreview: 'Where should I deliver to please...',
-      timestamp: 'Today, 10:52'
-    }
-  ].slice(0, Math.min(ownerListing.messages, 4)) : [];
+  // Fetch conversations for product (owner view only)
+  useEffect(() => {
+    const fetchProductConversations = async () => {
+      if (!isOwnerView || !product?.id || !user) return;
+
+      try {
+        setIsLoadingConversations(true);
+        const token = localStorage.getItem('accessToken');
+        if (!token) return;
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/chat/conversations/product/${product.id}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            setProductConversations(result.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching product conversations:', error);
+      } finally {
+        setIsLoadingConversations(false);
+      }
+    };
+
+    fetchProductConversations();
+  }, [isOwnerView, product?.id, user]);
+
+  // Format conversations for display
+  const recentMessages = productConversations.slice(0, 4).map((conv: any) => ({
+    id: conv.id,
+    name: conv.buyer ? `${conv.buyer.firstName || ''} ${conv.buyer.lastName || ''}`.trim() || 'Unknown User' : 'Unknown User',
+    avatar: conv.buyer?.profileImage || sellerAvatar,
+    rating: conv.buyer?.rating || 4.3,
+    messageState: conv.messageState || 'read' as 'new' | 'read' | 'you',
+    messagePreview: conv.lastMessage?.preview || conv.lastMessage?.content || 'No messages yet',
+    timestamp: conv.timestamp || ''
+  }));
+
+  // Calculate days left from product expiresAt
+  const calculateDaysLeft = (expiresAt?: string | null): number | undefined => {
+    if (!expiresAt) return undefined;
+    const expiryDate = new Date(expiresAt);
+    const now = new Date();
+    const diffTime = expiryDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : undefined;
+  };
+
+  const productDaysLeft = product?.expiresAt ? calculateDaysLeft(product.expiresAt) : ownerListing?.daysLeft;
+  const messagesCount = productConversations.length;
 
   // Load product reviews from backend
   const loadReviews = useCallback(async () => {
@@ -1145,7 +1168,7 @@ const ProductDetail: React.FC = () => {
         const imagesArray: ProductImage[] = typeof product.images === 'string'
           ? JSON.parse(product.images)
           : product.images;
-        
+
         if (Array.isArray(imagesArray) && imagesArray.length > 0) {
           imageUrls = imagesArray.map((img: ProductImage) => img.url);
         } else if (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) {
@@ -1562,7 +1585,7 @@ const ProductDetail: React.FC = () => {
                 >
                   <img src={trashIcon} alt="Delete listing" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
                 </button>
-                {ownerListing?.status === 'active' && !ownerListing?.daysLeft ? (
+                {ownerListing?.status === 'active' && (productDaysLeft === undefined || productDaysLeft > 3) ? (
                   <button
                     type="button"
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
@@ -1794,7 +1817,12 @@ const ProductDetail: React.FC = () => {
                 <h1 className="font-normal" style={{ fontSize: '18px', color: '#939393', whiteSpace: 'nowrap' }}>
                   {product.title}
                 </h1>
-                {isOwnerView && renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
+                {isOwnerView && renderStatusBadge(
+                  ownerListing?.status === 'active' && productDaysLeft !== undefined && productDaysLeft <= 3
+                    ? 'active'
+                    : ownerListing?.status,
+                  productDaysLeft !== undefined && productDaysLeft <= 3 ? productDaysLeft : ownerListing?.daysLeft
+                )}
               </div>
 
               {/* Price and posted Date */}
@@ -1938,8 +1966,8 @@ const ProductDetail: React.FC = () => {
                 </div>
               )}
 
-              {/* Messages Received Component - Only show for active listings without daysLeft */}
-              {isOwnerView && ownerListing?.status === 'active' && !ownerListing?.daysLeft && ownerListing?.messages && ownerListing.messages > 0 && (
+              {/* Messages Received Component - Only show for active listings */}
+              {isOwnerView && ownerListing?.status === 'active' && messagesCount > 0 && (
                 <div ref={messagesDropdownRef} className="relative">
                   <div
                     className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mb-2"
@@ -1957,7 +1985,7 @@ const ProductDetail: React.FC = () => {
                   >
                     {/* Avatars */}
                     <div className="flex items-center" style={{ marginRight: '6px' }}>
-                      {[1, 2, 3, 4].slice(0, Math.min(ownerListing.messages, 4)).map((_, index) => {
+                      {recentMessages.slice(0, Math.min(messagesCount, 4)).map((message: any, index: number) => {
                         const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
                         return (
                           <div
@@ -1972,8 +2000,8 @@ const ProductDetail: React.FC = () => {
                             }}
                           >
                             <img
-                              src={sellerAvatar}
-                              alt={`Buyer ${index + 1}`}
+                              src={message.avatar}
+                              alt={message.name}
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -1989,7 +2017,9 @@ const ProductDetail: React.FC = () => {
                         fontFamily: 'Poppins, sans-serif'
                       }}
                     >
-                      {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} received for this product
+                      {messagesCount === 0
+                        ? '0 messages received for this product'
+                        : `${messagesCount} Message${messagesCount !== 1 ? 's' : ''} received for this product`}
                     </span>
 
                     {/* Arrow Icon */}
@@ -2327,8 +2357,8 @@ const ProductDetail: React.FC = () => {
                 </div>
               )}
 
-              {/* Days Left Badge */}
-              {isOwnerView && ownerListing?.daysLeft && (
+              {/* Days Left Badge - Show when <= 3 days left */}
+              {isOwnerView && productDaysLeft !== undefined && productDaysLeft <= 3 && productDaysLeft > 0 && (
                 <div
                   className="flex items-start gap-3 p-2.5 mt-2"
                   style={{
@@ -2365,7 +2395,7 @@ const ProductDetail: React.FC = () => {
                         fontFamily: 'Bricolage Grotesque, sans-serif'
                       }}
                     >
-                      {ownerListing.daysLeft} day{ownerListing.daysLeft !== 1 ? 's' : ''} left for your listing on our marketplace.
+                      {productDaysLeft} day{productDaysLeft !== 1 ? 's' : ''} left for your listing on our marketplace.
                     </p>
 
                     {/* Description */}
@@ -2486,7 +2516,12 @@ const ProductDetail: React.FC = () => {
                 </p>
                 {isMobile && isOwnerView && !currentReviewStatus && (
                   <div className="flex-shrink-0">
-                    {renderStatusBadge(ownerListing?.status, ownerListing?.daysLeft)}
+                    {renderStatusBadge(
+                      ownerListing?.status === 'active' && productDaysLeft !== undefined && productDaysLeft <= 3
+                        ? 'active'
+                        : ownerListing?.status,
+                      productDaysLeft !== undefined && productDaysLeft <= 3 ? productDaysLeft : ownerListing?.daysLeft
+                    )}
                   </div>
                 )}
               </div>
@@ -2531,7 +2566,7 @@ const ProductDetail: React.FC = () => {
             </div>
             {isMobile && isOwnerView ? (
               <div className="flex items-center gap-2">
-                {(ownerListing?.status === 'inactive' || ownerListing?.daysLeft) ? (
+                {(ownerListing?.status === 'inactive' || (productDaysLeft !== undefined && productDaysLeft <= 3)) ? (
                   <>
                     <button
                       type="button"
@@ -2967,8 +3002,8 @@ const ProductDetail: React.FC = () => {
             Read more
           </button>
 
-          {/* Messages Received Component - Mobile - Only show for active listings without daysLeft */}
-          {isOwnerView && ownerListing?.status === 'active' && !ownerListing?.daysLeft && ownerListing?.messages && ownerListing.messages > 0 && (
+          {/* Messages Received Component - Mobile - Only show for active listings */}
+          {isOwnerView && ownerListing?.status === 'active' && (productDaysLeft === undefined || productDaysLeft > 3) && messagesCount > 0 && (
             <div ref={messagesDropdownRef} className="relative">
               <div
                 className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mt-2"
@@ -2986,7 +3021,7 @@ const ProductDetail: React.FC = () => {
               >
                 {/* Avatars */}
                 <div className="flex items-center" style={{ marginRight: '6px' }}>
-                  {[1, 2, 3, 4].slice(0, Math.min(ownerListing.messages, 4)).map((_, index) => {
+                  {recentMessages.slice(0, Math.min(messagesCount, 4)).map((message: any, index: number) => {
                     const avatarColors = ['#E3F2FD', '#F3E5F5', '#FFF3E0', '#E8F5E9'];
                     return (
                       <div
@@ -3001,8 +3036,8 @@ const ProductDetail: React.FC = () => {
                         }}
                       >
                         <img
-                          src={sellerAvatar}
-                          alt={`Buyer ${index + 1}`}
+                          src={message.avatar}
+                          alt={message.name}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -3018,7 +3053,9 @@ const ProductDetail: React.FC = () => {
                     fontFamily: 'Poppins, sans-serif'
                   }}
                 >
-                  {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} received for this product
+                  {messagesCount === 0
+                    ? '0 messages received for this product'
+                    : `${messagesCount} Message${messagesCount !== 1 ? 's' : ''} received for this product`}
                 </span>
 
                 {/* Arrow Icon */}
@@ -3623,46 +3660,14 @@ const ProductDetail: React.FC = () => {
                 <div className="mb-6 text-left lg:text-center">
                   <div className="flex items-center justify-between lg:justify-center space-x-2 mb-2">
                     <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-2">
-                        <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                          {Number.isInteger(averageRating) ? averageRating.toFixed(1) : averageRating.toString()}
-                        </div>
-                        <div className="flex items-center">
-                          {[1, 2, 3, 4, 5].map((star) => {
-                            const isFilled = star <= averageRating;
-                            const hasHalfStar = star > Math.floor(averageRating) && star - 0.5 <= averageRating && averageRating % 1 >= 0.5;
-
-                            return (
-                              <div key={star} className="relative w-5 h-5">
-                                {/* Gray background star */}
-                                <svg
-                                  className="absolute w-full h-full text-gray-300"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-
-                                {/* Yellow filled star (full or half) */}
-                                <div
-                                  className="absolute top-0 left-0 h-full overflow-hidden"
-                                  style={{
-                                    width: isFilled ? '100%' : hasHalfStar ? '50%' : '0%'
-                                  }}
-                                >
-                                  <svg
-                                    className="w-full h-full text-yellow-400 fill-current"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                  </svg>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                      <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        {Number.isInteger(averageRating) ? averageRating.toFixed(1) : averageRating.toString()}
                       </div>
+                      <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
                     </div>
-                    {!isReviewPosted && (
+                    {!isReviewPosted && !(isMobile && isOwnerView) && (
                       <div className="lg:hidden">
                         <button
                           onClick={() => setShowGiveOpinionModal(true)}
@@ -3676,23 +3681,13 @@ const ProductDetail: React.FC = () => {
                   </div>
                   <div className="text-sm mb-4" style={{ color: '#6A6A6A' }}>Review & Rates ({totalReviews})</div>
 
-                  {/* Rating Bars */}
                   <div className="space-y-2 mb-2 lg:mb-0">
                     {[5, 4, 3, 2, 1].map((rating) => {
                       const count = ratingDistribution[rating] || 0;
                       const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
                       return (
-                        <div key={rating} className="flex items-center space-x-2">
-                          <span className="text-xs w-4 text-gray-600">{rating}</span>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5 flex-1">
-                            <div
-                              className="bg-yellow-400 h-1.5 rounded-full"
-                              style={{ width: `${percentage}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-xs w-8 text-right text-gray-500">
-                            {count}
-                          </span>
+                        <div key={rating} className="w-full bg-gray-200 rounded-full h-1">
+                          <div className="bg-yellow-400 h-1 rounded-full" style={{ width: `${percentage}%` }}></div>
                         </div>
                       );
                     })}

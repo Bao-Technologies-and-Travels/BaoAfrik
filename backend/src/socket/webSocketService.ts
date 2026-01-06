@@ -526,15 +526,24 @@ export class WebSocketService {
       });
 
       // Parse productData to extract files if stored there
+      // Note: message.productData from sendMessage is already parsed, but check if it's a string from Prisma
       let parsedProductData = null;
       let extractedFiles: any[] = [];
       if (message.productData) {
-        parsedProductData = typeof message.productData === 'string'
-          ? JSON.parse(message.productData)
-          : message.productData;
+        // message.productData from sendMessage should already be parsed, but handle both cases
+        if (typeof message.productData === 'string') {
+          try {
+            parsedProductData = JSON.parse(message.productData);
+          } catch (e) {
+            console.warn('Failed to parse productData string:', e);
+            parsedProductData = null;
+          }
+        } else {
+          parsedProductData = message.productData;
+        }
         
         // Extract files from productData if stored there
-        if (parsedProductData._files && Array.isArray(parsedProductData._files)) {
+        if (parsedProductData && parsedProductData._files && Array.isArray(parsedProductData._files)) {
           extractedFiles = parsedProductData._files;
           // Remove _files from productData to keep it clean
           delete parsedProductData._files;
@@ -716,7 +725,7 @@ export class WebSocketService {
     return this.io;
   }
 
-  // Broadcast product notification to all connected users
+  // Broadcast product notification to all connected users (DEPRECATED - only notify creator now)
   broadcastProductNotification(data: {
     productId: string;
     productTitle: string;
@@ -741,6 +750,58 @@ export class WebSocketService {
       this.io.emit('notification_count_updated');
     } catch (error) {
       console.error('Error broadcasting product notification:', error);
+    }
+  }
+
+  // Send product notification only to the product creator
+  sendProductNotificationToUser(userId: string, data: {
+    productId: string;
+    productTitle: string;
+    sellerId: string;
+    sellerName: string;
+    sellerImage: string | null;
+    productImage?: string | null;
+  }) {
+    try {
+      // Send only to the specific user (product creator)
+      this.io.to(userId).emit('product_creator_notification', {
+        productId: data.productId,
+        productTitle: data.productTitle,
+        sellerId: data.sellerId,
+        sellerName: data.sellerName,
+        sellerImage: data.sellerImage,
+        productImage: data.productImage,
+        timestamp: new Date().toISOString()
+      });
+
+      // Update notification count for this user
+      this.io.to(userId).emit('notification_count_updated');
+    } catch (error) {
+      console.error('Error sending product notification to user:', error);
+    }
+  }
+
+  // Send status change notification to product creator
+  sendStatusChangeNotification(userId: string, data: {
+    productId: string;
+    productTitle: string;
+    previousStatus: string;
+    newStatus: string;
+  }) {
+    try {
+      // Send status change notification to the product creator
+      this.io.to(userId).emit('product_status_change', {
+        productId: data.productId,
+        productTitle: data.productTitle,
+        previousStatus: data.previousStatus,
+        newStatus: data.newStatus,
+        timestamp: new Date().toISOString()
+      });
+
+      // Update notification count for this user
+      this.io.to(userId).emit('notification_count_updated');
+    } catch (error) {
+      console.error('Error sending status change notification:', error);
     }
   }
 

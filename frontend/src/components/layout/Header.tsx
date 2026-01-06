@@ -271,37 +271,42 @@ const Header: React.FC<HeaderProps> = ({
 
     const onNewProductNotification = (payload: any) => {
       if (payload?.productId) {
-        const has = notifications.some(n => n.meta?.productId === payload.productId);
+        const has = notifications.some(n => n.meta?.productId === payload.productId && n.type === 'product');
         if (has) return;
       }
 
       const created = new Date();
+      // Check if this is a notification for the user's own listing
+      const isOwnListing = payload.sellerId === payload.userId;
       const normalized = {
         id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
         day: getDayLabel(created),
         time: payload.time || formatTime(created),
-        title: payload.sellerName || 'A seller',
-        body: `just listed "${payload.productTitle || 'a new product'}"`,
+        title: isOwnListing ? 'Your listing is available on the platform' : (payload.sellerName || 'A seller'),
+        body: isOwnListing 
+          ? `Your listing "${payload.productTitle || 'a new product'}" is now available on the marketplace`
+          : `just listed "${payload.productTitle || 'a new product'}"`,
         meta: {
           productId: payload.productId,
           productTitle: payload.productTitle,
           productImage: payload.productImage,
           sellerId: payload.sellerId,
           sellerName: payload.sellerName,
-          sellerImage: payload.sellerImage
+          sellerImage: isOwnListing ? null : payload.sellerImage // Don't show profile image for own listings
         },
         type: 'product',
         isRead: false,
-        actor: payload.sellerImage ? {
+        actor: isOwnListing ? null : (payload.sellerImage ? {
           id: payload.sellerId,
           firstName: payload.sellerName?.split(' ')[0] || '',
           lastName: payload.sellerName?.split(' ').slice(1).join(' ') || '',
           profileImage: payload.sellerImage
-        } : null
+        } : null),
+        sellerImage: isOwnListing ? null : payload.sellerImage
       };
 
       setNotifications(prev => {
-        const existsByMeta = payload?.productId ? prev.some(n => n.meta?.productId === payload.productId) : false;
+        const existsByMeta = payload?.productId ? prev.some(n => n.meta?.productId === payload.productId && n.type === 'product') : false;
         if (existsByMeta) return prev;
         return [normalized, ...prev];
       });

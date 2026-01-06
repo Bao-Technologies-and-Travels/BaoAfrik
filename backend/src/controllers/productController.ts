@@ -459,7 +459,7 @@ export class ProductController {
 
       const product: any = await productService.updateProductStatus(id, userId, status);
 
-      // If product was newly published, create notifications and broadcast
+      // If product was newly published, only notify the product creator
       if (product._newlyPublished && status === 'PUBLISHED') {
         try {
           // Get product with seller info for notification
@@ -488,34 +488,68 @@ export class ProductController {
               }
             }
 
-            // Create notifications for all users
-            await notificationService.createNotificationsForAllUsers({
+            // notify the product creator (seller)
+            await notificationService.createNotification({
+              userId: seller.id,
               actorId: seller.id,
               type: 'product',
-              message: `${sellerName} just listed "${productWithSeller.title}"`,
+              message: `Your listing "${productWithSeller.title}" is now available on the marketplace`,
               metadata: {
                 productId: productWithSeller.id,
                 productTitle: productWithSeller.title,
                 productImage: productImage,
                 sellerId: seller.id,
                 sellerName: sellerName,
-                sellerImage: seller.profileImage
+                sellerImage: null
               }
             });
 
-            // Broadcast via WebSocket
-            webSocketService.broadcastProductNotification({
+            // Send notification to the product creator
+            webSocketService.sendProductNotificationToUser(seller.id, {
               productId: productWithSeller.id,
               productTitle: productWithSeller.title,
               sellerId: seller.id,
               sellerName: sellerName,
-              sellerImage: seller.profileImage || null,
+              sellerImage: null,
               productImage: productImage
             });
           }
         } catch (notifError: any) {
           // Log error but don't fail the request
           console.error('Error creating product notifications:', notifError);
+        }
+      }
+
+      // Handle status changes (PUBLISHED to DRAFT, or active to inactive)
+      const previousStatus = (product as any)._previousStatus;
+      if (previousStatus && previousStatus === 'PUBLISHED' && status === 'DRAFT') {
+        try {
+          const productWithSeller = await productService.getProductById(id) as ProductWithSeller | null;
+          if (productWithSeller && productWithSeller.seller) {
+            const seller = productWithSeller.seller;
+            await notificationService.createNotification({
+              userId: seller.id,
+              actorId: seller.id,
+              type: 'product_status_change',
+              message: `Your listing "${productWithSeller.title}" has been moved to drafts`,
+              metadata: {
+                productId: productWithSeller.id,
+                productTitle: productWithSeller.title,
+                previousStatus: 'PUBLISHED',
+                newStatus: 'DRAFT'
+              }
+            });
+
+            // Send WebSocket notification for status change
+            webSocketService.sendStatusChangeNotification(seller.id, {
+              productId: productWithSeller.id,
+              productTitle: productWithSeller.title,
+              previousStatus: 'PUBLISHED',
+              newStatus: 'DRAFT'
+            });
+          }
+        } catch (notifError: any) {
+          console.error('Error creating status change notification:', notifError);
         }
       }
 
