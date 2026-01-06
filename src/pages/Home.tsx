@@ -58,11 +58,13 @@ const Home: React.FC = () => {
   const navigationLocation = useLocation();
   const navigate = useNavigate();
   const productGridRef = React.useRef<HTMLDivElement>(null);
+  const productFeedRef = React.useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [location, setLocation] = useState('');
   const [placeOfOrigin, setPlaceOfOrigin] = useState('');
+  const [placeOfOriginInput, setPlaceOfOriginInput] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sharedProducts, setSharedProducts] = useState<Set<number>>(new Set());
   const [savedProducts, setSavedProducts] = useState<Set<number>>(new Set());
@@ -95,7 +97,15 @@ const Home: React.FC = () => {
   const totalPages = 48;
   const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const [isMobile, setIsMobile] = useState(false);
-  const [searchHistory, setSearchHistory] = useState<string[]>(['Cameroonian spices', 'Ivorian clothing', 'Nigerian products', 'Cultural mask', 'Traditional accessories']);
+  // Initialize search history from localStorage
+  const [searchHistory, setSearchHistory] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('searchHistory');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [showSearchHistory, setShowSearchHistory] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [selectedCategoryText, setSelectedCategoryText] = useState('');
@@ -529,6 +539,7 @@ const Home: React.FC = () => {
     setSelectedCategoryText('');
     setLocation('');
     setPlaceOfOrigin('');
+    setPlaceOfOriginInput('');
     setSelectedPlaceOfOriginText('');
     setSearchResults([]);
     setIsSearchActive(false);
@@ -1712,6 +1723,17 @@ const Home: React.FC = () => {
     console.log('Selected Country Filter:', selectedCountry);
     console.log('Selected Image:', selectedImage ? 'Yes' : 'No');
     
+    // Save search query to localStorage if it's not empty
+    if (searchQuery.trim()) {
+      const updatedHistory = [searchQuery.trim(), ...searchHistory.filter(item => item !== searchQuery.trim())].slice(0, 10);
+      setSearchHistory(updatedHistory);
+      try {
+        localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
+      } catch (error) {
+        console.error('Failed to save search history:', error);
+      }
+    }
+    
     // If image is selected, prepare for API call (API-ready)
     if (selectedImage && imageFormData) {
       // TODO: API call for image-based search
@@ -1801,6 +1823,13 @@ const Home: React.FC = () => {
     
     setSearchResults(products);
     setIsSearchActive(true);
+    
+    // Scroll to product feed section
+    setTimeout(() => {
+      if (productFeedRef.current) {
+        productFeedRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   // Handle Enter key press in search input
@@ -2213,29 +2242,52 @@ const Home: React.FC = () => {
                 />
               )}
             <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Place of Origin</label>
-            <button
-              onClick={() => {
-                setFocusedSearchSection('placeOfOrigin');
-                setShowPlaceOfOriginDropdown(!showPlaceOfOriginDropdown);
-              }}
-              onFocus={() => setFocusedSearchSection('placeOfOrigin')}
-              onBlur={() => {
-                setTimeout(() => {
-                  setFocusedSearchSection(null);
-                  setShowPlaceOfOriginDropdown(false);
-                }, 200);
-              }}
-              className="border-0 p-0 focus:outline-none text-left flex items-center justify-between w-full"
-              style={{ fontSize: '11px', color: selectedPlaceOfOriginText ? '#212121' : '#E9E9E9', background: 'transparent' }}
-            >
-              <span>{selectedPlaceOfOriginText || 'Choose a location'}</span>
+            <div className="relative flex items-center w-full">
+              <style>
+                {`
+                  .place-of-origin-input::placeholder {
+                    color: #E9E9E9;
+                  }
+                `}
+              </style>
+              <input
+                type="text"
+                placeholder="Type a country"
+                value={selectedPlaceOfOriginText || placeOfOriginInput}
+                onChange={(e) => {
+                  setPlaceOfOriginInput(e.target.value);
+                  setSelectedPlaceOfOriginText('');
+                  setPlaceOfOrigin('');
+                  if (e.target.value.trim()) {
+                    setShowPlaceOfOriginDropdown(true);
+                  }
+                }}
+                onFocus={() => {
+                  setFocusedSearchSection('placeOfOrigin');
+                  if (placeOfOriginInput.trim() || !selectedPlaceOfOriginText) {
+                    setShowPlaceOfOriginDropdown(true);
+                  }
+                }}
+                onBlur={() => {
+                  setTimeout(() => {
+                    setFocusedSearchSection(null);
+                    setShowPlaceOfOriginDropdown(false);
+                  }, 200);
+                }}
+                className="border-0 p-0 focus:outline-none focus:ring-0 flex-1 place-of-origin-input"
+                style={{ fontSize: '11px', color: (selectedPlaceOfOriginText || placeOfOriginInput) ? '#212121' : '#212121', background: 'transparent' }}
+              />
               <img 
                 src={arrowDownIcon} 
                 alt="Arrow" 
-                className="w-3 h-3 ml-2 transition-transform"
+                className="w-3 h-3 ml-2 transition-transform flex-shrink-0 cursor-pointer"
                 style={{ transform: showPlaceOfOriginDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                onClick={() => {
+                  setShowPlaceOfOriginDropdown(!showPlaceOfOriginDropdown);
+                  setFocusedSearchSection('placeOfOrigin');
+                }}
               />
-            </button>
+            </div>
             </div>
             
           {/* Seller Location Section */}
@@ -2464,6 +2516,7 @@ const Home: React.FC = () => {
                 onMouseDown={() => {
                   setSelectedPlaceOfOriginText('');
                   setPlaceOfOrigin('');
+                  setPlaceOfOriginInput('');
                   setShowPlaceOfOriginDropdown(false);
                 }}
                 className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
@@ -2540,17 +2593,24 @@ const Home: React.FC = () => {
                 { name: 'Uganda', flagCode: 'ug' },
                 { name: 'Zambia', flagCode: 'zm' },
                 { name: 'Zimbabwe', flagCode: 'zw' }
-              ].sort((a, b) => a.name.localeCompare(b.name)).map((country) => (
+              ]
+              .filter(country => {
+                if (!placeOfOriginInput.trim()) return true;
+                return country.name.toLowerCase().includes(placeOfOriginInput.toLowerCase());
+              })
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((country) => (
                 <button
                   key={country.name}
                   onMouseDown={() => {
                     setSelectedPlaceOfOriginText(country.name);
                     setPlaceOfOrigin(country.name);
+                    setPlaceOfOriginInput(country.name);
                     setShowPlaceOfOriginDropdown(false);
                   }}
                   className="w-full text-left px-4 py-1.5 hover:bg-gray-50 transition-colors flex items-center gap-2"
                   style={{
-                    backgroundColor: 'transparent',
+                    backgroundColor: selectedPlaceOfOriginText === country.name ? '#F0F8FE' : 'transparent',
                     color: selectedPlaceOfOriginText === country.name ? '#64B5F6' : '#6A6A6A',
                     fontSize: '11px'
                   }}
@@ -3065,7 +3125,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Filtered Products Section */}
-      <section className="py-8">
+      <section className="py-8" ref={productFeedRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Conditional Layout: Category Sections for "All" or Regular Grid for Specific Category */}
           {activeCategory === 'All' && !isSearchActive ? (
@@ -3468,7 +3528,10 @@ const Home: React.FC = () => {
           {/* For search results (isSearchActive), group by categories */}
           {isSearchActive && !shouldShowNoResultsState() ? (
             <div className="space-y-8">
-              {categories.filter(cat => cat !== 'All').map((category) => {
+              {(selectedCategoryText 
+                ? [selectedCategoryText] 
+                : categories.filter(cat => cat !== 'All')
+              ).map((category) => {
                 // Get products from this category that are in search results
                 const categoryProducts = (allProducts[category as keyof typeof allProducts] || []);
                 const filteredProducts = searchResults.filter(product => 
