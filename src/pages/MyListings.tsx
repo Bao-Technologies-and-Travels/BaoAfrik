@@ -1157,7 +1157,7 @@ const MyListings: React.FC = () => {
                   <div
                     style={{
                       position: 'absolute',
-                      top: '32px',
+                      ...(index >= sortedListings.length - 2 ? { bottom: '32px' } : { top: '32px' }),
                       right: '0',
                       backgroundColor: '#FFFFFF',
                       borderRadius: '12px',
@@ -1339,8 +1339,8 @@ const MyListings: React.FC = () => {
                      borderRadius: '12px',
                      border: '1px solid #E9E9E9',
                      boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                     padding: isMobile ? '4px' : '6px',
-                     minWidth: isMobile ? '130px' : '150px',
+                     padding: isMobile ? '3px' : '4px',
+                     minWidth: isMobile ? '110px' : '130px',
                      zIndex: 1000
                    }}
                  >
@@ -1356,8 +1356,8 @@ const MyListings: React.FC = () => {
                        width: '100%',
                        display: 'flex',
                        alignItems: 'center',
-                       gap: isMobile ? '6px' : '8px',
-                       padding: isMobile ? '6px 8px' : '8px 10px',
+                       gap: isMobile ? '5px' : '6px',
+                       padding: isMobile ? '5px 6px' : '6px 8px',
                        border: 'none',
                        background: 'transparent',
                        cursor: 'pointer',
@@ -1370,8 +1370,8 @@ const MyListings: React.FC = () => {
                        e.currentTarget.style.backgroundColor = 'transparent';
                      }}
                    >
-                     <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px', flexShrink: 0, filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                     <span style={{ color: '#FF5151', fontSize: isMobile ? '12px' : '13px', fontFamily: 'Poppins, sans-serif', lineHeight: 1, whiteSpace: 'nowrap' }}>Delete the listing</span>
+                     <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '12px' : '14px', height: isMobile ? '12px' : '14px', flexShrink: 0, filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                     <span style={{ color: '#FF5151', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif', lineHeight: 1, whiteSpace: 'nowrap' }}>Delete the listing</span>
                    </button>
                    <button
                      type="button"
@@ -1383,19 +1383,19 @@ const MyListings: React.FC = () => {
                        width: '100%',
                        display: 'flex',
                        alignItems: 'center',
-                      gap: isMobile ? '6px' : '8px',
-                      padding: isMobile ? '6px 8px' : '8px 10px',
+                      gap: isMobile ? '5px' : '6px',
+                      padding: isMobile ? '5px 6px' : '6px 8px',
                        border: 'none',
                        background: '#FAFAFA',
                        cursor: 'pointer',
                       borderRadius: '6px',
-                       marginTop: '4px'
+                       marginTop: '3px'
                      }}
                    >
-                     <svg width={isMobile ? "14" : "16"} height={isMobile ? "14" : "16"} viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                     <svg width={isMobile ? "12" : "14"} height={isMobile ? "12" : "14"} viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                        <path d="M18 6L6 18M6 6l12 12" />
                      </svg>
-                     <span style={{ color: '#B0B0B0', fontSize: isMobile ? '12px' : '13px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                     <span style={{ color: '#B0B0B0', fontSize: isMobile ? '11px' : '12px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
               </button>
                  </div>
                )}
@@ -1809,8 +1809,8 @@ const MyListings: React.FC = () => {
                               borderRadius: '12px',
                               border: '1px solid #E9E9E9',
                               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                              padding: '4px',
-                              minWidth: '130px',
+                              padding: '3px',
+                              minWidth: '110px',
                               zIndex: 1000
                             }}
                           >
@@ -1826,8 +1826,8 @@ const MyListings: React.FC = () => {
                                 width: '100%',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '6px',
-                                padding: '6px 8px',
+                                gap: '5px',
+                                padding: '5px 6px',
                                 border: 'none',
                                 background: 'transparent',
                                 cursor: 'pointer',
@@ -1840,8 +1840,8 @@ const MyListings: React.FC = () => {
                                 e.currentTarget.style.backgroundColor = 'transparent';
                               }}
                             >
-                              <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px', flexShrink: 0, filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
-                              <span style={{ color: '#FF5151', fontSize: '12px', fontFamily: 'Poppins, sans-serif', lineHeight: 1, whiteSpace: 'nowrap' }}>Delete the listing</span>
+                              <img src={trashIcon} alt="Delete" style={{ width: '12px', height: '12px', flexShrink: 0, filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                              <span style={{ color: '#FF5151', fontSize: '11px', fontFamily: 'Poppins, sans-serif', lineHeight: 1, whiteSpace: 'nowrap' }}>Delete the listing</span>
                             </button>
                             <button
                               type="button"
@@ -1853,19 +1853,19 @@ const MyListings: React.FC = () => {
                                 width: '100%',
                                 display: 'flex',
                                 alignItems: 'center',
-                               gap: '6px',
-                               padding: '6px 8px',
+                               gap: '5px',
+                               padding: '5px 6px',
                                 border: 'none',
                                 background: '#FAFAFA',
                                 cursor: 'pointer',
                                borderRadius: '6px',
-                                marginTop: '4px'
+                                marginTop: '3px'
                               }}
                             >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M18 6L6 18M6 6l12 12" />
                               </svg>
-                              <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                              <span style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
                             </button>
                           </div>
                         )}

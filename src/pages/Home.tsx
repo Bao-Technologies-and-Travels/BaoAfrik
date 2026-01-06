@@ -1865,43 +1865,43 @@ const Home: React.FC = () => {
       navigate('/image-search');
     } else {
       // Desktop: Open file explorer
-      const fileInput = document.getElementById('image-upload') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.click();
-      }
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
     }
   };
 
   // Handle image from file
   const handleImageFromFile = (file: File) => {
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
-      return;
-    }
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
-      alert('Image size must be less than 10MB');
-      return;
-    }
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        alert('Image size must be less than 10MB');
+        return;
+      }
 
-    // Set selected image
-    setSelectedImage(file);
+      // Set selected image
+      setSelectedImage(file);
 
     // Create preview URL
     const imageUrl = URL.createObjectURL(file);
     setSelectedImageUrl(imageUrl);
 
-    // Create FormData for future API call
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('timestamp', new Date().toISOString());
-    
-    setImageFormData(formData);
+      // Create FormData for future API call
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('timestamp', new Date().toISOString());
+      
+      setImageFormData(formData);
   };
-
+      
   // Handle image file selection
   const handleImageSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -2263,17 +2263,17 @@ const Home: React.FC = () => {
                   }
                 }}
                 onFocus={() => {
-                  setFocusedSearchSection('placeOfOrigin');
+                setFocusedSearchSection('placeOfOrigin');
                   if (placeOfOriginInput.trim() || !selectedPlaceOfOriginText) {
                     setShowPlaceOfOriginDropdown(true);
                   }
-                }}
-                onBlur={() => {
-                  setTimeout(() => {
-                    setFocusedSearchSection(null);
-                    setShowPlaceOfOriginDropdown(false);
-                  }, 200);
-                }}
+              }}
+              onBlur={() => {
+                setTimeout(() => {
+                  setFocusedSearchSection(null);
+                  setShowPlaceOfOriginDropdown(false);
+                }, 200);
+              }}
                 className="border-0 p-0 focus:outline-none focus:ring-0 flex-1 place-of-origin-input"
                 style={{ fontSize: '11px', color: (selectedPlaceOfOriginText || placeOfOriginInput) ? '#212121' : '#212121', background: 'transparent' }}
               />
@@ -3701,36 +3701,36 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <>
-              {/* Section Header - Hide when no search results */}
-              {!shouldShowNoResultsState() && (
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center">
-                    <h2 className="text-[20px] font-semibold text-gray-900">
-                      {activeCategory}
-                    </h2>
-                    <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                  {getProductsToDisplay().length > 0 && (
-                    <div className="flex items-center space-x-3">
-                      <button 
-                        onClick={scrollProductsLeft}
-                        className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                        aria-label="Scroll products left"
-                      >
-                        <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                      </button>
-                      <button 
-                        onClick={scrollProductsRight}
-                        className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                        aria-label="Scroll products right"
-                      >
-                        <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-                      </button>
-                    </div>
-                  )}
-                </div>
+          {/* Section Header - Hide when no search results */}
+          {!shouldShowNoResultsState() && (
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                <h2 className="text-[20px] font-semibold text-gray-900">
+                  {activeCategory}
+                </h2>
+              <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+              {getProductsToDisplay().length > 0 && (
+                <div className="flex items-center space-x-3">
+                  <button 
+                    onClick={scrollProductsLeft}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                    aria-label="Scroll products left"
+                  >
+                    <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+              </button>
+                  <button 
+                    onClick={scrollProductsRight}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                    aria-label="Scroll products right"
+                  >
+                    <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+              </button>
+            </div>
+              )}
+          </div>
               )}
             </>
           )}
@@ -4310,7 +4310,7 @@ const Home: React.FC = () => {
                               filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                             }} 
                           />
-                        </button>
+                      </button>
                       </div>
                     </div>
                   )}
@@ -4636,8 +4636,8 @@ const Home: React.FC = () => {
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                        }}
-                      >
+                      }}
+                    >
                         <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
                         Manage the request
                     </button>

@@ -3631,8 +3631,8 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                       </>
                     ) : (
                       <>
-                        <span>Save as draft</span>
-                        <img src={draft2Icon} alt="Save" className="w-5 h-5" />
+                    <span>Save as draft</span>
+                    <img src={draft2Icon} alt="Save" className="w-5 h-5" />
                       </>
                     )}
                   </button>
