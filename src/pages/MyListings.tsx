@@ -298,6 +298,28 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
   return payload;
 };
 
+const buildListingPrefillPayload = (listing: Listing) => {
+  const payload: Record<string, string> = {};
+  if (listing.title) payload.title = listing.title;
+  if (listing.price) payload.price = listing.price;
+  if (listing.currency) payload.currency = listing.currency;
+  if (listing.image) payload.image = listing.image;
+  if (listing.category) {
+    // Map category to the format expected by CreateListing
+    const categoryMap: Record<string, string> = {
+      'Food & Spicy': 'food',
+      'Beauty & Wellness': 'beauty',
+      'Fashion & Textiles': 'fashion',
+      'Home & Decor': 'home',
+      'Books & Media': 'books'
+    };
+    payload.category = categoryMap[listing.category] || listing.category.toLowerCase().replace(/\s+/g, '_');
+  }
+  // Note: description and country are not available in Listing interface
+  // They will remain empty and user can fill them in
+  return payload;
+};
+
 const MyListings: React.FC = () => {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
@@ -512,6 +534,14 @@ const MyListings: React.FC = () => {
       const prefillData = buildDraftPrefillPayload(draft);
       navigate('/create-listing', { state: { draft: prefillData } });
     }, 0);
+  };
+
+  const handleListingEdit = (listing: Listing, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    const prefillData = buildListingPrefillPayload(listing);
+    navigate('/create-listing', { state: { draft: prefillData } });
   };
 
   const handleDraftDelete = (draftId: string) => {
@@ -1099,6 +1129,7 @@ const MyListings: React.FC = () => {
             {/* Column 7: Actions */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
               <button
+                onClick={(e) => handleListingEdit(listing, e)}
                 style={{
                   width: '24px',
                   height: '24px',
@@ -1446,7 +1477,7 @@ const MyListings: React.FC = () => {
                   fontSize: '10px',
                   fontFamily: 'Poppins, sans-serif'
                 }}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => handleListingEdit(listing, e)}
               >
                 <img src={pencilIcon} alt="Edit" className="w-2.5 h-2.5" />
                 <span>Edit</span>
@@ -1915,10 +1946,7 @@ const MyListings: React.FC = () => {
                           border: 'none',
                           cursor: 'pointer'
                         }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/edit-listing/${listing.id}`);
-                        }}
+                        onClick={(e) => handleListingEdit(listing, e)}
                       >
                         <img src={pencilIcon} alt="Edit" style={{ width: '11px', height: '11px' }} />
                         <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>Edit</span>

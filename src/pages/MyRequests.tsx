@@ -212,7 +212,6 @@ const MyRequests: React.FC = () => {
   const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
   const moreOptionsRef = useRef<HTMLDivElement | null>(null);
   const [statusModalOpenFor, setStatusModalOpenFor] = useState<string | null>(null);
-  const statusModalRef = useRef<HTMLDivElement | null>(null);
   const [viewRequestModalOpen, setViewRequestModalOpen] = useState(false);
   const [selectedRequestForView, setSelectedRequestForView] = useState<Request | null>(null);
   const [requestToDelete, setRequestToDelete] = useState<Request | null>(null);
@@ -343,7 +342,7 @@ const MyRequests: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
+      const target = event.target as HTMLElement;
       
       if (statusDropdownRef.current && !statusDropdownRef.current.contains(target)) {
         setIsStatusDropdownOpen(false);
@@ -355,14 +354,20 @@ const MyRequests: React.FC = () => {
       if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
         setMoreOptionsOpenFor(null);
       }
-      if (statusModalRef.current && !statusModalRef.current.contains(target)) {
-        setStatusModalOpenFor(null);
+      // Check if click is outside any status modal
+      if (statusModalOpenFor) {
+        const statusModal = target.closest('.status-modal-container');
+        const statusModalButton = target.closest('.status-modal-button');
+        const statusModalDropdown = target.closest('.status-modal-dropdown');
+        if (!statusModal && !statusModalButton && !statusModalDropdown) {
+          setStatusModalOpenFor(null);
+        }
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [statusModalOpenFor]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -421,7 +426,7 @@ const MyRequests: React.FC = () => {
     const isModalOpen = statusModalOpenFor === requestId;
     
     return (
-      <div style={{ position: 'relative' }} ref={statusModalRef}>
+      <div style={{ position: 'relative' }} className="status-modal-container">
         <div
           className="inline-flex items-center gap-1 px-2.5 rounded-full"
           style={{
@@ -443,6 +448,7 @@ const MyRequests: React.FC = () => {
           </span>
           <button
             type="button"
+            className="status-modal-button"
             onClick={(e) => {
               e.stopPropagation();
               setStatusModalOpenFor(isModalOpen ? null : requestId);
@@ -893,7 +899,7 @@ const MyRequests: React.FC = () => {
             </span>
             <div className="flex items-center gap-2" style={{ position: 'relative' }}>
               {/* Status Badge with Arrow */}
-              <div style={{ position: 'relative' }} ref={statusModalRef}>
+              <div style={{ position: 'relative' }} className="status-modal-container">
                 <div
                   className="inline-flex items-center gap-1 px-2 rounded-full"
                   style={{
@@ -915,6 +921,7 @@ const MyRequests: React.FC = () => {
                   </span>
                   <button
                     type="button"
+                    className="status-modal-button"
                     onClick={(e) => {
                       e.stopPropagation();
                       setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
@@ -937,6 +944,7 @@ const MyRequests: React.FC = () => {
                 {/* Status Modal */}
                 {isStatusModalOpen && (
                   <div
+                    className="status-modal-dropdown"
                     onClick={(e) => e.stopPropagation()}
                     style={{
                       position: 'absolute',

@@ -31,6 +31,10 @@ import settingIcon from '../assets/images/pre/setting.svg';
 import reactionIcon from '../assets/images/pre/reaction.svg';
 import optionIcon from '../assets/images/pre/option.svg';
 import notificationIcon from '../assets/images/pre/notification.svg';
+import messageAvatarIcon from '../assets/images/pre/main.png';
+import appNotificationIcon from '../assets/images/pre/nof.svg';
+import avatar from '../assets/images/logos/avatar.png';
+import logoIcon from '../assets/images/logos/ba-brand-icon-colored.png';
 import emoji1 from '../assets/images/pre/s1.svg';
 import emoji2 from '../assets/images/pre/s2.svg';
 import emoji3 from '../assets/images/pre/s3.svg';
@@ -91,6 +95,7 @@ const PNGIcon: React.FC<{ size?: number }> = ({ size = 40 }) => (
 );
 
 const Messages: React.FC = () => {
+  const navigate = useNavigate();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [productData, setProductData] = useState<any>(null);
@@ -157,6 +162,31 @@ const Messages: React.FC = () => {
   const [showMobileReactionPicker, setShowMobileReactionPicker] = useState(false);
   const [mobileMessageCoords, setMobileMessageCoords] = useState<{ top: number; left: number } | null>(null);
   const [pinnedMessage, setPinnedMessage] = useState<any>(null);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
+  
+  // Mock notification data with read/unread status
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'message', isRead: false, sender: 'Nadine Ngum', text: 'sent you a message', subText: 'Click to view', time: '19 min ago', day: 'Today' },
+    { id: 2, type: 'app', isRead: false, text: 'Your profile has been updated,', subText: 'you are now...', subText2: 'Invoice 6 August 2025 Sequence: 2-7480...', time: '2 hrs ago', day: 'Today' },
+    { id: 3, type: 'message', isRead: true, text: 'New Reviews and Rates from Nadine Ngum...', subText: '"I recently purchased a beautiful Kente...', time: '17:12', day: 'Yesterday' },
+    { id: 4, type: 'app', isRead: true, text: 'New post alert', subText: 'A new listing regarding your recent search...', time: '14:57', day: 'Yesterday' },
+    { id: 5, type: 'message', isRead: true, sender: 'Elidiana IKE', text: 'sent you a message', subText: 'See more details', time: '11:31', day: 'Yesterday' },
+  ]);
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(notif => ({ ...notif, isRead: true })));
+  };
+
+  const filteredNotifications = notifications.filter(notif => {
+    if (notificationTab === 'all') return true;
+    if (notificationTab === 'unread') return !notif.isRead;
+    if (notificationTab === 'messages') return notif.type === 'message';
+    return true;
+  });
+
+  const unreadCount = notifications.filter(notif => !notif.isRead).length;
+
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const messagesContainerRef = React.useRef<HTMLDivElement>(null);
   const chatListRef = React.useRef<HTMLDivElement>(null);
@@ -176,7 +206,6 @@ const Messages: React.FC = () => {
     };
   }, []);
 
-  const navigate = useNavigate();
   const location = useLocation();
 
   const handleHomepageClick = () => {
@@ -614,11 +643,22 @@ const Messages: React.FC = () => {
     }
   };
 
-  // Close message options popup on click outside or Escape key
+  // Handle clicks outside dropdowns to close them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const notificationDropdown = target.closest('.notification-dropdown');
+      const menuDropdown = target.closest('.menu-dropdown');
+
+      if (!notificationDropdown && isNotificationOpen) {
+        setIsNotificationOpen(false);
+      }
+
+      if (!menuDropdown && isMenuDropdownOpen) {
+        setIsMenuDropdownOpen(false);
+      }
+
       if (activeMessageOptionsId !== null) {
-        const target = event.target as HTMLElement;
         if (!target.closest('.reaction-container')) {
           setActiveMessageOptionsId(null);
         }
@@ -638,7 +678,7 @@ const Messages: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [activeMessageOptionsId]);
+  }, [isNotificationOpen, isMenuDropdownOpen, activeMessageOptionsId]);
 
   // Render message status indicator
   const renderMessageStatus = (messageId: number) => {
@@ -1537,6 +1577,7 @@ const Messages: React.FC = () => {
                 {/* See User Profile Button */}
                 <div className="flex justify-center">
                   <button 
+                    onClick={() => navigate('/seller/joaquin-edimo')}
                     className="px-5 py-1.5 rounded-lg text-xs font-medium transition-colors"
                     style={{ 
                       backgroundColor: '#F0F8FE', 
@@ -3501,9 +3542,204 @@ const Messages: React.FC = () => {
                 </Link>
 
                 {/* Notification Button */}
-                <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
-                  <img src={notificationIcon} alt="Notifications" className="w-6 h-6" />
-                </button>
+                <div className="relative notification-dropdown">
+                  <button
+                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                    className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative p-2"
+                    title="Notifications"
+                    aria-label="View notifications"
+                  >
+                    <img 
+                      src={notificationIcon} 
+                      alt="Notifications" 
+                      className="w-6 h-6"
+                      style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
+                    />
+                    {unreadCount > 0 && (
+                      <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FF0000' }}>
+                        <span className="text-white text-xs font-medium">{unreadCount}</span>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Notification Dropdown */}
+                  {isNotificationOpen && (
+                    <div 
+                      className="fixed right-8 top-20 w-96 bg-white shadow-lg border border-gray-200 z-50 notification-dropdown"
+                      style={{ 
+                        borderRadius: '20px',
+                        maxHeight: '600px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column'
+                      }}
+                    >
+                      {/* Header */}
+                      <div className="px-6 pt-5 pb-3">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-semibold" style={{ color: '#212121' }}>Notifications</h3>
+                          <button
+                            onClick={() => setIsNotificationOpen(false)}
+                            className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Tabs */}
+                        <div className="flex items-center space-x-6 border-b border-gray-200 relative">
+                          <button
+                            onClick={() => setNotificationTab('all')}
+                            className="pb-2 font-normal transition-colors relative"
+                            style={{ 
+                              color: notificationTab === 'all' ? '#64B5F6' : '#BABABA',
+                              fontSize: '12px'
+                            }}
+                          >
+                            All
+                            {notificationTab === 'all' && (
+                              <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => setNotificationTab('unread')}
+                            className="pb-2 font-normal transition-colors relative"
+                            style={{ 
+                              color: notificationTab === 'unread' ? '#64B5F6' : '#BABABA',
+                              fontSize: '12px'
+                            }}
+                          >
+                            Unreads
+                            {notificationTab === 'unread' && (
+                              <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => setNotificationTab('messages')}
+                            className="pb-2 font-normal transition-colors relative"
+                            style={{ 
+                              color: notificationTab === 'messages' ? '#64B5F6' : '#BABABA',
+                              fontSize: '12px'
+                            }}
+                          >
+                            Messages
+                            {notificationTab === 'messages' && (
+                              <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Notification List */}
+                      <div 
+                        className="flex-1"
+                        style={{ 
+                          overflowY: 'auto',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none'
+                        }}
+                      >
+                        <style>
+                          {`
+                            .notification-dropdown::-webkit-scrollbar {
+                              display: none;
+                            }
+                          `}
+                        </style>
+
+                        {/* Render notifications grouped by day */}
+                        {['Today', 'Yesterday'].map(day => {
+                          const dayNotifs = filteredNotifications.filter(n => n.day === day);
+                          if (dayNotifs.length === 0) return null;
+                          
+                          return (
+                            <div key={day} className={day === 'Today' ? 'pt-3 pb-1' : 'pt-2 pb-2'}>
+                              <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
+                              
+                              {dayNotifs.map((notif) => (
+                                <div key={notif.id} className="transition-colors cursor-pointer" style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}>
+                                  <div className="flex items-start space-x-2 py-2 px-6">
+                                    <div className="relative flex-shrink-0">
+                                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: notif.type === 'message' ? '#E3F2FD' : '#F9A825', border: '2px solid white' }}>
+                                        {notif.type === 'message' ? (
+                                          <img src={avatar} alt="Avatar" className="w-6 h-6 rounded-full object-cover" />
+                                        ) : (
+                                          <img src={logoIcon} alt="Logo" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
+                                        )}
+                                      </div>
+                                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
+                                        <img src={notif.type === 'message' ? messageAvatarIcon : appNotificationIcon} alt="Icon" className="w-3 h-3" />
+                                      </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-start justify-between">
+                                        <div className="flex-1 min-w-0">
+                                          {notif.sender ? (
+                                            <p style={{ fontSize: '11px' }}>
+                                              <span className="font-semibold" style={{ color: notif.isRead ? '#939393' : '#616161' }}>{notif.sender}</span> <span style={{ color: '#939393' }}>{notif.text}</span>
+                                            </p>
+                                          ) : (
+                                            <p className={notif.id === 2 && !notif.isRead ? 'font-semibold' : ''} style={{ color: notif.isRead ? '#939393' : '#616161', fontSize: '11px' }}>{notif.text}</p>
+                                          )}
+                                          {notif.subText && (
+                                            <p className={notif.id === 1 ? 'mt-0.5' : 'text-xs mt-0.5'} style={{ color: notif.id === 1 && !notif.isRead ? '#64B5F6' : '#9E9E9E', fontSize: notif.id === 1 ? '11px' : '10px' }}>{notif.subText}</p>
+                                          )}
+                                          {notif.subText2 && (
+                                            <p className="text-xs mt-0.5" style={{ color: '#9E9E9E', fontSize: '10px' }}>{notif.subText2}</p>
+                                          )}
+                                        </div>
+                                        <div className="flex flex-col items-end ml-2 flex-shrink-0" style={{ gap: notif.isRead ? '2px' : '4px' }}>
+                                          <button className="text-gray-400 hover:text-gray-600">
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                              <circle cx="6" cy="12" r="1.5"/>
+                                              <circle cx="12" cy="12" r="1.5"/>
+                                              <circle cx="18" cy="12" r="1.5"/>
+                                            </svg>
+                                          </button>
+                                          {notif.isRead ? (
+                                            <span className="text-xs" style={{ color: '#9E9E9E', fontSize: '10px' }}>{notif.time}</span>
+                                          ) : (
+                                            <div className="flex items-center space-x-1" style={{ marginTop: notif.id === 2 ? '16px' : '6px' }}>
+                                              <span style={{ color: '#9E9E9E', fontSize: '9px' }}>{notif.time}</span>
+                                              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {notif.id !== dayNotifs[dayNotifs.length - 1].id && <div className="border-b border-gray-100" />}
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Footer */}
+                      <div className="px-6 pt-5 pb-3 flex items-center justify-between">
+                        <button onClick={markAllAsRead} className="text-xs hover:opacity-70 transition-opacity" style={{ color: '#939393' }}>
+                          Mark all as read
+                        </button>
+                        <button 
+                          onClick={() => {
+                            navigate('/notifications');
+                            setIsNotificationOpen(false);
+                          }}
+                          className="text-xs flex items-center space-x-1 hover:opacity-70 transition-opacity" 
+                          style={{ color: '#64B5F6' }}
+                        >
+                          <span>See all notifications</span>
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Profile Picture */}
                 <div className="w-10 h-10 rounded-full overflow-hidden">
@@ -3807,6 +4043,7 @@ const Messages: React.FC = () => {
 
                     {/* See User Profile Button */}
                     <button 
+                      onClick={() => navigate('/seller/joaquin-edimo')}
                       className="px-6 py-2 rounded-lg text-sm font-medium transition-colors"
                       style={{ 
                         backgroundColor: '#F0F8FE', 

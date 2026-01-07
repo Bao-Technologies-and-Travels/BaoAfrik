@@ -127,6 +127,8 @@ const CreateListing: React.FC = () => {
     const [isOriginDropdownOpen, setIsOriginDropdownOpen] = useState(false);
     const [isSaleTypeDropdownOpen, setIsSaleTypeDropdownOpen] = useState(false);
     const [isCurrencyDropdownOpen, setIsCurrencyDropdownOpen] = useState(false);
+    const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+    const locationDropdownRef = useRef<HTMLDivElement | null>(null);
     const [primaryImageIndex, setPrimaryImageIndex] = useState(0);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
     const [draggedImagesTotal, setDraggedImagesTotal] = useState(0);
@@ -164,6 +166,29 @@ const CreateListing: React.FC = () => {
       { value: 'GBP', label: 'Pound Sterling', flagCode: 'gb' },
       { value: 'EUR', label: 'Euro', flagCode: 'eu' }
     ];
+
+  const ukLocations = [
+    { value: 'london', label: 'London, United Kingdom' },
+    { value: 'manchester', label: 'Manchester, United Kingdom' },
+    { value: 'birmingham', label: 'Birmingham, United Kingdom' },
+    { value: 'glasgow', label: 'Glasgow, United Kingdom' },
+    { value: 'liverpool', label: 'Liverpool, United Kingdom' },
+    { value: 'leeds', label: 'Leeds, United Kingdom' },
+    { value: 'edinburgh', label: 'Edinburgh, United Kingdom' },
+    { value: 'bristol', label: 'Bristol, United Kingdom' },
+    { value: 'cardiff', label: 'Cardiff, United Kingdom' },
+    { value: 'belfast', label: 'Belfast, United Kingdom' },
+    { value: 'newcastle', label: 'Newcastle upon Tyne, United Kingdom' },
+    { value: 'sheffield', label: 'Sheffield, United Kingdom' },
+    { value: 'nottingham', label: 'Nottingham, United Kingdom' },
+    { value: 'leicester', label: 'Leicester, United Kingdom' },
+    { value: 'cambridge', label: 'Cambridge, United Kingdom' },
+    { value: 'oxford', label: 'Oxford, United Kingdom' },
+    { value: 'brighton', label: 'Brighton, United Kingdom' },
+    { value: 'southampton', label: 'Southampton, United Kingdom' },
+    { value: 'portsmouth', label: 'Portsmouth, United Kingdom' },
+    { value: 'norwich', label: 'Norwich, United Kingdom' }
+  ];
 
   const countries = [
     { value: 'algeria', label: 'Algeria', flagCode: 'dz' },
@@ -269,6 +294,9 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
         (country) => country.label.toLowerCase() === prefill.country.toLowerCase()
       );
       if (originOption) setOrigin(originOption.value);
+    }
+    if (prefill.category) {
+      setCategory(prefill.category);
     }
     if (prefill.image) {
       setImageUrls([prefill.image]);
@@ -609,6 +637,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
         const originDropdown = target.closest('.origin-dropdown');
         const saleTypeDropdown = target.closest('.sale-type-dropdown');
         const currencyDropdown = target.closest('.currency-dropdown');
+        const locationDropdown = target.closest('.location-dropdown');
 
       if (!languageSelector && isLanguageDropdownOpen) {
         setIsLanguageDropdownOpen(false);
@@ -633,13 +662,17 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
         if (!currencyDropdown && isCurrencyDropdownOpen) {
           setIsCurrencyDropdownOpen(false);
         }
+
+        if (!locationDropdown && isLocationDropdownOpen) {
+          setIsLocationDropdownOpen(false);
+        }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-    }, [isLanguageDropdownOpen, isMenuDropdownOpen, isCategoryDropdownOpen, isOriginDropdownOpen, isSaleTypeDropdownOpen, isCurrencyDropdownOpen]);
+    }, [isLanguageDropdownOpen, isMenuDropdownOpen, isCategoryDropdownOpen, isOriginDropdownOpen, isSaleTypeDropdownOpen, isCurrencyDropdownOpen, isLocationDropdownOpen]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -1103,6 +1136,15 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
           --tw-ring-color: #97CDF9 !important;
           box-shadow: 0 0 0 2px #97CDF9 !important;
         }
+        /* Hide scrollbar for location dropdown */
+        .location-dropdown-scroll::-webkit-scrollbar {
+          display: none;
+        }
+        .location-dropdown-scroll {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+        }
         /* Price input container focus */
         .price-input-container:focus-within {
           --tw-ring-color: #97CDF9 !important;
@@ -1498,26 +1540,99 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
               </div>
 
               {/* Location Section */}
-              <div className="flex items-start justify-between mt-4" style={{ maxWidth: '560px' }}>
-                <div className="flex flex-col">
-                  <div className="flex items-center space-x-1.5 mb-1">
-                    <img src={locIcon} alt="Location" className="w-4 h-4" />
-                    <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
+              <div className="relative location-dropdown" style={{ maxWidth: '560px' }}>
+                <div className="flex items-start justify-between mt-4">
+                  <div className="flex flex-col">
+                    <div className="flex items-center space-x-1.5 mb-1">
+                      <img src={locIcon} alt="Location" className="w-4 h-4" />
+                      <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className="text-xs font-medium border-none focus:outline-none ml-6"
+                      style={{ color: '#64B5F6' }}
+                      readOnly
+                    />
                   </div>
-                  <input
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="text-xs font-medium border-none focus:outline-none ml-6"
-                    style={{ color: '#64B5F6' }}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+                    className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
+                    style={{ 
+                      backgroundColor: '#F0F8FE', 
+                      color: '#64B5F6',
+                      border: isLocationDropdownOpen ? '1px solid #97CDF9' : 'none',
+                      boxShadow: isLocationDropdownOpen ? '0 0 0 2px #97CDF9' : 'none'
+                    }}
+                  >
+                    Change location
+                  </button>
                 </div>
-                <button
-                  className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
-                  style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
-                >
-                  Change location
-                </button>
+                {/* Location Dropdown Menu */}
+                {isLocationDropdownOpen && (
+                  <div 
+                    ref={locationDropdownRef}
+                    className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg location-dropdown-scroll"
+                    style={{ 
+                      borderRadius: '12px',
+                      top: '100%',
+                      right: 0,
+                      width: 'auto',
+                      minWidth: '280px',
+                      maxHeight: '200px',
+                      overflowY: 'auto',
+                      overflowX: 'hidden'
+                    }}
+                  >
+                    {ukLocations.map((loc, index) => (
+                      <div
+                        key={loc.value}
+                        className={`w-full ${
+                          index === 0 ? 'rounded-t-xl' : ''
+                        } ${
+                          index === ukLocations.length - 1 ? 'rounded-b-xl' : ''
+                        }`}
+                        style={{
+                          backgroundColor: 'transparent'
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLocation(loc.label);
+                            setIsLocationDropdownOpen(false);
+                          }}
+                          className="w-full text-left transition-colors relative"
+                          style={{
+                            color: '#6A6A6A',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            padding: '10px 16px',
+                            fontWeight: 500
+                          }}
+                        >
+                          {location === loc.label && (
+                            <div 
+                              style={{
+                                position: 'absolute',
+                                left: '8px',
+                                right: '8px',
+                                top: '4px',
+                                bottom: '4px',
+                                backgroundColor: '#F0F8FE',
+                                borderRadius: '8px',
+                                zIndex: -1
+                              }}
+                            />
+                          )}
+                          <span style={{ position: 'relative', zIndex: 1 }}>{loc.label}</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1963,26 +2078,100 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                </div>
 
               {/* Mobile Location Section */}
-              <div className="flex items-start justify-between mt-24 mb-24">
-                <div className="flex flex-col">
-                  <div className="flex items-center mb-0.5" style={{ marginLeft: '-2px' }}>
-                    <img src={locIcon} alt="Location" className="w-3 h-3 hidden" />
-                    <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontSize: '0.7rem' }}>Your location</span>
+              <div className="relative location-dropdown">
+                <div className="flex items-start justify-between mt-24 mb-24">
+                  <div className="flex flex-col">
+                    <div className="flex items-center mb-0.5" style={{ marginLeft: '-2px' }}>
+                      <img src={locIcon} alt="Location" className="w-3 h-3 hidden" />
+                      <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontSize: '0.7rem' }}>Your location</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className="text-xs font-medium border-none focus:outline-none ml-0"
+                      style={{ color: '#64B5F6', fontSize: '0.7rem' }}
+                      readOnly
+                    />
                   </div>
-                  <input
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="text-xs font-medium border-none focus:outline-none ml-0"
-                    style={{ color: '#64B5F6', fontSize: '0.7rem' }}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
+                    style={{ 
+                      backgroundColor: '#F0F8FE', 
+                      color: '#64B5F6', 
+                      fontSize: '0.7rem',
+                      border: isLocationDropdownOpen ? '1px solid #97CDF9' : 'none',
+                      boxShadow: isLocationDropdownOpen ? '0 0 0 2px #97CDF9' : 'none'
+                    }}
+                  >
+                    Change location
+                  </button>
                 </div>
-                <button
-                  className="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
-                  style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '0.7rem' }}
-                >
-                  Change location
-                </button>
+                {/* Location Dropdown Menu */}
+                {isLocationDropdownOpen && (
+                  <div 
+                    ref={locationDropdownRef}
+                    className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg location-dropdown-scroll"
+                    style={{ 
+                      borderRadius: '12px',
+                      top: '100%',
+                      right: 0,
+                      width: 'auto',
+                      minWidth: '240px',
+                      maxHeight: '180px',
+                      overflowY: 'auto',
+                      overflowX: 'hidden'
+                    }}
+                  >
+                    {ukLocations.map((loc, index) => (
+                      <div
+                        key={loc.value}
+                        className={`w-full ${
+                          index === 0 ? 'rounded-t-xl' : ''
+                        } ${
+                          index === ukLocations.length - 1 ? 'rounded-b-xl' : ''
+                        }`}
+                        style={{
+                          backgroundColor: 'transparent'
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLocation(loc.label);
+                            setIsLocationDropdownOpen(false);
+                          }}
+                          className="w-full text-left transition-colors relative"
+                          style={{
+                            color: '#6A6A6A',
+                            cursor: 'pointer',
+                            fontSize: '0.75rem',
+                            padding: '10px 16px',
+                            fontWeight: 500
+                          }}
+                        >
+                          {location === loc.label && (
+                            <div 
+                              style={{
+                                position: 'absolute',
+                                left: '8px',
+                                right: '8px',
+                                top: '4px',
+                                bottom: '4px',
+                                backgroundColor: '#F0F8FE',
+                                borderRadius: '8px',
+                                zIndex: -1
+                              }}
+                            />
+                          )}
+                          <span style={{ position: 'relative', zIndex: 1 }}>{loc.label}</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Mobile Title Input */}
