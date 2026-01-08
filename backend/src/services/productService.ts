@@ -624,4 +624,108 @@ export class ProductService {
             throw new Error(`Error saving review: ${error.message}`);
         }
     }
+
+    // Save a product (bookmark)
+    async saveProduct(productId: string, userId: string): Promise<void> {
+        try {
+            // Check if product exists
+            const product = await prisma.product.findUnique({
+                where: { id: productId }
+            });
+
+            if (!product) {
+                throw new Error('Product not found');
+            }
+
+            // Check if already saved
+            const existingSave = await prisma.productSave.findUnique({
+                where: {
+                    userId_productId: {
+                        userId,
+                        productId
+                    }
+                }
+            });
+
+            if (existingSave) {
+                // Already saved, do nothing
+                return;
+            }
+
+            // Create save
+            await prisma.productSave.create({
+                data: {
+                    userId,
+                    productId
+                }
+            });
+        } catch (error: any) {
+            if (error.code === 'P2002') {
+                // Unique constraint violation - already saved
+                return;
+            }
+            throw new Error(`Error saving product: ${error.message}`);
+        }
+    }
+
+    // Unsave a product (remove bookmark)
+    async unsaveProduct(productId: string, userId: string): Promise<void> {
+        try {
+            await prisma.productSave.deleteMany({
+                where: {
+                    userId,
+                    productId
+                }
+            });
+        } catch (error: any) {
+            throw new Error(`Error unsaving product: ${error.message}`);
+        }
+    }
+
+    // Check if product is saved by user
+    async isProductSaved(productId: string, userId: string): Promise<boolean> {
+        try {
+            const save = await prisma.productSave.findUnique({
+                where: {
+                    userId_productId: {
+                        userId,
+                        productId
+                    }
+                }
+            });
+            return !!save;
+        } catch (error: any) {
+            throw new Error(`Error checking if product is saved: ${error.message}`);
+        }
+    }
+
+    // Get all saved product IDs for a user
+    async getSavedProductIds(userId: string): Promise<string[]> {
+        try {
+            const saves = await prisma.productSave.findMany({
+                where: { userId },
+                select: { productId: true }
+            });
+            return saves.map(save => save.productId);
+        } catch (error: any) {
+            throw new Error(`Error getting saved products: ${error.message}`);
+        }
+    }
+
+    // Toggle save status (save if not saved, unsave if saved)
+    async toggleSaveProduct(productId: string, userId: string): Promise<{ saved: boolean }> {
+        try {
+            const isSaved = await this.isProductSaved(productId, userId);
+            
+            if (isSaved) {
+                await this.unsaveProduct(productId, userId);
+                return { saved: false };
+            } else {
+                await this.saveProduct(productId, userId);
+                return { saved: true };
+            }
+        } catch (error: any) {
+            throw new Error(`Error toggling save status: ${error.message}`);
+        }
+    }
 }

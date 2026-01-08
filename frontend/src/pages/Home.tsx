@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getProductCountry, countries } from '../utils/countryHelpers';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/layout/Header';
+import { useAuth } from '../contexts/AuthContext';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -96,13 +97,19 @@ interface Notification {
 }
 
 const Home: React.FC = () => {
+  const navigationLocation = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const productGridRef = React.useRef<HTMLDivElement>(null);
+  const productFeedRef = React.useRef<HTMLDivElement>(null);
   const categoryRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
+  const searchResultsRef = React.useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sellerLocation, setSellerLocation] = useState('');
   const [placeOfOrigin, setPlaceOfOrigin] = useState('');
+  const [placeOfOriginInput, setPlaceOfOriginInput] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sharedProducts, setSharedProducts] = useState<Set<number>>(new Set());
   const [savedProducts, setSavedProducts] = useState<Set<number>>(new Set());
@@ -110,11 +117,17 @@ const Home: React.FC = () => {
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imageFormData, setImageFormData] = useState<FormData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [goToPageInput, setGoToPageInput] = useState('');
-  const [searchHistory, setSearchHistory] = useState<string[]>(['Epices Camerounais', 'Vêtements', 'Produits Nigerians', 'Masque culturel', 'Accessoires traditionnels']);
+  const [searchHistory, setSearchHistory] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('searchHistory');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [showSearchHistory, setShowSearchHistory] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [selectedCategoryText, setSelectedCategoryText] = useState('');
@@ -124,6 +137,7 @@ const Home: React.FC = () => {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestProductName, setRequestProductName] = useState('');
   const [requestProductOrigin, setRequestProductOrigin] = useState('');
+  const [requestProductOriginInput, setRequestProductOriginInput] = useState('');
   const [requestSellerLocation, setrequestSellerLocation] = useState('');
   const [requestDescription, setRequestDescription] = useState('');
   const [requestPriceRange, setRequestPriceRange] = useState('');
@@ -135,7 +149,6 @@ const Home: React.FC = () => {
   const [searchResults, setSearchResults] = useState<FrontendProduct[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
   const [requests, setRequests] = useState<any[]>([]);
   const [isLoadingRequests, setIsLoadingRequests] = useState(true);
   const [requestsError, setRequestsError] = useState<string | null>(null);
@@ -157,16 +170,25 @@ const Home: React.FC = () => {
   const [isMobileSearchFocused, setIsMobileSearchFocused] = useState(false);
   const [showMobileSearchHistory, setShowMobileSearchHistory] = useState(false);
   const [showSellerLocationSuggestions, setShowSellerLocationSuggestions] = useState(false);
-  const [hoveredCategoryOption, setHoveredCategoryOption] = useState<string | null>(null);
-  const [hoveredOriginOption, setHoveredOriginOption] = useState<string | null>(null);
   const [isRequestProductOriginDropdownOpen, setIsRequestProductOriginDropdownOpen] = useState(false);
   const requestProductOriginDropdownRef = React.useRef<HTMLDivElement>(null);
+  const [hoveredCategoryOption, setHoveredCategoryOption] = useState<string | null>(null);
+  const [hoveredOriginOption, setHoveredOriginOption] = useState<string | null>(null);
+
   const filterDropdownRef = React.useRef<HTMLDivElement>(null);
   const priceDropdownRef = React.useRef<HTMLDivElement>(null);
   const locationDropdownRef = React.useRef<HTMLDivElement>(null);
   const [openFilterDropdown, setOpenFilterDropdown] = useState<string | null>(null);
   const [openPriceDropdown, setOpenPriceDropdown] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState('');
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
+  const [isChangeLocationInputFocused, setIsChangeLocationInputFocused] = useState(false);
+  const [changeLocationQuery, setChangeLocationQuery] = useState('');
+  const [changeLocationSuggestions, setChangeLocationSuggestions] = useState<string[]>([]);
+  const [hoveredLocationSuggestion, setHoveredLocationSuggestion] = useState<string | null>(null);
+  const [requestUserLocation, setRequestUserLocation] = useState('');
+  const [showChangeLocationModal, setShowChangeLocationModal] = useState(false);
 
   const locationSuggestions = [
     'Pakse, Laos',
@@ -610,6 +632,30 @@ const Home: React.FC = () => {
     return Math.max(1, Math.ceil(totalItems / itemsPerPage));
   }, [productsToDisplay.length, itemsPerPage]);
 
+  // Get products to display
+  const getProductsToDisplay = (): FrontendProduct[] => {
+    if (isSearchActive) {
+      return searchResults;
+    }
+
+    // Use activeCategory for filtering
+    let products: FrontendProduct[] = [];
+    if (activeCategory === 'All') {
+      products = Object.values(allProductsComputed).flat();
+    } else {
+      products = allProductsComputed[activeCategory as keyof typeof allProductsComputed] || [];
+    }
+
+    // Apply country filter if selected (filter by country badge, not seller location)
+    if (selectedCountry) {
+      products = products.filter((product: FrontendProduct) =>
+        getProductCountry(product.origin).name === selectedCountry
+      );
+    }
+
+    return products;
+  };
+
   // Check if we should show "no results" state
   const shouldShowNoResultsState = () => {
     const products = productsToDisplay;
@@ -654,6 +700,45 @@ const Home: React.FC = () => {
     setSelectedCountry('');
   };
 
+  // Handle product navigation - check if user owns the product and navigate with owner view state
+  const handleProductClick = (e: React.MouseEvent, productId: string | number) => {
+    e.preventDefault();
+
+    // Find the original product from the products array
+    const originalProduct = products.find(p => String(p.id) === String(productId));
+
+    // Check if the current user is the owner
+    if (user && originalProduct && originalProduct.seller && String(originalProduct.seller.id) === String(user.id)) {
+      // Navigate with owner view state (similar to CreateListing)
+      const productData = {
+        id: originalProduct.id,
+        title: originalProduct.title,
+        price: originalProduct.price?.toString() || '0',
+        currency: originalProduct.currency || 'GBP',
+        image: originalProduct.images?.[0]?.url || '',
+        status: 'inactive' as const,
+        rating: 0,
+        reviews: 0,
+        createdAt: new Date(originalProduct.createdAt).getTime(),
+        priceValue: parseFloat(originalProduct.price?.toString() || '0'),
+        messages: 0,
+        category: originalProduct.category || '',
+        reviewStatus: 'success' as const
+      };
+
+      navigate(`/product/${productId}`, {
+        state: {
+          fromMyListings: true,
+          listing: productData,
+          sellerVerified: originalProduct.seller.isVerifiedSeller || false
+        }
+      });
+    } else {
+      // Navigate normally for products the user doesn't own
+      navigate(`/product/${productId}`);
+    }
+  };
+
   // Auto-slide functionality
   useEffect(() => {
     const slideInterval = setInterval(() => {
@@ -665,7 +750,7 @@ const Home: React.FC = () => {
     return () => clearInterval(slideInterval);
   }, [bannerSlides.length]);
 
-  // modile detection
+  // mobile detection
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -732,6 +817,29 @@ const Home: React.FC = () => {
       setSearchResults(products);
     }
   }, [selectedCountry]);
+
+  // Handle image data from ImageSearch page
+  useEffect(() => {
+    const state = navigationLocation.state as any;
+    if (state?.selectedImage && state?.selectedImageUrl) {
+      setSelectedImage(state.selectedImage);
+      setSelectedImageUrl(state.selectedImageUrl);
+
+      // Recreate FormData since it cannot be cloned in history state
+      const formData = new FormData();
+      formData.append('image', state.selectedImage);
+      formData.append('timestamp', new Date().toISOString());
+      setImageFormData(formData);
+
+      // Open mobile search flow if requested
+      if (state.openSearchFlow && isMobile) {
+        setShowMobileSearchFlow(true);
+      }
+
+      // Clear the state to prevent re-processing
+      window.history.replaceState({}, document.title);
+    }
+  }, [navigationLocation.state, isMobile]);
 
   // Handle click outside for filter dropdowns
   useEffect(() => {
@@ -1032,29 +1140,44 @@ const Home: React.FC = () => {
 
   // Handle search functionality
   const handleSearch = () => {
-    // Get all products
-    let productsToSearch: FrontendProduct[] = getAllProducts();
-
-    // Apply search query filter (Product input)
+    // Save search query to localStorage if it's not empty
     if (searchQuery.trim()) {
-      const beforeCount = productsToSearch.length;
-      productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.location.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const updatedHistory = [searchQuery.trim(), ...searchHistory.filter(item => item !== searchQuery.trim())].slice(0, 10);
+      setSearchHistory(updatedHistory);
+      try {
+        localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
+      } catch (error) {
+        console.error('Failed to save search history:', error);
+      }
     }
 
-    // Apply category filter (Categories dropdown)
+    // Get all products
+    let productsToSearch: FrontendProduct[] = getAllProducts();
+    const query = searchQuery.trim().toLowerCase();
+
+    // Get all available categories (excluding 'All')
+    const availableCategories = Object.keys(allProductsComputed).filter(cat => cat !== 'All');
+
+    // IMPORTANT: Apply filters FIRST, then search query
+    // This ensures search works within the filtered set
+
+    // Apply category filter FIRST (Categories dropdown)
+    // Also sync activeCategory with selectedCategoryText for consistency
     if (selectedCategoryText) {
-      const beforeCount = productsToSearch.length;
       productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
         product.category === selectedCategoryText
       );
+      // Sync activeCategory with selectedCategoryText
+      setActiveCategory(selectedCategoryText);
+    } else if (activeCategory && activeCategory !== 'All') {
+      // If no dropdown filter but activeCategory is set (from tab click), use that
+      productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
+        product.category === activeCategory
+      );
     }
 
-    // Apply place of origin filter (Place of Origin dropdown - filters by country badge at top)
+    // Apply place of origin filter FIRST (Place of Origin dropdown - filters by country badge at top)
     if (selectedPlaceOfOriginText) {
-      const beforeCount = productsToSearch.length;
       productsToSearch = productsToSearch.filter((product: FrontendProduct) => {
         const country = getProductCountry(product.origin).name;
         return country === selectedPlaceOfOriginText;
@@ -1063,22 +1186,97 @@ const Home: React.FC = () => {
 
     // Apply country filter from filter buttons (applies to both category view and search)
     if (selectedCountry) {
-      const beforeCount = productsToSearch.length;
       productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
         getProductCountry(product.origin).name === selectedCountry
       );
     }
 
     // Apply seller location filter (Seller Location input - filters by location at bottom)
-    if (sellerLocation.trim()) {
-      const beforeCount = productsToSearch.length;
+    if (location.trim()) {
       productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
-        product.location.toLowerCase().includes(sellerLocation.toLowerCase())
+        product.location.toLowerCase().includes(location.toLowerCase())
       );
     }
 
+    // NOW apply search query filter to the already-filtered products
+    // This ensures search works within the selected category/origin
+    if (query) {
+      // Check if query matches a category name
+      const matchingCategory = availableCategories.find(cat =>
+        cat.toLowerCase().includes(query) || query.includes(cat.toLowerCase())
+      );
+
+      productsToSearch = productsToSearch.filter((product: FrontendProduct) => {
+        // Match product name
+        const matchesName = product.name.toLowerCase().includes(query);
+        // Match location
+        const matchesLocation = product.location.toLowerCase().includes(query);
+        // Match category name
+        const matchesCategory = product.category?.toLowerCase().includes(query) || false;
+        // Match place of origin
+        const productCountry = getProductCountry(product.origin).name.toLowerCase();
+        const matchesOrigin = productCountry.includes(query) || query.includes(productCountry);
+
+        return matchesName || matchesLocation || matchesCategory || matchesOrigin;
+      });
+
+      // If search query matches a category and we have results, set that category
+      if (matchingCategory && productsToSearch.length > 0) {
+        // Check if all results belong to this category
+        const allInCategory = productsToSearch.every(p => p.category === matchingCategory);
+        if (allInCategory) {
+          setActiveCategory(matchingCategory);
+        }
+      }
+    }
+
+    // Detect category from results if not already set
+    if (productsToSearch.length > 0 && !selectedCategoryText && query) {
+      // Count products by category
+      const categoryCounts: Record<string, number> = {};
+      productsToSearch.forEach(product => {
+        const cat = product.category || 'Other';
+        categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+      });
+
+      // If all results belong to one category, set that category
+      const categoriesWithResults = Object.keys(categoryCounts);
+      if (categoriesWithResults.length === 1) {
+        setActiveCategory(categoriesWithResults[0]);
+      }
+    }
+
+    // Only set search active if there's actually a search query or active filters
+    // If there's a filter but no search query, we should still show the filtered results
+    const hasSearchQuery = query.length > 0;
+    const hasActiveFilters = selectedCategoryText || selectedPlaceOfOriginText || selectedCountry || location.trim();
+
     setSearchResults(productsToSearch);
+
+    // Only activate search mode if there's a search query OR if we have filters applied
+    // This ensures filtered products are shown even without a search query
+    if (hasSearchQuery || hasActiveFilters) {
     setIsSearchActive(true);
+    } else {
+      // If no search query and no filters, exit search mode
+      setIsSearchActive(false);
+      setSearchResults([]);
+    }
+
+    // Scroll to search results after a short delay to allow DOM update
+    setTimeout(() => {
+      if (searchResultsRef.current) {
+        searchResultsRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      } else if (productFeedRef.current) {
+        productFeedRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 100);
   };
 
   // Handle Enter key press in search input
@@ -1123,10 +1321,46 @@ const Home: React.FC = () => {
 
   // Handle scan functionality - trigger file input
   const handleScan = () => {
+    if (isMobile) {
+      // Mobile: Navigate to dedicated image search page
+      navigate('/image-search');
+    } else {
+      // Desktop: Open file explorer
     const fileInput = document.getElementById('image-upload') as HTMLInputElement;
     if (fileInput) {
       fileInput.click();
+      }
     }
+  };
+
+  // Handle image from file
+  const handleImageFromFile = (file: File) => {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('Image size must be less than 10MB');
+      return;
+    }
+
+    // Set selected image
+    setSelectedImage(file);
+
+    // Create preview URL
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImageUrl(imageUrl);
+
+    // Create FormData for future API call
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('timestamp', new Date().toISOString());
+
+    setImageFormData(formData);
   };
 
   // Handle image file selection
@@ -1194,36 +1428,66 @@ const Home: React.FC = () => {
     });
   };
 
+  // Load saved products on mount
+  useEffect(() => {
+    const loadSavedProducts = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/products/saved`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && Array.isArray(result.data)) {
+
+            const savedStringIds = new Set(result.data);
+            const savedNumberIds = new Set<number>();
+
+            // Match saved string IDs with product IDs
+            products.forEach((product: BaseProduct) => {
+              if (savedStringIds.has(product.id)) {
+                // Find the corresponding frontend product
+                const frontendProduct = transformToFrontendProducts([product])[0];
+                if (frontendProduct) {
+                  savedNumberIds.add(Number(frontendProduct.id));
+                }
+              }
+            });
+
+            setSavedProducts(savedNumberIds);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load saved products:', error);
+      }
+    };
+
+    if (products.length > 0) {
+      loadSavedProducts();
+    }
+  }, [products]);
+
   // Handle save functionality
-  const handleSave = (productId: number) => {
-    setSavedProducts(prev => {
-      const newSaved = new Set(prev);
-      if (newSaved.has(productId)) {
-        newSaved.delete(productId);
-        // Remove notification if product is unbookmarked
-        setNotifications(prev => prev.filter(notif => notif.product.id !== productId));
-      } else {
-        // Simulate bookmarking attempt with potential failure
+  const handleSave = async (productId: number) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      // Show notification that user needs to log in
         const product = productsToDisplay.find((p: FrontendProduct) => p.id === productId);
         if (product) {
-          // Simulate random failure (20% chance of failure for demo purposes)
-          const shouldFail = Math.random() < 0.2;
-
-          if (shouldFail) {
-            // Show error notification
             setNotifications(prev => {
-              const existingNotification = prev.find(notif => notif.product.id === productId);
-              if (existingNotification) {
-                return prev;
-              }
-
               const notificationId = `${productId}-error-${Date.now()}`;
               const errorNotification: Notification = {
                 id: notificationId,
                 product: {
                   id: product.id,
                   name: product.name,
-                  price: parseFloat(product.price) || 0, // Convert string price to number
+              price: parseFloat(product.price) || 0,
                   image: typeof product.image === 'string' ? product.image : ''
                 },
                 timestamp: Date.now(),
@@ -1236,9 +1500,65 @@ const Home: React.FC = () => {
 
               return [...prev, errorNotification];
             });
+      }
+      return;
+    }
+
+    const product = productsToDisplay.find((p: FrontendProduct) => p.id === productId);
+    if (!product) return;
+
+    // Find the original product with string ID
+    const originalProduct = products.find((p: BaseProduct) => {
+      const frontendProduct = transformToFrontendProducts([p])[0];
+      return frontendProduct && frontendProduct.id === productId;
+    });
+
+    if (!originalProduct) {
+      console.error('Could not find original product for ID:', productId);
+      return;
+    }
+
+    const wasSaved = savedProducts.has(productId);
+    const productStringId = originalProduct.id;
+
+    // Optimistic update
+    setSavedProducts(prev => {
+      const newSaved = new Set(prev);
+      if (wasSaved) {
+        newSaved.delete(productId);
           } else {
-            // Success - add to bookmarks
             newSaved.add(productId);
+      }
+      return newSaved;
+    });
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${productStringId}/save`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update bookmark');
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        // Update state based on result
+        setSavedProducts(prev => {
+          const newSaved = new Set(prev);
+          if (result.data.saved) {
+            newSaved.add(productId);
+          } else {
+            newSaved.delete(productId);
+          }
+          return newSaved;
+        });
+
+        // Show success notification
             setNotifications(prev => {
               const existingNotification = prev.find(notif => notif.product.id === productId);
               if (existingNotification) {
@@ -1251,7 +1571,7 @@ const Home: React.FC = () => {
                 product: {
                   id: product.id,
                   name: product.name,
-                  price: parseFloat(product.price) || 0, // Convert string price to number
+              price: parseFloat(product.price) || 0,
                   image: typeof product.image === 'string' ? product.image : ''
                 },
                 timestamp: Date.now(),
@@ -1265,10 +1585,45 @@ const Home: React.FC = () => {
               return [...prev, newNotification];
             });
           }
-        }
+    } catch (error) {
+      // Revert optimistic update on error
+      setSavedProducts(prev => {
+        const newSaved = new Set(prev);
+        if (wasSaved) {
+          newSaved.add(productId);
+        } else {
+          newSaved.delete(productId);
       }
       return newSaved;
     });
+
+      // Show error notification
+      setNotifications(prev => {
+        const existingNotification = prev.find(notif => notif.product.id === productId);
+        if (existingNotification) {
+          return prev;
+        }
+
+        const notificationId = `${productId}-error-${Date.now()}`;
+        const errorNotification: Notification = {
+          id: notificationId,
+          product: {
+            id: product.id,
+            name: product.name,
+            price: parseFloat(product.price) || 0,
+            image: typeof product.image === 'string' ? product.image : ''
+          },
+          timestamp: Date.now(),
+          type: 'error'
+        };
+
+        setTimeout(() => {
+          setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
+        }, 5000);
+
+        return [...prev, errorNotification];
+      });
+    }
   };
 
   const removeNotification = (notificationId: string) => {
@@ -1302,8 +1657,8 @@ const Home: React.FC = () => {
         alert('Description is required');
         return false;
       }
-      if (!requestProductOrigin) {
-        alert('Please select a product origin');
+      if (!requestProductOrigin && !requestProductOriginInput.trim()) {
+        alert('Please select or type a product origin');
         return false;
       }
       return true;
@@ -1351,8 +1706,8 @@ const Home: React.FC = () => {
       const formData = {
         productName: requestProductName.trim(),
         description: requestDescription.trim(),
-        origin: requestProductOrigin,
-        sellerLocation: location, // Use the location state from dropdown
+        origin: requestProductOrigin || requestProductOriginInput.trim(),
+        sellerLocation: location,
         minPrice,
         maxPrice,
         currency,
@@ -1377,6 +1732,7 @@ const Home: React.FC = () => {
       // Reset form
       setRequestProductName('');
       setRequestProductOrigin('');
+      setRequestProductOriginInput('');
       setrequestSellerLocation('');
       setRequestDescription('');
       setRequestPriceRange('');
@@ -1413,6 +1769,15 @@ const Home: React.FC = () => {
     }
   };
 
+  // Cleanup image URL on unmount or when image changes
+  useEffect(() => {
+    return () => {
+      if (selectedImageUrl) {
+        URL.revokeObjectURL(selectedImageUrl);
+      }
+    };
+  }, [selectedImageUrl]);
+
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
 
@@ -1438,7 +1803,7 @@ const Home: React.FC = () => {
               flexShrink: 0,
               borderRadius: '30px',
               border: '1px solid #E4E4E4',
-              background: focusedSearchSection ? '#F4F4F4' : '#FFF',
+              background: selectedImage ? '#F1F1F1' : (focusedSearchSection ? '#F4F4F4' : '#FFF'),
               boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
               fontFamily: 'Poppins, sans-serif',
               transition: 'background 0.2s ease'
@@ -1446,7 +1811,7 @@ const Home: React.FC = () => {
           >
             {/* Product Section */}
             <div
-              className="flex flex-col justify-center px-4 flex-1 relative"
+              className="flex items-center px-4 flex-1 relative"
               style={{
                 background: focusedSearchSection === 'product' ? '#FFF' : 'transparent',
                 borderTopLeftRadius: '30px',
@@ -1459,23 +1824,27 @@ const Home: React.FC = () => {
                 height: '58px'
               }}
             >
-              {/* Divider */}
-              {!(focusedSearchSection === 'product' || focusedSearchSection === 'categories') && (
-                <div
+              {/* Image Thumbnail */}
+              {selectedImageUrl && (
+                <img
+                  src={selectedImageUrl}
+                  alt="Selected product"
                   style={{
-                    position: 'absolute',
-                    right: 0,
-                    top: '12px',
-                    bottom: '12px',
-                    width: '1px',
-                    backgroundColor: '#E4E4E4'
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '8px',
+                    objectFit: 'cover',
+                    marginRight: '12px',
+                    flexShrink: 0
                   }}
                 />
               )}
+
+              <div className="flex flex-col justify-center flex-1">
               <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
               <input
                 type="text"
-                placeholder="Search a product"
+                  placeholder={selectedImage ? "Wanna be more specific ?" : "Search a product"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleSearchKeyPress}
@@ -1494,6 +1863,7 @@ const Home: React.FC = () => {
                 className="border-0 p-0 focus:outline-none focus:ring-0 product-search-input"
                 style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
               />
+              </div>
               <style>
                 {`
                   .product-search-input::placeholder {
@@ -1589,29 +1959,52 @@ const Home: React.FC = () => {
                 />
               )}
               <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Place of Origin</label>
-              <button
-                onClick={() => {
+              <div className="relative flex items-center w-full">
+                <style>
+                  {`
+                  .place-of-origin-input::placeholder {
+                    color: #E9E9E9;
+                  }
+                `}
+                </style>
+                <input
+                  type="text"
+                  placeholder="Type a country"
+                  value={selectedPlaceOfOriginText || placeOfOriginInput}
+                  onChange={(e) => {
+                    setPlaceOfOriginInput(e.target.value);
+                    setSelectedPlaceOfOriginText('');
+                    setPlaceOfOrigin('');
+                    if (e.target.value.trim()) {
+                      setShowPlaceOfOriginDropdown(true);
+                    }
+                  }}
+                  onFocus={() => {
                   setFocusedSearchSection('placeOfOrigin');
-                  setShowPlaceOfOriginDropdown(!showPlaceOfOriginDropdown);
+                    if (placeOfOriginInput.trim() || !selectedPlaceOfOriginText) {
+                      setShowPlaceOfOriginDropdown(true);
+                    }
                 }}
-                onFocus={() => setFocusedSearchSection('placeOfOrigin')}
                 onBlur={() => {
                   setTimeout(() => {
                     setFocusedSearchSection(null);
                     setShowPlaceOfOriginDropdown(false);
                   }, 200);
                 }}
-                className="border-0 p-0 focus:outline-none text-left flex items-center justify-between w-full"
-                style={{ fontSize: '11px', color: selectedPlaceOfOriginText ? '#212121' : '#E9E9E9', background: 'transparent' }}
-              >
-                <span>{selectedPlaceOfOriginText || 'Choose a location'}</span>
+                  className="border-0 p-0 focus:outline-none focus:ring-0 flex-1 place-of-origin-input"
+                  style={{ fontSize: '11px', color: (selectedPlaceOfOriginText || placeOfOriginInput) ? '#212121' : '#212121', background: 'transparent' }}
+                />
                 <img
                   src={arrowDownIcon}
                   alt="Arrow"
-                  className="w-3 h-3 ml-2 transition-transform"
+                  className="w-3 h-3 ml-2 transition-transform flex-shrink-0 cursor-pointer"
                   style={{ transform: showPlaceOfOriginDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  onClick={() => {
+                    setShowPlaceOfOriginDropdown(!showPlaceOfOriginDropdown);
+                    setFocusedSearchSection('placeOfOrigin');
+                  }}
                 />
-              </button>
+              </div>
             </div>
 
             {/* Seller Location Section */}
@@ -1644,7 +2037,38 @@ const Home: React.FC = () => {
               />
             </div>
 
-            {/* Scan Icon */}
+            {/* Scan Icon or Clear Image Button */}
+            {selectedImage ? (
+              <button
+                onClick={() => {
+                  setSelectedImage(null);
+                  setSelectedImageUrl(null);
+                  setImageFormData(null);
+                  if (selectedImageUrl) {
+                    URL.revokeObjectURL(selectedImageUrl);
+                  }
+                }}
+                className="flex items-center justify-center px-3 hover:opacity-70 transition-opacity"
+                title="Clear image"
+              >
+                <div
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    backgroundColor: '#8A8A8A',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </div>
+              </button>
+            ) : (
             <button
               onClick={handleScan}
               className="flex items-center justify-center px-3 hover:opacity-70 transition-opacity"
@@ -1656,6 +2080,7 @@ const Home: React.FC = () => {
                 style={{ width: '20px', height: '20px' }}
               />
             </button>
+            )}
 
             {/* Search Button */}
             <button
@@ -1753,6 +2178,7 @@ const Home: React.FC = () => {
                   onMouseDown={() => {
                     setSelectedCategoryText('');
                     setSelectedCategory('');
+                    setActiveCategory('All'); // Sync activeCategory when clearing filter
                     setShowCategoryDropdown(false);
                   }}
                   className="w-full text-left px-4 py-1.5 hover:bg-gray-50 transition-colors"
@@ -1770,6 +2196,7 @@ const Home: React.FC = () => {
                     onMouseDown={() => {
                       setSelectedCategoryText(category);
                       setSelectedCategory(category);
+                      setActiveCategory(category); // Sync activeCategory with dropdown selection
                       setShowCategoryDropdown(false);
                     }}
                     className="w-full text-left px-4 py-1.5 hover:bg-gray-50 transition-colors"
@@ -1808,6 +2235,7 @@ const Home: React.FC = () => {
                   onMouseDown={() => {
                     setSelectedPlaceOfOriginText('');
                     setPlaceOfOrigin('');
+                    setPlaceOfOriginInput('');
                     setShowPlaceOfOriginDropdown(false);
                   }}
                   className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
@@ -1829,12 +2257,20 @@ const Home: React.FC = () => {
                   />
                   <span>Africa</span>
                 </button>
-                {countries.sort((a, b) => a.name.localeCompare(b.name)).map((country) => (
+                {countries
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .filter((country) => {
+                    const searchTerm = placeOfOriginInput.toLowerCase().trim();
+                    if (!searchTerm) return true;
+                    return country.name.toLowerCase().includes(searchTerm);
+                  })
+                  .map((country) => (
                   <button
                     key={country.name}
                     onMouseDown={() => {
                       setSelectedPlaceOfOriginText(country.name);
                       setPlaceOfOrigin(country.name);
+                        setPlaceOfOriginInput('');
                       setShowPlaceOfOriginDropdown(false);
                     }}
                     className="w-full text-left px-4 py-1.5 hover:bg-gray-50 transition-colors flex items-center gap-2"
@@ -1875,9 +2311,34 @@ const Home: React.FC = () => {
           <div className="flex items-center gap-2">
             {/* Search Input */}
             <div className="flex-1 relative">
+              <div
+                className="flex items-center w-full px-4 py-3 pr-12"
+                style={{
+                  borderRadius: '30px',
+                  border: '1px solid #E9E9E9',
+                  backgroundColor: selectedImage ? '#F1F1F1' : '#FFF',
+                  fontFamily: 'Poppins, sans-serif',
+                  minHeight: '48px'
+                }}
+              >
+                {/* Image Thumbnail */}
+                {selectedImageUrl && (
+                  <img
+                    src={selectedImageUrl}
+                    alt="Selected product"
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      objectFit: 'cover',
+                      marginRight: '12px',
+                      flexShrink: 0
+                    }}
+                  />
+                )}
               <input
                 type="text"
-                placeholder="What are you looking for today ?"
+                  placeholder={selectedImage ? "Wanna be more specific ?" : "What are you looking for today ?"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleSearchKeyPress}
@@ -1898,11 +2359,10 @@ const Home: React.FC = () => {
                     setShowSearchHistory(false);
                   }, 200);
                 }}
-                className="w-full px-4 py-3 pr-12 focus:outline-none text-sm"
+                  className="flex-1 focus:outline-none text-sm"
                 style={{
-                  borderRadius: '30px',
-                  border: '1px solid #E9E9E9',
-                  backgroundColor: '#FFF',
+                    backgroundColor: 'transparent',
+                    border: 'none',
                   fontFamily: 'Poppins, sans-serif',
                   color: '#212121',
                   caretColor: '#64B5F6'
@@ -1914,7 +2374,37 @@ const Home: React.FC = () => {
                     font-size: 12px;
                   }
                 `}</style>
-              {/* Scan Icon */}
+                {selectedImage ? (
+                  <button
+                    onClick={() => {
+                      setSelectedImage(null);
+                      setSelectedImageUrl(null);
+                      setImageFormData(null);
+                      if (selectedImageUrl) {
+                        URL.revokeObjectURL(selectedImageUrl);
+                      }
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                    title="Clear image"
+                  >
+                    <div
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        borderRadius: '50%',
+                        backgroundColor: '#8A8A8A',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </div>
+                  </button>
+                ) : (
               <button
                 onClick={handleScan}
                 className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
@@ -1927,6 +2417,8 @@ const Home: React.FC = () => {
                   style={{ opacity: 0.6 }}
                 />
               </button>
+                )}
+              </div>
             </div>
 
             {/* Filter Button */}
@@ -2033,8 +2525,8 @@ const Home: React.FC = () => {
       </div>
 
       {/* Hero Banner - Auto Sliding */}
-      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-4 sm:mx-20 md:mx-24 lg:mx-40 rounded-2xl mb-6 sm:mb-0" style={{ background: 'linear-gradient(to right, #F9A822, #E55325)', height: isMobile ? '100px' : 'auto' }}>
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-1 md:py-1" style={{ height: isMobile ? '100%' : 'auto' }}>
+      <section className="text-white relative overflow-hidden mt-4 sm:mt-6 mx-4 sm:mx-20 md:mx-24 lg:mx-40 rounded-2xl mb-6 sm:mb-0" style={{ background: 'linear-gradient(to right, #F9A822, #E55325)', height: window.innerWidth < 640 ? '100px' : 'auto' }}>
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-1 md:py-1" style={{ height: window.innerWidth < 640 ? '100%' : 'auto' }}>
           <div className="flex flex-row items-center justify-between gap-1 sm:gap-4 md:gap-0">
             <div className="flex-1 text-left px-1 sm:px-2 md:pl-2">
               <button
@@ -2074,7 +2566,7 @@ const Home: React.FC = () => {
                     maskComposite: 'intersect',
                     WebkitMaskComposite: 'source-in'
                   }}
-                  loading="lazy"
+                  loading="eager"
                   width="320"
                   height="192"
                 />
@@ -2112,11 +2604,14 @@ const Home: React.FC = () => {
                   setActiveCategory(category);
                   setIsSearchActive(false);
                   setSearchQuery('');
+                  // Clear dropdown filter state when clicking category tab
+                  setSelectedCategoryText('');
+                  setSelectedCategory('');
                 }}
                 className={`whitespace-nowrap pb-2 sm:pb-3 md:pb-4 px-0.5 sm:px-1 transition-colors flex-shrink-0 relative`}
                 style={{
-                  fontSize: isMobile ? '13px' : '16px',
-                  fontWeight: isMobile ? '300' : 'normal',
+                  fontSize: window.innerWidth < 640 ? '13px' : '16px',
+                  fontWeight: window.innerWidth < 640 ? '300' : 'normal',
                   fontFamily: 'Poppins, sans-serif',
                   color: activeCategory === category ? '#64B5F6' : '#BABABA'
                 }}
@@ -2130,36 +2625,6 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* {isSearchActive && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mx-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <svg className="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <div>
-                <span className="text-blue-700 text-sm font-medium">
-                  Showing {searchResults.length} search results
-                </span>
-                {searchQuery && (
-                  <p className="text-blue-600 text-xs mt-1">
-                    for "{searchQuery}"
-                    {selectedCategoryText && ` in ${selectedCategoryText}`}
-                    {selectedPlaceOfOriginText && ` from ${selectedPlaceOfOriginText}`}
-                  </p>
-                )}
-              </div>
-            </div>
-            <button
-              onClick={clearSearch}
-              className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
-            >
-              Clear Search
-            </button>
-          </div>
-        </div>
-      )} */}
 
       {/* Mobile Filter Buttons - Horizontal Scroll */}
       <section className="bg-white md:hidden" style={{ marginTop: '-8px', marginBottom: '-8px' }}>
@@ -2246,135 +2711,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="relative filter-dropdown hidden md:block">
-              <button
-                onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-                className="flex items-center space-x-2 border rounded-lg transition-colors"
-                style={{
-                  padding: '8px 10px',
-                  backgroundColor: '#FAFAFA',
-                  borderColor: '#E4E4E4',
-                  fontFamily: 'Poppins, sans-serif'
-                }}
-              >
-                <span className="text-base font-normal" style={{ color: '#BABABA' }}>Filter :</span>
-                <img src={earthIcon} alt="Earth" style={{ width: '22px', height: '22px' }} />
-                <span className="text-base font-medium" style={{ color: '#6A6A6A' }}>{selectedCountry || 'Africa'}</span>
-                <img
-                  src={arrowDownIcon}
-                  alt="Arrow"
-                  className={`w-4 h-4 transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {/* Dropdown Menu */}
-              {isFilterDropdownOpen && (
-                <div
-                  className="absolute left-0 bg-white border border-gray-200 z-10"
-                  style={{
-                    width: '200px',
-                    flexShrink: 0,
-                    borderRadius: '16px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                    top: '0'
-                  }}
-                >
-                  <style>
-                    {`
-                    .filter-dropdown-scroll::-webkit-scrollbar {
-                      width: 2px;
-                    }
-                    .filter-dropdown-scroll::-webkit-scrollbar-track {
-                      background: transparent;
-                    }
-                    .filter-dropdown-scroll::-webkit-scrollbar-thumb {
-                      background-color: #E4E4E4;
-                      border-radius: 10px;
-                    }
-                  `}
-                  </style>
-
-                  {/* Search Input at Top */}
-                  <div className="px-3 pt-3 pb-2 border-b border-gray-200">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Filter :"
-                        className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none"
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          color: '#6A6A6A',
-                          border: 'none'
-                        }}
-                      />
-                      <button
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                        onClick={() => setIsFilterDropdownOpen(false)}
-                      >
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Scrollable Country List */}
-                  <div
-                    className="py-2 overflow-y-auto filter-dropdown-scroll"
-                    style={{
-                      maxHeight: 'calc(6 * 44px)',
-                      scrollbarWidth: 'thin',
-                      scrollbarColor: '#E4E4E4 transparent'
-                    }}
-                  >
-                    <button
-                      onClick={() => {
-                        setSelectedCountry('');
-                        setIsFilterDropdownOpen(false);
-                      }}
-                      style={{
-                        backgroundColor: !selectedCountry ? '#F0F8FE' : 'transparent',
-                        color: !selectedCountry ? '#64B5F6' : '#BABABA'
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center">
-                        <img
-                          src={globyIcon}
-                          alt="Globe"
-                          className="w-4 h-4 mr-2"
-                          style={{
-                            filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
-                          }}
-                        />
-                        <span>Africa</span>
-                      </div>
-                    </button>
-                    {africanCountries.map((country) => (
-                      <button
-                        key={country.name}
-                        onClick={() => {
-                          setSelectedCountry(country.name);
-                          setIsFilterDropdownOpen(false);
-                        }}
-                        style={{
-                          backgroundColor: selectedCountry === country.name ? '#F0F8FE' : 'transparent',
-                          color: selectedCountry === country.name ? '#64B5F6' : '#BABABA'
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
-                      >
-                        <span className="flex items-center space-x-2">
-                          <img
-                            src={country.flag}
-                            alt={`${country.name} flag`}
-                            className="w-5 h-4 object-cover rounded-sm"
-                          />
-                          <span>{country.name}</span>
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {renderCountryFilterButton('relative', 'top-filter')}
             </div>
 
             {/* Notifications - Centered */}
@@ -2382,53 +2719,63 @@ const Home: React.FC = () => {
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`absolute top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 shadow-sm animate-in slide-in-from-right duration-300 w-80 sm:w-96 ${notification.type === 'success'
-                    ? 'bg-blue-50 border border-blue-200'
-                    : 'bg-orange-50 border border-orange-200'
-                    }`}
+                  className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center rounded-xl px-4 py-3 shadow-lg animate-in slide-in-from-right duration-300"
+                  style={{
+                    backgroundColor: notification.type === 'success' ? '#F5FBFF' : '#FFFCF7',
+                    border: notification.type === 'success' ? '1px solid #CFE8FC' : '1px solid #FCD79B',
+                    width: '350px'
+                  }}
                 >
                   {/* Product Image */}
                   <div className="relative mr-3">
                     <img
                       src={notification.product.image}
                       alt={notification.product.name}
-                      className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg"
+                      className="w-10 h-10 object-cover rounded-lg"
                     />
-                    {/* Bookmark Icon Overlay */}
-                    <div className={`absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex items-center justify-center ${notification.type === 'success'
-                      ? 'bg-blue-500'
-                      : 'bg-white border border-orange-300'
-                      }`}>
+                    {/* Bookmark Icon Badge */}
                       {notification.type === 'success' ? (
-                        <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+                        <div className="w-3 h-3 rounded flex items-center justify-center" style={{ backgroundColor: '#64B5F6' }}>
+                          <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
+                        </div>
+                      </div>
                       ) : (
-                        <svg className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5l14 14M5 19L19 5" />
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="#F9A825" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 5v14l7-5 7 5V5a2 2 0 00-2-2H7a2 2 0 00-2 2z" />
                         </svg>
+                      </div>
                       )}
-                    </div>
                   </div>
 
                   {/* Notification Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-gray-800">
+                    <div className="text-sm">
                       {notification.type === 'success' ? (
-                        <>Added to <Link to="/bookmarks" className="text-blue-600 hover:text-blue-700 underline">Bookmarks</Link></>
+                        <>
+                          <span style={{ color: '#939393' }}>Added to </span>
+                          <Link to="/bookmarks" className="underline hover:opacity-70" style={{ color: '#64B5F6' }}>Bookmarks</Link>
+                        </>
                       ) : (
-                        <>Failed to add to <span className="text-orange-600">Bookmarks</span></>
+                        <>
+                          <span style={{ color: '#939393' }}>Failed to add to </span>
+                          <span style={{ color: '#F9A825' }}>Bookmarks</span>
+                        </>
                       )}
                     </div>
-                    <div className="text-xs text-gray-600 truncate">
-                      {notification.product.name} - ${notification.product.price}
+                    <div className="text-xs truncate" style={{ color: '#939393' }}>
+                      {notification.product.name} · ${notification.product.price}
                     </div>
                   </div>
 
                   {/* Close Button */}
                   <button
                     onClick={() => removeNotification(notification.id)}
-                    className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="ml-2 hover:opacity-70 transition-opacity"
+                    style={{ color: '#6A6A6A' }}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -2445,21 +2792,17 @@ const Home: React.FC = () => {
       </section>
 
       {/* Filtered Products Section */}
-      <section className="py-8">
+      <section className="py-8" ref={productFeedRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Conditional Layout: Category Sections for "All" or Regular Grid for Specific Category */}
           {activeCategory === 'All' && !isSearchActive ? (
             // Category Sections Layout
             (() => {
               // Check if any category has products after country filter
-              const hasAnyProducts = categories
-                .filter(cat => cat !== 'All')
-                .some((category) => {
-                  const categoryProducts = (allProductsComputed[category] || []);
+              const hasAnyProducts = categories.filter(cat => cat !== 'All').some((category) => {
+                const categoryProducts = (allProductsComputed[category as keyof typeof allProductsComputed] || []);
                   const filteredProducts = selectedCountry
-                    ? categoryProducts.filter(product =>
-                      getProductCountry(product.origin).name === selectedCountry
-                    )
+                  ? categoryProducts.filter(product => getProductCountry(product.origin).name === selectedCountry)
                     : categoryProducts;
                   return filteredProducts.length > 0;
                 });
@@ -2469,26 +2812,26 @@ const Home: React.FC = () => {
                 return (
                   <div>
                     {/* No Results State */}
-                    <div className="text-center" style={{ padding: isMobile ? '32px 16px' : '48px 16px' }}>
+                    <div className="text-center" style={{ padding: window.innerWidth < 640 ? '32px 16px' : '48px 16px' }}>
                       {/* Shopping Bag with Magnifying Glass Icon */}
                       <img
                         src={bagIcon}
                         alt="No products found"
                         className="mx-auto"
                         style={{
-                          width: isMobile ? '40px' : '60px',
-                          height: isMobile ? '40px' : '60px',
-                          marginBottom: isMobile ? '12px' : '16px'
+                          width: window.innerWidth < 640 ? '40px' : '60px',
+                          height: window.innerWidth < 640 ? '40px' : '60px',
+                          marginBottom: window.innerWidth < 640 ? '12px' : '16px'
                         }}
                       />
 
                       {/* Message */}
                       <p style={{
-                        fontSize: isMobile ? '12px' : '18px',
+                        fontSize: window.innerWidth < 640 ? '12px' : '18px',
                         color: '#6A6A6A',
                         fontFamily: 'Poppins, sans-serif',
-                        maxWidth: isMobile ? '280px' : '500px',
-                        margin: isMobile ? '0 auto 12px' : '0 auto 16px',
+                        maxWidth: window.innerWidth < 640 ? '280px' : '500px',
+                        margin: window.innerWidth < 640 ? '0 auto 12px' : '0 auto 16px',
                         lineHeight: '1.5'
                       }}>
                         Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
@@ -2500,37 +2843,37 @@ const Home: React.FC = () => {
                         className="inline-flex items-center mx-auto"
                         style={{
                           display: 'flex',
-                          padding: isMobile ? '8px 16px' : '10px 20px',
+                          padding: window.innerWidth < 640 ? '8px 16px' : '10px 20px',
                           alignItems: 'center',
-                          gap: isMobile ? '4px' : '6px',
+                          gap: window.innerWidth < 640 ? '4px' : '6px',
                           borderRadius: '8px',
                           backgroundColor: '#F0F8FE',
                           color: '#64B5F6',
                           border: 'none',
                           cursor: 'pointer',
                           fontFamily: 'Poppins, sans-serif',
-                          fontSize: isMobile ? '11px' : '14px',
+                          fontSize: window.innerWidth < 640 ? '11px' : '14px',
                           fontWeight: '500'
                         }}
                       >
-                        <img src={draftsIcon} alt="Request" style={{ width: isMobile ? '14px' : '20px', height: isMobile ? '14px' : '20px' }} />
+                        <img src={draftsIcon} alt="Request" style={{ width: window.innerWidth < 640 ? '14px' : '20px', height: window.innerWidth < 640 ? '14px' : '20px' }} />
                         Make a request
                       </button>
                     </div>
 
                     {/* Other Products Near You Section */}
-                    <div style={{ marginTop: isMobile ? '32px' : '48px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: isMobile ? '16px' : '24px' }}>
+                    <div style={{ marginTop: window.innerWidth < 640 ? '32px' : '48px' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '16px' : '24px' }}>
                         <h3 className="font-semibold text-gray-900" style={{
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: isMobile ? '14px' : '20px'
+                          fontFamily: 'Faktum, sans-serif',
+                          fontSize: window.innerWidth < 640 ? '14px' : '20px'
                         }}>
                           Other products near you
                         </h3>
                         <button className="font-medium hover:underline" style={{
                           color: '#64B5F6',
                           fontFamily: 'Poppins, sans-serif',
-                          fontSize: isMobile ? '10px' : '14px'
+                          fontSize: window.innerWidth < 640 ? '10px' : '14px'
                         }}>
                           View more...
                         </button>
@@ -2538,15 +2881,15 @@ const Home: React.FC = () => {
 
                       {/* Product Cards */}
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-                        {Object.values(allProductsComputed).flat().slice(0, 6).map((product: FrontendProduct) => (
-                          <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                        {Object.values(allProductsComputed).flat().slice(0, 6).map((product) => (
+                          <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group cursor-pointer">
                             {/* Product Image - Top */}
-                            <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: isMobile ? '10px' : '12px' }}>
+                            <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
                               <img
                                 src={product.image}
                                 alt={product.name}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                style={{ borderRadius: isMobile ? '10px' : '12px' }}
+                                style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
                                 loading="lazy"
                                 width="200"
                                 height="200"
@@ -2555,103 +2898,81 @@ const Home: React.FC = () => {
                               {/* Country Badge */}
                               <div className="absolute bg-white rounded-md shadow-sm" style={{
                                 display: 'flex',
-                                padding: isMobile ? '1px 4px' : '2px 6px',
+                                padding: window.innerWidth < 640 ? '1px 4px' : '2px 6px',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                gap: isMobile ? '2px' : '4px',
-                                top: isMobile ? '6px' : '8px',
-                                left: isMobile ? '6px' : '8px'
+                                gap: window.innerWidth < 640 ? '2px' : '4px',
+                                top: window.innerWidth < 640 ? '6px' : '8px',
+                                left: window.innerWidth < 640 ? '6px' : '8px'
                               }}>
                                 <img
-                                  src={getProductCountry(product.origin).flag}
+                                  src={`https://flagcdn.com/w20/${getProductCountry(product.origin).code}.png`}
                                   alt={getProductCountry(product.origin).name}
+                                  className="rounded-full"
                                   style={{
-                                    width: isMobile ? '12px' : '14px',
-                                    height: isMobile ? '12px' : '14px',
-                                    objectFit: 'cover',
-                                    borderRadius: '50%'
+                                    width: window.innerWidth < 640 ? '10px' : '12px',
+                                    height: window.innerWidth < 640 ? '10px' : '12px',
+                                    objectFit: 'cover'
                                   }}
                                 />
-                                <span className="font-medium text-gray-800" style={{ fontSize: isMobile ? '8px' : '12px' }}>
+                                <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
                                   {getProductCountry(product.origin).abbreviation}
                                 </span>
                               </div>
                             </div>
 
                             {/* Product Content */}
-                            <div className="flex flex-col" style={{ padding: isMobile ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
+                            <div className="flex flex-col" style={{ padding: window.innerWidth < 640 ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
                               {/* Price and Verified Badge Row */}
-                              <div className="flex items-center justify-between" style={{ marginBottom: isMobile ? '4px' : '4px' }}>
-                                <div className="font-bold text-gray-900" style={{ fontSize: isMobile ? '12px' : '16px' }}>
-                                  {/* {formatPrice(product.price, product.currency)} */}
-                                  {product.currency} {product.price}
+                              <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
+                                <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
+                                  ${product.price}
                                 </div>
-                                {/* {product.verified ? (
+                                {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                     display: 'flex',
-                                    padding: isMobile ? '1px 3px' : '1px 4px',
+                                    padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                     gap: '1px',
-                                    fontSize: isMobile ? '7px' : '9px'
+                                    fontSize: window.innerWidth < 640 ? '7px' : '9px'
                                   }}>
-                                    <img src={verifyIcon} alt="Verified" style={{ width: isMobile ? '6px' : '8px', height: isMobile ? '6px' : '8px' }} />
+                                    <img src={verifyIcon} alt="Verified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                     <span>Verified seller</span>
                                   </div>
                                 ) : (
                                   <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{
                                     display: 'flex',
-                                    padding: isMobile ? '1px 3px' : '1px 4px',
+                                    padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                     gap: '1px',
-                                    fontSize: isMobile ? '7px' : '9px'
+                                    fontSize: window.innerWidth < 640 ? '7px' : '9px'
                                   }}>
-                                    <img src={unverifyIcon} alt="Unverified" style={{ width: isMobile ? '6px' : '8px', height: isMobile ? '6px' : '8px' }} />
+                                    <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                     <span>Unverified Seller</span>
                                   </div>
-                                )} */}
+                                )}
                               </div>
 
                               {/* Product Name */}
                               <h3 className="line-clamp-2 font-medium" style={{
-                                fontSize: isMobile ? '10px' : '13px',
+                                fontSize: window.innerWidth < 640 ? '10px' : '13px',
                                 color: '#212121',
-                                marginBottom: isMobile ? '4px' : '4px'
+                                marginBottom: window.innerWidth < 640 ? '4px' : '4px'
                               }}>
                                 {product.name}
                               </h3>
 
                               {/* Location and Bookmark Row */}
-                              <div className="flex items-center justify-between w-full relative" style={{ minHeight: isMobile ? '16px' : '20px' }}>
-                                <div className="flex-1 overflow-hidden pr-4 relative">
-                                  <div className="flex items-center text-gray-500 w-full">
-                                    <img
-                                      src={locationIcon}
-                                      alt="Location"
-                                      className="flex-shrink-0"
-                                      style={{
-                                        width: isMobile ? '8px' : '10px',
-                                        height: isMobile ? '8px' : '10px',
-                                        marginRight: isMobile ? '3px' : '4px',
-                                        flexShrink: 0
-                                      }}
-                                    />
-                                    <span
-                                      className="font-normal truncate block w-full"
-                                      style={{
-                                        fontSize: isMobile ? '8px' : '10px',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        position: 'relative',
-                                        paddingRight: '4px'
-                                      }}
-                                    >
-                                      {product.location}
-                                    </span>
-                                    <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
-                                  </div>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center text-gray-500 flex-1">
+                                  <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
+                                    width: window.innerWidth < 640 ? '8px' : '10px',
+                                    height: window.innerWidth < 640 ? '8px' : '10px',
+                                    marginRight: window.innerWidth < 640 ? '3px' : '4px'
+                                  }} />
+                                  <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
                                 </div>
                                 {/* Bookmark Button */}
                                 <button
@@ -2659,30 +2980,36 @@ const Home: React.FC = () => {
                                     e.preventDefault();
                                     handleSave(product.id);
                                   }}
-                                  className="transition-colors touch-manipulation flex-shrink-0"
+                                  className="transition-colors touch-manipulation rounded"
                                   style={{
-                                    width: isMobile ? '16px' : '20px',
-                                    height: isMobile ? '16px' : '20px',
+                                    width: window.innerWidth < 640 ? '16px' : '20px',
+                                    height: window.innerWidth < 640 ? '16px' : '20px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    position: 'relative',
-                                    zIndex: 1
+                                    marginLeft: window.innerWidth < 640 ? '4px' : '8px',
+                                    backgroundColor: savedProducts.has(product.id) ? '#64B5F6' : 'transparent'
                                   }}
                                 >
+                                  {savedProducts.has(product.id) ? (
+                                    <svg className="text-white" style={{ width: window.innerWidth < 640 ? '10px' : '12px', height: window.innerWidth < 640 ? '10px' : '12px' }} fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                  ) : (
                                   <img
                                     src={bookmarkIcon}
                                     alt="Bookmark"
                                     style={{
-                                      width: isMobile ? '16px' : '20px',
-                                      height: isMobile ? '16px' : '20px',
-                                      filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
-                                    }}
-                                  />
+                                        width: window.innerWidth < 640 ? '16px' : '20px',
+                                        height: window.innerWidth < 640 ? '16px' : '20px',
+                                        filter: 'grayscale(100%) opacity(0.5)'
+                                      }}
+                                    />
+                                  )}
                                 </button>
                               </div>
                             </div>
-                          </Link>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -2694,12 +3021,10 @@ const Home: React.FC = () => {
               return (
                 <div className="space-y-8">
                   {categories.filter(cat => cat !== 'All').map((category) => {
-                    const categoryProducts = (allProductsComputed[category] || []);
+                    const categoryProducts = (allProductsComputed[category as keyof typeof allProductsComputed] || []);
                     // Filter products by selected country
                     const filteredProducts = selectedCountry
-                      ? categoryProducts.filter(product =>
-                        getProductCountry(product.origin).name === selectedCountry
-                      )
+                      ? categoryProducts.filter(product => getProductCountry(product.origin).name === selectedCountry)
                       : categoryProducts;
                     if (filteredProducts.length === 0) return null;
 
@@ -2732,20 +3057,17 @@ const Home: React.FC = () => {
                         )}
 
                         {/* Category Products - Horizontal Scroll */}
-                        <div
-                          className={filteredProducts.length <= 6 ? '' : 'overflow-x-auto scrollbar-hide'}
-                          ref={(el) => { categoryRefs.current[category] = el; }}
-                        >
+                        <div className={filteredProducts.length <= 6 ? '' : 'overflow-x-auto scrollbar-hide'}>
                           <div className={filteredProducts.length <= 6 ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6' : 'flex gap-5 sm:gap-6'}>
                             {filteredProducts.slice(0, 12).map((product) => (
-                              <Link key={product.id} to={`/product/${product.id}`} className={`bg-white rounded-lg overflow-hidden transition-all duration-200 block group ${filteredProducts.length > 6 ? 'flex-shrink-0' : ''}`} style={filteredProducts.length > 6 ? { width: '200px' } : {}}>
+                              <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className={`bg-white rounded-lg overflow-hidden transition-all duration-200 block group cursor-pointer ${filteredProducts.length > 6 ? 'flex-shrink-0' : ''}`} style={filteredProducts.length > 6 ? { width: '200px' } : {}}>
                                 {/* Product Image - Top */}
-                                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: isMobile ? '10px' : '12px' }}>
+                                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
                                   <img
                                     src={product.image}
                                     alt={product.name}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                    style={{ borderRadius: isMobile ? '10px' : '12px' }}
+                                    style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
                                     loading="lazy"
                                     width="200"
                                     height="200"
@@ -2754,69 +3076,68 @@ const Home: React.FC = () => {
                                   {/* Country Badge */}
                                   <div className="absolute bg-white rounded-md shadow-sm" style={{
                                     display: 'flex',
-                                    padding: isMobile ? '1px 4px' : '2px 6px',
+                                    padding: window.innerWidth < 640 ? '1px 4px' : '2px 6px',
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                    gap: isMobile ? '2px' : '4px',
-                                    top: isMobile ? '6px' : '8px',
-                                    left: isMobile ? '6px' : '8px'
+                                    gap: window.innerWidth < 640 ? '2px' : '4px',
+                                    top: window.innerWidth < 640 ? '6px' : '8px',
+                                    left: window.innerWidth < 640 ? '6px' : '8px'
                                   }}>
                                     <img
                                       src={getProductCountry(product.origin).flag}
                                       alt={getProductCountry(product.origin).name}
+                                      className="rounded-full"
                                       style={{
-                                        width: isMobile ? '12px' : '14px',
-                                        height: isMobile ? '12px' : '14px',
-                                        objectFit: 'cover',
-                                        borderRadius: '50%'
+                                        width: window.innerWidth < 640 ? '10px' : '12px',
+                                        height: window.innerWidth < 640 ? '10px' : '12px',
+                                        objectFit: 'cover'
                                       }}
                                     />
-                                    <span className="font-medium text-gray-800" style={{ fontSize: isMobile ? '8px' : '12px' }}>
+                                    <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
                                       {getProductCountry(product.origin).abbreviation}
                                     </span>
                                   </div>
                                 </div>
 
                                 {/* Product Content */}
-                                <div className="flex flex-col" style={{ padding: isMobile ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
+                                <div className="flex flex-col" style={{ padding: window.innerWidth < 640 ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
                                   {/* Price and Verified Badge Row */}
-                                  <div className="flex items-center justify-between" style={{ marginBottom: isMobile ? '4px' : '4px' }}>
-                                    <div className="font-bold text-gray-900" style={{ fontSize: isMobile ? '12px' : '16px' }}>
-                                      {/* {formatPrice(product.price, product.currency)} */}
-                                      {product.currency} {product.price}
+                                  <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
+                                    <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
+                                      ${product.price}
                                     </div>
-                                    {/* {product.verified ? (
+                                    {product.verified ? (
                                       <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                         display: 'flex',
-                                        padding: isMobile ? '1px 3px' : '1px 4px',
+                                        padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                         gap: '1px',
-                                        fontSize: isMobile ? '7px' : '9px'
+                                        fontSize: window.innerWidth < 640 ? '7px' : '9px'
                                       }}>
-                                        <img src={verifyIcon} alt="Verified" style={{ width: isMobile ? '6px' : '8px', height: isMobile ? '6px' : '8px' }} />
+                                        <img src={verifyIcon} alt="Verified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                         <span>Verified seller</span>
                                       </div>
                                     ) : (
                                       <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{
                                         display: 'flex',
-                                        padding: isMobile ? '1px 3px' : '1px 4px',
+                                        padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                         gap: '1px',
-                                        fontSize: isMobile ? '7px' : '9px'
+                                        fontSize: window.innerWidth < 640 ? '7px' : '9px'
                                       }}>
-                                        <img src={unverifyIcon} alt="Unverified" style={{ width: isMobile ? '6px' : '8px', height: isMobile ? '6px' : '8px' }} />
+                                        <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                         <span>Unverified Seller</span>
                                       </div>
-                                    )} */}
+                                    )}
                                   </div>
 
                                   {/* Product Name */}
                                   <h3 className="line-clamp-2 font-medium" style={{
-                                    fontSize: isMobile ? '10px' : '13px',
+                                    fontSize: window.innerWidth < 640 ? '10px' : '13px',
                                     color: '#212121',
-                                    marginBottom: isMobile ? '4px' : '4px'
+                                    marginBottom: window.innerWidth < 640 ? '4px' : '4px'
                                   }}>{product.name}</h3>
 
                                   {/* Location and Bookmark Row - Below Product Name */}
@@ -2824,15 +3145,15 @@ const Home: React.FC = () => {
                                     {/* Location */}
                                     <div className="flex items-center text-gray-500 flex-1">
                                       <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                                        width: isMobile ? '8px' : '10px',
-                                        height: isMobile ? '8px' : '10px',
-                                        marginRight: isMobile ? '3px' : '4px'
+                                        width: window.innerWidth < 640 ? '8px' : '10px',
+                                        height: window.innerWidth < 640 ? '8px' : '10px',
+                                        marginRight: window.innerWidth < 640 ? '3px' : '4px'
                                       }} />
-                                      <span className="truncate font-normal" style={{ fontSize: isMobile ? '8px' : '10px' }}>{product.location}</span>
+                                      <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
                                     </div>
 
                                     {/* Bookmark Button */}
-                                    <div style={{ marginLeft: isMobile ? '4px' : '8px' }}>
+                                    <div style={{ marginLeft: window.innerWidth < 640 ? '4px' : '8px' }}>
                                       <button
                                         onClick={(e) => {
                                           e.preventDefault();
@@ -2842,23 +3163,23 @@ const Home: React.FC = () => {
                                         className="transition-colors touch-manipulation"
                                         title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
                                         style={{
-                                          width: isMobile ? '16px' : '20px',
-                                          height: isMobile ? '16px' : '20px',
+                                          width: window.innerWidth < 640 ? '16px' : '20px',
+                                          height: window.innerWidth < 640 ? '16px' : '20px',
                                           display: 'flex',
                                           alignItems: 'center',
                                           justifyContent: 'center'
                                         }}
                                       >
                                         <img src={bookmarkIcon} alt="Bookmark" style={{
-                                          width: isMobile ? '16px' : '20px',
-                                          height: isMobile ? '16px' : '20px',
+                                          width: window.innerWidth < 640 ? '16px' : '20px',
+                                          height: window.innerWidth < 640 ? '16px' : '20px',
                                           filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
                                         }} />
                                       </button>
                                     </div>
                                   </div>
                                 </div>
-                              </Link>
+                              </div>
                             ))}
                           </div>
                         </div>
@@ -2871,6 +3192,182 @@ const Home: React.FC = () => {
           ) : (
             // Regular Grid Layout for Specific Category or Search
             <>
+              {/* For search results (isSearchActive), group by categories */}
+              {isSearchActive && !shouldShowNoResultsState() ? (
+                <div ref={searchResultsRef} className="space-y-8">
+                  {(selectedCategoryText
+                    ? [selectedCategoryText]
+                    : categories.filter(cat => cat !== 'All')
+                  ).map((category) => {
+                    // Get products from this category that are in search results
+                    const categoryProducts = (allProductsComputed[category as keyof typeof allProductsComputed] || []);
+                    const filteredProducts = searchResults.filter(product =>
+                      categoryProducts.some(cp => cp.id === product.id)
+                    );
+
+                    if (filteredProducts.length === 0) return null;
+
+                    return (
+                      <div key={category} className="mb-8">
+                        {/* Category Header - Hidden on Mobile */}
+                        {window.innerWidth >= 640 && (
+                          <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center">
+                              <h2 className="text-[20px] font-semibold text-gray-900">{category}</h2>
+                              <svg className="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <button
+                                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                                aria-label="Scroll left"
+                              >
+                                <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                              </button>
+                              <button
+                                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+                                aria-label="Scroll right"
+                              >
+                                <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Category Products - Horizontal Scroll */}
+                        <div className={filteredProducts.length <= 6 ? '' : 'overflow-x-auto scrollbar-hide'}>
+                          <div className={filteredProducts.length <= 6 ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6' : 'flex gap-5 sm:gap-6'}>
+                            {filteredProducts.slice(0, 12).map((product) => (
+                              <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className={`bg-white rounded-lg overflow-hidden transition-all duration-200 block group cursor-pointer ${filteredProducts.length > 6 ? 'flex-shrink-0' : ''}`} style={filteredProducts.length > 6 ? { width: '200px' } : {}}>
+                                {/* Product Image - Top */}
+                                <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
+                                  <img
+                                    src={product.image}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                    style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
+                                    loading="lazy"
+                                    width="200"
+                                    height="200"
+                                  />
+
+                                  {/* Country Badge */}
+                                  <div className="absolute bg-white rounded-md shadow-sm" style={{
+                                    display: 'flex',
+                                    padding: window.innerWidth < 640 ? '1px 4px' : '2px 6px',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: window.innerWidth < 640 ? '2px' : '4px',
+                                    top: window.innerWidth < 640 ? '6px' : '8px',
+                                    left: window.innerWidth < 640 ? '6px' : '8px'
+                                  }}>
+                                    <img
+                                      src={getProductCountry(product.origin).flag}
+                                      alt={getProductCountry(product.origin).name}
+                                      className="rounded-full"
+                                      style={{
+                                        width: window.innerWidth < 640 ? '10px' : '12px',
+                                        height: window.innerWidth < 640 ? '10px' : '12px',
+                                        objectFit: 'cover'
+                                      }}
+                                    />
+                                    <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
+                                      {getProductCountry(product.origin).abbreviation}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Product Content */}
+                                <div className="flex flex-col" style={{ padding: window.innerWidth < 640 ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
+                                  {/* Price and Verified Badge Row */}
+                                  <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
+                                    <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
+                                      ${product.price}
+                                    </div>
+                                    {product.verified ? (
+                                      <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
+                                        display: 'flex',
+                                        padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        gap: '1px',
+                                        fontSize: window.innerWidth < 640 ? '7px' : '9px'
+                                      }}>
+                                        <img src={verifyIcon} alt="Verified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
+                                        <span>Verified seller</span>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{
+                                        display: 'flex',
+                                        padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        gap: '1px',
+                                        fontSize: window.innerWidth < 640 ? '7px' : '9px'
+                                      }}>
+                                        <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
+                                        <span>Unverified Seller</span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Product Name */}
+                                  <h3 className="line-clamp-2 font-medium" style={{
+                                    fontSize: window.innerWidth < 640 ? '10px' : '13px',
+                                    color: '#212121',
+                                    marginBottom: window.innerWidth < 640 ? '4px' : '4px'
+                                  }}>{product.name}</h3>
+
+                                  {/* Location and Bookmark Row - Below Product Name */}
+                                  <div className="flex items-center justify-between">
+                                    {/* Location */}
+                                    <div className="flex items-center text-gray-500 flex-1">
+                                      <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
+                                        width: window.innerWidth < 640 ? '8px' : '10px',
+                                        height: window.innerWidth < 640 ? '8px' : '10px',
+                                        marginRight: window.innerWidth < 640 ? '3px' : '4px'
+                                      }} />
+                                      <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
+                                    </div>
+
+                                    {/* Bookmark Button */}
+                                    <div style={{ marginLeft: window.innerWidth < 640 ? '4px' : '8px' }}>
+                                      <button
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleSave(product.id);
+                                        }}
+                                        className="transition-colors touch-manipulation"
+                                        title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                                        style={{
+                                          width: window.innerWidth < 640 ? '16px' : '20px',
+                                          height: window.innerWidth < 640 ? '16px' : '20px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center'
+                                        }}
+                                      >
+                                        <img src={bookmarkIcon} alt="Bookmark" style={{
+                                          width: window.innerWidth < 640 ? '16px' : '20px',
+                                          height: window.innerWidth < 640 ? '16px' : '20px',
+                                          filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
+                                        }} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+            <>
               {/* Section Header - Hide when no search results */}
               {!shouldShowNoResultsState() && (
                 <div className="flex items-center justify-between mb-6">
@@ -2882,7 +3379,7 @@ const Home: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
-                  {productsToDisplay.length > 0 && (
+                      {getProductsToDisplay().length > 0 && (
                     <div className="flex items-center space-x-3">
                       <button
                         onClick={scrollProductsLeft}
@@ -2901,32 +3398,34 @@ const Home: React.FC = () => {
                     </div>
                   )}
                 </div>
+                  )}
+                </>
               )}
 
               {/* Products Grid */}
               {shouldShowNoResultsState() ? (
                 <div>
                   {/* No Results State */}
-                  <div className="text-center" style={{ padding: isMobile ? '32px 16px' : '48px 16px' }}>
+                  <div className="text-center" style={{ padding: window.innerWidth < 640 ? '32px 16px' : '48px 16px' }}>
                     {/* Shopping Bag with Magnifying Glass Icon */}
                     <img
                       src={bagIcon}
                       alt="No products found"
                       className="mx-auto"
                       style={{
-                        width: isMobile ? '40px' : '60px',
-                        height: isMobile ? '40px' : '60px',
-                        marginBottom: isMobile ? '12px' : '16px'
+                        width: window.innerWidth < 640 ? '40px' : '60px',
+                        height: window.innerWidth < 640 ? '40px' : '60px',
+                        marginBottom: window.innerWidth < 640 ? '12px' : '16px'
                       }}
                     />
 
                     {/* Message */}
                     <p style={{
-                      fontSize: isMobile ? '12px' : '18px',
+                      fontSize: window.innerWidth < 640 ? '12px' : '18px',
                       color: '#6A6A6A',
                       fontFamily: 'Poppins, sans-serif',
-                      maxWidth: isMobile ? '280px' : '500px',
-                      margin: isMobile ? '0 auto 12px' : '0 auto 16px',
+                      maxWidth: window.innerWidth < 640 ? '280px' : '500px',
+                      margin: window.innerWidth < 640 ? '0 auto 12px' : '0 auto 16px',
                       lineHeight: '1.5'
                     }}>
                       Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
@@ -2938,37 +3437,37 @@ const Home: React.FC = () => {
                       className="inline-flex items-center mx-auto"
                       style={{
                         display: 'flex',
-                        padding: isMobile ? '8px 16px' : '10px 20px',
+                        padding: window.innerWidth < 640 ? '8px 16px' : '10px 20px',
                         alignItems: 'center',
-                        gap: isMobile ? '4px' : '6px',
+                        gap: window.innerWidth < 640 ? '4px' : '6px',
                         borderRadius: '8px',
                         backgroundColor: '#F0F8FE',
                         color: '#64B5F6',
                         border: 'none',
                         cursor: 'pointer',
                         fontFamily: 'Poppins, sans-serif',
-                        fontSize: isMobile ? '11px' : '14px',
+                        fontSize: window.innerWidth < 640 ? '11px' : '14px',
                         fontWeight: '500'
                       }}
                     >
-                      <img src={draftsIcon} alt="Request" style={{ width: isMobile ? '14px' : '20px', height: isMobile ? '14px' : '20px' }} />
+                      <img src={draftsIcon} alt="Request" style={{ width: window.innerWidth < 640 ? '14px' : '20px', height: window.innerWidth < 640 ? '14px' : '20px' }} />
                       Make a request
                     </button>
                   </div>
 
                   {/* Other Products Near You Section */}
-                  <div style={{ marginTop: isMobile ? '32px' : '48px' }}>
-                    <div className="flex items-center justify-between" style={{ marginBottom: isMobile ? '16px' : '24px' }}>
+                  <div style={{ marginTop: window.innerWidth < 640 ? '32px' : '48px' }}>
+                    <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '16px' : '24px' }}>
                       <h3 className="font-semibold text-gray-900" style={{
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: isMobile ? '14px' : '20px'
+                        fontFamily: 'Faktum, sans-serif',
+                        fontSize: window.innerWidth < 640 ? '14px' : '20px'
                       }}>
                         Other products near you
                       </h3>
                       <button className="font-medium hover:underline" style={{
                         color: '#64B5F6',
                         fontFamily: 'Poppins, sans-serif',
-                        fontSize: isMobile ? '10px' : '14px'
+                        fontSize: window.innerWidth < 640 ? '10px' : '14px'
                       }}>
                         View more...
                       </button>
@@ -2976,15 +3475,15 @@ const Home: React.FC = () => {
 
                     {/* Product Cards */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-                      {Object.values(allProductsComputed).flat().slice(0, 6).map((product: FrontendProduct) => (
-                        <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                      {Object.values(allProductsComputed).flat().slice(0, 6).map((product) => (
+                        <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group cursor-pointer">
                           {/* Product Image - Top */}
-                          <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: isMobile ? '10px' : '12px' }}>
+                          <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
                             <img
                               src={product.image}
                               alt={product.name}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                              style={{ borderRadius: isMobile ? '10px' : '12px' }}
+                              style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
                               loading="lazy"
                               width="200"
                               height="200"
@@ -2993,69 +3492,68 @@ const Home: React.FC = () => {
                             {/* Country Badge */}
                             <div className="absolute bg-white rounded-md shadow-sm" style={{
                               display: 'flex',
-                              padding: isMobile ? '1px 4px' : '2px 6px',
+                              padding: window.innerWidth < 640 ? '1px 4px' : '2px 6px',
                               justifyContent: 'center',
                               alignItems: 'center',
-                              gap: isMobile ? '2px' : '4px',
-                              top: isMobile ? '6px' : '8px',
-                              left: isMobile ? '6px' : '8px'
+                              gap: window.innerWidth < 640 ? '2px' : '4px',
+                              top: window.innerWidth < 640 ? '6px' : '8px',
+                              left: window.innerWidth < 640 ? '6px' : '8px'
                             }}>
                               <img
                                 src={getProductCountry(product.origin).flag}
                                 alt={getProductCountry(product.origin).name}
+                                className="rounded-full"
                                 style={{
-                                  width: isMobile ? '12px' : '14px',
-                                  height: isMobile ? '12px' : '14px',
-                                  objectFit: 'cover',
-                                  borderRadius: '50%'
+                                  width: window.innerWidth < 640 ? '10px' : '12px',
+                                  height: window.innerWidth < 640 ? '10px' : '12px',
+                                  objectFit: 'cover'
                                 }}
                               />
-                              <span className="font-medium text-gray-800" style={{ fontSize: isMobile ? '8px' : '12px' }}>
+                              <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
                                 {getProductCountry(product.origin).abbreviation}
                               </span>
                             </div>
                           </div>
 
                           {/* Product Content */}
-                          <div className="flex flex-col" style={{ padding: isMobile ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
+                          <div className="flex flex-col" style={{ padding: window.innerWidth < 640 ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
                             {/* Price and Verified Badge Row */}
-                            <div className="flex items-center justify-between" style={{ marginBottom: isMobile ? '4px' : '4px' }}>
-                              <div className="font-bold text-gray-900" style={{ fontSize: isMobile ? '12px' : '16px' }}>
-                                {/* {formatPrice(product.price, product.currency)} */}
-                                {product.currency} {product.price}
+                            <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
+                              <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
+                                ${product.price}
                               </div>
-                              {/* {product.verified ? (
+                              {product.verified ? (
                                 <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                   display: 'flex',
-                                  padding: isMobile ? '1px 3px' : '1px 4px',
+                                  padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
                                   justifyContent: 'center',
                                   alignItems: 'center',
                                   gap: '1px',
-                                  fontSize: isMobile ? '7px' : '9px'
+                                  fontSize: window.innerWidth < 640 ? '7px' : '9px'
                                 }}>
-                                  <img src={verifyIcon} alt="Verified" style={{ width: isMobile ? '6px' : '8px', height: isMobile ? '6px' : '8px' }} />
+                                  <img src={verifyIcon} alt="Verified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                   <span>Verified seller</span>
                                 </div>
                               ) : (
                                 <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{
                                   display: 'flex',
-                                  padding: isMobile ? '1px 3px' : '1px 4px',
+                                  padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
                                   justifyContent: 'center',
                                   alignItems: 'center',
                                   gap: '1px',
-                                  fontSize: isMobile ? '7px' : '9px'
+                                  fontSize: window.innerWidth < 640 ? '7px' : '9px'
                                 }}>
-                                  <img src={unverifyIcon} alt="Unverified" style={{ width: isMobile ? '6px' : '8px', height: isMobile ? '6px' : '8px' }} />
+                                  <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                   <span>Unverified Seller</span>
                                 </div>
-                              )} */}
+                              )}
                             </div>
 
                             {/* Product Name */}
                             <h3 className="line-clamp-2 font-medium" style={{
-                              fontSize: isMobile ? '10px' : '13px',
+                              fontSize: window.innerWidth < 640 ? '10px' : '13px',
                               color: '#212121',
-                              marginBottom: isMobile ? '4px' : '4px'
+                              marginBottom: window.innerWidth < 640 ? '4px' : '4px'
                             }}>
                               {product.name}
                             </h3>
@@ -3064,11 +3562,11 @@ const Home: React.FC = () => {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center text-gray-500 flex-1">
                                 <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                                  width: isMobile ? '8px' : '10px',
-                                  height: isMobile ? '8px' : '10px',
-                                  marginRight: isMobile ? '3px' : '4px'
+                                  width: window.innerWidth < 640 ? '8px' : '10px',
+                                  height: window.innerWidth < 640 ? '8px' : '10px',
+                                  marginRight: window.innerWidth < 640 ? '3px' : '4px'
                                 }} />
-                                <span className="truncate font-normal" style={{ fontSize: isMobile ? '8px' : '10px' }}>{product.location}</span>
+                                <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
                               </div>
                               {/* Bookmark Button */}
                               <button
@@ -3078,27 +3576,27 @@ const Home: React.FC = () => {
                                 }}
                                 className="transition-colors touch-manipulation"
                                 style={{
-                                  width: isMobile ? '16px' : '20px',
-                                  height: isMobile ? '16px' : '20px',
+                                  width: window.innerWidth < 640 ? '16px' : '20px',
+                                  height: window.innerWidth < 640 ? '16px' : '20px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  marginLeft: isMobile ? '4px' : '8px'
+                                  marginLeft: window.innerWidth < 640 ? '4px' : '8px'
                                 }}
                               >
                                 <img
                                   src={bookmarkIcon}
                                   alt="Bookmark"
                                   style={{
-                                    width: isMobile ? '16px' : '20px',
-                                    height: isMobile ? '16px' : '20px',
+                                    width: window.innerWidth < 640 ? '16px' : '20px',
+                                    height: window.innerWidth < 640 ? '16px' : '20px',
                                     filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
                                   }}
                                 />
                               </button>
                             </div>
                           </div>
-                        </Link>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -3108,8 +3606,8 @@ const Home: React.FC = () => {
                   ref={productGridRef}
                   className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6 overflow-x-auto scrollbar-hide"
                 >
-                  {productsToDisplay.map((product: FrontendProduct) => (
-                    <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 block group">
+                  {getProductsToDisplay().map((product) => (
+                    <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 block group cursor-pointer">
                       {/* Product Image - Top */}
                       <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
                         <img
@@ -3119,10 +3617,6 @@ const Home: React.FC = () => {
                           loading="lazy"
                           width="200"
                           height="200"
-                          onError={(e) => {
-                            // Fallback if image fails to load
-                            e.currentTarget.src = getDefaultProductImage(product.category || 'Other');
-                          }}
                         />
 
                         {/* Country Badge */}
@@ -3143,8 +3637,7 @@ const Home: React.FC = () => {
                         {/* Price and Verified Badge Row */}
                         <div className="flex items-center justify-between mb-1">
                           <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
-                            {/* {formatPrice(product.price, product.currency)} */}
-                            {product.currency} {product.price}
+                            ${product.price}
                           </div>
                           {product.verified ? (
                             <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
@@ -3189,7 +3682,7 @@ const Home: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               )}
@@ -4026,83 +4519,134 @@ const Home: React.FC = () => {
                 Product Origin
               </label>
               <div className="relative" ref={requestProductOriginDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setIsRequestProductOriginDropdownOpen(!isRequestProductOriginDropdownOpen)}
-                  className="w-full px-3 py-2.5 border rounded-lg text-left flex items-center justify-between"
+                <div className="relative flex items-center w-full">
+                  <input
+                    type="text"
+                    placeholder="Type a country"
+                    value={requestProductOrigin || requestProductOriginInput}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setRequestProductOriginInput(value);
+                      setRequestProductOrigin('');
+                      if (value.trim()) {
+                        setIsRequestProductOriginDropdownOpen(true);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (requestProductOriginInput.trim() || !requestProductOrigin) {
+                        setIsRequestProductOriginDropdownOpen(true);
+                      }
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => {
+                        setIsRequestProductOriginDropdownOpen(false);
+                      }, 200);
+                    }}
+                    className="w-full px-3 py-2.5 border rounded-lg focus:outline-none"
                   style={{
                     borderColor: '#E4E4E4',
                     borderRadius: '8px',
                     backgroundColor: '#FFFFFF',
                     minHeight: '32px',
-                    padding: '6px 10px'
-                  }}
-                >
-                  <div className="flex items-center gap-2 flex-wrap flex-1">
-                    {requestProductOrigin ? (
-                      <div
-                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded"
-                        style={{
-                          backgroundColor: '#F1F1F1',
-                          borderRadius: '6px'
-                        }}
-                      >
-                        <span style={{ fontSize: '10px', color: '#6A6A6A' }}>
-                          {requestProductOrigin}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setRequestProductOrigin('');
-                          }}
-                          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                            <path d="M9 3L3 9M3 3l6 6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </button>
-                      </div>
-                    ) : (
-                      <span style={{ color: '#D9D9D9', fontSize: '10px' }}>Choose a location</span>
-                    )}
-                  </div>
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#6A6A6A"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                      padding: '6px 10px',
+                      fontSize: '10px',
+                      fontFamily: 'Poppins, sans-serif',
+                      color: (requestProductOrigin || requestProductOriginInput) ? '#212121' : '#D9D9D9',
+                      paddingRight: '32px'
+                    }}
+                  />
+                  <img
+                    src={arrowDownIcon}
+                    alt="Arrow"
+                    className="absolute right-3 w-3 h-3 transition-transform flex-shrink-0 cursor-pointer"
+                    style={{
+                      transform: isRequestProductOriginDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      pointerEvents: 'none'
+                    }}
+                  />
+                </div>
                 {isRequestProductOriginDropdownOpen && (
                   <div
                     className="absolute z-50 w-full mt-1 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden"
-                    style={{ maxHeight: '200px', overflowY: 'auto' }}
+                        style={{
+                      maxHeight: '200px',
+                      overflowY: 'auto',
+                      borderRadius: '8px'
+                    }}
                   >
-                    {africanCountries.map((country) => (
+                    <style>
+                      {`
+                        .request-origin-dropdown::-webkit-scrollbar {
+                          width: 2px;
+                        }
+                        .request-origin-dropdown::-webkit-scrollbar-track {
+                          background: transparent;
+                        }
+                        .request-origin-dropdown::-webkit-scrollbar-thumb {
+                          background-color: #E4E4E4;
+                          border-radius: 10px;
+                        }
+                      `}
+                    </style>
+                    <div className="request-origin-dropdown py-1">
+                        <button
+                        type="button"
+                        onMouseDown={() => {
+                            setRequestProductOrigin('');
+                          setRequestProductOriginInput('');
+                          setIsRequestProductOriginDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        style={{
+                          backgroundColor: !requestProductOrigin && !requestProductOriginInput ? '#F0F8FE' : 'transparent',
+                          color: !requestProductOrigin && !requestProductOriginInput ? '#64B5F6' : '#6A6A6A',
+                          fontSize: '10px'
+                        }}
+                      >
+                        <img
+                          src={globyIcon}
+                          alt="Globe"
+                          className="w-3 h-3"
+                          style={{
+                            filter: (requestProductOrigin || requestProductOriginInput)
+                              ? 'grayscale(100%) brightness(0.7)'
+                              : 'none'
+                          }}
+                        />
+                        <span>Africa</span>
+                        </button>
+                      {africanCountries
+                        .filter((country) => {
+                          const searchTerm = requestProductOriginInput.toLowerCase().trim();
+                          if (!searchTerm) return true;
+                          return country.name.toLowerCase().includes(searchTerm);
+                        })
+                        .map((country) => (
                       <button
                         key={country.code}
                         type="button"
-                        onClick={() => {
+                            onMouseDown={() => {
                           setRequestProductOrigin(country.name);
+                              setRequestProductOriginInput('');
                           setIsRequestProductOriginDropdownOpen(false);
                         }}
-                        className="w-full text-left px-3 py-2 transition-colors flex items-center gap-2 relative"
+                            className="w-full text-left px-3 py-2 transition-colors flex items-center gap-2 relative hover:bg-gray-50"
                         style={{
-                          color: '#6A6A6A',
+                              color: requestProductOrigin === country.name ? '#64B5F6' : '#6A6A6A',
                           fontSize: '10px',
-                          backgroundColor: 'transparent'
-                        }}
-                      >
-                        <img src={country.flag} alt={country.name} style={{ width: '16px', height: '12px', borderRadius: '4px' }} />
+                              backgroundColor: requestProductOrigin === country.name ? '#F0F8FE' : 'transparent'
+                            }}
+                          >
+                            <img
+                              src={country.flag}
+                              alt={country.name}
+                              className="object-cover rounded-full"
+                              style={{ width: '16px', height: '16px' }}
+                            />
                         <span>{country.name}</span>
                       </button>
                     ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -4355,31 +4899,136 @@ const Home: React.FC = () => {
               <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
                 Product Origin
               </label>
-              <div style={{ position: 'relative' }}>
+              <div style={{ position: 'relative' }} ref={requestProductOriginDropdownRef}>
+                <div className="relative flex items-center w-full">
                 <input
                   type="text"
-                  value={requestProductOrigin}
-                  onChange={(e) => setRequestProductOrigin(e.target.value)}
-                  placeholder="Choose a location"
+                    placeholder="Type a country"
+                    value={requestProductOrigin || requestProductOriginInput}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setRequestProductOriginInput(value);
+                      setRequestProductOrigin('');
+                      if (value.trim()) {
+                        setIsRequestProductOriginDropdownOpen(true);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (requestProductOriginInput.trim() || !requestProductOrigin) {
+                        setIsRequestProductOriginDropdownOpen(true);
+                      }
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => {
+                        setIsRequestProductOriginDropdownOpen(false);
+                      }, 200);
+                    }}
                   style={{
                     width: '100%',
                     padding: '8px 12px',
+                      paddingRight: '36px',
                     borderRadius: '8px',
                     border: '1px solid #E4E4E4',
                     fontSize: '12px',
                     fontFamily: 'Poppins, sans-serif',
                     outline: 'none',
-                    color: requestProductOrigin ? '#212121' : '#D9D9D9'
-                  }}
-                />
-                <svg
-                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px' }}
-                  fill="none"
-                  stroke="#6A6A6A"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                      color: (requestProductOrigin || requestProductOriginInput) ? '#212121' : '#D9D9D9'
+                    }}
+                  />
+                  <img
+                    src={arrowDownIcon}
+                    alt="Arrow"
+                    className="absolute right-3 w-3 h-3 transition-transform flex-shrink-0"
+                    style={{
+                      transform: isRequestProductOriginDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      pointerEvents: 'none'
+                    }}
+                  />
+                </div>
+                {isRequestProductOriginDropdownOpen && (
+                  <div
+                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden"
+                    style={{
+                      maxHeight: '280px',
+                      overflowY: 'auto',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    <style>
+                      {`
+                        .request-origin-dropdown::-webkit-scrollbar {
+                          width: 2px;
+                        }
+                        .request-origin-dropdown::-webkit-scrollbar-track {
+                          background: transparent;
+                        }
+                        .request-origin-dropdown::-webkit-scrollbar-thumb {
+                          background-color: #E4E4E4;
+                          border-radius: 10px;
+                        }
+                      `}
+                    </style>
+                    <div className="request-origin-dropdown py-1">
+                      <button
+                        type="button"
+                        onMouseDown={() => {
+                          setRequestProductOrigin('');
+                          setRequestProductOriginInput('');
+                          setIsRequestProductOriginDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        style={{
+                          backgroundColor: !requestProductOrigin && !requestProductOriginInput ? '#F0F8FE' : 'transparent',
+                          color: !requestProductOrigin && !requestProductOriginInput ? '#64B5F6' : '#6A6A6A',
+                          fontSize: '11px'
+                        }}
+                      >
+                        <img
+                          src={globyIcon}
+                          alt="Globe"
+                          className="w-4 h-4"
+                          style={{
+                            filter: (requestProductOrigin || requestProductOriginInput)
+                              ? 'grayscale(100%) brightness(0.7)'
+                              : 'none'
+                          }}
+                        />
+                        <span>Africa</span>
+                      </button>
+                      {africanCountries
+                        .filter((country) => {
+                          const searchTerm = requestProductOriginInput.toLowerCase().trim();
+                          if (!searchTerm) return true;
+                          return country.name.toLowerCase().includes(searchTerm);
+                        })
+                        .map((country) => (
+                          <button
+                            key={country.code}
+                            type="button"
+                            onMouseDown={() => {
+                              setRequestProductOrigin(country.name);
+                              setRequestProductOriginInput('');
+                              setIsRequestProductOriginDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 transition-colors flex items-center gap-2 relative hover:bg-gray-50"
+                            style={{
+                              color: requestProductOrigin === country.name ? '#64B5F6' : '#6A6A6A',
+                              fontSize: '11px',
+                              backgroundColor: requestProductOrigin === country.name ? '#F0F8FE' : 'transparent'
+                            }}
+                          >
+                            <img
+                              src={country.flag}
+                              alt={country.name}
+                              className="object-cover rounded-full"
+                              style={{ width: '16px', height: '16px' }}
+                            />
+                            <span>{country.name}</span>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -4534,6 +5183,194 @@ const Home: React.FC = () => {
           </div>
         </div>
       ) : null}
+
+      {/* Change Location Bottom Sheet - Mobile Only */}
+      {showChangeLocationModal && isMobile && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center'
+          }}
+          onClick={() => {
+            setShowChangeLocationModal(false);
+            setChangeLocationQuery('');
+            setHoveredLocationSuggestion(null);
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              height: '500px',
+              backgroundColor: '#FFF',
+              borderTopLeftRadius: '20px',
+              borderTopRightRadius: '20px',
+              fontFamily: 'Poppins, sans-serif',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header with background */}
+            <div className="flex items-center justify-between" style={{ padding: '16px 20px', backgroundColor: '#FAFAFA', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }}>
+              <h2 style={{ fontSize: '12px', fontWeight: 600, color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Change location
+              </h2>
+              <button
+                onClick={() => {
+                  setShowChangeLocationModal(false);
+                  setChangeLocationQuery('');
+                  setHoveredLocationSuggestion(null);
+                  setIsChangeLocationInputFocused(false);
+                }}
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  backgroundColor: '#8A8A8A',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0
+                }}
+              >
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
+              {/* Set your location label */}
+              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '8px' }}>
+                Set your location
+              </label>
+
+              {/* Location Input */}
+              <input
+                type="text"
+                value={changeLocationQuery}
+                onChange={(e) => setChangeLocationQuery(e.target.value)}
+                onFocus={() => setIsChangeLocationInputFocused(true)}
+                onBlur={() => setIsChangeLocationInputFocused(false)}
+                placeholder=""
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  border: `1px solid ${isChangeLocationInputFocused ? '#64B5F6' : '#E9E9E9'}`,
+                  fontSize: '12px',
+                  fontFamily: 'Poppins, sans-serif',
+                  outline: 'none',
+                  marginBottom: '16px'
+                }}
+              />
+
+              {/* Location Suggestions List */}
+              {changeLocationQuery.trim() && (
+                <div style={{ marginBottom: '20px' }}>
+                  {locationSuggestions
+                    .filter(location =>
+                      location.toLowerCase().includes(changeLocationQuery.toLowerCase())
+                    )
+                    .slice(0, 5)
+                    .map((location) => (
+                      <button
+                        key={location}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setRequestUserLocation(location);
+                          setShowChangeLocationModal(false);
+                          setChangeLocationQuery('');
+                          setHoveredLocationSuggestion(null);
+                          setIsChangeLocationInputFocused(false);
+                        }}
+                        onMouseEnter={() => setHoveredLocationSuggestion(location)}
+                        onMouseLeave={() => setHoveredLocationSuggestion(null)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          marginBottom: '4px',
+                          backgroundColor: hoveredLocationSuggestion === location ? '#F0F8FE' : 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          textAlign: 'left',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        {/* Location Icon - Same as home page */}
+                        <img
+                          src={locationIcon}
+                          alt="Location"
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            flexShrink: 0,
+                            filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
+                          }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#212121' }}>
+                          {location}
+                        </span>
+                      </button>
+                    ))}
+                </div>
+              )}
+
+            </div>
+
+            {/* Save the location Button */}
+            <div style={{ padding: '20px', paddingTop: '0' }}>
+              <button
+                onClick={() => {
+                  if (changeLocationQuery.trim()) {
+                    const matchingLocation = locationSuggestions.find(loc =>
+                      loc.toLowerCase().includes(changeLocationQuery.toLowerCase())
+                    );
+                    if (matchingLocation) {
+                      setRequestUserLocation(matchingLocation);
+                    }
+                  }
+                  setShowChangeLocationModal(false);
+                  setChangeLocationQuery('');
+                  setHoveredLocationSuggestion(null);
+                  setIsChangeLocationInputFocused(false);
+                }}
+                style={{
+                  width: '100%',
+                  height: '40px',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  backgroundColor: '#F9A825',
+                  color: '#FFF',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: '400'
+                }}
+              >
+                Save the location
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirmation Modal */}
       {showConfirmationModal && (
@@ -5017,9 +5854,34 @@ const Home: React.FC = () => {
           <div className="px-4 pb-3 relative">
             <div className="flex items-center gap-2">
               <div className="flex-1 relative">
+                <div
+                  className="flex items-center w-full px-4 py-3 pr-12"
+                  style={{
+                    borderRadius: '30px',
+                    border: `1px solid ${isMobileSearchFocused ? '#B8DDFB' : '#E9E9E9'}`,
+                    backgroundColor: selectedImage ? '#F1F1F1' : '#FFF',
+                    fontFamily: 'Poppins, sans-serif',
+                    minHeight: '44px'
+                  }}
+                >
+                  {/* Image Thumbnail */}
+                  {selectedImageUrl && (
+                    <img
+                      src={selectedImageUrl}
+                      alt="Selected product"
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        objectFit: 'cover',
+                        marginRight: '12px',
+                        flexShrink: 0
+                      }}
+                    />
+                  )}
                 <input
                   type="text"
-                  placeholder="What are you looking for today ?"
+                    placeholder={selectedImage ? "Wanna be more specific ?" : "What are you looking for today ?"}
                   value={mobileSearchQuery}
                   onChange={(e) => {
                     setMobileSearchQuery(e.target.value);
@@ -5041,11 +5903,10 @@ const Home: React.FC = () => {
                       setShowMobileSearchHistory(false);
                     }, 200);
                   }}
-                  className="w-full px-4 py-3 pr-12 focus:outline-none"
+                    className="flex-1 focus:outline-none"
                   style={{
-                    borderRadius: '30px',
-                    border: `1px solid ${isMobileSearchFocused ? '#B8DDFB' : '#E9E9E9'}`,
-                    backgroundColor: '#FFF',
+                      backgroundColor: 'transparent',
+                      border: 'none',
                     fontFamily: 'Poppins, sans-serif',
                     color: '#212121',
                     caretColor: '#64B5F6',
@@ -5054,13 +5915,14 @@ const Home: React.FC = () => {
                 />
                 <style>
                   {`
-                    input[placeholder="What are you looking for today ?"]::placeholder {
+                      input[placeholder="What are you looking for today ?"]::placeholder,
+                      input[placeholder="Wanna be more specific ?"]::placeholder {
                       font-size: 11px;
                       color: #D9D9D9;
                     }
                   `}
                 </style>
-                {mobileSearchQuery && (
+                  {mobileSearchQuery && !selectedImage && (
                   <button
                     onClick={() => {
                       setMobileSearchQuery('');
@@ -5073,6 +5935,37 @@ const Home: React.FC = () => {
                     <img src={SDicon} alt="Clear" className="w-4 h-4" />
                   </button>
                 )}
+                  {selectedImage ? (
+                    <button
+                      onClick={() => {
+                        setSelectedImage(null);
+                        setSelectedImageUrl(null);
+                        setImageFormData(null);
+                        if (selectedImageUrl) {
+                          URL.revokeObjectURL(selectedImageUrl);
+                        }
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+                      title="Clear image"
+                    >
+                      <div
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '50%',
+                          backgroundColor: '#8A8A8A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </div>
+                    </button>
+                  ) : (
                 <button
                   onClick={handleScan}
                   className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
@@ -5086,6 +5979,8 @@ const Home: React.FC = () => {
                     style={{ opacity: 0.6 }}
                   />
                 </button>
+                  )}
+                </div>
 
               </div>
               <button
@@ -5323,11 +6218,11 @@ const Home: React.FC = () => {
           {/* Country Filter - Show when seller location is applied, but hide when no results */}
           {mobileFilterSellerLocation && mobileSearchSubmitted && (() => {
             // Check if there are search results
-            let products: FrontendProduct[] = [];
+            let products = [];
             if (activeCategory === 'All') {
               products = Object.values(allProductsComputed).flat();
             } else {
-              products = allProductsComputed[activeCategory] || [];
+              products = allProductsComputed[activeCategory as keyof typeof allProductsComputed] || [];
             }
 
             if (selectedCountry) {
@@ -5444,11 +6339,11 @@ const Home: React.FC = () => {
           {/* Category and Country Filters - Show when no filters applied and search is submitted, but hide when no results */}
           {!mobileFilterCategory && !mobileFilterProductOrigin && !mobileFilterSellerLocation && mobileSearchSubmitted && (() => {
             // Check if there are search results
-            let products: FrontendProduct[] = [];
+            let products = [];
             if (activeCategory === 'All') {
               products = Object.values(allProductsComputed).flat();
             } else {
-              products = allProductsComputed[activeCategory] || [];
+              products = allProductsComputed[activeCategory as keyof typeof allProductsComputed] || [];
             }
 
             if (selectedCountry) {
@@ -5596,15 +6491,15 @@ const Home: React.FC = () => {
 
           {/* Search Results or Empty State */}
           <div className="flex-1 overflow-y-auto px-4 pb-24">
-            {mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && (
+            {mobileSearchSubmitted && (mobileSearchQuery.trim() !== '' || selectedImage) && (
               <>
                 {(() => {
                   // Get all products
-                  let products: FrontendProduct[] = [];
+                  let products = [];
                   if (activeCategory === 'All') {
                     products = Object.values(allProductsComputed).flat();
                   } else {
-                    products = allProductsComputed[activeCategory] || [];
+                    products = allProductsComputed[activeCategory as keyof typeof allProductsComputed] || [];
                   }
 
                   // Apply country filter if selected
@@ -5628,9 +6523,31 @@ const Home: React.FC = () => {
                   const filteredProducts = products.filter(product => {
                     const query = mobileSearchQuery.toLowerCase().trim();
                     const productCategory = getProductCategory(product.id);
-                    const matchesSearch = product.name.toLowerCase().includes(query) ||
+
+                    // If image is selected, API will handle similarity matching
+                    // For now, if image is selected and no other filters, show empty results to demonstrate no results state
+                    // When API is integrated, replace this with actual API results
+                    // Example: const apiResults = await fetch('/api/search-by-image', { method: 'POST', body: imageFormData });
+                    // Then filter products to only include those in apiResults
+                    let matchesSearch = false;
+                    if (selectedImage) {
+                      // In production, this will be replaced with actual API results
+                      // For now, if no filters are applied, simulate no results
+                      // When API returns empty results, filteredProducts will be empty and no results state will show
+                      if (mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) {
+                        // If filters are applied, show products matching those filters
+                        matchesSearch = true;
+                      } else {
+                        // Simulate: if no filters, no results (API will handle this in production)
+                        // In production, this will be: matchesSearch = apiResults.includes(product.id);
+                        matchesSearch = false; // Simulate no results for image search
+                      }
+                    } else {
+                      // Text search
+                      matchesSearch = product.name.toLowerCase().includes(query) ||
                       productCategory.toLowerCase().includes(query) ||
                       product.location.toLowerCase().includes(query);
+                    }
 
                     const matchesCategory = !mobileFilterCategory || productCategory === mobileFilterCategory;
                     const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.origin).name === mobileFilterProductOrigin;
@@ -5661,7 +6578,10 @@ const Home: React.FC = () => {
                             margin: '0 auto 12px',
                             lineHeight: '1.5'
                           }}>
-                            Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
+                            {selectedImage
+                              ? "We couldn't find similar products. Don't worry, just ask for it and we will bring it for you."
+                              : "Can't find what you're looking for? don't worry, just ask for it and we will bring it for you."
+                            }
                           </p>
                           <button
                             type="button"
@@ -5707,8 +6627,8 @@ const Home: React.FC = () => {
 
                           {/* Product Cards */}
                           <div className="grid grid-cols-2 gap-3">
-                            {Object.values(allProductsComputed).flat().slice(0, 6).map((product: FrontendProduct) => (
-                              <Link key={product.id} to={`/product/${product.id}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
+                            {Object.values(allProductsComputed).flat().slice(0, 6).map((product) => (
+                              <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group cursor-pointer">
                                 {/* Product Image - Top */}
                                 <div className="aspect-square relative overflow-hidden mb-1" style={{ borderRadius: '10px' }}>
                                   <img
@@ -5732,7 +6652,7 @@ const Home: React.FC = () => {
                                     left: '6px'
                                   }}>
                                     <img
-                                      src={getProductCountry(product.origin).flag}
+                                      src={`https://flagcdn.com/w20/${getProductCountry(product.origin).code}.png`}
                                       alt={getProductCountry(product.origin).name}
                                       className="rounded-full"
                                       style={{
@@ -5826,7 +6746,7 @@ const Home: React.FC = () => {
                                     </button>
                                   </div>
                                 </div>
-                              </Link>
+                              </div>
                             ))}
                           </div>
                         </div>
@@ -5838,7 +6758,10 @@ const Home: React.FC = () => {
                     <>
                       <div className="pb-3">
                         <h2 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', color: '#212121', fontWeight: 500 }}>
-                          Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'})</span>
+                          {selectedImage
+                            ? <>Search results for similar products <span style={{ fontWeight: 400 }}>({filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'})</span></>
+                            : <>Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'})</span></>
+                          }
                         </h2>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
@@ -5975,13 +6898,13 @@ const Home: React.FC = () => {
           </div>
 
           {/* Bottom Search Button */}
-          {(!mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchQuery.trim() === '')) && (
+          {(!mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchQuery.trim() === '' && !selectedImage)) && (
             <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 bg-white" style={{ borderTop: '1px solid #E9E9E9' }}>
               <button
                 type="button"
                 className="w-full py-3 rounded-xl"
                 style={{
-                  backgroundColor: mobileSearchQuery.trim() ? '#F9A825' : '#D9D9D9',
+                  backgroundColor: (mobileSearchQuery.trim() || selectedImage) ? '#F9A825' : '#D9D9D9',
                   color: '#FFFFFF',
                   border: 'none',
                   fontSize: '14px',
@@ -5990,8 +6913,12 @@ const Home: React.FC = () => {
                   cursor: 'pointer'
                 }}
                 onClick={() => {
-                  if (mobileSearchQuery.trim()) {
+                  if (mobileSearchQuery.trim() || selectedImage) {
                     setMobileSearchSubmitted(true);
+                    // Trigger search with image if available
+                    if (selectedImage) {
+                      handleSearch();
+                    }
                   }
                 }}
               >

@@ -1069,12 +1069,13 @@ const ProductDetail: React.FC = () => {
       const primaryImage = imageUrls.length > 0 ? imageUrls[0] : null;
 
       // Call backend to create or get a conversation
+      // Note: We don't send initialMessage here - it will be sent when user clicks send
       const response = await axios.post(
         `${API_BASE}/chat/conversations`,
         {
           participantId: product.seller.id,
           productId: product.id,
-          initialMessage: `Hi, I'm interested in your product "${product.title}". Is it still available please?`,
+          // initialMessage removed - message will only be sent when user clicks send
           productData: {
             id: product.id,
             name: product.title,

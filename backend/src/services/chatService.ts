@@ -459,6 +459,23 @@ export class ChatService {
                 // Get user's metadata if exists
                 const userMetadata = message.metadata?.find((m: any) => m.userId === userId);
 
+                // Extract voice message properties from productData if present
+                let voiceDuration = null;
+                let waveformData = null;
+                if (parsedProductData && typeof parsedProductData === 'object') {
+                    voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
+                    waveformData = parsedProductData._waveformData || parsedProductData.waveformData || null;
+                    // Clean up temporary voice properties from productData
+                    if (parsedProductData._voiceDuration || parsedProductData._waveformData) {
+                        delete parsedProductData._voiceDuration;
+                        delete parsedProductData._waveformData;
+                        // If productData is now empty, set to null
+                        if (Object.keys(parsedProductData).length === 0) {
+                            parsedProductData = null;
+                        }
+                    }
+                }
+
                 return {
                     ...message,
                     content: plainText,
@@ -468,6 +485,9 @@ export class ChatService {
                     fileSize: message.fileSize,
                     imageUrl: message.imageUrl,
                     audioUrl: message.audioUrl,
+                    // Include voice message properties
+                    duration: voiceDuration || message.duration || null,
+                    waveformData: waveformData || message.waveformData || null,
                     reaction: userReaction?.reaction || null,
                     reactions: message.reactions || [],
                     isPinned: userMetadata?.isPinned || false,
@@ -478,6 +498,14 @@ export class ChatService {
                 };
 
             } catch (error) {
+                // Extract voice message properties from productData even on error
+                let voiceDuration = null;
+                let waveformData = null;
+                if (parsedProductData && typeof parsedProductData === 'object') {
+                    voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
+                    waveformData = parsedProductData._waveformData || parsedProductData.waveformData || null;
+                }
+                
                 return {
                     ...message,
                     content: '[Secure message - decryption failed]',
@@ -488,6 +516,9 @@ export class ChatService {
                     fileSize: message.fileSize,
                     imageUrl: message.imageUrl,
                     audioUrl: message.audioUrl,
+                    // Include voice message properties
+                    duration: voiceDuration || message.duration || null,
+                    waveformData: waveformData || message.waveformData || null,
                     reaction: null,
                     reactions: [],
                     isPinned: false,

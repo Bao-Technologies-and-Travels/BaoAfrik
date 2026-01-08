@@ -14,10 +14,7 @@ import moneyIcon from '../assets/images/pre/money.svg';
 import bulletIcon from '../assets/images/pre/bullet.svg';
 import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 import backArrowIcon from '../assets/images/pre/back arrow.svg';
-import statusIcon from '../assets/images/pre/status.svg';
 import lilLogo from '../assets/images/pre/lil.png';
-import activeIcon from '../assets/images/pre/active.svg';
-import inactiveIcon from '../assets/images/pre/inactive.svg';
 import locationIcon from '../assets/images/pre/PL.svg';
 import closeIcon from '../assets/images/pre/CLose.svg';
 import redtrashIcon from '../assets/images/pre/redtrash.svg';
@@ -60,7 +57,7 @@ const mapFrontendStatusToBackend = (frontendStatus: Request['status']): string =
         'pending': 'PENDING',
         'completed': 'FULFILLED',
         'expired': 'REJECTED',
-        'ongoing': 'PENDING' // Map ongoing to PENDING for now
+        'ongoing': 'ONGOING'
     };
     return statusMap[frontendStatus] || 'PENDING';
 };
@@ -256,7 +253,6 @@ const MyRequests: React.FC = () => {
     const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
     const moreOptionsRef = useRef<HTMLDivElement | null>(null);
     const [statusModalOpenFor, setStatusModalOpenFor] = useState<string | null>(null);
-    const statusModalRef = useRef<HTMLDivElement | null>(null);
     const [viewRequestModalOpen, setViewRequestModalOpen] = useState(false);
     const [selectedRequestForView, setSelectedRequestForView] = useState<Request | null>(null);
     const [requestToDelete, setRequestToDelete] = useState<Request | null>(null);
@@ -297,7 +293,8 @@ const MyRequests: React.FC = () => {
                     return;
                 }
 
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/requests`, {
+                // Fetch only the current user's requests
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/requests?userId=${user.id}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -326,9 +323,9 @@ const MyRequests: React.FC = () => {
                         const createdAt = req.createdAt ? new Date(req.createdAt).getTime() : Date.now();
                         return {
                             id: req.id,
-                            productName: req.productName || 'Untitled Request',
+                            productName: req.productName || '',
                             createdAt,
-                            sellerLocation: req.sellerLocation || 'Location not specified',
+                            sellerLocation: req.sellerLocation || '',
                             origin: req.origin || '',
                             minPrice: req.minPrice,
                             maxPrice: req.maxPrice,
@@ -469,7 +466,7 @@ const MyRequests: React.FC = () => {
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            const target = event.target as Node;
+            const target = event.target as HTMLElement;
 
             if (statusDropdownRef.current && !statusDropdownRef.current.contains(target)) {
                 setIsStatusDropdownOpen(false);
@@ -481,15 +478,33 @@ const MyRequests: React.FC = () => {
             if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
                 setMoreOptionsOpenFor(null);
             }
-            if (statusModalRef.current && !statusModalRef.current.contains(target)) {
-                setStatusModalOpenFor(null);
+            // Check if click is outside any status modal
+            if (statusModalOpenFor) {
+                const statusBadgeElement = document.querySelector(`[data-status-badge-id="${statusModalOpenFor}"]`);
+                const statusModalElement = statusBadgeElement?.querySelector('[data-status-modal="true"]');
+                // Check if click is inside the status badge container or its modal dropdown
+                const isInsideStatusBadge = statusBadgeElement && statusBadgeElement.contains(target);
+                const isInsideModal = statusModalElement && statusModalElement.contains(target);
+                // Check if the clicked button is inside the status modal
+                const clickedButton = target.closest('button');
+                const isButtonInModal = clickedButton && statusModalElement && statusModalElement.contains(clickedButton);
+                // Only close if click is outside AND not on a button inside the modal
+                if (!isInsideStatusBadge && !isInsideModal && !isButtonInModal) {
+                    setStatusModalOpenFor(null);
+                }
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+        const handleClickOutsideDelayed = (event: MouseEvent) => {
+            setTimeout(() => {
+                handleClickOutside(event);
+            }, 0);
+        };
+        document.addEventListener('click', handleClickOutsideDelayed);
+        return () => document.removeEventListener('click', handleClickOutsideDelayed);
+    }, [statusModalOpenFor]);
 
+    // mobile detection
     useEffect(() => {
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 1024);
@@ -547,7 +562,6 @@ const MyRequests: React.FC = () => {
             }
 
             const result = await response.json();
-            // Backend returns the request object directly, not wrapped
             const updatedRequest = result.data || result;
 
             // Update local state
@@ -601,12 +615,21 @@ const MyRequests: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to delete request');
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error || errorData.message || 'Failed to delete request';
+                throw new Error(errorMessage);
             }
 
             setIsDeleteSuccess(true);
             // Update local state
             setRequests((prev) => prev.filter((request) => request.id !== requestToDelete.id));
+
+            addToast({
+                type: 'success',
+                title: 'Request Deleted',
+                message: 'Request has been deleted successfully',
+                duration: 2000
+            });
         } catch (error: any) {
             console.error('Error deleting request:', error);
             addToast({
@@ -639,13 +662,8 @@ const MyRequests: React.FC = () => {
         const isModalOpen = statusModalOpenFor === requestId;
 
         return (
-            <div style={{ position: 'relative' }} ref={statusModalRef}>
-                <button
-                    type="button"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setStatusModalOpenFor(isModalOpen ? null : requestId);
-                    }}
+            <div style={{ position: 'relative' }} className="status-modal-container">
+                <div
                     className="inline-flex items-center gap-1 px-2.5 rounded-full"
                     style={{
                         backgroundColor: config.bgColor,
@@ -653,10 +671,7 @@ const MyRequests: React.FC = () => {
                         borderRadius: '8px',
                         paddingTop: '4px',
                         paddingBottom: '6px',
-                        height: '24px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif'
+                        height: '24px'
                     }}
                 >
                     <span
@@ -667,10 +682,28 @@ const MyRequests: React.FC = () => {
                     >
                         {config.text}
                     </span>
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                </button>
+                    <button
+                        type="button"
+                        className="status-modal-button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setStatusModalOpenFor(isModalOpen ? null : requestId);
+                        }}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </button>
+                </div>
                 {isModalOpen && (
                     <div
                         style={{
@@ -684,8 +717,7 @@ const MyRequests: React.FC = () => {
                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                             padding: '4px',
                             width: '100px',
-                            zIndex: 10000,
-                            isolation: 'isolate',
+                            zIndex: 1000,
                             display: 'flex',
                             flexDirection: 'column',
                             gap: '2px'
@@ -782,7 +814,6 @@ const MyRequests: React.FC = () => {
         };
 
         const config = statusConfig[request.status];
-        const defaultDescription = 'Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste.';
         const isStatusModalOpen = statusModalOpenFor === request.id;
         const isMoreOptionsOpen = moreOptionsOpenFor === request.id;
 
@@ -941,6 +972,7 @@ const MyRequests: React.FC = () => {
                                     </div>
                                 )}
                             </div>
+
                             {/* More Options Button */}
                             <div style={{ position: 'relative' }}>
                                 <button
@@ -1096,13 +1128,8 @@ const MyRequests: React.FC = () => {
                         </span>
                         <div className="flex items-center gap-2" style={{ position: 'relative' }}>
                             {/* Status Badge with Arrow */}
-                            <div style={{ position: 'relative' }} ref={statusModalRef}>
-                                <button
-                                    type="button"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
-                                    }}
+                            <div style={{ position: 'relative' }} className="status-modal-container">
+                                <div
                                     className="inline-flex items-center gap-1 px-2 rounded-full"
                                     style={{
                                         backgroundColor: config.bgColor,
@@ -1110,10 +1137,7 @@ const MyRequests: React.FC = () => {
                                         borderRadius: '8px',
                                         paddingTop: '3px',
                                         paddingBottom: '4px',
-                                        height: '20px',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        fontFamily: 'Poppins, sans-serif'
+                                        height: '20px'
                                     }}
                                 >
                                     <span
@@ -1124,13 +1148,32 @@ const MyRequests: React.FC = () => {
                                     >
                                         {config.text}
                                     </span>
-                                    <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </button>
+                                    <button
+                                        type="button"
+                                        className="status-modal-button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
+                                        }}
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            padding: 0,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </button>
+                                </div>
                                 {/* Status Modal */}
                                 {isStatusModalOpen && (
                                     <div
+                                        className="status-modal-dropdown"
                                         onClick={(e) => e.stopPropagation()}
                                         style={{
                                             position: 'absolute',
@@ -1222,6 +1265,7 @@ const MyRequests: React.FC = () => {
                                     </div>
                                 )}
                             </div>
+
                             {/* More Options Button */}
                             <div style={{ position: 'relative' }} ref={moreOptionsRef}>
                                 <button
@@ -1380,9 +1424,11 @@ const MyRequests: React.FC = () => {
                 </div>
 
                 {/* Description */}
-                <p className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '7px' : '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
-                    {request.description || defaultDescription}
-                </p>
+                {request.description && (
+                    <p className="mb-3 sm:mb-4" style={{ fontSize: isMobile ? '7px' : '10px', color: '#6A6A6A', lineHeight: '1.5', fontWeight: 'normal' }}>
+                        {request.description}
+                    </p>
+                )}
 
                 {/* Tags and Status Badge Row - Desktop/Tablet */}
                 {!isMobile && (
@@ -2442,7 +2488,7 @@ const MyRequests: React.FC = () => {
                     </div>
 
                     {/* Filters and Sort - Desktop */}
-                    {!isMobile && (!shouldShowEmptyState && !isSearchNoResultsState) && (
+                    {!isMobile && totalRequests > 0 && (
                         <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-6 mb-6">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 w-full">
                                 {/* Left Side - Filters */}
@@ -2905,12 +2951,14 @@ const MyRequests: React.FC = () => {
                                         </h2>
 
                                         {/* Description */}
-                                        <p
-                                            className="text-xs text-center mb-5"
-                                            style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
-                                        >
-                                            Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!
-                                        </p>
+                                        {selectedRequestForView.description && (
+                                            <p
+                                                className="text-xs text-center mb-5"
+                                                style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+                                            >
+                                                {selectedRequestForView.description}
+                                            </p>
+                                        )}
 
                                         {/* Three Badges - Centered */}
                                         <div className="flex flex-col items-center gap-2 mb-5">
@@ -3103,12 +3151,14 @@ const MyRequests: React.FC = () => {
                                     </h2>
 
                                     {/* Description */}
-                                    <p
-                                        className="text-xs text-center mb-5"
-                                        style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
-                                    >
-                                        Spread the joy! This innovative product is sure to bring smiles to your friends and family. Share the excitement today!
-                                    </p>
+                                    {selectedRequestForView.description && (
+                                        <p
+                                            className="text-xs text-center mb-5"
+                                            style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', lineHeight: '1.5' }}
+                                        >
+                                            {selectedRequestForView.description}
+                                        </p>
+                                    )}
 
                                     {/* Three Badges - Centered */}
                                     <div className="flex flex-col items-center gap-2 mb-5">

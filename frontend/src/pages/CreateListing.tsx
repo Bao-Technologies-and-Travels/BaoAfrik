@@ -24,14 +24,12 @@ import groupIcon from '../assets/images/pre/group.svg';
 import frameIcon from '../assets/images/pre/frame.svg';
 import podsIcon from '../assets/images/pre/pods.svg';
 import settingIcon from '../assets/images/pre/setting.svg';
-import pathIcon from '../assets/images/pre/Path.svg';
-import path2Icon from '../assets/images/pre/path2.svg';
+
 import loadIcon from '../assets/images/pre/load.svg';
 import a1 from '../assets/images/pre/a1.png';
-import a2 from '../assets/images/pre/a2.png';
-import a3 from '../assets/images/pre/a3.png';
-import a4 from '../assets/images/pre/a4.png';
+
 import verityIcon from '../assets/images/pre/verity.svg';
+import redtrashIcon from '../assets/images/pre/redtrash.svg';
 import avatar from "../assets/images/logos/avatar.png";
 import logoIcon from "../assets/images/logos/ba-brand-icon-colored.png";
 import messageAvatarIcon from '../assets/images/pre/main.png';
@@ -121,6 +119,8 @@ const CreateListing: React.FC = () => {
   const { user } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+  const [draftToDelete, setDraftToDelete] = useState<DraftListing | null>(null);
+  const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
 
   const ukCities = [
     'London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool',
@@ -666,10 +666,17 @@ const CreateListing: React.FC = () => {
     setIsDraftsModalOpen(false);
   };
 
-  const handleDraftDelete = async (draftId: string) => {
+  const handleDraftDelete = (draft: DraftListing) => {
+    setDraftToDelete(draft);
+    setIsDeleteSuccess(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!draftToDelete) return;
+
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${draftId}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${draftToDelete.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -679,12 +686,18 @@ const CreateListing: React.FC = () => {
         return;
       }
 
-      setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
+      setIsDeleteSuccess(true);
+      setDraftListings((prev) => prev.filter((draft) => draft.id !== draftToDelete.id));
       addToast({ type: 'success', title: 'Deleted', message: 'Draft deleted successfully', duration: 2000 });
     } catch (e) {
       console.error('Delete draft error', e);
       addToast({ type: 'error', title: 'Error', message: 'Failed to delete draft', duration: 2000 });
     }
+  };
+
+  const handleDeleteClose = () => {
+    setDraftToDelete(null);
+    setIsDeleteSuccess(false);
   };
 
   const validateImageFile = (file: File): { valid: boolean; message?: string } => {
@@ -1019,7 +1032,6 @@ const CreateListing: React.FC = () => {
       }
 
       if (result.success) {
-        // Use editingDraftId if it exists, otherwise use response ID or URL param id
         const productId = editingDraftId || result.data.id || id;
         const savedProduct = result.data;
 
@@ -1454,6 +1466,7 @@ const CreateListing: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // synce drafts from localStorage
   useEffect(() => {
     const stateDraft = (routerLocation.state as { draft?: Record<string, string> } | null)?.draft;
 
@@ -1531,7 +1544,7 @@ const CreateListing: React.FC = () => {
                 backgroundColor: '#FFE9E9',
                 flexShrink: 0
               }}
-              onClick={() => handleDraftDelete(draft.id)}
+              onClick={() => handleDraftDelete(draft)}
             >
               <img
                 src={trashIcon}
@@ -1721,9 +1734,7 @@ const CreateListing: React.FC = () => {
                       paddingTop: '4px',
                       paddingBottom: '4px'
                     }}
-                    onClick={() => {
-                      setDraftListings((prev) => prev.filter((d) => d.id !== draft.id));
-                    }}
+                    onClick={() => handleDraftDelete(draft)}
                   >
                     <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
                   </button>
@@ -1918,9 +1929,7 @@ const CreateListing: React.FC = () => {
           box-shadow: none !important;
         }
       `}</style>
-      {/* continue here */}
 
-      {/* <Header /> */}
       <header className="hidden lg:block flex-shrink-0 rounded-t-2xl" style={{ backgroundColor: '#F5F5F5' }}>
         <div className="max-w-7xl mx-auto px-1 sm:px-2 lg:px-3">
           <div className="flex items-center justify-between h-16">
@@ -4876,6 +4885,321 @@ const CreateListing: React.FC = () => {
           </div>
         </>
       )}
+
+      {/* Delete Confirmation Modal */}
+      {draftToDelete && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={handleDeleteClose}
+          />
+          {isMobile ? (
+            // Mobile: Bottom sheet
+            <div className="fixed inset-0 z-50 flex items-end justify-center p-4">
+              <div
+                className="bg-white relative w-full"
+                style={{
+                  borderRadius: '30px',
+                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                  maxWidth: '420px',
+                  maxHeight: '90vh',
+                  overflowY: 'auto'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="pt-8 px-5 pb-8 relative">
+                  {/* Close Button */}
+                  <button
+                    type="button"
+                    onClick={handleDeleteClose}
+                    className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+
+                  {isDeleteSuccess ? (
+                    <>
+                      {/* Success Icon */}
+                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                        <img
+                          src={verityIcon}
+                          alt="Success"
+                          style={{ width: '80px', height: '80px' }}
+                        />
+                      </div>
+
+                      {/* Success Text */}
+                      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                        <p
+                          style={{
+                            color: '#212121',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            fontSize: '16px',
+                            lineHeight: '1.5',
+                            margin: 0
+                          }}
+                        >
+                          The draft "{draftToDelete.title}" has been successfully removed.
+                        </p>
+                      </div>
+
+                      {/* Close Button */}
+                      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                        <button
+                          type="button"
+                          onClick={handleDeleteClose}
+                          style={{
+                            backgroundColor: '#F9A825',
+                            borderRadius: '12px',
+                            border: 'none',
+                            padding: isMobile ? '8px 120px' : '10px 140px',
+                            cursor: 'pointer',
+                            color: '#FFFFFF',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: isMobile ? '13px' : '14px',
+                            fontWeight: 300
+                          }}
+                        >
+                          Close
+                        </button>
+                      </div>
+
+                      {/* Drag Indicator at far bottom */}
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        paddingBottom: '8px',
+                        paddingTop: '4px'
+                      }}>
+                        <div style={{
+                          width: '80px',
+                          height: '4px',
+                          backgroundColor: '#D9D9D9',
+                          borderRadius: '2px'
+                        }} />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Delete Icon */}
+                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                        <img
+                          src={redtrashIcon}
+                          alt="Delete"
+                          style={{ width: '80px', height: '80px' }}
+                        />
+                      </div>
+
+                      {/* Title */}
+                      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                        <p
+                          style={{
+                            color: '#212121',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            fontSize: '16px',
+                            lineHeight: '1.5',
+                            margin: 0,
+                            fontWeight: 600
+                          }}
+                        >
+                          The draft "{draftToDelete.title}" will be<br />
+                          permanently deleted, do you<br />
+                          wish to continue ?
+                        </p>
+                      </div>
+
+                      {/* Buttons */}
+                      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '20px' }}>
+                        <button
+                          type="button"
+                          onClick={handleDeleteClose}
+                          style={{
+                            backgroundColor: '#F1F1F1',
+                            borderRadius: '12px',
+                            border: 'none',
+                            padding: isMobile ? '6px 40px' : '8px 48px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}
+                        >
+                          <svg width={isMobile ? "14" : "16"} height={isMobile ? "14" : "16"} viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                          </svg>
+                          <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '13px' : '14px' }}>Cancel</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleConfirmDelete}
+                          style={{
+                            backgroundColor: '#FF5151',
+                            borderRadius: '12px',
+                            border: 'none',
+                            padding: isMobile ? '6px 40px' : '8px 48px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}
+                        >
+                          <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px', filter: 'brightness(0) invert(1)' }} />
+                          <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '13px' : '14px' }}>Delete</span>
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Desktop: Centered Modal
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div
+                className="bg-white relative rounded-[30px] p-8 max-w-[420px] w-full"
+                style={{
+                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={handleDeleteClose}
+                  className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+
+                {isDeleteSuccess ? (
+                  <>
+                    {/* Success Icon */}
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                      <img
+                        src={verityIcon}
+                        alt="Success"
+                        style={{ width: '80px', height: '80px' }}
+                      />
+                    </div>
+
+                    {/* Success Text */}
+                    <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                      <p
+                        style={{
+                          color: '#212121',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '16px',
+                          lineHeight: '1.5',
+                          margin: 0
+                        }}
+                      >
+                        The draft "{draftToDelete.title}" has been successfully removed.
+                      </p>
+                    </div>
+
+                    {/* Close Button */}
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                      <button
+                        type="button"
+                        onClick={handleDeleteClose}
+                        style={{
+                          backgroundColor: '#F9A825',
+                          borderRadius: '12px',
+                          border: 'none',
+                          padding: '10px 140px',
+                          cursor: 'pointer',
+                          color: '#FFFFFF',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '14px',
+                          fontWeight: 300
+                        }}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Delete Icon */}
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                      <img
+                        src={redtrashIcon}
+                        alt="Delete"
+                        style={{ width: '80px', height: '80px' }}
+                      />
+                    </div>
+
+                    {/* Title */}
+                    <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                      <p
+                        style={{
+                          color: '#212121',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '16px',
+                          lineHeight: '1.5',
+                          margin: 0,
+                          fontWeight: 600
+                        }}
+                      >
+                        The draft "{draftToDelete.title}" will be<br />
+                        permanently deleted, do you<br />
+                        wish to continue ?
+                      </p>
+                    </div>
+
+                    {/* Buttons */}
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '20px' }}>
+                      <button
+                        type="button"
+                        onClick={handleDeleteClose}
+                        style={{
+                          backgroundColor: '#F1F1F1',
+                          borderRadius: '12px',
+                          border: 'none',
+                          padding: '8px 48px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                        <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleConfirmDelete}
+                        style={{
+                          backgroundColor: '#FF5151',
+                          borderRadius: '12px',
+                          border: 'none',
+                          padding: '8px 48px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) invert(1)' }} />
+                        <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Delete</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
       {renderDraftsModal()}
     </div>
   );

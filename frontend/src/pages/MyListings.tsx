@@ -3040,7 +3040,7 @@ const MyListings: React.FC = () => {
                         )}
 
                         {/* Filters and Action Buttons Bar - Desktop only */}
-                        {!isMobile && (!shouldShowEmptyState && !isSearchNoResultsState) && (
+                        {!isMobile && (totalListings > 0) && (
                             <div className="max-w-6xl mx-auto w-full pl-0 pr-0 mt-6 mb-6">
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pl-0 lg:pl-0 lg:-ml-16 w-full">
                                     {/* Left Side - Filters */}

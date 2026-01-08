@@ -505,19 +505,39 @@ export class WebSocketService {
         normalizedProductData = data.productData;
       }
 
-      // Store all files in productData as metadata (temporary solution)
-      // In a real implementation, you might want a separate filesData field
+      // Determine message type: VOICE if messageType is VOICE, FILE if has files, otherwise use provided messageType or TEXT
+      let finalMessageType = messageType || 'TEXT';
+      if (messageType === 'VOICE') {
+        finalMessageType = 'VOICE';
+      } else if (hasFiles) {
+        finalMessageType = 'FILE';
+      }
+
+
+      if (finalMessageType === 'VOICE' && (data.voiceDuration || data.waveformData)) {
+        if (!normalizedProductData) {
+          normalizedProductData = {};
+        }
+        if (data.voiceDuration) {
+          normalizedProductData._voiceDuration = data.voiceDuration;
+        }
+        if (data.waveformData) {
+          normalizedProductData._waveformData = data.waveformData;
+        }
+      }
+
       if (allFiles.length > 1 && normalizedProductData) {
         normalizedProductData._files = allFiles;
       } else if (allFiles.length > 1) {
         normalizedProductData = { _files: allFiles };
       }
 
+      
       const message = await this.chatService.sendMessage({
         content: content || '', // Allow empty content if files are present
         conversationId,
         senderId,
-        messageType: hasFiles ? 'FILE' : messageType,
+        messageType: finalMessageType,
         fileUrl: finalFileUrl,
         fileName: finalFileName,
         fileSize: finalFileSize,
@@ -554,7 +574,7 @@ export class WebSocketService {
       }
 
       // Prepare the message response with all files
-      const messageResponse = {
+      const messageResponse: any = {
         ...message,
         tempId,
         status: 'DELIVERED',
@@ -571,6 +591,17 @@ export class WebSocketService {
         } : null,
         productData: parsedProductData
       };
+      
+      // Include voice message properties if this is a voice message
+      if (finalMessageType === 'VOICE' && data.voiceDuration) {
+        messageResponse.type = 'voice';
+        messageResponse.duration = data.voiceDuration;
+        messageResponse.waveformData = data.waveformData || [];
+        // Set audioUrl from files if available
+        if (allFiles.length > 0 && allFiles[0].fileUrl) {
+          messageResponse.audioUrl = allFiles[0].fileUrl;
+        }
+      }
 
       // Find all participants except sender
       const participants = (conversation.participants || []).map((p: any) => p.user).filter(Boolean);
@@ -694,12 +725,23 @@ export class WebSocketService {
         conversationId,
         userId
       });
-      // Notify other participants
-      socket.to(conversationId).emit('messages_read', {
+      
+      // Broadcast to all participants in the conversation room
+      this.io.to(`conversation:${conversationId}`).emit('messages_read', {
         messageIds,
         conversationId,
         readBy: userId
       });
+      
+      // Also send status updates for each message to mark as read
+      for (const messageId of messageIds) {
+        this.io.to(`conversation:${conversationId}`).emit('message_status_updated', {
+          messageId,
+          conversationId,
+          status: 'READ',
+          updatedAt: new Date()
+        });
+      }
     } catch (error) {
       console.error('Error marking messages as read:', error);
       socket.emit('error', { message: 'Failed to mark messages as read' });

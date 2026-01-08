@@ -256,11 +256,12 @@ export class ChatController {
             const finalProductData = requestProductData || productData;
 
             // Create conversation
+            // Only pass initialMessage if provided - message will be sent when user clicks send
             const conversation = await this.chatService.createConversation({
                 creatorId: buyerId,
                 participantId: product.seller.id,
                 productId: product.id,
-                initialMessage: initialMessage || `Hi, I'm interested in your product "${product.title}". Is it still available?`,
+                initialMessage: initialMessage, // Only send if explicitly provided
                 productData: finalProductData
             });
 

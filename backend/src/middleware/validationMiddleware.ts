@@ -433,7 +433,7 @@ export const createRequestValidation = [
 ];
 export const updateRequestValidation = [
   param('id').isUUID().withMessage('Invalid request ID'),
-  body('status').optional().isIn(['PENDING', 'FULFILLED', 'REJECTED']).withMessage('Invalid status'),
+  body('status').optional().isIn(['PENDING', 'FULFILLED', 'REJECTED', 'ONGOING']).withMessage('Invalid status'),
   body('productName').optional().trim().notEmpty().withMessage('Product name cannot be empty'),
   body('description').optional().trim().notEmpty().withMessage('Description cannot be empty'),
   body('origin').optional().trim().notEmpty().withMessage('Origin cannot be empty'),
@@ -446,7 +446,7 @@ export const requestIdValidation = [
   param('id').isUUID().withMessage('Invalid request ID')
 ];
 export const getRequestsValidation = [
-  query('status').optional().isIn(['PENDING', 'FULFILLED', 'REJECTED']).withMessage('Invalid status'),
+  query('status').optional().isIn(['PENDING', 'FULFILLED', 'REJECTED', 'ONGOING']).withMessage('Invalid status'),
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100')
 ];

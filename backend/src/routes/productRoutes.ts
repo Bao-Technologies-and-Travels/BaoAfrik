@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ProductController } from '../controllers/productController';
-import { body, param, query } from 'express-validator';
+import { body } from 'express-validator';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { validateCreateProduct, validateUpdateProduct } from '@/middleware/validationMiddleware';
 
@@ -12,10 +12,16 @@ router.post('/', authenticateToken, validateCreateProduct, productController.cre
 router.get('/my-products', authenticateToken, productController.getUserProducts);
 router.get('/user/:userId', productController.getUserProductsPublic);
 router.post('/search', productController.getProducts);
+
+// Bookmark/Save routes - must come before /:id routes
+router.get('/saved', authenticateToken, productController.getSavedProducts);
+router.post('/:id/save', authenticateToken, productController.toggleSaveProduct);
+router.get('/:id/saved', authenticateToken, productController.checkProductSaved);
+
+// Product CRUD routes - parameterized routes must come last
 router.get('/:id', productController.getProduct);
 router.put('/:id', authenticateToken, validateUpdateProduct, productController.updateProduct);
 router.delete('/:id', authenticateToken, productController.deleteProduct);
-// router.put('/:id/save', authenticateToken, productController.saveProduct);
 
 // Reviews routes
 router.get('/:id/reviews', productController.getProductReviews);

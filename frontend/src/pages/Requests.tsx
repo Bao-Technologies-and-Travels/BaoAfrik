@@ -1008,6 +1008,27 @@ const Requests: React.FC = () => {
     const isCurrentUserOwner = (req: ProductRequest | undefined) => {
       return user && req && req.userId === user.id;
     };
+
+    // Helper function to get status display text
+    const getStatusDisplay = (status: string | undefined): string => {
+      if (!status) return 'Pending';
+      const statusUpper = status.toUpperCase();
+      switch (statusUpper) {
+        case 'PENDING':
+          return 'Pending';
+        case 'ONGOING':
+          return 'Ongoing';
+        case 'FULFILLED':
+          return 'Fulfilled';
+        case 'REJECTED':
+          return 'Rejected';
+        case 'CANCELLED':
+          return 'Cancelled';
+        default:
+          return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+      }
+    };
+
     // Handle both card format (from getAllCards/getFilteredCards) and direct ProductRequest
     let req: ProductRequest | undefined;
     let cardIsPending: boolean;
@@ -1027,6 +1048,8 @@ const Requests: React.FC = () => {
     }
 
     const country = req ? getProductCountry(req.origin) : (productData ? { name: productData.country, flag: productData.flag } : { name: '', flag: '' });
+    const requestStatus = req?.status || 'PENDING';
+    const statusDisplay = getStatusDisplay(requestStatus);
 
     return (
       <div
@@ -1071,6 +1094,7 @@ const Requests: React.FC = () => {
               Request
             </span>
             {isCurrentUserOwner(req) ? (
+              // Owner's view: Manage Request button + Share icon
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -1128,7 +1152,8 @@ const Requests: React.FC = () => {
                   />
                 </button>
               </div>
-            ) : cardIsPending ? (
+            ) : (
+              // Other users' requests: Status badge + More options modal
               <div className="flex items-center gap-2">
                 <div
                   className="px-2 py-0.5 rounded-md"
@@ -1140,7 +1165,7 @@ const Requests: React.FC = () => {
                     fontFamily: 'Poppins, sans-serif'
                   }}
                 >
-                  Pending
+                  {statusDisplay}
                 </div>
                 <div style={{ position: 'relative' }} ref={moreOptionsRef}>
                   <button
@@ -1176,7 +1201,8 @@ const Requests: React.FC = () => {
                         boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                         padding: isMobile ? '6px' : '8px',
                         minWidth: isMobile ? '150px' : '200px',
-                        zIndex: 1000
+                        zIndex: 10000,
+                        isolation: 'isolate'
                       }}
                     >
                       {/* Manage request */}
@@ -1289,71 +1315,6 @@ const Requests: React.FC = () => {
                   )}
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <button
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg border"
-                  style={{
-                    backgroundColor: '#FFFFFF',
-                    borderColor: '#F9A825',
-                    color: '#F9A825',
-                    fontWeight: 'normal',
-                    fontSize: '11px',
-                    fontFamily: 'Poppins, sans-serif',
-                    height: '26px',
-                    width: 'auto',
-                    opacity: isManagingRequest ? 0.7 : 1,
-                    cursor: isManagingRequest ? 'not-allowed' : 'pointer'
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isManagingRequest && req) {
-                      handleManageRequest(req);
-                    }
-                  }}
-                  disabled={isManagingRequest}
-                >
-                  <img src={requestIcon} alt="Request" style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: isMobile ? '8px' : '10px',
-                    padding: isMobile ? '6px 10px' : '8px 12px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    backgroundColor: 'transparent',
-                    cursor: 'pointer',
-                    fontFamily: 'Poppins, sans-serif',
-                    fontSize: isMobile ? '11px' : '13px',
-                    color: '#939393'
-                  }} />
-                  Manage request
-                </button>
-                <button
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{
-                    backgroundColor: '#F4F4F4',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (req) {
-                      handleShareClick(e, req);
-                    }
-                  }}
-                >
-                  <img
-                    src={shareIcon}
-                    alt="Share"
-                    style={{
-                      width: '16px',
-                      height: '16px',
-                      filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                    }}
-                  />
-                </button>
-              </div>
             )}
           </div>
         )}
@@ -1373,39 +1334,70 @@ const Requests: React.FC = () => {
             >
               Request
             </span>
-            {/* Share button - only for non-pending cards */}
-            {!cardIsPending && (cardId.startsWith('near') || cardId.startsWith('filtered') || cardId.startsWith('search') || cardId.startsWith('all')) && (
-              <button
-                className="rounded-full flex items-center justify-center"
-                style={{
-                  backgroundColor: '#F4F4F4',
-                  border: 'none',
-                  cursor: 'pointer',
-                  width: '24px',
-                  height: '24px',
-                  flexShrink: 0,
-                  position: 'absolute',
-                  right: 0
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (req) {
-                    handleShareClick(e, req);
-                  }
-                }}
-              >
-                <img
-                  src={shareIcon}
-                  alt="Share"
-                  style={{
-                    width: '12px',
-                    height: '12px',
-                    filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+            {isCurrentUserOwner(req) ? (
+              // Owner's view: Manage Request button + Share icon
+              <div className="flex items-center gap-2" style={{ position: 'absolute', right: 0 }}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (req) {
+                      handleManageRequest(req);
+                    }
                   }}
-                />
-              </button>
-            )}
-            {cardIsPending && (
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-lg border"
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderColor: '#F9A825',
+                    color: '#F9A825',
+                    fontWeight: 'normal',
+                    fontSize: '9px',
+                    fontFamily: 'Poppins, sans-serif',
+                    height: '22px',
+                    width: 'auto'
+                  }}
+                >
+                  <img
+                    src={requestIcon}
+                    alt="Manage"
+                    style={{
+                      width: '10px',
+                      height: '10px'
+                    }}
+                  />
+                  <span>Manage</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (req) {
+                      handleShareClick(e, req);
+                    }
+                  }}
+                  className="rounded-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: '#F4F4F4',
+                    border: 'none',
+                    cursor: 'pointer',
+                    width: '24px',
+                    height: '24px',
+                    flexShrink: 0
+                  }}
+                >
+                  <img
+                    src={shareIcon}
+                    alt="Share"
+                    style={{
+                      width: '12px',
+                      height: '12px',
+                      filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                    }}
+                  />
+                </button>
+              </div>
+            ) : (
+              // Other users' requests: Status badge + More options modal
               <div className="flex items-center gap-2" style={{ position: 'absolute', right: 0, alignItems: 'center' }}>
                 <div
                   className="px-2 py-0.5 rounded-md"
@@ -1417,7 +1409,7 @@ const Requests: React.FC = () => {
                     fontFamily: 'Poppins, sans-serif'
                   }}
                 >
-                  Pending
+                  {statusDisplay}
                 </div>
                 <div style={{ position: 'relative' }} ref={moreOptionsRef}>
                   <button
@@ -1453,7 +1445,8 @@ const Requests: React.FC = () => {
                         boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                         padding: isMobile ? '6px' : '8px',
                         minWidth: isMobile ? '150px' : '200px',
-                        zIndex: 1000
+                        zIndex: 10000,
+                        isolation: 'isolate'
                       }}
                     >
                       {/* Manage request */}
@@ -1852,7 +1845,7 @@ const Requests: React.FC = () => {
         )}
 
         {/* Manage the request button - Mobile only (replaces Respond to request) */}
-        {isMobile && !cardIsPending && (
+        {isMobile && !cardIsPending && isCurrentUserOwner(req) && (
           <div className="w-full flex justify-center mt-3">
             <button
               className="flex items-center justify-center gap-1.5 mx-auto"
@@ -3713,7 +3706,13 @@ const Requests: React.FC = () => {
           {/* Modal */}
           {isMobile ? (
             // Mobile: Bottom sheet with original form
-            <div className="fixed inset-0 z-50 flex items-end justify-center p-4">
+            <div
+              className="fixed inset-0 z-50 flex items-end justify-center p-4"
+              onClick={() => {
+                setShowRequestModal(false);
+                setSelectedCard(null);
+              }}
+            >
               <div
                 className="bg-white relative w-full"
                 style={{
@@ -3892,7 +3891,7 @@ const Requests: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Message Buyer Button - Below ratings */}
+                    {/* Message Buyer / Manage Request Button - Below ratings */}
                     <button
                       className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg w-full"
                       style={{
@@ -3925,13 +3924,27 @@ const Requests: React.FC = () => {
                         </>
                       ) : (
                         <>
-                          <img
-                            src={basketIcon}
-                            alt="Cart"
-                            className="w-4 h-4"
-                            style={{ filter: 'brightness(0) invert(1)' }}
-                          />
-                          <span>Message Buyer</span>
+                          {!user || (selectedCard && selectedCard.userId !== user.id) ? (
+                            <>
+                              <img
+                                src={basketIcon}
+                                alt="Cart"
+                                className="w-4 h-4"
+                                style={{ filter: 'brightness(0) invert(1)' }}
+                              />
+                              <span>Message Buyer</span>
+                            </>
+                          ) : (
+                            <>
+                              <img
+                                src={requestIcon}
+                                alt="Manage"
+                                className="w-4 h-4"
+                                style={{ filter: 'brightness(0) invert(1)' }}
+                              />
+                              <span>Manage Request</span>
+                            </>
+                          )}
                         </>
                       )}
                     </button>
@@ -3956,7 +3969,13 @@ const Requests: React.FC = () => {
             </div>
           ) : (
             // Desktop: Centered modal
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              onClick={() => {
+                setShowRequestModal(false);
+                setSelectedCard(null);
+              }}
+            >
               <div
                 className="bg-white rounded-[30px] pt-8 sm:pt-10 px-5 sm:px-6 relative max-w-sm w-full pb-8"
                 style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
@@ -4128,10 +4147,10 @@ const Requests: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Message Buyer Button - Only show if not the current user's request */}
+                  {/* Message Buyer / Manage Request Button */}
                   {!user || (selectedCard && selectedCard.userId !== user.id) ? (
                     <button
-                      className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg w-full"
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
                       style={{
                         backgroundColor: '#F9A825',
                         color: '#FFFFFF',
@@ -4159,62 +4178,34 @@ const Requests: React.FC = () => {
                       <span>Message Buyer</span>
                     </button>
                   ) : (
-                    <div className="flex gap-2 w-full">
-                      <button
-                        onClick={() => {
-                          if (selectedCard) {
-                            handleManageRequest(selectedCard);
-                            setShowRequestModal(false);
-                            setSelectedCard(null);
-                          }
-                        }}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg"
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: isMobile ? '8px' : '10px',
-                          padding: isMobile ? '6px 10px' : '8px 12px',
-                          borderRadius: '8px',
-                          border: 'none',
-                          backgroundColor: 'transparent',
-                          cursor: 'pointer',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: isMobile ? '11px' : '13px',
-                          color: '#939393'
-                        }}
-                      >
-                        <img
-                          src={requestIcon}
-                          alt="Manage"
-                          className="w-4 h-4"
-                        />
-                        <span>Manage Request</span>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (selectedCard) {
-                            handleShareClick(e, selectedCard);
-                          }
-                        }}
-                        className="flex items-center justify-center w-10 rounded-lg"
-                        style={{
-                          backgroundColor: '#F0F8FE',
-                          border: 'none',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <img
-                          src={shareIcon}
-                          alt="Share"
-                          className="w-4 h-4"
-                          style={{
-                            filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
-                          }}
-                        />
-                      </button>
-                    </div>
+                    <button
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                      style={{
+                        backgroundColor: '#F9A825',
+                        color: '#FFFFFF',
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '12px',
+                        fontWeight: 400,
+                        border: 'none',
+                        cursor: 'pointer',
+                        height: 'auto'
+                      }}
+                      onClick={() => {
+                        if (selectedCard) {
+                          handleManageRequest(selectedCard);
+                          setShowRequestModal(false);
+                          setSelectedCard(null);
+                        }
+                      }}
+                    >
+                      <img
+                        src={requestIcon}
+                        alt="Manage"
+                        className="w-4 h-4"
+                        style={{ filter: 'brightness(0) invert(1)' }}
+                      />
+                      <span>Manage Request</span>
+                    </button>
                   )}
                 </div>
               </div>

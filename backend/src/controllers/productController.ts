@@ -6,6 +6,14 @@ import { notificationService } from '../services/notificationService';
 import { webSocketService } from '../server';
 import { Prisma } from '../generated/client';
 
+type AuthenticatedRequest = Request & {
+  user?: {
+    id: string;
+    email: string;
+    role?: string;
+  };
+};
+
 // Type for product with seller relation
 type ProductWithSeller = {
   id: string;
@@ -715,6 +723,155 @@ export class ProductController {
         });
       }
 
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Save/Bookmark a product
+  async saveProduct(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId || !id) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      await productService.saveProduct(id, userId);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Product saved successfully'
+      });
+    } catch (error: any) {
+      if (error.message === 'Product not found') {
+        return res.status(404).json({
+          success: false,
+          message: error.message
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Unsave/Unbookmark a product
+  async unsaveProduct(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId || !id) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      await productService.unsaveProduct(id, userId);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Product unsaved successfully'
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Toggle save status (save if not saved, unsave if saved)
+  async toggleSaveProduct(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId || !id) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const result = await productService.toggleSaveProduct(id, userId);
+
+      return res.status(200).json({
+        success: true,
+        message: result.saved ? 'Product saved successfully' : 'Product unsaved successfully',
+        data: result
+      });
+    } catch (error: any) {
+      if (error.message === 'Product not found') {
+        return res.status(404).json({
+          success: false,
+          message: error.message
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Get all saved product IDs for the current user
+  async getSavedProducts(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const savedProductIds = await productService.getSavedProductIds(userId);
+
+      return res.status(200).json({
+        success: true,
+        data: savedProductIds
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Check if a product is saved by the current user
+  async checkProductSaved(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId || !id) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const isSaved = await productService.isProductSaved(id, userId);
+
+      return res.status(200).json({
+        success: true,
+        data: { saved: isSaved }
+      });
+    } catch (error: any) {
       return res.status(500).json({
         success: false,
         message: error.message

@@ -34,6 +34,7 @@ import ArchivedChats from './pages/ArchivedChats';
 import ProfileSettings from './pages/ProfileSettings';
 import Requests from './pages/Requests';
 import MyRequests from './pages/MyRequests';
+import ImageSearch from './pages/ImageSearch';
 import './App.css';
 
 import { ToastProvider } from './contexts/ToastContext';
@@ -44,7 +45,7 @@ function AppContent() {
   const isUserAccountPage = location.pathname === '/account';
   const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success', '/two-factor-email', '/two-factor-phone', '/two-factor-code', '/two-factor-success'];
   const isAuthPage = authPages.includes(location.pathname);
-  const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings', '/my-listings', '/my-requests'];
+  const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings', '/my-listings', '/my-requests', '/image-search'];
   const isCustomLayoutPage = customLayoutPages.includes(location.pathname);
   const isEditListingPage = location.pathname.match(/^\/edit-listing\/[^/]+$/);
 
@@ -88,6 +89,7 @@ function AppContent() {
           <Route path="/settings" element={<ProfileSettings />} />
           <Route path="/my-listings" element={<MyListings />} />
           <Route path="/my-requests" element={<MyRequests />} />
+          <Route path="/image-search" element={<ImageSearch />} />
         </Routes>
       </div>
     );

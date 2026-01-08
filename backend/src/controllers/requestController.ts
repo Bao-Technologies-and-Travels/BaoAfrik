@@ -32,45 +32,29 @@ export const RequestController = {
         }
     },
 
-    async getRequests(req: AuthenticatedRequest, res: Response) {
+    async getRequests(req: Request, res: Response) {
         try {
             const { status, userId, page = 1, limit = 10 } = req.query;
-            
+
             // Determine target userId:
-            // 1. If userId is explicitly provided in query, use it (but require auth if different from authenticated user)
-            // 2. If authenticated user exists and no userId in query, use authenticated user's ID
-            // 3. Otherwise, no userId filter (public requests)
+            // 1. If userId is explicitly provided in query, filter by that userId
+            // 2. Otherwise, return all requests (no userId filter)
+            // Note: This endpoint is public and shows all requests by default
             let targetUserId: string | undefined = undefined;
-            
+
             if (userId) {
-                // If userId is provided in query
-                if (req.user && req.user.id !== userId) {
-                    // User is trying to access another user's requests - check if admin
-                    // For now, allow if authenticated (can add admin check later)
-                    targetUserId = userId as string;
-                } else if (req.user) {
-                    // Authenticated user requesting their own or another's (allowed)
-                    targetUserId = userId as string;
-                } else {
-                    // No auth but userId in query - require authentication
-                    return res.status(401).json({ 
-                        success: false,
-                        error: 'Authentication required to fetch user requests' 
-                    });
-                }
-            } else if (req.user) {
-                // No userId in query but user is authenticated - fetch their own requests
-                targetUserId = req.user.id;
+                // If userId is provided in query, filter by that userId
+                targetUserId = userId as string;
             }
-            // If no userId and no auth, targetUserId remains undefined (public requests)
-            
+            // If no userId in query, targetUserId remains undefined (returns all requests)
+
             const result = await requestService.getRequests({
                 status: status as string | undefined,
                 userId: targetUserId,
                 page: Number(page),
                 limit: Number(limit)
             });
-            
+
             return res.json({
                 success: true,
                 data: result.data,
@@ -78,9 +62,9 @@ export const RequestController = {
             });
         } catch (error) {
             console.error('Error fetching requests:', error);
-            return res.status(500).json({ 
+            return res.status(500).json({
                 success: false,
-                error: 'Failed to fetch requests' 
+                error: 'Failed to fetch requests'
             });
         }
     },
@@ -130,7 +114,7 @@ export const RequestController = {
             }
 
             const isOwner = await requestService.isRequestOwner(id, userId);
-            
+
             // Log for debugging
             console.log('Update request check:', {
                 requestId: id,
@@ -141,7 +125,7 @@ export const RequestController = {
             });
 
             if (!isOwner && userRole !== 'ADMIN') {
-                return res.status(403).json({ 
+                return res.status(403).json({
                     error: 'Not authorized to update this request',
                     details: 'You can only update your own requests'
                 });
